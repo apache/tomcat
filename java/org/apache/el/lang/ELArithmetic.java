@@ -32,10 +32,12 @@ public abstract class ELArithmetic {
 
     public final static class BigDecimalDelegate extends ELArithmetic {
 
+        @Override
         protected Number add(Number num0, Number num1) {
             return ((BigDecimal) num0).add((BigDecimal) num1);
         }
 
+        @Override
         protected Number coerce(Number num) {
             if (num instanceof BigDecimal)
                 return num;
@@ -44,27 +46,33 @@ public abstract class ELArithmetic {
             return new BigDecimal(num.doubleValue());
         }
 
+        @Override
         protected Number coerce(String str) {
             return new BigDecimal(str);
         }
 
+        @Override
         protected Number divide(Number num0, Number num1) {
             return ((BigDecimal) num0).divide((BigDecimal) num1,
                     BigDecimal.ROUND_HALF_UP);
         }
 
+        @Override
         protected Number subtract(Number num0, Number num1) {
             return ((BigDecimal) num0).subtract((BigDecimal) num1);
         }
 
+        @Override
         protected Number mod(Number num0, Number num1) {
             return new Double(num0.doubleValue() % num1.doubleValue());
         }
 
+        @Override
         protected Number multiply(Number num0, Number num1) {
             return ((BigDecimal) num0).multiply((BigDecimal) num1);
         }
 
+        @Override
         public boolean matches(Object obj0, Object obj1) {
             return (obj0 instanceof BigDecimal || obj1 instanceof BigDecimal);
         }
@@ -72,36 +80,44 @@ public abstract class ELArithmetic {
 
     public final static class BigIntegerDelegate extends ELArithmetic {
 
+        @Override
         protected Number add(Number num0, Number num1) {
             return ((BigInteger) num0).add((BigInteger) num1);
         }
 
+        @Override
         protected Number coerce(Number num) {
             if (num instanceof BigInteger)
                 return num;
             return new BigInteger(num.toString());
         }
 
+        @Override
         protected Number coerce(String str) {
             return new BigInteger(str);
         }
 
+        @Override
         protected Number divide(Number num0, Number num1) {
             return (new BigDecimal((BigInteger) num0)).divide(new BigDecimal((BigInteger) num1), BigDecimal.ROUND_HALF_UP);
         }
 
+        @Override
         protected Number multiply(Number num0, Number num1) {
             return ((BigInteger) num0).multiply((BigInteger) num1);
         }
 
+        @Override
         protected Number mod(Number num0, Number num1) {
             return ((BigInteger) num0).mod((BigInteger) num1);
         }
 
+        @Override
         protected Number subtract(Number num0, Number num1) {
             return ((BigInteger) num0).subtract((BigInteger) num1);
         }
 
+        @Override
         public boolean matches(Object obj0, Object obj1) {
             return (obj0 instanceof BigInteger || obj1 instanceof BigInteger);
         }
@@ -109,6 +125,7 @@ public abstract class ELArithmetic {
 
     public final static class DoubleDelegate extends ELArithmetic {
 
+        @Override
         protected Number add(Number num0, Number num1) {
             // could only be one of these
             if (num0 instanceof BigDecimal) {
@@ -119,6 +136,7 @@ public abstract class ELArithmetic {
             return new Double(num0.doubleValue() + num1.doubleValue());
         }
 
+        @Override
         protected Number coerce(Number num) {
             if (num instanceof Double)
                 return num;
@@ -127,18 +145,22 @@ public abstract class ELArithmetic {
             return new Double(num.doubleValue());
         }
 
+        @Override
         protected Number coerce(String str) {
             return new Double(str);
         }
 
+        @Override
         protected Number divide(Number num0, Number num1) {
             return new Double(num0.doubleValue() / num1.doubleValue());
         }
 
+        @Override
         protected Number mod(Number num0, Number num1) {
             return new Double(num0.doubleValue() % num1.doubleValue());
         }
 
+        @Override
         protected Number subtract(Number num0, Number num1) {
             // could only be one of these
             if (num0 instanceof BigDecimal) {
@@ -149,6 +171,7 @@ public abstract class ELArithmetic {
             return new Double(num0.doubleValue() - num1.doubleValue());
         }
 
+        @Override
         protected Number multiply(Number num0, Number num1) {
             // could only be one of these
             if (num0 instanceof BigDecimal) {
@@ -159,6 +182,7 @@ public abstract class ELArithmetic {
             return new Double(num0.doubleValue() * num1.doubleValue());
         }
 
+        @Override
         public boolean matches(Object obj0, Object obj1) {
             return (obj0 instanceof Double
                     || obj1 instanceof Double
@@ -172,36 +196,44 @@ public abstract class ELArithmetic {
 
     public final static class LongDelegate extends ELArithmetic {
 
+        @Override
         protected Number add(Number num0, Number num1) {
             return new Long(num0.longValue() + num1.longValue());
         }
 
+        @Override
         protected Number coerce(Number num) {
             if (num instanceof Long)
                 return num;
             return new Long(num.longValue());
         }
 
+        @Override
         protected Number coerce(String str) {
             return new Long(str);
         }
 
+        @Override
         protected Number divide(Number num0, Number num1) {
             return new Long(num0.longValue() / num1.longValue());
         }
 
+        @Override
         protected Number mod(Number num0, Number num1) {
             return new Long(num0.longValue() % num1.longValue());
         }
 
+        @Override
         protected Number subtract(Number num0, Number num1) {
             return new Long(num0.longValue() - num1.longValue());
         }
 
+        @Override
         protected Number multiply(Number num0, Number num1) {
             return new Long(num0.longValue() * num1.longValue());
         }
 
+        @Override
         public boolean matches(Object obj0, Object obj1) {
             return (obj0 instanceof Long || obj1 instanceof Long);
         }

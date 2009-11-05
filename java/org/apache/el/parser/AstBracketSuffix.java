@@ -32,6 +32,7 @@ public final class AstBracketSuffix extends SimpleNode {
         super(id);
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         return this.children[0].getValue(ctx);
