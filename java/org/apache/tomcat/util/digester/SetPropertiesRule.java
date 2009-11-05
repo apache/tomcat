@@ -49,6 +49,7 @@ public class SetPropertiesRule extends Rule {
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
      * Use {@link #SetPropertiesRule()} instead.
      */
+    @Deprecated
     public SetPropertiesRule(Digester digester) {
 
         this();

@@ -357,6 +357,7 @@ public interface ServletContext {
      *
      */
 
+    @Deprecated
     public Servlet getServlet(String name) throws ServletException;
     
   
@@ -377,6 +378,7 @@ public interface ServletContext {
      *
      */
     
+    @Deprecated
     public Enumeration<Servlet> getServlets();
     
     
@@ -396,6 +398,7 @@ public interface ServletContext {
      *
      */
  
+    @Deprecated
     public Enumeration<String> getServletNames();
     
   
@@ -431,6 +434,7 @@ public interface ServletContext {
      *
      */
 
+    @Deprecated
     public void log(Exception exception, String msg);
     
     

@@ -186,6 +186,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use setAddress
      * @param addr String
      */
+    @Deprecated
     public void setMcastAddr(String addr) {
         setAddress(addr);
     }
@@ -198,6 +199,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getAddress
      * @return String
      */
+    @Deprecated
     public String getMcastAddr() {
         return getAddress();
     }
@@ -213,6 +215,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getBind
      * @return String
      */
+    @Deprecated
     public String getMcastBindAddress() {
         return getBind();
     }
@@ -225,6 +228,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use setPort
      * @param port int
      */
+    @Deprecated
     public void setMcastPort(int port) {
         setPort(port);
     }
@@ -253,6 +257,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getPort()
      * @return int
      */
+    @Deprecated
     public int getMcastPort() {
         return getPort();
     }
@@ -265,6 +270,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use setFrequency
      * @param time long
      */
+    @Deprecated
     public void setMcastFrequency(long time) {
         setFrequency(time);
     }
@@ -277,6 +283,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getFrequency
      * @return long
      */
+    @Deprecated
     public long getMcastFrequency() {
         return getFrequency();
     }
@@ -297,6 +304,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getDropTime
      * @return long
      */
+    @Deprecated
     public long getMcastDropTime() {
         return getDropTime();
     }
@@ -527,6 +535,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getSoTimeout
      * @return int
      */
+    @Deprecated
     public int getMcastSoTimeout() {
         return getSoTimeout();
     }
@@ -539,6 +548,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use setSoTimeout
      * @param mcastSoTimeout int
      */
+    @Deprecated
     public void setMcastSoTimeout(int mcastSoTimeout) {
         setSoTimeout(mcastSoTimeout);
     }
@@ -552,6 +562,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use getTtl
      * @return int
      */
+    @Deprecated
     public int getMcastTTL() {
         return getTtl();
     }
@@ -572,6 +583,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @deprecated use setTtl
      * @param mcastTTL int
      */
+    @Deprecated
     public void setMcastTTL(int mcastTTL) {
         setTtl(mcastTTL);
     }

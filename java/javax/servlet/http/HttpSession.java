@@ -199,6 +199,7 @@ public interface HttpSession {
     *
     */
 
+    @Deprecated
     public HttpSessionContext getSessionContext();
     
     
@@ -237,6 +238,7 @@ public interface HttpSession {
      *
      */
   
+    @Deprecated
     public Object getValue(String name);
     
     
@@ -277,6 +279,7 @@ public interface HttpSession {
      *
      */
     
+    @Deprecated
     public String[] getValueNames();
     
     
@@ -333,6 +336,7 @@ public interface HttpSession {
      *
      */
  
+    @Deprecated
     public void putValue(String name, Object value);
 
 
@@ -379,6 +383,7 @@ public interface HttpSession {
      *					invalidated session
      */
 
+    @Deprecated
     public void removeValue(String name);
 
 

@@ -783,6 +783,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      *  instantiated for any reason
      * @deprecated
      */
+    @Deprecated
     public Session createSession() {
         return createSession(null);
     }

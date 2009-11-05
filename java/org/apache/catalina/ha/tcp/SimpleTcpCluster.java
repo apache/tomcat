@@ -281,6 +281,7 @@ public class SimpleTcpCluster
      * @deprecated use getManagerTemplate().getClass().getName() instead.
      * @return String
      */
+    @Deprecated
     public String getManagerClassName() {
         return managerTemplate.getClass().getName();
     }
@@ -289,6 +290,7 @@ public class SimpleTcpCluster
      * @deprecated use nested &lt;Manager&gt; element inside the cluster config instead.
      * @param managerClassName String
      */
+    @Deprecated
     public void setManagerClassName(String managerClassName) {
         log.warn("setManagerClassName is deprecated, use nested <Manager> element inside the <Cluster> element instead, this request will be ignored.");
     }
