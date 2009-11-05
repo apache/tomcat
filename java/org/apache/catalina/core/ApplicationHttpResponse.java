@@ -337,6 +337,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param msg The new message
      * @deprecated
      */
+    @Deprecated
     public void setStatus(int sc, String msg) {
 
         if (!included)

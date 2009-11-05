@@ -522,6 +522,7 @@ public class ResourceAttributes implements Attributes {
      * @param lastModified New last modified date value
      * @deprecated
      */
+    @Deprecated
     public void setLastModified(Date lastModified) {
         setLastModifiedDate(lastModified);
     }

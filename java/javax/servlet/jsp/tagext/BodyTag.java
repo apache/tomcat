@@ -123,6 +123,7 @@ public interface BodyTag extends IterationTag {
      * or IterationTag.EVAL_BODY_AGAIN.
      */
  
+    @Deprecated
     public final static int EVAL_BODY_TAG = 2;
 
     /**

@@ -45,6 +45,7 @@ package javax.servlet;
  *	replacement.
  */
 
+@Deprecated
 public interface SingleThreadModel {
     // No methods
 }

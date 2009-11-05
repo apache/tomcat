@@ -104,6 +104,7 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public HttpSessionContext getSessionContext() {
         return session.getSessionContext();
     }
@@ -117,6 +118,7 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public Object getValue(String name) {
         return session.getAttribute(name);
     }
@@ -130,6 +132,7 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public String[] getValueNames() {
         return session.getValueNames();
     }
@@ -143,6 +146,7 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public void putValue(String name, Object value) {
         session.setAttribute(name, value);
     }
@@ -156,6 +160,7 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public void removeValue(String name) {
         session.removeAttribute(name);
     }

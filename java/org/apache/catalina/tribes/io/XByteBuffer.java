@@ -428,6 +428,7 @@ public class XByteBuffer
      * @return - four bytes in an array
      * @deprecated use toBytes(boolean,byte[],int)
      */
+    @Deprecated
     public static byte[] toBytes(boolean bool) {
         byte[] b = new byte[1] ;
         return toBytes(bool,b,0);
@@ -455,6 +456,7 @@ public class XByteBuffer
      * @return - four bytes in an array
      * @deprecated use toBytes(int,byte[],int)
      */
+    @Deprecated
     public static byte[] toBytes(int n) {
         return toBytes(n,new byte[4],0);
     }
@@ -476,6 +478,7 @@ public class XByteBuffer
      * @return - eight bytes in an array
      * @deprecated use toBytes(long,byte[],int)
      */
+    @Deprecated
     public static byte[] toBytes(long n) {
         return toBytes(n,new byte[8],0);
     }
