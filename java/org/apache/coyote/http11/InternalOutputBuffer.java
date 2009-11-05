@@ -135,6 +135,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
      * 
      * @throws IOException an underlying I/O error occurred
      */
+    @Override
     public void flush()
         throws IOException {
 
@@ -155,6 +156,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
      * Recycle the output buffer. This should be called when closing the 
      * connection.
      */
+    @Override
     public void recycle() {
         super.recycle();
         socketBuffer.recycle();
@@ -168,6 +170,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
+    @Override
     public void nextRequest() {
         super.nextRequest();
         socketBuffer.recycle();
@@ -179,6 +182,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
      * 
      * @throws IOException an underlying I/O error occurred
      */
+    @Override
     public void endRequest()
         throws IOException {
         super.endRequest();
@@ -194,6 +198,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
     /**
      * Send an acknoledgement.
      */
+    @Override
     public void sendAck()
         throws IOException {
 
@@ -212,6 +217,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
      * 
      * @throws IOException an undelying I/O error occured
      */
+    @Override
     protected void commit()
         throws IOException {
 

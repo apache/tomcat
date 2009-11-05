@@ -72,6 +72,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
      * read operations, or if the given buffer is not big enough to accomodate
      * the whole line.
      */
+    @Override
     public boolean parseRequestLine(boolean useAvailableDataOnly)
     
         throws IOException {
@@ -249,6 +250,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
     /**
      * Parse the HTTP headers.
      */
+    @Override
     public boolean parseHeaders()
         throws IOException {
 
@@ -433,6 +435,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
         return fill(true);
     }
 
+    @Override
     protected boolean fill(boolean block) throws IOException {
 
         int nRead = 0;
