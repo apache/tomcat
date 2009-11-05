@@ -706,6 +706,7 @@ public abstract class HttpServlet extends GenericServlet {
      * 
      * @see javax.servlet.Servlet#service
      */
+    @Override
     public void service(ServletRequest req, ServletResponse res)
         throws ServletException, IOException {
 
@@ -750,15 +751,18 @@ class NoBodyResponse extends HttpServletResponseWrapper {
 
     // SERVLET RESPONSE interface methods
 
+    @Override
     public void setContentLength(int len) {
         super.setContentLength(len);
         didSetContentLength = true;
     }
 
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return noBody;
     }
 
+    @Override
     public PrintWriter getWriter() throws UnsupportedEncodingException {
 
         if (writer == null) {
@@ -796,10 +800,12 @@ class NoBodyOutputStream extends ServletOutputStream {
         return contentLength;
     }
 
+    @Override
     public void write(int b) {
         contentLength++;
     }
 
+    @Override
     public void write(byte buf[], int offset, int len)
         throws IOException
     {
