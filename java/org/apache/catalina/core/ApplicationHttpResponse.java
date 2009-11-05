@@ -354,6 +354,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @deprecated
      */
     @Deprecated
+    @Override
     public void setStatus(int sc, String msg) {
 
         if (!included)
