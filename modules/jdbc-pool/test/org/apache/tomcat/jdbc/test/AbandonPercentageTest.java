@@ -18,8 +18,6 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
 
 public class AbandonPercentageTest extends DefaultTestCase {
