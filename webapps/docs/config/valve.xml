@@ -624,6 +624,92 @@
 </section>
 
 
+<section name="Remote IP Valve">
+
+  <subsection name="Introduction">
+  
+    <p>Tomcat port of
+    <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
+    this valve replaces the apparent client remote IP address and hostname for
+    the request with the IP address list presented by a proxy or a load balancer
+    via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
+
+    <p>Another feature of this valve is to replace the apparent scheme
+    (http/https) and server port with the scheme presented by a proxy or a load
+    balancer via a request header (e.g. &quot;X-Forwarded-Proto&quot;).</p>
+ 
+    <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
+    <code>Context</code> level as required. Normally, this Valve would be used
+    at the <code>Engine</code> level.</p>
+    
+    <p>If used in conjunction with Remote Address/Host valves then this valve
+    should be defined first to ensure that the correct client IP address is
+    presented to the Remote Address/Host valves.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Remote IP Valve</strong> supports the
+    following configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.RemoteIpValve</strong>.</p>
+      </attribute>
+
+      <attribute name="remoteIPHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the list of
+        traversed IP addresses starting from the requesting client. If not
+        specified, the default of <code>x-forwarded-for</code> is used.</p>
+      </attribute>
+
+      <attribute name="internalProxies" required="false">
+        <p>List of internal proxies' IP addresses as comma separated regular
+        expressions. If they appear in the <strong>remoteIpHeader</strong>
+        value, they will be trusted and will not appear in the
+        <strong>proxiesHeader</strong> value. If not specified the default value
+        of <code>10\.\d{1,3}\.\d{1,3}\.\d{1,3}, 192\.168\.\d{1,3}\.\d{1,3},
+        169\.254\.\d{1,3}\.\d{1,3}, 127\.\d{1,3}\.\d{1,3}\.\d{1,3}</code> will
+        be used.</p>
+      </attribute>
+
+      <attribute name="proxiesHeader" required="false">
+        <p>Name of the HTTP header created by this valve to hold the list of
+        proxies that have been processed in the incoming
+        <strong>remoteIpHeader</strong>. If not specified, the default of
+        <code>x-forwarded-by</code> is used.</p>
+      </attribute>
+
+      <attribute name="trustedProxies" required="false">
+        <p>List of trusted proxies' IP addresses as comma separated regular
+        expressions. If they appear in the <strong>remoteIpHeader</strong>
+        value, they will be trusted and will appear in the
+        <strong>proxiesHeader</strong> value. If not specified, no proxies will
+        be trusted.</p>
+      </attribute>
+
+      <attribute name="protocolHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the protocol
+        used by the client to connect to the proxy. If not specified, the
+        default of <code>null</code> is used.</p>
+      </attribute>
+
+      <attribute name="protocolHeaderHttpsValue" required="false">
+        <p>Value of the <strong>protocolHeader</strong> to indicate that it is
+        an HTTPS request. If not specified, the default of <code>https</code> is
+        used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 </body>
 
 
