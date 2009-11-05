@@ -96,7 +96,7 @@ public class WebRuleSet extends RuleSetBase {
 
     /**
      * Construct an instance of this <code>RuleSet</code> with the default
-     * matching pattern prefix and default fargment setting.
+     * matching pattern prefix and default fragment setting.
      */
     public WebRuleSet() {
 
@@ -611,7 +611,7 @@ public class WebRuleSet extends RuleSetBase {
 
 
 /**
- * Rule to check that the <code>login-config</code> is occuring 
+ * Rule to check that the <code>login-config</code> is occurring 
  * only 1 time within the web.xml
  */
 final class SetLoginConfig extends Rule {
@@ -632,7 +632,7 @@ final class SetLoginConfig extends Rule {
 
 
 /**
- * Rule to check that the <code>jsp-config</code> is occuring 
+ * Rule to check that the <code>jsp-config</code> is occurring 
  * only 1 time within the web.xml
  */
 final class SetJspConfig extends Rule {
@@ -653,7 +653,7 @@ final class SetJspConfig extends Rule {
 
 
 /**
- * Rule to check that the <code>session-config</code> is occuring 
+ * Rule to check that the <code>session-config</code> is occurring 
  * only 1 time within the web.xml
  */
 final class SetSessionConfig extends Rule {
