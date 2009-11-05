@@ -134,6 +134,7 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected ConcurrentLinkedQueue<SocketProcessor> processorCache = new ConcurrentLinkedQueue<SocketProcessor>() {
         protected AtomicInteger size = new AtomicInteger(0);
+        @Override
         public boolean offer(SocketProcessor sc) {
             sc.reset(null,null);
             boolean offer = socketProperties.getProcessorCache()==-1?true:size.get()<socketProperties.getProcessorCache();
@@ -148,6 +149,7 @@ public class NioEndpoint extends AbstractEndpoint {
             else return false;
         }
         
+        @Override
         public SocketProcessor poll() {
             SocketProcessor result = super.poll();
             if ( result != null ) {
@@ -156,6 +158,7 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
         
+        @Override
         public void clear() {
             super.clear();
             size.set(0);
@@ -168,6 +171,7 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected ConcurrentLinkedQueue<KeyAttachment> keyCache = new ConcurrentLinkedQueue<KeyAttachment>() {
         protected AtomicInteger size = new AtomicInteger(0);
+        @Override
         public boolean offer(KeyAttachment ka) {
             ka.reset();
             boolean offer = socketProperties.getKeyCache()==-1?true:size.get()<socketProperties.getKeyCache();
@@ -182,6 +186,7 @@ public class NioEndpoint extends AbstractEndpoint {
             else return false;
         }
 
+        @Override
         public KeyAttachment poll() {
             KeyAttachment result = super.poll();
             if ( result != null ) {
@@ -190,6 +195,7 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
 
+        @Override
         public void clear() {
             super.clear();
             size.set(0);
@@ -202,6 +208,7 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected ConcurrentLinkedQueue<PollerEvent> eventCache = new ConcurrentLinkedQueue<PollerEvent>() {
         protected AtomicInteger size = new AtomicInteger(0);
+        @Override
         public boolean offer(PollerEvent pe) {
             pe.reset();
             boolean offer = socketProperties.getEventCache()==-1?true:size.get()<socketProperties.getEventCache();
@@ -216,6 +223,7 @@ public class NioEndpoint extends AbstractEndpoint {
             else return false;
         }
 
+        @Override
         public PollerEvent poll() {
             PollerEvent result = super.poll();
             if ( result != null ) {
@@ -224,6 +232,7 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
 
+        @Override
         public void clear() {
             super.clear();
             size.set(0);
@@ -237,6 +246,7 @@ public class NioEndpoint extends AbstractEndpoint {
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
         protected AtomicInteger size = new AtomicInteger(0);
         protected AtomicInteger bytes = new AtomicInteger(0);
+        @Override
         public boolean offer(NioChannel socket) {
             boolean offer = socketProperties.getBufferPool()==-1?true:size.get()<socketProperties.getBufferPool();
             offer = offer && (socketProperties.getBufferPoolSize()==-1?true:(bytes.get()+socket.getBufferSize())<socketProperties.getBufferPoolSize());
@@ -252,6 +262,7 @@ public class NioEndpoint extends AbstractEndpoint {
             else return false;
         }
         
+        @Override
         public NioChannel poll() {
             NioChannel result = super.poll();
             if ( result != null ) {
@@ -261,6 +272,7 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
         
+        @Override
         public void clear() {
             super.clear();
             size.set(0);
@@ -462,7 +474,9 @@ public class NioEndpoint extends AbstractEndpoint {
      * SSL engine.
      */
     protected boolean SSLEnabled = false;
+    @Override
     public boolean isSSLEnabled() { return SSLEnabled;}
+    @Override
     public void setSSLEnabled(boolean SSLEnabled) {this.SSLEnabled = SSLEnabled;}
 
     protected boolean secure = false;
@@ -547,6 +561,7 @@ public class NioEndpoint extends AbstractEndpoint {
      *
      * @return true if the endpoint is running, false otherwise
      */
+    @Override
     public boolean isRunning() {
         return running;
     }
@@ -557,6 +572,7 @@ public class NioEndpoint extends AbstractEndpoint {
      *
      * @return true if the endpoint is paused, false otherwise
      */
+    @Override
     public boolean isPaused() {
         return paused;
     }
@@ -1013,6 +1029,7 @@ public class NioEndpoint extends AbstractEndpoint {
             }//end if
         }//run
         
+        @Override
         public String toString() {
             return super.toString()+"[intOps="+this.interestOps+"]";
         }

@@ -64,6 +64,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     /**
      * Generic properties - currently only socket.XXX properties
      */
+    @Override
     public boolean setProperty(String name, String value) {
         final String socketName = "socket.";
         try {
@@ -89,7 +90,9 @@ public class JIoEndpoint extends AbstractEndpoint {
      * Priority of the acceptor and poller threads.
      */
     protected int threadPriority = Thread.NORM_PRIORITY;
+    @Override
     public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
+    @Override
     public int getThreadPriority() { return threadPriority; }
 
     

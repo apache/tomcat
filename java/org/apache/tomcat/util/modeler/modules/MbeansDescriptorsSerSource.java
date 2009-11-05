@@ -59,6 +59,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
         this.source=source;
     }
 
+    @Override
     public List<ObjectName> loadDescriptors( Registry registry, String location,
             String type, Object source) throws Exception {
         setRegistry(registry);

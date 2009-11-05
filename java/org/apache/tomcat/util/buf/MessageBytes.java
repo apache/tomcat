@@ -185,6 +185,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /** Compute the string value
      */
+    @Override
     public String toString() {
         if( hasStrValue ) return strValue;
         
@@ -400,6 +401,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     
 
     // -------------------- Hash code  --------------------
+    @Override
     public  int hashCode() {
         if( hasHashCode ) return hashCode;
         int code = 0;
