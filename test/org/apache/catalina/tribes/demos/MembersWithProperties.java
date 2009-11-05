@@ -106,6 +106,7 @@ public class MembersWithProperties implements MembershipListener{
             this.channel = channel;
         }
 
+        @Override
         public void run() {
             System.out.println("Shutting down...");
             try {

@@ -41,6 +41,7 @@ public class Benchmarks extends TestCase {
 
     private static class GetDateBenchmarkTest_Sync implements Runnable {
 
+        @Override
         public String toString() {
             return "Syncs";
         }
@@ -68,11 +69,13 @@ public class Benchmarks extends TestCase {
 
     private static class GetDateBenchmarkTest_Local implements Runnable {
 
+        @Override
         public String toString() {
             return "ThreadLocals";
         }
 
         private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
+            @Override
             protected Long initialValue() {
                 return Long.valueOf(0);
             }
@@ -97,6 +100,7 @@ public class Benchmarks extends TestCase {
     private static class GetDateBenchmarkTest_LocalMutableLong implements
             Runnable {
 
+        @Override
         public String toString() {
             return "ThreadLocals with a mutable Long";
         }
@@ -106,6 +110,7 @@ public class Benchmarks extends TestCase {
         }
 
         private ThreadLocal<MutableLong> currentMillisLocal = new ThreadLocal<MutableLong>() {
+            @Override
             protected MutableLong initialValue() {
                 return new MutableLong();
             }
@@ -129,6 +134,7 @@ public class Benchmarks extends TestCase {
 
     private static class GetDateBenchmarkTest_LocalStruct implements Runnable {
 
+        @Override
         public String toString() {
             return "single ThreadLocal";
         }
@@ -140,6 +146,7 @@ public class Benchmarks extends TestCase {
         }
 
         private ThreadLocal<Struct> currentStruct = new ThreadLocal<Struct>() {
+            @Override
             protected Struct initialValue() {
                 return new Struct();
             }
@@ -189,6 +196,7 @@ public class Benchmarks extends TestCase {
     private static class TimeDateElementBenchmarkTest_Sync extends
             TimeDateElementBenchmarkTestBase implements Runnable {
 
+        @Override
         public String toString() {
             return "Syncs";
         }
@@ -246,6 +254,7 @@ public class Benchmarks extends TestCase {
     private static class TimeDateElementBenchmarkTest_Local extends
             TimeDateElementBenchmarkTestBase implements Runnable {
 
+        @Override
         public String toString() {
             return "ThreadLocals";
         }
@@ -253,26 +262,31 @@ public class Benchmarks extends TestCase {
         private ThreadLocal<String> currentDateStringLocal = new ThreadLocal<String>();
 
         private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>() {
+            @Override
             protected Date initialValue() {
                 return new Date();
             }
         };
         private ThreadLocal<SimpleDateFormat> dayFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+            @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("dd");
             }
         };
         private ThreadLocal<SimpleDateFormat> monthFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+            @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("MM");
             }
         };
         private ThreadLocal<SimpleDateFormat> yearFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+            @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("yyyy");
             }
         };
         private ThreadLocal<SimpleDateFormat> timeFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+            @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("hh:mm:ss");
             }
@@ -317,6 +331,7 @@ public class Benchmarks extends TestCase {
     private static class TimeDateElementBenchmarkTest_LocalStruct extends
             TimeDateElementBenchmarkTestBase implements Runnable {
 
+        @Override
         public String toString() {
             return "single ThreadLocal";
         }
@@ -332,6 +347,7 @@ public class Benchmarks extends TestCase {
         }
 
         private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+            @Override
             protected Struct initialValue() {
                 return new Struct();
             }
@@ -375,6 +391,7 @@ public class Benchmarks extends TestCase {
     private static class TimeDateElementBenchmarkTest_LocalStruct_SBuilder extends
             TimeDateElementBenchmarkTestBase implements Runnable {
 
+        @Override
         public String toString() {
             return "single ThreadLocal, with StringBuilder";
         }
@@ -390,6 +407,7 @@ public class Benchmarks extends TestCase {
         }
 
         private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+            @Override
             protected Struct initialValue() {
                 return new Struct();
             }

@@ -44,6 +44,7 @@ public class SocketValidateReceive {
         InputStream in = socket.getInputStream();
         MyDataReader reader = new MyDataReader(50000);
         Thread t = new Thread() {
+            @Override
             public void run() {
                 while ( true ) {
                     try {

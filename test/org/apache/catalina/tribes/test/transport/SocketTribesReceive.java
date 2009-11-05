@@ -45,6 +45,7 @@ public class SocketTribesReceive {
         socket.setReceiveBufferSize(size);
         InputStream in = socket.getInputStream();
         Thread t = new Thread() {
+            @Override
             public void run() {
                 while ( true ) {
                     try {

@@ -27,11 +27,13 @@ import junit.framework.TestCase;
 
 public class TestAsyncQueue extends TestCase {
     protected FairBlockingQueue<Object> queue = null;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         this.queue = new FairBlockingQueue<Object>();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         this.queue = null;
         super.tearDown();
@@ -72,6 +74,7 @@ public class TestAsyncQueue extends TestCase {
             this.setDaemon(false);
             this.setName(TestAsyncQueue.class.getName()+"-OfferThread");
         }
+        @Override
         public void run() {
             try {
                 sleep(delay);

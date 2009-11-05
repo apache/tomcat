@@ -136,6 +136,7 @@ public class CoordinationDemo {
             for (int i = 0; i < status.length; i++) {
                 final int j = i;
                 t[j] = new Thread() {
+                    @Override
                     public void run() {
                         status[j].stop();
                     }
@@ -161,6 +162,7 @@ public class CoordinationDemo {
             for (int i = 0; i < status.length; i++) {
                 final int j = i;
                 t[j] = new Thread() {
+                    @Override
                     public void run() {
                         status[j].start();
                     }
@@ -349,6 +351,7 @@ public class CoordinationDemo {
             channel = new GroupChannel();
             ((ReceiverBase)channel.getChannelReceiver()).setAutoBind(100);
             interceptor = new NonBlockingCoordinator() {
+                @Override
                 public void fireInterceptorEvent(InterceptorEvent event) {
                     status = event.getEventTypeDesc();
                     int type = event.getEventType();

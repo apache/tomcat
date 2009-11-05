@@ -51,6 +51,7 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
             this.cookieValue = cookieValue;
         }
         
+        @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
                 throws IOException {
             try {

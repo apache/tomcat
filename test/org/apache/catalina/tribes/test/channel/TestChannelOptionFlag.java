@@ -34,11 +34,13 @@ import org.apache.catalina.tribes.ChannelException;
  */
 public class TestChannelOptionFlag extends TestCase {
     GroupChannel channel = null;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         channel = new GroupChannel();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         if ( channel != null ) try {channel.stop(Channel.DEFAULT);}catch ( Exception ignore) { /* Ignore */ }

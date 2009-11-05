@@ -34,6 +34,7 @@ public class TestSenderConnections extends TestCase {
     private ManagedChannel[] channels = new ManagedChannel[count];
     private TestMsgListener[] listeners = new TestMsgListener[count];
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         for (int i = 0; i < channels.length; i++) {
@@ -86,6 +87,7 @@ public class TestSenderConnections extends TestCase {
         sendMessages(2000,15000);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         for (int i = 0; i < channels.length; i++) {
             channels[i].stop(Channel.DEFAULT);
