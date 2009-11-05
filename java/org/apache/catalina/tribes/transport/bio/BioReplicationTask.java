@@ -155,6 +155,7 @@ public class BioReplicationTask extends AbstractRxTask {
         }
     }
     
+    @Override
     public void close() {
         setDoRun(false);
         try {socket.close();}catch ( Exception ignore){}

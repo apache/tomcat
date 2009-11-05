@@ -292,6 +292,7 @@ public class ManagerServlet
     /**
      * Finalize this servlet.
      */
+    @Override
     public void destroy() {
 
         // No actions necessary
@@ -308,6 +309,7 @@ public class ManagerServlet
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException {
@@ -389,6 +391,7 @@ public class ManagerServlet
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @Override
     public void doPut(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException {
@@ -429,6 +432,7 @@ public class ManagerServlet
     /**
      * Initialize this servlet.
      */
+    @Override
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set

@@ -160,6 +160,7 @@ public class StandardManager
      *
      * @param container The associated Container
      */
+    @Override
     public void setContainer(Container container) {
 
         // De-register from the old Container (if any)
@@ -184,6 +185,7 @@ public class StandardManager
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -236,6 +238,7 @@ public class StandardManager
     /**
      * Return the descriptive short name of this Manager implementation.
      */
+    @Override
     public String getName() {
 
         return (name);
@@ -280,6 +283,7 @@ public class StandardManager
      * @exception IllegalStateException if a new session cannot be
      *  instantiated for any reason
      */
+    @Override
     public Session createSession(String sessionId) {
 
         if ((maxActiveSessions >= 0) &&

@@ -85,11 +85,13 @@ public class LockOutRealm extends CombinedRealm {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
         // Configure the list of failed users to delete the oldest entry once it
         // exceeds the specified size
         failedUsers = new LinkedHashMap<String, LockRecord>(cacheSize, 0.75f,
                 true) {
+            @Override
             protected boolean removeEldestEntry(
                     Map.Entry<String, LockRecord> eldest) {
                 if (size() > cacheSize) {
@@ -119,6 +121,7 @@ public class LockOutRealm extends CombinedRealm {
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, byte[] credentials) {
         if (isLocked(username)) {
             // Trying to authenticate a locked user is an automatic failure
@@ -152,6 +155,7 @@ public class LockOutRealm extends CombinedRealm {
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
      */
+    @Override
     public Principal authenticate(String username, String clientDigest,
             String once, String nc, String cnonce, String qop,
             String realmName, String md5a2) {
@@ -184,6 +188,7 @@ public class LockOutRealm extends CombinedRealm {
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, String credentials) {
         if (isLocked(username)) {
             // Trying to authenticate a locked user is an automatic failure
@@ -211,6 +216,7 @@ public class LockOutRealm extends CombinedRealm {
      * @param certs Array of client certificates, with the first one in
      *  the array being the certificate of the client itself.
      */
+    @Override
     public Principal authenticate(X509Certificate[] certs) {
         String username = null;
         if (certs != null && certs.length >0) {

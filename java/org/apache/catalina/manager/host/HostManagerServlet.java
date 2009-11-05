@@ -191,6 +191,7 @@ public class HostManagerServlet
     /**
      * Finalize this servlet.
      */
+    @Override
     public void destroy() {
 
         // No actions necessary
@@ -207,6 +208,7 @@ public class HostManagerServlet
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException {
@@ -307,6 +309,7 @@ public class HostManagerServlet
     /**
      * Initialize this servlet.
      */
+    @Override
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set

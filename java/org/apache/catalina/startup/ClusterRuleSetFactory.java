@@ -140,6 +140,7 @@ public class ClusterRuleSetFactory {
          * @param digester Digester instance to which the new Rule instances
          *  should be added.
          */
+        @Override
         public void addRuleInstances(Digester digester) {
             //Cluster configuration start
             digester.addObjectCreate(prefix + "Membership",

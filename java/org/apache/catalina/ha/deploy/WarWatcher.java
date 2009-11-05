@@ -219,10 +219,12 @@ public class WarWatcher {
             return war;
         }
 
+        @Override
         public int hashCode() {
             return war.getAbsolutePath().hashCode();
         }
 
+        @Override
         public boolean equals(Object other) {
             if (other instanceof WarInfo) {
                 WarInfo wo = (WarInfo) other;

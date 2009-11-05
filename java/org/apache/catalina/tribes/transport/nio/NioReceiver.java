@@ -81,6 +81,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 //        return interestOpsMutex;
 //    }
 
+    @Override
     public void stop() {
         this.stopListening();
         super.stop();
@@ -91,6 +92,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      * @throws Exception
      * @see org.apache.catalina.tribes.ClusterReceiver#start()
      */
+    @Override
     public void start() throws IOException {
         super.start();
         try {

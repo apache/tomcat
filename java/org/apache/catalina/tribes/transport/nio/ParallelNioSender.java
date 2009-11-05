@@ -235,6 +235,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         else return result;
     }
 
+    @Override
     public void connect() {
         //do nothing, we connect on demand
         setConnected(true);
@@ -269,17 +270,20 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     }
 
 
+    @Override
     public synchronized void disconnect() {
         setConnected(false);
         try {close(); }catch (Exception x){}
 
     }
 
+    @Override
     public void finalize() {
         try {disconnect(); }catch ( Exception ignore){}
         try {selector.close();} catch (Exception ignore) {}
     }
 
+    @Override
     public boolean keepalive() {
         boolean result = false;
         for ( Iterator<Entry<Member, NioSender>> i = nioSenders.entrySet().iterator(); i.hasNext();  ) {

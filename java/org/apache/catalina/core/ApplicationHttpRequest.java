@@ -206,6 +206,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the attribute to retrieve
      */
+    @Override
     public Object getAttribute(String name) {
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
@@ -240,6 +241,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getAttributeNames()</code> method of the wrapped
      * request.
      */
+    @Override
     public Enumeration<String> getAttributeNames() {
         return (new AttributeNamesEnumerator());
     }
@@ -251,6 +253,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the attribute to remove
      */
+    @Override
     public void removeAttribute(String name) {
 
         if (!removeSpecial(name))
@@ -266,6 +269,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param name Name of the attribute to set
      * @param value Value of the attribute to set
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
@@ -289,6 +293,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param path Path of the resource to be wrapped
      */
+    @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (context == null)
@@ -336,6 +341,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getContextPath()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getContextPath() {
 
         return (this.contextPath);
@@ -348,6 +354,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the requested parameter
      */
+    @Override
     public String getParameter(String name) {
 
 	parseParameters();
@@ -369,6 +376,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterMap()</code> method of the
      * wrapped request.
      */
+    @Override
     public Map<String, String[]> getParameterMap() {
 
 	parseParameters();
@@ -381,6 +389,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterNames()</code> method of the
      * wrapped request.
      */
+    @Override
     public Enumeration<String> getParameterNames() {
 
 	parseParameters();
@@ -395,6 +404,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the requested parameter
      */
+    @Override
     public String[] getParameterValues(String name) {
 
 	parseParameters();
@@ -419,6 +429,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Override the <code>getPathInfo()</code> method of the wrapped request.
      */
+    @Override
     public String getPathInfo() {
 
         return (this.pathInfo);
@@ -430,6 +441,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getQueryString()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getQueryString() {
 
         return (this.queryString);
@@ -441,6 +453,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getRequestURI()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getRequestURI() {
 
         return (this.requestURI);
@@ -452,6 +465,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getRequestURL()</code> method of the wrapped
      * request.
      */
+    @Override
     public StringBuffer getRequestURL() {
 
         StringBuffer url = new StringBuffer();
@@ -479,6 +493,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getServletPath()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getServletPath() {
 
         return (this.servletPath);
@@ -490,6 +505,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Return the session associated with this Request, creating one
      * if necessary.
      */
+    @Override
     public HttpSession getSession() {
         return (getSession(true));
     }
@@ -501,6 +517,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param create Create a new session if one does not exist
      */
+    @Override
     public HttpSession getSession(boolean create) {
 
         if (crossContext) {
@@ -555,6 +572,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the request specifies a JSESSIONID that is valid within
      * the context of this ApplicationHttpRequest, false otherwise.
      */
+    @Override
     public boolean isRequestedSessionIdValid() {
 
         if (crossContext) {

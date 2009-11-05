@@ -48,6 +48,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     protected long expire = 1000 * 60; //one minute expiration
     protected boolean deepclone = true;
 
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws
         ChannelException {
         //todo, optimize, if destination.length==1, then we can do
@@ -73,6 +74,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         if (okToProcess(msg.getOptions())) {
             if ( msg.getMessage().getLength() == (START_DATA.length+msg.getUniqueId().length+END_DATA.length) &&
@@ -110,6 +112,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         this.expire = expire;
     }
     
+    @Override
     public void heartbeat() {
         try {
             long now = System.currentTimeMillis();

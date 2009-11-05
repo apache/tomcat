@@ -58,6 +58,7 @@ public class CopyParentClassLoaderRule extends Rule {
      *
      * @exception Exception if a processing error occurs
      */
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 

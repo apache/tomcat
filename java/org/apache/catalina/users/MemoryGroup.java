@@ -82,6 +82,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * Return the set of {@link Role}s assigned specifically to this group.
      */
+    @Override
     public Iterator<Role> getRoles() {
 
         synchronized (roles) {
@@ -94,6 +95,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * Return the {@link UserDatabase} within which this Group is defined.
      */
+    @Override
     public UserDatabase getUserDatabase() {
 
         return (this.database);
@@ -104,6 +106,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * Return the set of {@link org.apache.catalina.User}s that are members of this group.
      */
+    @Override
     public Iterator<User> getUsers() {
 
         ArrayList<User> results = new ArrayList<User>();
@@ -127,6 +130,7 @@ public class MemoryGroup extends AbstractGroup {
      *
      * @param role The new role
      */
+    @Override
     public void addRole(Role role) {
 
         synchronized (roles) {
@@ -143,6 +147,7 @@ public class MemoryGroup extends AbstractGroup {
      *
      * @param role The role to check
      */
+    @Override
     public boolean isInRole(Role role) {
 
         synchronized (roles) {
@@ -157,6 +162,7 @@ public class MemoryGroup extends AbstractGroup {
      *
      * @param role The old role
      */
+    @Override
     public void removeRole(Role role) {
 
         synchronized (roles) {
@@ -169,6 +175,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * Remove all {@link Role}s from those assigned to this group.
      */
+    @Override
     public void removeRoles() {
 
         synchronized (roles) {
@@ -181,6 +188,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * <p>Return a String representation of this group in XML format.</p>
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("<group groupname=\"");

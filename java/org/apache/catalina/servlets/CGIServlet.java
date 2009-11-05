@@ -283,6 +283,7 @@ public final class CGIServlet extends HttpServlet {
      *                                  interferes with the servlet's normal
      *                                  operation
      */
+    @Override
     public void init(ServletConfig config) throws ServletException {
 
         super.init(config);
@@ -529,6 +530,7 @@ public final class CGIServlet extends HttpServlet {
      * @see javax.servlet.http.HttpServlet
      *
      */
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
         throws IOException, ServletException {
         doGet(req, res);
@@ -548,6 +550,7 @@ public final class CGIServlet extends HttpServlet {
      * @see javax.servlet.http.HttpServlet
      *
      */
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException {
 
@@ -1168,6 +1171,7 @@ public final class CGIServlet extends HttpServlet {
          * @return  HTML string containing CGI environment info
          *
          */
+        @Override
         public String toString() {
 
             StringBuilder sb = new StringBuilder();
@@ -1638,6 +1642,7 @@ public final class CGIServlet extends HttpServlet {
                 final BufferedReader stdErrRdr = commandsStdErr ;
 
                 new Thread() {
+                    @Override
                     public void run () {
                         sendToLog(stdErrRdr) ;
                     }
@@ -1849,6 +1854,7 @@ public final class CGIServlet extends HttpServlet {
         /**
          * @see java.io.InputStream#read()
          */
+        @Override
         public int read() throws IOException {
             if (state == STATE_HEADER_END) {
                 return -1;

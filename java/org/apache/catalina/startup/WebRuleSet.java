@@ -150,6 +150,7 @@ public class WebRuleSet extends RuleSetBase {
      * @param digester Digester instance to which the new Rule instances
      *  should be added.
      */
+    @Override
     public void addRuleInstances(Digester digester) {
         sessionConfig = new SetSessionConfig();
         jspConfig = new SetJspConfig();
@@ -619,6 +620,7 @@ final class SetLoginConfig extends Rule {
     public SetLoginConfig() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         if (isLoginConfigSet){
@@ -640,6 +642,7 @@ final class SetJspConfig extends Rule {
     public SetJspConfig() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         if (isJspConfigSet){
@@ -661,6 +664,7 @@ final class SetSessionConfig extends Rule {
     public SetSessionConfig() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         if (isSessionConfigSet){
@@ -683,6 +687,7 @@ final class SetAuthConstraintRule extends Rule {
     public SetAuthConstraintRule() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         SecurityConstraint securityConstraint =
@@ -707,6 +712,7 @@ final class SetDistributableRule extends Rule {
     public SetDistributableRule() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         WebXml webXml = (WebXml) digester.peek();
@@ -733,6 +739,7 @@ final class SetPublicIdRule extends Rule {
 
     private String method = null;
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
@@ -771,6 +778,7 @@ final class ServletDefCreateRule extends Rule {
     public ServletDefCreateRule() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         ServletDef servletDef = new ServletDef();
@@ -779,6 +787,7 @@ final class ServletDefCreateRule extends Rule {
             digester.getLogger().debug("new " + servletDef.getClass().getName());
     }
 
+    @Override
     public void end(String namespace, String name)
         throws Exception {
         ServletDef servletDef = (ServletDef) digester.pop();
@@ -799,6 +808,7 @@ final class CallParamMultiRule extends CallParamRule {
         super(paramIndex);
     }
 
+    @Override
     public void end(String namespace, String name) {
         if (bodyTextStack != null && !bodyTextStack.empty()) {
             // what we do now is push one parameter onto the top set of parameters
@@ -837,6 +847,7 @@ final class CallMethodMultiRule extends CallMethodRule {
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
      */
+    @Override
     public void end(String namespace, String name) throws Exception {
 
         // Retrieve or construct the parameter values array
@@ -924,6 +935,7 @@ final class IgnoreAnnotationsRule extends Rule {
     public IgnoreAnnotationsRule() {
     }
 
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
         WebXml webxml = (WebXml) digester.peek(digester.getCount() - 1);
@@ -948,6 +960,7 @@ final class AbsoluteOrderingRule extends Rule {
     public AbsoluteOrderingRule() {
     }
     
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
         digester.getLogger().warn(
@@ -963,6 +976,7 @@ final class RelativeOrderingRule extends Rule {
     public RelativeOrderingRule() {
     }
     
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
         digester.getLogger().warn(
@@ -989,6 +1003,7 @@ final class SoapHeaderRule extends Rule {
      *   the element name otherwise
      * @param bodyText The body text of this element
      */
+    @Override
     public void body(String namespace, String name, String text)
             throws Exception {
         String namespaceuri = null;
@@ -1023,6 +1038,7 @@ final class ServiceQnameRule extends Rule {
      *   the element name otherwise
      * @param bodyText The body text of this element
      */
+    @Override
     public void body(String namespace, String name, String text)
             throws Exception {
         String namespaceuri = null;

@@ -267,6 +267,7 @@ public class DataSourceRealm
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, String credentials) {
     	
     	// No user or no credentials
@@ -400,6 +401,7 @@ public class DataSourceRealm
     /**
      * Return a short name for this Realm implementation.
      */
+    @Override
     protected String getName() {
 
         return (name);
@@ -409,6 +411,7 @@ public class DataSourceRealm
     /**
      * Return the password associated with the given principal's user name.
      */
+    @Override
     protected String getPassword(String username) {
 
         Connection dbConnection = null;
@@ -474,6 +477,7 @@ public class DataSourceRealm
     /**
      * Return the Principal associated with the given user name.
      */
+    @Override
     protected Principal getPrincipal(String username) {
     	Connection dbConnection = open();
         if (dbConnection == null) {
@@ -607,6 +611,7 @@ public class DataSourceRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents it from being started
      */
+    @Override
     public void start() throws LifecycleException {
 
         // Perform normal superclass initialization
@@ -640,6 +645,7 @@ public class DataSourceRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException {
 
         // Perform normal superclass finalization

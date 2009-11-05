@@ -81,7 +81,8 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
      * @exception ReflectionException if a Java reflection exception
      *  occurs when invoking the getter
      */
-     public void setAttribute(Attribute attribute)
+     @Override
+    public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
         ReflectionException {
 

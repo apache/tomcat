@@ -141,6 +141,7 @@ public final class ResourceSet<T> extends HashSet<T> {
      *
      * @exception IllegalStateException if this ResourceSet is locked
      */
+    @Override
     public boolean add(T o) {
 
         if (locked)
@@ -156,6 +157,7 @@ public final class ResourceSet<T> extends HashSet<T> {
      *
      * @exception IllegalStateException if this ResourceSet is locked
      */
+    @Override
     public void clear() {
 
         if (locked)
@@ -174,6 +176,7 @@ public final class ResourceSet<T> extends HashSet<T> {
      *
      * @exception IllegalStateException if this ResourceSet is locked
      */
+    @Override
     public boolean remove(Object o) {
 
         if (locked)

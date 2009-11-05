@@ -697,6 +697,7 @@ public class Tomcat {
         public ExistingStandardWrapper( Servlet existing ) {
             this.existing = existing;
         }
+        @Override
         public synchronized Servlet loadServlet() throws ServletException {
             if (!init) {
                 existing.init(facade);
@@ -705,9 +706,11 @@ public class Tomcat {
             return existing;
 
         }
+        @Override
         public long getAvailable() {
             return 0;
         }
+        @Override
         public boolean isUnavailable() {
             return false;       
         }

@@ -136,6 +136,7 @@ public class RpcChannel implements ChannelListener{
         channel.removeChannelListener(this);
     }
     
+    @Override
     public void finalize() {
         breakdown();
     }
@@ -215,10 +216,12 @@ public class RpcChannel implements ChannelListener{
             }
         }
         
+        @Override
         public int hashCode() {
             return key.hashCode();
         }
         
+        @Override
         public boolean equals(Object o) {
             if ( o instanceof RpcCollector ) {
                 RpcCollector r = (RpcCollector)o;
@@ -237,10 +240,12 @@ public class RpcChannel implements ChannelListener{
             this.id = id;
         }
         
+        @Override
         public int hashCode() {
             return id[0]+id[1]+id[2]+id[3];
         }
 
+        @Override
         public boolean equals(Object o) {
             if ( o instanceof RpcCollectorKey ) {
                 RpcCollectorKey r = (RpcCollectorKey)o;

@@ -58,6 +58,7 @@ public class ClusterSessionListener extends ClusterListener {
      * @param myobj
      *            ClusterMessage - the message received from the cluster
      */
+    @Override
     public void messageReceived(ClusterMessage myobj) {
         if (myobj != null && myobj instanceof SessionMessage) {
             SessionMessage msg = (SessionMessage) myobj;
@@ -100,6 +101,7 @@ public class ClusterSessionListener extends ClusterListener {
      *         invoked. If false is returned, the messageReceived method will
      *         not be invoked.
      */
+    @Override
     public boolean accept(ClusterMessage msg) {
         return (msg instanceof SessionMessage);
     }

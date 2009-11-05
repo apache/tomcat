@@ -60,6 +60,7 @@ public class PooledParallelSender extends PooledSender implements MultiPointSend
         }
     }
 
+    @Override
     public DataSender getNewDataSender() {
         try {
             ParallelNioSender sender = new ParallelNioSender();
@@ -70,11 +71,13 @@ public class PooledParallelSender extends PooledSender implements MultiPointSend
         }
     }
     
+    @Override
     public synchronized void disconnect() {
         this.connected = false;
         super.disconnect();
     }
 
+    @Override
     public synchronized void connect() throws IOException {
         this.connected = true;
         super.connect();

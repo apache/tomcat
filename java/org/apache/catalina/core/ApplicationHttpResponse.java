@@ -112,6 +112,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @exception IllegalStateException if the response has already
      *  been committed
      */
+    @Override
     public void reset() {
 
         // If already committed, the wrapped response will throw ISE
@@ -126,6 +127,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param len The new content length
      */
+    @Override
     public void setContentLength(int len) {
 
         if (!included)
@@ -139,6 +141,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param type The new content type
      */
+    @Override
     public void setContentType(String type) {
 
         if (!included)
@@ -152,6 +155,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param loc The new locale
      */
+    @Override
     public void setLocale(Locale loc) {
 
         if (!included)
@@ -165,6 +169,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param size The buffer size
      */
+    @Override
     public void setBufferSize(int size) {
         if (!included)
             getResponse().setBufferSize(size);
@@ -179,6 +184,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param cookie The new cookie
      */
+    @Override
     public void addCookie(Cookie cookie) {
 
         if (!included)
@@ -193,6 +199,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param name The new header name
      * @param value The new header value
      */
+    @Override
     public void addDateHeader(String name, long value) {
 
         if (!included)
@@ -207,6 +214,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param name The new header name
      * @param value The new header value
      */
+    @Override
     public void addHeader(String name, String value) {
 
         if (!included)
@@ -221,6 +229,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param name The new header name
      * @param value The new header value
      */
+    @Override
     public void addIntHeader(String name, int value) {
 
         if (!included)
@@ -236,6 +245,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendError(int sc) throws IOException {
 
         if (!included)
@@ -252,6 +262,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendError(int sc, String msg) throws IOException {
 
         if (!included)
@@ -267,6 +278,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendRedirect(String location) throws IOException {
 
         if (!included)
@@ -281,6 +293,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param name The new header name
      * @param value The new header value
      */
+    @Override
     public void setDateHeader(String name, long value) {
 
         if (!included)
@@ -295,6 +308,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param name The new header name
      * @param value The new header value
      */
+    @Override
     public void setHeader(String name, String value) {
 
         if (!included)
@@ -309,6 +323,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param name The new header name
      * @param value The new header value
      */
+    @Override
     public void setIntHeader(String name, int value) {
 
         if (!included)
@@ -322,6 +337,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param sc The new status code
      */
+    @Override
     public void setStatus(int sc) {
 
         if (!included)

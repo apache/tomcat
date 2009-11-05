@@ -139,6 +139,7 @@ public final class ParameterMap<K,V> extends HashMap<K,V> {
      *
      * @exception IllegalStateException if this map is currently locked
      */
+    @Override
     public void clear() {
 
         if (locked)
@@ -162,6 +163,7 @@ public final class ParameterMap<K,V> extends HashMap<K,V> {
      *
      * @exception IllegalStateException if this map is currently locked
      */
+    @Override
     public V put(K key, V value) {
 
         if (locked)
@@ -181,6 +183,7 @@ public final class ParameterMap<K,V> extends HashMap<K,V> {
      *
      * @exception IllegalStateException if this map is currently locked
      */
+    @Override
     public void putAll(Map<? extends K,? extends V> map) {
 
         if (locked)
@@ -201,6 +204,7 @@ public final class ParameterMap<K,V> extends HashMap<K,V> {
      *
      * @exception IllegalStateException if this map is currently locked
      */
+    @Override
     public V remove(Object key) {
 
         if (locked)

@@ -92,6 +92,7 @@ public class CombinedRealm extends RealmBase {
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, byte[] credentials) {
         Principal authenticatedUser = null;
         
@@ -130,6 +131,7 @@ public class CombinedRealm extends RealmBase {
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
      */
+    @Override
     public Principal authenticate(String username, String clientDigest,
             String once, String nc, String cnonce, String qop,
             String realmName, String md5a2) {
@@ -166,6 +168,7 @@ public class CombinedRealm extends RealmBase {
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, String credentials) {
         Principal authenticatedUser = null;
         
@@ -196,6 +199,7 @@ public class CombinedRealm extends RealmBase {
      *
      * @param container The associated Container
      */
+    @Override
     public void setContainer(Container container) {
         for(Realm realm : realms) {
             // Set the realmPath for JMX naming
@@ -220,6 +224,7 @@ public class CombinedRealm extends RealmBase {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
         // Start 'sub-realms' then this one
         for (Realm realm : realms) {
@@ -240,7 +245,8 @@ public class CombinedRealm extends RealmBase {
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
-     public void stop() throws LifecycleException {
+     @Override
+    public void stop() throws LifecycleException {
         // Stop this realm, then the sub-realms (reverse order to start)
         super.stop();
         for (Realm realm : realms) {
@@ -258,6 +264,7 @@ public class CombinedRealm extends RealmBase {
      * @param certs Array of client certificates, with the first one in
      *  the array being the certificate of the client itself.
      */
+    @Override
     public Principal authenticate(X509Certificate[] certs) {
         Principal authenticatedUser = null;
         String username = null;

@@ -113,6 +113,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
 //------------------------------------------------------------------------------    
 //              METHODS TO OVERRIDE    
 //------------------------------------------------------------------------------
+    @Override
     protected int getStateMessageType() {
         return AbstractReplicatedMap.MapMessage.MSG_STATE;
     }
@@ -124,6 +125,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
      * @return Member - the backup node
      * @throws ChannelException
      */
+    @Override
     protected Member[] publishEntryInfo(Object key, Object value) throws ChannelException {
         if  (! (key instanceof Serializable && value instanceof Serializable)  ) return new Member[0];
         Member[] members = getMapMembers();
