@@ -16,11 +16,8 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-import java.util.concurrent.CountDownLatch;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import org.apache.tomcat.jdbc.test.CheckOutThreadTest.TestThread;
 
 /**
  * If a connection is abandoned and closed, 
