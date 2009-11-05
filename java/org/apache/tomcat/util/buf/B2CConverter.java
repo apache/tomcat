@@ -128,11 +128,13 @@ final class  ReadConvertor extends InputStreamReader {
     
     /** Overriden - will do nothing but reset internal state.
      */
+    @Override
     public  final void close() throws IOException {
         // NOTHING
         // Calling super.close() would reset out and cb.
     }
     
+    @Override
     public  final int read(char cbuf[], int off, int len)
         throws IOException
     {
@@ -167,15 +169,18 @@ final class IntermediateInputStream extends InputStream {
     public IntermediateInputStream() {
     }
     
+    @Override
     public  final void close() throws IOException {
         // shouldn't be called - we filter it out in writer
         throw new IOException("close() called - shouldn't happen ");
     }
     
+    @Override
     public  final  int read(byte cbuf[], int off, int len) throws IOException {
         return bc.substract(cbuf, off, len);
     }
     
+    @Override
     public  final int read() throws IOException {
         return bc.substract();
     }

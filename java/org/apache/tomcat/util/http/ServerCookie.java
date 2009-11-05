@@ -59,6 +59,7 @@ public class ServerCookie implements Serializable {
         "EEE, dd-MMM-yyyy HH:mm:ss z";
     private static final ThreadLocal<DateFormat> OLD_COOKIE_FORMAT =
         new ThreadLocal<DateFormat>() {
+        @Override
         protected DateFormat initialValue() {
             DateFormat df =
                 new SimpleDateFormat(OLD_COOKIE_PATTERN, Locale.US);
@@ -186,6 +187,7 @@ public class ServerCookie implements Serializable {
 
     // -------------------- utils --------------------
 
+    @Override
     public String toString() {
         return "Cookie " + getName() + "=" + getValue() + " ; "
             + getVersion() + " " + getPath() + " " + getDomain();

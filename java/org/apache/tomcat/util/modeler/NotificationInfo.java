@@ -53,6 +53,7 @@ public class NotificationInfo extends FeatureInfo implements Serializable {
      *
      * @param description The new description
      */
+    @Override
     public void setDescription(String description) {
         super.setDescription(description);
         this.info = null;
@@ -64,6 +65,7 @@ public class NotificationInfo extends FeatureInfo implements Serializable {
      *
      * @param name The new name
      */
+    @Override
     public void setName(String name) {
         super.setName(name);
         this.info = null;
@@ -123,6 +125,7 @@ public class NotificationInfo extends FeatureInfo implements Serializable {
     /**
      * Return a string representation of this notification descriptor.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("NotificationInfo[");

@@ -632,12 +632,15 @@ public class StringCache {
         public String enc = null;
         public String value = null;
 
+        @Override
         public String toString() {
             return value;
         }
+        @Override
         public int hashCode() {
             return value.hashCode();
         }
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof ByteEntry) {
                 return value.equals(((ByteEntry) obj).value);
@@ -656,12 +659,15 @@ public class StringCache {
         public char[] name = null;
         public String value = null;
 
+        @Override
         public String toString() {
             return value;
         }
+        @Override
         public int hashCode() {
             return value.hashCode();
         }
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof CharEntry) {
                 return value.equals(((CharEntry) obj).value);

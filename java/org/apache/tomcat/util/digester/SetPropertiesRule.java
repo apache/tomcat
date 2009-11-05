@@ -158,6 +158,7 @@ public class SetPropertiesRule extends Rule {
      *   the element name otherwise
      * @param attributes The attribute list for this element
      */
+    @Override
     public void begin(String namespace, String theName, Attributes attributes)
             throws Exception {
         
@@ -263,6 +264,7 @@ public class SetPropertiesRule extends Rule {
     /**
      * Render a printable version of this Rule.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("SetPropertiesRule[");
