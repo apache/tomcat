@@ -98,7 +98,7 @@ public class StandardEngine
      */
     private Service service = null;
 
-    /** Allow the base dir to be specified explicitely for
+    /** Allow the base dir to be specified explicitly for
      * each engine. In time we should stop using catalina.base property -
      * otherwise we loose some flexibility.
      */
@@ -135,7 +135,7 @@ public class StandardEngine
     public Realm getRealm() {
         Realm configured=super.getRealm();
         // If no set realm has been called - default to JAAS
-        // This can be overriden at engine, context and host level  
+        // This can be overridden at engine, context and host level  
         if( configured==null ) {
             configured=new JAASRealm();
             this.setRealm( configured );
@@ -355,7 +355,7 @@ public class StandardEngine
         //}
         
         if( service==null ) {
-            // for consistency...: we are probably in embeded mode
+            // for consistency...: we are probably in embedded mode
             try {
                 service=new StandardService();
                 service.setContainer( this );

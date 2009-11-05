@@ -118,7 +118,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * If this request is cross context, since this changes session accesss
+     * If this request is cross context, since this changes session access
      * behavior.
      */
     protected boolean crossContext = false;
