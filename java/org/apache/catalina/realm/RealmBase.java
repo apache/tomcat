@@ -1463,6 +1463,7 @@ public abstract class RealmBase
             this.name = name;
         }
         
+        @Override
         public boolean equals(Object o)
         {
             boolean equals = false;
@@ -1473,10 +1474,12 @@ public abstract class RealmBase
             }
             return equals;
         }
+        @Override
         public int hashCode()
         {
             return name.hashCode();
         }
+        @Override
         public String toString()
         {
             return name;

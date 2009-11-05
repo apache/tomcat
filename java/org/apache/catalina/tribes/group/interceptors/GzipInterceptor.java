@@ -40,6 +40,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 public class GzipInterceptor extends ChannelInterceptorBase {
     public static final int DEFAULT_BUFFER_SIZE = 2048;
     
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         try {
             byte[] data = compress(msg.getMessage().getBytes());
@@ -52,6 +53,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         try {
             byte[] data = decompress(msg.getMessage().getBytes());

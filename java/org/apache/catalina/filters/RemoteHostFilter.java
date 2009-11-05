@@ -94,6 +94,7 @@ public final class RemoteHostFilter
                 event, chain);        
     }
 
+    @Override
     protected Log getLogger() {
         return log;
     }

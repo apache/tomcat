@@ -79,6 +79,7 @@ public class ErrorReportValve
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -99,6 +100,7 @@ public class ErrorReportValve
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 

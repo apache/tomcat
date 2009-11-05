@@ -81,6 +81,7 @@ public class ClusterSingleSignOn
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -111,6 +112,7 @@ public class ClusterSingleSignOn
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
 
 	super.start();
@@ -165,6 +167,7 @@ public class ClusterSingleSignOn
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException {
 
 	super.stop();
@@ -182,6 +185,7 @@ public class ClusterSingleSignOn
     /**
      * Return a String rendering of this object.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("ClusterSingleSignOn[");
@@ -207,6 +211,7 @@ public class ClusterSingleSignOn
      * @param ssoId Single sign on identifier
      * @param session Session to be associated
      */
+    @Override
     protected void associate(String ssoId, Session session) {
 
 	if (cluster != null) {
@@ -246,6 +251,7 @@ public class ClusterSingleSignOn
      * @param ssoId Single sign on identifier
      * @param session Session to be deregistered
      */
+    @Override
     protected void deregister(String ssoId, Session session) {
 
 	if (cluster != null) {
@@ -283,6 +289,7 @@ public class ClusterSingleSignOn
      *
      * @param ssoId Single sign on identifier to deregister
      */
+    @Override
     protected void deregister(String ssoId) {
 
 	if (cluster != null) {
@@ -320,6 +327,7 @@ public class ClusterSingleSignOn
      * @param username Username used to authenticate this user
      * @param password Password used to authenticate this user
      */
+    @Override
     protected void register(String ssoId, Principal principal, String authType,
                   String username, String password) {
 
@@ -377,6 +385,7 @@ public class ClusterSingleSignOn
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
      */
+    @Override
     protected void update(String ssoId, Principal principal, String authType,
                           String username, String password) {
 
@@ -415,6 +424,7 @@ public class ClusterSingleSignOn
      * @param ssoId Single sign on identifier from which to remove the session.
      * @param session the session to be removed.
      */
+    @Override
     protected void removeSession(String ssoId, Session session) {
 
 	if (cluster != null) {

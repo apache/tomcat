@@ -418,6 +418,7 @@ public class StandardHost
      * Return the canonical, fully qualified, name of the virtual host
      * this Container represents.
      */
+    @Override
     public String getName() {
 
         return (name);
@@ -433,6 +434,7 @@ public class StandardHost
      *
      * @exception IllegalArgumentException if name is null
      */
+    @Override
     public void setName(String name) {
 
         if (name == null)
@@ -561,6 +563,7 @@ public class StandardHost
      *
      * @param child Child container to be added
      */
+    @Override
     public void addChild(Container child) {
 
         if (!(child instanceof Context))
@@ -589,6 +592,7 @@ public class StandardHost
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -687,6 +691,7 @@ public class StandardHost
     /**
      * Return a String representation of this component.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -707,6 +712,7 @@ public class StandardHost
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents it from being started
      */
+    @Override
     public synchronized void start() throws LifecycleException {
         if( started ) {
             return;
@@ -795,6 +801,7 @@ public class StandardHost
 
     private boolean initialized=false;
     
+    @Override
     public void init() {
         if( initialized ) return;
         initialized=true;
@@ -838,6 +845,7 @@ public class StandardHost
         }
     }
 
+    @Override
     public void destroy() throws Exception {
         // destroy our child containers, if any
         Container children[] = findChildren();
@@ -849,6 +857,7 @@ public class StandardHost
       
     }
     
+    @Override
     public ObjectName preRegister(MBeanServer server, ObjectName oname ) 
         throws Exception
     {
@@ -859,6 +868,7 @@ public class StandardHost
         return res;        
     }
     
+    @Override
     public ObjectName createObjectName(String domain, ObjectName parent)
         throws Exception
     {

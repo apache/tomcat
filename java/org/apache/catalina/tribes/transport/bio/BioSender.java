@@ -91,6 +91,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * Connect other cluster member receiver 
      * @see org.apache.catalina.tribes.transport.IDataSender#connect()
      */
+    @Override
     public  void connect() throws IOException {
         openSocket();
    }
@@ -101,6 +102,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * 
      * @see IDataSender#disconnect()
      */
+    @Override
     public  void disconnect() {
         boolean connect = isConnected();
         closeSocket();
@@ -149,6 +151,7 @@ public class BioSender extends AbstractSender implements DataSender {
     /**
      * Name of this SockerSender
      */
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("DataSender[(");
         buf.append(super.toString()).append(")");

@@ -285,6 +285,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      *
      * @param output The output to log. Should not be <code>null</code>.
      */
+    @Override
     protected void handleOutput(String output) {
         if (redirectOutput) {
             if (redirectOutPrintStream == null) {
@@ -305,6 +306,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * @param output The output to log. Should not be <code>null</code>.
      *
      */
+    @Override
     protected void handleFlush(String output) {
         handleOutput(output);
         redirectOutPrintStream.flush();
@@ -315,6 +317,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      *
      * @param output The error output to log. Should not be <code>null</code>.
      */
+    @Override
     protected void handleErrorOutput(String output) {
         if (redirectOutput) {
             if (redirectErrPrintStream == null) {
@@ -335,6 +338,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * @param output The error output to log. Should not be <code>null</code>.
      *
      */
+    @Override
     protected void handleErrorFlush(String output) {
         handleErrorOutput(output);
         redirectErrPrintStream.flush();

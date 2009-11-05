@@ -448,6 +448,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 //============================================================================================================    
 //              OVERRIDDEN METHODS FROM CHANNEL INTERCEPTOR BASE    
 //============================================================================================================
+    @Override
     public void start(int svc) throws ChannelException {
             if (membership == null) setupMembership();
             if (started)return;
@@ -459,6 +460,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             startElection(false);
     }
 
+    @Override
     public void stop(int svc) throws ChannelException {
         try {
             halt();
@@ -480,11 +482,13 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
     
     
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         waitForRelease();
         super.sendMessage(destination, msg, payload);
     }
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         if ( Arrays.contains(msg.getMessage().getBytesDirect(),0,COORD_ALIVE,0,COORD_ALIVE.length) ) {
             //ignore message, its an alive message
@@ -504,10 +508,12 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
     }
 
+    @Override
     public boolean accept(ChannelMessage msg) {
         return super.accept(msg);
     }
 
+    @Override
     public void memberAdded(Member member) {
         memberAdded(member,true);
     }
@@ -527,6 +533,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         
     }
 
+    @Override
     public void memberDisappeared(Member member) {
         try {
             
@@ -554,6 +561,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         return coord != null && getLocalMember(false).equals(coord);
     }
 
+    @Override
     public void heartbeat() {
         try {
             MemberImpl local = (MemberImpl)getLocalMember(false);
@@ -574,6 +582,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * has members
      */
+    @Override
     public boolean hasMembers() {
         
         return membership.hasMembers();
@@ -583,6 +592,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Get all current cluster members
      * @return all members or empty array
      */
+    @Override
     public Member[] getMembers() {
         
         return membership.getMembers();
@@ -593,6 +603,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * @param mbr Member
      * @return Member
      */
+    @Override
     public Member getMember(Member mbr) {
         
         return membership.getMember(mbr);
@@ -603,6 +614,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      *
      * @return Member
      */
+    @Override
     public Member getLocalMember(boolean incAlive) {
         Member local = super.getLocalMember(incAlive);
         if ( view == null && (local != null)) setupMembership();
@@ -751,6 +763,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
     }
     
+    @Override
     public void fireInterceptorEvent(InterceptorEvent event) {
         if (event instanceof CoordinationEvent &&
             ((CoordinationEvent)event).type == CoordinationEvent.EVT_CONF_RX) 
@@ -816,6 +829,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             return interceptor;
         }
         
+        @Override
         public String toString() {
             StringBuilder buf = new StringBuilder("CoordinationEvent[type=");
             buf.append(type).append("\n\tLocal:");

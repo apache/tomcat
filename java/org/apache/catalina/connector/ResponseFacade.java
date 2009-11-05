@@ -132,6 +132,7 @@ public class ResponseFacade
     /**
      * Prevent cloning the facade.
      */
+    @Override
     protected Object clone()
         throws CloneNotSupportedException {
         throw new CloneNotSupportedException();

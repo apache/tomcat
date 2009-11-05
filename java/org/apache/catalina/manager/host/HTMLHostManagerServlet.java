@@ -82,6 +82,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException {

@@ -49,12 +49,14 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         queue.returnSender(sender);
     }
     
+    @Override
     public synchronized void connect() throws IOException {
         //do nothing, happens in the socket sender itself
         queue.open();
         setConnected(true);
     }
     
+    @Override
     public synchronized void disconnect() {
         queue.close();
         setConnected(false);
@@ -79,6 +81,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         return poolSize;
     }
 
+    @Override
     public boolean keepalive() {
         //do nothing, the pool checks on every return
         return (queue==null)?false:queue.checkIdleKeepAlive();

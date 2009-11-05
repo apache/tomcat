@@ -59,6 +59,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     WeakReference<TcpFailureDetector> failureDetector = null;
     WeakReference<StaticMembershipInterceptor> staticMembers = null;
     
+    @Override
     public synchronized void start(int svc) throws ChannelException {
         super.start(svc);
         running = true;
@@ -81,6 +82,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         
     }
     
+    @Override
     public void stop(int svc) throws ChannelException {
         running = false;
         if ( thread != null ) thread.interrupt();
@@ -88,6 +90,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         super.stop(svc);
     }
     
+    @Override
     public void heartbeat() {
         super.heartbeat();
         if (!getUseThread()) sendPing();
@@ -144,6 +147,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         }
     }
     
+    @Override
     public void messageReceived(ChannelMessage msg) {
         //catch incoming 
         boolean process = true;
@@ -159,6 +163,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     }//messageReceived
     
     protected class PingThread extends Thread {
+        @Override
         public void run() {
             while (running) {
                 try {

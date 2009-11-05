@@ -96,6 +96,7 @@ public class UserDatabaseRealm
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return info;
@@ -140,6 +141,7 @@ public class UserDatabaseRealm
      * @param principal Principal for whom the role is to be checked
      * @param role Security role to be checked
      */
+    @Override
     public boolean hasRole(Principal principal, String role) {
         if( principal instanceof GenericPrincipal) {
             GenericPrincipal gp = (GenericPrincipal)principal;
@@ -180,6 +182,7 @@ public class UserDatabaseRealm
     /**
      * Return a short name for this Realm implementation.
      */
+    @Override
     protected String getName() {
 
         return (name);
@@ -190,6 +193,7 @@ public class UserDatabaseRealm
     /**
      * Return the password associated with the given principal's user name.
      */
+    @Override
     protected String getPassword(String username) {
 
         User user = database.findUser(username);
@@ -206,6 +210,7 @@ public class UserDatabaseRealm
     /**
      * Return the Principal associated with the given user name.
      */
+    @Override
     protected Principal getPrincipal(String username) {
 
         User user = database.findUser(username);
@@ -241,6 +246,7 @@ public class UserDatabaseRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents it from being started
      */
+    @Override
     public synchronized void start() throws LifecycleException {
 
         // Perform normal superclass initialization
@@ -270,6 +276,7 @@ public class UserDatabaseRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public synchronized void stop() throws LifecycleException {
 
         // Perform normal superclass finalization

@@ -64,6 +64,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     ReentrantReadWriteLock inLock = new ReentrantReadWriteLock(true);
     ReentrantReadWriteLock outLock= new ReentrantReadWriteLock(true);
 
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         if ( !okToProcess(msg.getOptions()) ) {
             super.sendMessage(destination, msg, payload);
@@ -94,6 +95,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         if ( cx != null ) throw cx;
     }
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         if ( !okToProcess(msg.getOptions()) ) {
             super.messageReceived(msg);
@@ -168,11 +170,13 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return result;
     }
     
+    @Override
     public void memberAdded(Member member) {
         //notify upwards
         super.memberAdded(member);
     }
 
+    @Override
     public void memberDisappeared(Member member) {
         //reset counters - lock free
         incounter.remove(member);

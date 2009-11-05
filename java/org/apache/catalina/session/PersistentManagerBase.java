@@ -324,6 +324,7 @@ public abstract class PersistentManagerBase
 	 * @param container
 	 *            The associated Container
 	 */
+    @Override
     public void setContainer(Container container) {
 
         // De-register from the old Container (if any)
@@ -348,6 +349,7 @@ public abstract class PersistentManagerBase
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -417,6 +419,7 @@ public abstract class PersistentManagerBase
     /**
      * Return the descriptive short name of this Manager implementation.
      */
+    @Override
     public String getName() {
 
         return (name);
@@ -537,7 +540,8 @@ public abstract class PersistentManagerBase
     /**
      * Implements the Manager interface, direct call to processExpires and processPersistenceChecks
      */
-	public void processExpires() {
+	@Override
+    public void processExpires() {
 		
         long timeNow = System.currentTimeMillis();
         Session sessions[] = findSessions();
@@ -589,6 +593,7 @@ public abstract class PersistentManagerBase
      * @exception IOException if an input/output error occurs while
      *  processing this request
      */
+    @Override
     public Session findSession(String id) throws IOException {
 
         Session session = super.findSession(id);
@@ -689,6 +694,7 @@ public abstract class PersistentManagerBase
      *
      * @param session Session to be removed
      */
+    @Override
     public void remove(Session session) {
 
         super.remove (session);

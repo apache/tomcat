@@ -238,6 +238,7 @@ public class InputBuffer extends Reader
      * 
      * @throws IOException An underlying IOException occurred
      */
+    @Override
     public void close()
         throws IOException {
         closed = true;
@@ -360,6 +361,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public int read()
         throws IOException {
 
@@ -370,6 +372,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public int read(char[] cbuf)
         throws IOException {
 
@@ -380,6 +383,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public int read(char[] cbuf, int off, int len)
         throws IOException {
 
@@ -390,6 +394,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public long skip(long n)
         throws IOException {
 
@@ -426,6 +431,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public boolean ready()
         throws IOException {
 
@@ -436,11 +442,13 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public boolean markSupported() {
         return true;
     }
 
 
+    @Override
     public void mark(int readAheadLimit)
         throws IOException {
 
@@ -464,6 +472,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public void reset()
         throws IOException {
 
