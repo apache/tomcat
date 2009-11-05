@@ -42,6 +42,7 @@ public class TestRemoteProcessException extends TestCase {
     GroupChannel channel1;
     GroupChannel channel2;
     Listener listener1;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         channel1 = new GroupChannel();
@@ -52,6 +53,7 @@ public class TestRemoteProcessException extends TestCase {
         channel2.start(Channel.DEFAULT);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         channel1.stop(Channel.DEFAULT);

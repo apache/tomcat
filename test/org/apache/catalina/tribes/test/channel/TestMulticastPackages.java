@@ -44,6 +44,7 @@ public class TestMulticastPackages extends TestCase {
     GroupChannel channel2;
     Listener listener1;
     int threadCounter = 0;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         channel1 = new GroupChannel();
@@ -66,6 +67,7 @@ public class TestMulticastPackages extends TestCase {
         channel2.start(Channel.DEFAULT);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         channel1.stop(Channel.DEFAULT);
@@ -105,6 +107,7 @@ public class TestMulticastPackages extends TestCase {
         Thread[] threads = new Thread[threadCount];
         for (int x=0; x<threads.length; x++ ) {
             threads[x] = new Thread() {
+                @Override
                 public void run() {
                     try {
                         long start = System.currentTimeMillis();

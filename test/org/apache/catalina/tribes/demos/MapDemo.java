@@ -166,6 +166,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         }
 
         
+        @Override
         public void run() {
             System.out.println("Shutting down...");
             //create an exit thread that forces a shutdown if the JVM wont exit cleanly
@@ -188,6 +189,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             this.delay = delay;
         }
 
+        @Override
         public void run() {
             try {
                 Thread.sleep(delay);
@@ -285,6 +287,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
 
             if (DEBUG) {
                 table.addMouseListener(new MouseAdapter() {
+                    @Override
                     public void mouseClicked(MouseEvent e) {
                         printDebugData(table);
                     }
@@ -375,6 +378,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             }
             if ( "random".equals(e.getActionCommand()) ) {
                 Thread t = new Thread() {
+                    @Override
                     public void run() {
                         for (int i = 0; i < 5; i++) {
                             String key = random(5,0,0,true,true,null);
@@ -510,6 +514,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             super();
         }
 
+        @Override
         public Component getTableCellRendererComponent
             (JTable table, Object value, boolean isSelected,
              boolean hasFocus, int row, int column) {

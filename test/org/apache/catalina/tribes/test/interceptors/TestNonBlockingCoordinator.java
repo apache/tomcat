@@ -31,6 +31,7 @@ public class TestNonBlockingCoordinator extends TestCase {
     NonBlockingCoordinator[] coordinators = null;
     int channelCount = 10;
     Thread[] threads = null;
+    @Override
     protected void setUp() throws Exception {
         System.out.println("Setup");
         super.setUp();
@@ -44,6 +45,7 @@ public class TestNonBlockingCoordinator extends TestCase {
             channels[i].addInterceptor(new TcpFailureDetector());
             final int j = i;
             threads[i] = new Thread() {
+                @Override
                 public void run() {
                     try {
                         channels[j].start(Channel.DEFAULT);
@@ -90,6 +92,7 @@ public class TestNonBlockingCoordinator extends TestCase {
         System.out.println("Coordinator[2b] is:" + member);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         System.out.println("tearDown");
         super.tearDown();

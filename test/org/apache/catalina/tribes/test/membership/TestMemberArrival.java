@@ -31,6 +31,7 @@ public class TestMemberArrival
     private ManagedChannel[] channels = new ManagedChannel[count];
     private TestMbrListener[] listeners = new TestMbrListener[count];
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         for (int i = 0; i < channels.length; i++) {
@@ -55,6 +56,7 @@ public class TestMemberArrival
         for (int i=0; i<channels.length; i++ ) {
             final Channel channel = channels[i];
             Thread t = new Thread() {
+                @Override
                 public void run() {
                     try {
                         channel.start(Channel.DEFAULT);
@@ -72,6 +74,7 @@ public class TestMemberArrival
         for (int i=listeners.length-1; i>=0; i-- ) assertEquals("Checking member arrival length",channels.length-1,listeners[i].members.size());
     }
 
+    @Override
     protected void tearDown() throws Exception {
 
         for (int i = 0; i < channels.length; i++) {
