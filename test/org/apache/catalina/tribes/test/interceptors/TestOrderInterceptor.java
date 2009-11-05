@@ -39,6 +39,7 @@ public class TestOrderInterceptor extends TestCase {
     TestListener[] test = null;
     int channelCount = 2;
     Thread[] threads = null;
+    @Override
     protected void setUp() throws Exception {
         System.out.println("Setup");
         super.setUp();
@@ -59,6 +60,7 @@ public class TestOrderInterceptor extends TestCase {
             channels[i].addChannelListener(test[i]);
             final int j = i;
             threads[i] = new Thread() {
+                @Override
                 public void run() {
                     try {
                         channels[j].start(Channel.DEFAULT);
@@ -120,6 +122,7 @@ public class TestOrderInterceptor extends TestCase {
     }
 
 
+    @Override
     protected void tearDown() throws Exception {
         System.out.println("tearDown");
         super.tearDown();
@@ -160,6 +163,7 @@ public class TestOrderInterceptor extends TestCase {
         int cnt = 1;
         ChannelMessage hold = null;
         Member[] dest = null;
+        @Override
         public synchronized void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
             if ( hold == null ) {
                 //System.out.println("Skipping message:"+msg);

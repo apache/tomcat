@@ -27,11 +27,13 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
 public class TestChannelStartStop extends TestCase {
     GroupChannel channel = null;
     int udpPort = 45543;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         channel = new GroupChannel();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         try {channel.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }

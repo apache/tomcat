@@ -79,6 +79,7 @@ public class TestStandardContext extends TomcatBaseTest {
     }
     
     private static final class Bug46243Client extends SimpleHttpClient {
+        @Override
         public boolean isResponseBodyOK() {
             // Don't care about the body in this test
             return true;

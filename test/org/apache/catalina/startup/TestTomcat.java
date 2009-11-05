@@ -40,6 +40,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
                 throws IOException {
             res.getWriter().write("Hello world");
@@ -55,6 +56,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         private static final String JNDI_ENV_NAME = "test";
         
+        @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
                 throws IOException {
             
@@ -79,6 +81,7 @@ public class TestTomcat extends TomcatBaseTest {
         
         private static final long serialVersionUID = 1L;
         
+        @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
         throws IOException {
             URL url = req.getServletContext().getResource("/WEB-INF/web.xml");

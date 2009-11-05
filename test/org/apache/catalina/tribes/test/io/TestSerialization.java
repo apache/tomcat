@@ -20,6 +20,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import junit.framework.TestCase;
 
 public class TestSerialization extends TestCase {
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
@@ -28,6 +29,7 @@ public class TestSerialization extends TestCase {
         
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

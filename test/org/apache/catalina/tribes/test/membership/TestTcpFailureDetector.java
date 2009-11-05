@@ -45,6 +45,7 @@ public class TestTcpFailureDetector extends TestCase {
     private ManagedChannel channel2 = null;
     private TestMbrListener mbrlist1 = null;
     private TestMbrListener mbrlist2 = null;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         channel1 = new GroupChannel();
@@ -122,6 +123,7 @@ public class TestTcpFailureDetector extends TestCase {
     }
 
 
+    @Override
     protected void tearDown() throws Exception {
         tcpFailureDetector1 = null;
         tcpFailureDetector2 = null;
