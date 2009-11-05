@@ -604,7 +604,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * an array and isSeparateArrayResults is true, resultproperty used as
      * prefix (<code>resultproperty.0-array.length</code> and store the
      * result array length at <code>resultproperty.length</code>. Other
-     * option is that you delemit your result with a delimiter
+     * option is that you delimit your result with a delimiter
      * (java.util.StringTokenizer is used).
      * 
      * @param propertyPrefix

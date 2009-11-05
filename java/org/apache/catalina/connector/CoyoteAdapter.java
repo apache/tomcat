@@ -622,7 +622,7 @@ public class CoyoteAdapter
 
 
     /**
-     * Look for SSL sesison ID if required. Only look for SSL Session ID if it
+     * Look for SSL session ID if required. Only look for SSL Session ID if it
      * is the only tracking method enabled.
      */
     protected void parseSessionSslId(Request request) {

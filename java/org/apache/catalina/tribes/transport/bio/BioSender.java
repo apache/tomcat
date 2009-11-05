@@ -226,9 +226,9 @@ public class BioSender extends AbstractSender implements DataSender {
      * Wait for ack is needed and make auto retry when write message is failed.
      * After sending error close and reopen socket again.
      * 
-     * After successfull sending update stats
+     * After successful sending update stats
      * 
-     * WARNING: Subclasses must be very carefull that only one thread call this pushMessage at once!!!
+     * WARNING: Subclasses must be very careful that only one thread call this pushMessage at once!!!
      * 
      * @see #closeSocket()
      * @see #openSocket()
@@ -251,8 +251,8 @@ public class BioSender extends AbstractSender implements DataSender {
     }
     
     /**
-     * Wait for Acknowledgement from other server
-     * FIXME Please, not wait only for three charcters, better control that the wait ack message is correct.
+     * Wait for Acknowledgment from other server
+     * FIXME Please, not wait only for three characters, better control that the wait ack message is correct.
      * @param timeout
      * @throws java.io.IOException
      * @throws java.net.SocketTimeoutException

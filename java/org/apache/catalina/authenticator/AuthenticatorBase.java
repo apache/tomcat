@@ -57,7 +57,7 @@ import org.apache.juli.logging.LogFactory;
  * Basic implementation of the <b>Valve</b> interface that enforces the
  * <code>&lt;security-constraint&gt;</code> elements in the web application
  * deployment descriptor.  This functionality is implemented as a Valve
- * so that it can be ommitted in environments that do not require these
+ * so that it can be omitted in environments that do not require these
  * features.  Individual implementations of each supported authentication
  * method can subclass this base class as required.
  * <p>

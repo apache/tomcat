@@ -80,7 +80,7 @@ public class Strftime {
         translate.put("r","hh:mm:ss a");
         translate.put("R","HH:mm");
         //There's no way to specify this with SimpleDateFormat
-        //translate.put("s","seconds since ecpoch");
+        //translate.put("s","seconds since epoch");
         translate.put("S","ss");
         translate.put("t","\t");
         translate.put("T","HH:mm:ss");
@@ -88,12 +88,12 @@ public class Strftime {
         //translate.put("u","day of week ( 1-7 )");
 
         //There's no way to specify this with SimpleDateFormat
-        //translate.put("U","week in year with first sunday as first day...");
+        //translate.put("U","week in year with first Sunday as first day...");
 
         translate.put("V","ww"); //I'm not sure this is always exactly the same
 
         //There's no way to specify this with SimpleDateFormat
-        //translate.put("W","week in year with first monday as first day...");
+        //translate.put("W","week in year with first Monday as first day...");
 
         //There's no way to specify this with SimpleDateFormat
         //translate.put("w","E");

@@ -83,7 +83,7 @@ public final class ParameterMap<K,V> extends HashMap<K,V> {
     /**
      * Construct a new map with the same mappings as the given map.
      *
-     * @param map Map whose contents are dupliated in the new map
+     * @param map Map whose contents are duplicated in the new map
      */
     public ParameterMap(Map<K,V> map) {
 

@@ -188,7 +188,7 @@ public class NioSender extends AbstractSender implements DataSender{
         }
         if ( current != null ) {
             if ( remaining > 0 ) {
-                //weve written everything, or we are starting a new package
+                //we have written everything, or we are starting a new package
                 //protect against buffer overwrite
                 int byteswritten = isUdpBased()?dataChannel.write(writebuf) : socketChannel.write(writebuf);
                 if (byteswritten == -1 ) throw new EOFException();

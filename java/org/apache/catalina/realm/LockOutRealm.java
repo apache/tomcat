@@ -33,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
  * authentication attempts in a given period of time. To ensure correct
  * operation, there is a reasonable degree of synchronisation in this Realm.
  * This Realm does not require modification to the underlying Realms or the
- * associated user storage mecahisms. It achieves this by recording all failed
+ * associated user storage mechanisms. It achieves this by recording all failed
  * logins, including those for users that do not exist. To prevent a DOS by
  * deliberating making requests with invalid users (and hence causing this cache
  * to grow) the size of the list of users that have failed authentication is

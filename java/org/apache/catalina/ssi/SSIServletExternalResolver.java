@@ -346,7 +346,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         String retVal = null;
         int lastSlash = servletPath.lastIndexOf('/');
         if (lastSlash >= 0) {
-            //cut off file namee
+            //cut off file name
             retVal = servletPath.substring(0, lastSlash + 1);
         }
         return retVal;

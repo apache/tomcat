@@ -37,7 +37,7 @@ import org.apache.catalina.ha.ClusterManager;
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience on
  * each nodes of a cluster, where the security identity of a user who successfully
- * authenticates to one web application is propogated to other web applications and
+ * authenticates to one web application is propagated to other web applications and
  * to other nodes cluster in the same security domain.  For successful use, the following
  * requirements must be met:
  * <ul>

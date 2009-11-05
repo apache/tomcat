@@ -54,7 +54,7 @@ public interface Pipeline {
 
     /**
      * <p>Set the Valve instance that has been distinguished as the basic
-     * Valve for this Pipeline (if any).  Prioer to setting the basic Valve,
+     * Valve for this Pipeline (if any).  Prior to setting the basic Valve,
      * the Valve's <code>setContainer()</code> will be called, if it
      * implements <code>Contained</code>, with the owning Container as an
      * argument.  The method may throw an <code>IllegalArgumentException</code>
@@ -84,7 +84,7 @@ public interface Pipeline {
      *
      * @exception IllegalArgumentException if this Container refused to
      *  accept the specified Valve
-     * @exception IllegalArgumentException if the specifie Valve refuses to be
+     * @exception IllegalArgumentException if the specified Valve refuses to be
      *  associated with this Container
      * @exception IllegalStateException if the specified Valve is already
      *  associated with a different Container

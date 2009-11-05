@@ -44,7 +44,7 @@ import org.apache.catalina.valves.ValveBase;
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience,
  * where the security identity of a user who successfully authenticates to one
- * web application is propogated to other web applications in the same
+ * web application is propagated to other web applications in the same
  * security domain.  For successful use, the following requirements must
  * be met:
  * <ul>

@@ -94,7 +94,7 @@ public class CometConnectionManagerValve
 
     
     /**
-     * List of current Coment connections.
+     * List of current Comet connections.
      */
     protected List<Request> cometRequests =
         Collections.synchronizedList(new ArrayList<Request>());
@@ -259,7 +259,7 @@ public class CometConnectionManagerValve
             // begin event, and Comet mode is on
             HttpSession session = request.getSession(true);
             
-            // Track the conection for webapp reload
+            // Track the connection for webapp reload
             cometRequests.add(request);
             
             // Track the connection for session expiration

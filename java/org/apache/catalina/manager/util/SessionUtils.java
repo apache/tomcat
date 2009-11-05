@@ -66,7 +66,7 @@ public class SessionUtils {
     /**
      * Try to get user locale from the session, if possible.
      * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3, Struts 1.x and Spring
-     * JSF check the browser meta tag "accept languages" to choose what langage to display.
+     * JSF check the browser meta tag "accept languages" to choose what language to display.
      * @param in_session
      * @return String
      */

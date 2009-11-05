@@ -824,7 +824,7 @@ public class JDBCStore extends StoreBase {
      * <code>null</code> or closed try to reopen it.
      * Returns <code>null</code> if the connection could not be established.
      *
-     * @return <code>Connection</code> if the connection suceeded
+     * @return <code>Connection</code> if the connection succeeded
      */
     protected Connection getConnection() {
         try {

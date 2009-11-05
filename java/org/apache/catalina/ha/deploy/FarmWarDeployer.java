@@ -445,7 +445,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /*
-     * Modifcation from watchDir war detected!
+     * Modification from watchDir war detected!
      * 
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(java.io.File)
      */
@@ -469,7 +469,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /*
-     * War remvoe from watchDir
+     * War remove from watchDir
      * 
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(java.io.File)
      */

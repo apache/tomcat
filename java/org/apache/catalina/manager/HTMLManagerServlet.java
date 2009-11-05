@@ -647,7 +647,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @see ManagerServlet#undeploy(PrintWriter, String)
      *
-     * @param path Context path of the application to be undeployd
+     * @param path Context path of the application to be undeployed
      * @return message String
      */
     protected String undeploy(String path) {
@@ -1066,8 +1066,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
     // ------------------------------------------------------ Private Constants
 
     // These HTML sections are broken in relatively small sections, because of
-    // limited number of subsitutions MessageFormat can process
-    // (maximium of 10).
+    // limited number of substitutions MessageFormat can process
+    // (maximum of 10).
 
     private static final String APPS_HEADER_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
