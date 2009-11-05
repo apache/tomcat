@@ -49,6 +49,7 @@ public class JdkLoggerFormatter extends Formatter {
     public static final int LOG_LEVEL_ERROR  = 1000;
     public static final int LOG_LEVEL_FATAL  = 1000;
 
+    @Override
     public String format(LogRecord record) {
         Throwable t=record.getThrown();
         int level=record.getLevel().intValue();

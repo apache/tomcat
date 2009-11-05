@@ -127,6 +127,7 @@ public class DirContextURLConnection
      * 
      * @throws IOException Object not found
      */
+    @Override
     public void connect()
         throws IOException {
         
@@ -173,6 +174,7 @@ public class DirContextURLConnection
     /**
      * Return the content length value.
      */
+    @Override
     public int getContentLength() {
         return getHeaderFieldInt(ResourceAttributes.CONTENT_LENGTH, -1);
     }
@@ -181,6 +183,7 @@ public class DirContextURLConnection
     /**
      * Return the content type value.
      */
+    @Override
     public String getContentType() {
         return getHeaderField(ResourceAttributes.CONTENT_TYPE);
     }
@@ -189,6 +192,7 @@ public class DirContextURLConnection
     /**
      * Return the last modified date.
      */
+    @Override
     public long getDate() {
         return date;
     }
@@ -197,6 +201,7 @@ public class DirContextURLConnection
     /**
      * Return the last modified date.
      */
+    @Override
     public long getLastModified() {
 
         if (!connected) {
@@ -239,6 +244,7 @@ public class DirContextURLConnection
     /**
      * Returns an unmodifiable Map of the header fields.
      */
+    @Override
     public Map<String,List<String>> getHeaderFields() {
 
       if (!connected) {
@@ -282,6 +288,7 @@ public class DirContextURLConnection
     /**
      * Returns the name of the specified header field.
      */
+    @Override
     public String getHeaderField(String name) {
 
         if (!connected) {
@@ -318,6 +325,7 @@ public class DirContextURLConnection
     /**
      * Get object content.
      */
+    @Override
     public Object getContent()
         throws IOException {
         
@@ -339,6 +347,7 @@ public class DirContextURLConnection
     /**
      * Get object content.
      */
+    @Override
     public Object getContent(Class[] classes)
         throws IOException {
         
@@ -357,6 +366,7 @@ public class DirContextURLConnection
     /**
      * Get input stream.
      */
+    @Override
     public InputStream getInputStream() 
         throws IOException {
         
@@ -381,6 +391,7 @@ public class DirContextURLConnection
     /**
      * Get the Permission for this URL
      */
+    @Override
     public Permission getPermission() {
 
         return permission;

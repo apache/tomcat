@@ -976,6 +976,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Clone the attributes object (WARNING: fake cloning).
      */
+    @Override
     public Object clone() {
         return this;
     }
