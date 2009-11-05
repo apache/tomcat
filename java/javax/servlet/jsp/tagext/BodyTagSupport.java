@@ -55,6 +55,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      * @see BodyTag#doStartTag
      */
  
+    @Override
     public int doStartTag() throws JspException {
         return EVAL_BODY_BUFFERED;
     }
@@ -68,6 +69,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      * @see Tag#doEndTag
      */
 
+    @Override
     public int doEndTag() throws JspException {
 	return super.doEndTag();
     }
@@ -114,6 +116,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      * @see BodyTag#doAfterBody
      */
 
+    @Override
     public int doAfterBody() throws JspException {
  	return SKIP_BODY;
     }
@@ -125,6 +128,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      * @see Tag#release
      */
 
+    @Override
     public void release() {
 	bodyContent = null;
 

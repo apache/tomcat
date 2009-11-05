@@ -37,7 +37,8 @@ public class ScopedAttributeELResolver extends ELResolver {
 		super();
 	}
 
-	public Object getValue(ELContext context, Object base, Object property)
+	@Override
+    public Object getValue(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -56,7 +57,8 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return null;
 	}
 
-	public Class<Object> getType(ELContext context, Object base, Object property)
+	@Override
+    public Class<Object> getType(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -70,7 +72,8 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return null;
 	}
 
-	public void setValue(ELContext context, Object base, Object property,
+	@Override
+    public void setValue(ELContext context, Object base, Object property,
 			Object value) throws NullPointerException,
 			PropertyNotFoundException, PropertyNotWritableException,
 			ELException {
@@ -94,7 +97,8 @@ public class ScopedAttributeELResolver extends ELResolver {
 		}
 	}
 
-	public boolean isReadOnly(ELContext context, Object base, Object property)
+	@Override
+    public boolean isReadOnly(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -107,7 +111,8 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return false;
 	}
 
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+	@Override
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 
 		PageContext ctxt = (PageContext) context.getContext(JspContext.class);
 		List<FeatureDescriptor> list = new ArrayList<FeatureDescriptor>();
@@ -183,7 +188,8 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return list.iterator();
 	}
 
-	public Class<String> getCommonPropertyType(ELContext context, Object base) {
+	@Override
+    public Class<String> getCommonPropertyType(ELContext context, Object base) {
 		if (base == null) {
 			return String.class;
 		}
