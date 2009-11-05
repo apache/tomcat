@@ -278,6 +278,7 @@ public interface Manager {
      *  instantiated for any reason
      * @deprecated
      */
+    @Deprecated
     public Session createSession();
 
 

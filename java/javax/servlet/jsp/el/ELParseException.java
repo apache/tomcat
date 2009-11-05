@@ -25,6 +25,7 @@ package javax.servlet.jsp.el;
  * @deprecated
  */
 
+@Deprecated
 public class ELParseException extends ELException {
 
  //-------------------------------------

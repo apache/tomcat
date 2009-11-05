@@ -117,9 +117,11 @@ public class DummyResponse
     public boolean containsHeader(String name) { return false; }
     public String encodeRedirectURL(String url) { return null; }
     /** @deprecated */
+    @Deprecated
     public String encodeRedirectUrl(String url) { return null; }
     public String encodeURL(String url) { return null; }
     /** @deprecated */
+    @Deprecated
     public String encodeUrl(String url) { return null; }
     public void sendAcknowledgement() throws IOException {}
     public void sendError(int status) throws IOException {}
@@ -130,6 +132,7 @@ public class DummyResponse
     public void setIntHeader(String name, int value) {}
     public void setStatus(int status) {}
     /** @deprecated */
+    @Deprecated
     public void setStatus(int status, String message) {}
     public Collection<String> getHeaders(String name) { return null; }
 }

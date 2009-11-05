@@ -224,6 +224,7 @@ public final class ApplicationContextFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public Servlet getServlet(String name)
         throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -245,6 +246,7 @@ public final class ApplicationContextFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public Enumeration<Servlet> getServlets() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Enumeration<Servlet>) doPrivileged("getServlets", null);
@@ -257,6 +259,7 @@ public final class ApplicationContextFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public Enumeration<String> getServletNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Enumeration<String>) doPrivileged("getServletNames", null);
@@ -278,6 +281,7 @@ public final class ApplicationContextFacade
     /**
      * @deprecated
      */
+    @Deprecated
     public void log(Exception exception, String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Class[]{Exception.class, String.class}, 

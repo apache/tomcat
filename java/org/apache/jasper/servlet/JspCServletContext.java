@@ -340,6 +340,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
+    @Deprecated
     public Servlet getServlet(String name) throws ServletException {
 
         return (null);
@@ -362,6 +363,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
+    @Deprecated
     public Enumeration<String> getServletNames() {
 
         return (new Vector<String>().elements());
@@ -374,6 +376,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
+    @Deprecated
     public Enumeration<Servlet> getServlets() {
 
         return (new Vector<Servlet>().elements());
@@ -401,6 +404,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated Use log(String,Throwable) instead
      */
+    @Deprecated
     public void log(Exception exception, String message) {
 
         log(message, exception);

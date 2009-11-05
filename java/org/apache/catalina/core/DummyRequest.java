@@ -215,6 +215,7 @@ public class DummyRequest
     public String getProtocol() { return null; }
     public BufferedReader getReader() throws IOException { return null; }
     /** @deprecated */
+    @Deprecated
     public String getRealPath(String path) { return null; }
     public String getRemoteAddr() { return null; }
     public String getRemoteHost() { return null; }
@@ -274,6 +275,7 @@ public class DummyRequest
     public boolean isRequestedSessionIdFromCookie() { return false; }
     public boolean isRequestedSessionIdFromURL() { return false; }
     /** @deprecated */
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() { return false; }
     public boolean isRequestedSessionIdValid() { return false; }
     public boolean isUserInRole(String role) { return false; }

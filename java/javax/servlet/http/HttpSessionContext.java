@@ -37,6 +37,7 @@ import java.util.Enumeration;
  */
 
 
+@Deprecated
 public interface HttpSessionContext {
 
     /**
@@ -48,6 +49,7 @@ public interface HttpSessionContext {
      *
      */
 
+    @Deprecated
     public HttpSession getSession(String sessionId);
     
     
@@ -62,6 +64,7 @@ public interface HttpSessionContext {
      *
      */
 
+    @Deprecated
     public Enumeration<String> getIds();
 }
 

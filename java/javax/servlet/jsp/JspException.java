@@ -93,6 +93,7 @@ public class JspException extends Exception {
      * @return  the <code>Throwable</code> that caused this JSP exception
      */
     
+    @Deprecated
     public Throwable getRootCause() {
         return getCause();
     }
