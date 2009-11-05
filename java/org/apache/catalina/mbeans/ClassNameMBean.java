@@ -67,7 +67,8 @@ public class ClassNameMBean extends BaseModelMBean {
       * Return the fully qualified Java class name of the managed object
       * for this MBean.
       */
-     public String getClassName() {
+     @Override
+    public String getClassName() {
 
          return (this.resource.getClass().getName());
 

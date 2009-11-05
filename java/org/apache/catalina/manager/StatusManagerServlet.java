@@ -98,6 +98,7 @@ public class StatusManagerServlet
     /**
      * Initialize this servlet.
      */
+    @Override
     public void init() throws ServletException {
 
         // Retrieve the MBean server
@@ -160,6 +161,7 @@ public class StatusManagerServlet
     /**
      * Finalize this servlet.
      */
+    @Override
     public void destroy() {
 
         // No actions necessary
@@ -176,6 +178,7 @@ public class StatusManagerServlet
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException {

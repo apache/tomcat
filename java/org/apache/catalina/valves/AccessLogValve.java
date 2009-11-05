@@ -275,6 +275,7 @@ public class AccessLogValve
      */
     private static final ThreadLocal<AccessDateStruct> currentDateStruct =
             new ThreadLocal<AccessDateStruct>() {
+        @Override
         protected AccessDateStruct initialValue() {
             return new AccessDateStruct();
         }
@@ -351,6 +352,7 @@ public class AccessLogValve
     /**
      * Return descriptive information about this implementation.
      */
+    @Override
     public String getInfo() {
         return (info);
     }
@@ -535,6 +537,7 @@ public class AccessLogValve
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         if (started && getEnabled() && writer != null && buffered) {
             writer.flush();
@@ -551,6 +554,7 @@ public class AccessLogValve
      * @exception IOException if an input/output error has occurred
      * @exception ServletException if a servlet error has occurred
      */
+    @Override
     public void invoke(Request request, Response response) throws IOException,
             ServletException {
 

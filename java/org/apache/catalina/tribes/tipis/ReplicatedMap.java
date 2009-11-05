@@ -92,6 +92,7 @@ public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback,
 //------------------------------------------------------------------------------
 //              METHODS TO OVERRIDE
 //------------------------------------------------------------------------------
+    @Override
     protected int getStateMessageType() {
         return AbstractReplicatedMap.MapMessage.MSG_STATE_COPY;
     }
@@ -103,6 +104,7 @@ public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback,
      * @return Member - the backup node
      * @throws ChannelException
      */
+    @Override
     protected Member[] publishEntryInfo(Object key, Object value) throws ChannelException {
         if  (! (key instanceof Serializable && value instanceof Serializable)  ) return new Member[0];
         //select a backup node

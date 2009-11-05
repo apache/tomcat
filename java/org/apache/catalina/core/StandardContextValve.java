@@ -82,6 +82,7 @@ final class StandardContextValve
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -97,6 +98,7 @@ final class StandardContextValve
      * 
      * @see org.apache.catalina.Contained#setContainer(org.apache.catalina.Container)
      */
+    @Override
     public void setContainer(Container container) {
         super.setContainer(container);
         context = (StandardContext) container;
@@ -115,6 +117,7 @@ final class StandardContextValve
      * @exception IOException if an input/output error occurred
      * @exception ServletException if a servlet error occurred
      */
+    @Override
     public final void invoke(Request request, Response response)
         throws IOException, ServletException {
 
@@ -232,6 +235,7 @@ final class StandardContextValve
      * @exception IOException if an input/output error occurred
      * @exception ServletException if a servlet error occurred
      */
+    @Override
     public final void event(Request request, Response response, CometEvent event)
         throws IOException, ServletException {
 

@@ -101,6 +101,7 @@ public final class SessionEvent
     /**
      * Return a string representation of this event.
      */
+    @Override
     public String toString() {
 
         return ("SessionEvent['" + getSession() + "','" +

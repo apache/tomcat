@@ -68,6 +68,7 @@ public class CoyoteInputStream
     /**
      * Prevent cloning the facade.
      */
+    @Override
     protected Object clone()
         throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
@@ -77,6 +78,7 @@ public class CoyoteInputStream
     // --------------------------------------------- ServletInputStream Methods
 
 
+    @Override
     public int read()
         throws IOException {    
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -106,6 +108,7 @@ public class CoyoteInputStream
         }
     }
 
+    @Override
     public int available() throws IOException {
         
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -134,6 +137,7 @@ public class CoyoteInputStream
         }    
     }
 
+    @Override
     public int read(final byte[] b) throws IOException {
         
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -164,6 +168,7 @@ public class CoyoteInputStream
     }
 
 
+    @Override
     public int read(final byte[] b, final int off, final int len)
         throws IOException {
             
@@ -195,6 +200,7 @@ public class CoyoteInputStream
     }
 
 
+    @Override
     public int readLine(byte[] b, int off, int len) throws IOException {
         return super.readLine(b, off, len);
     }
@@ -205,6 +211,7 @@ public class CoyoteInputStream
      * Since we re-cycle, we can't allow the call to super.close()
      * which would permantely disable us.
      */
+    @Override
     public void close() throws IOException {
         
         if (SecurityUtil.isPackageProtectionEnabled()){

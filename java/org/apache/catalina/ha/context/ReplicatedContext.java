@@ -113,6 +113,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
         }
     }
     
+    @Override
     public ServletContext getServletContext() {
         if (context == null) {
             context = new ReplApplContext(getBasePath(), this);
@@ -137,6 +138,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
             return (ReplicatedContext)getContext();
         }
         
+        @Override
         protected ServletContext getFacade() {
              return super.getFacade();
         }
@@ -148,12 +150,14 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
             this.attributes = map;
         }
         
+        @Override
         public void removeAttribute(String name) {
             tomcatAttributes.remove(name);
             //do nothing
             super.removeAttribute(name);
         }
         
+        @Override
         public void setAttribute(String name, Object value) {
             if ( (!getParent().startComplete) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
                 tomcatAttributes.put(name,value);
@@ -161,6 +165,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
                 super.setAttribute(name,value);
         }
         
+        @Override
         public Object getAttribute(String name) {
             if (tomcatAttributes.containsKey(name) )
                 return tomcatAttributes.get(name);
@@ -168,6 +173,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
                 return super.getAttribute(name);
         }
         
+        @Override
         public Enumeration<String> getAttributeNames() {
             return new MultiEnumeration<String>(new Enumeration[] {super.getAttributeNames(),new Enumerator<String>(tomcatAttributes.keySet(), true)});
         }

@@ -311,6 +311,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         finalize();
     }
 
+    @Override
     public void finalize() {
         try {broadcast(MapMessage.MSG_STOP,false); }catch ( Exception ignore){}
         //cleanup
@@ -329,10 +330,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         this.externalLoaders = null;
     }
     
+    @Override
     public int hashCode() {
         return Arrays.hashCode(this.mapContextName);
     }
     
+    @Override
     public boolean equals(Object o) {
         if ( o == null ) return false;
         if ( !(o instanceof AbstractReplicatedMap)) return false;
@@ -807,6 +810,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param key Object
      * @return Object
      */
+    @Override
     public Object remove(Object key) {
         return remove(key,true);
     }
@@ -828,6 +832,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         return (MapEntry)super.get(key);
     }
     
+    @Override
     public Object get(Object key) {
         MapEntry entry = (MapEntry)super.get(key);
         if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" entry:"+entry);
@@ -917,10 +922,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
          * @param key Object
          * @return boolean
          */
+        @Override
         public boolean containsKey(Object key) {
             return super.containsKey(key);
         }
     
+        @Override
         public Object put(Object key, Object value) {
             return put(key,value,true);
         }
@@ -952,6 +959,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
          * Copies all values from one map to this instance
          * @param m Map
          */
+        @Override
         public void putAll(Map m) {
             Iterator i = m.entrySet().iterator();
             while ( i.hasNext() ) {
@@ -960,6 +968,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
         
+        @Override
         public void clear() {
             clear(true);
         }
@@ -975,6 +984,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
     
+        @Override
         public boolean containsValue(Object value) {
             if ( value == null ) {
                 return super.containsValue(value);
@@ -989,6 +999,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }//end if
         }
     
+        @Override
         public Object clone() {
             throw new UnsupportedOperationException("This operation is not valid on a replicated map");
         }
@@ -1011,6 +1022,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return super.size();
         }
     
+        @Override
         public Set<MapEntry> entrySet() {
             LinkedHashSet<MapEntry> set = new LinkedHashSet<MapEntry>(super.size());
             Iterator i = super.entrySet().iterator();
@@ -1025,6 +1037,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return Collections.unmodifiableSet(set);
         }
     
+        @Override
         public Set<Object> keySet() {
             //todo implement
             //should only return keys where this is active.
@@ -1041,6 +1054,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
     
     
+        @Override
         public int size() {
             //todo, implement a counter variable instead
             //only count active members in this node
@@ -1056,10 +1070,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return counter;
         }
     
+        @Override
         public boolean isEmpty() {
             return size()==0;
         }
     
+        @Override
         public Collection<Object> values() {
             ArrayList<Object> values = new ArrayList<Object>();
             Iterator i = super.entrySet().iterator();
@@ -1162,10 +1178,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return old;
         }
 
+        @Override
         public int hashCode() {
             return key.hashCode();
         }
 
+        @Override
         public boolean equals(Object o) {
             return key.equals(o);
         }
@@ -1196,6 +1214,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
         
+        @Override
         public String toString() {
             StringBuilder buf = new StringBuilder("MapEntry[key:");
             buf.append(getKey()).append("; ");
@@ -1235,6 +1254,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         private Member[] nodes;
         private Member primary;
         
+        @Override
         public String toString() {
             StringBuilder buf = new StringBuilder("MapMessage[context=");
             buf.append(new String(mapId));
@@ -1401,6 +1421,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
          * shallow clone
          * @return Object
          */
+        @Override
         public Object clone() {
             MapMessage msg = new MapMessage(this.mapId, this.msgtype, this.diff, this.key, this.value, this.diffvalue, this.primary, this.nodes);
             msg.keydata = this.keydata;

@@ -211,6 +211,7 @@ public class NioSender extends AbstractSender implements DataSender{
      * @throws IOException
      * @todo Implement this org.apache.catalina.tribes.transport.IDataSender method
      */
+    @Override
     public synchronized void connect() throws IOException {
         if ( connecting || isConnected()) return;
         connecting = true;
@@ -255,6 +256,7 @@ public class NioSender extends AbstractSender implements DataSender{
      *
      * @todo Implement this org.apache.catalina.tribes.transport.IDataSender method
      */
+    @Override
     public void disconnect() {
         try {
             connecting = false;

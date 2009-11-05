@@ -258,6 +258,7 @@ public class WebdavServlet
     /**
      * Initialize this servlet.
      */
+    @Override
     public void init()
         throws ServletException {
 
@@ -308,6 +309,7 @@ public class WebdavServlet
     /**
      * Handles the special WebDAV methods.
      */
+    @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
@@ -351,6 +353,7 @@ public class WebdavServlet
      * and false if any of the conditions is not satisfied, in which case
      * request processing is stopped
      */
+    @Override
     protected boolean checkIfHeaders(HttpServletRequest request,
                                      HttpServletResponse response,
                                      ResourceAttributes resourceAttributes)
@@ -373,6 +376,7 @@ public class WebdavServlet
      *
      * @param request The servlet request we are processing
      */
+    @Override
     protected String getRelativePath(HttpServletRequest request) {
         // Are we being processed by a RequestDispatcher.include()?
         if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
@@ -401,6 +405,7 @@ public class WebdavServlet
      * @throws ServletException If an error occurs
      * @throws IOException If an IO error occurs
      */
+    @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
@@ -776,6 +781,7 @@ public class WebdavServlet
     /**
      * DELETE Method.
      */
+    @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
@@ -803,6 +809,7 @@ public class WebdavServlet
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
@@ -2699,6 +2706,7 @@ public class WebdavServlet
         /**
          * Get a String representation of this lock token.
          */
+        @Override
         public String toString() {
 
             String result =  "Type:" + type + "\n";

@@ -766,6 +766,7 @@ public class StandardContext
     }
 
 
+    @Override
     public void setName( String name ) {
         super.setName( name );
         encodedPath = urlEncoder.encode(name);
@@ -1388,6 +1389,7 @@ public class StandardContext
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -1425,6 +1427,7 @@ public class StandardContext
      *
      * @param loader The newly associated loader
      */
+    @Override
     public synchronized void setLoader(Loader loader) {
 
         super.setLoader(loader);
@@ -1652,6 +1655,7 @@ public class StandardContext
      * This call is meaningful only <strong>after</strong> a Loader has
      * been configured.
      */
+    @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null)
             return (parentClassLoader);
@@ -1915,6 +1919,7 @@ public class StandardContext
      *
      * @param resources The newly associated DirContext
      */
+    @Override
     public synchronized void setResources(DirContext resources) {
 
         if (started) {
@@ -2109,6 +2114,7 @@ public class StandardContext
      * @exception IllegalArgumentException if the proposed container is
      *  not an implementation of Wrapper
      */
+    @Override
     public void addChild(Container child) {
 
         // Global JspServlet
@@ -3347,6 +3353,7 @@ public class StandardContext
      * @exception IllegalArgumentException if the proposed container is
      *  not an implementation of Wrapper
      */
+    @Override
     public void removeChild(Container child) {
 
         if (!(child instanceof Wrapper)) {
@@ -4231,6 +4238,7 @@ public class StandardContext
      *
      * @exception LifecycleException if a startup error occurs
      */
+    @Override
     public synchronized void start() throws LifecycleException {
         //if (lazy ) return;
         if (started) {
@@ -4620,6 +4628,7 @@ public class StandardContext
      *
      * @exception LifecycleException if a shutdown error occurs
      */
+    @Override
     public synchronized void stop() throws LifecycleException {
 
         // Validate and update our current component state
@@ -4751,6 +4760,7 @@ public class StandardContext
      * XXX Should this be done in stop() ?
      * 
      */ 
+    @Override
     public void destroy() throws Exception {
         if( oname != null ) { 
             // Send j2ee.object.deleted notification 
@@ -4792,6 +4802,7 @@ public class StandardContext
     /**
      * Return a String representation of this component.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -5272,6 +5283,7 @@ public class StandardContext
     }
     
 
+    @Override
     public ObjectName createObjectName(String hostDomain, ObjectName parentName)
             throws MalformedObjectNameException
     {
@@ -5353,6 +5365,7 @@ public class StandardContext
      * @return ObjectName The name of the object
      * @throws Exception If an error occurs
      */
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name)
             throws Exception
@@ -5365,6 +5378,7 @@ public class StandardContext
         return super.preRegister(server,name);
     }
 
+    @Override
     public void preDeregister() throws Exception {
         if( started ) {
             try {
@@ -5375,6 +5389,7 @@ public class StandardContext
         }
     }
 
+    @Override
     public void init() throws Exception {
 
         if( this.getParent() == null ) {
@@ -5449,6 +5464,7 @@ public class StandardContext
         
     }
 
+    @Override
     public ObjectName getParentName() throws MalformedObjectNameException {
         // "Life" update
         String path=oname.getKeyProperty("name");

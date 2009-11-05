@@ -124,6 +124,7 @@ public class CometEventImpl implements CometEvent {
         }
     }
     
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());

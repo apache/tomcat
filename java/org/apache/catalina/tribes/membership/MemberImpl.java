@@ -507,6 +507,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * String representation of this object
      */
+    @Override
     public String toString()  {
         StringBuilder buf = new StringBuilder("org.apache.catalina.tribes.membership.MemberImpl[");
         buf.append(getName()).append(",");
@@ -543,6 +544,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * @see java.lang.Object#hashCode()
      * @return The hash code
      */
+    @Override
     public int hashCode() {
         return getHost()[0]+getHost()[1]+getHost()[2]+getHost()[3];
     }
@@ -551,6 +553,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Returns true if the param o is a McastMember with the same name
      * @param o
      */
+    @Override
     public boolean equals(Object o) {
         if ( o instanceof MemberImpl )    {
             return Arrays.equals(this.getHost(),((MemberImpl)o).getHost()) &&

@@ -54,6 +54,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
     DecimalFormat df = new DecimalFormat("#0.00");
 
 
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         if ( access.addAndGet(1) == 1 ) txStart = System.currentTimeMillis();
         long bytes = XByteBuffer.getDataPackageLength(((ChannelData)msg).getDataPackageLength());
@@ -77,6 +78,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
         msgTxCnt.addAndGet(1);
     }
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         if ( rxStart == 0 ) rxStart = System.currentTimeMillis();
         long bytes = XByteBuffer.getDataPackageLength(((ChannelData)msg).getDataPackageLength());

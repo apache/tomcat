@@ -78,6 +78,7 @@ public class PersistentValve
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -99,6 +100,7 @@ public class PersistentValve
      * @exception IOException if an input/output error occurred
      * @exception ServletException if a servlet error occurred
      */
+    @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 

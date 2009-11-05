@@ -608,6 +608,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * Return a String representation of this UserDatabase.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("MemoryUserDatabase[id=");

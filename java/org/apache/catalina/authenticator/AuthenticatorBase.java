@@ -252,6 +252,7 @@ public abstract class AuthenticatorBase
     /**
      * Return the Container to which this Valve is attached.
      */
+    @Override
     public Container getContainer() {
 
         return (this.context);
@@ -264,6 +265,7 @@ public abstract class AuthenticatorBase
      *
      * @param container The container to which we are attached
      */
+    @Override
     public void setContainer(Container container) {
 
         if (!(container instanceof Context))
@@ -306,6 +308,7 @@ public abstract class AuthenticatorBase
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -384,6 +387,7 @@ public abstract class AuthenticatorBase
      * @exception IOException if an input/output error occurs
      * @exception ServletException if thrown by a processing element
      */
+    @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 

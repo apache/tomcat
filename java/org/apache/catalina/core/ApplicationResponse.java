@@ -102,6 +102,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      * @exception IllegalStateException if the response has already
      *  been committed
      */
+    @Override
     public void reset() {
 
         // If already committed, the wrapped response will throw ISE
@@ -116,6 +117,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      *
      * @param len The new content length
      */
+    @Override
     public void setContentLength(int len) {
 
         if (!included)
@@ -129,6 +131,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      *
      * @param type The new content type
      */
+    @Override
     public void setContentType(String type) {
 
         if (!included)
@@ -142,6 +145,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      *
      * @param loc The new locale
      */
+    @Override
     public void setLocale(Locale loc) {
         if (!included)
             getResponse().setLocale(loc);
@@ -153,6 +157,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      *
      * @param size The buffer size
      */
+    @Override
     public void setBufferSize(int size) {
         if (!included)
             getResponse().setBufferSize(size);
@@ -167,6 +172,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      *
      * @param response The new wrapped response
      */
+    @Override
     public void setResponse(ServletResponse response) {
 
         super.setResponse(response);

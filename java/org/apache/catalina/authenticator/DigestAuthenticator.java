@@ -103,6 +103,7 @@ public class DigestAuthenticator
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -126,6 +127,7 @@ public class DigestAuthenticator
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public boolean authenticate(Request request,
                                 Response response,
                                 LoginConfig config)

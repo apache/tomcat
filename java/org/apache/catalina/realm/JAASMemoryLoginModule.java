@@ -216,6 +216,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
      * @param request Request we are processing
      * @param context Context the Request is mapped to
      */
+    @Override
     public SecurityConstraint [] findSecurityConstraints(Request request,
                                                      Context context) {
         ArrayList<SecurityConstraint> results = null;

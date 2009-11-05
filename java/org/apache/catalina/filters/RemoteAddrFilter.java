@@ -93,6 +93,7 @@ public final class RemoteAddrFilter
                 event, chain);        
     }
 
+    @Override
     protected Log getLogger() {
         return log;
     }

@@ -64,6 +64,7 @@ public class PooledMultiSender extends PooledSender {
      * @todo Implement this org.apache.catalina.tribes.transport.PooledSender
      *   method
      */
+    @Override
     public DataSender getNewDataSender() {
         MultipointBioSender sender = new MultipointBioSender();
         AbstractSender.transferProperties(this,sender);

@@ -51,6 +51,7 @@ public class StaticMembershipInterceptor
     /**
      * has members
      */
+    @Override
     public boolean hasMembers() {
         return super.hasMembers() || (members.size()>0);
     }
@@ -59,6 +60,7 @@ public class StaticMembershipInterceptor
      * Get all current cluster members
      * @return all members or empty array
      */
+    @Override
     public Member[] getMembers() {
         if ( members.size() == 0 ) return super.getMembers();
         else {
@@ -78,6 +80,7 @@ public class StaticMembershipInterceptor
      * @param mbr Member
      * @return Member
      */
+    @Override
     public Member getMember(Member mbr) {
         if ( members.contains(mbr) ) return members.get(members.indexOf(mbr));
         else return super.getMember(mbr);
@@ -88,6 +91,7 @@ public class StaticMembershipInterceptor
      *
      * @return Member
      */
+    @Override
     public Member getLocalMember(boolean incAlive) {
         if (this.localMember != null ) return localMember;
         else return super.getLocalMember(incAlive);
@@ -98,12 +102,14 @@ public class StaticMembershipInterceptor
      * @param svc int
      * @throws ChannelException
      */
+    @Override
     public void start(int svc) throws ChannelException {
         if ( (Channel.SND_RX_SEQ&svc)==Channel.SND_RX_SEQ ) super.start(Channel.SND_RX_SEQ); 
         if ( (Channel.SND_TX_SEQ&svc)==Channel.SND_TX_SEQ ) super.start(Channel.SND_TX_SEQ); 
         final Member[] mbrs = members.toArray(new Member[members.size()]);
         final ChannelInterceptorBase base = this;
         Thread t = new Thread() {
+            @Override
             public void run() {
                 for (int i=0; i<mbrs.length; i++ ) {
                     base.memberAdded(mbrs[i]);

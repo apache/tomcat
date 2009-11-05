@@ -85,6 +85,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         else return result;
     }
 
+    @Override
     public void connect() throws IOException {
         //do nothing, we connect on demand
         setConnected(true);
@@ -119,16 +120,19 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     }
 
 
+    @Override
     public synchronized void disconnect() {
         try {close(); }catch (Exception x){}
         setConnected(false);
     }
 
+    @Override
     public void finalize() {
         try {disconnect(); }catch ( Exception ignore){}
     }
 
 
+    @Override
     public boolean keepalive() {
         //throw new UnsupportedOperationException("Method ParallelBioSender.checkKeepAlive() not implemented");
         boolean result = false;

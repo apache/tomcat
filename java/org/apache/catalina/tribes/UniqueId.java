@@ -42,11 +42,13 @@ public final class UniqueId implements Serializable{
         System.arraycopy(id,offset,this.id,0,length);
     }
     
+    @Override
     public int hashCode() {
         if ( id == null ) return 0;
         return Arrays.hashCode(id);
     }
     
+    @Override
     public boolean equals(Object other) {
         boolean result = (other instanceof UniqueId);
         if ( result ) {
@@ -63,6 +65,7 @@ public final class UniqueId implements Serializable{
         return id;
     }
     
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("UniqueId");
         buf.append(org.apache.catalina.tribes.util.Arrays.toString(id));

@@ -37,12 +37,14 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
     
     protected byte[] domain = new byte[0];
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         //should we filter incoming based on domain?
         super.messageReceived(msg);
     }//messageReceived
 
 
+    @Override
     public void memberAdded(Member member) {
         if ( membership == null ) setupMembership();
         boolean notify = false;
@@ -53,6 +55,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         if ( notify ) super.memberAdded(member);
     }
 
+    @Override
     public void memberDisappeared(Member member) {
         if ( membership == null ) setupMembership();
         boolean notify = false;
@@ -63,21 +66,25 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         if ( notify ) super.memberDisappeared(member);
     }
 
+    @Override
     public boolean hasMembers() {
         if ( membership == null ) setupMembership();
         return membership.hasMembers();
     }
 
+    @Override
     public Member[] getMembers() {
         if ( membership == null ) setupMembership();
         return membership.getMembers();
     }
 
+    @Override
     public Member getMember(Member mbr) {
         if ( membership == null ) setupMembership();
         return membership.getMember(mbr);
     }
 
+    @Override
     public Member getLocalMember(boolean incAlive) {
         return super.getLocalMember(incAlive);
     }

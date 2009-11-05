@@ -70,6 +70,7 @@ public class JMXQueryTask extends AbstractCatalinaTask {
      *
      * @exception BuildException if an error occurs
      */
+    @Override
     public void execute() throws BuildException {
         super.execute();
         String queryString = (query == null) ? "":("?qry="+query);
