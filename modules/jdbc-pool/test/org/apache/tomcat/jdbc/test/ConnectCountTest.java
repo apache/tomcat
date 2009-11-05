@@ -239,6 +239,7 @@ public class ConnectCountTest extends DefaultTestCase {
         protected long sleep = 10;
         protected boolean async = false;
         long minwait = Long.MAX_VALUE, maxwait = -1, totalwait=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
+        @Override
         public void run() {
             try {
                 long now = System.currentTimeMillis();

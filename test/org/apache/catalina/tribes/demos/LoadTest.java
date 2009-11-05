@@ -265,6 +265,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             // Default constructor
         }
         
+        @Override
         public byte[] getMessage() {
             if ( message == null ) {
                 message = outdata;
@@ -272,6 +273,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             return message;
         }
         
+        @Override
         public void setMessage(byte[] data) {
             this.message = data;
         }
@@ -382,6 +384,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             this.channel = channel;
         }
         
+        @Override
         public void run() {
             System.out.println("Shutting down...");
             SystemExit exit = new SystemExit(5000);
@@ -401,6 +404,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         public SystemExit(long delay) {
             this.delay = delay;
         }
+        @Override
         public void run () {
             try {
                 Thread.sleep(delay);

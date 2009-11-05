@@ -28,6 +28,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public class TestCookiesNoFwdStrictSysProps extends CookiesBaseTest {
     
+    @Override
     public void testCookiesInstance() throws Exception {
 
         System.setProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE",

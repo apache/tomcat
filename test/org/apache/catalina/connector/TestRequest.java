@@ -177,6 +177,7 @@ public class TestRequest extends TomcatBaseTest {
             return null;
         }
 
+        @Override
         public boolean isResponseBodyOK() {
             if (getResponseBody() == null) {
                 return false;

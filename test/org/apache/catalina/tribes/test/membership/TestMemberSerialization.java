@@ -33,6 +33,7 @@ public class TestMemberSerialization extends TestCase {
     MemberImpl m1, m2, p1,p2;
     byte[] payload = null;
     int udpPort = 3445;
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         payload = new byte[333];
@@ -108,6 +109,7 @@ public class TestMemberSerialization extends TestCase {
         return result;
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
