@@ -182,6 +182,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     /** 
      * Send an acknoledgement.
      */
+    @Override
     public void sendAck() throws IOException {
 
         if (!committed) {
@@ -237,6 +238,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
      * 
      * @throws IOException an undelying I/O error occured
      */
+    @Override
     protected void commit()
         throws IOException {
 
