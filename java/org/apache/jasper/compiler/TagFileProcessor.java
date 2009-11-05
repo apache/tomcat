@@ -146,6 +146,7 @@ class TagFileProcessor {
             variableVector = new Vector<TagVariableInfo>();
         }
 
+        @Override
         public void visit(Node.TagDirective n) throws JasperException {
 
             JspUtil.checkAttributes("Tag directive", n, tagDirectiveAttrs, err);
@@ -188,6 +189,7 @@ class TagFileProcessor {
             return result;
         }
 
+        @Override
         public void visit(Node.AttributeDirective n) throws JasperException {
 
             JspUtil.checkAttributes("Attribute directive", n,
@@ -287,6 +289,7 @@ class TagFileProcessor {
             checkUniqueName(attrName, ATTR_NAME, n, tagAttributeInfo);
         }
 
+        @Override
         public void visit(Node.VariableDirective n) throws JasperException {
 
             JspUtil.checkAttributes("Variable directive", n,
@@ -637,6 +640,7 @@ class TagFileProcessor {
             this.pageInfo = compiler.getPageInfo();
         }
 
+        @Override
         public void visit(Node.CustomTag n) throws JasperException {
             TagFileInfo tagFileInfo = n.getTagFileInfo();
             if (tagFileInfo != null) {

@@ -95,6 +95,7 @@ public class UTF8Reader
      *
      * @exception  IOException  If an I/O error occurs
      */
+    @Override
     public int read() throws IOException {
 
         // decode character
@@ -230,6 +231,7 @@ public class UTF8Reader
      *
      * @exception  IOException  If an I/O error occurs
      */
+    @Override
     public int read(char ch[], int offset, int length) throws IOException {
 
         // handle surrogate
@@ -511,6 +513,7 @@ public class UTF8Reader
      *
      * @exception  IOException  If an I/O error occurs
      */
+    @Override
     public long skip(long n) throws IOException {
 
         long remaining = n;
@@ -540,6 +543,7 @@ public class UTF8Reader
      *
      * @exception  IOException  If an I/O error occurs
      */
+    @Override
     public boolean ready() throws IOException {
 	    return false;
     } // ready()
@@ -547,6 +551,7 @@ public class UTF8Reader
     /**
      * Tell whether this stream supports the mark() operation.
      */
+    @Override
     public boolean markSupported() {
 	    return false;
     } // markSupported()
@@ -564,6 +569,7 @@ public class UTF8Reader
      * @exception  IOException  If the stream does not support mark(),
      *                          or if some other I/O error occurs
      */
+    @Override
     public void mark(int readAheadLimit) throws IOException {
 	throw new IOException(
                 Localizer.getMessage("jsp.error.xml.operationNotSupported",
@@ -583,6 +589,7 @@ public class UTF8Reader
      *                          or if the stream does not support reset(),
      *                          or if some other I/O error occurs
      */
+    @Override
     public void reset() throws IOException {
         fOffset = 0;
         fSurrogate = -1;
@@ -595,6 +602,7 @@ public class UTF8Reader
      *
      * @exception  IOException  If an I/O error occurs
      */
+    @Override
     public void close() throws IOException {
         fInputStream.close();
     } // close()
