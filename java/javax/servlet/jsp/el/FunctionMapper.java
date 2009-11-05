@@ -26,6 +26,7 @@ package javax.servlet.jsp.el;
  * @since 2.0
  * @deprecated
  */
+@Deprecated
 public interface FunctionMapper {
   /**
    * Resolves the specified local name and prefix into a Java.lang.Method.

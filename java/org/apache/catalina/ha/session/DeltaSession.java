@@ -805,6 +805,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
  *             will be removed in a future version of this API.
  */
 
+@Deprecated
 final class StandardSessionContext
     implements HttpSessionContext {
 
@@ -818,6 +819,7 @@ final class StandardSessionContext
      *             must return an empty <code>Enumeration</code> and will be
      *             removed in a future version of the API.
      */
+    @Deprecated
     public Enumeration<String> getIds() {
         return (new Enumerator<String>(dummy));
     }
@@ -833,6 +835,7 @@ final class StandardSessionContext
      *             must return null and will be removed in a future version of
      *             the API.
      */
+    @Deprecated
     public HttpSession getSession(String id) {
         return (null);
     }

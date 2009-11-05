@@ -48,6 +48,7 @@ public class SetPropertyRule extends Rule {
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
      * Use {@link #SetPropertyRule(String name, String value)} instead.
      */
+    @Deprecated
     public SetPropertyRule(Digester digester, String name, String value) {
 
         this(name, value);

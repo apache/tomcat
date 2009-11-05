@@ -630,6 +630,7 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Deprecated
     public Servlet getServlet(String name) {
 
         return (null);
@@ -650,6 +651,7 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Deprecated
     public Enumeration<String> getServletNames() {
         return (new Enumerator<String>(emptyString));
     }
@@ -658,6 +660,7 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Deprecated
     public Enumeration<Servlet> getServlets() {
         return (new Enumerator<Servlet>(emptyServlet));
     }
@@ -684,6 +687,7 @@ public class ApplicationContext
      * @deprecated As of Java Servlet API 2.1, use
      *  <code>log(String, Throwable)</code> instead
      */
+    @Deprecated
     public void log(Exception exception, String message) {
         
         context.getLogger().error(message, exception);

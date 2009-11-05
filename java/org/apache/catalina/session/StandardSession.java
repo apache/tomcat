@@ -1034,6 +1034,7 @@ public class StandardSession
      *  replacement.  It will be removed in a future version of the
      *  Java Servlet API.
      */
+    @Deprecated
     public HttpSessionContext getSessionContext() {
 
         if (sessionContext == null)
@@ -1098,6 +1099,7 @@ public class StandardSession
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>getAttribute()</code>
      */
+    @Deprecated
     public Object getValue(String name) {
 
         return (getAttribute(name));
@@ -1115,6 +1117,7 @@ public class StandardSession
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>getAttributeNames()</code>
      */
+    @Deprecated
     public String[] getValueNames() {
 
         if (!isValidInternal())
@@ -1184,6 +1187,7 @@ public class StandardSession
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>setAttribute()</code>
      */
+    @Deprecated
     public void putValue(String name, Object value) {
 
         setAttribute(name, value);
@@ -1257,6 +1261,7 @@ public class StandardSession
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>removeAttribute()</code>
      */
+    @Deprecated
     public void removeValue(String name) {
 
         removeAttribute(name);
@@ -1725,6 +1730,7 @@ public class StandardSession
  *  interface will be removed in a future version of this API.
  */
 
+@Deprecated
 final class StandardSessionContext implements HttpSessionContext {
 
 
@@ -1738,6 +1744,7 @@ final class StandardSessionContext implements HttpSessionContext {
      *  This method must return an empty <code>Enumeration</code>
      *  and will be removed in a future version of the API.
      */
+    @Deprecated
     public Enumeration<String> getIds() {
 
         return (new Enumerator<String>(dummy));
@@ -1755,6 +1762,7 @@ final class StandardSessionContext implements HttpSessionContext {
      *  This method must return null and will be removed in a
      *  future version of the API.
      */
+    @Deprecated
     public HttpSession getSession(String id) {
 
         return (null);
