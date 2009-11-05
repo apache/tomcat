@@ -151,6 +151,7 @@ public class ExtendedAccessLogValve
     /**
      * Return descriptive information about this implementation.
      */
+    @Override
     public String getInfo() {
         return (extendedAccessLogInfo);
     }
@@ -209,6 +210,7 @@ public class ExtendedAccessLogValve
     /**
      * Open the new log file for the date specified by <code>dateStamp</code>.
      */
+    @Override
     protected synchronized void open() {
         super.open();
         if (currentLogFile.length()==0) {
@@ -228,6 +230,7 @@ public class ExtendedAccessLogValve
         
         private static final ThreadLocal<ElementTimestampStruct> currentDate =
                 new ThreadLocal<ElementTimestampStruct>() {
+            @Override
             protected ElementTimestampStruct initialValue() {
                 return new ElementTimestampStruct("yyyy-MM-dd");
             }
@@ -254,6 +257,7 @@ public class ExtendedAccessLogValve
         
         private static final ThreadLocal<ElementTimestampStruct> currentTime =
                 new ThreadLocal<ElementTimestampStruct>() {
+            @Override
             protected ElementTimestampStruct initialValue() {
                 return new ElementTimestampStruct("HH:mm:ss");
             }
@@ -528,6 +532,7 @@ public class ExtendedAccessLogValve
         
     }
     
+    @Override
     protected AccessLogElement[] createLogElements() {
         if (log.isDebugEnabled()) {
             log.debug("decodePattern, pattern =" + pattern);

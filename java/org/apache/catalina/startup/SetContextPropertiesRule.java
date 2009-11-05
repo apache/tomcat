@@ -48,6 +48,7 @@ public class SetContextPropertiesRule extends Rule {
      *
      * @exception Exception if a processing error occurs
      */
+    @Override
     public void begin(String namespace, String nameX, Attributes attributes)
         throws Exception {
 

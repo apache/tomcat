@@ -64,6 +64,7 @@ public class Membership
       */
     protected Comparator<Member> memberComparator = new MemberComparator();
 
+    @Override
     public Object clone() {
         synchronized (membersLock) {
             Membership clone = new Membership(local, memberComparator);

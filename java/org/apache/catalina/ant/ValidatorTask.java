@@ -73,6 +73,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
      *
      * @exception BuildException if a validation error occurs
      */
+    @Override
     public void execute() throws BuildException {
 
         if (path == null) {

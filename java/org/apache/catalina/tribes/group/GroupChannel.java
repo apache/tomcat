@@ -145,6 +145,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Invoke this method from the application on a periodic basis if
      * you have turned off internal heartbeats <code>channel.setHeartbeat(false)</code>
      */
+    @Override
     public void heartbeat() {
         super.heartbeat();
         Iterator<Object> i = membershipListeners.iterator();
@@ -237,6 +238,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * but its an extreme case, and you're probably better off doing that logic between the applications itself.
      * @param msg ChannelMessage
      */
+    @Override
     public void messageReceived(ChannelMessage msg) {
         if ( msg == null ) return;
         try {
@@ -313,6 +315,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * and the channel will broadcast it to the membership listeners
      * @param member Member - the new member
      */
+    @Override
     public void memberAdded(Member member) {
         //notify upwards
         for (int i=0; i<membershipListeners.size(); i++ ) {
@@ -326,6 +329,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * and the channel will broadcast it to the membership listeners
      * @param member Member - the member that left or crashed
      */
+    @Override
     public void memberDisappeared(Member member) {
         //notify upwards
         for (int i=0; i<membershipListeners.size(); i++ ) {
@@ -401,6 +405,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @throws ChannelException
      * @see org.apache.catalina.tribes.Channel#start(int)
      */
+    @Override
     public synchronized void start(int svc) throws ChannelException {
         setupDefaultStack();
         if (optionCheck) checkOptionFlags();
@@ -417,6 +422,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @throws ChannelException
      * @see org.apache.catalina.tribes.Channel#stop(int)
      */
+    @Override
     public synchronized void stop(int svc) throws ChannelException {
         if (hbthread != null) {
             hbthread.stopHeartbeat();
@@ -654,6 +660,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             interrupt();
         }
 
+        @Override
         public void run() {
             while (doRun) {
                 try {

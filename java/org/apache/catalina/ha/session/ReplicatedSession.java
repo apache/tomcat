@@ -81,6 +81,7 @@ implements org.apache.catalina.ha.ClusterSession{
     }
 
 
+    @Override
     public void removeAttribute(String name) {
         setIsDirty(true);
         super.removeAttribute(name);
@@ -90,6 +91,7 @@ implements org.apache.catalina.ha.ClusterSession{
      * see parent description,
      * plus we also notify other nodes in the cluster
      */
+    @Override
     public void removeAttribute(String name, boolean notify) {
         setIsDirty(true);
         super.removeAttribute(name,notify);
@@ -99,6 +101,7 @@ implements org.apache.catalina.ha.ClusterSession{
     /**
      * Sets an attribute and notifies the other nodes in the cluster
      */
+    @Override
     public void setAttribute(String name, Object value)
     {
         if ( value == null ) {
@@ -111,6 +114,7 @@ implements org.apache.catalina.ha.ClusterSession{
         super.setAttribute(name,value);
     }
 
+    @Override
     public void setMaxInactiveInterval(int interval) {
         setIsDirty(true);
         super.setMaxInactiveInterval(interval);
@@ -136,11 +140,13 @@ implements org.apache.catalina.ha.ClusterSession{
      *
      * @param principal The new Principal, or <code>null</code> if none
      */
+    @Override
     public void setPrincipal(Principal principal) {
         super.setPrincipal(principal);
         setIsDirty(true);
     }
 
+    @Override
     public void expire() {
         SimpleTcpReplicationManager mgr =(SimpleTcpReplicationManager)getManager();
         mgr.sessionInvalidated(getIdInternal());
@@ -148,6 +154,7 @@ implements org.apache.catalina.ha.ClusterSession{
         super.expire();
     }
 
+    @Override
     public void invalidate() {
         SimpleTcpReplicationManager mgr =(SimpleTcpReplicationManager)getManager();
         mgr.sessionInvalidated(getIdInternal());
@@ -166,6 +173,7 @@ implements org.apache.catalina.ha.ClusterSession{
      * @exception ClassNotFoundException if an unknown class is specified
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void readObjectData(ObjectInputStream stream)
         throws ClassNotFoundException, IOException {
 
@@ -183,6 +191,7 @@ implements org.apache.catalina.ha.ClusterSession{
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void writeObjectData(ObjectOutputStream stream)
         throws IOException {
 
@@ -252,6 +261,7 @@ implements org.apache.catalina.ha.ClusterSession{
 
     }
 
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("ReplicatedSession id=");
         buf.append(getIdInternal()).append(" ref=").append(super.toString()).append("\n");
@@ -270,12 +280,14 @@ implements org.apache.catalina.ha.ClusterSession{
     public void setAccessCount(int accessCount) {
         this.accessCount.set(accessCount);
     }
+    @Override
     public long getLastAccessedTime() {
         return lastAccessedTime;
     }
     public void setLastAccessedTime(long lastAccessedTime) {
         this.lastAccessedTime = lastAccessedTime;
     }
+    @Override
     public long getThisAccessedTime() {
         return thisAccessedTime;
     }

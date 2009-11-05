@@ -309,6 +309,7 @@ public class Embedded  extends StandardService {
      *
      * @exception IllegalStateException if no engines have been added yet
      */
+    @Override
     public synchronized void addConnector(Connector connector) {
 
         if( log.isDebugEnabled() ) {
@@ -576,6 +577,7 @@ public class Embedded  extends StandardService {
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -762,6 +764,7 @@ public class Embedded  extends StandardService {
      *
      * @param listener The listener to add
      */
+    @Override
     public void addLifecycleListener(LifecycleListener listener) {
 
         lifecycle.addLifecycleListener(listener);
@@ -773,6 +776,7 @@ public class Embedded  extends StandardService {
      * Get the lifecycle listeners associated with this lifecycle. If this 
      * Lifecycle has no listeners registered, a zero-length array is returned.
      */
+    @Override
     public LifecycleListener[] findLifecycleListeners() {
 
         return lifecycle.findLifecycleListeners();
@@ -785,6 +789,7 @@ public class Embedded  extends StandardService {
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removeLifecycleListener(LifecycleListener listener) {
 
         lifecycle.removeLifecycleListener(listener);
@@ -800,6 +805,7 @@ public class Embedded  extends StandardService {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
 
         if( log.isInfoEnabled() )
@@ -842,6 +848,7 @@ public class Embedded  extends StandardService {
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException {
 
         if( log.isDebugEnabled() )

@@ -127,6 +127,7 @@ public final class FileStore extends StoreBase {
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -143,6 +144,7 @@ public final class FileStore extends StoreBase {
     /**
      * Return the name for this Store, used for logging.
      */
+    @Override
     public String getStoreName() {
         return(storeName);
     }

@@ -59,6 +59,7 @@ public class RequestDumperFilter implements Filter {
 
     private static final ThreadLocal<Timestamp> timestamp =
             new ThreadLocal<Timestamp>() {
+        @Override
         protected Timestamp initialValue() {
             return new Timestamp();
         }

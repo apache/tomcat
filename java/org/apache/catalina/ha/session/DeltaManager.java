@@ -162,6 +162,7 @@ public class DeltaManager extends ClusterManagerBase{
      * corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
         return info;
     }
@@ -173,6 +174,7 @@ public class DeltaManager extends ClusterManagerBase{
     /**
      * Return the descriptive short name of this Manager implementation.
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -279,6 +281,7 @@ public class DeltaManager extends ClusterManagerBase{
     /**
      * @return Returns the processingTime.
      */
+    @Override
     public long getProcessingTime() {
         return processingTime;
     }
@@ -494,6 +497,7 @@ public class DeltaManager extends ClusterManagerBase{
      * @param container
      *            The associated Container
      */
+    @Override
     public void setContainer(Container container) {
         // De-register from the old Container (if any)
         if ((this.container != null) && (this.container instanceof Context))
@@ -531,6 +535,7 @@ public class DeltaManager extends ClusterManagerBase{
      * @exception IllegalStateException
      *                if a new session cannot be instantiated for any reason
      */
+    @Override
     public Session createSession(String sessionId) {
         return createSession(sessionId, true);
     }
@@ -594,6 +599,7 @@ public class DeltaManager extends ClusterManagerBase{
      * Create DeltaSession
      * @see org.apache.catalina.Manager#createEmptySession()
      */
+    @Override
     public Session createEmptySession() {
         return getNewDeltaSession() ;
     }

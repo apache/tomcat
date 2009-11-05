@@ -105,6 +105,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      *
      * @param name Name of the attribute to retrieve
      */
+    @Override
     public Object getAttribute(String name) {
 
         synchronized (attributes) {
@@ -118,6 +119,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      * Override the <code>getAttributeNames()</code> method of the wrapped
      * request.
      */
+    @Override
     public Enumeration<String> getAttributeNames() {
 
         synchronized (attributes) {
@@ -133,6 +135,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      *
      * @param name Name of the attribute to remove
      */
+    @Override
     public void removeAttribute(String name) {
 
         synchronized (attributes) {
@@ -151,6 +154,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      * @param name Name of the attribute to set
      * @param value Value of the attribute to set
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         synchronized (attributes) {
@@ -170,6 +174,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      *
      * @param request The new wrapped request
      */
+    @Override
     public void setRequest(ServletRequest request) {
 
         super.setRequest(request);

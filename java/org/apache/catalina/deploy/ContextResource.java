@@ -71,6 +71,7 @@ public class ContextResource extends ResourceBase implements Serializable {
     /**
      * Return a String representation of this object.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("ContextResource[");

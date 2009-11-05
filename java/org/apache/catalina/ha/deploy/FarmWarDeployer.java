@@ -221,6 +221,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * @param msg
      *            ClusterMessage - the message received from the cluster
      */
+    @Override
     public void messageReceived(ClusterMessage msg) {
         try {
             if (msg instanceof FileMessage) {
@@ -330,6 +331,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      *         invoked. If false is returned, the messageReceived method will
      *         not be invoked.
      */
+    @Override
     public boolean accept(ClusterMessage msg) {
         return (msg instanceof FileMessage) || (msg instanceof UndeployMessage);
     }
@@ -653,18 +655,22 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /*--Instance Getters/Setters--------------------------------*/
+    @Override
     public CatalinaCluster getCluster() {
         return cluster;
     }
 
+    @Override
     public void setCluster(CatalinaCluster cluster) {
         this.cluster = cluster;
     }
 
+    @Override
     public boolean equals(Object listener) {
         return super.equals(listener);
     }
 
+    @Override
     public int hashCode() {
         return super.hashCode();
     }

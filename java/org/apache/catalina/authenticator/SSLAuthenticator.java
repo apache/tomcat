@@ -59,6 +59,7 @@ public class SSLAuthenticator
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -81,6 +82,7 @@ public class SSLAuthenticator
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public boolean authenticate(Request request,
                                 Response response,
                                 LoginConfig config)
@@ -173,6 +175,7 @@ public class SSLAuthenticator
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
 
         super.start();
@@ -187,6 +190,7 @@ public class SSLAuthenticator
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void stop() throws LifecycleException {
 
         super.stop();

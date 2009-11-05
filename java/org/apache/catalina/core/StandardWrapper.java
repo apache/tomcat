@@ -330,6 +330,7 @@ public class StandardWrapper
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -467,6 +468,7 @@ public class StandardWrapper
      *
      * @param container Proposed parent Container
      */
+    @Override
     public void setParent(Container container) {
 
         if ((container != null) &&
@@ -633,6 +635,7 @@ public class StandardWrapper
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         super.backgroundProcess();
         
@@ -671,6 +674,7 @@ public class StandardWrapper
      *
      * @param child Child container to be added
      */
+    @Override
     public void addChild(Container child) {
 
         throw new IllegalStateException
@@ -1193,6 +1197,7 @@ public class StandardWrapper
     /**
      * Return a String representation of this component.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
@@ -1550,6 +1555,7 @@ public class StandardWrapper
      *
      * @exception LifecycleException if a fatal error occurs during startup
      */
+    @Override
     public void start() throws LifecycleException {
     
         // Send j2ee.state.starting notification 
@@ -1588,6 +1594,7 @@ public class StandardWrapper
      *
      * @exception LifecycleException if a fatal error occurs during shutdown
      */
+    @Override
     public void stop() throws LifecycleException {
 
         setAvailable(Long.MAX_VALUE);

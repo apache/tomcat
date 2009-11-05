@@ -82,6 +82,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
     
     protected HashMap<Member, Long> addSuspects = new HashMap<Member, Long>();
     
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         try {
             super.sendMessage(destination, msg, payload);
@@ -97,6 +98,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         }
     }
 
+    @Override
     public void messageReceived(ChannelMessage msg) {
         //catch incoming 
         boolean process = true;
@@ -112,6 +114,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
     }//messageReceived
     
     
+    @Override
     public void memberAdded(Member member) {
         if ( membership == null ) setupMembership();
         boolean notify = false;
@@ -133,6 +136,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         if ( notify ) super.memberAdded(member);
     }
 
+    @Override
     public void memberDisappeared(Member member) {
         if ( membership == null ) setupMembership();
         boolean notify = false;
@@ -164,25 +168,30 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         }
     }
     
+    @Override
     public boolean hasMembers() {
         if ( membership == null ) setupMembership();
         return membership.hasMembers();
     }
 
+    @Override
     public Member[] getMembers() {
         if ( membership == null ) setupMembership();
         return membership.getMembers();
     }
 
+    @Override
     public Member getMember(Member mbr) {
         if ( membership == null ) setupMembership();
         return membership.getMember(mbr);
     }
 
+    @Override
     public Member getLocalMember(boolean incAlive) {
         return super.getLocalMember(incAlive);
     }
     
+    @Override
     public void heartbeat() {
         super.heartbeat();
         checkMembers(false);

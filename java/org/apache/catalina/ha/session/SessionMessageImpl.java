@@ -113,6 +113,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     /**
      * set message send time but only the first setting works (one shot)
      */
+    @Override
     public void setTimestamp(long time) {
         synchronized(this) {
             if(!timestampSet) {
@@ -122,6 +123,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
         }
     }
     
+    @Override
     public long getTimestamp() { return serializationTimestamp;}
     
     /**
@@ -146,13 +148,16 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     public String getContextName() {
        return mContextName;
     }
+    @Override
     public String getUniqueId() {
         return uniqueId;
     }
+    @Override
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
     
+    @Override
     public String toString() {
         return getEventTypeString() + "#" + getContextName() + "#" + getSessionID() ;
     }

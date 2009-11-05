@@ -108,6 +108,7 @@ public class ContextRuleSet extends RuleSetBase {
      * @param digester Digester instance to which the new Rule instances
      *  should be added.
      */
+    @Override
     public void addRuleInstances(Digester digester) {
 
         if (create) {

@@ -65,6 +65,7 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      * @return Returns the class info.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -80,6 +81,7 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
      * @exception Exception
      *                if an error occurs
      */
+    @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
 
