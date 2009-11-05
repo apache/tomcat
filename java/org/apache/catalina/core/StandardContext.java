@@ -378,7 +378,7 @@ public class StandardContext
 
     /**
      * Filter mappings added via {@link ServletContext} may have to be inserted
-     * before the mappings in the deploymenmt descriptor but must be inserted in
+     * before the mappings in the deployment descriptor but must be inserted in
      * the order the {@link ServletContext} methods are called. This isn't an
      * issue for the mappings added after the deployment descriptor - they are
      * just added to the end - but correctly the adding mappings before the
@@ -1642,7 +1642,7 @@ public class StandardContext
      * Set the original document root for this Context.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      *
-     * @param docBase The orginal document root
+     * @param docBase The original document root
      */
     public void setOriginalDocBase(String docBase) {
 
