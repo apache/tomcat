@@ -171,6 +171,7 @@ public class DefaultTestCase extends TestCase {
     }
 
 
+    @Override
     protected void tearDown() throws Exception {
         try {datasource.close();}catch(Exception ignore){}
         try {tDatasource.close();}catch(Exception ignore){}
