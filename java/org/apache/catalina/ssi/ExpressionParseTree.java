@@ -164,13 +164,13 @@ public class ExpressionParseTree {
                     break;
                 case ExpressionTokenizer.TOKEN_GE :
                     pushOpp(new NotNode());
-                    // Similar stategy to NOT_EQ above, except this
+                    // Similar strategy to NOT_EQ above, except this
                     // is NOT less than
                     oppStack.add(0, new LessThanNode());
                     break;
                 case ExpressionTokenizer.TOKEN_LE :
                     pushOpp(new NotNode());
-                    // Similar stategy to NOT_EQ above, except this
+                    // Similar strategy to NOT_EQ above, except this
                     // is NOT greater than
                     oppStack.add(0, new GreaterThanNode());
                     break;

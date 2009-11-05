@@ -345,7 +345,7 @@ public class FormAuthenticator
 
     /**
      * Does this request match the saved one (so that it must be the redirect
-     * we signalled after successful authentication?
+     * we signaled after successful authentication?
      *
      * @param request The request to be verified
      */
@@ -409,7 +409,7 @@ public class FormAuthenticator
         Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = names.next();
-            // The browser isn't expecting this conditional reposponse now.
+            // The browser isn't expecting this conditional response now.
             // Assuming that it can quietly recover from an unexpected 412.
             // BZ 43687
             if(!("If-Modified-Since".equalsIgnoreCase(name) ||

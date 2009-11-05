@@ -20,7 +20,7 @@ import org.apache.catalina.tribes.util.Arrays;
 import java.io.Serializable;
 
 /**
- * <p>Title: Represents a globabally unique Id</p>
+ * <p>Title: Represents a globally unique Id</p>
  *
  * <p>Company: </p>
  *

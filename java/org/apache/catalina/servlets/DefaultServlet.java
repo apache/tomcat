@@ -633,7 +633,7 @@ public class DefaultServlet
     /**
      * URL rewriter.
      *
-     * @param path Path which has to be rewiten
+     * @param path Path which has to be rewritten
      */
     protected String rewriteUrl(String path) {
         return urlEncoder.encode( path );

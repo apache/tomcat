@@ -958,7 +958,7 @@ public class WebappClassLoader
 
     /**
      * Find the specified resource in our local repository, and return a
-     * <code>URL</code> refering to it, or <code>null</code> if this resource
+     * <code>URL</code> referring to it, or <code>null</code> if this resource
      * cannot be found.
      *
      * @param name Name of the resource to be found
@@ -2344,7 +2344,7 @@ public class WebappClassLoader
 
 
     /**
-     * Validate a classname. As per SRV.9.7.2, we must restict loading of 
+     * Validate a classname. As per SRV.9.7.2, we must restrict loading of 
      * classes from J2SE (java.*) and classes of the servlet API 
      * (javax.servlet.*). That should enhance robustness and prevent a number
      * of user error (where an older version of servlet.jar would be present

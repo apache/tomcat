@@ -71,7 +71,7 @@ public class ServerLifecycleListener
 
 
     /**
-     * Semicolon separated list of paths containing MBean desciptor resources.
+     * Semicolon separated list of paths containing MBean descriptor resources.
      */
     protected String descriptors = null;
 
@@ -278,7 +278,7 @@ public class ServerLifecycleListener
      */
     protected void createMBeans(Connector connector) throws Exception {
 
-        // Create the MBean for the Connnector itself
+        // Create the MBean for the Connector itself
 //        if (log.isDebugEnabled())
 //            log.debug("Creating MBean for Connector " + connector);
 //        MBeanUtils.createMBean(connector);

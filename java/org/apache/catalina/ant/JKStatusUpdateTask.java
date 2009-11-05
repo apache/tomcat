@@ -352,7 +352,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * check correct lb and worker pararmeter
+     * check correct lb and worker parameter
      */
     protected void checkParameter() {
         if (worker == null) {

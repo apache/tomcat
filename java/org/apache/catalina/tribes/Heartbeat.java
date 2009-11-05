@@ -27,7 +27,7 @@ package org.apache.catalina.tribes;
 public interface Heartbeat {
     
     /**
-     * Heartbeat invokation for resources cleanup etc
+     * Heartbeat invocation for resources cleanup etc
      */
     public void heartbeat();
 

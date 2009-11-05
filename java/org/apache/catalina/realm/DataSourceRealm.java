@@ -36,7 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
 *
-* Implmentation of <b>Realm</b> that works with any JDBC JNDI DataSource.
+* Implementation of <b>Realm</b> that works with any JDBC JNDI DataSource.
 * See the JDBCRealm.howto for more details on how to set up the database and
 * for configuration options.
 *
@@ -105,7 +105,7 @@ public class DataSourceRealm
 
 
     /**
-     * The column in the user table that holds the user's credintials
+     * The column in the user table that holds the user's credentials
      */
     protected String userCredCol = null;
 

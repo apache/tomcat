@@ -487,8 +487,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     // ------------------------------------------------------ Private Constants
 
     // These HTML sections are broken in relatively small sections, because of
-    // limited number of subsitutions MessageFormat can process
-    // (maximium of 10).
+    // limited number of substitutions MessageFormat can process
+    // (maximum of 10).
 
     private static final String HOSTS_HEADER_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +

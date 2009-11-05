@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 
  * Same implementation as the MessageDispatchInterceptor
- * except is ues an atomic long for the currentSize calculation
+ * except it uses an atomic long for the currentSize calculation
  * and uses a thread pool for message sending.
  * 
  * @author Filip Hanik

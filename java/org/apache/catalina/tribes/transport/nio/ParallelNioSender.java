@@ -95,7 +95,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 delta = System.currentTimeMillis() - start;
             }
             if ( remaining > 0 ) {
-                //timeout has occured
+                //timeout has occurred
                 ChannelException cxtimeout = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
                 if ( cx==null ) cx = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
                 for (int i=0; i<senders.length; i++ ) {
@@ -307,7 +307,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 }
             }
         }
-        //clean up any cancelled keys
+        //clean up any canceled keys
         if ( result ) try { selector.selectNow(); }catch (Exception ignore){}
         return result;
     }

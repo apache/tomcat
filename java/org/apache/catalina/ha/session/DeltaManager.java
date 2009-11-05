@@ -396,7 +396,7 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * Set the maximum number of actives Sessions allowed, or -1 for no limit.
+     * Set the maximum number of active Sessions allowed, or -1 for no limit.
      * 
      * @param max
      *            The new maximum number of sessions
@@ -652,7 +652,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Load sessions from other cluster node.
-     * FIXME replace currently sessions with same id without notifcation.
+     * FIXME replace currently sessions with same id without notification.
      * FIXME SSO handling is not really correct with the session replacement!
      * @exception ClassNotFoundException
      *                if a serialized class cannot be found during the reload
@@ -1257,7 +1257,7 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * Exipre all find sessions.
+     * Expire all find sessions.
      */
     public void expireAllLocalSessions()
     {

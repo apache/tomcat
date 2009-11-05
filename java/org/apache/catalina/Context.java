@@ -965,7 +965,7 @@ public interface Context extends Container {
 
 
     /**
-     * Remove the tag library location forthe specified tag library URI.
+     * Remove the tag library location for the specified tag library URI.
      *
      * @param uri URI, relative to the web.xml file
      */
@@ -1010,7 +1010,7 @@ public interface Context extends Container {
 
     /**
      * Get the server.xml <context> attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
+     * @return true if namespace awareness is enabled.
      *
      */
     public boolean getXmlNamespaceAware();
@@ -1062,7 +1062,7 @@ public interface Context extends Container {
 
     /**
      * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
+     * @return true if namespace awareness is enabled.
      */
     public boolean getTldNamespaceAware();
 

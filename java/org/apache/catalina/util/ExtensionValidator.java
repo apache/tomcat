@@ -39,9 +39,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Ensures that all extension dependies are resolved for a WEB application
+ * Ensures that all extension dependencies are resolved for a WEB application
  * are met. This class builds a master list of extensions available to an
- * applicaiton and then validates those extensions.
+ * application and then validates those extensions.
  *
  * See http://java.sun.com/j2se/1.4/docs/guide/extensions/spec.html for
  * a detailed explanation of the extension mechanism in Java.
@@ -113,7 +113,7 @@ public final class ExtensionValidator {
 
 
     /**
-     * Runtime validation of a Web Applicaiton.
+     * Runtime validation of a Web Application.
      *
      * This method uses JNDI to look up the resources located under a 
      * <code>DirContext</code>. It locates Web Application MANIFEST.MF 
@@ -140,7 +140,7 @@ public final class ExtensionValidator {
         // If the application context is null it does not exist and 
         // therefore is not valid
         if (dirContext == null) return false;
-        // Find the Manifest for the Web Applicaiton
+        // Find the Manifest for the Web Application
         InputStream inputStream = null;
         try {
             NamingEnumeration<Binding> wne =
@@ -236,7 +236,7 @@ public final class ExtensionValidator {
      * represented by any given <code>ManifestResource</code> objects 
      * is not met.
      *
-     * This method should also provide static validation of a Web Applicaiton 
+     * This method should also provide static validation of a Web Application 
      * if provided with the necessary parameters.
      *
      * @param appName The name of the Application that will appear in the 
@@ -277,7 +277,7 @@ public final class ExtensionValidator {
             while (rit.hasNext()) {
                 boolean found = false;
                 Extension requiredExt = rit.next();
-                // check the applicaion itself for the extension
+                // check the application itself for the extension
                 if (availableExtensions != null) {
                     Iterator<Extension> ait = availableExtensions.iterator();
                     while (ait.hasNext()) {

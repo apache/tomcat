@@ -35,7 +35,7 @@ import org.apache.tomcat.util.buf.C2BConverter;
 /**
  * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3
  * OutputBuffer, with the removal of some of the state handling (which in 
- * Coyote is mostly the Processor's responsability).
+ * Coyote is mostly the Processor's responsibility).
  *
  * @author Costin Manolache
  * @author Remy Maucherat

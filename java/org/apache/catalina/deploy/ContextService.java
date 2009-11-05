@@ -172,7 +172,7 @@ public class ContextService extends ResourceBase implements Serializable {
     /**
      * A list of Handlers to use for this service-ref.
      *
-     * The instanciation of the handler have to be done.
+     * The instantiation of the handler have to be done.
      */
     private HashMap<String, ContextHandler> handlers =
         new HashMap<String, ContextHandler>();

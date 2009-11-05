@@ -40,7 +40,7 @@ public interface CometEvent {
      *  fields using the request and response objects. Between the end of the processing 
      *  of this event, and the beginning of the processing of the end or error events,
      *  it is possible to use the response object to write data on the open connection.
-     *  Note that the response object and depedent OutputStream and Writer are still 
+     *  Note that the response object and dependent OutputStream and Writer are still 
      *  not synchronized, so when they are accessed by multiple threads, 
      *  synchronization is mandatory. After processing the initial event, the request 
      *  is considered to be committed.
@@ -115,7 +115,7 @@ public interface CometEvent {
      * Ends the Comet session. This signals to the container that 
      * the container wants to end the comet session. This will send back to the
      * client a notice that the server has no more data to send as part of this
-     * request. The servlet should perform any needed cleanup as if it had recieved
+     * request. The servlet should perform any needed cleanup as if it had received
      * an END or ERROR event. 
      * 
      * @throws IOException if an IO exception occurs

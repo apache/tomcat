@@ -92,7 +92,7 @@ public final class SSIFsize implements SSICommand {
     }
 
 
-    //We try to mimick Apache here, as we do everywhere
+    //We try to mimic Apache here, as we do everywhere
     //All the 'magic' numbers are from the util_script.c Apache source file.
     protected String formatSize(long size, String format) {
         String retString = "";

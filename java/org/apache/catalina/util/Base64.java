@@ -108,7 +108,7 @@ public final class  Base64
     }
 
     /**
-     * Encodes hex octects into Base64.
+     * Encodes hex octets into Base64.
      *
      * @param binaryData Array containing binary data to encode.
      * @return Base64-encoded data.
@@ -203,7 +203,7 @@ public final class  Base64
     }
 
     /**
-     * Decodes Base64 data into octects
+     * Decodes Base64 data into octets
      *
      * @param base64DataBC Byte array containing Base64 data
      * @param decodedDataCC The decoded data chars
