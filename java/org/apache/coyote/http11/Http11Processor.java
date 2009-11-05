@@ -1016,6 +1016,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
      * Set the socket buffer flag.
      * @Override
      */
+    @Override
     public void setSocketBuffer(int socketBuffer) {
         super.setSocketBuffer(socketBuffer);
         outputBuffer.setSocketBuffer(socketBuffer);

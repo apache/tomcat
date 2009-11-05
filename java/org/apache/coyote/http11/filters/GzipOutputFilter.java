@@ -150,6 +150,7 @@ public class GzipOutputFilter implements OutputFilter {
         extends OutputStream {
         protected ByteChunk outputChunk = new ByteChunk();
         protected byte[] singleByteBuffer = new byte[1];
+        @Override
         public void write(int b)
             throws IOException {
             // Shouldn't get used for good performance, but is needed for 
@@ -158,12 +159,15 @@ public class GzipOutputFilter implements OutputFilter {
             outputChunk.setBytes(singleByteBuffer, 0, 1);
             buffer.doWrite(outputChunk, null);
         }
+        @Override
         public void write(byte[] b, int off, int len)
             throws IOException {
             outputChunk.setBytes(b, off, len);
             buffer.doWrite(outputChunk, null);
         }
+        @Override
         public void flush() throws IOException {}
+        @Override
         public void close() throws IOException {}
     }
 

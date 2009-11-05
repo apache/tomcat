@@ -153,6 +153,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * Recycle the input buffer. This should be called when closing the 
      * connection.
      */
+    @Override
     public void recycle() {
         super.recycle();
         // Recycle filters
@@ -176,6 +177,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
+    @Override
     public void nextRequest() {
         super.nextRequest();
         parsingHeader = true;
@@ -199,6 +201,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * @return true if data is properly fed; false if no data is available 
      * immediately and thread should be freed
      */
+    @Override
     public boolean parseRequestLine(boolean useAvailableDataOnly)
         throws IOException {
 
@@ -425,6 +428,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
     /**
      * Parse the HTTP headers.
      */
+    @Override
     public boolean parseHeaders()
         throws IOException {
         HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
@@ -654,6 +658,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * 
      * @return false if at end of stream
      */
+    @Override
     protected boolean fill(boolean block) throws IOException, EOFException {
         return fill(true,block);
     }

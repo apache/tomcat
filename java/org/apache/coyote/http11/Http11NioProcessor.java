@@ -1253,6 +1253,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
      * Specialized utility method: find a sequence of lower case bytes inside
      * a ByteChunk.
      */
+    @Override
     protected int findBytes(ByteChunk bc, byte[] b) {
 
         byte first = b[0];
@@ -1281,6 +1282,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
      * Determine if we must drop the connection because of the HTTP status
      * code.  Use the same list of codes as Apache/httpd.
      */
+    @Override
     protected boolean statusDropsConnection(int status) {
         return status == 400 /* SC_BAD_REQUEST */ ||
                status == 408 /* SC_REQUEST_TIMEOUT */ ||
