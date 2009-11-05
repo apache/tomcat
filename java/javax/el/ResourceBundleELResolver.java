@@ -31,7 +31,8 @@ public class ResourceBundleELResolver extends ELResolver {
 		super();
 	}
 
-	public Object getValue(ELContext context, Object base, Object property)
+	@Override
+    public Object getValue(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -53,7 +54,8 @@ public class ResourceBundleELResolver extends ELResolver {
 		return null;
 	}
 
-	public Class<?> getType(ELContext context, Object base, Object property)
+	@Override
+    public Class<?> getType(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -66,7 +68,8 @@ public class ResourceBundleELResolver extends ELResolver {
 		return null;
 	}
 
-	public void setValue(ELContext context, Object base, Object property,
+	@Override
+    public void setValue(ELContext context, Object base, Object property,
 			Object value) throws NullPointerException,
 			PropertyNotFoundException, PropertyNotWritableException,
 			ELException {
@@ -82,7 +85,8 @@ public class ResourceBundleELResolver extends ELResolver {
 		}
 	}
 
-	public boolean isReadOnly(ELContext context, Object base, Object property)
+	@Override
+    public boolean isReadOnly(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -95,7 +99,8 @@ public class ResourceBundleELResolver extends ELResolver {
 		return true;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	@Override
+    public Iterator getFeatureDescriptors(ELContext context, Object base) {
 		if (base instanceof ResourceBundle) {
 			List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>();
 			Enumeration e = ((ResourceBundle) base).getKeys();
@@ -118,7 +123,8 @@ public class ResourceBundleELResolver extends ELResolver {
 		return null;
 	}
 
-	public Class<?> getCommonPropertyType(ELContext context, Object base) {
+	@Override
+    public Class<?> getCommonPropertyType(ELContext context, Object base) {
 		if (base instanceof ResourceBundle) {
 			return String.class;
 		}
