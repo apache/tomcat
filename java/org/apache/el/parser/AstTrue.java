@@ -32,6 +32,7 @@ public final class AstTrue extends BooleanNode {
         super(id);
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         return Boolean.TRUE;

@@ -50,6 +50,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
         this.expectedType = expectedType;
     }
 
+    @Override
     public Object getValue(ELContext context) {
         if (this.expectedType != null) {
             return ELSupport.coerceToType(this.value, this.expectedType);
@@ -57,27 +58,33 @@ public final class ValueExpressionLiteral extends ValueExpression implements
         return this.value;
     }
 
+    @Override
     public void setValue(ELContext context, Object value) {
         throw new PropertyNotWritableException(MessageFactory.get(
                 "error.value.literal.write", this.value));
     }
 
+    @Override
     public boolean isReadOnly(ELContext context) {
         return true;
     }
 
+    @Override
     public Class<?> getType(ELContext context) {
         return (this.value != null) ? this.value.getClass() : null;
     }
 
+    @Override
     public Class<?> getExpectedType() {
         return this.expectedType;
     }
 
+    @Override
     public String getExpressionString() {
         return (this.value != null) ? this.value.toString() : null;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return (obj instanceof ValueExpressionLiteral && this
                 .equals((ValueExpressionLiteral) obj));
@@ -88,10 +95,12 @@ public final class ValueExpressionLiteral extends ValueExpression implements
                 .equals(ve.value))));
     }
 
+    @Override
     public int hashCode() {
         return (this.value != null) ? this.value.hashCode() : 0;
     }
 
+    @Override
     public boolean isLiteralText() {
         return true;
     }
