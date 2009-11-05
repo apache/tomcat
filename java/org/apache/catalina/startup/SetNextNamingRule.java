@@ -47,7 +47,7 @@ public class SetNextNamingRule extends Rule {
      *
      * @param methodName Method name of the parent method to call
      * @param paramType Java class of the parent method's argument
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      */
