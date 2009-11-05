@@ -100,6 +100,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
     /**
      * Set content type
      */
+    @Override
     public void setContentType(String contentType) {
         if (debug > 1) {
             System.out.println("setContentType to "+contentType);
@@ -173,6 +174,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void flushBuffer() throws IOException {
         if (debug > 1) {
             System.out.println("flush buffer @ CompressionServletResponseWrapper");
@@ -188,6 +190,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
 
         if (writer != null)
@@ -210,6 +213,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public PrintWriter getWriter() throws IOException {
 
         if (writer != null)
@@ -239,7 +243,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
 
     }
 
-
+    @Override
     public void setContentLength(int length) {
         // Don't, as compression will change it
     }

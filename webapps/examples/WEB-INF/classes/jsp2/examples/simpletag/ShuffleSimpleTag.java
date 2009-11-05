@@ -32,6 +32,7 @@ public class ShuffleSimpleTag extends SimpleTagSupport {
     private JspFragment fragment2;
     private JspFragment fragment3;
 
+    @Override
     public void doTag() throws JspException, IOException {
         switch( (int)(Math.random() * 6) ) {
             case 0:
