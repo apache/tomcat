@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.EventListener;
@@ -57,6 +58,7 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.FilterRegistration.Dynamic;
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.tomcat.addons.UserSessionManager;
 import org.apache.tomcat.integration.ObjectManager;
@@ -72,15 +74,15 @@ import org.apache.tomcat.util.http.MimeMap;
 
 /**
  * Context - initialized from web.xml or using APIs.
- * 
+ *
  * Initialization order:
- * 
+ *
  *  - add all listeners
  *  - add all filters
  *  - add all servlets
- *  
+ *
  *  - session parameters
- *  - 
+ *  -
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -88,14 +90,14 @@ import org.apache.tomcat.util.http.MimeMap;
  */
 
 public class ServletContextImpl implements ServletContext {
-    
+
     /**
      * Empty collection to serve as the basis for empty enumerations.
      */
     private transient static final ArrayList empty = new ArrayList();
-    
+
     transient Logger log;
-    
+
     /**
      * Base path - the directory root of the webapp
      */
@@ -123,7 +125,7 @@ public class ServletContextImpl implements ServletContext {
     protected transient ArrayList<EventListener> lifecycleListeners = new ArrayList();
 
     protected UserSessionManager manager;
-    
+
     HashMap<String, FilterConfigImpl> filters = new HashMap<String, FilterConfigImpl>();
 
     HashMap<String, ServletConfigImpl> servlets = new HashMap<String, ServletConfigImpl>();
@@ -133,16 +135,16 @@ public class ServletContextImpl implements ServletContext {
     /** Mapper for filters.
      */
     protected WebappFilterMapper webappFilterMapper;
-    
-    /** Internal mapper for request dispatcher, must have all 
-     *  context mappings. 
-     */ 
+
+    /** Internal mapper for request dispatcher, must have all
+     *  context mappings.
+     */
     protected WebappServletMapper mapper;
-    
+
     transient Locale2Charset charsetMapper = new Locale2Charset();
 
     transient TomcatLite facade;
-    
+
     ObjectManager om;
 
     private String hostname;
@@ -151,7 +153,7 @@ public class ServletContextImpl implements ServletContext {
     boolean initDone = false;
 
     boolean startDone = false;
-    
+
     // ------------------------------------------------- ServletContext Methods
     public ServletContextImpl() {
     }
@@ -159,7 +161,7 @@ public class ServletContextImpl implements ServletContext {
     public void setTomcat(TomcatLite facade) {
         this.facade = facade;
     }
-    
+
     /**
      * Registry/framework interface associated with the context.
      * Also available as a context attribute.
@@ -171,11 +173,11 @@ public class ServletContextImpl implements ServletContext {
         }
         return om;
     }
-    
+
     public void setObjectManager(ObjectManager om) {
         this.om = om;
     }
-    
+
     public Locale2Charset getCharsetMapper() {
         return charsetMapper;
     }
@@ -188,29 +190,29 @@ public class ServletContextImpl implements ServletContext {
         this.contextPath = path;
         log = Logger.getLogger("webapp" + path.replace('/', '.'));
     }
-    
+
     public void setHostname(String hostname) {
         this.hostname = hostname;
     }
-    
+
     public String getHostname() {
         return hostname;
     }
-    
+
     /** The directory where this app is based. May be null.
-     * 
+     *
      * @param basePath
      */
     public void setBasePath(String basePath) {
-        this.basePath = basePath;        
+        this.basePath = basePath;
     }
 
     public ServletContextConfig getContextConfig() {
         return contextConfig;
     }
-    
+
     /** The directory where this app is based.
-     * 
+     *
      * @param basePath
      */
     public String getBasePath() {
@@ -234,10 +236,19 @@ public class ServletContextImpl implements ServletContext {
     public List<EventListener> getListeners() {
         return lifecycleListeners;
     }
-    
-    public void addListener(EventListener listener) {
-      lifecycleListeners.add(listener);
+
+    public void addListener(Class <? extends EventListener> listenerClass) {
+        // implement me
     }
+
+    public void addListener(String className) {
+        // implement me
+    }
+
+    public <T extends EventListener> void addListener(T t) {
+      lifecycleListeners.add(t);
+    }
+
 
     public void removeListener(EventListener listener) {
       lifecycleListeners.remove(listener);
@@ -256,7 +267,7 @@ public class ServletContextImpl implements ServletContext {
     public ServletConfigImpl getServletConfig(String jsp_servlet_name) {
         return (ServletConfigImpl)servlets.get(jsp_servlet_name);
     }
-    
+
     public Map getServletConfigs() {
         return servlets;
     }
@@ -264,27 +275,27 @@ public class ServletContextImpl implements ServletContext {
     /**
      *  Add a servlet to the context.
      *  Called from processWebAppData()
-     * 
+     *
      * @param servletConfig
      */
     public void addServletConfig(ServletConfigImpl servletConfig) {
         servlets.put(servletConfig.getServletName(), servletConfig);
     }
-    
+
     public boolean getPrivileged() {
         return false;
     }
 
-    
+
     public Map getFilters() {
         return filters;
     }
-    
+
 
     protected boolean getCrossContext() {
         return true;
     }
-    
+
     public void addMimeType(String ext, String type) {
         contentTypes.addContentType(ext, type);
     }
@@ -302,7 +313,7 @@ public class ServletContextImpl implements ServletContext {
 
         return mapper;
     }
-    
+
     public WebappFilterMapper getFilterMapper() {
         if (webappFilterMapper == null) {
             Object customMapper = getObjectManager().get(WebappFilterMapper.class);
@@ -316,7 +327,7 @@ public class ServletContextImpl implements ServletContext {
 
         return webappFilterMapper ;
     }
-    
+
     public FilterConfigImpl getFilter(String name) {
         return (FilterConfigImpl)filters.get(name);
     }
@@ -349,7 +360,7 @@ public class ServletContextImpl implements ServletContext {
     public void addSecurityRole(String role) {
         securityRoles.add(role);
     }
-    
+
     public List getSecurityRoles() {
         return securityRoles;
     }
@@ -392,14 +403,14 @@ public class ServletContextImpl implements ServletContext {
         }
     }
 
-    
+
     /**
      * Return the main path associated with this context.
      */
     public String getContextPath() {
         return contextPath;
     }
-    
+
 
     /**
      * Return the value of the specified initialization parameter, or
@@ -473,10 +484,10 @@ public class ServletContextImpl implements ServletContext {
      */
     public RequestDispatcher getNamedDispatcher(String name) {
         if (name == null) return null;
-        ServletConfigImpl wrapper = 
+        ServletConfigImpl wrapper =
             (ServletConfigImpl) this.getServletConfig(name);
         if (wrapper == null) return null;
-        
+
         return new RequestDispatcherImpl(wrapper, name);
     }
 
@@ -490,18 +501,18 @@ public class ServletContextImpl implements ServletContext {
      */
     public RequestDispatcher getRequestDispatcher(String path) {
         if (path == null) return null;
-        
+
         if (!path.startsWith("/"))
             throw new IllegalArgumentException(path);
 
         path = UrlUtils.normalize(path);
         if (path == null)  return (null);
 
-        
+
         return new RequestDispatcherImpl(this, path);
     }
 
-    public RequestDispatcher getRequestDispatcher(String path, 
+    public RequestDispatcher getRequestDispatcher(String path,
                                                   int type,
                                                   String dispatcherPath) {
         RequestDispatcher dispatcher = getRequestDispatcher(path);
@@ -512,23 +523,23 @@ public class ServletContextImpl implements ServletContext {
     ThreadLocal requestDispatcherStack = new ThreadLocal();
 
     protected ClassLoader classLoader;
-    
+
 //    protected RequestDispatcherImpl getRequestDispatcher() {
-//        ArrayList/*<RequestDispatcherImpl>*/ list = 
+//        ArrayList/*<RequestDispatcherImpl>*/ list =
 //            (ArrayList)requestDispatcherStack.get();
 //        if (list == null) {
 //            list = new ArrayList();
 //            requestDispatcherStack.set(list);
 //        }
-//        
-//        
+//
+//
 //        return null;
 //    }
 
     public void resetDispatcherStack() {
-        
+
     }
-    
+
     /**
      * Return the URL to the resource that is mapped to a specified path.
      * The path must begin with a "/" and is interpreted as relative to the
@@ -545,7 +556,7 @@ public class ServletContextImpl implements ServletContext {
         if (path == null || !path.startsWith("/")) {
             throw new MalformedURLException("getResource() " + path);
         }
-        
+
         path = UrlUtils.normalize(path);
         if (path == null)
             return (null);
@@ -585,9 +596,9 @@ public class ServletContextImpl implements ServletContext {
             return (null);
 
         File resFile = new File(basePath + path);
-        if (!resFile.exists()) 
+        if (!resFile.exists())
             return null;
-        
+
         try {
             return new FileInputStream(resFile);
         } catch (FileNotFoundException e) {
@@ -624,7 +635,7 @@ public class ServletContextImpl implements ServletContext {
         if (!path.endsWith("/")) {
           path = path + "/";
         }
-        
+
         HashSet result = new HashSet();
         for (int i=0; i < files.length; i++) {
             if (files[i].isDirectory() ) {
@@ -807,7 +818,7 @@ public class ServletContextImpl implements ServletContext {
                         event =
                             new ServletContextAttributeEvent(this.getServletContext(),
                                                              name, value);
-                    
+
                 }
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -843,7 +854,7 @@ public class ServletContextImpl implements ServletContext {
             removeAttribute(key);
         }
     }
-    
+
     public void initFilters() throws ServletException {
         Iterator fI = getFilters().values().iterator();
         while (fI.hasNext()) {
@@ -851,16 +862,16 @@ public class ServletContextImpl implements ServletContext {
             try {
                 fc.getFilter(); // will triger init()
             } catch (Throwable e) {
-                log.log(Level.WARNING, getContextPath() + " Filter.init() " + 
+                log.log(Level.WARNING, getContextPath() + " Filter.init() " +
                         fc.getFilterName(), e);
-            } 
-            
+            }
+
         }
     }
-    
+
     public void initServlets() throws ServletException {
         Iterator fI = getServletConfigs().values().iterator();
-        Map/*<Integer, List<ServletConfigImpl>>*/ onStartup = 
+        Map/*<Integer, List<ServletConfigImpl>>*/ onStartup =
             new TreeMap/*<Integer, List<ServletConfigImpl>>*/();
         while (fI.hasNext()) {
             ServletConfigImpl fc = (ServletConfigImpl)fI.next();
@@ -877,15 +888,15 @@ public class ServletContextImpl implements ServletContext {
         Iterator keys = onStartup.keySet().iterator();
         while (keys.hasNext()) {
             Integer key = (Integer)keys.next();
-            List/*<ServletConfigImpl>*/ servlets = (List)onStartup.get(key); 
+            List/*<ServletConfigImpl>*/ servlets = (List)onStartup.get(key);
             Iterator servletsI = servlets.iterator();
             while (servletsI.hasNext()) {
                 ServletConfigImpl fc = (ServletConfigImpl) servletsI.next();
                 try {
-                    fc.loadServlet(); 
+                    fc.loadServlet();
                 } catch (Throwable e) {
                     log.log(Level.WARNING, "Error initializing  " + fc.getServletName(), e);
-                } 
+                }
             }
         }
     }
@@ -895,19 +906,19 @@ public class ServletContextImpl implements ServletContext {
         while (fI.hasNext()) {
             String listenerClass = (String)fI.next();
             try {
-                Object l = 
+                Object l =
                     getClassLoader().loadClass(listenerClass).newInstance();
                 lifecycleListeners.add((EventListener) l);
             } catch (Throwable e) {
                 log.log(Level.WARNING, "Error initializing listener " + listenerClass, e);
-            } 
+            }
         }
     }
 
     public ClassLoader getClassLoader() {
         return classLoader;
     }
-    
+
     public void addMapping(String path, String name) {
       ServletConfigImpl wrapper = getServletConfig(name);
       addMapping(path, wrapper);
@@ -916,9 +927,9 @@ public class ServletContextImpl implements ServletContext {
     public void addMapping(String path, ServletConfig wrapper) {
         getMapper().addWrapper(getMapper().contextMapElement, path, wrapper);
     }
-    
-    
-    
+
+
+
     public void setWelcomeFiles(String[] name) {
       getMapper().contextMapElement.welcomeResources = name;
     }
@@ -928,21 +939,21 @@ public class ServletContextImpl implements ServletContext {
     }
 
     public void setSessionTimeout(int to) {
-      getManager().setSessionTimeout(to);      
+      getManager().setSessionTimeout(to);
     }
-    
+
     /**
      * Initialize the context from the parsed config.
-     * 
+     *
      * Note that WebAppData is serializable.
      */
     public void processWebAppData(ServletContextConfig d) throws ServletException {
         this.contextConfig = d;
-        
+
         for (String k: d.mimeMapping.keySet()) {
-            addMimeType(k, d.mimeMapping.get(k));            
+            addMimeType(k, d.mimeMapping.get(k));
         }
-        
+
         String[] wFiles = (String[])d.welcomeFileList.toArray(new String[0]);
         if (wFiles.length == 0) {
             wFiles = new String[] {"index.html" };
@@ -951,64 +962,64 @@ public class ServletContextImpl implements ServletContext {
           getMapper().contextMapElement.resources = new File(getBasePath());
         }
         setWelcomeFiles(wFiles);
-        
+
         Iterator i2 = d.filters.values().iterator();
         while (i2.hasNext()) {
             FilterData fd = (FilterData)i2.next();
             addFilter(fd.filterName, fd.filterClass, fd.initParams);
         }
-        
+
         Iterator i3 = d.servlets.values().iterator();
         while (i3.hasNext()) {
             ServletData sd = (ServletData) i3.next();
-            // jsp-file 
+            // jsp-file
             if (sd.servletClass == null) {
                 if (sd.jspFile == null) {
                     log.log(Level.WARNING, "Missing servlet class for " + sd.servletName);
                     continue;
                 }
             }
-             
-            ServletConfigImpl sw = 
+
+            ServletConfigImpl sw =
               new ServletConfigImpl(this, sd.servletName, sd.servletClass);
             sw.setConfig(sd.initParams);
             sw.setJspFile(sd.jspFile);
             sw.setLoadOnStartup(sd.loadOnStartup);
             //sw.setRunAs(sd.runAs);
             sw.setSecurityRoleRef(sd.securityRoleRef);
-            
+
             addServletConfig(sw);
         }
-        
+
         for (String k: d.servletMapping.keySet()) {
-            addMapping(k, d.servletMapping.get(k));            
+            addMapping(k, d.servletMapping.get(k));
         }
-        
+
         Iterator i5 = d.filterMappings.iterator();
         while (i5.hasNext()) {
-            FilterMappingData k = (FilterMappingData) i5.next();  
+            FilterMappingData k = (FilterMappingData) i5.next();
             String[] disp = new String[k.dispatcher.size()];
             if (k.urlPattern != null) {
-              addFilterMapping(k.urlPattern, 
-                  k.filterName, 
+              addFilterMapping(k.urlPattern,
+                  k.filterName,
                   (String[])k.dispatcher.toArray(disp));
             }
             if (k.servletName != null) {
-              addFilterServletMapping(k.servletName, 
-                  k.filterName, 
+              addFilterServletMapping(k.servletName,
+                  k.filterName,
                   (String[])k.dispatcher.toArray(disp));
             }
          }
-        
+
         for (String n: d.localeEncodingMapping.keySet()) {
-            getCharsetMapper().addCharsetMapping(n, 
+            getCharsetMapper().addCharsetMapping(n,
                     d.localeEncodingMapping.get(n));
         }
     }
-    
-    public void addServlet(String servletName, String servletClass, 
+
+    public void addServlet(String servletName, String servletClass,
                            String jspFile, Map params) {
-      ServletConfigImpl sc = new ServletConfigImpl(this, servletName, 
+      ServletConfigImpl sc = new ServletConfigImpl(this, servletName,
           servletClass);
       sc.setJspFile(jspFile);
       sc.setConfig(params);
@@ -1016,41 +1027,41 @@ public class ServletContextImpl implements ServletContext {
     }
 
     @Override
-    public javax.servlet.Registration.Dynamic addServlet(String servletName, Servlet servlet) {
+    public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
       ServletConfigImpl sc = new ServletConfigImpl(this, servletName, null);
       sc.setServlet(servlet);
       addServletConfig(sc);
       return sc.getDynamic();
     }
-    
+
     public void addServletSec(String serlvetName, String runAs, Map roles) {
       // TODO
     }
-    
-    
-    
-    public void addFilterMapping(String path, String filterName, 
+
+
+
+    public void addFilterMapping(String path, String filterName,
                                  String[] dispatcher) {
-      getFilterMapper().addMapping(filterName, 
+      getFilterMapper().addMapping(filterName,
           path, null, dispatcher, true);
-      
+
     }
 
-    public void addFilterServletMapping(String servlet, 
-                                        String filterName, 
+    public void addFilterServletMapping(String servlet,
+                                        String filterName,
                                         String[] dispatcher) {
-      getFilterMapper().addMapping(filterName, 
-          null, servlet, 
-          dispatcher, true);      
+      getFilterMapper().addMapping(filterName,
+          null, servlet,
+          dispatcher, true);
     }
-    
+
     /**
      * Called from TomcatLite.init(), required before start.
-     * 
-     * Will initialize defaults and load web.xml unless webAppData is 
+     *
+     * Will initialize defaults and load web.xml unless webAppData is
      * already set and recent. No other processing is done except reading
      * the config - you can add or alter it before start() is called.
-     * 
+     *
      * @throws ServletException
      */
     public void init() throws ServletException {
@@ -1060,51 +1071,51 @@ public class ServletContextImpl implements ServletContext {
         initDone = true;
         // Load global init params from the facade
         initEngineDefaults();
-        
+
         initTempDir();
-        
+
 
         // Merge in web.xml - or other config source ( programmatic, etc )
-        ContextPreinitListener cfg = 
-            (ContextPreinitListener) getObjectManager().get( 
+        ContextPreinitListener cfg =
+            (ContextPreinitListener) getObjectManager().get(
                 ContextPreinitListener.class);
         if (cfg != null) {
             cfg.preInit(this);
         }
 
         processWebAppData(contextConfig);
-        
+
         // if not defined yet:
         addDefaultServlets();
     }
-    
-    
+
+
     protected void initTempDir() throws ServletException {
-        // We need a base path - at least for temp files, req. by spec 
+        // We need a base path - at least for temp files, req. by spec
         if (basePath == null) {
             basePath = ("/".equals(contextPath)) ?
                     facade.getWork().getAbsolutePath() + "/ROOT" :
                     facade.getWork().getAbsolutePath() + contextPath;
         }
-        
+
         File f = new File(basePath + "/WEB-INF/tmp");
         f.mkdirs();
         setAttribute("javax.servlet.context.tempdir", f);
     }
-    
+
     /**
      * Static file handler ( default )
      * *.jsp support
-     * 
+     *
      */
     protected void addDefaultServlets() throws ServletException {
         if (servlets.get("default") == null) {
-            ServletConfigImpl fileS = new ServletConfigImpl(this, 
-                    "default", null); 
+            ServletConfigImpl fileS = new ServletConfigImpl(this,
+                    "default", null);
             addServletConfig(fileS);
             addMapping("/", fileS);
         }
-        
+
         // *.jsp support
         if (servlets.get("jspwildcard") == null) {
             ServletConfigImpl fileS = new ServletConfigImpl(this,
@@ -1113,9 +1124,9 @@ public class ServletContextImpl implements ServletContext {
             addMapping("*.jsp", fileS);
         }
     }
-    
+
     protected void initEngineDefaults() throws ServletException {
-        
+
         // TODO: make this customizable, avoid loading it on startup
         // Set the class name as default in the addon support
         for (String sname: facade.ctxDefaultInitParam.keySet()) {
@@ -1128,7 +1139,7 @@ public class ServletContextImpl implements ServletContext {
             ServletConfigImpl fileS = new ServletConfigImpl(this, sname, sclass);
             addServletConfig(fileS);
         }
-        
+
         for (String sname: facade.preloadMappings.keySet()) {
             String path = facade.preloadMappings.get(sname);
             ServletConfigImpl servletConfig = getServletConfig(sname);
@@ -1136,7 +1147,7 @@ public class ServletContextImpl implements ServletContext {
         }
     }
 
-        
+
     public ArrayList getClasspath(File directory, File classesDir) {
         ArrayList res = new ArrayList();
         if (classesDir.isDirectory() && classesDir.exists() &&
@@ -1151,13 +1162,13 @@ public class ServletContextImpl implements ServletContext {
                 || !directory.canRead()) {
             return res;
         }
-        
+
         File[] jars = directory.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
               return name.endsWith(".jar");
             }
           });
-        
+
         for (int j = 0; j < jars.length; j++) {
             try {
                 URL url = jars[j].toURL();
@@ -1174,13 +1185,13 @@ public class ServletContextImpl implements ServletContext {
             return;
         }
         String base = getBasePath();
-        
+
         ArrayList urls = getClasspath(new File(base + "/WEB-INF/lib"),
                 new File(base + "/WEB-INF/classes"));
         URL[] urlsA = new URL[urls.size()];
         urls.toArray(urlsA);
 
-        URLClassLoader parentLoader = 
+        URLClassLoader parentLoader =
             getEngine().getContextParentLoader();
 
         // create a class loader.
@@ -1192,14 +1203,14 @@ public class ServletContextImpl implements ServletContext {
           ctxRepo.addURL(urlsA);
           repository = ctxRepo;
         */
-        
+
         classLoader = new URLClassLoader(urlsA, parentLoader);
-        
+
         // JMX should know about us ( TODO: is it too early ? )
         facade.notifyAdd(this);
 
         initListeners();
-        
+
         List listeners = this.getListeners();
         ServletContextEvent event = null;
         for (int i = 0; i < listeners.size(); i++) {
@@ -1218,10 +1229,10 @@ public class ServletContextImpl implements ServletContext {
             }
         }
 
-        
+
         initFilters();
         initServlets();
-        
+
         startDone = true;
     }
 
@@ -1238,13 +1249,13 @@ public class ServletContextImpl implements ServletContext {
     }
 
 
-    // TODO: configurable ? init-params 
+    // TODO: configurable ? init-params
     public String getSessionCookieName() {
         return "JSESSIONID";
     }
-    
 
-    
+
+
     public void destroy() throws ServletException {
         // destroy filters
         Iterator fI = filters.values().iterator();
@@ -1271,7 +1282,7 @@ public class ServletContextImpl implements ServletContext {
     public TomcatLite getEngine() {
         return facade;
     }
-    
+
     public String findStatusPage(int status) {
         if (contextConfig.errorPageCode.size() == 0) {
             return null;
@@ -1283,9 +1294,9 @@ public class ServletContextImpl implements ServletContext {
         return (String) contextConfig.errorPageCode.get(Integer.toString(status));
     }
 
-    public void handleStatusPage(ServletRequestImpl req, 
-                                 ServletResponseImpl res, 
-                                 int status, 
+    public void handleStatusPage(ServletRequestImpl req,
+                                 ServletResponseImpl res,
+                                 int status,
                                  String statusPage) {
        String message = RequestUtil.filter(res.getMessage());
        if (message == null)
@@ -1297,20 +1308,20 @@ public class ServletContextImpl implements ServletContext {
    protected void setErrorAttributes(ServletRequestImpl req,
                                    int status,
                                    String message) {
-       req.setAttribute("javax.servlet.error.status_code", 
+       req.setAttribute("javax.servlet.error.status_code",
                new Integer(status));
        if (req.getWrapper() != null) {
-           req.setAttribute("javax.servlet.error.servlet_name", 
+           req.setAttribute("javax.servlet.error.servlet_name",
                    req.getWrapper().servletName);
        }
-       req.setAttribute("javax.servlet.error.request_uri", 
+       req.setAttribute("javax.servlet.error.request_uri",
                req.getRequestURI());
-       req.setAttribute("javax.servlet.error.message", 
+       req.setAttribute("javax.servlet.error.message",
                message);
 
    }
-   
-   public void handleError(ServletRequestImpl req, 
+
+   public void handleError(ServletRequestImpl req,
                            ServletResponseImpl res,
                            Throwable t) {
        Throwable realError = t;
@@ -1335,7 +1346,7 @@ public class ServletContextImpl implements ServletContext {
            dispatchError(req, res, errorPage);
        } else {
            log("Unhandled error", t);
-           if (t instanceof ServletException && 
+           if (t instanceof ServletException &&
                    ((ServletException)t).getRootCause() != null) {
                log("RootCause:", ((ServletException)t).getRootCause());
            }
@@ -1345,13 +1356,13 @@ public class ServletContextImpl implements ServletContext {
        }
    }
 
-   protected void dispatchError(ServletRequestImpl req, 
-                              ServletResponseImpl res, 
+   protected void dispatchError(ServletRequestImpl req,
+                              ServletResponseImpl res,
                               String errorPage) {
        RequestDispatcher rd =
            getRequestDispatcher(errorPage);
        try {
-           // will clean up the buffer 
+           // will clean up the buffer
            rd.forward(req, res);
            return; // handled
        } catch (ServletException e) {
@@ -1360,7 +1371,7 @@ public class ServletContextImpl implements ServletContext {
            // TODO
        }
    }
-   
+
    protected String findErrorPage(Throwable exception) {
        if (contextConfig.errorPageException.size() == 0) {
            return null;
@@ -1382,32 +1393,38 @@ public class ServletContextImpl implements ServletContext {
 
    }
 
+
    @Override
    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
        return null;
    }
+
 
    @Override
    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
        return null;
    }
 
+
    @Override
    public SessionCookieConfig getSessionCookieConfig() {
        return null;
    }
 
+
    @Override
    public void setSessionTrackingModes(EnumSet<SessionTrackingMode> sessionTrackingModes) {
    }
 
-   public void addFilter(String filterName, String filterClass, 
+
+   public void addFilter(String filterName, String filterClass,
                          Map params) {
        FilterConfigImpl fc = new FilterConfigImpl(this);
        fc.setData(filterName, filterClass, params);
        filters.put(filterName, fc);
    }
-   
+
+
    @Override
    public Dynamic addFilter(String filterName, String className) {
        FilterConfigImpl fc = new FilterConfigImpl(this);
@@ -1415,6 +1432,7 @@ public class ServletContextImpl implements ServletContext {
        filters.put(filterName, fc);
        return fc.getDynamic();
    }
+
 
    @Override
    public Dynamic addFilter(String filterName, Filter filter) {
@@ -1425,6 +1443,7 @@ public class ServletContextImpl implements ServletContext {
        return fc.getDynamic();
    }
 
+
    @Override
    public Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
        FilterConfigImpl fc = new FilterConfigImpl(this);
@@ -1434,16 +1453,18 @@ public class ServletContextImpl implements ServletContext {
        return fc.getDynamic();
    }
 
+
    @Override
-   public javax.servlet.Registration.Dynamic addServlet(String servletName,
+   public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName,
                                                         String className) {
        ServletConfigImpl sc = new ServletConfigImpl(this, servletName, className);
        addServletConfig(sc);
        return sc.getDynamic();
    }
 
+
    @Override
-   public javax.servlet.Registration.Dynamic addServlet(String servletName,
+   public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName,
                                                         Class<? extends Servlet> servletClass) {
        ServletConfigImpl sc = new ServletConfigImpl(this, servletName, servletClass.getName());
        sc.setServletClass(servletClass);
@@ -1451,10 +1472,11 @@ public class ServletContextImpl implements ServletContext {
        return sc.getDynamic();
    }
 
-   // That's tricky - this filter will have no name. We need to generate one 
+   // That's tricky - this filter will have no name. We need to generate one
    // because our code relies on names.
    AtomicInteger autoName = new AtomicInteger();
-   
+
+
    @Override
    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
        FilterConfigImpl fc = new FilterConfigImpl(this);
@@ -1476,6 +1498,7 @@ public class ServletContextImpl implements ServletContext {
        }
    }
 
+
    @Override
    public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
        String filterName = "_tomcat_auto_servlet_" + autoName.incrementAndGet();
@@ -1490,23 +1513,25 @@ public class ServletContextImpl implements ServletContext {
        }
    }
 
-   @Override
+
    public FilterRegistration findFilterRegistration(String filterName) {
        return filters.get(filterName);
    }
 
-   @Override
+
    public ServletRegistration findServletRegistration(String servletName) {
        return servlets.get(servletName);
    }
-   
+
+
    @Override
    public boolean setInitParameter(String name, String value) {
        HashMap<String, String> params = contextConfig.contextParam;
        return setInitParameter(this, params, name, value);
    }
-   
-   static Set<String> setInitParameters(ServletContextImpl ctx, 
+
+
+   static Set<String> setInitParameters(ServletContextImpl ctx,
            Map<String, String> params,
            Map<String, String> initParameters)
            throws IllegalArgumentException, IllegalStateException {
@@ -1524,14 +1549,14 @@ public class ServletContextImpl implements ServletContext {
            }
        }
        return result;
-   }   
+   }
 
    /**
     * true if the context initialization parameter with the given name and value was set successfully on this ServletContext, and false if it was not set because this ServletContext already contains a context initialization parameter with a matching name
     * Throws:
     * java.lang.IllegalStateException - if this ServletContext has already been initialized
     */
-   static boolean setInitParameter(ServletContextImpl ctx, Map<String, String> params, 
+   static boolean setInitParameter(ServletContextImpl ctx, Map<String, String> params,
                                    String name, String value) {
        if (name == null || value == null) {
            throw new IllegalArgumentException();
@@ -1547,5 +1572,57 @@ public class ServletContextImpl implements ServletContext {
            return true;
        }
    }
+
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        // fix me - just here to compile
+        return null;
+    }
+
+
+
+    public void declareRoles(String... roleNames) {
+        // implement me
+    }
+
+    public <T extends EventListener> T createListener(Class<T> c) throws ServletException {
+        // implement me
+        return null;
+    }
+
+    public Collection<String> getMappings() {
+        // implement me
+        return null;
+    }
+
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        // implement me
+        return null;
+    }
+
+    public FilterRegistration getFilterRegistration(String filterName) {
+        // implement me
+        return null;
+    }
+
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        // implement me
+        return null;
+    }
+
+    public ServletRegistration getServletRegistration(String servletName) {
+        // implement me
+        return null;
+    }
+
+    public int getEffectiveMinorVersion() {
+        // implement me
+        return -1;
+    }
+
+    public int getEffectiveMajorVersion() {
+        // implement me
+        return -1;
+    }
+
 }
 

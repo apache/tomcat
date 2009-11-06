@@ -1,12 +1,12 @@
 /*
  * Copyright 1999,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,7 +69,7 @@ import org.apache.tomcat.util.http.mapper.MappingData;
 
 
 /**
- * 
+ *
  * Wrapper object for the Coyote request.
  *
  * @author Remy Maucherat
@@ -95,13 +96,13 @@ public class ServletRequestImpl implements HttpServletRequest {
     /**
      * Request dispatcher state.
      */
-    public static final String DISPATCHER_TYPE_ATTR = 
+    public static final String DISPATCHER_TYPE_ATTR =
         "org.apache.catalina.core.DISPATCHER_TYPE";
 
     /**
      * Request dispatcher path.
      */
-    public static final String DISPATCHER_REQUEST_PATH_ATTR = 
+    public static final String DISPATCHER_REQUEST_PATH_ATTR =
         "org.apache.catalina.core.DISPATCHER_REQUEST_PATH";
 
     /**
@@ -175,7 +176,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     public static final String SERVLET_NAME_ATTR =
         "javax.servlet.error.servlet_name";
 
-    
+
     /**
      * The name of the cookie used to pass the session identifier back
      * and forth with the client.
@@ -204,7 +205,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     public static final String SUBJECT_ATTR =
         "javax.security.auth.subject";
 
-    
+
     /**
      * The servlet context attribute under which we store a temporary
      * working directory (as an object of type File) for use by servlets
@@ -228,7 +229,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * The match string for identifying a session ID parameter.
      */
     private static final String match = ";" + SESSION_PARAMETER_NAME + "=";
-   
+
     /**
      * The set of cookies associated with this Request.
      */
@@ -242,7 +243,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * declare formats[] as a static variable.
      */
     protected SimpleDateFormat formats[] = null;
-    
+
 
     /**
      * The attributes associated with this Request, keyed by attribute name.
@@ -295,14 +296,14 @@ public class ServletRequestImpl implements HttpServletRequest {
     /**
      * ServletInputStream.
      */
-    protected ServletInputStreamImpl inputStream; 
+    protected ServletInputStreamImpl inputStream;
 
 
     /**
      * Reader.
      */
     protected BufferedReader reader;
-    
+
 
     /**
      * Using stream flag.
@@ -395,7 +396,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Filter chain associated with the request.
      */
     protected FilterChainImpl filterChain = new FilterChainImpl();
-    
+
     /**
      * Mapping data.
      */
@@ -408,7 +409,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * The response with which this request is associated.
      */
     protected ServletResponseImpl response = new ServletResponseImpl();
-    
+
     /**
      * URI byte to char converter (not recycled).
      */
@@ -423,13 +424,13 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Post data buffer.
      */
     public final static int CACHED_POST_LEN = 8192;
-    
+
     public  byte[] postData = null;
 
-    
+
     private HttpRequest httpRequest;
-    
-    /** New IO/buffer model  
+
+    /** New IO/buffer model
      */
     //protected Http11Connection con;
 
@@ -499,7 +500,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     public void setConnector(Connector c) {
         connector = c;
     }
-    
+
     public Connector getConnector() {
         return connector;
     }
@@ -563,7 +564,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      *
      * @exception IOException if an input/output error occurs
      */
-    public ServletInputStream createInputStream() 
+    public ServletInputStream createInputStream()
         throws IOException {
         return inputStream;
     }
@@ -588,11 +589,11 @@ public class ServletRequestImpl implements HttpServletRequest {
     public Object getAttribute(String name) {
 
         if (name.equals(ServletRequestImpl.DISPATCHER_TYPE_ATTR)) {
-            return (dispatcherType == null) 
+            return (dispatcherType == null)
                 ? REQUEST_INTEGER
                 : dispatcherType;
         } else if (name.equals(ServletRequestImpl.DISPATCHER_REQUEST_PATH_ATTR)) {
-            return (requestDispatcherPath == null) 
+            return (requestDispatcherPath == null)
                 ? getRequestPathMB().toString()
                 : requestDispatcherPath.toString();
         }
@@ -606,7 +607,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 //        if(attr != null)
 //            return attr;
 //        if( isSSLAttribute(name) ) {
-//            reqB.action(ActionCode.ACTION_REQ_SSL_ATTRIBUTE, 
+//            reqB.action(ActionCode.ACTION_REQ_SSL_ATTRIBUTE,
 //                                 reqB);
 //            attr = reqB.getAttribute(ServletRequestImpl.CERTIFICATES_ATTR);
 //            if( attr != null) {
@@ -738,7 +739,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Get the context path.
-     * 
+     *
      * @return the context path
      */
     public MessageBytes getContextPathMB() {
@@ -783,7 +784,7 @@ public class ServletRequestImpl implements HttpServletRequest {
             formats[1].setTimeZone(GMT_ZONE);
             formats[2].setTimeZone(GMT_ZONE);
         }
-        
+
         // Attempt to convert the date header in a variety of formats
         long result = FastHttpDateFormat.parseDate(value, formats);
         if (result != (-1L)) {
@@ -796,7 +797,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Get the decoded request URI.
-     * 
+     *
      * @return the URL decoded request URI
      */
     public String getDecodedRequestURI() {
@@ -806,7 +807,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Get the decoded request URI.
-     * 
+     *
      * @return the URL decoded request URI
      */
     public MessageBytes getDecodedRequestURIMB() {
@@ -833,7 +834,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     public String getHeader(String name) {
         return httpRequest.getHeader(name);
     }
-    
+
     /**
      * Return the names of all headers received with this request.
      */
@@ -897,7 +898,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     /**
      * Returns the Internet Protocol (IP) address of the interface on
      * which the request  was received.
-     */       
+     */
     public String getLocalAddr(){
         return httpRequest.localAddr().toString();
     }
@@ -1062,7 +1063,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Get the path info.
-     * 
+     *
      * @return the path info
      */
     public MessageBytes getPathInfoMB() {
@@ -1086,14 +1087,14 @@ public class ServletRequestImpl implements HttpServletRequest {
         }
 
     }
-    
+
     /**
      * Return the principal that has been authenticated for this Request.
      */
     public Principal getPrincipal() {
         return (userPrincipal);
     }
-     
+
     /**
      * Return the protocol and version used to make this Request.
      */
@@ -1145,7 +1146,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     /**
      *  Converter for the encoding associated with the request.
      *  If encoding is changed - a different encoder will be returned.
-     *  
+     *
      *  Encoders are cached ( per request ) - at least 8K per charset
      */
     public B2CConverter getB2C() throws IOException {
@@ -1153,7 +1154,7 @@ public class ServletRequestImpl implements HttpServletRequest {
       if (enc == null) {
         enc = DEFAULT_CHARACTER_ENCODING;
       }
-      B2CConverter conv = 
+      B2CConverter conv =
         (B2CConverter) encoders.get(enc);
       if (conv == null) {
         conv = new B2CConverter(enc);
@@ -1161,7 +1162,7 @@ public class ServletRequestImpl implements HttpServletRequest {
       }
       return conv;
     }
-    
+
     /**
      * Return the real path of the specified virtual path.
      *
@@ -1213,7 +1214,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     /**
      * Returns the Internet Protocol (IP) source port of the client
      * or last proxy that sent the request.
-     */    
+     */
     public int getRemotePort(){
         return httpRequest.getRemotePort();
     }
@@ -1241,11 +1242,11 @@ public class ServletRequestImpl implements HttpServletRequest {
     public HttpServletRequest getRequest() {
         return this;
     }
-    
+
     public HttpRequest getHttpRequest() {
       return httpRequest;
     }
-    
+
     public void setHttpRequest(HttpRequest req, BodyReader in) {
       this.httpRequest = req;
       inputBuffer = in;
@@ -1316,7 +1317,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Get the request path.
-     * 
+     *
      * @return the request path
      */
     public MessageBytes getRequestPathMB() {
@@ -1330,13 +1331,13 @@ public class ServletRequestImpl implements HttpServletRequest {
     public String getRequestURI() {
         return httpRequest.requestURI().toString();
     }
-    
+
     /**
      */
     public void setRequestURI(String uri) {
       httpRequest.decodedURI().setString(uri);
       try {
-        UriNormalizer.decodeRequest(httpRequest.decodedURI(), 
+        UriNormalizer.decodeRequest(httpRequest.decodedURI(),
                 httpRequest.requestURI(), httpRequest.getURLDecoder());
       } catch(IOException ioe) {
         ioe.printStackTrace();
@@ -1432,7 +1433,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Get the servlet path.
-     * 
+     *
      * @return the servlet path
      */
     public MessageBytes getServletPathMB() {
@@ -1537,8 +1538,8 @@ public class ServletRequestImpl implements HttpServletRequest {
     public boolean isSecure() {
         return (secure);
     }
-    
-    
+
+
     /**
      * Return <code>true</code> if the authenticated user principal
      * possesses the specified role name.
@@ -1566,7 +1567,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         if (role.equals(userPrincipal.getName())) {
             return true;
         }
-        
+
         // TODO: check !!!!
         // Check for a role defined directly as a <security-role>
         return false;
@@ -1652,7 +1653,7 @@ public class ServletRequestImpl implements HttpServletRequest {
                 (ServletRequestAttributeListener) listeners.get(i);
             try {
                 if (event == null) {
-                    event = 
+                    event =
                         new ServletRequestAttributeEvent(context.getServletContext(),
                             getRequest(), name, value);
                 }
@@ -1673,7 +1674,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param value The associated value
      */
     public void setAttribute(String name, Object value) {
-	
+
         // Name cannot be null
         if (name == null)
             throw new IllegalArgumentException
@@ -1712,7 +1713,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 //        if (name.startsWith("org.apache.tomcat.")) {
 //            reqB.setAttribute(name, value);
 //        }
-//        
+//
         // Notify interested application event listeners
         List listeners = context.getListeners();
         if (listeners.size() == 0)
@@ -1862,7 +1863,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
     /**
      * Set the decoded request URI.
-     * 
+     *
      * @param uri The decoded request URI
      */
     public void setDecodedRequestURI(String uri) {
@@ -2051,18 +2052,18 @@ public class ServletRequestImpl implements HttpServletRequest {
 
         if (System.getSecurityManager() != null){
             HttpSession session = getSession(false);
-            if ( (subject != null) && 
+            if ( (subject != null) &&
                  (!subject.getPrincipals().contains(principal)) ){
-                subject.getPrincipals().add(principal);         
+                subject.getPrincipals().add(principal);
             } else if (session != null &&
                         session.getAttribute(ServletRequestImpl.SUBJECT_ATTR) == null) {
                 subject = new Subject();
-                subject.getPrincipals().add(principal);         
+                subject.getPrincipals().add(principal);
             }
             if (session != null){
                 session.setAttribute(ServletRequestImpl.SUBJECT_ATTR, subject);
             }
-        } 
+        }
 
         this.userPrincipal = principal;
     }
@@ -2092,7 +2093,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     protected void configureSessionCookie(Cookie cookie) {
         cookie.setMaxAge(-1);
         String contextPath = null;
-        if (//!connector.getEmptySessionPath() && 
+        if (//!connector.getEmptySessionPath() &&
                 (getContext() != null)) {
             contextPath = getContext().getEncodedPath();
         }
@@ -2129,14 +2130,14 @@ public class ServletRequestImpl implements HttpServletRequest {
             manager = context.getManager();
         if (manager == null)
             return (null);      // Sessions are not supported
-        
+
         // Return the current session if it exists and is valid
         if ((session != null) && !manager.isValid(session))
             session = null;
         if (session != null)
             return (session);
-        
-        
+
+
         if (requestedSessionId != null) {
             try {
                 session = manager.findSession(requestedSessionId);
@@ -2360,7 +2361,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      */
     protected void parseSessionCookiesId() {
         String sessionCookieName = context.getSessionCookieName();
-        
+
         // Parse session id from cookies
         Cookies serverCookies = httpRequest.getCookies();
         int count = serverCookies.getCookieCount();
@@ -2374,7 +2375,7 @@ public class ServletRequestImpl implements HttpServletRequest {
                 if (!isRequestedSessionIdFromCookie()) {
                     // Accept only the first session id cookie
                     //scookie.getValue().convertToAscii();
-                    
+
                     setRequestedSessionId
                         (scookie.getValue().toString());
                     setRequestedSessionCookie(true);
@@ -2409,18 +2410,18 @@ public class ServletRequestImpl implements HttpServletRequest {
             int semicolon2 = uriBC.indexOf(';', sessionIdStart);
             if (semicolon2 >= 0) {
                 request.setRequestedSessionId
-                    (new String(uriBC.getBuffer(), start + sessionIdStart, 
+                    (new String(uriBC.getBuffer(), start + sessionIdStart,
                             semicolon2 - sessionIdStart));
                 // Extract session ID from request URI
                 byte[] buf = uriBC.getBuffer();
                 for (int i = 0; i < end - start - semicolon2; i++) {
-                    buf[start + semicolon + i] 
+                    buf[start + semicolon + i]
                         = buf[start + i + semicolon2];
                 }
                 uriBC.setBytes(buf, start, end - start - semicolon2 + semicolon);
             } else {
                 request.setRequestedSessionId
-                    (new String(uriBC.getBuffer(), start + sessionIdStart, 
+                    (new String(uriBC.getBuffer(), start + sessionIdStart,
                             (end - start) - sessionIdStart));
                 uriBC.setEnd(start + semicolon);
             }
@@ -2464,16 +2465,16 @@ public class ServletRequestImpl implements HttpServletRequest {
     }
 
 
-    @Override
     public void addAsyncListener(AsyncListener listener) {
     }
 
 
-    @Override
+
     public void addAsyncListener(AsyncListener listener,
                                  ServletRequest servletRequest,
                                  ServletResponse servletResponse) {
     }
+
 
 
     @Override
@@ -2482,10 +2483,12 @@ public class ServletRequestImpl implements HttpServletRequest {
     }
 
 
+
     @Override
     public ServletContext getServletContext() {
         return null;
     }
+
 
 
     @Override
@@ -2494,24 +2497,25 @@ public class ServletRequestImpl implements HttpServletRequest {
     }
 
 
+
     @Override
     public boolean isAsyncSupported() {
         return false;
     }
 
 
-    @Override
     public void setAsyncTimeout(long timeout) {
     }
 
 
-    @Override
+
+   @Override
     public AsyncContext startAsync() throws IllegalStateException {
         return null;
     }
 
 
-    @Override
+   @Override
     public AsyncContext startAsync(ServletRequest servletRequest,
                                    ServletResponse servletResponse)
             throws IllegalStateException {
@@ -2519,43 +2523,48 @@ public class ServletRequestImpl implements HttpServletRequest {
     }
 
 
-    @Override
+
+   @Override
     public boolean authenticate(HttpServletResponse response)
             throws IOException, ServletException {
         return false;
     }
 
 
-    @Override
+
+   @Override
     public Part getPart(String name) {
         return null;
     }
 
 
-    @Override
-    public Iterable<Part> getParts() {
-        return null;
-    }
 
-
-    @Override
+   @Override
     public void login(String username, String password) throws ServletException {
     }
 
 
-    @Override
+
+   @Override
     public void logout() throws ServletException {
     }
 
 
-    @Override
+
     public long getAsyncTimeout() {
         return 0;
     }
 
 
-    @Override
+
+   @Override
     public DispatcherType getDispatcherType() {
+        return null;
+    }
+
+
+   @Override
+    public Collection<Part> getParts() throws IOException, ServletException {
         return null;
     }
 
