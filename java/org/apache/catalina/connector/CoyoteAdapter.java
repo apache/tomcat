@@ -24,11 +24,11 @@ import java.util.EnumSet;
 
 import javax.servlet.SessionTrackingMode;
 
-import org.apache.catalina.CometEvent;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;

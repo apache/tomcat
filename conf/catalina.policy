@@ -146,6 +146,9 @@ grant {
     // Precompiled JSPs need access to these system properties.
     permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
     permission java.util.PropertyPermission "org.apache.el.parser.COERCE_TO_ZERO", "read";
+    
+    // Applications using Comet need to be able to access this package
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
 };
 
 
