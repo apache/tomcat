@@ -18,7 +18,6 @@
 
 package org.apache.catalina.deploy;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -31,8 +30,9 @@ import java.util.HashMap;
  * @author Fabien Carrion
  */
 
-public class ContextHandler extends ResourceBase implements Serializable {
+public class ContextHandler extends ResourceBase {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 
