@@ -39,18 +39,18 @@ public class CoyoteConnector implements Adapter, Connector {
 
     public void acknowledge(HttpServletResponse res) throws IOException {
         Response cres = (Response) ((ServletResponseImpl) res).getHttpResponse().nativeResponse;
-        cres.acknowledge();        
+        cres.acknowledge();
     }
 
     public void reset(HttpServletResponse res) {
         Response cres = (Response) ((ServletResponseImpl) res).getHttpResponse().nativeResponse;
-        cres.reset();        
+        cres.reset();
     }
-    
+
     public void recycle(HttpServletRequest req, HttpServletResponse res) {
-    
+
     }
-    
+
     public static HttpResponse getResponse(final Response cres) {
         HttpResponse hres = new HttpResponse() {
             public int getStatus() {
@@ -75,101 +75,101 @@ public class CoyoteConnector implements Adapter, Connector {
                 cres.setCommitted(b);
             }
         };
-        
+
         hres.setMimeHeaders(cres.getMimeHeaders());
         hres.nativeResponse = cres;
-        
+
         return hres;
     }
-    
+
     public static HttpRequest getRequest(Request req) {
-        
+
         HttpRequest httpReq = new HttpRequest(req.scheme(),
-                req.method(), 
+                req.method(),
                 req.unparsedURI(),
                 req.protocol(),
                 req.getMimeHeaders(),
                 req.requestURI(),
                 req.decodedURI(),
                 req.query(), req.getParameters(),
-                req.serverName(), 
+                req.serverName(),
                 req.getCookies()) {
-            
+
         };
         httpReq.nativeRequest = req;
-        
+
         // TODO: anything else computed in coyote ?
-        
+
         return httpReq;
     }
 
     @Override
     public void initRequest(HttpServletRequest hreq, HttpServletResponse hres) {
         ServletRequestImpl req = (ServletRequestImpl) hreq;
-        ServletResponseImpl res = (ServletResponseImpl) hres;        
+        ServletResponseImpl res = (ServletResponseImpl) hres;
         req.setConnector(this);
-        
+
         Request creq = new Request();
         Response cres = new Response();
         HttpResponse nRes = getResponse(cres);
 
         BodyWriter out = new BodyWriter(4096);
         out.setConnector(this, res);
-        
+
         res.setHttpResponse(nRes, out);
-        
+
         cres.setRequest(creq);
         cres.setHook(new ActionHook() {
-          public void action(ActionCode actionCode, 
+          public void action(ActionCode actionCode,
                              Object param) {
           }
         });
-        
+
         BodyReader in = new BodyReader();
         in.setConnector(this, req);
         HttpRequest nReq = getRequest(creq);
         req.setHttpRequest(nReq, in);
-        
+
     }
-      
+
 
     // ---- Coyote Adapter interface ---
-    
+
     @Override
     public void service(Request creq, Response cres) throws Exception {
         long t0 = System.currentTimeMillis();
 
         // compute decodedURI - not done by connector
         UriNormalizer.decodeRequest(creq.decodedURI(), creq.requestURI(), creq.getURLDecoder());
-        
+
         // find the facades
         ServletRequestImpl req = (ServletRequestImpl) creq.getNote(ADAPTER_REQ_NOTE);
         ServletResponseImpl res = (ServletResponseImpl) cres.getNote(ADAPTER_RES_NOTE);
 
-        
+
         if (req == null) {
           req = new ServletRequestImpl();
           res = req.getResponse();
-          
+
           BodyReader in = new BodyReader();
           in.setConnector(this, req);
 
           HttpRequest nReq = getRequest(creq);
           nReq.setServerPort(creq.getServerPort());
           HttpResponse nRes = getResponse(cres);
-          
+
           req.setHttpRequest(nReq, in);
           BodyWriter out = new BodyWriter(4096);
           out.setConnector(this, res);
-          
+
           res.setHttpResponse(nRes, out);
-          
+
           creq.setNote(ADAPTER_REQ_NOTE, req);
           cres.setNote(ADAPTER_RES_NOTE, res);
-          
+
         }
         req.setConnector(this);
-        
+
         try {
             lite.service(req, res);
         } catch(IOException ex) {
@@ -178,14 +178,14 @@ public class CoyoteConnector implements Adapter, Connector {
             t.printStackTrace();
         } finally {
             long t1 = System.currentTimeMillis();
-            
-//            log.info("<<<<<<<< DONE: " + creq.method() + " " + 
-//                    creq.decodedURI() + " " + 
-//                    res.getStatus() + " " + 
+
+//            log.info("<<<<<<<< DONE: " + creq.method() + " " +
+//                    creq.decodedURI() + " " +
+//                    res.getStatus() + " " +
 //                    (t1 - t0));
-            
+
             // Final processing
-            // TODO: only if not commet, this doesn't work with the 
+            // TODO: only if not commet, this doesn't work with the
             // other connectors since we don't have the info
             // TODO: add this note in the nio/apr connectors
             // TODO: play nice with TomcatLite, other adapters that flush/close
@@ -195,7 +195,7 @@ public class CoyoteConnector implements Adapter, Connector {
                     cres.sendHeaders();
                 }
                 res.getOutputBuffer().flush();
-                
+
                 BodyWriter mw = res.getBodyWriter();
                 //MessageWriter.getWriter(creq, cres, 0);
                 mw.flush();
@@ -204,7 +204,7 @@ public class CoyoteConnector implements Adapter, Connector {
                 BodyReader reader = req.getBodyReader();
                 //getReader(creq);
                 reader.recycle();
-                
+
                 cres.finish();
 
                 creq.recycle();
@@ -215,7 +215,7 @@ public class CoyoteConnector implements Adapter, Connector {
             }
         }
     }
-        
+
     @Override
     public boolean event(Request req, Response res, SocketStatus status)
         throws Exception {
@@ -230,7 +230,7 @@ public class CoyoteConnector implements Adapter, Connector {
 
     public String getRemoteHost(HttpServletRequest hreq) {
         ServletRequestImpl req = (ServletRequestImpl) hreq;
-        
+
         Request creq = (Request) req.getHttpRequest().nativeRequest;
         creq.action(ActionCode.ACTION_REQ_HOST_ATTRIBUTE, creq);
         return creq.remoteHost().toString();
@@ -238,7 +238,7 @@ public class CoyoteConnector implements Adapter, Connector {
 
     public String getRemoteAddr(HttpServletRequest hreq) {
         ServletRequestImpl req = (ServletRequestImpl) hreq;
-        
+
         Request creq = (Request) req.getHttpRequest().nativeRequest;
         creq.action(ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE, creq);
         return creq.remoteAddr().toString();
@@ -248,8 +248,8 @@ public class CoyoteConnector implements Adapter, Connector {
     @Override
     public void beforeClose(HttpServletResponse res, int len) throws IOException {
         Response cres = (Response) ((ServletResponseImpl) res).getHttpResponse().nativeResponse;
-    
-        if ((!cres.isCommitted()) 
+
+        if ((!cres.isCommitted())
                 && (cres.getContentLengthLong() == -1)) {
                 // Flushing the char buffer
                 // If this didn't cause a commit of the response, the final content
@@ -262,7 +262,7 @@ public class CoyoteConnector implements Adapter, Connector {
 
     public int doRead(ServletRequestImpl hreq, ByteChunk bb) throws IOException {
         ServletRequestImpl req = (ServletRequestImpl) hreq;
-        
+
         Request creq = (Request) req.getHttpRequest().nativeRequest;
         return creq.doRead(bb);
     }
@@ -279,7 +279,7 @@ public class CoyoteConnector implements Adapter, Connector {
     @Override
     public void realFlush(HttpServletResponse res) throws IOException {
         Response cres = (Response) ((ServletResponseImpl) res).getHttpResponse().nativeResponse;
-        cres.action(ActionCode.ACTION_CLIENT_FLUSH, 
+        cres.action(ActionCode.ACTION_CLIENT_FLUSH,
                 cres);
         // If some exception occurred earlier, or if some IOE occurred
         // here, notify the servlet with an IOE
@@ -294,7 +294,7 @@ public class CoyoteConnector implements Adapter, Connector {
     @Override
     public void sendHeaders(HttpServletResponse res) throws IOException {
         Response cres = (Response) ((ServletResponseImpl) res).getHttpResponse().nativeResponse;
-        
+
         // This should happen before 'prepareResponse' is called !!
         // Now update coyote response based on response
         // don't set charset/locale - they're computed in lite
@@ -312,43 +312,43 @@ public class CoyoteConnector implements Adapter, Connector {
     protected boolean daemon = false;
 
     /**
-     * Note indicating the response is COMET. 
+     * Note indicating the response is COMET.
      */
     public static final int COMET_RES_NOTE = 2;
     public static final int COMET_REQ_NOTE = 2;
-    
-    public static final int ADAPTER_RES_NOTE = 1;    
-    public static final int ADAPTER_REQ_NOTE = 1;    
-    
+
+    public static final int ADAPTER_RES_NOTE = 1;
+    public static final int ADAPTER_REQ_NOTE = 1;
+
     protected ProtocolHandler proto;
 
     //protected Adapter adapter = new MapperAdapter();
     protected int maxThreads = 20;
     boolean started = false;
     boolean async = false; // use old nio connector
-    
+
     protected ObjectManager om;
-    
-    
+
+
     public void setObjectManager(ObjectManager om) {
         this.om = om;
     }
-    
-    /** 
+
+    /**
      * Add an adapter. If more than the 'default' adapter is
      * added, a MapperAdapter will be inserted.
-     * 
+     *
      * @param path Use "/" for the default.
      * @param adapter
      */
 //    public void addAdapter(String path, Adapter added) {
 //        if ("/".equals(path)) {
-//            ((MapperAdapter) adapter).setDefaultAdapter(added);        
+//            ((MapperAdapter) adapter).setDefaultAdapter(added);
 //        } else {
 //            ((MapperAdapter) adapter).getMapper().addWrapper(path, added);
 //        }
 //    }
-    
+
     /**
      */
     public void run() {
@@ -363,7 +363,7 @@ public class CoyoteConnector implements Adapter, Connector {
     public void setDaemon(boolean b) {
       daemon = b;
     }
-    
+
     protected void initAdapters() {
         if (proto == null) {
             addProtocolHandler(port, daemon);
@@ -380,7 +380,7 @@ public class CoyoteConnector implements Adapter, Connector {
       proto.destroy();
       started = false;
     }
-    
+
 //    /**
 //     *  Simple CLI support - arg is a path:className pair.
 //     */
@@ -394,14 +394,14 @@ public class CoyoteConnector implements Adapter, Connector {
 //        e.printStackTrace();
 //      }
 //    }
-    
+
     public void setConnector(ProtocolHandler h) {
         this.proto = h;
         h.setAttribute("port", Integer.toString(port));
 
         om.bind("ProtocolHandler:" + "ep-" + port, proto);
     }
-    
+
     public void addProtocolHandler(int port, boolean daemon) {
         Http11NioProtocol proto = new Http11NioProtocol();
         proto.setCompression("on");
@@ -412,29 +412,29 @@ public class CoyoteConnector implements Adapter, Connector {
         setPort(port);
         setDaemon(daemon);
     }
-    
-    public void addProtocolHandler(ProtocolHandler proto, 
+
+    public void addProtocolHandler(ProtocolHandler proto,
                                    int port, boolean daemon) {
         setConnector(proto);
         setPort(port);
         setDaemon(daemon);
     }
-    
+
     public void setPort(int port) {
         if (proto != null) {
             proto.setAttribute("port", Integer.toString(port));
         }
         this.port = port;
       }
-      
-    
+
+
     public void init() {
         //JdkLoggerConfig.loadCustom();
-        om.bind("CoyoteConnector:" + "CoyoteConnector-" + port, 
+        om.bind("CoyoteConnector:" + "CoyoteConnector-" + port,
                 this);
     }
 
-    
+
     public void start() throws IOException {
       try {
         if (started) {
@@ -446,20 +446,25 @@ public class CoyoteConnector implements Adapter, Connector {
         // not required - should run fine without a connector.
         if (proto != null) {
             proto.setAdapter(this);
-        
+
             proto.init();
             proto.start();
         }
-        
+
         started = true;
       } catch (Throwable e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
     }
-    
+
     public boolean getStarted() {
       return started;
-    } 
-    
+    }
+
+    public boolean asyncDispatch(Request req,Response res, SocketStatus status) throws Exception {
+        // implement me
+        return false;
+    }
+
 }

@@ -14,18 +14,18 @@ import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
 
 /**
- * Implement buffering and character translation acording to the 
- * servlet spec.  
- * 
+ * Implement buffering and character translation acording to the
+ * servlet spec.
+ *
  * This class handles both chars and bytes.
- * 
+ *
  * It is tightly integrated with servlet response, sending headers
  * and updating the commit state.
- * 
- * TODO: add 'extension' interface that allows direct access to 
- * the async connector non-copy non-blocking queue. Same for the 
- * OutputStream. Maybe switch the buffer to the brigade. 
- * 
+ *
+ * TODO: add 'extension' interface that allows direct access to
+ * the async connector non-copy non-blocking queue. Same for the
+ * OutputStream. Maybe switch the buffer to the brigade.
+ *
  * @author Costin Manolache
  */
 public class BodyWriter extends Writer {
@@ -34,7 +34,7 @@ public class BodyWriter extends Writer {
     protected static final int WRITER_NOTE = 3;
 
 
-    private ByteChunk.ByteOutputChannel byteFlusher = 
+    private ByteChunk.ByteOutputChannel byteFlusher =
         new ByteChunk.ByteOutputChannel() {
 
         @Override
@@ -44,7 +44,7 @@ public class BodyWriter extends Writer {
         }
     };
 
-    private CharChunk.CharOutputChannel charFlusher = 
+    private CharChunk.CharOutputChannel charFlusher =
         new CharChunk.CharOutputChannel() {
         @Override
         public void realWriteChars(char[] cbuf, int off, int len)
@@ -52,9 +52,9 @@ public class BodyWriter extends Writer {
             BodyWriter.this.realWriteChars(cbuf, off, len);
         }
     };
-    
 
-    public static final String DEFAULT_ENCODING = 
+
+    public static final String DEFAULT_ENCODING =
         org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
@@ -119,7 +119,7 @@ public class BodyWriter extends Writer {
 
 
     /**
-     * Encoding to use. 
+     * Encoding to use.
      * TODO: isn't it redundant ? enc, gotEnc, conv plus the enc in the bb
      */
     protected String enc;
@@ -132,7 +132,7 @@ public class BodyWriter extends Writer {
 
 
     /**
-     * List of encoders. The writer is reused - the encoder mapping 
+     * List of encoders. The writer is reused - the encoder mapping
      * avoids creating expensive objects. In future it'll contain nio.Charsets
      */
     protected HashMap encoders = new HashMap();
@@ -166,7 +166,7 @@ public class BodyWriter extends Writer {
 
     /**
      * Alternate constructor which allows specifying the initial buffer size.
-     * 
+     *
      * @param size Buffer size to use
      */
     public BodyWriter(int size) {
@@ -179,7 +179,7 @@ public class BodyWriter extends Writer {
         cb.setLimit(size);
 
     }
-    
+
     public void setConnector(Connector c, ServletResponseImpl res) {
         this.res = res;
         this.connector = c;
@@ -191,7 +191,7 @@ public class BodyWriter extends Writer {
 
     /**
      * Is the response output suspended ?
-     * 
+     *
      * @return suspended flag value
      */
     public boolean isSuspended() {
@@ -201,7 +201,7 @@ public class BodyWriter extends Writer {
 
     /**
      * Set the suspended flag.
-     * 
+     *
      * @param suspended New suspended flag value
      */
     public void setSuspended(boolean suspended) {
@@ -216,31 +216,31 @@ public class BodyWriter extends Writer {
      * Recycle the output buffer.
      */
     public void recycle() {
-        
+
         state = BYTE_STATE;
         headersSent = false;
         bytesWritten = 0;
         charsWritten = 0;
-        
+
         cb.recycle();
-        bb.recycle(); 
+        bb.recycle();
         closed = false;
         suspended = false;
-        
+
         if (conv!= null) {
             conv.recycle();
         }
-        
+
         gotEnc = false;
         enc = null;
-        
+
     }
 
 
     /**
-     * Close the output buffer. This tries to calculate the response size if 
+     * Close the output buffer. This tries to calculate the response size if
      * the response has not been committed yet.
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     public void close()
@@ -266,7 +266,7 @@ public class BodyWriter extends Writer {
 
     /**
      * Flush bytes or chars contained in the buffer.
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     public void flush()
@@ -276,7 +276,7 @@ public class BodyWriter extends Writer {
 
     /**
      * Flush bytes or chars contained in the buffer.
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     protected void doFlush(boolean realFlush)
@@ -294,10 +294,10 @@ public class BodyWriter extends Writer {
         if (state == CHAR_STATE) {
             cb.flushBuffer();
             state = BYTE_STATE;
-        } 
+        }
         if (state == BYTE_STATE) {
             bb.flushBuffer();
-        }  
+        }
         doFlush = false;
 
         if (realFlush) {
@@ -310,14 +310,14 @@ public class BodyWriter extends Writer {
     // ------------------------------------------------- Bytes Handling Methods
 
 
-    /** 
+    /**
      * Sends the buffer data to the client output, checking the
      * state of Response and calling the right interceptors.
-     * 
+     *
      * @param buf Byte buffer to be written to the response
      * @param off Offset
      * @param cnt Length
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     private void realWriteBytes(byte buf[], int off, int cnt)
@@ -356,7 +356,7 @@ public class BodyWriter extends Writer {
     }
 
 
-    private void writeBytes(byte b[], int off, int len) 
+    private void writeBytes(byte b[], int off, int len)
         throws IOException {
 
         if (closed)
@@ -432,7 +432,7 @@ public class BodyWriter extends Writer {
     }
 
 
-    public void write(StringBuffer sb)
+    public void write(StringBuilder sb)
         throws IOException {
 
         if (suspended)
@@ -477,7 +477,7 @@ public class BodyWriter extends Writer {
             s="null";
         write(s, 0, s.length());
 
-    } 
+    }
 
     public void println() throws IOException {
         write("\n");
@@ -511,7 +511,7 @@ public class BodyWriter extends Writer {
     }
 
 
-    private void realWriteChars(char c[], int off, int len) 
+    private void realWriteChars(char c[], int off, int len)
         throws IOException {
 
         if (!gotEnc)
@@ -523,7 +523,7 @@ public class BodyWriter extends Writer {
     }
 
 
-    public void checkConverter() 
+    public void checkConverter()
         throws IOException {
 
         if (!gotEnc)
@@ -532,7 +532,7 @@ public class BodyWriter extends Writer {
     }
 
 
-    protected void setConverter() 
+    protected void setConverter()
         throws IOException {
 
         enc = res.getCharacterEncoding();
@@ -542,7 +542,7 @@ public class BodyWriter extends Writer {
             enc = DEFAULT_ENCODING;
         conv = (C2BConverter) encoders.get(enc);
         if (conv == null) {
-            
+
             if (System.getSecurityManager() != null){
                 try{
                     conv = (C2BConverter)AccessController.doPrivileged(
@@ -553,22 +553,22 @@ public class BodyWriter extends Writer {
                                 }
 
                             }
-                    );              
+                    );
                 }catch(PrivilegedActionException ex){
                     Exception e = ex.getException();
                     if (e instanceof IOException)
-                        throw (IOException)e; 
+                        throw (IOException)e;
                 }
             } else {
                 conv = new C2BConverter(bb, enc);
             }
-            
+
             encoders.put(enc, conv);
 
         }
     }
 
-    
+
     // --------------------  BufferedOutputStream compatibility
 
 
@@ -598,9 +598,9 @@ public class BodyWriter extends Writer {
     }
 
 
-    /** 
+    /**
      * True if this buffer hasn't been used ( since recycle() ) -
-     * i.e. no chars or bytes have been added to the buffer.  
+     * i.e. no chars or bytes have been added to the buffer.
      */
     public boolean isNew() {
         return (bytesWritten == 0) && (charsWritten == 0);
@@ -642,7 +642,7 @@ public class BodyWriter extends Writer {
 //    public abstract void recycle();
 //    public abstract void setSuspended(boolean suspended);
 //    public abstract boolean isSuspended();
-//    
+//
 //    public abstract void reset();
 //    public abstract int getBufferSize();
 //    public abstract void setBufferSize(int n);
@@ -652,5 +652,5 @@ public class BodyWriter extends Writer {
 //    }
 //    public abstract void write(byte[] b, int off, int len) throws IOException;
 //    public abstract void writeByte(int b) throws IOException;
-//    
+//
 //}

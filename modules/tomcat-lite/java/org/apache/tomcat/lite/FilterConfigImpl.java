@@ -1,12 +1,12 @@
 /*
  * Copyright 1999,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ package org.apache.tomcat.lite;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -36,36 +37,36 @@ import javax.servlet.FilterRegistration.Dynamic;
 import org.apache.tomcat.servlets.util.Enumerator;
 
 
-/** 
+/**
  * A Filter is configured in web.xml by:
  *  - name - used in mappings
  *  - className - used to instantiate the filter
  *  - init params
  *  - other things not used in the servlet container ( icon, descr, etc )
- *  
+ *
  * Alternatively, in API mode you can pass the actual filter.
- * 
+ *
  * @see ServletConfigImpl
  */
 public final class FilterConfigImpl implements FilterConfig, FilterRegistration {
 
     DynamicFilterRegistration dynamic = new DynamicFilterRegistration();
-    
+
     public FilterConfigImpl(ServletContextImpl context) {
         this.ctx = context;
     }
-    
+
     boolean asyncSupported;
-    
+
     private ServletContextImpl ctx = null;
 
     /**
      * The application Filter we are configured for.
      */
     private transient Filter filter = null;
-    
+
     String descryption;
-    
+
     private String filterName;
 
     private String filterClassName;
@@ -80,11 +81,11 @@ public final class FilterConfigImpl implements FilterConfig, FilterRegistration 
         this.filterClassName = filterClass;
         this.initParams = params;
     }
-    
+
     public void setFilter(Filter f) {
         filter = f;
     }
-    
+
     public String getFilterName() {
         return filterName;
     }
@@ -92,7 +93,7 @@ public final class FilterConfigImpl implements FilterConfig, FilterRegistration 
     public void setFilterClass(Class<? extends Filter> filterClass2) {
         this.filterClass = filterClass2;
     }
-    
+
 
     public String getInitParameter(String name) {
         if (initParams == null) return null;
@@ -140,17 +141,17 @@ public final class FilterConfigImpl implements FilterConfig, FilterRegistration 
                 filterClass = (Class<? extends Filter>) classLoader.loadClass(filterClassName);
             }
             this.filter = (Filter) filterClass.newInstance();
-        } finally {        
+        } finally {
             if (classLoader != oldCtxClassLoader) {
                 Thread.currentThread().setContextClassLoader(oldCtxClassLoader);
             }
         }
-        
+
         // TODO: resource injection
-        
+
         return filter;
     }
-    
+
     public Filter getFilter() throws ClassCastException, ClassNotFoundException, IllegalAccessException, InstantiationException, ServletException {
         Filter filter = createFilter();
         filter.init(this);
@@ -169,12 +170,13 @@ public final class FilterConfigImpl implements FilterConfig, FilterRegistration 
         this.filter = null;
      }
 
-    @Override
+
+   @Override
     public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes,
                                           boolean isMatchAfter,
                                           String... servletNames) {
         if (ctx.startDone) {
-            // Use the context method instead of the servlet API to 
+            // Use the context method instead of the servlet API to
             // add mappings after context init.
             throw new IllegalStateException();
         }
@@ -188,12 +190,13 @@ public final class FilterConfigImpl implements FilterConfig, FilterRegistration 
         }
     }
 
-    @Override
+
+   @Override
     public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes,
                                          boolean isMatchAfter,
                                          String... urlPatterns) {
         if (ctx.startDone) {
-            // Use the context method instead of the servlet API to 
+            // Use the context method instead of the servlet API to
             // add mappings after context init.
             throw new IllegalStateException();
         }
@@ -207,66 +210,138 @@ public final class FilterConfigImpl implements FilterConfig, FilterRegistration 
         }
     }
 
-    @Override
+
+   @Override
     public boolean setInitParameter(String name, String value)
             throws IllegalArgumentException, IllegalStateException {
-        return ServletContextImpl.setInitParameter(ctx, initParams, 
+        return ServletContextImpl.setInitParameter(ctx, initParams,
                 name, value);
     }
 
-    @Override
+
+   @Override
     public Set<String> setInitParameters(Map<String, String> initParameters)
     throws IllegalArgumentException, IllegalStateException {
-        return ServletContextImpl.setInitParameters(ctx, initParams, 
+        return ServletContextImpl.setInitParameters(ctx, initParams,
                 initParameters);
     }
-    
+
     public Dynamic getDynamic() {
         return dynamic;
     }
-    
+
     public class DynamicFilterRegistration implements Dynamic {
 
-        @Override
+
+       @Override
         public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes,
                                               boolean isMatchAfter,
                                               String... servletNames) {
             FilterConfigImpl.this.addMappingForServletNames(dispatcherTypes, isMatchAfter, servletNames);
         }
 
-        @Override
+
+       @Override
         public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes,
                                              boolean isMatchAfter,
                                              String... urlPatterns) {
             FilterConfigImpl.this.addMappingForUrlPatterns(dispatcherTypes, isMatchAfter, urlPatterns);
         }
 
-        @Override
+
+       @Override
         public boolean setInitParameter(String name, String value)
                 throws IllegalArgumentException, IllegalStateException {
-            return ServletContextImpl.setInitParameter(ctx, initParams, 
+            return ServletContextImpl.setInitParameter(ctx, initParams,
                     name, value);
         }
 
-        @Override
+
+       @Override
         public Set<String> setInitParameters(Map<String, String> initParameters)
                 throws IllegalArgumentException, IllegalStateException {
-            return ServletContextImpl.setInitParameters(ctx, initParams, 
+            return ServletContextImpl.setInitParameters(ctx, initParams,
                     initParameters);
         }
 
-        @Override
+
+       @Override
         public void setAsyncSupported(boolean isAsyncSupported)
                 throws IllegalStateException {
             asyncSupported = isAsyncSupported;
         }
 
-        @Override
+
         public void setDescription(String description)
                 throws IllegalStateException {
             FilterConfigImpl.this.descryption = description;
         }
+
+       @Override
+        public Collection<String> getUrlPatternMappings() {
+            // implement me
+            return null;
+        }
+
+       @Override
+        public Collection<String> getServletNameMappings() {
+            // implement me
+            return null;
+        }
+
+       @Override
+        public Map<String, String> getInitParameters() {
+            // implement me
+            return null;
+        }
+
+       @Override
+        public String getInitParameter(String name) {
+            if (initParams == null) return null;
+            return initParams.get(name);
+        }
+
+       @Override
+        public String getClassName() {
+            // implement me
+            return null;
+        }
+
+       @Override
+        public String getName() {
+            // implement me
+            return null;
+        }
     }
 
-    
+   @Override
+    public Collection<String> getUrlPatternMappings() {
+        // implement me
+        return null;
+    }
+
+   @Override
+    public Collection<String> getServletNameMappings() {
+        // implement me
+        return null;
+    }
+
+   @Override
+    public Map<String, String> getInitParameters() {
+        // implement me
+        return null;
+    }
+
+   @Override
+    public String getClassName() {
+        // implement me
+        return null;
+    }
+
+   @Override
+    public String getName() {
+        // implement me
+        return null;
+    }
+
 }
