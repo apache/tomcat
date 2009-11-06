@@ -107,7 +107,7 @@ public class BayeuxStockTicker implements ServletContextListener,
                 Stock[] stocks = new Stock[] { 
                         new Stock("GOOG", 435.43),
                         new Stock("YHOO", 27.88), 
-                        new Stock("SPRG", 1015.55), };
+                        new Stock("ASF", 1015.55), };
                 for (Stock s : stocks) {
                     Channel ch = b.getChannel("/stock/"+s.getSymbol(), true);
                     ch.subscribe(c);
@@ -134,7 +134,7 @@ public class BayeuxStockTicker implements ServletContextListener,
                         m.put("price", stock.getValueAsString());
                         m.put("change", stock.getLastChangeAsString());
                         ch.publish(m);
-                        System.out.println("Stock: "+stock.getSymbol()+" Price: "+stock.getValueAsString()+" Change: "+stock.getLastChangeAsString());
+                        System.out.println("Bayeux Stock: "+stock.getSymbol()+" Price: "+stock.getValueAsString()+" Change: "+stock.getLastChangeAsString());
                     }
                     Thread.sleep(850);
                 }
