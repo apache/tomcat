@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.servlet.ServletException;
 
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 import org.apache.tomcat.bayeux.HttpError;
 import org.apache.tomcat.bayeux.BayeuxException;
 import org.apache.tomcat.bayeux.BayeuxRequest;

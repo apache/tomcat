@@ -18,7 +18,7 @@ package org.apache.tomcat.bayeux;
 
 import org.json.JSONObject;
 import org.apache.tomcat.bayeux.request.MetaHandshakeRequest;
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 import org.json.JSONException;
 import org.apache.tomcat.bayeux.request.MetaConnectRequest;
 import org.apache.tomcat.bayeux.request.MetaDisconnectRequest;

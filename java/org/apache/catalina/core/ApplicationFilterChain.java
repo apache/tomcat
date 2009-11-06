@@ -32,12 +32,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.CometEvent;
-import org.apache.catalina.CometFilter;
-import org.apache.catalina.CometFilterChain;
-import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Globals;
 import org.apache.catalina.InstanceEvent;
+import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.comet.CometFilter;
+import org.apache.catalina.comet.CometFilterChain;
+import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.tomcat.util.res.StringManager;
