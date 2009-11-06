@@ -24,8 +24,8 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import org.apache.catalina.CometEvent;
-import org.apache.catalina.CometProcessor;
+import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.comet.CometProcessor;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

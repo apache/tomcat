@@ -23,9 +23,9 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
 
-import org.apache.catalina.CometFilter;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.comet.CometFilter;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.FilterMap;
 
