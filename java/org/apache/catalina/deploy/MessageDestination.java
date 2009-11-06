@@ -29,24 +29,11 @@ package org.apache.catalina.deploy;
  * @since Tomcat 5.0
  */
 
-public class MessageDestination {
+public class MessageDestination extends ResourceBase {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * The description of this destination.
-     */
-    private String description = null;
-
-    public String getDescription() {
-        return (this.description);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
 
     /**
@@ -78,20 +65,6 @@ public class MessageDestination {
 
 
     /**
-     * The name of this destination.
-     */
-    private String name = null;
-
-    public String getName() {
-        return (this.name);
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    /**
      * The small icon of this destination.
      */
     private String smallIcon = null;
@@ -116,7 +89,7 @@ public class MessageDestination {
 
         StringBuilder sb = new StringBuilder("MessageDestination[");
         sb.append("name=");
-        sb.append(name);
+        sb.append(getName());
         if (displayName != null) {
             sb.append(", displayName=");
             sb.append(displayName);
@@ -129,9 +102,9 @@ public class MessageDestination {
             sb.append(", smallIcon=");
             sb.append(smallIcon);
         }
-        if (description != null) {
+        if (getDescription() != null) {
             sb.append(", description=");
-            sb.append(description);
+            sb.append(getDescription());
         }
         sb.append("]");
         return (sb.toString());

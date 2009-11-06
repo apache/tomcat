@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 public class ErrorPage implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
 
