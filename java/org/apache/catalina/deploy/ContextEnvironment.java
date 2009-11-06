@@ -18,10 +18,6 @@
 
 package org.apache.catalina.deploy;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * Representation of an application environment entry, as represented in
@@ -31,39 +27,11 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 
-public class ContextEnvironment implements Serializable, Injectable {
+public class ContextEnvironment extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * The description of this environment entry.
-     */
-    private String description = null;
-
-    public String getDescription() {
-        return (this.description);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    /**
-     * The name of this environment entry.
-     */
-    private String name = null;
-
-    public String getName() {
-        return (this.name);
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
 
     /**
@@ -82,20 +50,6 @@ public class ContextEnvironment implements Serializable, Injectable {
 
 
     /**
-     * The type of this environment entry.
-     */
-    private String type = null;
-
-    public String getType() {
-        return (this.type);
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-
-    /**
      * The value of this environment entry.
      */
     private String value = null;
@@ -109,17 +63,6 @@ public class ContextEnvironment implements Serializable, Injectable {
     }
 
 
-    private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
-
-    public void addInjectionTarget(String injectionTargetName, String jndiName) {
-        InjectionTarget target = new InjectionTarget(injectionTargetName, jndiName);
-        injectionTargets.add(target);
-    }
-
-    public List<InjectionTarget> getInjectionTargets() {
-        return injectionTargets;
-    }
-
     // --------------------------------------------------------- Public Methods
 
 
@@ -131,14 +74,14 @@ public class ContextEnvironment implements Serializable, Injectable {
 
         StringBuilder sb = new StringBuilder("ContextEnvironment[");
         sb.append("name=");
-        sb.append(name);
-        if (description != null) {
+        sb.append(getName());
+        if (getDescription() != null) {
             sb.append(", description=");
-            sb.append(description);
+            sb.append(getDescription());
         }
-        if (type != null) {
+        if (getType() != null) {
             sb.append(", type=");
-            sb.append(type);
+            sb.append(getType());
         }
         if (value != null) {
             sb.append(", value=");
@@ -150,23 +93,5 @@ public class ContextEnvironment implements Serializable, Injectable {
         return (sb.toString());
 
     }
-
-
-    // -------------------------------------------------------- Package Methods
-
-
-    /**
-     * The NamingResources with which we are associated (if any).
-     */
-    protected NamingResources resources = null;
-
-    public NamingResources getNamingResources() {
-        return (this.resources);
-    }
-
-    void setNamingResources(NamingResources resources) {
-        this.resources = resources;
-    }
-
 
 }
