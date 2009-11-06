@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import javax.servlet.ServletException;
 
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 import org.apache.tomcat.bayeux.HttpError;
 import org.apache.tomcat.bayeux.BayeuxException;
 import org.apache.tomcat.bayeux.BayeuxRequest;

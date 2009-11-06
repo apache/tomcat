@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.cometd.bayeux.Bayeux;

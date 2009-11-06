@@ -30,9 +30,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.CometEvent;
-import org.apache.catalina.CometFilter;
-import org.apache.catalina.CometFilterChain;
+import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.comet.CometFilter;
+import org.apache.catalina.comet.CometFilterChain;
 import org.apache.tomcat.util.res.StringManager;
 
 /**

@@ -28,7 +28,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import javax.servlet.ServletException;
 
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 import org.apache.tomcat.bayeux.HttpError;
 
 import org.apache.juli.logging.Log;

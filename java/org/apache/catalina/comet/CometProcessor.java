@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.catalina;
+package org.apache.catalina.comet;
 
 import java.io.IOException;
 
