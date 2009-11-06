@@ -34,6 +34,7 @@ import java.util.ArrayList;
 
 public class ResourceBase implements Serializable, Injectable {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 

@@ -33,6 +33,7 @@ import java.io.Serializable;
 
 public class ServletDef implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 

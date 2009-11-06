@@ -18,10 +18,6 @@
 
 package org.apache.catalina.deploy;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * <p>Representation of a message destination reference for a web application,
@@ -33,24 +29,11 @@ import java.util.List;
  * @since Tomcat 5.0
  */
 
-public class MessageDestinationRef implements Serializable, Injectable {
+public class MessageDestinationRef extends ResourceBase {
 
-
+    private static final long serialVersionUID = 1L;
+    
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * The description of this destination ref.
-     */
-    private String description = null;
-
-    public String getDescription() {
-        return (this.description);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
 
     /**
@@ -68,34 +51,6 @@ public class MessageDestinationRef implements Serializable, Injectable {
 
 
     /**
-     * The name of this destination ref.
-     */
-    private String name = null;
-
-    public String getName() {
-        return (this.name);
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    /**
-     * The type of this destination ref.
-     */
-    private String type = null;
-
-    public String getType() {
-        return (this.type);
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-
-    /**
      * The usage of this destination ref.
      */
     private String usage = null;
@@ -106,17 +61,6 @@ public class MessageDestinationRef implements Serializable, Injectable {
 
     public void setUsage(String usage) {
         this.usage = usage;
-    }
-
-    private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
-
-    public void addInjectionTarget(String injectionTargetName, String jndiName) {
-        InjectionTarget target = new InjectionTarget(injectionTargetName, jndiName);
-        injectionTargets.add(target);
-    }
-
-    public List<InjectionTarget> getInjectionTargets() {
-        return injectionTargets;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -130,43 +74,26 @@ public class MessageDestinationRef implements Serializable, Injectable {
 
         StringBuilder sb = new StringBuilder("MessageDestination[");
         sb.append("name=");
-        sb.append(name);
+        sb.append(getName());
         if (link != null) {
             sb.append(", link=");
             sb.append(link);
         }
-        if (type != null) {
+        if (getType() != null) {
             sb.append(", type=");
-            sb.append(type);
+            sb.append(getType());
         }
         if (usage != null) {
             sb.append(", usage=");
             sb.append(usage);
         }
-        if (description != null) {
+        if (getDescription() != null) {
             sb.append(", description=");
-            sb.append(description);
+            sb.append(getDescription());
         }
         sb.append("]");
         return (sb.toString());
 
-    }
-
-
-    // -------------------------------------------------------- Package Methods
-
-
-    /**
-     * The NamingResources with which we are associated (if any).
-     */
-    protected NamingResources resources = null;
-
-    public NamingResources getNamingResources() {
-        return (this.resources);
-    }
-
-    void setNamingResources(NamingResources resources) {
-        this.resources = resources;
     }
 
 

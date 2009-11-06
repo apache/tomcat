@@ -18,8 +18,6 @@
 
 package org.apache.catalina.deploy;
 
-import java.io.Serializable;
-
 
 /**
  * Representation of a local EJB resource reference for a web application, as
@@ -31,8 +29,9 @@ import java.io.Serializable;
  * @version $Revision$ $Date$
  */
 
-public class ContextLocalEjb extends ResourceBase implements Serializable {
+public class ContextLocalEjb extends ResourceBase {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 
