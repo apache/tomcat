@@ -135,7 +135,7 @@ grant {
     // Allow read of JAXP compliant XML parser debug
     permission java.util.PropertyPermission "jaxp.debug", "read";
 
-    // All JSPs need to ne able to read this package
+    // All JSPs need to be able to read this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat";
     
     // Precompiled JSPs need access to these packages.
