@@ -35,6 +35,9 @@ import java.io.Serializable;
 public class LoginConfig implements Serializable {
 
 
+    private static final long serialVersionUID = 1L;
+
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -162,6 +165,61 @@ public class LoginConfig implements Serializable {
         sb.append("]");
         return (sb.toString());
 
+    }
+
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((authMethod == null) ? 0 : authMethod.hashCode());
+        result = prime * result
+                + ((errorPage == null) ? 0 : errorPage.hashCode());
+        result = prime * result
+                + ((loginPage == null) ? 0 : loginPage.hashCode());
+        result = prime * result
+                + ((realmName == null) ? 0 : realmName.hashCode());
+        return result;
+    }
+
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof LoginConfig))
+            return false;
+        LoginConfig other = (LoginConfig) obj;
+        if (authMethod == null) {
+            if (other.authMethod != null)
+                return false;
+        } else if (!authMethod.equals(other.authMethod))
+            return false;
+        if (errorPage == null) {
+            if (other.errorPage != null)
+                return false;
+        } else if (!errorPage.equals(other.errorPage))
+            return false;
+        if (loginPage == null) {
+            if (other.loginPage != null)
+                return false;
+        } else if (!loginPage.equals(other.loginPage))
+            return false;
+        if (realmName == null) {
+            if (other.realmName != null)
+                return false;
+        } else if (!realmName.equals(other.realmName))
+            return false;
+        return true;
     }
 
 
