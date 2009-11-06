@@ -40,6 +40,7 @@ import org.apache.catalina.Server;
 
 public class NamingResources implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
 
@@ -48,6 +49,7 @@ public class NamingResources implements Serializable {
      * Create a new NamingResources instance.
      */
     public NamingResources() {
+        // NOOP
     }
 
 

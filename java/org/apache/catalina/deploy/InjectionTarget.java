@@ -29,6 +29,7 @@ public class InjectionTarget {
 
 
     public InjectionTarget() {
+        // NOOP
     }
 
     public InjectionTarget(String targetClass, String targetName) {

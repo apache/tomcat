@@ -33,6 +33,7 @@ import java.util.Iterator;
 
 public class ContextTransaction implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 
