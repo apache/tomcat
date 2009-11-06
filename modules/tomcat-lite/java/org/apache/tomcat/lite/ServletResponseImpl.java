@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -53,7 +54,7 @@ import org.apache.tomcat.util.http.ServerCookie;
 public class ServletResponseImpl
     implements HttpServletResponse {
 
-    /** 
+    /**
      * Format for http response header date field
      * From DateTool
      */
@@ -61,8 +62,8 @@ public class ServletResponseImpl
         "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // ----------------------------------------------------------- Constructors
-    
-    
+
+
     ServletResponseImpl() {
         urlEncoder.addSafeCharacter('/');
     }
@@ -103,12 +104,12 @@ public class ServletResponseImpl
      */
     protected boolean included = false;
 
-    
+
     /**
      * The characterEncoding flag
      */
     private boolean isCharacterEncodingSet = false;
-    
+
     /**
      * The error flag.
      */
@@ -151,19 +152,19 @@ public class ServletResponseImpl
 
 
     private HttpResponse resB;
-    
-    
+
+
     // Cached/derived information - reflected in headers
     protected static Locale DEFAULT_LOCALE = Locale.getDefault();
-    
+
     public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
 
     protected Locale locale = DEFAULT_LOCALE;
 
-    // XXX 
+    // XXX
     protected boolean commited = false;
     protected String contentType = null;
-    
+
     /**
      * Has the charset been explicitly set.
      */
@@ -187,11 +188,11 @@ public class ServletResponseImpl
         included = false;
         error = false;
         isCharacterEncodingSet = false;
-        
+
         cookies.clear();
 
         outputBuffer.recycle();
-        
+
         resB.recycle();
     }
 
@@ -209,7 +210,7 @@ public class ServletResponseImpl
 
     /**
      * Set the application commit flag.
-     * 
+     *
      * @param appCommitted The new application committed flag value
      */
     public void setAppCommitted(boolean appCommitted) {
@@ -222,7 +223,7 @@ public class ServletResponseImpl
      */
     public boolean isAppCommitted() {
         return (this.appCommitted || isCommitted() || isSuspended()
-                || ((getHttpResponse().getContentLength() > 0) 
+                || ((getHttpResponse().getContentLength() > 0)
                     && (getContentCount() >= getHttpResponse().getContentLength())));
     }
 
@@ -283,7 +284,7 @@ public class ServletResponseImpl
 
     /**
      * Set the suspended flag.
-     * 
+     *
      * @param suspended The new suspended flag value
      */
     public void setSuspended(boolean suspended) throws IOException {
@@ -323,7 +324,7 @@ public class ServletResponseImpl
      *
      * @exception IOException if an input/output error occurs
      */
-    public ServletOutputStream createOutputStream() 
+    public ServletOutputStream createOutputStream()
         throws IOException {
         // Probably useless
         return outputStream;
@@ -336,7 +337,7 @@ public class ServletResponseImpl
     public String getContentType() {
         String ret = contentType;
 
-        if (ret != null 
+        if (ret != null
             && characterEncoding != null
             && charsetSet) {
             ret = ret + ";charset=" + characterEncoding;
@@ -379,7 +380,7 @@ public class ServletResponseImpl
      *
      * @exception IOException if an input/output error occurs
      */
-    public void flushBuffer() 
+    public void flushBuffer()
         throws IOException {
         outputBuffer.flush();
     }
@@ -408,7 +409,7 @@ public class ServletResponseImpl
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
-    public ServletOutputStream getOutputStream() 
+    public ServletOutputStream getOutputStream()
         throws IOException {
 
         if (usingWriter)
@@ -439,7 +440,7 @@ public class ServletResponseImpl
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
-    public PrintWriter getWriter() 
+    public PrintWriter getWriter()
         throws IOException {
 
         if (usingOutputStream)
@@ -490,14 +491,14 @@ public class ServletResponseImpl
 
         if (isCommitted())
             throw new IllegalStateException("isCommitted");
-        
+
         resB.recycle(); // reset headers, status code, message
         req.getConnector().reset(this);
         contentType = null;
         locale = DEFAULT_LOCALE;
         characterEncoding = DEFAULT_CHARACTER_ENCODING;
         charsetSet = false;
-        
+
         outputBuffer.reset();
     }
 
@@ -539,7 +540,7 @@ public class ServletResponseImpl
 
     /**
      * Set the content length (in bytes) for this Response.
-     * Ignored for writers if non-ISO-8859-1 encoding ( we could add more 
+     * Ignored for writers if non-ISO-8859-1 encoding ( we could add more
      * encodings that are constant.
      */
     public void setContentLength(int length) {
@@ -550,8 +551,8 @@ public class ServletResponseImpl
         // Ignore any call from an included servlet
         if (included)
             return;
-        
-        // writers can use variable-length encoding. 
+
+        // writers can use variable-length encoding.
         if (usingWriter && !"ISO-8859-1".equals(getCharacterEncoding())) {
             return;
         }
@@ -622,11 +623,11 @@ public class ServletResponseImpl
 
         if (isCommitted())
             return;
-        
+
         // Ignore any call from an included servlet
         if (included)
-            return;     
-        
+            return;
+
         // Ignore any call made after the getWriter has been invoked
         // The default should be used
         if (usingWriter)
@@ -642,8 +643,8 @@ public class ServletResponseImpl
         isCharacterEncodingSet = true;
     }
 
-    
-    
+
+
     /**
      * Set the Locale that is appropriate for this response, including
      * setting the appropriate character encoding.
@@ -670,7 +671,7 @@ public class ServletResponseImpl
         String contentLanguage = locale.getLanguage();
         if ((contentLanguage != null) && (contentLanguage.length() > 0)) {
             String country = locale.getCountry();
-            StringBuilder value = new StringBuilder(contentLanguage);
+            StringBuffer value = new StringBuffer(contentLanguage);
             if ((country != null) && (country.length() > 0)) {
                 value.append('-');
                 value.append(country);
@@ -726,7 +727,7 @@ public class ServletResponseImpl
      * Return an array of all the header names set for this response, or
      * a zero-length array if no headers have been set.
      */
-    public Iterable<String> getHeaderNames() {
+    public Collection<String> getHeaderNames() {
 
         MimeHeaders headers = getHttpResponse().getMimeHeaders();
         int n = headers.size();
@@ -809,10 +810,10 @@ public class ServletResponseImpl
 
         cookies.add(cookie);
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuffer sb = new StringBuffer();
         ServerCookie.appendCookieValue
         (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-                cookie.getPath(), cookie.getDomain(), cookie.getComment(), 
+                cookie.getPath(), cookie.getDomain(), cookie.getComment(),
                 cookie.getMaxAge(), cookie.getSecure(), false);
 
         // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
@@ -952,10 +953,10 @@ public class ServletResponseImpl
      * @param url URL to be encoded
      */
     public String encodeURL(String url) {
-        
+
         String absolute = toAbsolute(url);
         if (isEncodeable(absolute)) {
-            // W3c spec clearly said 
+            // W3c spec clearly said
             if (url.equalsIgnoreCase("")){
                 url = absolute;
             }
@@ -983,7 +984,7 @@ public class ServletResponseImpl
 
     /**
      * Send an acknowledgment of a request.
-     * 
+     *
      * @exception IOException if an input/output error occurs
      */
     public void sendAcknowledgement()
@@ -994,7 +995,7 @@ public class ServletResponseImpl
 
         // Ignore any call from an included servlet
         if (included)
-            return; 
+            return;
 
         req.getConnector().acknowledge(this);
     }
@@ -1010,7 +1011,7 @@ public class ServletResponseImpl
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
-    public void sendError(int status) 
+    public void sendError(int status)
         throws IOException {
         sendError(status, null);
     }
@@ -1026,7 +1027,7 @@ public class ServletResponseImpl
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
-    public void sendError(int status, String message) 
+    public void sendError(int status, String message)
         throws IOException {
 
         if (isCommitted())
@@ -1035,7 +1036,7 @@ public class ServletResponseImpl
 
         // Ignore any call from an included servlet
         if (included)
-            return; 
+            return;
 
         setError();
 
@@ -1055,10 +1056,10 @@ public class ServletResponseImpl
             // TODO: maybe other mechanism to customize default.
             defaultStatusPage(status, message);
         }
-        setSuspended(true);        
+        setSuspended(true);
     }
 
-    /** 
+    /**
      * Default handler for status code != 200
      */
     void defaultStatusPage(int status, String message)
@@ -1066,15 +1067,15 @@ public class ServletResponseImpl
         setContentType("text/html");
         if (status > 400 && status < 600) {
             if (getOutputBuffer().getBytesWritten() == 0) {
-                getOutputBuffer().write("<html><body><h1>Status: " + 
-                        status + "</h1><h1>Message: " + message + 
+                getOutputBuffer().write("<html><body><h1>Status: " +
+                        status + "</h1><h1>Message: " + message +
                         "</h1></body></html>");
                 getOutputBuffer().flush();
             }
         }
     }
 
-    
+
 
     /**
      * Send a temporary redirect to the specified redirect location URL.
@@ -1085,7 +1086,7 @@ public class ServletResponseImpl
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
-    public void sendRedirect(String location) 
+    public void sendRedirect(String location)
         throws IOException {
 
         if (isCommitted())
@@ -1094,7 +1095,7 @@ public class ServletResponseImpl
 
         // Ignore any call from an included servlet
         if (included)
-            return; 
+            return;
 
         // Clear any data content that has been buffered
         resetBuffer();
@@ -1248,7 +1249,7 @@ public class ServletResponseImpl
             return (false);
         if (hreq.isRequestedSessionIdFromCookie())
             return (false);
-        
+
         // Is this a valid absolute URL?
         URL url = null;
         try {
@@ -1333,7 +1334,7 @@ public class ServletResponseImpl
                     String relativePath = req.getDecodedRequestURI();
                     int pos = relativePath.lastIndexOf('/');
                     relativePath = relativePath.substring(0, pos);
-                    
+
                     String encodedURI = null;
                     encodedURI = urlEncoder.encodeURL(relativePath);
                     redirectURLCC.append(encodedURI, 0, encodedURI.length());
@@ -1383,7 +1384,7 @@ public class ServletResponseImpl
             c == '+' || c == '-' || c == '.';
     }
 
-    
+
     /**
      * Return the specified URL with the specified session identifier
      * suitably encoded.
@@ -1409,7 +1410,7 @@ public class ServletResponseImpl
             anchor = path.substring(pound);
             path = path.substring(0, pound);
         }
-        StringBuilder sb = new StringBuilder(path);
+        StringBuffer sb = new StringBuffer(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
             sb.append(";jsessionid=");
             sb.append(sessionId);
@@ -1428,7 +1429,7 @@ public class ServletResponseImpl
     public BodyWriter getOutputBuffer() {
       return outputBuffer;
     }
-    
+
     public void setWriter(BodyWriter ob) {
         outputBuffer = ob;
         outputStream = new ServletOutputStreamImpl(outputBuffer);
@@ -1451,8 +1452,9 @@ public class ServletResponseImpl
     }
 
 
-    @Override
-    public Iterable<String> getHeaders(String name) {
+
+   @Override
+    public Collection<String> getHeaders(String name) {
         return null;
     }
 
