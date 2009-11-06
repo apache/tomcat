@@ -26,8 +26,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.apache.catalina.CometEvent;
-import org.apache.catalina.CometFilterChain;
+import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.comet.CometFilterChain;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

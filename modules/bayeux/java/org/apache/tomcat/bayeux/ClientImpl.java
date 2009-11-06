@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 import org.json.JSONObject;
 import org.apache.cometd.bayeux.Bayeux;
 import org.apache.cometd.bayeux.Client;

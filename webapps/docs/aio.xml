@@ -58,7 +58,7 @@
   <subsection name="CometEvent">
   
   <p>
-    Servlets which implement the <code>org.apache.catalina.CometProcessor</code>
+    Servlets which implement the <code>org.apache.catalina.comet.CometProcessor</code>
     interface will have their event method invoked rather than the usual service
     method, according to the event which occurred. The event object gives
     access to the usual request and response objects, which may be used in the
