@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2002,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ package org.apache.tomcat.lite;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,11 +29,14 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import javax.servlet.ServletSecurityElement;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
 
@@ -42,7 +46,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 
 /**
  * Based on Wrapper.
- * 
+ *
  * Standard implementation of the <b>Wrapper</b> interface that represents
  * an individual servlet definition.  No child Containers are allowed, and
  * the parent Container must be a Context.
@@ -52,11 +56,11 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 @SuppressWarnings("deprecation")
 public class ServletConfigImpl implements ServletConfig, ServletRegistration {
-    
+
     ServletDynamicRegistration dynamic = new ServletDynamicRegistration();
-    
+
     protected boolean asyncSupported;
-    
+
     private static Logger log=
         Logger.getLogger(ServletConfigImpl.class.getName());
 
@@ -75,7 +79,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
     protected int loadOnStartup = -1;
     protected String runAs;
     protected Map securityRoleRef = new HashMap(); // roleName -> [roleLink]
-    
+
     /**
      * The date and time at which this servlet will become available (in
      * milliseconds since the epoch), or zero if the servlet is available.
@@ -83,14 +87,14 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
      * servlet is considered permanent.
      */
     private transient long available = 0L;
-    
+
     private ServletContextImpl ctx;
 
     /**
      * The (single) initialized instance of this servlet.
      */
     private transient Servlet instance = null;
-    
+
     /**
      * Are we unloading our servlet instance at the moment?
      */
@@ -111,13 +115,13 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
      */
     private transient Stack instancePool = null;
 
-    
+
     // Statistics
     private transient long loadTime=0;
     private transient int classLoadTime=0;
 
     // ------------------------------------------------------------- Properties
-    public ServletConfigImpl(ServletContextImpl ctx, String name, 
+    public ServletConfigImpl(ServletContextImpl ctx, String name,
                              String classname) {
         this.servletName = name;
         this.servletClassName = classname;
@@ -177,7 +181,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
     public void setJspFile(String s) {
       this.jspFile = s;
     }
-    
+
     /**
      * Return the load-on-startup order value (negative value means
      * load on first call).
@@ -229,11 +233,11 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         HashSet allow = new HashSet();
         allow.add("TRACE");
         allow.add("OPTIONS");
-	
+
         Method[] methods = getAllDeclaredMethods(servletClazz);
         for (int i=0; methods != null && i<methods.length; i++) {
             Method m = methods[i];
-	    
+
             if (m.getName().equals("doGet")) {
                 allow.add("GET");
                 allow.add("HEAD");
@@ -257,7 +261,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
 
     /**
      * Extract the root cause from a servlet exception.
-     * 
+     *
      * @param e The servlet exception
      */
     public static Throwable getRootCause(ServletException e) {
@@ -280,15 +284,15 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
 
     /**
      *  MUST be called before service()
-     *  This method should be called to get the servlet. After 
+     *  This method should be called to get the servlet. After
      *  service(), dealocate should be called. This deals with STM and
      *  update use counters.
-     *  
+     *
      *  Normally called from RequestDispatcher and TomcatLite.
      */
     public Servlet allocate() throws ServletException {
         // If we are currently unloading this servlet, throw an exception
-        if (unloading) 
+        if (unloading)
             throw new ServletException
               ("allocate() while unloading " + getServletName());
 
@@ -316,10 +320,10 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
             countAllocated++;
             return (instance);
         }
-        
+
         // Simpler policy for ST: unbound number of servlets ( can grow to
         // one per thread )
-        
+
         synchronized (instancePool) {
             if (instancePool.isEmpty()) {
                 try {
@@ -330,7 +334,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
                     }
                     countAllocated++;
                     Servlet newServlet = loadServlet();
-                    log.fine("New STM servet " + newServlet + " " + 
+                    log.fine("New STM servet " + newServlet + " " +
                             countAllocated);
                     return newServlet;
                 } catch (ServletException e) {
@@ -344,7 +348,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
                     countAllocated);
             Servlet s = (Servlet) instancePool.pop();
             countAllocated++;
-            log.fine("After get " + instancePool.size() + " " + s  + 
+            log.fine("After get " + instancePool.size() + " " + s  +
                     " " + countAllocated);
             return s;
         }
@@ -365,11 +369,11 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         synchronized (instancePool) {
             countAllocated--;
             if (instancePool.contains(servlet)) {
-                System.err.println("Aleady in pool " + servlet + " " 
+                System.err.println("Aleady in pool " + servlet + " "
                         + instancePool.size()+ " " + countAllocated);
                 return;
             }
-            System.err.println("return  pool " + servlet +  " " + 
+            System.err.println("return  pool " + servlet +  " " +
                     instancePool.size() + " " + countAllocated);
             instancePool.push(servlet);
         }
@@ -384,7 +388,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         if (actualClass == null) {
             // No explicit name. Try to use the framework
             if (jspFile != null) {
-                
+
                 // Named JSPs can be handled by a servlet or by the mapper.
                 Servlet res = (Servlet) ctx.getObjectManager().get("filetemplate-servlet");
                 if (res != null) {
@@ -393,7 +397,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
                     initParams.put("jsp-file", jspFile);
                     return res;
                 } else {
-                    UserTemplateClassMapper mapper = 
+                    UserTemplateClassMapper mapper =
                         (UserTemplateClassMapper) ctx.getObjectManager().get(
                                 UserTemplateClassMapper.class);
                     if (mapper != null) {
@@ -415,36 +419,36 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
             //ctx.getObjectManager().getObject(c);
             //ctx.getObjectManager().getObject(servletName);
         }
-            
-        
+
+
         if (servletClass == null) {
             // set classClass
             loadClass(actualClass);
         }
 
-        
-        // jsp-file case. Load the JspProxyServlet instead, with the 
-        // right params. Note the JspProxyServlet is _not_ jasper, 
-        // nor 'jsp' servlet - it is just a proxy with no special 
+
+        // jsp-file case. Load the JspProxyServlet instead, with the
+        // right params. Note the JspProxyServlet is _not_ jasper,
+        // nor 'jsp' servlet - it is just a proxy with no special
         // params. It calls the jsp servlet and jasper to generate the
         // real class.
-        
+
         // this is quite different from catalina, where an ugly kludge was
         // used to use the same jsp servlet in 2 roles
-        
+
         // the jsp proxy is replaced by the web.xml processor
-        
+
         if (servletClass == null) {
             unavailable(null);
             throw new UnavailableException("ClassNotFound: " + actualClass);
         }
-        
+
         // Instantiate and initialize an instance of the servlet class itself
         try {
             return (Servlet) servletClass.newInstance();
         } catch (ClassCastException e) {
             unavailable(null);
-            throw new UnavailableException("ClassCast: (Servlet)" + 
+            throw new UnavailableException("ClassCast: (Servlet)" +
                     actualClass);
         } catch (Throwable e) {
             unavailable(null);
@@ -452,13 +456,13 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
             // Added extra log statement for Bugzilla 36630:
             // http://issues.apache.org/bugzilla/show_bug.cgi?id=36630
             if(log.isLoggable(Level.FINE)) {
-                log.log(Level.FINE, "newInstance() error: servlet-name: " + 
+                log.log(Level.FINE, "newInstance() error: servlet-name: " +
                         getServletName() +
                         " servlet-class: " + actualClass, e);
             }
 
             // Restore the context ClassLoader
-            throw new ServletException("newInstance() error " + getServletName() + 
+            throw new ServletException("newInstance() error " + getServletName() +
                     " " + actualClass, e);
         }
     }
@@ -473,13 +477,13 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         // Nothing to do if we already have an instance or an instance pool
         if (!singleThreadModel && (instance != null))
             return instance;
-        
+
         long t1=System.currentTimeMillis();
 
         Servlet servlet = newInstance();
-        
+
         classLoadTime=(int) (System.currentTimeMillis() -t1);
-        
+
         // Call the initialization method of this servlet
         try {
             servlet.init(this);
@@ -500,7 +504,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
                 instancePool = new Stack();
         }
         loadTime=System.currentTimeMillis() -t1;
-        
+
         return servlet;
     }
 
@@ -509,14 +513,14 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         // Complain if no servlet class has been specified
         if (actualClass == null) {
             unavailable(null);
-            throw new ServletException("servlet-class missing " +  
+            throw new ServletException("servlet-class missing " +
                     getServletName());
         }
-        
-        ClassLoader classLoader = ctx.getClassLoader(); 
-        if (classLoader == null ) 
+
+        ClassLoader classLoader = ctx.getClassLoader();
+        if (classLoader == null )
             classLoader = this.getClass().getClassLoader();
-        
+
         // Load the specified servlet class from the appropriate class loader
         try {
             servletClass = classLoader.loadClass(actualClass);
@@ -580,7 +584,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
      *  destroy() method
      */
     public synchronized void unload() throws ServletException {
-        setAvailable(Long.MAX_VALUE);        
+        setAvailable(Long.MAX_VALUE);
 
         // Nothing to do if we have never loaded the instance
         if (!singleThreadModel && (instance == null))
@@ -594,7 +598,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
             long delay = ctx.getUnloadDelay() / 20;
             while ((nRetries < 21) && (countAllocated > 0)) {
                 if ((nRetries % 10) == 0) {
-                    log.info("Servlet.unload() timeout " + 
+                    log.info("Servlet.unload() timeout " +
                             countAllocated);
                 }
                 try {
@@ -610,7 +614,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
             Thread.currentThread().getContextClassLoader();
         if (instance != null) {
             ClassLoader classLoader = instance.getClass().getClassLoader();
-            
+
             PrintStream out = System.out;
             // Call the servlet destroy() method
             try {
@@ -620,13 +624,13 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
                 instance = null;
                 //instancePool = null;
                 unloading = false;
-                throw new ServletException("Servlet.destroy() " + 
+                throw new ServletException("Servlet.destroy() " +
                         getServletName(), t);
             } finally {
                 // restore the context ClassLoader
                 Thread.currentThread().setContextClassLoader(oldCtxClassLoader);
             }
-            
+
             // Deregister the destroyed instance
             instance = null;
         }
@@ -653,8 +657,8 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
 
         unloading = false;
     }
-    
-    
+
+
     /**
      * Return the initialization parameter value for the specified name,
      * if any; otherwise return <code>null</code>.
@@ -772,33 +776,33 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         if ((parentMethods != null) && (parentMethods.length > 0)) {
             Method[] allMethods =
                 new Method[parentMethods.length + thisMethods.length];
-	    System.arraycopy(parentMethods, 0, allMethods, 0,
+        System.arraycopy(parentMethods, 0, allMethods, 0,
                              parentMethods.length);
-	    System.arraycopy(thisMethods, 0, allMethods, parentMethods.length,
+        System.arraycopy(thisMethods, 0, allMethods, parentMethods.length,
                              thisMethods.length);
 
-	    thisMethods = allMethods;
-	}
+        thisMethods = allMethods;
+    }
 
-	return thisMethods;
+    return thisMethods;
     }
 
     /** Specify the instance. Avoids the class lookup, disables unloading.
      *  Use for embedded case, or to control the allocation.
-     * 
+     *
      * @param servlet
      */
     public void setServlet(Servlet servlet) {
         instance = servlet;
         ctx.getObjectManager().bind("Servlet:" +
-                ctx.getContextPath() + ":" + getServletName(), 
+                ctx.getContextPath() + ":" + getServletName(),
                 this);
     }
 
     public String getSecurityRoleRef(String role) {
         return (String)securityRoleRef.get(role);
     }
-    
+
     public void setSecurityRoleRef(Map securityRoles) {
       this.securityRoleRef = securityRoles;
     }
@@ -811,10 +815,10 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
       this.loadOnStartup = loadOnStartup;
     }
 
-    @Override
+   @Override
     public Set<String> addMapping(String... urlPatterns) {
         if (ctx.startDone) {
-            // Use the context method instead of the servlet API to 
+            // Use the context method instead of the servlet API to
             // add mappings after context init.
             throw new IllegalStateException();
         }
@@ -833,25 +837,28 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
         return failed;
     }
 
-    @Override
+
+   @Override
     public boolean setInitParameter(String name, String value)
             throws IllegalArgumentException, IllegalStateException {
-        return ServletContextImpl.setInitParameter(ctx, initParams, 
+        return ServletContextImpl.setInitParameter(ctx, initParams,
                 name, value);
     }
 
-    @Override
+
+   @Override
     public Set<String> setInitParameters(Map<String, String> initParameters)
             throws IllegalArgumentException, IllegalStateException {
-        return ServletContextImpl.setInitParameters(ctx, initParams, 
+        return ServletContextImpl.setInitParameters(ctx, initParams,
                 initParameters);
     }
 
     public Dynamic getDynamic() {
         return dynamic;
     }
-    
+
     class ServletDynamicRegistration implements Dynamic {
+
 
         @Override
         public void setAsyncSupported(boolean isAsyncSupported)
@@ -859,15 +866,125 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
             asyncSupported = isAsyncSupported;
         }
 
-        @Override
+
         public void setDescription(String description)
                 throws IllegalStateException {
             ServletConfigImpl.this.description = description;
         }
-        
+
+        @Override
+        public Set<String> setServletSecurity(ServletSecurityElement constraint) {
+            //implement me
+            return null;
+        }
+
+        @Override
+        public void setLoadOnStartup(int loadOnStartup) {
+            //implement me - here to compile
+        }
+
+        @Override
+        public void setMultipartConfig(MultipartConfigElement multipartConfig) {
+            //implement me - here to compile
+        }
+
+        @Override
+        public void setRunAsRole(String roleName) {
+            //implement me - here to compile
+        }
+
+        @Override
+        public String getRunAsRole() {
+            //implement me - here to compile
+            return null;
+        }
+
+        @Override
+        public Collection<String> getMappings() {
+            //implement me
+            return null;
+        }
+
+        @Override
+        public Set<String> addMapping(String... urlPatterns) {
+            //implement me
+            return null;
+        }
+
+        @Override
+        public Map<String, String> getInitParameters() {
+            // implement me
+            return null;
+        }
+
+        @Override
+        public Set<String> setInitParameters(Map<String, String> initParameters)
+                throws IllegalArgumentException, IllegalStateException {
+            // implement me
+            return null;
+        }
+
+        @Override
+        public String getClassName() {
+            // implement me
+            return null;
+        }
+
+        @Override
+        public String getName() {
+            // implement me
+            return null;
+        }
+
+        @Override
+        public String getInitParameter(String name) {
+            // implement me
+            return null;
+        }
+
+        @Override
+        public boolean setInitParameter(String name, String value)
+                throws IllegalArgumentException, IllegalStateException {
+            // implement me
+            return false;
+        }
+
+    }
+
+   @Override
+    public Collection<String> getMappings() {
+        //implement me
+        return null;
     }
 
     public void setServletClass(Class<? extends Servlet> servletClass2) {
         servletClass = servletClass2;
     }
+
+
+   @Override
+    public String getRunAsRole() {
+        //implement me
+        return null;
+    }
+
+
+   @Override
+    public Map<String, String> getInitParameters() {
+        // implement me
+        return null;
+    }
+
+   @Override
+    public String getClassName() {
+        // implement me
+        return null;
+    }
+
+   @Override
+    public String getName() {
+        // implement me
+        return null;
+    }
+
 }
