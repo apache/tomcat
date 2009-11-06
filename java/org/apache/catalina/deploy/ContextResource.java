@@ -18,7 +18,6 @@
 
 package org.apache.catalina.deploy;
 
-import java.io.Serializable;
 
 /**
  * Representation of a resource reference for a web application, as
@@ -30,8 +29,9 @@ import java.io.Serializable;
  * @version $Revision$ $Date$
  */
 
-public class ContextResource extends ResourceBase implements Serializable {
+public class ContextResource extends ResourceBase {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 

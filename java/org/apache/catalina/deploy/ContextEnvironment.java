@@ -33,6 +33,7 @@ import java.util.List;
 
 public class ContextEnvironment implements Serializable, Injectable {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 
