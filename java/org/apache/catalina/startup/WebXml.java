@@ -41,6 +41,7 @@ import org.apache.catalina.deploy.JspPropertyGroup;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.MessageDestination;
 import org.apache.catalina.deploy.MessageDestinationRef;
+import org.apache.catalina.deploy.ResourceBase;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.SecurityRoleRef;
 import org.apache.catalina.deploy.ServletDef;
@@ -582,25 +583,9 @@ public class WebXml {
             new HashMap<String, Boolean>();
 
         for (WebXml fragment : fragments) {
-            for (String contextParam : fragment.getContextParams().keySet()) {
-                if (!contextParams.containsKey(contextParam)) {
-                    // Not defined in main web.xml
-                    String value =
-                        fragment.getContextParams().get(contextParam);
-                    if (temp.getContextParams().containsKey(contextParam)) {
-                        if (value != null && !value.equals(
-                                temp.getContextParams().get(contextParam))) {
-                            log.error(sm.getString(
-                                    "webXml.mergeConflictContextParam",
-                                    contextParam,
-                                    fragment.getName(),
-                                    fragment.getURL()));
-                            return false;
-                        }
-                    } else {
-                        temp.addContextParam(contextParam, value);
-                    }
-                }
+            if (!mergeMap(fragment.getContextParams(), contextParams,
+                    temp.getContextParams(), fragment, "Context Parameter")) {
+                return false;
             }
         }
         contextParams.putAll(temp.getContextParams());
@@ -633,142 +618,36 @@ public class WebXml {
         }
 
         for (WebXml fragment : fragments) {
-            for (ContextLocalEjb ejbLocalRef :
-                    fragment.getEjbLocalRefs().values()) {
-                String name = ejbLocalRef.getName();
-                boolean mergeInjectionFlag = false;
-                if (ejbLocalRefs.containsKey(name)) {
-                    if (mergeInjectionFlags.containsKey(name)) {
-                        mergeInjectionFlag =
-                            mergeInjectionFlags.get(name).booleanValue(); 
-                    } else {
-                        if (ejbLocalRefs.get(
-                                name).getInjectionTargets().size() == 0) {
-                            mergeInjectionFlag = true;
-                        }
-                        mergeInjectionFlags.put(name,
-                                Boolean.valueOf(mergeInjectionFlag));
-                    }
-                    if (mergeInjectionFlag) {
-                        ejbLocalRefs.get(name).getInjectionTargets().addAll(
-                                ejbLocalRef.getInjectionTargets());
-                    }
-                } else {
-                    // Not defined in main web.xml
-                    if (temp.getEjbLocalRefs().containsKey(name)) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictEjbLocalRef",
-                                name,
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    } else {
-                        temp.getEjbLocalRefs().put(name, ejbLocalRef);
-                    }
-                }
+            if (!mergeResourceMap(fragment.getEjbLocalRefs(), ejbLocalRefs,
+                    temp.getEjbLocalRefs(), mergeInjectionFlags, fragment)) {
+                return false;
             }
         }
         ejbLocalRefs.putAll(temp.getEjbLocalRefs());
         mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
-            for (ContextEjb ejbRef : fragment.getEjbRefs().values()) {
-                String name = ejbRef.getName();
-                boolean mergeInjectionFlag = false;
-                if (ejbRefs.containsKey(name)) {
-                    if (mergeInjectionFlags.containsKey(name)) {
-                        mergeInjectionFlag =
-                            mergeInjectionFlags.get(name).booleanValue(); 
-                    } else {
-                        if (ejbRefs.get(
-                                name).getInjectionTargets().size() == 0) {
-                            mergeInjectionFlag = true;
-                        }
-                        mergeInjectionFlags.put(name,
-                                Boolean.valueOf(mergeInjectionFlag));
-                    }
-                    if (mergeInjectionFlag) {
-                        ejbRefs.get(name).getInjectionTargets().addAll(
-                                ejbRef.getInjectionTargets());
-                    }
-                } else {
-                    // Not defined in main web.xml
-                    if (temp.getEjbRefs().containsKey(name)) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictEjbRef",
-                                name,
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    } else {
-                        temp.getEjbRefs().put(name, ejbRef);
-                    }
-                }
+            if (!mergeResourceMap(fragment.getEjbRefs(), ejbRefs,
+                    temp.getEjbRefs(), mergeInjectionFlags, fragment)) {
+                return false;
             }
         }
         ejbRefs.putAll(temp.getEjbRefs());
         mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
-            for (ContextEnvironment envEntry :
-                    fragment.getEnvEntries().values()) {
-                String name = envEntry.getName();
-                boolean mergeInjectionFlag = false;
-                if (envEntries.containsKey(name)) {
-                    if (mergeInjectionFlags.containsKey(name)) {
-                        mergeInjectionFlag =
-                            mergeInjectionFlags.get(name).booleanValue(); 
-                    } else {
-                        if (envEntries.get(
-                                name).getInjectionTargets().size() == 0) {
-                            mergeInjectionFlag = true;
-                        }
-                        mergeInjectionFlags.put(name,
-                                Boolean.valueOf(mergeInjectionFlag));
-                    }
-                    if (mergeInjectionFlag) {
-                        envEntries.get(name).getInjectionTargets().addAll(
-                                envEntry.getInjectionTargets());
-                    }
-                } else {
-                    // Not defined in main web.xml
-                    if (temp.getEnvEntries().containsKey(name)) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictEnvEntry",
-                                name,
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    } else {
-                        temp.getEnvEntries().put(name, envEntry);
-                    }
-                }
+            if (!mergeResourceMap(fragment.getEnvEntries(), envEntries,
+                    temp.getEnvEntries(), mergeInjectionFlags, fragment)) {
+                return false;
             }
         }
         envEntries.putAll(temp.getEnvEntries());
         mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
-            for (String errorPageKey : fragment.getErrorPages().keySet()) {
-                if (!errorPages.containsKey(errorPageKey)) {
-                    // Not defined in main web.xml
-                    ErrorPage errorPage =
-                        fragment.getErrorPages().get(errorPageKey);
-                    if (temp.getErrorPages().containsKey(errorPageKey)) {
-                        if (!errorPage.getLocation().equals(
-                                temp.getErrorPages().get(
-                                        errorPageKey).getLocation())) {
-                            log.error(sm.getString(
-                                    "webXml.mergeConflictErrorPage",
-                                    errorPageKey,
-                                    fragment.getName(),
-                                    fragment.getURL()));
-                            return false;
-                        }
-                    } else {
-                        temp.addErrorPage(errorPage);
-                    }
-                }
+            if (!mergeMap(fragment.getErrorPages(), errorPages,
+                    temp.getErrorPages(), fragment, "Error Page")) {
+                return false;
             }
         }
         errorPages.putAll(temp.getErrorPages());
@@ -780,28 +659,173 @@ public class WebXml {
             }
         }
 
-        
-        // TODO SERVLET3 - Merge remaining elements
+        for (WebXml fragment : fragments) {
+            for (JspPropertyGroup jspPropertyGroup : fragment.getJspPropertyGroups()) {
+                // Always additive
+                addJspPropertyGroup(jspPropertyGroup);
+            }
+        }
 
         for (WebXml fragment : fragments) {
             for (String listener : fragment.getListeners()) {
-                if (!listeners.contains(listener)) {
-                    // Not defined in main web.xml
-                    if (temp.getListeners().contains(listener)) {
+                // Always additive
+                addListener(listener);
+            }
+        }
+
+        for (WebXml fragment : fragments) {
+            if (!mergeMap(fragment.getLocalEncodingMappings(),
+                    localeEncodingMappings, temp.getLocalEncodingMappings(),
+                    fragment, "Locale Encoding Mapping")) {
+                return false;
+            }
+        }
+        errorPages.putAll(temp.getErrorPages());
+
+        if (getLoginConfig() == null) {
+            LoginConfig tempLoginConfig = null;
+            for (WebXml fragment : fragments) {
+                LoginConfig loginConfig = fragment.loginConfig;
+                if (loginConfig != null) {
+                    if (tempLoginConfig == null || loginConfig.equals(tempLoginConfig)) {
+                        tempLoginConfig = loginConfig;
+                    } else {
                         log.error(sm.getString(
-                                "webXml.mergeConflictListener",
-                                listener,
+                                "webXml.mergeConflictLoginConfig",
                                 fragment.getName(),
                                 fragment.getURL()));
-                        return false;
-                    } else {
-                        temp.addListener(listener);
                     }
                 }
             }
         }
-        listeners.addAll(temp.getListeners());
 
+
+        for (WebXml fragment : fragments) {
+            if (!mergeResourceMap(fragment.getMessageDestinationRefs(), messageDestinationRefs,
+                    temp.getMessageDestinationRefs(), mergeInjectionFlags, fragment)) {
+                return false;
+            }
+        }
+        messageDestinationRefs.putAll(temp.getMessageDestinationRefs());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            if (!mergeResourceMap(fragment.getMessageDestinations(), messageDestinations,
+                    temp.getMessageDestinations(), mergeInjectionFlags, fragment)) {
+                return false;
+            }
+        }
+        messageDestinations.putAll(temp.getMessageDestinations());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            if (!mergeMap(fragment.getMimeMappings(), mimeMappings,
+                    temp.getMimeMappings(), fragment, "Mime Mapping")) {
+                return false;
+            }
+        }
+
+        for (WebXml fragment : fragments) {
+            if (!mergeResourceMap(fragment.getResourceEnvRefs(), resourceEnvRefs,
+                    temp.getResourceEnvRefs(), mergeInjectionFlags, fragment)) {
+                return false;
+            }
+        }
+        resourceEnvRefs.putAll(temp.getResourceEnvRefs());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            if (!mergeResourceMap(fragment.getResourceRefs(), resourceRefs,
+                    temp.getResourceRefs(), mergeInjectionFlags, fragment)) {
+                return false;
+            }
+        }
+        resourceRefs.putAll(temp.getResourceRefs());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            for (SecurityConstraint constraint : fragment.getSecurityConstraints()) {
+                // Always additive
+                addSecurityConstraint(constraint);
+            }
+        }
+
+        for (WebXml fragment : fragments) {
+            for (String role : fragment.getSecurityRoles()) {
+                // Always additive
+                addSecurityRole(role);
+            }
+        }
+
+        
+        // TODO SERVLET3 - Merge remaining elements
+
+        return true;
+    }
+    
+    private <T extends ResourceBase> boolean mergeResourceMap(
+            Map<String, T> fragmentResources, Map<String, T> mainResources,
+            Map<String, T> tempResources,
+            Map<String,Boolean> mergeInjectionFlags, WebXml fragment) {
+        for (T resource : fragmentResources.values()) {
+            String name = resource.getName();
+            boolean mergeInjectionFlag = false;
+            if (mainResources.containsKey(name)) {
+                if (mergeInjectionFlags.containsKey(name)) {
+                    mergeInjectionFlag =
+                        mergeInjectionFlags.get(name).booleanValue(); 
+                } else {
+                    if (mainResources.get(
+                            name).getInjectionTargets().size() == 0) {
+                        mergeInjectionFlag = true;
+                    }
+                    mergeInjectionFlags.put(name,
+                            Boolean.valueOf(mergeInjectionFlag));
+                }
+                if (mergeInjectionFlag) {
+                    mainResources.get(name).getInjectionTargets().addAll(
+                            resource.getInjectionTargets());
+                }
+            } else {
+                // Not defined in main web.xml
+                if (tempResources.containsKey(name)) {
+                    log.error(sm.getString(
+                            "webXml.mergeConflictResource",
+                            name,
+                            fragment.getName(),
+                            fragment.getURL()));
+                    return false;
+                } else {
+                    tempResources.put(name, resource);
+                }
+            }
+        }
+        return true;
+    }
+    
+    private <T> boolean mergeMap(Map<String,T> fragmentMap,
+            Map<String,T> mainMap, Map<String,T> tempMap, WebXml fragment,
+            String mapName) {
+        for (String key : fragmentMap.keySet()) {
+            if (!mainMap.containsKey(key)) {
+                // Not defined in main web.xml
+                T value =fragmentMap.get(key);
+                if (tempMap.containsKey(key)) {
+                    if (value != null && !value.equals(
+                            tempMap.get(key))) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictString",
+                                mapName,
+                                key,
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                } else {
+                    tempMap.put(key, value);
+                }
+            }
+        }
         return true;
     }
 }
