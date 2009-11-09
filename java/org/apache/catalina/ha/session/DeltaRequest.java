@@ -46,7 +46,7 @@ public class DeltaRequest implements Externalizable {
     /**
      * The string manager for this package.
      */
-    protected static StringManager sm = StringManager
+    protected static final StringManager sm = StringManager
             .getManager(Constants.Package);
 
     public static final int TYPE_ATTRIBUTE = 0;

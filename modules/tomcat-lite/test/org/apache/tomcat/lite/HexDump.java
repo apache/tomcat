@@ -33,7 +33,7 @@ public final class HexDump {
 
 
     // -------------------------------------------------------------- Constants
-    static StringManager sm;
+    static final StringManager sm;
 
     /**
      *  Table for HEX to DEC byte translation.
