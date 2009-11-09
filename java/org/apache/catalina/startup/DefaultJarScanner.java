@@ -163,7 +163,7 @@ public class DefaultJarScanner implements JarScanner {
             callback.scan((JarURLConnection) conn);
         } else {
             String urlStr = url.toString();
-            if (urlStr.startsWith("file:")) {
+            if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:")) {
                 if (urlStr.endsWith(JAR_EXT)) {
                     URL jarURL = new URL("jar:" + urlStr + "!/");
                     callback.scan((JarURLConnection) jarURL.openConnection());
