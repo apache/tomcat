@@ -38,7 +38,7 @@ import org.apache.tomcat.util.modeler.Registry;
 
 public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 {
-    private static Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
+    private static final Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
 
     Registry registry;
     String location;

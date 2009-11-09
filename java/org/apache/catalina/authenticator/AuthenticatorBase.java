@@ -77,7 +77,7 @@ import org.apache.juli.logging.LogFactory;
 public abstract class AuthenticatorBase
     extends ValveBase
     implements Authenticator, Lifecycle {
-    private static Log log = LogFactory.getLog(AuthenticatorBase.class);
+    private static final Log log = LogFactory.getLog(AuthenticatorBase.class);
 
 
     //------------------------------------------------------ Constructor

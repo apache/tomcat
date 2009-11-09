@@ -52,7 +52,7 @@ import org.apache.catalina.Executor;
 public class StandardService
         implements Lifecycle, Service, MBeanRegistration 
  {
-    private static Log log = LogFactory.getLog(StandardService.class);
+    private static final Log log = LogFactory.getLog(StandardService.class);
    
 
     // ----------------------------------------------------- Instance Variables

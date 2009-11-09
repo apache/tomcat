@@ -52,7 +52,7 @@ import org.xml.sax.Attributes;
 public class MemoryUserDatabase implements UserDatabase {
 
 
-    private static Log log = LogFactory.getLog(MemoryUserDatabase.class);
+    private static final Log log = LogFactory.getLog(MemoryUserDatabase.class);
 
     // ----------------------------------------------------------- Constructors
 

@@ -47,7 +47,7 @@ import org.apache.tomcat.util.digester.Digester;
 
 public class MemoryRealm  extends RealmBase {
 
-    private static Log log = LogFactory.getLog(MemoryRealm.class);
+    private static final Log log = LogFactory.getLog(MemoryRealm.class);
 
     // ----------------------------------------------------- Instance Variables
 

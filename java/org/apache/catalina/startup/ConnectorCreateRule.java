@@ -37,7 +37,7 @@ import org.apache.juli.logging.Log;
 
 public class ConnectorCreateRule extends Rule {
 
-    protected static Log log = LogFactory.getLog(ConnectorCreateRule.class);
+    protected static final Log log = LogFactory.getLog(ConnectorCreateRule.class);
     // --------------------------------------------------------- Public Methods
 
 

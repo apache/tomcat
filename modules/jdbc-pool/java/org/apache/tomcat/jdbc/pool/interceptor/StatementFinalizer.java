@@ -32,7 +32,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  *
  */
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
-    protected static Log log = LogFactory.getLog(StatementFinalizer.class);
+    protected static final Log log = LogFactory.getLog(StatementFinalizer.class);
     
     protected ArrayList<WeakReference<Statement>> statements = new ArrayList<WeakReference<Statement>>();
     

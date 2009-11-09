@@ -49,7 +49,7 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     // -------------------------------------------------------------- Constants
 
-    protected static Log log = LogFactory.getLog(JIoEndpoint.class);
+    protected static final Log log = LogFactory.getLog(JIoEndpoint.class);
 
     // ----------------------------------------------------------------- Fields
 

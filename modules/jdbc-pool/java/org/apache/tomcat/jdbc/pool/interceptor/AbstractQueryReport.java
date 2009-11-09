@@ -37,7 +37,7 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
  */
 public abstract class AbstractQueryReport extends AbstractCreateStatementInterceptor {
     //logger
-    protected static Log log = LogFactory.getLog(AbstractQueryReport.class);
+    protected static final Log log = LogFactory.getLog(AbstractQueryReport.class);
 
     /**
      * The threshold in milliseconds. If the query is faster than this, we don't measure it

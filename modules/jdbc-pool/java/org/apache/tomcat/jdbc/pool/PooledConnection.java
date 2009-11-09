@@ -38,7 +38,7 @@ public class PooledConnection {
     /**
      * Logger
      */
-    protected static Log log = LogFactory.getLog(PooledConnection.class);
+    protected static final Log log = LogFactory.getLog(PooledConnection.class);
     /**
      * Instance counter
      */

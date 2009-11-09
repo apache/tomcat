@@ -34,7 +34,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class ChannelImpl implements Channel {
     
-    protected static Log log = LogFactory.getLog(ChannelImpl.class);
+    protected static final Log log = LogFactory.getLog(ChannelImpl.class);
     
     /**
      * The unique id of this channel

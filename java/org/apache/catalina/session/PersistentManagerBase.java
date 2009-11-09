@@ -54,7 +54,7 @@ public abstract class PersistentManagerBase
     extends ManagerBase
     implements Lifecycle, PropertyChangeListener {
 
-    private static Log log = LogFactory.getLog(PersistentManagerBase.class);
+    private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
 
     // ---------------------------------------------------- Security Classes
 

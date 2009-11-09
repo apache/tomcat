@@ -36,7 +36,7 @@ import org.apache.juli.logging.LogFactory;
 public class HeartbeatListener
     implements LifecycleListener, ContainerListener {
 
-    private static Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final Log log = LogFactory.getLog(HeartbeatListener.class);
 
     /* To allow to select the connector */
     int port = 0;

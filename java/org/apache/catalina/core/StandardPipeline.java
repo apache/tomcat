@@ -55,7 +55,7 @@ public class StandardPipeline
     implements Pipeline, Contained, Lifecycle 
  {
 
-    private static Log log = LogFactory.getLog(StandardPipeline.class);
+    private static final Log log = LogFactory.getLog(StandardPipeline.class);
 
     // ----------------------------------------------------------- Constructors
 

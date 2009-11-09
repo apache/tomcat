@@ -41,7 +41,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class CombinedRealm extends RealmBase {
 
-    private static Log log = LogFactory.getLog(CombinedRealm.class);
+    private static final Log log = LogFactory.getLog(CombinedRealm.class);
 
     /**
      * The string manager for this package.
