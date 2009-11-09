@@ -39,4 +39,5 @@ public @interface WebServlet {
     String smallIcon() default "";
     String largeIcon() default "";
     String description() default "";
+    String displayName() default "";
 }
