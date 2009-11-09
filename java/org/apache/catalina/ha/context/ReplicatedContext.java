@@ -54,7 +54,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
         super.addLifecycleListener(this);            
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
-            if (this.context == null) this.context = new ReplApplContext(this.getBasePath(), this);
+            if (this.context == null) this.context = new ReplApplContext(this);
             if ( catclust != null ) {
                 ReplicatedMap map = new ReplicatedMap(this,catclust.getChannel(),DEFAULT_REPL_TIMEOUT,
                                                       getName(),getClassLoaders());
@@ -116,7 +116,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
     @Override
     public ServletContext getServletContext() {
         if (context == null) {
-            context = new ReplApplContext(getBasePath(), this);
+            context = new ReplApplContext(this);
             if (getAltDDName() != null)
                 context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
         }
@@ -130,8 +130,8 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
         protected ConcurrentHashMap<String, Object> tomcatAttributes =
             new ConcurrentHashMap<String, Object>();
         
-        public ReplApplContext(String basePath, ReplicatedContext context) {
-            super(basePath,context);
+        public ReplApplContext(ReplicatedContext context) {
+            super(context);
         }
         
         protected ReplicatedContext getParent() {
