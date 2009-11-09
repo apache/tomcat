@@ -70,7 +70,7 @@ public abstract class StoreBase
     /**
      * The string manager for this package.
      */
-    protected StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * The Manager with which this JDBCStore is associated.
