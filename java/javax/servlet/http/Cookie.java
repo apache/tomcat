@@ -16,6 +16,7 @@
 */
 package javax.servlet.http;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -58,12 +59,9 @@ import java.util.ResourceBundle;
  * @version	$Version$
  *
  */
+public class Cookie implements Cloneable, Serializable {
 
-// XXX would implement java.io.Serializable too, but can't do that
-// so long as sun.servlet.* must run on older JDK 1.02 JVMs which
-// don't include that support.
-
-public class Cookie implements Cloneable {
+    private static final long serialVersionUID = 1L;
 
     private static final String LSTRING_FILE =
 	"javax.servlet.http.LocalStrings";
@@ -560,11 +558,11 @@ public class Cookie implements Cloneable {
      *				a reserved token; <code>false</code>
      *				if it is not			
      */
-    private boolean isToken(String value) {
-        int len = value.length();
+    private boolean isToken(String possibleToken) {
+        int len = possibleToken.length();
 
         for (int i = 0; i < len; i++) {
-            char c = value.charAt(i);
+            char c = possibleToken.charAt(i);
 
             if (c < 0x20 || c >= 0x7f || tspecials.indexOf(c) != -1 ||
                     (STRICT_NAMING && tspecials2.indexOf(c) != -1)) {
