@@ -156,8 +156,8 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  * <code><pre>
  * &lt;filter&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
- *    &lt;filter-class&gt;fr.xebia.servlet.filter.XForwardedFilter&lt;/filter-class&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+ *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
@@ -173,7 +173,7 @@ import org.apache.juli.logging.LogFactory;
  * &lt;/filter&gt;
  * 
  * &lt;filter-mapping&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
  * &lt;/filter-mapping&gt;</pre></code>
@@ -182,8 +182,8 @@ import org.apache.juli.logging.LogFactory;
  * <table border="1">
  * <tr>
  * <th>property</th>
- * <th>Value Before XForwardedFilter</th>
- * <th>Value After XForwardedFilter</th>
+ * <th>Value Before RemoteIpFilter</th>
+ * <th>Value After RemoteIpFilter</th>
  * </tr>
  * <tr>
  * <td>request.remoteAddr</td>
@@ -229,12 +229,12 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Sample with trusted proxies</strong>
  * </p>
  * <p>
- * XForwardedFilter configuration:
+ * RemoteIpFilter configuration:
  * </p>
  * <code><pre>
  * &lt;filter&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
- *    &lt;filter-class&gt;fr.xebia.servlet.filter.XForwardedFilter&lt;/filter-class&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+ *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
@@ -250,7 +250,7 @@ import org.apache.juli.logging.LogFactory;
  * &lt;/filter&gt;
  * 
  * &lt;filter-mapping&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
  * &lt;/filter-mapping&gt;</pre></code>
@@ -259,8 +259,8 @@ import org.apache.juli.logging.LogFactory;
  * <table border="1">
  * <tr>
  * <th>property</th>
- * <th>Value Before XForwardedFilter</th>
- * <th>Value After XForwardedFilter</th>
+ * <th>Value Before RemoteIpFilter</th>
+ * <th>Value After RemoteIpFilter</th>
  * </tr>
  * <tr>
  * <td>request.remoteAddr</td>
@@ -286,12 +286,12 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Sample with internal and trusted proxies</strong>
  * </p>
  * <p>
- * XForwardedFilter configuration:
+ * RemoteIpFilter configuration:
  * </p>
  * <code><pre>
  * &lt;filter&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
- *    &lt;filter-class&gt;fr.xebia.servlet.filter.XForwardedFilter&lt;/filter-class&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+ *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
@@ -307,7 +307,7 @@ import org.apache.juli.logging.LogFactory;
  * &lt;/filter&gt;
  * 
  * &lt;filter-mapping&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
  * &lt;/filter-mapping&gt;</pre></code>
@@ -316,8 +316,8 @@ import org.apache.juli.logging.LogFactory;
  * <table border="1">
  * <tr>
  * <th>property</th>
- * <th>Value Before XForwardedFilter</th>
- * <th>Value After XForwardedFilter</th>
+ * <th>Value Before RemoteIpFilter</th>
+ * <th>Value After RemoteIpFilter</th>
  * </tr>
  * <tr>
  * <td>request.remoteAddr</td>
@@ -344,12 +344,12 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Sample with an untrusted proxy</strong>
  * </p>
  * <p>
- * XForwardedFilter configuration:
+ * RemoteIpFilter configuration:
  * </p>
  * <code><pre>
  * &lt;filter&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
- *    &lt;filter-class&gt;fr.xebia.servlet.filter.XForwardedFilter&lt;/filter-class&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+ *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
@@ -365,7 +365,7 @@ import org.apache.juli.logging.LogFactory;
  * &lt;/filter&gt;
  * 
  * &lt;filter-mapping&gt;
- *    &lt;filter-name&gt;XForwardedFilter&lt;/filter-name&gt;
+ *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
  * &lt;/filter-mapping&gt;</pre></code>
@@ -374,8 +374,8 @@ import org.apache.juli.logging.LogFactory;
  * <table border="1">
  * <tr>
  * <th>property</th>
- * <th>Value Before XForwardedFilter</th>
- * <th>Value After XForwardedFilter</th>
+ * <th>Value Before RemoteIpFilter</th>
+ * <th>Value After RemoteIpFilter</th>
  * </tr>
  * <tr>
  * <td>request.remoteAddr</td>
@@ -460,9 +460,8 @@ public class RemoteIpFilter implements Filter {
             }
             if (date == null) {
                 throw new IllegalArgumentException(value);
-            } else {
-                return date.getTime();
             }
+            return date.getTime();
         }
         
         @Override
@@ -470,9 +469,8 @@ public class RemoteIpFilter implements Filter {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
             if (header == null || header.getValue() == null || header.getValue().isEmpty()) {
                 return null;
-            } else {
-                return header.getValue().get(0);
             }
+            return header.getValue().get(0);
         }
         
         protected Map.Entry<String, List<String>> getHeaderEntry(String name) {
@@ -494,9 +492,8 @@ public class RemoteIpFilter implements Filter {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
             if (header == null || header.getValue() == null) {
                 return Collections.enumeration(Collections.<String>emptyList());
-            } else {
-                return Collections.enumeration(header.getValue());
             }
+            return Collections.enumeration(header.getValue());
         }
         
         @Override
@@ -504,9 +501,8 @@ public class RemoteIpFilter implements Filter {
             String value = getHeader(name);
             if (value == null) {
                 return -1;
-            } else {
-                return Integer.parseInt(value);
             }
+            return Integer.parseInt(value);
         }
         
         @Override
@@ -580,7 +576,7 @@ public class RemoteIpFilter implements Filter {
     
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
     
-    protected static final String INTERNAL_PROXIES_PARAMETER = "allowedInternalProxies";
+    protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
     
     /**
      * Logger
@@ -756,13 +752,13 @@ public class RemoteIpFilter implements Filter {
             
             if (log.isDebugEnabled()) {
                 log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + request.getRemoteAddr()
-                          + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
-                          + "', originalScheme='" + request.getScheme() + "', original[" + remoteIPHeader + "]='"
-                          + request.getHeader(remoteIPHeader) + ", original[" + protocolHeader + "]='"
-                          + request.getHeader(protocolHeader) + "' will be seen as newRemoteAddr='" + xRequest.getRemoteAddr()
-                          + "', newRemoteHost='" + xRequest.getRemoteHost() + "', newScheme='" + xRequest.getScheme() + "', newSecure='"
-                          + xRequest.isSecure() + "', new[" + remoteIPHeader + "]='" + xRequest.getHeader(remoteIPHeader) + ", new["
-                          + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
+                        + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
+                        + "', originalScheme='" + request.getScheme() + "', original[" + remoteIPHeader + "]='"
+                        + request.getHeader(remoteIPHeader) + ", original[" + protocolHeader + "]='"
+                        + (protocolHeader == null ? null : request.getHeader(protocolHeader)) + "' will be seen as newRemoteAddr='"
+                        + xRequest.getRemoteAddr() + "', newRemoteHost='" + xRequest.getRemoteHost() + "', newScheme='"
+                        + xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" + remoteIPHeader + "]='"
+                        + xRequest.getHeader(remoteIPHeader) + ", new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
             }
             chain.doFilter(xRequest, response);
         } else {
