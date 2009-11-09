@@ -352,7 +352,7 @@ public class RemoteIpValve extends ValveBase {
     /**
      * The StringManager for this package.
      */
-    protected static StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
     
     /**
      * Convert a given comma delimited list of regular expressions into an array of compiled {@link Pattern}

@@ -91,7 +91,7 @@ public class InternalAprOutputBuffer
     /**
      * The string manager for this package.
      */
-    protected static StringManager sm =
+    protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
 
