@@ -80,6 +80,7 @@ public class StringManager {
                     bundle = ResourceBundle.getBundle(
                             bundleName, Locale.getDefault(), cl);
                 } catch(MissingResourceException ex2) {
+                    // Ignore
                 }
             }
         }
