@@ -132,7 +132,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * The string manager for this package.
      */
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
 

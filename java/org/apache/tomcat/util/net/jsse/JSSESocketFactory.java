@@ -80,7 +80,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class JSSESocketFactory
     extends org.apache.tomcat.util.net.ServerSocketFactory {
 
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
     // defaults

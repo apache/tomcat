@@ -208,7 +208,7 @@ public class StringManager {
      * @param packageName
      */
 
-    public synchronized static StringManager getManager(String packageName) {
+    public synchronized static final StringManager getManager(String packageName) {
 	StringManager mgr = managers.get(packageName);
 	if (mgr == null) {
 	    mgr = new StringManager(packageName);
