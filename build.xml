@@ -301,7 +301,7 @@
     <attribute name="filesDir" description="the directory to obtain the files from"/>
     <attribute name="filesId" description="the patternset id of the files to use"/>
     <attribute name="manifest" description="the manifest file use"
-               default="${tomcat.tmp}/servlet-api.jar.manifest" />
+               default="${tomcat.tmp}/default.manifest" />
     <attribute name="notice" description="the LICENSE file to use"
                default="res/META-INF/default.notice" />
     <attribute name="license" description="the NOTICE file to use"
@@ -355,8 +355,8 @@
       filesDir="${tomcat.classes}"
       filesId="files.jsp-api"
       manifest="${tomcat.tmp}/jsp-api.jar.manifest"
-      notice="res/META-INF/servlet-api.jar.notice"
-      license="res/META-INF/servlet-api.jar.license" />
+      notice="res/META-INF/jsp-api.jar.notice"
+      license="res/META-INF/jsp-api.jar.license" />
 
     <!-- JSP 2.1 EL Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
