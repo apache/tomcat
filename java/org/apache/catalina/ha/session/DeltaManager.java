@@ -73,7 +73,7 @@ public class DeltaManager extends ClusterManagerBase{
     /**
      * The string manager for this package.
      */
-    protected static StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------- Instance Variables
 
