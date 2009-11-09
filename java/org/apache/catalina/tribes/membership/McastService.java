@@ -52,7 +52,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * The string manager for this package.
      */
-    protected StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * The descriptive information about this implementation.

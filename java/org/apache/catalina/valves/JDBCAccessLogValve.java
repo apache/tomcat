@@ -230,7 +230,7 @@ public final class JDBCAccessLogValve
     /**
      * The string manager for this package.
      */
-    private StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**

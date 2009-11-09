@@ -39,7 +39,7 @@ public abstract class AbstractEndpoint {
     protected static final Log log = LogFactory.getLog(AbstractEndpoint.class);
     
     // -------------------------------------------------------------- Constants
-    protected StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
+    protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
 
     /**
      * The Request attribute key for the cipher suite.
