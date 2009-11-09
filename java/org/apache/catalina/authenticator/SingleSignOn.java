@@ -111,7 +111,7 @@ public class SingleSignOn
     /**
      * The string manager for this package.
      */
-    protected final static StringManager sm =
+    protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
 

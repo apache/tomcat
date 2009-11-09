@@ -67,7 +67,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     /**
      * The string manager for this package.
      */
-    protected static StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------- Instance Variables
 

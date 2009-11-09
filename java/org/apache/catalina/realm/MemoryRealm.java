@@ -89,7 +89,7 @@ public class MemoryRealm  extends RealmBase {
     /**
      * The string manager for this package.
      */
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
 

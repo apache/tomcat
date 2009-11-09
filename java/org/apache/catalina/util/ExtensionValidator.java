@@ -59,7 +59,7 @@ public final class ExtensionValidator {
     /**
      * The string resources for this package.
      */
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
     
     private static ArrayList<Extension> containerAvailableExtensions = null;
