@@ -19,7 +19,6 @@
 package org.apache.catalina.core;
 
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -90,10 +89,9 @@ public class ApplicationContext
      *
      * @param context The associated Context instance
      */
-    public ApplicationContext(String basePath, StandardContext context) {
+    public ApplicationContext(StandardContext context) {
         super();
         this.context = context;
-        this.basePath = basePath;
         
         // Populate session tracking modes
         populateSessionTrackingModes();
@@ -155,12 +153,6 @@ public class ApplicationContext
      */
     private static final StringManager sm =
       StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Base path.
-     */
-    private String basePath = null;
 
 
     /**
@@ -492,37 +484,21 @@ public class ApplicationContext
             throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
 
         
-        path = RequestUtil.normalize(path);
-        if (path == null)
+        String normPath = RequestUtil.normalize(path);
+        if (normPath == null)
             return (null);
 
-        String libPath = "/WEB-INF/lib/";
-        if ((path.startsWith(libPath)) && (path.endsWith(".jar"))) {
-            File jarFile = null;
-            if (context.isFilesystemBased()) {
-                jarFile = new File(basePath, path);
-            } else {
-                jarFile = new File(context.getWorkPath(), path);
-            }
-            if (jarFile.exists()) {
-                return jarFile.toURI().toURL();
-            } else {
-                return null;
-            }
-        } else {
-
-            DirContext resources = context.getResources();
-            if (resources != null) {
-                String fullPath = context.getName() + path;
-                String hostName = context.getParent().getName();
-                try {
-                    resources.lookup(path);
-                    return new URL
-                        ("jndi", "", 0, getJNDIUri(hostName, fullPath),
-                         new DirContextURLStreamHandler(resources));
-                } catch (Exception e) {
-                    // Ignore
-                }
+        DirContext resources = context.getResources();
+        if (resources != null) {
+            String fullPath = context.getName() + normPath;
+            String hostName = context.getParent().getName();
+            try {
+                resources.lookup(path);
+                return new URL
+                    ("jndi", "", 0, getJNDIUri(hostName, fullPath),
+                     new DirContextURLStreamHandler(resources));
+            } catch (Exception e) {
+                // Ignore
             }
         }
 
