@@ -36,7 +36,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * @author Remy Maucherat
  */
 public abstract class AbstractEndpoint {
-    protected static Log log = LogFactory.getLog(AbstractEndpoint.class);
+    protected static final Log log = LogFactory.getLog(AbstractEndpoint.class);
     
     // -------------------------------------------------------------- Constants
     protected StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");

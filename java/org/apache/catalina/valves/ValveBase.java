@@ -57,7 +57,7 @@ import org.apache.juli.logging.LogFactory;
 
 public abstract class ValveBase
     implements Contained, Valve, MBeanRegistration {
-    private static Log log = LogFactory.getLog(ValveBase.class);
+    private static final Log log = LogFactory.getLog(ValveBase.class);
 
     //------------------------------------------------------ Constructor
     

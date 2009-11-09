@@ -44,7 +44,7 @@ import org.apache.tomcat.jni.Library;
 public class AprLifecycleListener
     implements LifecycleListener {
 
-    private static Log log = LogFactory.getLog(AprLifecycleListener.class);
+    private static final Log log = LogFactory.getLog(AprLifecycleListener.class);
 
     /**
      * The string manager for this package.

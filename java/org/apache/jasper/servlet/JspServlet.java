@@ -58,7 +58,7 @@ import org.apache.tomcat.PeriodicEventListener;
 public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     // Logger
-    private Log log = LogFactory.getLog(JspServlet.class);
+    private final Log log = LogFactory.getLog(JspServlet.class);
 
     private ServletContext context;
     private ServletConfig config;

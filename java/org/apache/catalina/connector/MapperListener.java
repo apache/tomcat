@@ -53,7 +53,7 @@ public class MapperListener
  {
 
 
-    private static Log log = LogFactory.getLog(MapperListener.class);
+    private static final Log log = LogFactory.getLog(MapperListener.class);
 
 
     // ----------------------------------------------------- Instance Variables

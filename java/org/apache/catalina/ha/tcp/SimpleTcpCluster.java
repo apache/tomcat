@@ -76,7 +76,7 @@ public class SimpleTcpCluster
     implements CatalinaCluster, Lifecycle, LifecycleListener, IDynamicProperty,
                MembershipListener, ChannelListener{
 
-    public static Log log = LogFactory.getLog(SimpleTcpCluster.class);
+    public static final Log log = LogFactory.getLog(SimpleTcpCluster.class);
 
     // ----------------------------------------------------- Instance Variables
 

@@ -41,7 +41,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  */
 
 public class ConnectionState extends JdbcInterceptor  {
-    protected static Log log = LogFactory.getLog(ConnectionState.class);
+    protected static final Log log = LogFactory.getLog(ConnectionState.class);
     
     protected final String[] readState = {"getAutoCommit","getTransactionIsolation","isReadOnly","getCatalog"};
     protected final String[] writeState = {"setAutoCommit","setTransactionIsolation","setReadOnly","setCatalog"};

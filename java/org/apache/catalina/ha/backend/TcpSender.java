@@ -37,7 +37,7 @@ import java.util.StringTokenizer;
 public class TcpSender
     implements Sender {
 
-    private static Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final Log log = LogFactory.getLog(HeartbeatListener.class);
 
     HeartbeatListener config = null;
 

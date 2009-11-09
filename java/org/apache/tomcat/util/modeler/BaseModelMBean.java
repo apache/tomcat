@@ -101,7 +101,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Costin Manolache
  */
 public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBeanNotificationBroadcaster {
-    private static Log log = LogFactory.getLog(BaseModelMBean.class);
+    private static final Log log = LogFactory.getLog(BaseModelMBean.class);
 
     // ----------------------------------------------------------- Constructors
 

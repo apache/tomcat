@@ -53,7 +53,7 @@ public class StandardEngine
     extends ContainerBase
     implements Engine {
 
-    private static Log log = LogFactory.getLog(StandardEngine.class);
+    private static final Log log = LogFactory.getLog(StandardEngine.class);
 
     // ----------------------------------------------------------- Constructors
 

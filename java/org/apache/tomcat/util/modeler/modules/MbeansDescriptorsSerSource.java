@@ -32,7 +32,7 @@ import org.apache.tomcat.util.modeler.Registry;
 
 public class MbeansDescriptorsSerSource extends ModelerSource
 {
-    private static Log log = LogFactory.getLog(MbeansDescriptorsSerSource.class);
+    private static final Log log = LogFactory.getLog(MbeansDescriptorsSerSource.class);
     Registry registry;
     String location;
     String type;

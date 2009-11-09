@@ -72,7 +72,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public abstract class RealmBase
     implements Lifecycle, Realm, MBeanRegistration {
 
-    private static Log log = LogFactory.getLog(RealmBase.class);
+    private static final Log log = LogFactory.getLog(RealmBase.class);
 
     // ----------------------------------------------------- Instance Variables
 

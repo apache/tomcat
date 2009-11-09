@@ -79,7 +79,7 @@ import org.apache.tomcat.util.digester.Digester;
 public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // We need to extend MemoryRealm to avoid class cast
 
-    private static Log log = LogFactory.getLog(JAASMemoryLoginModule.class);
+    private static final Log log = LogFactory.getLog(JAASMemoryLoginModule.class);
 
     // ----------------------------------------------------- Instance Variables
 

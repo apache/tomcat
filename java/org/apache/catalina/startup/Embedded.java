@@ -102,7 +102,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  */
 
 public class Embedded  extends StandardService {
-    private static Log log = LogFactory.getLog(Embedded.class);
+    private static final Log log = LogFactory.getLog(Embedded.class);
 
     // ----------------------------------------------------------- Constructors
 
