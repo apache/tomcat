@@ -123,7 +123,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
     /**
      * The string manager for this package.
      */
-    protected StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * Has this component been started yet?
