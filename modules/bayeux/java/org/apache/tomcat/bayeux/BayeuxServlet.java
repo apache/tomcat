@@ -49,7 +49,7 @@ public class BayeuxServlet implements CometProcessor {
     /**
      * Logger object
      */
-    protected static Log log = LogFactory.getLog(BayeuxServlet.class);
+    protected static final Log log = LogFactory.getLog(BayeuxServlet.class);
 
     /**
      * Servlet config - for future use

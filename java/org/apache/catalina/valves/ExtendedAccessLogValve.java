@@ -133,7 +133,7 @@ public class ExtendedAccessLogValve
     extends AccessLogValve
     implements Lifecycle {
 
-    private static Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
+    private static final Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
 
     // ----------------------------------------------------- Instance Variables
 

@@ -45,7 +45,7 @@ public final class RemoteHostFilter
 
     
     // ----------------------------------------------------- Instance Variables
-    private static Log log = LogFactory.getLog(RemoteHostFilter.class);
+    private static final Log log = LogFactory.getLog(RemoteHostFilter.class);
 
 
     // ------------------------------------------------------------- Properties

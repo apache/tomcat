@@ -57,7 +57,7 @@ final class StandardHostValve
     extends ValveBase {
 
 
-    private static Log log = LogFactory.getLog(StandardHostValve.class);
+    private static final Log log = LogFactory.getLog(StandardHostValve.class);
 
     //------------------------------------------------------ Constructor
     public StandardHostValve() {

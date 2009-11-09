@@ -28,7 +28,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public class Async3 extends HttpServlet {
-    protected static Log log = LogFactory.getLog(Async3.class);
+    protected static final Log log = LogFactory.getLog(Async3.class);
     public Async3() {
     }
 

@@ -64,7 +64,7 @@ import org.apache.juli.logging.LogFactory;
 public class ServerLifecycleListener
     implements ContainerListener, LifecycleListener, PropertyChangeListener {
 
-    private static Log log = LogFactory.getLog(ServerLifecycleListener.class);
+    private static final Log log = LogFactory.getLog(ServerLifecycleListener.class);
 
 
     // ------------------------------------------------------------- Properties

@@ -44,7 +44,7 @@ public class JspConfig {
     private static final String WEB_XML = "/WEB-INF/web.xml";
 
     // Logger
-    private Log log = LogFactory.getLog(JspConfig.class);
+    private final Log log = LogFactory.getLog(JspConfig.class);
 
     private Vector<JspPropertyGroup> jspProperties = null;
     private ServletContext ctxt;

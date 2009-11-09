@@ -51,7 +51,7 @@ public class AsyncContextImpl implements AsyncContext {
         NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT, ERROR_DISPATCHING
     }
     
-    protected static Log log = LogFactory.getLog(AsyncContextImpl.class);
+    protected static final Log log = LogFactory.getLog(AsyncContextImpl.class);
     
     private ServletRequest servletRequest = null;
     private ServletResponse servletResponse = null;

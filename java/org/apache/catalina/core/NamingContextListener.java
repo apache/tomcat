@@ -81,7 +81,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public class NamingContextListener
     implements LifecycleListener, ContainerListener, PropertyChangeListener {
 
-    private static Log log = LogFactory.getLog(NamingContextListener.class);
+    private static final Log log = LogFactory.getLog(NamingContextListener.class);
 
 
     // ----------------------------------------------------- Instance Variables

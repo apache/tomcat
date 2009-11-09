@@ -49,7 +49,7 @@ import org.apache.tomcat.util.modeler.Registry;
 
 public class GlobalResourcesLifecycleListener
     implements LifecycleListener {
-    private static Log log = LogFactory.getLog(GlobalResourcesLifecycleListener.class);
+    private static final Log log = LogFactory.getLog(GlobalResourcesLifecycleListener.class);
 
     // ----------------------------------------------------- Instance Variables
 

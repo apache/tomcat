@@ -57,7 +57,7 @@ import org.apache.tomcat.util.net.SocketStatus;
 public class CoyoteAdapter
     implements Adapter 
  {
-    private static Log log = LogFactory.getLog(CoyoteAdapter.class);
+    private static final Log log = LogFactory.getLog(CoyoteAdapter.class);
 
     // -------------------------------------------------------------- Constants
 

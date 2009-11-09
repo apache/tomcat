@@ -47,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
 
 public class ExpandWar {
 
-    private static Log log = LogFactory.getLog(ExpandWar.class);
+    private static final Log log = LogFactory.getLog(ExpandWar.class);
 
     /**
      * The string resources for this package.

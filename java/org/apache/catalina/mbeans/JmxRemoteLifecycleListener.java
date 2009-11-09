@@ -52,7 +52,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class JmxRemoteLifecycleListener implements LifecycleListener {
     
-    private static Log log =
+    private static final Log log =
         LogFactory.getLog(JmxRemoteLifecycleListener.class);
     
     /**

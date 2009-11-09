@@ -49,7 +49,7 @@ import org.apache.juli.logging.LogFactory;
 
 public class DigestAuthenticator
     extends AuthenticatorBase {
-    private static Log log = LogFactory.getLog(DigestAuthenticator.class);
+    private static final Log log = LogFactory.getLog(DigestAuthenticator.class);
 
 
     // -------------------------------------------------------------- Constants
