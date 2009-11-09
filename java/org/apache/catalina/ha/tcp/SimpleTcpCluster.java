@@ -119,7 +119,7 @@ public class SimpleTcpCluster
     /**
      * The string manager for this package.
      */
-    protected StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * The cluster name to join
