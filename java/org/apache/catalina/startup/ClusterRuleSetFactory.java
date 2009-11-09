@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
 import java.lang.reflect.InvocationTargetException;
 public class ClusterRuleSetFactory {
     
-    public static Log log = LogFactory.getLog(ClusterRuleSetFactory.class);
+    public static final Log log = LogFactory.getLog(ClusterRuleSetFactory.class);
     
     public static RuleSetBase getClusterRuleSet(String prefix) {
         

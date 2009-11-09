@@ -53,7 +53,7 @@ import org.w3c.dom.Node;
  */
 public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 {
-    private static Log log = LogFactory.getLog(MbeansSource.class);
+    private static final Log log = LogFactory.getLog(MbeansSource.class);
     Registry registry;
     String type;
 

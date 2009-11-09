@@ -117,7 +117,7 @@ public class StandardContext
     extends ContainerBase
     implements Context, NotificationEmitter
 {
-    private static Log log = LogFactory.getLog(StandardContext.class);
+    private static final Log log = LogFactory.getLog(StandardContext.class);
 
 
     // ----------------------------------------------------------- Constructors

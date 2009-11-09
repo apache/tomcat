@@ -56,7 +56,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public class Connector
     implements Lifecycle, MBeanRegistration
 {
-    private static Log log = LogFactory.getLog(Connector.class);
+    private static final Log log = LogFactory.getLog(Connector.class);
 
 
     /**

@@ -44,7 +44,7 @@ public final class RemoteAddrFilter
     extends RequestFilter {
 
     // ----------------------------------------------------- Instance Variables
-    private static Log log = LogFactory.getLog(RemoteAddrFilter.class);
+    private static final Log log = LogFactory.getLog(RemoteAddrFilter.class);
 
 
     // ------------------------------------------------------------- Properties

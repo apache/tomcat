@@ -128,7 +128,7 @@ org.foobar.auth.DatabaseLoginModule REQUIRED
 public class JAASRealm
     extends RealmBase
  {
-    private static Log log = LogFactory.getLog(JAASRealm.class);
+    private static final Log log = LogFactory.getLog(JAASRealm.class);
 
     // ----------------------------------------------------- Instance Variables
 

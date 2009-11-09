@@ -65,7 +65,7 @@ import org.apache.tomcat.InstanceManager;
 public class JspServletWrapper {
 
     // Logger
-    private Log log = LogFactory.getLog(JspServletWrapper.class);
+    private final Log log = LogFactory.getLog(JspServletWrapper.class);
 
     private Servlet theServlet;
     private String jspUri;

@@ -39,7 +39,7 @@ public class ClusterJmxHelper {
     
     protected static Registry registry = Registry.getRegistry(null,null);
     
-    protected static Log log = LogFactory.getLog(ClusterJmxHelper.class);
+    protected static final Log log = LogFactory.getLog(ClusterJmxHelper.class);
     
     protected static boolean jmxEnabled = true;
     

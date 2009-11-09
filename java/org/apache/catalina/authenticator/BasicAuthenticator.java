@@ -47,7 +47,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 
 public class BasicAuthenticator
     extends AuthenticatorBase {
-    private static Log log = LogFactory.getLog(BasicAuthenticator.class);
+    private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
 
 
