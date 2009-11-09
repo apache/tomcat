@@ -1989,8 +1989,7 @@ public class WebappClassLoader
     }
 
     /**
-     * Find specified resource in local repositories. This block
-     * will execute under an AccessControl.doPrivilege block.
+     * Find specified resource in local repositories.
      *
      * @return the loaded resource, or null if the resource isn't found
      */
@@ -2049,13 +2048,7 @@ public class WebappClassLoader
 
                 // Note : Not getting an exception here means the resource was
                 // found
-                 if (securityManager != null) {
-                    PrivilegedAction<ResourceEntry> dp =
-                        new PrivilegedFindResource(files[i], path);
-                    entry = AccessController.doPrivileged(dp);
-                 } else {
-                    entry = findResourceInternal(files[i], path);
-                 }
+                entry = findResourceInternal(files[i], path);
 
                 ResourceAttributes attributes =
                     (ResourceAttributes) resources.getAttributes(fullPath);
