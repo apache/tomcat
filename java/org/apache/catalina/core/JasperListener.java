@@ -38,7 +38,7 @@ import org.apache.juli.logging.LogFactory;
 public class JasperListener
     implements LifecycleListener {
 
-    private static Log log = LogFactory.getLog(JasperListener.class);
+    private static final Log log = LogFactory.getLog(JasperListener.class);
 
     /**
      * The string manager for this package.

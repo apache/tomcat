@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
 
 public class MbeansDescriptorsDOMSource extends ModelerSource
 {
-    private static Log log = LogFactory.getLog(MbeansDescriptorsDOMSource.class);
+    private static final Log log = LogFactory.getLog(MbeansDescriptorsDOMSource.class);
 
     Registry registry;
     String location;

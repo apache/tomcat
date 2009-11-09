@@ -51,7 +51,7 @@ class JspReader {
     /**
      * Logger.
      */
-    private Log log = LogFactory.getLog(JspReader.class);
+    private final Log log = LogFactory.getLog(JspReader.class);
 
     /**
      * The current spot in the file.

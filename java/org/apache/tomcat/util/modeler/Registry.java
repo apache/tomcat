@@ -76,7 +76,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     /**
      * The Log instance to which we will write our log messages.
      */
-    private static Log log = LogFactory.getLog(Registry.class);
+    private static final Log log = LogFactory.getLog(Registry.class);
 
     // Support for the factory methods
     

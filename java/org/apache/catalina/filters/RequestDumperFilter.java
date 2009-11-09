@@ -68,7 +68,7 @@ public class RequestDumperFilter implements Filter {
     /**
      * The logger for this class.
      */
-    private static Log log = LogFactory.getLog(RequestDumperFilter.class);
+    private static final Log log = LogFactory.getLog(RequestDumperFilter.class);
 
 
     /**

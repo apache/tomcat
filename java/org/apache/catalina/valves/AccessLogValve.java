@@ -123,7 +123,7 @@ public class AccessLogValve
     extends ValveBase
     implements Lifecycle {
 
-    private static Log log = LogFactory.getLog(AccessLogValve.class);
+    private static final Log log = LogFactory.getLog(AccessLogValve.class);
 
     //------------------------------------------------------ Constructor
     public AccessLogValve() {

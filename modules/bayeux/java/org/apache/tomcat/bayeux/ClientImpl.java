@@ -41,7 +41,7 @@ public class ClientImpl implements Client {
 
     public static final String COMET_EVENT_ATTR = "org.apache.cometd.bayeux.client";
     
-    protected static Log log = LogFactory.getLog(ClientImpl.class);
+    protected static final Log log = LogFactory.getLog(ClientImpl.class);
 
     protected static LinkedList<Message> EMPTY_LIST = new LinkedList<Message>();
     /**

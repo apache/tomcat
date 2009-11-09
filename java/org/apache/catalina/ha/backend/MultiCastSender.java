@@ -33,7 +33,7 @@ import java.io.UnsupportedEncodingException;
 public class MultiCastSender
     implements Sender {
 
-    private static Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final Log log = LogFactory.getLog(HeartbeatListener.class);
 
     HeartbeatListener config = null;
 

@@ -73,7 +73,7 @@ import org.apache.juli.logging.LogFactory;
 public final class Tool {
 
 
-    private static Log log = LogFactory.getLog(Tool.class);
+    private static final Log log = LogFactory.getLog(Tool.class);
     
     // ------------------------------------------------------- Static Variables
 

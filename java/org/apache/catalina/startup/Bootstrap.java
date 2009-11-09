@@ -52,7 +52,7 @@ import org.apache.juli.logging.LogFactory;
 
 public final class Bootstrap {
 
-    private static Log log = LogFactory.getLog(Bootstrap.class);
+    private static final Log log = LogFactory.getLog(Bootstrap.class);
     
     // -------------------------------------------------------------- Constants
 

@@ -34,7 +34,7 @@ import org.apache.juli.logging.LogFactory;
 
 public class MbeansDescriptorsDigesterSource extends ModelerSource
 {
-    private static Log log =
+    private static final Log log =
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
 
     Registry registry;

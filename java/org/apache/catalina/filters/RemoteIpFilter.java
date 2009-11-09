@@ -581,7 +581,7 @@ public class RemoteIpFilter implements Filter {
     /**
      * Logger
      */
-    private static Log log = LogFactory.getLog(RemoteIpFilter.class);
+    private static final Log log = LogFactory.getLog(RemoteIpFilter.class);
     
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
     

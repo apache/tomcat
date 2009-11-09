@@ -39,7 +39,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
  */
 public class SlowQueryReport extends AbstractQueryReport  {
     //logger
-    protected static Log log = LogFactory.getLog(SlowQueryReport.class);
+    protected static final Log log = LogFactory.getLog(SlowQueryReport.class);
 
     /**
      * we will be keeping track of query stats on a per pool basis

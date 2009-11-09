@@ -347,7 +347,7 @@ public class RemoteIpValve extends ValveBase {
     /**
      * Logger
      */
-    private static Log log = LogFactory.getLog(RemoteIpValve.class);
+    private static final Log log = LogFactory.getLog(RemoteIpValve.class);
     
     /**
      * The StringManager for this package.

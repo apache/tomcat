@@ -42,7 +42,7 @@ import org.apache.juli.logging.LogFactory;
 public final class EmbeddedServletOptions implements Options {
     
     // Logger
-    private Log log = LogFactory.getLog(EmbeddedServletOptions.class);
+    private final Log log = LogFactory.getLog(EmbeddedServletOptions.class);
     
     private Properties settings = new Properties();
     

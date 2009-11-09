@@ -33,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
  *
  */
 public class PoolProperties implements PoolConfiguration {
-    protected static Log log = LogFactory.getLog(PoolProperties.class);
+    protected static final Log log = LogFactory.getLog(PoolProperties.class);
     
     protected static AtomicInteger poolCounter = new AtomicInteger(0);
     protected Properties dbProperties = new Properties();

@@ -41,7 +41,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class LockOutRealm extends CombinedRealm {
 
-    private static Log log = LogFactory.getLog(LockOutRealm.class);
+    private static final Log log = LogFactory.getLog(LockOutRealm.class);
 
     /**
      * The number of times in a row a user has to fail authentication to be

@@ -58,7 +58,7 @@ import org.apache.juli.logging.LogFactory;
 public final class JspRuntimeContext {
 
     // Logger
-    private Log log = LogFactory.getLog(JspRuntimeContext.class);
+    private final Log log = LogFactory.getLog(JspRuntimeContext.class);
 
     /*
      * Counts how many times the webapp's JSPs have been reloaded.
