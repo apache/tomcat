@@ -114,23 +114,6 @@ public class WebappClassLoader
     public static final boolean ENABLE_CLEAR_REFERENCES = 
         Boolean.valueOf(System.getProperty("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "true")).booleanValue();
     
-    protected class PrivilegedFindResource
-        implements PrivilegedAction<ResourceEntry> {
-
-        protected File file;
-        protected String path;
-
-        PrivilegedFindResource(File file, String path) {
-            this.file = file;
-            this.path = path;
-        }
-
-        public ResourceEntry run() {
-            return findResourceInternal(file, path);
-        }
-
-    }
-
     protected class PrivilegedFindResourceByName
         implements PrivilegedAction<ResourceEntry> {
 
