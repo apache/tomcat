@@ -131,6 +131,23 @@ public class WebappClassLoader
 
     }
 
+    protected class PrivilegedFindResourceByName
+        implements PrivilegedAction<ResourceEntry> {
+
+        protected String name;
+        protected String path;
+
+        PrivilegedFindResourceByName(String name, String path) {
+            this.name = name;
+            this.path = path;
+        }
+
+        public ResourceEntry run() {
+            return findResourceInternal(name, path);
+        }
+
+    }
+
     
     protected final class PrivilegedGetClassLoader
         implements PrivilegedAction<ClassLoader> {
@@ -973,7 +990,13 @@ public class WebappClassLoader
 
         ResourceEntry entry = resourceEntries.get(name);
         if (entry == null) {
-            entry = findResourceInternal(name, name);
+            if (securityManager != null) {
+                PrivilegedAction<ResourceEntry> dp =
+                    new PrivilegedFindResourceByName(name, name);
+                entry = AccessController.doPrivileged(dp);
+            } else {
+                entry = findResourceInternal(name, name);
+            }
         }
         if (entry != null) {
             url = entry.source;
@@ -1874,7 +1897,13 @@ public class WebappClassLoader
 
         ResourceEntry entry = null;
 
-        entry = findResourceInternal(name, classPath);
+        if (securityManager != null) {
+            PrivilegedAction<ResourceEntry> dp =
+                new PrivilegedFindResourceByName(name, classPath);
+            entry = AccessController.doPrivileged(dp);
+        } else {
+            entry = findResourceInternal(name, classPath);
+        }
 
         if (entry == null)
             throw new ClassNotFoundException(name);
