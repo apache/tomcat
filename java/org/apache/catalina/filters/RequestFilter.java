@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.comet.CometFilter;
 import org.apache.catalina.comet.CometFilterChain;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a Filter that performs filtering based on comparing the
@@ -71,16 +70,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class RequestFilter
     extends FilterBase implements CometFilter {
-
-
-    // ----------------------------------------------------- Class Variables
-
-    
-    /**
-     * The StringManager for this package.
-     */
-    protected static StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ----------------------------------------------------- Instance Variables
