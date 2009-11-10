@@ -171,7 +171,10 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
                 break;
             }
         }
-        ssl.setSoTimeout(oldTimeout);
+        // If legacy re-negotiation is disabled, socked could be closed here 
+        if (!ssl.isClosed()) {
+            ssl.setSoTimeout(oldTimeout);
+        }
         if (listener.completed == false) {
             throw new SocketException("SSL Cert handshake timeout");
         }
