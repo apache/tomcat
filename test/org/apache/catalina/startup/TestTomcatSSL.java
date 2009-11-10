@@ -1,0 +1,153 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.catalina.startup;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.tomcat.util.buf.ByteChunk;
+
+/**
+ * Requires test.keystore (checked in), generated with:
+ *  keytool -genkey -alias tomcat -keyalg RSA
+ *  pass: changeit 
+ *  CN: localhost ( for hostname validation )
+ */
+public class TestTomcatSSL extends TomcatBaseTest {
+    static TrustManager[] trustAllCerts = new TrustManager[] { 
+        new X509TrustManager() { 
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() { 
+                return null;
+            }
+            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+        }
+    };
+
+    private void initSsl(Tomcat tomcat) {
+        tomcat.getConnector().setSecure(true);
+        tomcat.getConnector().setProperty("SSLEnabled", "true");
+        tomcat.getConnector().setProperty("sslProtocol",
+            "tls");
+        // test runs in output/tmp
+        tomcat.getConnector().setAttribute("keystore", 
+            "../../test/org/apache/catalina/startup/test.keystore");
+    }
+    
+
+    public void testSimpleSsl() throws Exception {
+        //  Install the all-trusting trust manager so https:// works 
+        // with unsigned certs. 
+
+        // TODO: cleanup ? 
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
+                    sc.getSocketFactory());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("output/build/webapps/examples");
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        initSsl(tomcat);
+
+        tomcat.start();
+        ByteChunk res = getUrl("https://localhost:" + getPort() +
+            "/examples/servlets/servlet/HelloWorldExample");
+        assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
+    }
+
+    boolean handshakeDone = false;
+    
+    public void testReHandshake() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("output/build/webapps/examples");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+
+        initSsl(tomcat);
+
+        tomcat.start();
+        SSLContext sslCtx = SSLContext.getInstance("TLS");
+        sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
+        SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
+        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
+
+        socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
+            @Override
+            public void handshakeCompleted(HandshakeCompletedEvent event) {
+                handshakeDone = true;
+            }
+        });
+        
+        OutputStream os = socket.getOutputStream();
+        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
+        os.flush();
+
+        InputStream is = socket.getInputStream();
+
+        // Doesn't seem to work..
+        socket.getSession().invalidate();
+        socket.startHandshake();
+        handshakeDone = false;
+        byte[] b = new byte[0];
+        int maxTries = 60; // 60 * 1000 = example 1 minute time out
+        socket.setSoTimeout(1000);
+        for (int i = 0; i < maxTries; i++) {
+            try {
+                is.read(b);
+            } catch (IOException e) {
+                // timeout
+            }
+            if (handshakeDone) {
+                break;
+            }
+        }
+        SSLSession session = socket.getSession();
+        os = socket.getOutputStream();
+        
+        try {
+            os.write("Host: localhost\n\n".getBytes());
+        } catch (IOException ex) {
+            // success - connection closed
+            return;
+        }
+        
+        fail("Re-negotiation worked");
+        
+    }
+}
