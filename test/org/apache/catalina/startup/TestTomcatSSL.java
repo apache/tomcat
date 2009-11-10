@@ -20,11 +20,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -41,12 +41,16 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestTomcatSSL extends TomcatBaseTest {
     static TrustManager[] trustAllCerts = new TrustManager[] { 
         new X509TrustManager() { 
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() { 
+            public X509Certificate[] getAcceptedIssuers() { 
                 return null;
             }
-            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            public void checkClientTrusted(X509Certificate[] certs,
+                    String authType) {
+                // NOOP - Trust everything
             }
-            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            public void checkServerTrusted(X509Certificate[] certs,
+                    String authType) {
+                // NOOP - Trust everything
             }
         }
     };
@@ -63,10 +67,9 @@ public class TestTomcatSSL extends TomcatBaseTest {
     
 
     public void testSimpleSsl() throws Exception {
-        //  Install the all-trusting trust manager so https:// works 
+        // Install the all-trusting trust manager so https:// works 
         // with unsigned certs. 
 
-        // TODO: cleanup ? 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
@@ -91,7 +94,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
 
     boolean handshakeDone = false;
     
-    public void testReHandshake() throws Exception {
+    public void testRenegotiateFail() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
@@ -100,6 +103,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         initSsl(tomcat);
+        // Default - MITM not enabled
 
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
@@ -120,8 +124,6 @@ public class TestTomcatSSL extends TomcatBaseTest {
 
         InputStream is = socket.getInputStream();
 
-        // Doesn't seem to work..
-        socket.getSession().invalidate();
         socket.startHandshake();
         handshakeDone = false;
         byte[] b = new byte[0];
@@ -137,7 +139,6 @@ public class TestTomcatSSL extends TomcatBaseTest {
                 break;
             }
         }
-        SSLSession session = socket.getSession();
         os = socket.getOutputStream();
         
         try {
@@ -150,4 +151,61 @@ public class TestTomcatSSL extends TomcatBaseTest {
         fail("Re-negotiation worked");
         
     }
+    
+    public void testRenegotiateWorks() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("output/build/webapps/examples");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+
+        initSsl(tomcat);
+        // Enable MITM attack
+        tomcat.getConnector().setAttribute("enableMitmVulnerability", "true");
+
+        tomcat.start();
+        SSLContext sslCtx = SSLContext.getInstance("TLS");
+        sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
+        SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
+        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
+
+        socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
+            @Override
+            public void handshakeCompleted(HandshakeCompletedEvent event) {
+                handshakeDone = true;
+            }
+        });
+        
+        OutputStream os = socket.getOutputStream();
+        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
+        os.flush();
+
+        InputStream is = socket.getInputStream();
+
+        socket.startHandshake();
+        handshakeDone = false;
+        byte[] b = new byte[0];
+        int maxTries = 60; // 60 * 1000 = example 1 minute time out
+        socket.setSoTimeout(1000);
+        for (int i = 0; i < maxTries; i++) {
+            try {
+                is.read(b);
+            } catch (IOException e) {
+                // timeout
+            }
+            if (handshakeDone) {
+                break;
+            }
+        }
+        os = socket.getOutputStream();
+        
+        try {
+            os.write("Host: localhost\n\n".getBytes());
+        } catch (IOException ex) {
+            fail("Re-negotiation failed");
+        }
+        
+    }
+
 }
