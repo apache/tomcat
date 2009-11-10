@@ -42,6 +42,8 @@ import java.util.Collection;
 import java.util.Vector;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
@@ -92,6 +94,9 @@ public class JSSESocketFactory
     private static final String defaultKeyPass = "changeit";
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
+    
+    private static final boolean midmMode = 
+        "true".equals(System.getProperty("enable_ssl_mitm_vulnerability"));
     
     static org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
@@ -154,12 +159,34 @@ public class JSSESocketFactory
         SSLSocket asock = null;
         try {
              asock = (SSLSocket)socket.accept();
+             if (!midmMode) {
+                 asock.addHandshakeCompletedListener(
+                         new DisableSslRenegotiation());
+             }
              configureClientAuth(asock);
         } catch (SSLException e){
           throw new SocketException("SSL handshake error" + e.toString());
         }
         return asock;
     }
+    
+    private static class DisableSslRenegotiation 
+            implements HandshakeCompletedListener {
+        private volatile boolean completed = false;
+
+        public void handshakeCompleted(HandshakeCompletedEvent event) {
+            if (completed) {
+                try {
+                    log.warn("SSL renegotiation is disabled, closing connection");
+                    event.getSocket().close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+            completed = true;
+        }
+    }
+
 
     @Override
     public void handshake(Socket sock) throws IOException {
