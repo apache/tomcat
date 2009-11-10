@@ -178,6 +178,7 @@ public class JSSESocketFactory
             if (completed) {
                 try {
                     log.warn("SSL renegotiation is disabled, closing connection");
+                    event.getSession().invalidate();
                     event.getSocket().close();
                 } catch (IOException e) {
                     // ignore
