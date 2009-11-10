@@ -789,6 +789,13 @@
       certificates.</p>
     </attribute>
     
+    <attribute name="allowUnsafeLegacyRenegotiation" required="false">
+      <p>Is unsafe legacy TLS renegotiation allowed which is likely to expose
+      users to CVE-2009-3555, a man-in-the-middle vulnerability in the TLS
+      protocol that allows an attacker to inject arbitrary data into the user's
+      request. If not specified, a default of <code>false</code> is used.</p>
+    </attribute>
+
   </attributes>
 
   <p>For more information, see the
