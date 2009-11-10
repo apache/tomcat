@@ -69,11 +69,11 @@ public class WebXml {
     // web.xml only elements
     // Absolute Ordering
     private Set<String> absoluteOrdering = null;
-    public void addAbsoluteOrdering(String name) {
+    public void addAbsoluteOrdering(String fragmentName) {
         if (absoluteOrdering == null) {
             absoluteOrdering = new LinkedHashSet<String>();
         }
-        absoluteOrdering.add(name);
+        absoluteOrdering.add(fragmentName);
     }
     public void addAbsoluteOrderingOthers() {
         if (absoluteOrdering == null) {
@@ -88,8 +88,8 @@ public class WebXml {
     // web-fragment.xml only elements
     // Relative ordering
     private Set<String> after = new LinkedHashSet<String>();
-    public void addAfterOrdering(String name) {
-        after.add(name);
+    public void addAfterOrdering(String fragmentName) {
+        after.add(fragmentName);
     }
     public void addAfterOrderingOthers() {
         if (before.contains(ORDER_OTHERS)) {
@@ -99,8 +99,8 @@ public class WebXml {
         after.add(ORDER_OTHERS);
     }
     private Set<String> before = new LinkedHashSet<String>();
-    public void addBeforeOrdering(String name) {
-        before.add(name);
+    public void addBeforeOrdering(String fragmentName) {
+        before.add(fragmentName);
     }
     public void addBeforeOrderingOthers() {
         if (after.contains(ORDER_OTHERS)) {
@@ -162,8 +162,8 @@ public class WebXml {
     // context-param
     // TODO: description (multiple with language) is ignored
     private Map<String,String> contextParams = new HashMap<String,String>();
-    public void addContextParam(String name, String value) {
-        contextParams.put(name, value);
+    public void addContextParam(String param, String value) {
+        contextParams.put(param, value);
     }
     public Map<String,String> getContextParams() { return contextParams; }
     
@@ -708,10 +708,11 @@ public class WebXml {
         if (getLoginConfig() == null) {
             LoginConfig tempLoginConfig = null;
             for (WebXml fragment : fragments) {
-                LoginConfig loginConfig = fragment.loginConfig;
-                if (loginConfig != null) {
-                    if (tempLoginConfig == null || loginConfig.equals(tempLoginConfig)) {
-                        tempLoginConfig = loginConfig;
+                LoginConfig fragmentLoginConfig = fragment.loginConfig;
+                if (fragmentLoginConfig != null) {
+                    if (tempLoginConfig == null ||
+                            fragmentLoginConfig.equals(tempLoginConfig)) {
+                        tempLoginConfig = fragmentLoginConfig;
                     } else {
                         log.error(sm.getString(
                                 "webXml.mergeConflictLoginConfig",
@@ -860,36 +861,35 @@ public class WebXml {
             Map<String, T> tempResources,
             Map<String,Boolean> mergeInjectionFlags, WebXml fragment) {
         for (T resource : fragmentResources.values()) {
-            String name = resource.getName();
+            String resourceName = resource.getName();
             boolean mergeInjectionFlag = false;
-            if (mainResources.containsKey(name)) {
-                if (mergeInjectionFlags.containsKey(name)) {
+            if (mainResources.containsKey(resourceName)) {
+                if (mergeInjectionFlags.containsKey(resourceName)) {
                     mergeInjectionFlag =
-                        mergeInjectionFlags.get(name).booleanValue(); 
+                        mergeInjectionFlags.get(resourceName).booleanValue(); 
                 } else {
                     if (mainResources.get(
-                            name).getInjectionTargets().size() == 0) {
+                            resourceName).getInjectionTargets().size() == 0) {
                         mergeInjectionFlag = true;
                     }
-                    mergeInjectionFlags.put(name,
+                    mergeInjectionFlags.put(resourceName,
                             Boolean.valueOf(mergeInjectionFlag));
                 }
                 if (mergeInjectionFlag) {
-                    mainResources.get(name).getInjectionTargets().addAll(
+                    mainResources.get(resourceName).getInjectionTargets().addAll(
                             resource.getInjectionTargets());
                 }
             } else {
                 // Not defined in main web.xml
-                if (tempResources.containsKey(name)) {
+                if (tempResources.containsKey(resourceName)) {
                     log.error(sm.getString(
                             "webXml.mergeConflictResource",
-                            name,
+                            resourceName,
                             fragment.getName(),
                             fragment.getURL()));
                     return false;
-                } else {
-                    tempResources.put(name, resource);
-                }
+                } 
+                tempResources.put(resourceName, resource);
             }
         }
         return true;
