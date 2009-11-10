@@ -162,7 +162,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
 
         initSsl(tomcat);
         // Enable MITM attack
-        tomcat.getConnector().setAttribute("enableMitmVulnerability", "true");
+        tomcat.getConnector().setAttribute("allowUnsafeLegacyRenegotiation", "true");
 
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
