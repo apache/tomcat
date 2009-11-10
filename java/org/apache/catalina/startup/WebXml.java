@@ -250,6 +250,7 @@ public class WebXml {
         }
         welcomeFiles.add(welcomeFile);
     }
+    public Set<String> getWelcomeFiles() { return welcomeFiles; }
     
     // error-page
     private Map<String,ErrorPage> errorPages = new HashMap<String,ErrorPage>();
@@ -341,11 +342,12 @@ public class WebXml {
     // TODO: Should support multiple description elements with language
     // TODO: Should support multiple display-names elements with language
     // TODO: Should support multiple icon elements ???
-    private Set<ContextService> serviceRefs = new HashSet<ContextService>();
+    private Map<String,ContextService> serviceRefs =
+        new HashMap<String,ContextService>();
     public void addServiceRef(ContextService serviceRef) {
-        serviceRefs.add(serviceRef);
+        serviceRefs.put(serviceRef.getName(), serviceRef);
     }
-    public Set<ContextService> getServiceRefs() { return serviceRefs; }
+    public Map<String,ContextService> getServiceRefs() { return serviceRefs; }
     
     // resource-ref
     // TODO: Should support multiple description elements with language
@@ -512,7 +514,7 @@ public class WebXml {
         for (String role : securityRoles) {
             context.addSecurityRole(role);
         }
-        for (ContextService service : serviceRefs) {
+        for (ContextService service : serviceRefs.values()) {
             context.getNamingResources().addService(service);
         }
         for (ServletDef servlet : servlets.values()) {
@@ -660,6 +662,27 @@ public class WebXml {
         }
 
         for (WebXml fragment : fragments) {
+            for (Map.Entry<String,FilterDef> entry :
+                    fragment.getFilters().entrySet()) {
+                if (filters.containsKey(entry.getKey())) {
+                    mergeFilter(entry.getValue(),
+                            filters.get(entry.getKey()), false);
+                } else {
+                    if (!(mergeFilter(entry.getValue(),
+                            temp.getFilters().get(entry.getKey()), true))) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictFilter",
+                                entry.getKey(),
+                                fragment.getName(),
+                                fragment.getURL()));
+
+                        return false;
+                    }
+                }
+            }
+        }
+
+        for (WebXml fragment : fragments) {
             for (JspPropertyGroup jspPropertyGroup : fragment.getJspPropertyGroups()) {
                 // Always additive
                 addJspPropertyGroup(jspPropertyGroup);
@@ -757,8 +780,77 @@ public class WebXml {
             }
         }
 
+        for (WebXml fragment : fragments) {
+            if (!mergeResourceMap(fragment.getServiceRefs(), serviceRefs,
+                    temp.getServiceRefs(), mergeInjectionFlags, fragment)) {
+                return false;
+            }
+        }
+        serviceRefs.putAll(temp.getServiceRefs());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            for (Map.Entry<String,String> mapping :
+                    fragment.getServletMappings().entrySet()) {
+                // Always additive
+                addServletMapping(mapping.getKey(), mapping.getValue());
+            }
+        }
+
+        for (WebXml fragment : fragments) {
+            for (Map.Entry<String,ServletDef> entry :
+                    fragment.getServlets().entrySet()) {
+                if (servlets.containsKey(entry.getKey())) {
+                    mergeServlet(entry.getValue(),
+                            servlets.get(entry.getKey()), false);
+                } else {
+                    if (!(mergeServlet(entry.getValue(),
+                            temp.getServlets().get(entry.getKey()), true))) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictServlet",
+                                entry.getKey(),
+                                fragment.getName(),
+                                fragment.getURL()));
+
+                        return false;
+                    }
+                }
+            }
+        }
+
         
-        // TODO SERVLET3 - Merge remaining elements
+        if (sessionTimeout == null) {
+            for (WebXml fragment : fragments) {
+                Integer value = fragment.getSessionTimeout(); 
+                if (value != null) {
+                    if (temp.getSessionTimeout() == null) {
+                        temp.setSessionTimeout(value.toString());
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionTimeout",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionTimeout = temp.getSessionTimeout();
+        }
+
+        for (WebXml fragment : fragments) {
+            if (!mergeMap(fragment.getTaglibs(), taglibs,
+                    temp.getTaglibs(), fragment, "Taglibs")) {
+                return false;
+            }
+        }
+        taglibs.putAll(temp.getTaglibs());
+
+        for (WebXml fragment : fragments) {
+            for (String welcomeFile : fragment.getWelcomeFiles()) {
+                // Always additive
+                addWelcomeFile(welcomeFile);
+            }
+        }
 
         return true;
     }
@@ -828,4 +920,88 @@ public class WebXml {
         }
         return true;
     }
+    
+    private boolean mergeFilter(FilterDef src, FilterDef dest, boolean failOnConflict) {
+        if (src.isAsyncSupported() != dest.isAsyncSupported()) {
+            // Always fail
+            return false;
+        }
+        
+        if (dest.getFilterClass()  == null) {
+            dest.setFilterClass(src.getFilterClass());
+        } else if (src.getFilterClass() != null) {
+            if (failOnConflict &&
+                    !src.getFilterClass().equals(dest.getFilterClass())) {
+                return false;
+            }
+        }
+        
+        for (Map.Entry<String,String> srcEntry :
+                src.getParameterMap().entrySet()) {
+            if (dest.getParameterMap().containsKey(srcEntry.getKey())) {
+                if (failOnConflict && !dest.getParameterMap().get(
+                        srcEntry.getKey()).equals(srcEntry.getValue())) {
+                    return false;
+                }
+            } else {
+                dest.addInitParameter(srcEntry.getKey(), srcEntry.getValue());
+            }
+        }
+        return true;
+    }
+    
+    private boolean mergeServlet(ServletDef src, ServletDef dest, boolean failOnConflict) {
+        // These tests should be unnecessary...
+        if (dest.getServletClass() != null && dest.getJspFile() != null) {
+            return false;
+        }
+        if (src.getServletClass() != null && src.getJspFile() != null) {
+            return false;
+        }
+        
+        
+        if (dest.getServletClass() == null && dest.getJspFile() == null) {
+            dest.setServletClass(src.getServletClass());
+            dest.setJspFile(src.getJspFile());
+        } else if (failOnConflict) {
+            if (src.getServletClass() != null &&
+                    (dest.getJspFile() != null ||
+                            !src.getServletClass().equals(dest.getServletClass()))) {
+                return false;
+            }
+            if (src.getJspFile() != null &&
+                    (dest.getServletClass() != null ||
+                            !src.getJspFile().equals(dest.getJspFile()))) {
+                return false;
+            }
+        }
+        
+        // Additive
+        for (SecurityRoleRef securityRoleRef : src.getSecurityRoleRefs()) {
+            dest.addSecurityRoleRef(securityRoleRef);
+        }
+        
+        if (dest.getLoadOnStartup() == null) {
+            dest.setLoadOnStartup(src.getServletClass());
+        } else if (src.getLoadOnStartup() != null) {
+            if (failOnConflict &&
+                    !src.getLoadOnStartup().equals(dest.getLoadOnStartup())) {
+                return false;
+            }
+        }
+        
+        for (Map.Entry<String,String> srcEntry :
+                src.getParameterMap().entrySet()) {
+            if (dest.getParameterMap().containsKey(srcEntry.getKey())) {
+                if (failOnConflict && !dest.getParameterMap().get(
+                        srcEntry.getKey()).equals(srcEntry.getValue())) {
+                    return false;
+                }
+            } else {
+                dest.addInitParameter(srcEntry.getKey(), srcEntry.getValue());
+            }
+        }
+        return true;
+    }
+
 }
