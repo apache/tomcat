@@ -102,7 +102,7 @@ public class JSSESocketFactory
     protected String clientAuth = "false";
     protected SSLServerSocketFactory sslProxy = null;
     protected String[] enabledCiphers;
-    protected boolean enableMitmVulnerability = false;
+    protected boolean allowUnsafeLegacyRenegotiation = false;
 
     /**
      * Flag to state that we require client authentication.
@@ -157,7 +157,7 @@ public class JSSESocketFactory
         SSLSocket asock = null;
         try {
              asock = (SSLSocket)socket.accept();
-             if (!enableMitmVulnerability) {
+             if (!allowUnsafeLegacyRenegotiation) {
                  asock.addHandshakeCompletedListener(
                          new DisableSslRenegotiation());
              }
@@ -490,8 +490,8 @@ public class JSSESocketFactory
                 getEnabledCiphers(requestedCiphers,
                         sslProxy.getSupportedCipherSuites());
 
-            enableMitmVulnerability =
-                "true".equals(attributes.get("enableMitmVulnerability"));
+            allowUnsafeLegacyRenegotiation =
+                "true".equals(attributes.get("allowUnsafeLegacyRenegotiation"));
             
             // Check the SSL config is OK
             checkConfig();
