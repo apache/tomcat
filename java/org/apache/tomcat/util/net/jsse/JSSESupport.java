@@ -157,8 +157,8 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         ssl.startHandshake();
         int maxTries = 60; // 60 * 1000 = example 1 minute time out
         for (int i = 0; i < maxTries; i++) {
-        if(log.isTraceEnabled())
-            log.trace("Reading for try #" +i);
+            if (log.isTraceEnabled())
+                log.trace("Reading for try #" + i);
             try {
                 in.read(b);
             } catch(SSLException sslex) {
