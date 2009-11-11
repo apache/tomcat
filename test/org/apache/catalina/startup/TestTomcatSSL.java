@@ -30,6 +30,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -55,8 +56,17 @@ public class TestTomcatSSL extends TomcatBaseTest {
         }
     };
 
-    private void initSsl(Tomcat tomcat) {
-        tomcat.getConnector().setSecure(true);
+    private void initSsl(Tomcat tomcat, boolean nio) {
+        if (nio) {
+            Connector connector = 
+                new Connector("org.apache.coyote.http11.Http11NioProtocol");
+            connector.setPort(getPort());
+            tomcat.getService().addConnector(connector);
+            tomcat.setConnector(connector);
+            tomcat.getConnector().setSecure(true);            
+        } else {
+            tomcat.getConnector().setSecure(true);
+        }
         tomcat.getConnector().setProperty("SSLEnabled", "true");
         tomcat.getConnector().setProperty("sslProtocol",
             "tls");
@@ -65,8 +75,15 @@ public class TestTomcatSSL extends TomcatBaseTest {
             "../../test/org/apache/catalina/startup/test.keystore");
     }
     
-
     public void testSimpleSsl() throws Exception {
+        simpleSsl(false);
+    }
+    
+    public void testSimpleSslNio() throws Exception {
+        simpleSsl(true);
+    }
+    
+    public void simpleSsl(boolean nio) throws Exception {
         // Install the all-trusting trust manager so https:// works 
         // with unsigned certs. 
 
@@ -84,7 +101,8 @@ public class TestTomcatSSL extends TomcatBaseTest {
         File appDir = 
             new File("output/build/webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        initSsl(tomcat);
+        
+        initSsl(tomcat, nio);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -95,6 +113,10 @@ public class TestTomcatSSL extends TomcatBaseTest {
     boolean handshakeDone = false;
     
     public void testRenegotiateFail() throws Exception {
+        renegotiateFail(false);
+    }
+    
+    public void renegotiateFail(boolean nio) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
@@ -102,7 +124,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        initSsl(tomcat);
+        initSsl(tomcat, nio);
         // Default - MITM not enabled
 
         tomcat.start();
@@ -127,7 +149,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         socket.startHandshake();
         handshakeDone = false;
         byte[] b = new byte[0];
-        int maxTries = 60; // 60 * 1000 = example 1 minute time out
+        int maxTries = 5;  // 5 sec should be enough - in NIO we'll timeout
         socket.setSoTimeout(1000);
         for (int i = 0; i < maxTries; i++) {
             try {
@@ -140,7 +162,10 @@ public class TestTomcatSSL extends TomcatBaseTest {
             }
         }
         os = socket.getOutputStream();
-        
+        if (!handshakeDone) {
+            // success - we timedout without handshake
+            return;
+        }
         try {
             os.write("Host: localhost\n\n".getBytes());
         } catch (IOException ex) {
@@ -153,6 +178,21 @@ public class TestTomcatSSL extends TomcatBaseTest {
     }
     
     public void testRenegotiateWorks() throws Exception {
+        renegotiateWorks(false);
+    }
+    
+    
+    // Re-negotiation not implemented in NIO
+    //    public void testRenegotiateWorksNio() throws Exception {
+    //        renegotiateWorks(true);    
+    //    }
+
+    public void testRenegotiateFailNio() throws Exception {
+        renegotiateFail(true);        
+    }
+    
+    
+    public void renegotiateWorks(boolean nio) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
@@ -160,7 +200,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        initSsl(tomcat);
+        initSsl(tomcat, nio);
         // Enable MITM attack
         tomcat.getConnector().setAttribute("allowUnsafeLegacyRenegotiation", "true");
 
@@ -186,7 +226,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         socket.startHandshake();
         handshakeDone = false;
         byte[] b = new byte[0];
-        int maxTries = 60; // 60 * 1000 = example 1 minute time out
+        int maxTries = 5; 
         socket.setSoTimeout(1000);
         for (int i = 0; i < maxTries; i++) {
             try {
@@ -207,5 +247,4 @@ public class TestTomcatSSL extends TomcatBaseTest {
         }
         
     }
-
 }
