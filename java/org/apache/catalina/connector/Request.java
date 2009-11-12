@@ -2322,7 +2322,7 @@ public class Request
                     sm.getString("coyoteRequest.authenticate.ise"));
         }
 
-        // TODO SERVLET 3
+        // TODO SERVLET3
         return false;
     }
     
@@ -2376,12 +2376,12 @@ public class Request
     }
     
     public Collection<Part> getParts() {
-        // TODO Servlet 3 - file upload
+        // TODO SERVLET3 - file upload
         return null;
     }
     
     public Part getPart(String name) throws IllegalArgumentException {
-        // TODO Servlet 3.0 - file upload
+        // TODO SERVLET3 - file upload
         return null;
     }
 
