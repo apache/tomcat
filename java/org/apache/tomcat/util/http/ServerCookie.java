@@ -115,6 +115,12 @@ public class ServerCookie implements Serializable {
             FWD_SLASH_IS_SEPARATOR =
                 Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
         }
+        
+        if (FWD_SLASH_IS_SEPARATOR) {
+            tspecials2 = "()<>@,;:\\\"/[]?={} \t";
+        } else {
+            tspecials2 = "()<>@,;:\\\"[]?={} \t";
+        }
     }
 
     // Note: Servlet Spec =< 2.5 only refers to Netscape and RFC2109,
@@ -194,8 +200,7 @@ public class ServerCookie implements Serializable {
     }
     
     private static final String tspecials = ",; ";
-    private static final String tspecials2 = "()<>@,;:\\\"/[]?={} \t";
-    private static final String tspecials2NoSlash = "()<>@,;:\\\"[]?={} \t";
+    private static final String tspecials2;
 
     /*
      * Tests a string and returns true if the string counts as a
@@ -243,13 +248,13 @@ public class ServerCookie implements Serializable {
     }
 
     public static boolean isToken2(String value, String literals) {
-        String tspecials2 = (literals==null?ServerCookie.tspecials2:literals);
+        String tokens = (literals==null?ServerCookie.tspecials2:literals);
         if( value==null) return true;
         int len = value.length();
 
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
-            if (tspecials2.indexOf(c) != -1)
+            if (tokens.indexOf(c) != -1)
                 return false;
         }
         return true;
@@ -303,7 +308,7 @@ public class ServerCookie implements Serializable {
         buf.append("=");
         // Servlet implementation does not check anything else
         
-        version = maybeQuote2(version, buf, value,true);
+        version = maybeQuote2(version, buf, value, true);
         
         // Spec team clarified setting comment on a v0 cookie switches it to v1
         if (version == 0 && comment != null) {
@@ -354,17 +359,7 @@ public class ServerCookie implements Serializable {
         // Path=path
         if (path!=null) {
             buf.append ("; Path=");
-            if (version==0) {
-                maybeQuote2(version, buf, path);
-            } else {
-                if (FWD_SLASH_IS_SEPARATOR) {
-                    maybeQuote2(version, buf, path, ServerCookie.tspecials,
-                            false);
-                } else {
-                    maybeQuote2(version, buf, path,
-                            ServerCookie.tspecials2NoSlash, false);
-                }
-            }
+            maybeQuote2(version, buf, path);
         }
 
         // Secure
