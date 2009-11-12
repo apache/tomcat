@@ -1096,5 +1096,10 @@ public interface Context extends Container {
      */
     public void setJarScanner(JarScanner jarScanner);
 
+    /**
+     * Obtain the {@link Authenticator} that is used by this context or
+     * <code>null</code> if none is used.
+     */
+    public Authenticator getAuthenticator();
 }
 

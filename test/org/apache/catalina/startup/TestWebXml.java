@@ -1,0 +1,228 @@
+package org.apache.catalina.startup;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
+/**
+ * Test case for {@link ContextConfig}.
+ */
+public class TestWebXml extends TestCase {
+    private WebXml app;
+    private WebXml a;
+    private WebXml b;
+    private WebXml c;
+    private WebXml d;
+    private WebXml e;
+    private WebXml f;
+    private Map<String,WebXml> fragments;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        app = new WebXml();
+        a = new WebXml();
+        a.setName("a");
+        b = new WebXml();
+        b.setName("b");
+        c = new WebXml();
+        c.setName("c");
+        d = new WebXml();
+        d.setName("d");
+        e = new WebXml();
+        e.setName("e");
+        f = new WebXml();
+        f.setName("f");
+        fragments = new HashMap<String,WebXml>();
+        fragments.put("a",a);
+        fragments.put("b",b);
+        fragments.put("c",c);
+        fragments.put("d",d);
+        fragments.put("e",e);
+        fragments.put("f",f);
+    }
+
+    public void testOrderWebFragmentsAbsolute() {
+        app.addAbsoluteOrdering("c");
+        app.addAbsoluteOrdering("a");
+        app.addAbsoluteOrdering("b");
+        app.addAbsoluteOrdering("e");
+        app.addAbsoluteOrdering("d");
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        
+        Iterator<WebXml> iter = ordered.iterator();
+        assertEquals(c,iter.next());
+        assertEquals(a,iter.next());
+        assertEquals(b,iter.next());
+        assertEquals(e,iter.next());
+        assertEquals(d,iter.next());
+        assertFalse(iter.hasNext());
+    }
+
+    public void testOrderWebFragmentsAbsolutePartial() {
+        app.addAbsoluteOrdering("c");
+        app.addAbsoluteOrdering("a");
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        
+        Iterator<WebXml> iter = ordered.iterator();
+        assertEquals(c,iter.next());
+        assertEquals(a,iter.next());
+        assertFalse(iter.hasNext());
+    }
+
+    public void testOrderWebFragmentsAbsoluteOthersStart() {
+        app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
+        app.addAbsoluteOrdering("b");
+        app.addAbsoluteOrdering("d");
+        
+        Set<WebXml> others = new HashSet<WebXml>();
+        others.add(a);
+        others.add(c);
+        others.add(e);
+        others.add(f);
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        
+        Iterator<WebXml> iter = ordered.iterator();
+        while (others.size() > 0) {
+            WebXml o = iter.next();
+            assertTrue(others.contains(o));
+            others.remove(o);
+        }
+        assertEquals(b,iter.next());
+        assertEquals(d,iter.next());
+        assertFalse(iter.hasNext());
+    }
+
+    public void testOrderWebFragmentsAbsoluteOthersMiddle() {
+        app.addAbsoluteOrdering("b");
+        app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
+        app.addAbsoluteOrdering("d");
+        
+        Set<WebXml> others = new HashSet<WebXml>();
+        others.add(a);
+        others.add(c);
+        others.add(e);
+        others.add(f);
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+
+        Iterator<WebXml> iter = ordered.iterator();
+        assertEquals(b,iter.next());
+
+        while (others.size() > 0) {
+            WebXml o = iter.next();
+            assertTrue(others.contains(o));
+            others.remove(o);
+        }
+        assertEquals(d,iter.next());
+        assertFalse(iter.hasNext());
+    }
+
+    public void testOrderWebFragmentsAbsoluteOthersEnd() {
+        app.addAbsoluteOrdering("b");
+        app.addAbsoluteOrdering("d");
+        app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
+        
+        Set<WebXml> others = new HashSet<WebXml>();
+        others.add(a);
+        others.add(c);
+        others.add(e);
+        others.add(f);
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+
+        Iterator<WebXml> iter = ordered.iterator();
+        assertEquals(b,iter.next());
+        assertEquals(d,iter.next());
+
+        while (others.size() > 0) {
+            WebXml o = iter.next();
+            assertTrue(others.contains(o));
+            others.remove(o);
+        }
+        assertFalse(iter.hasNext());
+    }
+
+    public void testOrderWebFragmentsRelative1() {
+        // First example from servlet spec
+        a.addAfterOrderOthers();
+        a.addAfterOrder("c");
+        b.addBeforeOrderOthers();
+        c.addAfterOrderOthers();
+        f.addBeforeOrderOthers();
+        f.addBeforeOrder("b");
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        
+        Iterator<WebXml> iter = ordered.iterator();
+        assertEquals(f,iter.next());
+        assertEquals(b,iter.next());
+        assertEquals(d,iter.next());
+        assertEquals(e,iter.next());
+        assertEquals(c,iter.next());
+        assertEquals(a,iter.next());
+    }
+    
+    public void testOrderWebFragmentsRelative2() {
+        // Second example - use fragment a for no-id fragment
+        a.addAfterOrderOthers();
+        a.addBeforeOrder("c");
+        b.addBeforeOrderOthers();
+        d.addAfterOrderOthers();
+        e.addBeforeOrderOthers();
+        
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        
+        Iterator<WebXml> iter = ordered.iterator();
+        // A number of orders are possible but the algorithm is deterministic
+        // and this order is valid. If this fails after a change to the
+        // algorithm, then check to see if the new order is also valid.
+        assertEquals(b,iter.next());
+        assertEquals(e,iter.next());
+        assertEquals(f,iter.next());
+        assertEquals(a,iter.next());
+        assertEquals(c,iter.next());
+        assertEquals(d,iter.next());
+    }
+    
+    public void testOrderWebFragmentsRelative3() {
+        // Third example from spec
+        a.addAfterOrder("b");
+        c.addBeforeOrderOthers();
+        fragments.remove("e");
+        fragments.remove("f");
+
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        
+        Iterator<WebXml> iter = ordered.iterator();
+        // A number of orders are possible but the algorithm is deterministic
+        // and this order is valid. If this fails after a change to the
+        // algorithm, then check to see if the new order is also valid.
+        assertEquals(c,iter.next());
+        assertEquals(d,iter.next());
+        assertEquals(b,iter.next());
+        assertEquals(a,iter.next());
+    }
+    
+    public void testOrderWebFragmentsrelativeCircular() {
+        a.addBeforeOrder("b");
+        b.addBeforeOrder("a");
+
+        Exception e = null;
+        
+        try {
+            WebXml.orderWebFragments(app, fragments);
+        } catch (Exception e1) {
+            e = e1;
+        }
+        
+        assertTrue(e instanceof IllegalArgumentException);
+    }
+}

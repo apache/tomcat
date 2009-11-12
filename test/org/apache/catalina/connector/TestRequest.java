@@ -30,6 +30,8 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test case for {@link Request}. 
@@ -189,6 +191,63 @@ public class TestRequest extends TomcatBaseTest {
                 return false;
             }
             return true;
+        }
+        
+    }
+
+    /**
+     * Test case for {@link Request#login(String, String)} and
+     * {@link Request#logout()}.
+     */
+    public void testLoginLogout() throws Exception{
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        StandardContext ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+        // You can customize the context by calling 
+        // its API
+        
+        Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
+        ctx.addServletMapping("/", "servlet");
+        
+        MapRealm realm = new MapRealm();
+        realm.addUser(LoginLogoutServlet.USER, LoginLogoutServlet.PWD);
+        ctx.setRealm(realm);
+        
+        tomcat.start();
+        
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+
+        assertEquals(LoginLogoutServlet.OK, res.toString());
+    }
+    
+    private static final class LoginLogoutServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+        private static final String USER = "user";
+        private static final String PWD = "pwd";
+        private static final String OK = "OK";
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            req.login(USER, PWD);
+            
+            if (!req.getRemoteUser().equals(USER))
+                throw new ServletException();
+            if (!req.getUserPrincipal().getName().equals(USER))
+                throw new ServletException();
+            
+            req.logout();
+            
+            if (req.getRemoteUser() != null)
+                throw new ServletException();
+            if (req.getUserPrincipal() != null)
+                throw new ServletException();
+            
+            resp.getWriter().write(OK);
         }
         
     }
