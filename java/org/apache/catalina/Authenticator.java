@@ -18,18 +18,55 @@
 
 package org.apache.catalina;
 
+import java.io.IOException;
+import java.security.Principal;
+
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.deploy.LoginConfig;
+
 
 /**
  * An <b>Authenticator</b> is a component (usually a Valve or Container) that
- * provides some sort of authentication service.  The interface itself has no
- * functional significance,  but is used as a tagging mechanism so that other
- * components can detect the presence (via an "instanceof Authenticator" test)
- * of an already configured authentication service.
+ * provides some sort of authentication service.
  *
  * @author Craig R. McClanahan
  * @version $Revision$ $Date$
  */
 
 public interface Authenticator {
-    // No methods
+    
+    /**
+     * Authenticate the user making this request, based on the specified
+     * login configuration.  Return <code>true</code> if any specified
+     * constraint has been satisfied, or <code>false</code> if we have
+     * created a response challenge already.
+     *
+     * @param request Request we are processing
+     * @param response Response we are creating
+     * @param config    Login configuration describing how authentication
+     *              should be performed
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public boolean authenticate(Request request, Response response,
+            LoginConfig config) throws IOException;
+    
+    /**
+     * Register an authenticated Principal and authentication type in our
+     * request, in the current session (if there is one), and with our
+     * SingleSignOn valve, if there is one.  Set the appropriate cookie
+     * to be returned. Passing in a null principal will de-register any
+     * SSO sessions.
+     *
+     * @param request The servlet request we are processing
+     * @param response The servlet response we are generating
+     * @param principal The authenticated Principal to be registered
+     * @param authType The authentication type to be registered
+     * @param username Username used to authenticate (if any)
+     * @param password Password used to authenticate (if any)
+     */
+    public void register(Request request, Response response,
+            Principal principal, String authType,
+            String username, String password);
 }

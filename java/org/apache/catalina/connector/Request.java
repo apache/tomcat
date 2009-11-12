@@ -54,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import org.apache.catalina.Authenticator;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
@@ -63,6 +64,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
+import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
@@ -2307,18 +2309,70 @@ public class Request
         return requestedSessionSSL;
     }
     
-    public boolean authenticate(HttpServletResponse response) throws IOException {
-        // TODO Servlet 3 - authentication
+    /**
+     * @throws IOException If an I/O error occurs
+     * @throws IllegalStateException If the response has been committed
+     * @throws ServletException If the caller is responsible for handling the
+     *         error and the container has NOT set the HTTP response code etc.
+     */
+    public boolean authenticate(HttpServletResponse response) 
+    throws IOException, ServletException {
+        if (response.isCommitted()) {
+            throw new IllegalStateException(
+                    sm.getString("coyoteRequest.authenticate.ise"));
+        }
+
+        // TODO SERVLET 3
         return false;
     }
     
+    /**
+     * @throws ServletException If any of {@link #getRemoteUser()},
+     *         {@link #getUserPrincipal()} or {@link #getAuthType()} are
+     *         non-null, if the configured authenticator does not support
+     *         user name and password authentication or if the authentication
+     *         fails
+     */
     public void login(String username, String password)
     throws ServletException {
-        // TODO Servlet 3 - authentication
+        if (getAuthType() != null || getRemoteUser() != null ||
+                getUserPrincipal() != null) {
+            throw new ServletException(
+                    sm.getString("coyoteRequest.alreadyAuthenticated"));
+        }
+        
+        if (context.getLoginConfig() == null) {
+            throw new ServletException(
+                    sm.getString("coyoteRequest.noLoginConfig"));
+        }
+        
+        String authMethod = context.getLoginConfig().getAuthMethod();
+        if (BASIC_AUTH.equals(authMethod) || FORM_AUTH.equals(authMethod) ||
+                DIGEST_AUTH.equals(authMethod)) {
+            // Methods support user name and password authentication
+            Realm realm = context.getRealm();
+            
+            Principal principal = realm.authenticate(username, password);
+
+            if (principal == null) {
+                throw new ServletException(
+                        sm.getString("coyoteRequest.authFail", username));
+            }
+            // Assume if we have a non-null LogonConfig then we must have an
+            // authenticator
+            context.getAuthenticator().register(this, getResponse(), principal,
+                    authMethod, username, password);
+        } else {
+            throw new ServletException("coyoteRequest.noPasswordLogin");
+        }
     }
-    
+
+    /**
+     * @throws ServletException If the logout fails
+     */
     public void logout() throws ServletException {
-        // TODO Servlet 3 - authentication
+        context.getAuthenticator().register(this, getResponse(), null,
+                null, null, null);
     }
     
     public Collection<Part> getParts() {

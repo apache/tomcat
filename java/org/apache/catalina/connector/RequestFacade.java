@@ -982,7 +982,8 @@ public class RequestFacade implements HttpServletRequest {
         return request.getDispatcherType();
     }
     
-    public boolean authenticate(HttpServletResponse response) throws IOException {
+    public boolean authenticate(HttpServletResponse response)
+    throws IOException, ServletException {
         return request.authenticate(response);
     }
 
