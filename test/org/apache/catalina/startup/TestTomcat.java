@@ -19,6 +19,9 @@ package org.apache.catalina.startup;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -29,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextEnvironment;
+import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestTomcat extends TomcatBaseTest {
@@ -95,6 +100,34 @@ public class TestTomcat extends TomcatBaseTest {
         }
     }
     
+    /**
+     * Simple Realm that uses a configurable {@link Map} to link user names and
+     * passwords. No roles are supported at this stage.
+     */
+    public static final class MapRealm extends RealmBase {
+        private Map<String,String> users = new HashMap<String,String>();
+        
+        public void addUser(String username, String password) {
+            users.put(username, password);
+        }
+
+        @Override
+        protected String getName() {
+            return "MapRealm";
+        }
+
+        @Override
+        protected String getPassword(String username) {
+            return users.get(username);
+        }
+
+        @Override
+        protected Principal getPrincipal(String username) {
+            return new GenericPrincipal(username, getPassword(username));
+        }
+        
+    }
+
     /** 
      * Start tomcat with a single context and one 
      * servlet - all programmatic, no server.xml or 

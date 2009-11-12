@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -388,21 +387,10 @@ public class ContextConfig
         }
 
         // Has an authenticator been configured already?
-        if (context instanceof Authenticator)
+        if (context.getAuthenticator() != null)
             return;
-        if (context instanceof ContainerBase) {
-            Pipeline pipeline = ((ContainerBase) context).getPipeline();
-            if (pipeline != null) {
-                Valve basic = pipeline.getBasic();
-                if ((basic != null) && (basic instanceof Authenticator))
-                    return;
-                Valve valves[] = pipeline.getValves();
-                for (int i = 0; i < valves.length; i++) {
-                    if (valves[i] instanceof Authenticator)
-                        return;
-                }
-            }
-        } else {
+        
+        if (!(context instanceof ContainerBase)) {
             return;     // Cannot install a Valve even if it would be needed
         }
 
@@ -1237,22 +1225,24 @@ public class ContextConfig
         parseWebXml(contextWebXml, webXml, false);
         
         if (!webXml.isMetadataComplete()) {
+            // Process /WEB-INF/classes for annotations
+            // TODO SERVLET3
+
             // Have to process JARs for fragments
             Map<String,WebXml> fragments = processJarsForWebFragments();
             
             // Merge the fragments into the main web.xml
-            Set<WebXml> orderedFragments = orderWebFragments(webXml, fragments);
+            Set<WebXml> orderedFragments =
+                WebXml.orderWebFragments(webXml, fragments);
+
+            // Process JARs for annotations - only need to process those
+            // fragments we are going to use
+            processAnnotationsInJars(orderedFragments);
 
             // Merge fragment into application
             if (ok) {
                 ok = webXml.merge(orderedFragments);
             }
-
-            // Process JARs for annotations
-            processAnnotationsInJars(fragments);
-
-            // Process /WEB-INF/classes for annotations
-            // TODO SERVLET3
 
             // Apply merged web.xml to Context
             webXml.configureContext(context);
@@ -1566,58 +1556,11 @@ public class ContextConfig
         }
     }
 
-    /**
-     * Generates the sub-set of the web-fragment.xml files to be processed in
-     * the order that the fragments must be processed as per the rules in the
-     * Servlet spec.
-     * 
-     * @param application   The application web.xml file
-     * @param fragments     The map of fragment names to web fragments
-     * @return Ordered list of web-fragment.xml files to process
-     */
-    protected static Set<WebXml> orderWebFragments(WebXml application,
-            Map<String,WebXml> fragments) {
 
-        Set<WebXml> orderedFragments = new LinkedHashSet<WebXml>();
-        
-        boolean absoluteOrdering =
-            (application.getAbsoluteOrdering() != null);
-        
-        if (absoluteOrdering) {
-            // Only those fragments listed should be processed
-            Set<String> requestedOrder = application.getAbsoluteOrdering();
-            
-            for (String requestedName : requestedOrder) {
-                if (WebXml.ORDER_OTHERS.equals(requestedName)) {
-                    // Add all fragments not named explicitly at this point
-                    for (String name : fragments.keySet()) {
-                        if (!requestedOrder.contains(name)) {
-                            WebXml fragment = fragments.get(name);
-                            if (fragment != null) {
-                                orderedFragments.add(fragment);
-                            }
-                        }
-                    }
-                } else {
-                    WebXml fragment = fragments.get(requestedName);
-                    if (fragment != null) {
-                        orderedFragments.add(fragment);
-                    }
-                }
-            }
-        } else {
-            // TODO SERVLET3 Relative ordering
-        }
-        
-        return orderedFragments;
-    }
-
-    
-    protected void processAnnotationsInJars(Map<String,WebXml> fragments) {
-        for(String name : fragments.keySet()) {
-            WebXml fragment = fragments.get(name);
-            if (fragment == null || !fragment.isMetadataComplete()) {
-                // Scan jar for annotations
+    protected void processAnnotationsInJars(Set<WebXml> fragments) {
+        for(WebXml fragment : fragments) {
+            if (!fragment.isMetadataComplete()) {
+                // Scan jar for annotations, add to fragment
                 // TODO SERVLET3
             }
         }

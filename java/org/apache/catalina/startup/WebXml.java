@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,28 +90,31 @@ public class WebXml {
     // web-fragment.xml only elements
     // Relative ordering
     private Set<String> after = new LinkedHashSet<String>();
-    public void addAfterOrdering(String fragmentName) {
+    public void addAfterOrder(String fragmentName) {
         after.add(fragmentName);
     }
-    public void addAfterOrderingOthers() {
+    public void addAfterOrderOthers() {
         if (before.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString(
                     "webXml.multipleOther"));
         }
         after.add(ORDER_OTHERS);
     }
+    public Set<String> getAfterOrder() { return after; }
+    
     private Set<String> before = new LinkedHashSet<String>();
-    public void addBeforeOrdering(String fragmentName) {
+    public void addBeforeOrder(String fragmentName) {
         before.add(fragmentName);
     }
-    public void addBeforeOrderingOthers() {
+    public void addBeforeOrderOthers() {
         if (after.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString(
                     "webXml.multipleOther"));
         }
         before.add(ORDER_OTHERS);
     }
-    
+    public Set<String> getBeforeOrder() { return before; }
+
     // Common elements and attributes
     
     // Required attribute of web-app element
@@ -440,6 +445,19 @@ public class WebXml {
     private URL uRL = null;
     public void setURL(URL url) { this.uRL = url; }
     public URL getURL() { return uRL; }
+    
+    
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(32);
+        buf.append("Name: ");
+        buf.append(getName());
+        buf.append(", URL: ");
+        buf.append(getURL());
+        return buf.toString();
+    }
+    
     
     /**
      * Configure a {@link Context} using the stored web.xml representation.
@@ -1004,4 +1022,115 @@ public class WebXml {
         return true;
     }
 
-}
+
+    /**
+     * Generates the sub-set of the web-fragment.xml files to be processed in
+     * the order that the fragments must be processed as per the rules in the
+     * Servlet spec.
+     * 
+     * @param application   The application web.xml file
+     * @param fragments     The map of fragment names to web fragments
+     * @return Ordered list of web-fragment.xml files to process
+     */
+    protected static Set<WebXml> orderWebFragments(WebXml application,
+            Map<String,WebXml> fragments) {
+
+        Set<WebXml> orderedFragments = new LinkedHashSet<WebXml>();
+        
+        boolean absoluteOrdering =
+            (application.getAbsoluteOrdering() != null);
+        
+        if (absoluteOrdering) {
+            // Only those fragments listed should be processed
+            Set<String> requestedOrder = application.getAbsoluteOrdering();
+            
+            for (String requestedName : requestedOrder) {
+                if (WebXml.ORDER_OTHERS.equals(requestedName)) {
+                    // Add all fragments not named explicitly at this point
+                    for (String name : fragments.keySet()) {
+                        if (!requestedOrder.contains(name)) {
+                            WebXml fragment = fragments.get(name);
+                            if (fragment != null) {
+                                orderedFragments.add(fragment);
+                            }
+                        }
+                    }
+                } else {
+                    WebXml fragment = fragments.get(requestedName);
+                    if (fragment != null) {
+                        orderedFragments.add(fragment);
+                    }
+                }
+            }
+        } else {
+            List<String> order = new LinkedList<String>();
+            // Start by adding all fragments - order doesn't matter
+            order.addAll(fragments.keySet());
+            
+            // Now go through and move elements to start/end depending on if
+            // they specify others
+            for (WebXml fragment : fragments.values()) {
+                String name = fragment.getName();
+                if (fragment.getBeforeOrder().contains(WebXml.ORDER_OTHERS)) {
+                    // Move to beginning
+                    order.remove(name);
+                    order.add(0, name);
+                } else if (fragment.getAfterOrder().contains(WebXml.ORDER_OTHERS)) {
+                    // Move to end
+                    order.remove(name);
+                    order.add(name);
+                }
+            }
+            
+            // Now apply remaining ordering
+            for (WebXml fragment : fragments.values()) {
+                String name = fragment.getName();
+                for (String before : fragment.getBeforeOrder()) {
+                    if (!before.equals(WebXml.ORDER_OTHERS) &&
+                            order.contains(before) &&
+                            order.indexOf(before) < order.indexOf(name)) {
+                        order.remove(name);
+                        order.add(order.indexOf(before), name);
+                    }
+                }
+                for (String after : fragment.getAfterOrder()) {
+                    if (!after.equals(WebXml.ORDER_OTHERS) &&
+                            order.contains(after) &&
+                            order.indexOf(after) > order.indexOf(name)) {
+                        order.remove(name);
+                        order.add(order.indexOf(after) + 1, name);
+                    }
+                }
+            }
+            
+            // Finally check ordering was applied correctly - if there are
+            // errors then that indicates circular references
+            for (WebXml fragment : fragments.values()) {
+                String name = fragment.getName();
+                for (String before : fragment.getBeforeOrder()) {
+                    if (!before.equals(WebXml.ORDER_OTHERS) &&
+                            order.contains(before) &&
+                            order.indexOf(before) < order.indexOf(name)) {
+                        throw new IllegalArgumentException(sm.getString(""));
+                    }
+                }
+                for (String after : fragment.getAfterOrder()) {
+                    if (!after.equals(WebXml.ORDER_OTHERS) &&
+                            order.contains(after) &&
+                            order.indexOf(after) > order.indexOf(name)) {
+                        throw new IllegalArgumentException();
+                    }
+                }
+            }
+            
+            // Build the ordered list
+            for (String name : order) {
+                orderedFragments.add(fragments.get(name));
+            }
+        }
+        
+        return orderedFragments;
+    }
+
+}    
+

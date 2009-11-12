@@ -57,6 +57,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
+import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -69,6 +70,8 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
+import org.apache.catalina.Pipeline;
+import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
@@ -738,6 +741,24 @@ public class StandardContext
     // ----------------------------------------------------- Context Properties
 
 
+    public Authenticator getAuthenticator() {
+        if (this instanceof Authenticator)
+            return (Authenticator) this;
+        
+        Pipeline pipeline = getPipeline();
+        if (pipeline != null) {
+            Valve basic = pipeline.getBasic();
+            if ((basic != null) && (basic instanceof Authenticator))
+                return (Authenticator) basic;
+            Valve valves[] = pipeline.getValves();
+            for (int i = 0; i < valves.length; i++) {
+                if (valves[i] instanceof Authenticator)
+                    return (Authenticator) valves[i];
+            }
+        }
+        return null;
+    }
+    
     public JarScanner getJarScanner() {
         if (jarScanner == null) {
             jarScanner = new DefaultJarScanner();

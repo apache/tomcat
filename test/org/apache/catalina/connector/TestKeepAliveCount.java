@@ -120,6 +120,8 @@ public class TestKeepAliveCount extends TomcatBaseTest{
     
     private static class SimpleServlet extends HttpServlet {
 
+        private static final long serialVersionUID = 1L;
+
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentLength(0);

@@ -570,7 +570,7 @@ public abstract class AuthenticatorBase
      *
      * @exception IOException if an input/output error occurs
      */
-    protected abstract boolean authenticate(Request request,
+    public abstract boolean authenticate(Request request,
                                             Response response,
                                             LoginConfig config)
         throws IOException;
@@ -708,7 +708,7 @@ public abstract class AuthenticatorBase
      * @param username Username used to authenticate (if any)
      * @param password Password used to authenticate (if any)
      */
-    protected void register(Request request, Response response,
+    public void register(Request request, Response response,
                             Principal principal, String authType,
                             String username, String password) {
 
@@ -768,8 +768,14 @@ public abstract class AuthenticatorBase
             request.setNote(Constants.REQ_SSOID_NOTE, ssoId);
 
         } else {
-            // Update the SSO session with the latest authentication data
-            sso.update(ssoId, principal, authType, username, password);
+            if (principal == null) {
+                // Registering a programmatic logout
+                sso.deregister(ssoId);
+                return;
+            } else {
+                // Update the SSO session with the latest authentication data
+                sso.update(ssoId, principal, authType, username, password);
+            }
         }
 
         // Fix for Bug 10040
