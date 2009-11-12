@@ -22,7 +22,7 @@ import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 
 /**
- * TODO SERVLET 3 - async 
+ * TODO SERVLET3 - async 
  * @author fhanik
  *
  */
@@ -31,18 +31,18 @@ public class AsyncListenerWrapper {
     private AsyncListener listener = null;
     
     public void fireOnComplete(AsyncEvent event) throws IOException {
-        // TODO SERVLET 3 - async
+        // TODO SERVLET3 - async
         listener.onComplete(event);
     }
 
 
     public void fireOnTimeout(AsyncEvent event) throws IOException {
-        // TODO SERVLET 3 - async 
+        // TODO SERVLET3 - async 
         listener.onTimeout(event);
     }
     
     public void fireOnError(AsyncEvent event) throws IOException {
-        // TODO SERVLET 3 - async 
+        // TODO SERVLET3 - async 
         listener.onError(event);
     }
 
