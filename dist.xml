@@ -278,7 +278,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   	<!-- Make sure the RELEASE-NOTES has Windows line endings as they may be
          displayed post-install -->
     <fixcrlf srcdir="${tomcat.dist}/webapps/ROOT"
-        includes="RELEASE-NOTES.txt" eol="crlf" />
+        includes="RELEASE-NOTES.txt" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
@@ -294,7 +294,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   	<!-- Restore original line ending-->
     <fixcrlf srcdir="${tomcat.dist}/webapps/ROOT"
-        includes="RELEASE-NOTES.txt" />
+        includes="RELEASE-NOTES.txt" encoding="ISO-8859-1" fixlast="false" />
 
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
 
