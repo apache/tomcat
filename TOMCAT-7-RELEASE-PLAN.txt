@@ -15,13 +15,11 @@
   limitations under the License.
 ================================================================================
 
-$Id: $
-
             =====================================================
             An outline plan for the first stable Tomcat 7 release
             =====================================================
 
-1. Update trunk with new API from Servlet Spec 3.0 PR
+1. Update trunk with new API from Servlet Spec 3.0 Final Draft 2009-11-05
    - Done
 
 2. Provide NOOP implementations with TODO SRV3 markers so it will build
@@ -36,33 +34,29 @@ $Id: $
      2.3.3.3, 2.3.3.4 - In progress
      2.3.4 - Compliant
    - Sections 3 to 6 - not checked
-   - Section 7 - in progress
-     7.1, 7.2, 7.3, 7.4, 7.5, 7.6 - Compliant
-     7.7.1 - Compliant
-     7.7.2 - When is IAE thrown?
-     7.7.3 - Compliant
+   - Section 7 - Compliant
    - Section 8 - in progress
      8.1 - not checked
-     8.2 - in progress, plan as follows
-           - modify digester to parse to new classes
-           - configure Context & Jasper from new classes
-           - fragment scanning / parsing
-           - fragment ordering
-           - web(-fragment).xml merging code
-           - annotation scanning
+     8.2 - in progress, 'just' annotation scanning left
      8.3 - not checked
-   - Sections 9 onwards - not checked
+     8.4 - not checked
+   - Sections 9 to 12 - not checked
+   - Section 13 - In progess
+     13.1 to 13.3 - Compliant
+     13.4 - In progress
+     13.5 to 13.10 - Compliant
+     Section 14 to 15 - not checked
    - Java EE spec requirements - not checked
+   - JSR 196 - Recommended - Not yet implemented. Copy from Geronimo?
 
 4. Do an alpha release (from trunk)
    - Create tc7.0.x\tags to hold release tags
-   - Create Bugzilla project
    - Add to web site
    - Update Wiki version status page
 
 5. Fix issues as they get reported
 
-6. Update for next public draft(s) of the spec if any.
+6. Update for final release of the spec
 
 7. Aim for first stable TC7 release with final release of Servlet 3 spec
    - Create tc7.0.x\trunk from trunk at first stable release

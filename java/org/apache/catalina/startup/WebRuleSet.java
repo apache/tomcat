@@ -161,11 +161,10 @@ public class WebRuleSet extends RuleSetBase {
         digester.addRule(fullPrefix,
                          new IgnoreAnnotationsRule());
 
-        digester.addCallMethod(fullPrefix + "/name",
-                "setName", 0);
-        
         if (fragment) {
             // web-fragment.xml
+            digester.addCallMethod(fullPrefix + "/name",
+                    "setName", 0);
             digester.addRule(fullPrefix + "/absolute-ordering",
                     new AbsoluteOrderingRule());
             digester.addCallMethod(fullPrefix + "/ordering/after/name",
