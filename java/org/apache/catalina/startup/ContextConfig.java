@@ -1472,7 +1472,7 @@ public class ContextConfig
             
             JarFile jarFile = null;
             InputStream stream = null;
-            WebXml fragment = null;
+            WebXml fragment = new WebXml();
 
             try {
                 urlConn.setUseCaches(false);
@@ -1485,7 +1485,6 @@ public class ContextConfig
                             urlConn.getJarFileURL().toString() +
                             File.separatorChar + FRAGMENT_LOCATION);
                     source.setByteStream(stream);
-                    fragment = new WebXml();
                     parseWebXml(source, fragment, true);
                 }
             } finally {
@@ -1503,15 +1502,11 @@ public class ContextConfig
                         // ignore
                     }
                 }
-                if (fragment == null) {
-                    fragments.put(urlConn.getURL().toString(), fragment);
-                } else {
-                    fragment.setURL(urlConn.getURL());
-                    if (fragment.getName() == null) {
-                        fragment.setName(fragment.getURL().toString());
-                    }
-                    fragments.put(fragment.getName(), fragment);
+                fragment.setURL(urlConn.getURL());
+                if (fragment.getName() == null) {
+                    fragment.setName(fragment.getURL().toString());
                 }
+                fragments.put(fragment.getName(), fragment);
             }
         }
 
