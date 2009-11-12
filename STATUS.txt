@@ -34,3 +34,10 @@ PATCHES PROPOSED TO BACKPORT:
 * Add detection of the macosx jvm.
   Backport from trunk
   http://svn.eu.apache.org/viewvc?view=rev&revision=803803
+
+* Fix CVE-2009-3555 by disabling renegotiation
+  Backport from trunk
+  https://svn.apache.org/viewvc?view=revision&revision=835322
+  https://svn.apache.org/viewvc?view=revision&revision=835335
+  +1: mturk
+  -1:
