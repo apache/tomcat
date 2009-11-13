@@ -52,6 +52,15 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * {@link javax.sql.PooledConnection#getConnection()} method name
      */
     public static final String GETCONNECTION_VAL = "getConnection";
+    /**
+     * {@link java.sql.Wrapper#unwrap(Class)} method name
+     */
+    public static final String UNWRAP_VAL = "unwrap";
+    /**
+     * {@link java.sql.Wrapper#isWrapperFor(Class)} method name
+     */
+    public static final String ISWRAPPERFOR_VAL = "isWrapperFor";
+
     
     /**
      * Properties for this interceptor.

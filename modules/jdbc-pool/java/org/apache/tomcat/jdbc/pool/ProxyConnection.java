@@ -71,7 +71,9 @@ public class ProxyConnection extends JdbcInterceptor {
 
 
     public Object unwrap(Class<?> iface) throws SQLException {
-        if (isWrapperFor(iface)) {
+        if (iface == PooledConnection.class) {
+            return connection;
+        } else if (isWrapperFor(iface)) {
             return connection.getConnection();
         } else {
             throw new SQLException("Not a wrapper of "+iface.getName());
@@ -95,6 +97,11 @@ public class ProxyConnection extends JdbcInterceptor {
             return connection.getConnection();
         }
         if (isClosed()) throw new SQLException("Connection has already been closed.");
+        if (compare(UNWRAP_VAL,method)) {
+            return unwrap((Class<?>)args[0]);
+        } else if (compare(ISWRAPPERFOR_VAL,method)) {
+            return this.isWrapperFor((Class<?>)args[0]);
+        }
         try {
             return method.invoke(connection.getConnection(),args);
         }catch (Throwable t) {
