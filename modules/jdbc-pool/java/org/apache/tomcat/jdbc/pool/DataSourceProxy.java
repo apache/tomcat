@@ -516,6 +516,23 @@ public class DataSourceProxy implements PoolConfiguration {
 
     }    
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSuspectTimeout() {
+        return getPoolProperties().getSuspectTimeout(); 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSuspectTimeout(int seconds) {
+        getPoolProperties().setSuspectTimeout(seconds);
+    }
+    
   //===============================================================================
 //  Expose JMX attributes through Tomcat's dynamic reflection
 //===============================================================================

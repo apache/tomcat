@@ -72,6 +72,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
+    public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNETION ABANDONED";
     
     
     
@@ -86,7 +87,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     } 
     
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
-        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION}; 
+        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION, SUSPECT_ABANDONED_NOTIFICATION}; 
         String name = Notification.class.getName(); 
         String description = "A connection pool error condition was met."; 
         MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description); 
@@ -553,5 +554,21 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         // TODO Auto-generated method stub
         
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getSuspectTimeout() {
+       return getPoolProperties().getSuspectTimeout(); 
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setSuspectTimeout(int seconds) {
+       //no op
+   }
 
 }
