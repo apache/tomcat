@@ -111,6 +111,8 @@ public class PooledConnection {
     
     private AtomicBoolean released = new AtomicBoolean(false);
     
+    private volatile boolean suspect = false;
+    
     /**
      * Constructor
      * @param prop - pool properties
@@ -390,6 +392,18 @@ public class PooledConnection {
      */
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+        setSuspect(false);
+    }
+    
+    
+    
+
+    public boolean isSuspect() {
+        return suspect;
+    }
+
+    public void setSuspect(boolean suspect) {
+        this.suspect = suspect;
     }
 
     /**
