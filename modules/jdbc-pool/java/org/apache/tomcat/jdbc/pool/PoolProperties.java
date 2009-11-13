@@ -74,6 +74,8 @@ public class PoolProperties implements PoolConfiguration {
     protected long maxAge = 0;
     protected boolean useLock = false;
     private InterceptorDefinition[] interceptors = null;
+    protected int suspectTimeout = 0;
+    
     
     /** 
      * {@inheritDoc}
@@ -718,14 +720,32 @@ public class PoolProperties implements PoolConfiguration {
         return defaultReadOnly;
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSuspectTimeout() {
+        return this.suspectTimeout;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSuspectTimeout(int seconds) {
+        this.suspectTimeout = seconds;
+    }
+
     /** 
      * {@inheritDoc}
      */
     @Override
     public boolean isPoolSweeperEnabled() {
-        boolean result = getTimeBetweenEvictionRunsMillis()>0;
-        result = result && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
-        result = result || (isTestWhileIdle() && getValidationQuery()!=null);
+        boolean timer = getTimeBetweenEvictionRunsMillis()>0;
+        boolean result = timer && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
+        result = result || (timer && getSuspectTimeout()>0); 
+        result = result || (timer && isTestWhileIdle() && getValidationQuery()!=null);
         return result;
     }
     
