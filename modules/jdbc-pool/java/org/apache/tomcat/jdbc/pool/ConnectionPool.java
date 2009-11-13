@@ -475,6 +475,32 @@ public class ConnectionPool {
             con.unlock();
         }
     }
+    
+    /**
+     * thread safe way to abandon a connection
+     * signals a connection to be abandoned.
+     * this will disconnect the connection, and log the stack trace if logAbanded=true
+     * @param con PooledConnection
+     */
+    protected void suspect(PooledConnection con) {
+        if (con == null)
+            return;
+        if (con.isSuspect())
+            return;
+        try {
+            con.lock();
+            String trace = con.getStackTrace();
+            if (getPoolProperties().isLogAbandoned()) {
+                log.warn("Connection has been marked suspect, possibly abandoned " + con + "["+(System.currentTimeMillis()-con.getTimestamp())+" ms.]:" + trace);
+            }
+            if (jmxPool!=null) {
+                jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.SUSPECT_ABANDONED_NOTIFICATION, trace);
+            }
+            con.setSuspect(true);
+        } finally {
+            con.unlock();
+        }
+    }
 
     /**
      * thread safe way to release a connection
@@ -786,8 +812,8 @@ public class ConnectionPool {
     public void checkAbandoned() {
         try {
             if (busy.size()==0) return;
-            if (!shouldAbandon()) return;
             Iterator<PooledConnection> locked = busy.iterator();
+            int sto = getPoolProperties().getSuspectTimeout();
             while (locked.hasNext()) {
                 PooledConnection con = locked.next();
                 boolean setToNull = false;
@@ -799,10 +825,12 @@ public class ConnectionPool {
                         continue;
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
-                    if ((now - time) > con.getAbandonTimeout()) {
+                    if (shouldAbandon() && (now - time) > con.getAbandonTimeout()) {
                         busy.remove(con);
                         abandon(con);
                         setToNull = true;
+                    } else if (sto > 0 && (now - time) > (sto*1000)) {
+                        suspect(con);
                     } else {
                         //do nothing
                     } //end if
