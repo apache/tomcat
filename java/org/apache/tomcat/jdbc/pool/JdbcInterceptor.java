@@ -65,7 +65,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     /**
      * Property that decides how we do string comparison, default is reference (==)
      */
-    private boolean useEquals = false;
+    private boolean useEquals = true;
 
     /**
      * Public constructor for instantation through reflection
