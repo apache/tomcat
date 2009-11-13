@@ -165,6 +165,19 @@ public class TldLocationsCache {
         noTldJars.add("dnsns.jar");
         noTldJars.add("tools.jar");
         noTldJars.add("sunpkcs11.jar");
+        // Apple J2SE runtime
+        noTldJars.add("apple_provider.jar");
+        noTldJars.add("AppleScriptEngine.jar");
+        noTldJars.add("CoreAudio.jar");
+        noTldJars.add("dns_sd.jar");
+        noTldJars.add("j3daudio.jar");
+        noTldJars.add("j3dcore.jar");
+        noTldJars.add("j3dutils.jar");
+        noTldJars.add("jai_core.jar");
+        noTldJars.add("jai_codec.jar");
+        noTldJars.add("mlibwrapper_jai.jar");
+        noTldJars.add("MRJToolkit.jar");
+        noTldJars.add("vecmath.jar");
     }
     
     /** Constructor. 
