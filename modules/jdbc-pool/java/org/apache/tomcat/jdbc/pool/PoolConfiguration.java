@@ -698,5 +698,24 @@ public interface PoolConfiguration {
      * @param useLock set to true if a lock should be used on connection operations
      */
     public void setUseLock(boolean useLock);
+    
+    /**
+     * Similar to {@link #setRemoveAbandonedTimeout(int)} but instead of treating the connection
+     * as abandoned, and potentially closing the connection, this simply logs the warning if 
+     * {@link #isLogAbandoned()} returns true. If this value is equal or less than 0, no suspect 
+     * checking will be performed. Suspect checking only takes place if the timeout value is larger than 0 and
+     * the connection was not abandoned or if abandon check is disabled. If a connection is suspect a WARN message gets
+     * logged and a JMX notification gets sent once. 
+     * @param seconds - the amount of time in seconds that has to pass before a connection is marked suspect. 
+     */
+    public void setSuspectTimeout(int seconds);
+    
+    /**
+     * Returns the time in seconds to pass before a connection is marked an abanoned suspect.
+     * Any value lesser than or equal to 0 means the check is disabled. 
+     * @return Returns the time in seconds to pass before a connection is marked an abanoned suspect.
+     */
+    public int getSuspectTimeout();
+    
 
 }

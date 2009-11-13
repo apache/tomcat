@@ -73,7 +73,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * Invoked when a query execution, a call to execute/executeQuery or executeBatch failed.
      * @param query the query that was executed and failed
      * @param args the arguments to the execution
-     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#executes}
+     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param t the exception that happened
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
@@ -92,7 +92,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded and was within the timing threshold
      * @param query the query that was executed and failed
      * @param args the arguments to the execution
-     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#executes}
+     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param delta the time the execution took
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
@@ -111,7 +111,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded and was exceeded the timing threshold
      * @param query the query that was executed and failed
      * @param args the arguments to the execution
-     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#executes}
+     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param delta the time the execution took
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 

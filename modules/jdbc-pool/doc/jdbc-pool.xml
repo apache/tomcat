@@ -78,13 +78,16 @@
       <li>Asynchronous connection retrieval - you can queue your request for a connection and receive a Future&lt;Connection&gt; back.</li>    
       <li>Better idle connection handling. Instead of closing connections directly, it can still pool connections and sizes the idle pool with a smarter algorithm.</li>    
       <li>You can decide at what moment connections are considered abandoned, is it when the pool is full, or directly at a timeout
-          by specifying a threshold.
+          by specifying a pool usage threshold.
       </li>    
       <li>The abandon connection timer will reset upon a statement/query activity. Allowing a connections that is in use for a long time to not timeout.
           This is achieved using the ResetAbandonedTimer
       </li>    
       <li>Close connections after they have been connected for a certain time. Age based close upon return to the pool.
-      </li>    
+      </li>   
+      <li>Get JMX notifications and log entries when connections are suspected for being abandoned. This is similar to
+          the <code>removeAbandonedTimeout</code> but it doesn't take any action, only reports the information. 
+          This is achieved using the <code>suspectTimeout</code> attribute.</li> 
     </ol>
   </p>
 
@@ -388,6 +391,16 @@
          The default value is <code>true</code>.
       </p> 
     </attribute>    
+    <attribute name="suspectTimeout" required="false">
+      <p>(int) Timeout value in seconds. Default value is <code>0</code>.<br/>
+           Similar to to the <code>removeAbandonedTimeout</code> value but instead of treating the connection
+           as abandoned, and potentially closing the connection, this simply logs the warning if 
+           <code>logAbandoned</code> is set to true. If this value is equal or less than 0, no suspect 
+           checking will be performed. Suspect checking only takes place if the timeout value is larger than 0 and
+           the connection was not abandoned or if abandon check is disabled. If a connection is suspect a WARN message gets
+           logged and a JMX notification gets sent once. 
+      </p>
+    </attribute>
   </attributes>  
   </subsection>
 </section>
