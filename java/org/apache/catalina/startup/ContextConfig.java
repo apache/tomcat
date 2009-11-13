@@ -237,6 +237,19 @@ public class ContextConfig
         noFragmentJars.add("dnsns.jar");
         noFragmentJars.add("tools.jar");
         noFragmentJars.add("sunpkcs11.jar");
+        // Apple J2SE runtime
+        noFragmentJars.add("apple_provider.jar");
+        noFragmentJars.add("AppleScriptEngine.jar");
+        noFragmentJars.add("CoreAudio.jar");
+        noFragmentJars.add("dns_sd.jar");
+        noFragmentJars.add("j3daudio.jar");
+        noFragmentJars.add("j3dcore.jar");
+        noFragmentJars.add("j3dutils.jar");
+        noFragmentJars.add("jai_core.jar");
+        noFragmentJars.add("jai_codec.jar");
+        noFragmentJars.add("mlibwrapper_jai.jar");
+        noFragmentJars.add("MRJToolkit.jar");
+        noFragmentJars.add("vecmath.jar");
     }
 
     // ------------------------------------------------------------- Properties
