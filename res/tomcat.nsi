@@ -94,10 +94,10 @@ ${StrRep}
     ;Descriptions
     LangString DESC_SecTomcat ${LANG_ENGLISH} "Install the Tomcat Servlet container."
     LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core."
-    LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start Tomcat when the computer is started. This requires Windows NT 4.0, Windows 2000 or Windows XP."
+    LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start Tomcat when the computer is started."
     LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Install APR based Tomcat native .dll for better performance and scalability in production environments."
     LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
-    LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This include documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
+    LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This includes documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
     LangString DESC_SecManager ${LANG_ENGLISH} "Install the Tomcat Manager administrative web application."
     LangString DESC_SecHostManager ${LANG_ENGLISH} "Install the Tomcat Host Manager administrative web application."
     LangString DESC_SecExamples ${LANG_ENGLISH} "Install the Servlet and JSP example web applications."
@@ -184,7 +184,7 @@ Section "Core" SecTomcatCore
   Pop $0
   StrCmp $0 "0" InstallOk
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP \
-      "Failed to install Tomcat@VERSION_MAJOR@ service.$\r$\nCheck your settings and permissions$\r$\nIgnore and continue anyway (not recommended)?" \
+      "Failed to install Tomcat@VERSION_MAJOR@ service.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
        /SD IDIGNORE IDIGNORE InstallOk IDRETRY InstallRetry
   Quit
   InstallOk:
@@ -589,12 +589,9 @@ Function configure
   !insertmacro MUI_INSTALLOPTIONS_READ $R2 "config.ini" "Field 7" "State"
 
   IfSilent 0 +2
-  StrCpy $R4 'port="8080"'
+  StrCpy $R0 '8080'
 
-  IfSilent +2 0
   StrCpy $R4 'port="$R0"'
-
-  IfSilent 0 +2
   StrCpy $R5 ''
 
   IfSilent Silent 0
