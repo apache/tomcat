@@ -54,9 +54,9 @@ public class TestCookiesSwitchSysProps extends CookiesBaseTest {
         res = getUrl("http://localhost:" + getPort() + "/blank");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidFwd");
-        assertEquals("Cookie name fail", res.toString());
+        assertEquals("Cookie name ok", res.toString()); // Will auto-switch
         res = getUrl("http://localhost:" + getPort() + "/invalidStrict");
-        assertEquals("Cookie name fail", res.toString());
+        assertEquals("Cookie name ok", res.toString()); // Will auto-switch
         res = getUrl("http://localhost:" + getPort() + "/valid");
         assertEquals("Cookie name ok", res.toString());
 

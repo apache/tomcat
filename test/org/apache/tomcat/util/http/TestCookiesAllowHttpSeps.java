@@ -29,17 +29,20 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
 
-public class TestCookiesDisallowEquals extends TomcatBaseTest{
+public class TestCookiesAllowHttpSeps extends TomcatBaseTest{
 
-    private static final String COOKIE_WITH_EQUALS = "name=value=withequals";
-    private static final String COOKIE_TRUNCATED = "name=value";
+    private static final String COOKIE_WITH_SEPS = "name=val(ue";
     
-    public void testWithEquals() throws Exception {
-        TestCookieEqualsClient client = new TestCookieEqualsClient();
+    public void testWithHttpSep() throws Exception {
+        System.setProperty(
+                "org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0",
+                "true");
+
+        TestCookieHttpSepClient client = new TestCookieHttpSepClient();
         client.doRequest();
     }
     
-    private class TestCookieEqualsClient extends SimpleHttpClient {
+    private class TestCookieHttpSepClient extends SimpleHttpClient {
 
 
         private void doRequest() throws Exception {
@@ -56,7 +59,7 @@ public class TestCookiesDisallowEquals extends TomcatBaseTest{
             String[] request = new String[1];
             request[0] =
                 "GET /test HTTP/1.0" + CRLF +
-                "Cookie: " + COOKIE_WITH_EQUALS + CRLF + CRLF;
+                "Cookie: " + COOKIE_WITH_SEPS + CRLF + CRLF;
             setRequest(request);
             processRequest(true); // blocks until response has been read
             String response = getResponseBody();
@@ -65,7 +68,7 @@ public class TestCookiesDisallowEquals extends TomcatBaseTest{
             disconnect();
             reset();
             tomcat.stop();
-            assertEquals(COOKIE_TRUNCATED, response);
+            assertEquals(COOKIE_WITH_SEPS, response);
         }
         
         @Override
