@@ -385,6 +385,9 @@ Disable:
   !insertmacro MUI_INSTALLOPTIONS_READ $0 "config.ini" "Field 7" "HWND"
   !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 7" "Flags" "DISABLED"
   EnableWindow $0 0
+  ; Clear the values
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 5" "State" ""
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 7" "State" ""
 
 Display:
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "config.ini"
