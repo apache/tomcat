@@ -234,7 +234,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 	return strValue;
     }
 
-    /** Unimplemented yet. Do a char->byte conversion.
+    /** Do a char->byte conversion.
      */
     public void toBytes() {
         if( ! byteC.isNull() ) {
