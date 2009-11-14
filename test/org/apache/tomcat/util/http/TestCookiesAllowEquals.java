@@ -68,7 +68,7 @@ public class TestCookiesAllowEquals extends TomcatBaseTest{
             disconnect();
             reset();
             tomcat.stop();
-            assertTrue(response.contains(COOKIE_WITH_EQUALS));
+            assertEquals(COOKIE_WITH_EQUALS, response);
         }
         
         @Override

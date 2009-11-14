@@ -59,9 +59,7 @@ public class TestCookiesDefaultSysProps extends CookiesBaseTest {
         getUrl("http://localhost:" + getPort() + "/switch", res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
         for (String cookieHeader : cookieHeaders) {
-            if (cookieHeader.contains("name=")) {
-                assertTrue(cookieHeader.contains("name=\"val?ue\";"));
-            }
+            assertEquals("name=\"val?ue\"; Version=1", cookieHeader);
         }
 
     }
