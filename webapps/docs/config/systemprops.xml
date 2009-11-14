@@ -248,8 +248,8 @@
       </ul>
       </p>
       <p>Note that changing a number of the above defaults is likely to break
-      the majority of systems as a number of browsers are unable to correctly
-      handle the cookie headers that result from a strict adherence to the
+      the majority of systems as some browsers are unable to correctly handle
+      the cookie headers that result from a strict adherence to the
       specifications. Defaults, regardless of whether or not they have been
       changed by setting
       <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> can always be
@@ -277,6 +277,13 @@
     </property>
 
     <property
+    name="org.apache.tomcat.util.http. ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0">
+      <p>If this is <code>true</code> Tomcat will allow HTTP separators in
+      cookie names and values. If not specified, the default specification
+      compliant value of <code>false</code> will be used.</p>
+    </property>
+
+    <property
     name="org.apache.tomcat.util.http. ServerCookie.ALWAYS_ADD_EXPIRES">
       <p>If this is <code>true</code> Tomcat will always add an expires
       parameter to a SetCookie header even for cookies with version greater than
@@ -294,7 +301,8 @@
       be treated as a separator. Note that this character is frequently used in
       cookie path attributes and some browsers will fail to process a cookie if
       the path attribute is quoted as is required by a strict adherence to the
-      specifications. If not specified, the default value will be used. If
+      specifications. This is highly likely to break session tracking using
+      cookies. If not specified, the default value will be used. If
       <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
