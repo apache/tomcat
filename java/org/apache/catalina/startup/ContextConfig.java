@@ -188,9 +188,10 @@ public class ContextConfig
     private static HashSet<String> noFragmentJars;
     
     /*
-     * Initializes the set of JARs that are known not to contain any TLDs
+     * Initializes the set of JARs that are known not to contain any web-fragments
      */
     static {
+        // TODO - set this list via configuration (also TLDs in Jasper) 
         noFragmentJars = new HashSet<String>();
         // Bootstrap JARs
         noFragmentJars.add("bootstrap.jar");
