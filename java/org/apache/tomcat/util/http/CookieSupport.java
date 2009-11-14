@@ -65,16 +65,16 @@ public final class CookieSupport {
      * spec, these are comma, semi-colon and white-space. The HTTP spec
      * definition of linear white space is [CRLF] 1*( SP | HT )
      */
-    public static final char[] V0_SEPARATORS = {',', ';', ' ', '\t'};
-    public static final boolean[] V0_SEPARATOR_FLAGS = new boolean[128];
+    private static final char[] V0_SEPARATORS = {',', ';', ' ', '\t'};
+    private static final boolean[] V0_SEPARATOR_FLAGS = new boolean[128];
     
     /**
      * The list of separators that apply to version 1 cookies. This may or may
      * not include '/' depending on the setting of
      * {@link #FWD_SLASH_IS_SEPARATOR}.
      */
-    public static final char[] HTTP_SEPARATORS;
-    public static final boolean[] HTTP_SEPARATOR_FLAGS = new boolean[128];
+    private static final char[] HTTP_SEPARATORS;
+    private static final boolean[] HTTP_SEPARATOR_FLAGS = new boolean[128];
     
     static {
         STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
@@ -204,20 +204,6 @@ public final class CookieSupport {
 
             if (isHttpSeparator(c))
                 return true;
-        }
-        return false;
-    }
-
-    public static boolean containsCTL(String value) {
-        if (value==null) return false;
-        int len = value.length();
-        for (int i = 0; i < len; i++) {
-            char c = value.charAt(i);
-            if (c < 0x20 || c >= 0x7f) {
-                if (c == 0x09)
-                    continue; //allow horizontal tabs
-                return true;
-            }
         }
         return false;
     }
