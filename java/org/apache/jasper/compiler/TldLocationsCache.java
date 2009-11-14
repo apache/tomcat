@@ -119,6 +119,7 @@ public class TldLocationsCache {
      * Initializes the set of JARs that are known not to contain any TLDs
      */
     static {
+        // TODO - set this list via configuration (also web-fragments) 
         noTldJars = new HashSet<String>();
         // Bootstrap JARs
         noTldJars.add("bootstrap.jar");
