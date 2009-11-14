@@ -51,9 +51,9 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
         res = getUrl("http://localhost:" + getPort() + "/blank");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidFwd");
-        assertEquals("Cookie name fail", res.toString());
+        assertEquals("Cookie name ok", res.toString()); // Will auto-switch
         res = getUrl("http://localhost:" + getPort() + "/invalidStrict");
-        assertEquals("Cookie name fail", res.toString());
+        assertEquals("Cookie name ok", res.toString()); // Will auto-switch
         res = getUrl("http://localhost:" + getPort() + "/valid");
         assertEquals("Cookie name ok", res.toString());
         
@@ -62,9 +62,7 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
         getUrl("http://localhost:" + getPort() + "/switch", res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
         for (String cookieHeader : cookieHeaders) {
-            if (cookieHeader.contains("name=")) {
-                assertTrue(cookieHeader.contains("name=val?ue"));
-            }
+            assertEquals("name=\"val?ue\"; Version=1", cookieHeader);
         }
         
     }
