@@ -588,6 +588,11 @@ public class Catalina extends Embedded {
             load();
         }
 
+        if (server == null) {
+            log.fatal("Cannot start server. Server instance is not configured.");
+            return;
+        }
+
         long t1 = System.nanoTime();
         
         // Start the new server
