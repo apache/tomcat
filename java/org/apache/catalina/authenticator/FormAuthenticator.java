@@ -223,7 +223,6 @@ public class FormAuthenticator
         uriCC.setLimit(-1);
         String contextPath = request.getContextPath();
         String requestURI = request.getDecodedRequestURI();
-        response.setContext(request.getContext());
 
         // Is this the action request from the login page?
         boolean loginAction =
@@ -384,8 +383,7 @@ public class FormAuthenticator
      * @param request The request to be restored
      * @param session The session containing the saved information
      */
-    protected boolean restoreRequest(Request request, Session session)
-        throws IOException {
+    protected boolean restoreRequest(Request request, Session session) {
 
         // Retrieve and remove the SavedRequest object from our session
         SavedRequest saved = (SavedRequest)
