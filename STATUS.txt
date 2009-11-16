@@ -39,5 +39,5 @@ PATCHES PROPOSED TO BACKPORT:
   Backport from trunk
   https://svn.apache.org/viewvc?view=revision&revision=835322
   https://svn.apache.org/viewvc?view=revision&revision=835335
-  +1: mturk
+  +1: mturk, jfclere
   -1:
