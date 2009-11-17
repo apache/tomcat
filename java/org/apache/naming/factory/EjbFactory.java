@@ -55,7 +55,7 @@ public class EjbFactory
 
 
     /**
-     * Crete a new EJB instance.
+     * Create a new EJB instance.
      * 
      * @param obj The reference object describing the DataSource
      */

@@ -339,7 +339,7 @@ public class ResourceCache {
 
 
     /**
-     * Find a map elemnt given its name in a sorted array of map elements.
+     * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */

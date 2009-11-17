@@ -54,7 +54,7 @@ public class ResourceEnvFactory
 
 
     /**
-     * Crete a new Resource env instance.
+     * Create a new Resource env instance.
      * 
      * @param obj The reference object describing the DataSource
      */
