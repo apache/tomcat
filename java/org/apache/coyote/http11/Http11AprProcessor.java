@@ -69,7 +69,7 @@ public class Http11AprProcessor implements ActionHook {
     /**
      * Logger.
      */
-    protected static org.apache.juli.logging.Log log
+    protected static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11AprProcessor.class);
 
     /**

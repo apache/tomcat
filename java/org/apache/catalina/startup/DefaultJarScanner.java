@@ -52,7 +52,7 @@ public class DefaultJarScanner implements JarScanner {
     private static final String JAR_EXT = ".jar";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
 
     /**

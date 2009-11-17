@@ -28,7 +28,7 @@ import org.apache.catalina.startup.CatalinaProperties;
 public final class SecurityConfig{
     private static SecurityConfig singleton = null;
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityConfig.class );
 
     

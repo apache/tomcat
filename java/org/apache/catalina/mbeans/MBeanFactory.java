@@ -63,7 +63,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 public class MBeanFactory extends BaseModelMBean {
 
-    private static org.apache.juli.logging.Log log = 
+    private static final org.apache.juli.logging.Log log = 
         org.apache.juli.logging.LogFactory.getLog(MBeanFactory.class);
 
     /**

@@ -69,7 +69,7 @@ public final class SecurityUtil{
     private static HashMap<Object,Method[]> objectCache =
         new HashMap<Object,Method[]>();
         
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityUtil.class );
     
     private static String PACKAGE = "org.apache.catalina.security";
