@@ -54,7 +54,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import org.apache.catalina.Authenticator;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
@@ -2322,8 +2321,13 @@ public class Request
                     sm.getString("coyoteRequest.authenticate.ise"));
         }
 
-        // TODO SERVLET3
-        return false;
+        LoginConfig config = context.getLoginConfig();
+        
+        if (config == null) {
+            throw new ServletException(
+                    sm.getString("coyoteRequest.noLoginConfig"));
+        }
+        return context.getAuthenticator().authenticate(this, response, config);
     }
     
     /**
@@ -2341,12 +2345,13 @@ public class Request
                     sm.getString("coyoteRequest.alreadyAuthenticated"));
         }
         
-        if (context.getLoginConfig() == null) {
+        LoginConfig config = context.getLoginConfig();
+        if (config == null) {
             throw new ServletException(
                     sm.getString("coyoteRequest.noLoginConfig"));
         }
         
-        String authMethod = context.getLoginConfig().getAuthMethod();
+        String authMethod = config.getAuthMethod();
         if (BASIC_AUTH.equals(authMethod) || FORM_AUTH.equals(authMethod) ||
                 DIGEST_AUTH.equals(authMethod)) {
             // Methods support user name and password authentication
