@@ -270,40 +270,6 @@ public class MultipartStream {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Creates a new instance.
-     * @deprecated Use {@link #MultipartStream(InputStream, byte[],
-     * org.apache.commons.fileupload.MultipartStream.ProgressNotifier)},
-     * or {@link #MultipartStream(InputStream, byte[], int,
-     * org.apache.commons.fileupload.MultipartStream.ProgressNotifier)}
-     */
-    public MultipartStream() {
-        this(null, null, null);
-    }
-
-    /**
-     * <p> Constructs a <code>MultipartStream</code> with a custom size buffer
-     * and no progress notifier.
-     *
-     * <p> Note that the buffer must be at least big enough to contain the
-     * boundary string, plus 4 characters for CR/LF and double dash, plus at
-     * least one byte of data.  Too small a buffer size setting will degrade
-     * performance.
-     *
-     * @param input    The <code>InputStream</code> to serve as a data source.
-     * @param boundary The token used for dividing the stream into
-     *                 <code>encapsulations</code>.
-     * @param bufSize  The size of the buffer to be used, in bytes.
-     *
-     * @see #MultipartStream(InputStream, byte[],
-     *   MultipartStream.ProgressNotifier)
-     * @deprecated Use {@link #MultipartStream(InputStream, byte[], int,
-     *  org.apache.commons.fileupload.MultipartStream.ProgressNotifier)}.
-     */
-    public MultipartStream(InputStream input, byte[] boundary, int bufSize) {
-        this(input, boundary, bufSize, null);
-    }
-
-    /**
      * <p> Constructs a <code>MultipartStream</code> with a custom size buffer.
      *
      * <p> Note that the buffer must be at least big enough to contain the
@@ -361,23 +327,6 @@ public class MultipartStream {
             byte[] boundary,
             ProgressNotifier pNotifier) {
         this(input, boundary, DEFAULT_BUFSIZE, pNotifier);
-    }
-
-    /**
-     * <p> Constructs a <code>MultipartStream</code> with a default size buffer.
-     *
-     * @param input    The <code>InputStream</code> to serve as a data source.
-     * @param boundary The token used for dividing the stream into
-     *                 <code>encapsulations</code>.
-     *
-     * @deprecated Use {@link #MultipartStream(InputStream, byte[],
-     *  MultipartStream.ProgressNotifier)}.
-     * @see #MultipartStream(InputStream, byte[], int,
-     *  MultipartStream.ProgressNotifier)
-     */
-    public MultipartStream(InputStream input,
-            byte[] boundary) {
-        this(input, boundary, DEFAULT_BUFSIZE, null);
     }
 
     // --------------------------------------------------------- Public methods
