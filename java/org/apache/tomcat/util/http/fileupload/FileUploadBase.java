@@ -290,11 +290,11 @@ public abstract class FileUploadBase {
      * @throws FileUploadException if there are problems reading/parsing
      *                             the request or storing files.
      */
-    public List /* FileItem */ parseRequest(RequestContext ctx)
+    public List<FileItem> parseRequest(RequestContext ctx)
             throws FileUploadException {
         try {
             FileItemIterator iter = getItemIterator(ctx);
-            List items = new ArrayList();
+            List<FileItem> items = new ArrayList<FileItem>();
             FileItemFactory fac = getFileItemFactory();
             if (fac == null) {
                 throw new NullPointerException(
@@ -345,8 +345,9 @@ public abstract class FileUploadBase {
         ParameterParser parser = new ParameterParser();
         parser.setLowerCaseNames(true);
         // Parameter parser can handle null input
-        Map params = parser.parse(contentType, new char[] {';', ','});
-        String boundaryStr = (String) params.get("boundary");
+        Map<String,String> params =
+            parser.parse(contentType, new char[] {';', ','});
+        String boundaryStr = params.get("boundary");
 
         if (boundaryStr == null) {
             return null;
@@ -386,9 +387,10 @@ public abstract class FileUploadBase {
                 ParameterParser parser = new ParameterParser();
                 parser.setLowerCaseNames(true);
                 // Parameter parser can handle null input
-                Map params = parser.parse(pContentDisposition, ';');
+                Map<String,String> params =
+                    parser.parse(pContentDisposition, ';');
                 if (params.containsKey("filename")) {
-                    fileName = (String) params.get("filename");
+                    fileName = params.get("filename");
                     if (fileName != null) {
                         fileName = fileName.trim();
                     } else {
@@ -429,8 +431,9 @@ public abstract class FileUploadBase {
             ParameterParser parser = new ParameterParser();
             parser.setLowerCaseNames(true);
             // Parameter parser can handle null input
-            Map params = parser.parse(pContentDisposition, ';');
-            fieldName = (String) params.get("name");
+            Map<String,String> params =
+                parser.parse(pContentDisposition, ';');
+            fieldName = params.get("name");
             if (fieldName != null) {
                 fieldName = fieldName.trim();
             }
@@ -1013,6 +1016,9 @@ public abstract class FileUploadBase {
      * is exceeded.
      */
     protected abstract static class SizeException extends FileUploadException {
+
+        private static final long serialVersionUID = 1L;
+
         /**
          * The actual size of the request.
          */

@@ -38,33 +38,34 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      * Map of <code>String</code> keys to a <code>List</code> of
      * <code>String</code> instances.
      */
-    private final Map headerNameToValueListMap = new HashMap();
+    private final Map<String,List<String>> headerNameToValueListMap =
+        new HashMap<String,List<String>>();
 
     /**
      * List to preserve order of headers as added.  This would not be
      * needed if a <code>LinkedHashMap</code> could be used, but don't
      * want to depend on 1.4.
      */
-    private final List headerNameList = new ArrayList();
+    private final List<String> headerNameList = new ArrayList<String>();
 
     public String getHeader(String name) {
         String nameLower = name.toLowerCase();
-        List headerValueList = (List) headerNameToValueListMap.get(nameLower);
+        List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
             return null;
         }
-        return (String) headerValueList.get(0);
+        return headerValueList.get(0);
     }
 
-    public Iterator getHeaderNames() {
+    public Iterator<String> getHeaderNames() {
         return headerNameList.iterator();
     }
 
-    public Iterator getHeaders(String name) {
+    public Iterator<String> getHeaders(String name) {
         String nameLower = name.toLowerCase();
-        List headerValueList = (List) headerNameToValueListMap.get(nameLower);
+        List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
-            return Collections.EMPTY_LIST.iterator();
+            return Collections.<String>emptyList().iterator();
         }
         return headerValueList.iterator();
     }
@@ -77,9 +78,9 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      */
     public synchronized void addHeader(String name, String value) {
         String nameLower = name.toLowerCase();
-        List headerValueList = (List) headerNameToValueListMap.get(nameLower);
+        List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
-            headerValueList = new ArrayList();
+            headerValueList = new ArrayList<String>();
             headerNameToValueListMap.put(nameLower, headerValueList);
             headerNameList.add(nameLower);
         }
