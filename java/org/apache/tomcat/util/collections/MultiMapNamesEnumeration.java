@@ -20,10 +20,10 @@ package org.apache.tomcat.util.collections;
 import java.util.Enumeration;
 
 /** Enumerate the distinct header names.
-    Each nextElement() is O(n) ( a comparation is
+    Each nextElement() is O(n) ( a comparison is
     done with all previous elements ).
 
-    This is less frequesnt than add() -
+    This is less frequent than add() -
     we want to keep add O(1).
 */
 public final class MultiMapNamesEnumeration implements Enumeration<String> {
@@ -33,7 +33,7 @@ public final class MultiMapNamesEnumeration implements Enumeration<String> {
     MultiMap headers;
 
     // toString and unique options are not implemented -
-    // we allways to toString and unique.
+    // we always to toString and unique.
     
     /** Create a new multi-map enumeration.
      * @param  headers the collection to enumerate 

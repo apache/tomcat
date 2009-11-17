@@ -62,13 +62,13 @@ public final class SSLContext {
     public static native void setContextId(long ctx, String id);
 
     /**
-     * Asssociate BIOCallback for input or output data capture.
+     * Associate BIOCallback for input or output data capture.
      * <br />
      * First word in the output string will contain error
      * level in the form:
      * <PRE>
      * [ERROR]  -- Critical error messages
-     * [WARN]   -- Varning messages
+     * [WARN]   -- Warning messages
      * [INFO]   -- Informational messages
      * [DEBUG]  -- Debugging messaged
      * </PRE>
@@ -119,7 +119,7 @@ public final class SSLContext {
      * directive can be used both in per-server and per-directory context.
      * In per-server context it applies to the standard SSL handshake when a
      * connection is established. In per-directory context it forces a SSL
-     * renegotation with the reconfigured Cipher Suite after the HTTP request
+     * renegotiation with the reconfigured Cipher Suite after the HTTP request
      * was read but before the HTTP response is sent.
      * @param ctx Server or Client context to use.
      * @param ciphers An SSL cipher specification.
@@ -192,7 +192,7 @@ public final class SSLContext {
      * @param cert Certificate file.
      * @param key Private Key file to use if not in cert.
      * @param password Certificate password. If null and certificate
-     *                 is encrypted, password prompt will be dispayed.
+     *                 is encrypted, password prompt will be displayed.
      * @param idx Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
      */
     public static native boolean setCertificate(long ctx, String cert,
@@ -254,7 +254,7 @@ public final class SSLContext {
      * Authentication. Notice that this directive can be used both in per-server
      * and per-directory context. In per-server context it applies to the client
      * authentication process used in the standard SSL handshake when a connection
-     * is established. In per-directory context it forces a SSL renegotation with
+     * is established. In per-directory context it forces a SSL renegotiation with
      * the reconfigured client verification level after the HTTP request was read
      * but before the HTTP response is sent.
      * <br />

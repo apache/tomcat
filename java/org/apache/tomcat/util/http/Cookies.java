@@ -102,7 +102,7 @@ public final class Cookies { // extends MultiMap {
 
     // -------------------- Adding cookies --------------------
 
-    /** Register a new, unitialized cookie. Cookies are recycled, and
+    /** Register a new, initialized cookie. Cookies are recycled, and
      *  most of the time an existing ServerCookie object is returned.
      *  The caller can set the name/value and attributes for the cookie
      */
@@ -300,7 +300,7 @@ public final class Cookies { // extends MultiMap {
                     isQuoted = true;
                     valueStart=pos + 1; // strip "
                     // getQuotedValue returns the position before 
-                    // at the last qoute. This must be dealt with
+                    // at the last quote. This must be dealt with
                     // when the bytes are copied into the cookie
                     valueEnd=getQuotedValueEndPosition(bytes, 
                                                        valueStart, end);
@@ -327,7 +327,7 @@ public final class Cookies { // extends MultiMap {
                             bytes[pos] == '=' && CookieSupport.ALLOW_EQUALS_IN_VALUE) {
                         // Token
                         valueStart=pos;
-                        // getToken returns the position at the delimeter
+                        // getToken returns the position at the delimiter
                         // or other non-token character
                         valueEnd=getTokenEndPosition(bytes, valueStart, end,
                                 version, false);
@@ -468,7 +468,7 @@ public final class Cookies { // extends MultiMap {
     }
 
     /** 
-     * Given a starting position after an initial quote chracter, this gets
+     * Given a starting position after an initial quote character, this gets
      * the position of the end quote. This escapes anything after a '\' char
      * JVK RFC 2616
      */

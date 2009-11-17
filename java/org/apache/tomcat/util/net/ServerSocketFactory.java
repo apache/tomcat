@@ -69,7 +69,7 @@ public abstract class ServerSocketFactory implements Cloneable {
     /** General mechanism to pass attributes from the
      *  ServerConnector to the socket factory.
      *
-     *  Note that the "prefered" mechanism is to
+     *  Note that the "preferred" mechanism is to
      *  use bean setters and explicit methods, but
      *  this allows easy configuration via server.xml
      *  or simple Properties

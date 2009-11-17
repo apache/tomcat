@@ -539,7 +539,7 @@ public class JSSESocketFactory
     }
 
     /**
-     * Gets the intialized trust managers.
+     * Gets the initialized trust managers.
      */
     protected TrustManager[] getTrustManagers(String keystoreType,
             String keystoreProvider, String algorithm)

@@ -151,9 +151,9 @@ public class CallMethodRule extends Rule {
      *
      * @param methodName Method name of the parent method to call
      * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of ths element
+     *  zero for a single argument from the body of this element
      * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      */
@@ -177,9 +177,9 @@ public class CallMethodRule extends Rule {
      * object on the stack.
      * @param methodName Method name of the parent method to call
      * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of ths element
+     *  zero for a single argument from the body of this element
      * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      */
@@ -217,10 +217,10 @@ public class CallMethodRule extends Rule {
      *
      * @param methodName Method name of the parent method to call
      * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of ths element
+     *  zero for a single argument from the body of this element
      * @param paramTypes The Java classes that represent the
      *  parameter types of the method arguments
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean.TYPE</code>
      *  for a <code>boolean</code> parameter)
      */
@@ -244,10 +244,10 @@ public class CallMethodRule extends Rule {
      * object on the stack.
      * @param methodName Method name of the parent method to call
      * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of ths element
+     *  zero for a single argument from the body of this element
      * @param paramTypes The Java classes that represent the
      *  parameter types of the method arguments
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean.TYPE</code>
      *  for a <code>boolean</code> parameter)
      */
