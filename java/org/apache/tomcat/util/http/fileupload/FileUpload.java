@@ -88,6 +88,7 @@ public class FileUpload
      *
      * @return The factory class for new file items.
      */
+    @Override
     public FileItemFactory getFileItemFactory() {
         return fileItemFactory;
     }
@@ -98,6 +99,7 @@ public class FileUpload
      *
      * @param factory The factory class for new file items.
      */
+    @Override
     public void setFileItemFactory(FileItemFactory factory) {
         this.fileItemFactory = factory;
     }

@@ -71,6 +71,7 @@ public class FileUploadException extends Exception {
      *
      * @param stream <code>PrintStream</code> to use for output
      */
+    @Override
     public void printStackTrace(PrintStream stream) {
         super.printStackTrace(stream);
         if (cause != null) {
@@ -85,6 +86,7 @@ public class FileUploadException extends Exception {
      *
      * @param writer <code>PrintWriter</code> to use for output
      */
+    @Override
     public void printStackTrace(PrintWriter writer) {
         super.printStackTrace(writer);
         if (cause != null) {
@@ -93,6 +95,7 @@ public class FileUploadException extends Exception {
         }
     }
 
+    @Override
     public Throwable getCause() {
         return cause;
     }

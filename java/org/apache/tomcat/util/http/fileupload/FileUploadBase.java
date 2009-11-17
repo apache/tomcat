@@ -593,6 +593,7 @@ public abstract class FileUploadBase {
                         throw new FileUploadIOException(e);
                     }
                     istream = new LimitedInputStream(istream, fileSizeMax) {
+                        @Override
                         protected void raiseError(long pSizeMax, long pCount)
                                 throws IOException {
                             itemStream.close(true);
@@ -750,6 +751,7 @@ public abstract class FileUploadBase {
                 int requestSize = ctx.getContentLength();
                 if (requestSize == -1) {
                     input = new LimitedInputStream(input, sizeMax) {
+                        @Override
                         protected void raiseError(long pSizeMax, long pCount)
                                 throws IOException {
                             FileUploadException ex =
@@ -940,6 +942,7 @@ public abstract class FileUploadBase {
          * Returns the exceptions cause.
          * @return The exceptions cause, if any, or null.
          */
+        @Override
         public Throwable getCause() {
             return cause;
         }
@@ -1000,6 +1003,7 @@ public abstract class FileUploadBase {
          * Returns the exceptions cause.
          * @return The exceptions cause, if any, or null.
          */
+        @Override
         public Throwable getCause() {
             return cause;
         }
