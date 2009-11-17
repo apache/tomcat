@@ -23,7 +23,7 @@ import org.apache.jasper.JasperException;
 
 /**
  * This class generates functions mappers for the EL expressions in the page.
- * Instead of a global mapper, a mapper is used for ecah call to EL
+ * Instead of a global mapper, a mapper is used for each call to EL
  * evaluator, thus avoiding the prefix overlapping and redefinition
  * issues.
  *

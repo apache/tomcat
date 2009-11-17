@@ -44,8 +44,8 @@ import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.xml.sax.Attributes;
 
 /**
- * An internal data representation of a JSP page or a JSP docuement (XML). Also
- * included here is a visitor class for tranversing nodes.
+ * An internal data representation of a JSP page or a JSP document (XML). Also
+ * included here is a visitor class for traversing nodes.
  * 
  * @author Kin-man Chung
  * @author Jan Luehe
@@ -445,7 +445,7 @@ abstract class Node implements TagConstants {
 
         /*
          * Indicates whether an encoding has been explicitly specified in the
-         * page's bom.
+         * page's dom.
          */
         private boolean isBomPresent;
 
@@ -1889,7 +1889,7 @@ abstract class Node implements TagConstants {
             childInfo = new ChildInfo();
             name = this.getAttributeValue("name");
             if (name != null) {
-                // Mandatary attribute "name" will be checked in Validator
+                // Mandatory attribute "name" will be checked in Validator
                 localName = name;
                 int index = name.indexOf(':');
                 if (index != -1) {
@@ -2062,7 +2062,7 @@ abstract class Node implements TagConstants {
          * Add a source to Java line mapping
          * 
          * @param srcLine
-         *            The postion of the source line, relative to the line at
+         *            The position of the source line, relative to the line at
          *            the start of this node. The corresponding java line is
          *            assumed to be consecutive, i.e. one more than the last.
          */
@@ -2079,7 +2079,7 @@ abstract class Node implements TagConstants {
     }
 
     /***************************************************************************
-     * Auxillary classes used in Node
+     * Auxiliary classes used in Node
      */
 
     /**

@@ -47,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
  * &060;%@include file="..."%&062; directive is used.
  *
  * A background thread periodically checks the files a JSP page
- * is dependent upon.  If a dpendent file changes the JSP page
+ * is dependent upon.  If a dependent file changes the JSP page
  * which included it is recompiled.
  *
  * Only used if a web application context is a directory.
@@ -207,7 +207,7 @@ public final class JspRuntimeContext {
 
     /**
      * Get the SecurityManager Policy CodeSource for this web
-     * applicaiton context.
+     * application context.
      *
      * @return CodeSource for JSP
      */
@@ -235,7 +235,7 @@ public final class JspRuntimeContext {
     }
 
     /**
-     * Process a "destory" event for this web application context.
+     * Process a "destroy" event for this web application context.
      */                                                        
     public void destroy() {
         Iterator<JspServletWrapper> servlets = jsps.values().iterator();

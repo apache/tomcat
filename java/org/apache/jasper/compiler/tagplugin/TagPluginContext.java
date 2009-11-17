@@ -19,7 +19,7 @@ package org.apache.jasper.compiler.tagplugin;
 
 
 /**
- * This interface allows the plugin author to make inqueries about the
+ * This interface allows the plugin author to make inquiries about the
  * properties of the current tag, and to use Jasper resources to generate
  * direct Java codes in place of tag handler invocations.
  */
@@ -49,7 +49,7 @@ public interface TagPluginContext {
 
     /**
      * Generate a declaration in the of the generated class.  This can be
-     * used to declare an innter class, a method, or a class variable.
+     * used to declare an inner class, a method, or a class variable.
      * @param id An unique ID identifying the declaration.  It is not
      *           part of the declaration, and is used to ensure that the
      *           declaration will only appear once.  If this method is
@@ -78,7 +78,7 @@ public interface TagPluginContext {
     String getConstantAttribute(String attribute);
 
     /**
-     * Generate codesto evaluate value of a attribute in the custom tag
+     * Generate codes to evaluate value of a attribute in the custom tag
      * The codes is a Java expression.
      * NOTE: Currently cannot handle attributes that are fragments.
      * @param attribute The specified attribute
@@ -94,7 +94,7 @@ public interface TagPluginContext {
      * Abandon optimization for this tag handler, and instruct
      * Jasper to generate the tag handler calls, as usual.
      * Should be invoked if errors are detected, or when the tag body
-     * is deemed too compilicated for optimization.
+     * is deemed too complicated for optimization.
      */
     void dontUseTagPlugin();
 

@@ -463,7 +463,7 @@ class TagFileProcessor {
         }
 
         /**
-         * Perform miscellean checks after the nodes are visited.
+         * Perform miscellaneous checks after the nodes are visited.
          */
         void postCheck() throws JasperException {
             // Check that var.name-from-attributes has valid values.
@@ -505,7 +505,7 @@ class TagFileProcessor {
      * @param path
      *            the path for the tagfile
      * @param tagFileJarUrl
-     *            the url for the Jar containign the tag file 
+     *            the url for the Jar containing the tag file 
      * @param tagLibInfo
      *            the TagLibraryInfo object associated with this TagInfo
      * @return a TagInfo object assembled from the directives in the tag file.
@@ -586,7 +586,7 @@ class TagFileProcessor {
             try {
                 if (tripCount > 0) {
                     // When tripCount is greater than zero, a circular
-                    // dependency exists. The circularily dependant tag
+                    // dependency exists. The circularly dependent tag
                     // file is compiled in prototype mode, to avoid infinite
                     // recursion.
 
@@ -604,8 +604,8 @@ class TagFileProcessor {
                 wrapper.decTripCount();
             }
 
-            // Add the dependants for this tag file to its parent's
-            // dependant list. The only reliable dependency information
+            // Add the dependents for this tag file to its parent's
+            // Dependent list. The only reliable dependency information
             // can only be obtained from the tag instance.
             try {
                 Object tagIns = tagClazz.newInstance();
@@ -670,7 +670,7 @@ class TagFileProcessor {
     /**
      * Implements a phase of the translation that compiles (if necessary) the
      * tag files used in a JSP files. The directives in the tag files are
-     * assumed to have been proccessed and encapsulated as TagFileInfo in the
+     * assumed to have been processed and encapsulated as TagFileInfo in the
      * CustomTag nodes.
      */
     public void loadTagFiles(Compiler compiler, Node.Nodes page)

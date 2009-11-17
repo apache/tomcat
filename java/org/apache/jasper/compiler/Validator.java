@@ -43,7 +43,7 @@ import org.xml.sax.Attributes;
 /**
  * Performs validation on the page elements. Attributes are checked for
  * mandatory presence, entry value validity, and consistency. As a side effect,
- * some page global value (such as those from page direcitves) are stored, for
+ * some page global value (such as those from page directives) are stored, for
  * later use.
  * 
  * @author Kin-man Chung
@@ -805,7 +805,7 @@ class Validator {
             }
 
             /*
-             * The bodyconet of a SimpleTag cannot be JSP.
+             * The bodycontent of a SimpleTag cannot be JSP.
              */
             if (n.implementsSimpleTag()
                     && tagInfo.getBodyContent().equalsIgnoreCase(
@@ -1136,7 +1136,7 @@ class Validator {
                                     }
                                 }
                                 if (tldAttrs[j].isDeferredValue()) {
-                                    // The String litteral must be castable to what is declared as type
+                                    // The String literal must be castable to what is declared as type
                                     // for the attribute
                                     expectedType = tldAttrs[j].getExpectedTypeName();
                                 }

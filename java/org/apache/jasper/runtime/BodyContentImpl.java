@@ -503,7 +503,7 @@ public class BodyContentImpl extends BodyContent {
     
     /**
      * Clears the current contents of the buffer. Unlike clear(), this
-     * mehtod will not throw an IOException if the buffer has already been
+     * method will not throw an IOException if the buffer has already been
      * flushed. It merely clears the current content of the buffer and
      * returns.
      *

@@ -135,8 +135,8 @@ public interface Options {
      * The cache for the location of the TLD's
      * for the various tag libraries 'exposed'
      * by the web application.
-     * A tag library is 'exposed' either explicitely in 
-     * web.xml or implicitely via the uri tag in the TLD 
+     * A tag library is 'exposed' either explicitly in 
+     * web.xml or implicitly via the uri tag in the TLD 
      * of a taglib deployed in a jar file (WEB-INF/lib).
      *
      * @return the instance of the TldLocationsCache
@@ -156,7 +156,7 @@ public interface Options {
     public boolean getFork();
 
     /**
-     * Obtain JSP configuration informantion specified in web.xml.  
+     * Obtain JSP configuration information specified in web.xml.  
      */
     public JspConfig getJspConfig();
 

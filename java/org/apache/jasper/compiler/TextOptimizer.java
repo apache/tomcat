@@ -46,7 +46,7 @@ public class TextOptimizer {
         }
 
 	/*
-         * The following directis are ignored in text concatenation
+         * The following directives are ignored in text concatenation
          */
 
         @Override

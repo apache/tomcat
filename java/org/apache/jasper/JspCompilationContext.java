@@ -111,7 +111,7 @@ public class JspCompilationContext {
         if (baseURI == null) {
             baseURI = "/";
         } else if (baseURI.charAt(0) != '/') {
-            // strip the basde slash since it will be combined with the
+            // strip the base slash since it will be combined with the
             // uriBase to generate a file
             baseURI = "/" + baseURI;
         }
@@ -263,7 +263,7 @@ public class JspCompilationContext {
      */
     public String resolveRelativeUri(String uri) {
         // sometimes we get uri's massaged from File(String), so check for
-        // a root directory deperator char
+        // a root directory separator char
         if (uri.startsWith("/") || uri.startsWith(File.separator)) {
             return uri;
         } else {
@@ -424,7 +424,7 @@ public class JspCompilationContext {
     /**
      * Package name for the generated class is make up of the base package
      * name, which is user settable, and the derived package name.  The
-     * derived package name directly mirrors the file heirachy of the JSP page.
+     * derived package name directly mirrors the file hierarchy of the JSP page.
      */
     public String getServletPackageName() {
         if (isTagFile()) {
