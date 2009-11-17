@@ -99,7 +99,7 @@ public class AjpAprProtocol
 
 
     /**
-     * Adapter which will process the requests recieved by this endpoint.
+     * Adapter which will process the requests received by this endpoint.
      */
     private Adapter adapter;
     

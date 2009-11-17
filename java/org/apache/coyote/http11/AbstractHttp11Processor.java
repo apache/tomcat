@@ -94,7 +94,7 @@ public class AbstractHttp11Processor {
 
 
     /**
-     * Content delimitator for the request (if false, the connection will
+     * Content delimiter for the request (if false, the connection will
      * be closed at the end of the request).
      */
     protected boolean contentDelimitation = true;
@@ -179,7 +179,7 @@ public class AbstractHttp11Processor {
 
 
     /**
-     * Minimum contentsize to make compression.
+     * Minimum content size to make compression.
      */
     protected int compressionMinSize = 2048;
 
@@ -294,7 +294,7 @@ public class AbstractHttp11Processor {
     }
 
     /**
-     * Add a mime-type which will be compressable
+     * Add a mime-type which will be compressible
      * The mime-type String will be exactly matched
      * in the response mime-type header .
      *
@@ -307,7 +307,7 @@ public class AbstractHttp11Processor {
 
 
     /**
-     * Set compressable mime-type list (this method is best when used with
+     * Set compressible mime-type list (this method is best when used with
      * a large number of connectors, where it would be better to have all of
      * them referenced a single array).
      */
@@ -642,7 +642,7 @@ public class AbstractHttp11Processor {
             || (acceptEncodingMB.indexOf("gzip") == -1))
             return false;
 
-        // Check if content is not allready gzipped
+        // Check if content is not already gzipped
         MessageBytes contentEncodingMB =
             response.getMimeHeaders().getValue("Content-Encoding");
 
@@ -650,7 +650,7 @@ public class AbstractHttp11Processor {
             && (contentEncodingMB.indexOf("gzip") != -1))
             return false;
 
-        // If force mode, allways compress (test purposes only)
+        // If force mode, always compress (test purposes only)
         if (compressionLevel == 2)
            return true;
 
@@ -668,7 +668,7 @@ public class AbstractHttp11Processor {
             }
         }
 
-        // Check if suffisant len to trig the compression
+        // Check if sufficient length to trigger the compression
         long contentLength = response.getContentLengthLong();
         if ((contentLength == -1)
             || (contentLength > compressionMinSize)) {

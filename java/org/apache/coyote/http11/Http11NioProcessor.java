@@ -551,7 +551,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
         } else if (actionCode == ActionCode.ACTION_ACK) {
 
-            // Acknowlege request
+            // Acknowledge request
 
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
@@ -990,7 +990,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
         if (valueMB == null || valueMB.isNull()) {
             // HTTP/1.0
-            // Default is what the socket tells us. Overriden if a host is
+            // Default is what the socket tells us. Overridden if a host is
             // found/parsed
             request.setServerPort(endpoint.getPort());
             return;
