@@ -27,7 +27,7 @@ public class Time {
 
     /** number of microseconds per second */
     public static final long APR_USEC_PER_SEC  = 1000000L;
-    /** number of miliseconds per microsecond */
+    /** number of milliseconds per microsecond */
     public static final long APR_MSEC_PER_USEC = 1000L;
 
     /** @return apr_time_t as a second */
@@ -43,7 +43,7 @@ public class Time {
     }
 
     /**
-     * number of microseconds since 00:00:00 january 1, 1970 UTC
+     * number of microseconds since 00:00:00 January 1, 1970 UTC
      * @return the current time
      */
     public static native long now();

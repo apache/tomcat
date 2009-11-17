@@ -28,11 +28,11 @@ import java.nio.ByteBuffer;
 public class Shm {
 
     /**
-     * Create and make accessable a shared memory segment.
+     * Create and make accessible a shared memory segment.
      * <br />
      * A note about Anonymous vs. Named shared memory segments:<br />
-     *         Not all plaforms support anonymous shared memory segments, but in
-     *         some cases it is prefered over other types of shared memory
+     *         Not all platforms support anonymous shared memory segments, but in
+     *         some cases it is preferred over other types of shared memory
      *         implementations. Passing a NULL 'file' parameter to this function
      *         will cause the subsystem to use anonymous shared memory segments.
      *         If such a system is not available, APR_ENOTIMPL is returned.

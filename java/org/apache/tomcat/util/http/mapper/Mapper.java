@@ -983,7 +983,7 @@ public final class Mapper {
 
 
     /**
-     * Find a map elemnt given its name in a sorted array of map elements.
+     * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
@@ -993,7 +993,7 @@ public final class Mapper {
 
 
     /**
-     * Find a map elemnt given its name in a sorted array of map elements.
+     * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
@@ -1039,7 +1039,7 @@ public final class Mapper {
     }
 
     /**
-     * Find a map elemnt given its name in a sorted array of map elements.
+     * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
@@ -1049,7 +1049,7 @@ public final class Mapper {
 
 
     /**
-     * Find a map elemnt given its name in a sorted array of map elements.
+     * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */

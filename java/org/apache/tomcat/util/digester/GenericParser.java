@@ -57,7 +57,7 @@ public class GenericParser{
         "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
 
     /**
-     * Create a <code>SAXParser</code> configured to support XML Scheman and DTD
+     * Create a <code>SAXParser</code> configured to support XML Schema and DTD
      * @param properties parser specific properties/features
      * @return an XML Schema/DTD enabled <code>SAXParser</code>
      */

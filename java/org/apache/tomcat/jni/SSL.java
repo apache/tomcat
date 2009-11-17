@@ -221,7 +221,7 @@ public final class SSL {
      * lifetime of JVM. Library.init() has to be called before.
      * @param engine Support for external a Crypto Device ("engine"),
      *                usually
-     * a hardware accellerator card for crypto operations.
+     * a hardware accelerator card for crypto operations.
      * @return APR status code
      */
     public static native int initialize(String engine);
@@ -272,7 +272,7 @@ public final class SSL {
             throws Exception;
 
     /**
-     * Close BIO and derefrence callback object
+     * Close BIO and dereference callback object
      * @param bio BIO to close and destroy.
      * @return APR Status code
      */
@@ -317,7 +317,7 @@ public final class SSL {
      * SSL_TMP_KEY_DH_4096
      * </PRE>
      * @param idx temporary key index.
-     * @param file File contatining DH params.
+     * @param file File containing DH params.
      */
     public static native boolean loadDSATempKey(int idx, String file);
 

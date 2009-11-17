@@ -38,7 +38,7 @@ import java.io.UnsupportedEncodingException;
  *   multipart-body := preamble 1*encapsulation close-delimiter epilogue<br>
  *   encapsulation := delimiter body CRLF<br>
  *   delimiter := "--" boundary CRLF<br>
- *   close-delimiter := "--" boudary "--"<br>
+ *   close-delimiter := "--" boundary "--"<br>
  *   preamble := &lt;ignore&gt;<br>
  *   epilogue := &lt;ignore&gt;<br>
  *   body := header-part CRLF body-part<br>
@@ -249,7 +249,7 @@ public class MultipartStream {
 
 
     /**
-     * The index of last valid characer in the buffer + 1.
+     * The index of last valid character in the buffer + 1.
      * <br>
      * 0 <= tail <= bufSize
      */
@@ -296,7 +296,7 @@ public class MultipartStream {
         this.buffer = new byte[bufSize];
         this.notifier = pNotifier;
 
-        // We prepend CR/LF to the boundary to chop trailng CR/LF from
+        // We prepend CR/LF to the boundary to chop trailing CR/LF from
         // body-data tokens.
         this.boundary = new byte[boundary.length + BOUNDARY_PREFIX.length];
         this.boundaryLength = boundary.length + BOUNDARY_PREFIX.length;
@@ -584,7 +584,7 @@ public class MultipartStream {
             // Discard all data up to the delimiter.
             discardBodyData();
 
-            // Read boundary - if succeded, the stream contains an
+            // Read boundary - if succeeded, the stream contains an
             // encapsulation.
             return readBoundary();
         } catch (MalformedStreamException e) {

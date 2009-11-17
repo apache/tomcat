@@ -128,7 +128,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     public void setEncoding( String enc ) {
 	if( !byteC.isNull() ) {
-	    // if the encoding changes we need to reset the converion results
+	    // if the encoding changes we need to reset the conversion results
 	    charC.recycle();
 	    hasStrValue=false;
 	}
@@ -157,7 +157,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     public void resetStringValue() {
 	if( type != T_STR ) {
-	    // If this was cread as a byte[] or char[], we remove
+	    // If this was created as a byte[] or char[], we remove
 	    // the old string value
 	    hasStrValue=false;
 	    strValue=null;
@@ -335,7 +335,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
 	// mb is either CHARS or BYTES.
 	// this is either CHARS or BYTES
-	// Deal with the 4 cases ( in fact 3, one is simetric)
+	// Deal with the 4 cases ( in fact 3, one is symmetric)
 	
 	if( mb.type == T_CHARS && type==T_CHARS ) {
 	    return charC.equals( mb.charC );

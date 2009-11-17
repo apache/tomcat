@@ -63,7 +63,7 @@ import java.io.Serializable;
  */
 public final class ByteChunk implements Cloneable, Serializable {
 
-    /** Input interface, used when the buffer is emptiy
+    /** Input interface, used when the buffer is empty
      *
      * Same as java.nio.channel.ReadableByteChannel
      */
@@ -232,7 +232,7 @@ public final class ByteChunk implements Cloneable, Serializable {
 
     /** Maximum amount of data in this buffer.
      *
-     *  If -1 or not set, the buffer will grow undefinitely.
+     *  If -1 or not set, the buffer will grow indefinitely.
      *  Can be smaller than the current buffer size ( which will not shrink ).
      *  When the limit is reached, the buffer will be flushed ( if out is set )
      *  or throw exception.
@@ -417,7 +417,7 @@ public final class ByteChunk implements Cloneable, Serializable {
 
 
     /** Send the buffer to the sink. Called by append() when the limit is reached.
-     *  You can also call it explicitely to force the data to be written.
+     *  You can also call it explicitly to force the data to be written.
      *
      * @throws IOException
      */
@@ -498,7 +498,7 @@ public final class ByteChunk implements Cloneable, Serializable {
             strValue = new String( buff, start, end-start, enc );
             /*
              Does not improve the speed too much on most systems,
-             it's safer to use the "clasical" new String().
+             it's safer to use the "classical" new String().
              
              Most overhead is in creating char[] and copying,
              the internal implementation of new String() is very close to

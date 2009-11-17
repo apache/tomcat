@@ -52,7 +52,7 @@ public class RulesBase implements Rules {
     /**
      * The set of registered Rule instances, keyed by the matching pattern.
      * Each value is a List containing the Rules for that pattern, in the
-     * order that they were orginally registered.
+     * order that they were originally registered.
      */
     protected HashMap<String,List<Rule>> cache =
         new HashMap<String,List<Rule>>();

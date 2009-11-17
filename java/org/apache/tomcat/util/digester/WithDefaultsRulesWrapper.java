@@ -80,7 +80,7 @@ public class WithDefaultsRulesWrapper implements Rules {
         return wrappedRules.getDigester();
     }
     
-    /** Sets digeseter using these Rules */
+    /** Sets digester using these Rules */
     public void setDigester(Digester digester) {
         wrappedRules.setDigester(digester);
         Iterator<Rule> it = defaultRules.iterator();

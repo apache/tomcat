@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
 
 /** Efficient conversion of bytes  to character .
  *  
- *  This uses the standard JDK mechansim - a reader - but provides mechanisms
+ *  This uses the standard JDK mechanism - a reader - but provides mechanisms
  *  to recycle all the objects that are used. It is compatible with JDK1.1
  *  and up,
  *  ( nio is better, but it's not available even in 1.2 or 1.3 )
@@ -126,7 +126,7 @@ final class  ReadConvertor extends InputStreamReader {
         super( in, enc );
     }
     
-    /** Overriden - will do nothing but reset internal state.
+    /** Overridden - will do nothing but reset internal state.
      */
     @Override
     public  final void close() throws IOException {
@@ -157,7 +157,7 @@ final class  ReadConvertor extends InputStreamReader {
 }
 
 
-/** Special output stream where close() is overriden, so super.close()
+/** Special output stream where close() is overridden, so super.close()
     is never called.
     
     This allows recycling. It can also be disabled, so callbacks will

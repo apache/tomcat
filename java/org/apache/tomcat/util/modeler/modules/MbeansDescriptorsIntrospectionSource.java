@@ -197,7 +197,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param realClass The class to process
      * @param methods The methods to process
      * @param attMap The attribute map (complete)
-     * @param getAttMap The readable attributess map
+     * @param getAttMap The readable attributes map
      * @param setAttMap The settable attributes map
      * @param invokeAttMap The invokable attributes map
      */

@@ -100,7 +100,7 @@ public class SetPropertyRule extends Rule {
      * @param attributes The attribute list for this element
      * 
      * @exception NoSuchMethodException if the bean does not
-     *  have a writeable property of the specified name
+     *  have a writable property of the specified name
      */
     @Override
     public void begin(String namespace, String theName, Attributes attributes)

@@ -107,7 +107,7 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
     }
 
     /**
-     * Is this attribute writeable by management applications?
+     * Is this attribute writable by management applications?
      */
     public boolean isWriteable() {
         return (this.writeable);

@@ -19,7 +19,7 @@ package org.apache.tomcat.util.http;
 
 
 /**
- * Usefull methods for Content-Type processing
+ * Useful methods for Content-Type processing
  * 
  * @author James Duncan Davidson [duncan@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]

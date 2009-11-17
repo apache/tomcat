@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * Utilities to manipluate char chunks. While String is
+ * Utilities to manipulate char chunks. While String is
  * the easiest way to manipulate chars ( search, substrings, etc),
  * it is known to not be the most efficient solution - Strings are
- * designed as imutable and secure objects.
+ * designed as immutable and secure objects.
  * 
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
@@ -64,7 +64,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     private boolean isSet=false;  // XXX 
 
-    // -1: grow undefinitely
+    // -1: grow indefinitely
     // maximum amount to be cached
     private int limit=-1;
 
@@ -138,7 +138,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     /** Maximum amount of data in this buffer.
      *
-     *  If -1 or not set, the buffer will grow undefinitely.
+     *  If -1 or not set, the buffer will grow indefinitely.
      *  Can be smaller than the current buffer size ( which will not shrink ).
      *  When the limit is reached, the buffer will be flushed ( if out is set )
      *  or throw exception.
