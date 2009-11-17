@@ -294,15 +294,20 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Collection<Part> getParts() throws IOException, ServletException {
+    public Collection<Part> getParts() throws IllegalStateException,
+            IOException, ServletException {
         return this._getHttpServletRequest().getParts();
     }
 
     /**
+     * @throws ServletException 
+     * @throws IOException 
+     * @throws IllegalStateException 
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Part getPart(String name) {
+    public Part getPart(String name) throws IllegalStateException, IOException,
+            ServletException {
         return this._getHttpServletRequest().getPart(name);
     }
 
