@@ -25,12 +25,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
@@ -129,7 +129,7 @@ public class DigestAuthenticator
      */
     @Override
     public boolean authenticate(Request request,
-                                Response response,
+                                HttpServletResponse response,
                                 LoginConfig config)
         throws IOException {
 
@@ -400,8 +400,8 @@ public class DigestAuthenticator
      *              should be performed
      * @param nOnce nonce token
      */
-    protected void setAuthenticateHeader(Request request,
-                                         Response response,
+    protected void setAuthenticateHeader(HttpServletRequest request,
+                                         HttpServletResponse response,
                                          LoginConfig config,
                                          String nOnce) {
 
@@ -419,7 +419,7 @@ public class DigestAuthenticator
         String authenticateHeader = "Digest realm=\"" + realmName + "\", "
             +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
             + md5Encoder.encode(buffer) + "\"";
-        response.setHeader("WWW-Authenticate", authenticateHeader);
+        response.setHeader(AUTH_HEADER_NAME, authenticateHeader);
 
     }
 

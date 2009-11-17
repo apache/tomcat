@@ -123,7 +123,7 @@ public class FormAuthenticator
      */
     @Override
     public boolean authenticate(Request request,
-                                Response response,
+                                HttpServletResponse response,
                                 LoginConfig config)
         throws IOException {
 
@@ -305,17 +305,17 @@ public class FormAuthenticator
      * Called to forward to the login page
      * 
      * @param request Request we are processing
-     * @param response Response we are creating
+     * @param response Response we are populating
      * @param config    Login configuration describing how authentication
      *              should be performed
      */
-    protected void forwardToLoginPage(Request request, Response response, LoginConfig config) {
+    protected void forwardToLoginPage(Request request,
+            HttpServletResponse response, LoginConfig config) {
         RequestDispatcher disp =
             context.getServletContext().getRequestDispatcher
             (config.getLoginPage());
         try {
-            disp.forward(request.getRequest(), response.getResponse());
-            response.finishResponse();
+            disp.forward(request.getRequest(), response);
         } catch (Throwable t) {
             log.warn("Unexpected error forwarding to login page", t);
         }
@@ -326,16 +326,17 @@ public class FormAuthenticator
      * Called to forward to the error page
      * 
      * @param request Request we are processing
-     * @param response Response we are creating
+     * @param response Response we are populating
      * @param config    Login configuration describing how authentication
      *              should be performed
      */
-    protected void forwardToErrorPage(Request request, Response response, LoginConfig config) {
+    protected void forwardToErrorPage(Request request,
+            HttpServletResponse response, LoginConfig config) {
         RequestDispatcher disp =
             context.getServletContext().getRequestDispatcher
             (config.getErrorPage());
         try {
-            disp.forward(request.getRequest(), response.getResponse());
+            disp.forward(request.getRequest(), response);
         } catch (Throwable t) {
             log.warn("Unexpected error forwarding to error page", t);
         }
