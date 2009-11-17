@@ -46,7 +46,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *   containing all XML content underneath that element.</li>
  *   <li>alternatively, this rule can create nodes of type
  *   {@link org.w3c.dom.DocumentFragment DocumentFragment}, which will contain
- *   only the XML content under the element the rule was trigged on.</li>
+ *   only the XML content under the element the rule was triggered on.</li>
  * </ul>
  * The created node will be normalized, meaning it will not contain text nodes 
  * that only contain white space characters.

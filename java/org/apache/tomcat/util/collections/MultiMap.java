@@ -149,7 +149,7 @@ public class MultiMap {
         count--;
     }
 
-    /** Create a new, unitialized entry. 
+    /** Create a new, uninitialized entry. 
      */
     public int addField() {
         int len = fields.length;

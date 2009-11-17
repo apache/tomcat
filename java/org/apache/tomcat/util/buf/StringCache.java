@@ -220,7 +220,7 @@ public class StringCache {
                 // If training, everything is synced
                 synchronized (bcStats) {
                     // If the cache has been generated on a previous invocation
-                    // while waiting fot the lock, just return the toString value
+                    // while waiting for the lock, just return the toString value
                     // we just calculated
                     if (bcCache != null) {
                         return value;

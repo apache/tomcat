@@ -140,7 +140,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Use endfile for sending static files.
+     * Use sendfile for sending static files.
      */
     protected boolean useSendfile = Library.APR_HAS_SENDFILE;
     public void setUseSendfile(boolean useSendfile) { this.useSendfile = useSendfile; }
@@ -848,7 +848,7 @@ public class AprEndpoint extends AbstractEndpoint {
          */
         protected void destroy() {
             // Wait for polltime before doing anything, so that the poller threads
-            // exit, otherwise parallel descturction of sockets which are still
+            // exit, otherwise parallel destruction of sockets which are still
             // in the poller can cause problems
             try {
                 synchronized (this) {
@@ -1074,7 +1074,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
         /**
          * Create the sendfile poller. With some versions of APR, the maximum poller size will
-         * be 62 (reocmpiling APR is necessary to remove this limitation).
+         * be 62 (recompiling APR is necessary to remove this limitation).
          */
         protected void init() {
             pool = Pool.create(serverSockPool);
@@ -1098,7 +1098,7 @@ public class AprEndpoint extends AbstractEndpoint {
          */
         protected void destroy() {
             // Wait for polltime before doing anything, so that the poller threads
-            // exit, otherwise parallel descturction of sockets which are still
+            // exit, otherwise parallel destruction of sockets which are still
             // in the poller can cause problems
             try {
                 synchronized (this) {
@@ -1129,7 +1129,7 @@ public class AprEndpoint extends AbstractEndpoint {
          * will be handled asynchronously inside the kernel. As a result,
          * the poller will never be used.
          *
-         * @param data containing the reference to the data which should be snet
+         * @param data containing the reference to the data which should be sent
          * @return true if all the data has been sent right away, and false
          *              otherwise
          */
@@ -1258,7 +1258,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 // Close socket and clear pool
                                 remove(state);
                                 // Destroy file descriptor pool, which should close the file
-                                // Close the socket, as the reponse would be incomplete
+                                // Close the socket, as the response would be incomplete
                                 Socket.destroy(state.socket);
                                 continue;
                             }
@@ -1269,7 +1269,7 @@ public class AprEndpoint extends AbstractEndpoint {
                             if (nw < 0) {
                                 // Close socket and clear pool
                                 remove(state);
-                                // Close the socket, as the reponse would be incomplete
+                                // Close the socket, as the response would be incomplete
                                 // This will close the file too.
                                 Socket.destroy(state.socket);
                                 continue;

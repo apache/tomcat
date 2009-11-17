@@ -483,7 +483,7 @@ public class Socket {
      * @param t Value for the timeout in microseconds.
      * <PRE>
      * t > 0  -- read and write calls return APR_TIMEUP if specified time
-     *           elapsess with no data read or written
+     *           elapses with no data read or written
      * t == 0 -- read and write calls never block
      * t < 0  -- read and write calls block
      * </PRE>
@@ -537,8 +537,8 @@ public class Socket {
         throws Exception;
 
     /**
-     * Private method for geting the socket struct members
-     * @param socket The soocket to use
+     * Private method for getting the socket struct members
+     * @param socket The socket to use
      * @param what Struct member to obtain
      * <PRE>
      * SOCKET_GET_POOL  - The socket pool
@@ -546,7 +546,7 @@ public class Socket {
      * SOCKET_GET_APRS  - APR socket
      * SOCKET_GET_TYPE  - Socket type
      * </PRE>
-     * @return The stucture member address
+     * @return The structure member address
      */
     private static native long get(long socket, int what);
 

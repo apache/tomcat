@@ -22,7 +22,7 @@ import java.net.*;
 
 /**
  * Default server socket factory. Doesn't do much except give us
- * plain ol' server sockets.
+ * plain old server sockets.
  *
  * @author db@eng.sun.com
  * @author Harish Prabandham

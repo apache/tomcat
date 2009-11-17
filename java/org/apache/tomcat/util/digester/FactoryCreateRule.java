@@ -28,7 +28,7 @@ import org.xml.sax.Attributes;
  * complete, the object will be popped.</p>
  *
  * <p>This rule is intended in situations where the element's attributes are
- * needed before the object can be created.  A common senario is for the
+ * needed before the object can be created.  A common scenario is for the
  * ObjectCreationFactory implementation to use the attributes  as parameters
  * in a call to either a factory method or to a non-empty constructor.
  */

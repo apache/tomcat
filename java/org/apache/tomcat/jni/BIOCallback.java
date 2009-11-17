@@ -27,7 +27,7 @@ public interface BIOCallback {
 
     /**
      * Write data
-     * @param buf containg the bytes to write.
+     * @param buf containing the bytes to write.
      * @return Number of characters written.
      */
     public int write(byte [] buf);
@@ -49,7 +49,7 @@ public interface BIOCallback {
     /**
      * Read string up to the len or CLRLF
      * @param len Maximum number of characters to read
-     * @return String with up to len bytes readed
+     * @return String with up to len bytes read
      */
     public String gets(int len);
 
