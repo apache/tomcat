@@ -21,6 +21,8 @@ package org.apache.catalina;
 import java.io.IOException;
 import java.security.Principal;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
@@ -43,13 +45,13 @@ public interface Authenticator {
      * created a response challenge already.
      *
      * @param request Request we are processing
-     * @param response Response we are creating
+     * @param response Response we are populating
      * @param config    Login configuration describing how authentication
      *              should be performed
      *
      * @exception IOException if an input/output error occurs
      */
-    public boolean authenticate(Request request, Response response,
+    public boolean authenticate(Request request, HttpServletResponse response,
             LoginConfig config) throws IOException;
     
     /**
@@ -60,13 +62,13 @@ public interface Authenticator {
      * SSO sessions.
      *
      * @param request The servlet request we are processing
-     * @param response The servlet response we are generating
+     * @param response The servlet response we are populating
      * @param principal The authenticated Principal to be registered
      * @param authType The authentication type to be registered
      * @param username Username used to authenticate (if any)
      * @param password Password used to authenticate (if any)
      */
-    public void register(Request request, Response response,
+    public void register(Request request, HttpServletResponse response,
             Principal principal, String authType,
             String username, String password);
 }

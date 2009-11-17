@@ -30,6 +30,7 @@ import java.util.Random;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
@@ -101,6 +102,10 @@ public abstract class AuthenticatorBase
      */
     protected static final int SESSION_ID_BYTES = 16;
 
+    /**
+     * Authentication header
+     */
+    protected static final String AUTH_HEADER_NAME = "WWW-Authenticate";
 
     /**
      * The message digest algorithm to be used when generating session
@@ -564,14 +569,14 @@ public abstract class AuthenticatorBase
      * created a response challenge already.
      *
      * @param request Request we are processing
-     * @param response Response we are creating
+     * @param response Response we are populating
      * @param config    Login configuration describing how authentication
      *              should be performed
      *
      * @exception IOException if an input/output error occurs
      */
     public abstract boolean authenticate(Request request,
-                                            Response response,
+                                            HttpServletResponse response,
                                             LoginConfig config)
         throws IOException;
 
@@ -708,7 +713,7 @@ public abstract class AuthenticatorBase
      * @param username Username used to authenticate (if any)
      * @param password Password used to authenticate (if any)
      */
-    public void register(Request request, Response response,
+    public void register(Request request, HttpServletResponse response,
                             Principal principal, String authType,
                             String username, String password) {
 
