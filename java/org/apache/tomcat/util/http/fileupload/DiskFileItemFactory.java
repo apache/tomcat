@@ -5,26 +5,24 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.http.fileupload;
 
 import java.io.File;
 
 
 /**
- * <p>The default {@link org.apache.tomcat.util.http.fileupload.FileItemFactory}
+ * <p>The default {@link org.apache.commons.fileupload.FileItemFactory}
  * implementation. This implementation creates
- * {@link org.apache.tomcat.util.http.fileupload.FileItem} instances which keep their
+ * {@link org.apache.commons.fileupload.FileItem} instances which keep their
  * content either in memory, for smaller items, or in a temporary file on disk,
  * for larger items. The size threshold, above which content will be stored on
  * disk, is configurable, as is the directory in which temporary files will be
@@ -39,12 +37,24 @@ import java.io.File;
  * </ul>
  * </p>
  *
+ * <p>When using the <code>DiskFileItemFactory</code>, then you should
+ * consider the following: Temporary files are automatically deleted as
+ * soon as they are no longer needed. (More precisely, when the
+ * corresponding instance of {@link java.io.File} is garbage collected.)
+ * Cleaning up those files is done by an instance of
+ * {@link FileCleaningTracker}, and an associated thread. In a complex
+ * environment, for example in a web application, you should consider
+ * terminating this thread, for example, when your web application
+ * ends. See the section on "Resource cleanup"
+ * in the users guide of commons-fileupload.</p>
+ *
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
+ *
+ * @since FileUpload 1.1
  *
  * @version $Id$
  */
-public class DefaultFileItemFactory implements FileItemFactory
-{
+public class DiskFileItemFactory implements FileItemFactory {
 
     // ----------------------------------------------------- Manifest constants
 
@@ -70,6 +80,13 @@ public class DefaultFileItemFactory implements FileItemFactory
     private int sizeThreshold = DEFAULT_SIZE_THRESHOLD;
 
 
+    /**
+     * <p>The instance of {@link FileCleaningTracker}, which is responsible
+     * for deleting temporary files.</p>
+     * <p>May be null, if tracking files is not required.</p>
+     */
+    private FileCleaningTracker fileCleaningTracker;
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -77,8 +94,8 @@ public class DefaultFileItemFactory implements FileItemFactory
      * Constructs an unconfigured instance of this class. The resulting factory
      * may be configured by calling the appropriate setter methods.
      */
-    public DefaultFileItemFactory()
-    {
+    public DiskFileItemFactory() {
+        this(DEFAULT_SIZE_THRESHOLD, null);
     }
 
 
@@ -92,12 +109,10 @@ public class DefaultFileItemFactory implements FileItemFactory
      *                      which files will be created, should the item size
      *                      exceed the threshold.
      */
-    public DefaultFileItemFactory(int sizeThreshold, File repository)
-    {
+    public DiskFileItemFactory(int sizeThreshold, File repository) {
         this.sizeThreshold = sizeThreshold;
         this.repository = repository;
     }
-
 
     // ------------------------------------------------------------- Properties
 
@@ -111,8 +126,7 @@ public class DefaultFileItemFactory implements FileItemFactory
      * @see #setRepository(java.io.File)
      *
      */
-    public File getRepository()
-    {
+    public File getRepository() {
         return repository;
     }
 
@@ -126,22 +140,20 @@ public class DefaultFileItemFactory implements FileItemFactory
      * @see #getRepository()
      *
      */
-    public void setRepository(File repository)
-    {
+    public void setRepository(File repository) {
         this.repository = repository;
     }
 
 
     /**
      * Returns the size threshold beyond which files are written directly to
-     * disk. The default value is 1024 bytes.
+     * disk. The default value is 10240 bytes.
      *
      * @return The size threshold, in bytes.
      *
      * @see #setSizeThreshold(int)
      */
-    public int getSizeThreshold()
-    {
+    public int getSizeThreshold() {
         return sizeThreshold;
     }
 
@@ -154,8 +166,7 @@ public class DefaultFileItemFactory implements FileItemFactory
      * @see #getSizeThreshold()
      *
      */
-    public void setSizeThreshold(int sizeThreshold)
-    {
+    public void setSizeThreshold(int sizeThreshold) {
         this.sizeThreshold = sizeThreshold;
     }
 
@@ -163,7 +174,7 @@ public class DefaultFileItemFactory implements FileItemFactory
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Create a new {@link org.apache.tomcat.util.http.fileupload.DefaultFileItem}
+     * Create a new {@link org.apache.commons.fileupload.disk.DiskFileItem}
      * instance from the supplied parameters and the local factory
      * configuration.
      *
@@ -176,15 +187,37 @@ public class DefaultFileItemFactory implements FileItemFactory
      *
      * @return The newly created file item.
      */
-    public FileItem createItem(
-            String fieldName,
-            String contentType,
-            boolean isFormField,
-            String fileName
-            )
-    {
-        return new DefaultFileItem(fieldName, contentType,
+    public FileItem createItem(String fieldName, String contentType,
+            boolean isFormField, String fileName) {
+        DiskFileItem result = new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
+        FileCleaningTracker tracker = getFileCleaningTracker();
+        if (tracker != null) {
+            tracker.track(result.getTempFile(), this);
+        }
+        return result;
     }
 
+
+    /**
+     * Returns the tracker, which is responsible for deleting temporary
+     * files.
+     * @return An instance of {@link FileCleaningTracker}, defaults to
+     *   {@link org.apache.commons.io.FileCleaner#getInstance()}. Null,
+     *   if temporary files aren't tracked.
+     */
+    public FileCleaningTracker getFileCleaningTracker() {
+        return fileCleaningTracker;
+    }
+
+    /**
+     * Returns the tracker, which is responsible for deleting temporary
+     * files.
+     * @param pTracker An instance of {@link FileCleaningTracker},
+     *   which will from now on track the created files. May be null
+     *   to disable tracking.
+     */
+    public void setFileCleaningTracker(FileCleaningTracker pTracker) {
+        fileCleaningTracker = pTracker;
+    }
 }
