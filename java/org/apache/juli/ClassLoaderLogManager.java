@@ -293,7 +293,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Read configuration for the specified classloader.
      * 
      * @param classLoader 
-     * @throws IOException Errot
+     * @throws IOException Error
      */
     protected void readConfiguration(ClassLoader classLoader)
         throws IOException {

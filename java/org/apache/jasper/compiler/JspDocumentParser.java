@@ -106,7 +106,7 @@ class JspDocumentParser
 
     // Nesting level of Tag dependent bodies
     private int tagDependentNesting = 0;
-    // Flag set to delay incrmenting tagDependentNesting until jsp:body
+    // Flag set to delay incrementing tagDependentNesting until jsp:body
     // is first encountered
     private boolean tagDependentPending = false;
 
