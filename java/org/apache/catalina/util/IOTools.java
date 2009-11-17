@@ -31,11 +31,11 @@ import java.io.Writer;
 public class IOTools {
     protected final static int DEFAULT_BUFFER_SIZE=4*1024; //4k
 
-    //Ensure non-instantiability
     private IOTools() {
+      //Ensure non-instantiability
     }
 
-     /**
+    /**
      * Read input from reader and write it to writer until there is no more
      * input from reader.
      *
