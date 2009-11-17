@@ -31,7 +31,9 @@ import org.apache.catalina.startup.Tomcat;
 
 public class TestCookiesAllowEquals extends TomcatBaseTest{
 
-    private static final String COOKIE_WITH_EQUALS = "name=value=withequals";
+    private static final String COOKIE_WITH_EQUALS_1 = "name=equals=middle";
+    private static final String COOKIE_WITH_EQUALS_2 = "name==equalsstart";
+    private static final String COOKIE_WITH_EQUALS_3 = "name=equalsend=";
     
     public void testWithEquals() throws Exception {
         System.setProperty(
@@ -59,7 +61,9 @@ public class TestCookiesAllowEquals extends TomcatBaseTest{
             String[] request = new String[1];
             request[0] =
                 "GET /test HTTP/1.0" + CRLF +
-                "Cookie: " + COOKIE_WITH_EQUALS + CRLF + CRLF;
+                "Cookie: " + COOKIE_WITH_EQUALS_1 + CRLF +
+                "Cookie: " + COOKIE_WITH_EQUALS_2 + CRLF +
+                "Cookie: " + COOKIE_WITH_EQUALS_3 + CRLF + CRLF;
             setRequest(request);
             processRequest(true); // blocks until response has been read
             String response = getResponseBody();
@@ -68,7 +72,8 @@ public class TestCookiesAllowEquals extends TomcatBaseTest{
             disconnect();
             reset();
             tomcat.stop();
-            assertEquals(COOKIE_WITH_EQUALS, response);
+            assertEquals(COOKIE_WITH_EQUALS_1 + COOKIE_WITH_EQUALS_2 +
+                    COOKIE_WITH_EQUALS_3, response);
         }
         
         @Override
@@ -89,7 +94,7 @@ public class TestCookiesAllowEquals extends TomcatBaseTest{
             Cookie cookies[] = req.getCookies();
             for (Cookie cookie : cookies) {
                 resp.getWriter().write(cookie.getName() + "=" +
-                        cookie.getValue() + "\n");
+                        cookie.getValue());
             }
             resp.flushBuffer();
         }
