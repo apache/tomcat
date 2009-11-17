@@ -295,7 +295,7 @@ public abstract class AbstractInputBuffer implements InputBuffer{
     /**
      * End request (consumes leftover bytes).
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     public void endRequest()
         throws IOException {

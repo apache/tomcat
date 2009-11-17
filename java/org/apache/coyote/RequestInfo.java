@@ -23,7 +23,7 @@ import javax.management.ObjectName;
 /**
  * Structure holding the Request and Response objects. It also holds statistical
  * informations about request processing and provide management informations
- * about the requests beeing processed.
+ * about the requests being processed.
  *
  * Each thread uses a Request/Response pair that is recycled on each request.
  * This object provides a place to collect global low-level statistics - without
@@ -68,7 +68,7 @@ public class RequestInfo  {
     ObjectName rpName;
 
     // -------------------- Information about the current request  -----------
-    // This is usefull for long-running requests only
+    // This is useful for long-running requests only
 
     public String getMethod() {
         return req.method().toString();

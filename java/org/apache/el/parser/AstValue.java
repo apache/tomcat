@@ -63,7 +63,7 @@ public final class AstValue extends SimpleNode {
         // evaluate expr-a to value-a
         Object base = this.children[0].getValue(ctx);
 
-        // if our base is null (we know there are more properites to evaluate)
+        // if our base is null (we know there are more properties to evaluate)
         if (base == null) {
             throw new PropertyNotFoundException(MessageFactory.get(
                     "error.unreachable.base", this.children[0].getImage()));

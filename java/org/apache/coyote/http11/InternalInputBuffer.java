@@ -69,7 +69,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
      * using it.
      *
      * @throws IOException If an exception occurs during the underlying socket
-     * read operations, or if the given buffer is not big enough to accomodate
+     * read operations, or if the given buffer is not big enough to accommodate
      * the whole line.
      */
     @Override

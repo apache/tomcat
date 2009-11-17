@@ -326,7 +326,7 @@ public class InternalAprInputBuffer implements InputBuffer {
     /**
      * End request (consumes leftover bytes).
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     public void endRequest()
         throws IOException {
@@ -345,7 +345,7 @@ public class InternalAprInputBuffer implements InputBuffer {
      * using it.
      *
      * @throws IOException If an exception occurs during the underlying socket
-     * read operations, or if the given buffer is not big enough to accomodate
+     * read operations, or if the given buffer is not big enough to accommodate
      * the whole line.
      * @return true if data is properly fed; false if no data is available 
      * immediately and thread should be freed
@@ -744,7 +744,7 @@ public class InternalAprInputBuffer implements InputBuffer {
 
 
     /**
-     * Fill the internal buffer using data from the undelying input stream.
+     * Fill the internal buffer using data from the underlying input stream.
      * 
      * @return false if at end of stream
      */

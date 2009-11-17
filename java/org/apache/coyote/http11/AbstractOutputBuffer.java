@@ -181,7 +181,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
      * 
      * @param chunk byte chunk
      * @return number of bytes written
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     public int doWrite(ByteChunk chunk, Response res) 
         throws IOException {
@@ -208,7 +208,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     /**
      * Flush the response.
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     public void flush()
         throws IOException {
@@ -282,7 +282,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     /**
      * End request.
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     public void endRequest()
         throws IOException {
@@ -434,7 +434,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     
     
     /**
-     * This method will write the contents of the specyfied message bytes 
+     * This method will write the contents of the specified message bytes 
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
      * 
@@ -456,7 +456,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specyfied message bytes 
+     * This method will write the contents of the specified message bytes 
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
      * 
@@ -473,7 +473,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specyfied char 
+     * This method will write the contents of the specified char 
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
      * 
@@ -502,7 +502,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specyfied byte 
+     * This method will write the contents of the specified byte 
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
      * 
@@ -518,7 +518,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specyfied String to the 
+     * This method will write the contents of the specified String to the 
      * output stream, without filtering. This method is meant to be used to 
      * write the response header.
      * 
