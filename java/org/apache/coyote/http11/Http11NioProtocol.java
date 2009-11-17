@@ -17,32 +17,24 @@
 
 package org.apache.coyote.http11;
 
-import java.net.InetAddress;
-import java.net.URLEncoder;
 import java.nio.channels.SocketChannel;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
+
 import javax.management.ObjectName;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Adapter;
-import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioEndpoint.Handler;
+import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 
 /**
@@ -54,86 +46,35 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Costin Manolache
  * @author Filip Hanik
  */
-public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
-{
-    protected JSSEImplementation sslImplementation = null;
+public class Http11NioProtocol extends AbstractHttp11Protocol {
     
     public Http11NioProtocol() {
+        endpoint=new NioEndpoint();
         cHandler = new Http11ConnectionHandler( this );
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         //setServerSoTimeout(Constants.DEFAULT_SERVER_SOCKET_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
-    }
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-    /** Pass config info
-     */
-    public void setAttribute( String name, Object value ) {
-        if( log.isTraceEnabled())
-            log.trace(sm.getString("http11protocol.setattribute", name, value));
-
-        attributes.put(name, value);
-    }
-
-    public NioEndpoint getEndpoint() {
-        return ep;
-    }
-    
-    public Object getAttribute( String key ) {
-        if( log.isTraceEnabled())
-            log.trace(sm.getString("http11protocol.getattribute", key));
-        return attributes.get(key);
-    }
-
-    public Iterator<String> getAttributeNames() {
-        return attributes.keySet().iterator();
-    }
-
-    /**
-     * Set a property.
-     */
-    public boolean setProperty(String name, String value) {
-        setAttribute(name, value); //store all settings
-        if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
-            return ep.setProperty(name, value);
-        } else {
-            return ep.setProperty(name,value); //make sure we at least try to set all properties
-        }
         
     }
 
-    /**
-     * Get a property
-     */
-    public String getProperty(String name) {
-        return (String)getAttribute(name);
-    }
 
-    /** The adapter, used to call the connector
-     */
-    public void setAdapter(Adapter adapter) {
-        this.adapter=adapter;
-    }
 
-    public Adapter getAdapter() {
-        return adapter;
+    public NioEndpoint getEndpoint() {
+        return ((NioEndpoint)endpoint);
     }
+    
+
 
 
     /** Start the protocol
      */
     public void init() throws Exception {
-        ep.setName(getName());
-        ep.setHandler(cHandler);
+        endpoint.setName(getName());
+        ((NioEndpoint)endpoint).setHandler(cHandler);
         
         try {
-            ep.init();
+            endpoint.init();
             sslImplementation = new JSSEImplementation();
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
@@ -144,16 +85,13 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     }
 
-    ObjectName tpOname;
-    ObjectName rgOname;
-
     public void start() throws Exception {
         if( this.domain != null ) {
             try {
                 tpOname=new ObjectName
                     (domain + ":" + "type=ThreadPool,name=" + getName());
                 Registry.getRegistry(null, null)
-                .registerComponent(ep, tpOname, null );
+                .registerComponent(endpoint, tpOname, null );
             } catch (Exception e) {
                 log.error("Can't register threadpool" );
             }
@@ -164,7 +102,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         }
 
         try {
-            ep.start();
+            endpoint.start();
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
             throw ex;
@@ -173,293 +111,63 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             log.info(sm.getString("http11protocol.start", getName()));
     }
 
-    public void pause() throws Exception {
-        try {
-            ep.pause();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.pauseerror"), ex);
-            throw ex;
-        }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.pause", getName()));
-    }
-
-    public void resume() throws Exception {
-        try {
-            ep.resume();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.resumeerror"), ex);
-            throw ex;
-        }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.resume", getName()));
-    }
-
-    public void destroy() throws Exception {
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.stop", getName()));
-        ep.destroy();
-        if( tpOname!=null )
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if( rgOname != null )
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-    }
+ 
 
     // -------------------- Properties--------------------
-    protected NioEndpoint ep=new NioEndpoint();
-    protected boolean secure = false;
-
-    protected Hashtable<String, Object> attributes =
-        new Hashtable<String, Object>();
-
-    private int timeout = 300000;   // 5 minutes as in Apache HTTPD server
-    private int maxSavePostSize = 4 * 1024;
-    private int maxHttpHeaderSize = 8 * 1024;
-    protected int processorCache = 200; //max number of Http11NioProcessor objects cached
-    private int socketCloseDelay=-1;
-    private boolean disableUploadTimeout = true;
-    private int socketBuffer = 9000;
     
-    private Adapter adapter;
+
+    private int socketCloseDelay=-1;
+    
     private Http11ConnectionHandler cHandler;
-
-    /**
-     * Compression value.
-     */
-    private String compression = "off";
-    private String noCompressionUserAgents = null;
-    private String restrictedUserAgents = null;
-    private String compressableMimeTypes = "text/html,text/xml,text/plain";
-    private int compressionMinSize    = 2048;
-
-    private String server;
 
     // -------------------- Pool setup --------------------
 
     public void setPollerThreadCount(int count) {
-        ep.setPollerThreadCount(count);
+        ((NioEndpoint)endpoint).setPollerThreadCount(count);
     }
     
     public int getPollerThreadCount() {
-        return ep.getPollerThreadCount();
+        return ((NioEndpoint)endpoint).getPollerThreadCount();
     }
     
     public void setSelectorTimeout(long timeout) {
-        ep.setSelectorTimeout(timeout);
+        ((NioEndpoint)endpoint).setSelectorTimeout(timeout);
     }
     
     public long getSelectorTimeout() {
-        return ep.getSelectorTimeout();
+        return ((NioEndpoint)endpoint).getSelectorTimeout();
     }
     // *
-    public Executor getExecutor() {
-        return ep.getExecutor();
-    }
 
-    // *
-    public void setExecutor(Executor executor) {
-        ep.setExecutor(executor);
-    }
-    
-    public int getMaxThreads() {
-        return ep.getMaxThreads();
-    }
-
-    public void setMaxThreads( int maxThreads ) {
-        ep.setMaxThreads(maxThreads);
-        setAttribute("maxThreads", "" + maxThreads);
-    }
-
-    public void setThreadPriority(int threadPriority) {
-      ep.setThreadPriority(threadPriority);
-      setAttribute("threadPriority", "" + threadPriority);
-    }
     
     public void setAcceptorThreadPriority(int threadPriority) {
-      ep.setAcceptorThreadPriority(threadPriority);
+        ((NioEndpoint)endpoint).setAcceptorThreadPriority(threadPriority);
       setAttribute("acceptorThreadPriority", "" + threadPriority);
     }
 
     public void setPollerThreadPriority(int threadPriority) {
-      ep.setPollerThreadPriority(threadPriority);
+        ((NioEndpoint)endpoint).setPollerThreadPriority(threadPriority);
       setAttribute("pollerThreadPriority", "" + threadPriority);
     }
 
-    public int getThreadPriority() {
-      return ep.getThreadPriority();
-    }
-
     public int getAcceptorThreadPriority() {
-      return ep.getAcceptorThreadPriority();
+      return ((NioEndpoint)endpoint).getAcceptorThreadPriority();
     }
     
     public int getPollerThreadPriority() {
-      return ep.getThreadPriority();
+      return ((NioEndpoint)endpoint).getThreadPriority();
     }
     
     
     public boolean getUseSendfile() {
-        return ep.getUseSendfile();
+        return ((NioEndpoint)endpoint).getUseSendfile();
     }
 
     public void setUseSendfile(boolean useSendfile) {
-        ep.setUseSendfile(useSendfile);
+        ((NioEndpoint)endpoint).setUseSendfile(useSendfile);
     }
     
     // -------------------- Tcp setup --------------------
-
-    public int getBacklog() {
-        return ep.getBacklog();
-    }
-
-    public void setBacklog( int i ) {
-        ep.setBacklog(i);
-        setAttribute("backlog", "" + i);
-    }
-
-    public int getPort() {
-        return ep.getPort();
-    }
-
-    public void setPort( int port ) {
-        ep.setPort(port);
-        setAttribute("port", "" + port);
-    }
-
-    public InetAddress getAddress() {
-        return ep.getAddress();
-    }
-
-    public void setAddress(InetAddress ia) {
-        ep.setAddress( ia );
-        setAttribute("address", "" + ia);
-    }
-
-    public String getName() {
-        String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
-            if (encodedAddr.startsWith("/"))
-                encodedAddr = encodedAddr.substring(1);
-            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
-        }
-        return ("http-" + encodedAddr + ep.getPort());
-    }
-
-    public boolean getTcpNoDelay() {
-        return ep.getTcpNoDelay();
-    }
-
-    public void setTcpNoDelay( boolean b ) {
-        ep.setTcpNoDelay( b );
-        setAttribute("tcpNoDelay", "" + b);
-    }
-
-    public boolean getDisableUploadTimeout() {
-        return disableUploadTimeout;
-    }
-
-    public void setDisableUploadTimeout(boolean isDisabled) {
-        disableUploadTimeout = isDisabled;
-    }
-
-    public int getSocketBuffer() {
-        return socketBuffer;
-    }
-
-    public void setSocketBuffer(int valueI) {
-        socketBuffer = valueI;
-    }
-
-    public String getCompression() {
-        return compression;
-    }
-
-    public void setCompression(String valueS) {
-        compression = valueS;
-        setAttribute("compression", valueS);
-    }
-
-    public int getMaxSavePostSize() {
-        return maxSavePostSize;
-    }
-
-    public void setMaxSavePostSize(int valueI) {
-        maxSavePostSize = valueI;
-        setAttribute("maxSavePostSize", "" + valueI);
-    }
-
-    public int getMaxHttpHeaderSize() {
-        return maxHttpHeaderSize;
-    }
-
-    public void setMaxHttpHeaderSize(int valueI) {
-        maxHttpHeaderSize = valueI;
-        setAttribute("maxHttpHeaderSize", "" + valueI);
-    }
-
-    public String getRestrictedUserAgents() {
-        return restrictedUserAgents;
-    }
-
-    public void setRestrictedUserAgents(String valueS) {
-        restrictedUserAgents = valueS;
-        setAttribute("restrictedUserAgents", valueS);
-    }
-
-    public String getNoCompressionUserAgents() {
-        return noCompressionUserAgents;
-    }
-
-    public void setNoCompressionUserAgents(String valueS) {
-        noCompressionUserAgents = valueS;
-        setAttribute("noCompressionUserAgents", valueS);
-    }
-
-    public String getCompressableMimeType() {
-        return compressableMimeTypes;
-    }
-
-    public void setCompressableMimeType(String valueS) {
-        compressableMimeTypes = valueS;
-        setAttribute("compressableMimeTypes", valueS);
-    }
-
-    public int getCompressionMinSize() {
-        return compressionMinSize;
-    }
-
-    public void setCompressionMinSize(int valueI) {
-        compressionMinSize = valueI;
-        setAttribute("compressionMinSize", "" + valueI);
-    }
-
-    public int getSoLinger() {
-        return ep.getSoLinger();
-    }
-
-    public void setSoLinger( int i ) {
-        ep.setSoLinger( i );
-        setAttribute("soLinger", "" + i);
-    }
-
-    public int getSoTimeout() {
-        return ep.getSoTimeout();
-    }
-
-    public void setSoTimeout( int i ) {
-        ep.setSoTimeout(i);
-        setAttribute("soTimeout", "" + i);
-    }
-    
-    public void setKeepAliveTimeout(int keepAliveTimeout) {
-        ep.setKeepAliveTimeout(keepAliveTimeout);
-    }
-    
-    public int getKeepAliveTimeout() {
-        return ep.getKeepAliveTimeout();
-    }
-
     public String getProtocol() {
         return getProperty("protocol");
     }
@@ -469,42 +177,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         setAttribute("protocol", k);
     }
 
-    public boolean getSecure() {
-        return secure;
-    }
-
-    public void setSecure( boolean b ) {
-        ep.setSecure(b);
-        secure=b;
-        setAttribute("secure", "" + b);
-    }
-
-    public int getMaxKeepAliveRequests() {
-        return ep.getMaxKeepAliveRequests();
-    }
-
-    /** Set the maximum number of Keep-Alive requests that we will honor.
-     */
-    public void setMaxKeepAliveRequests(int mkar) {
-        ep.setMaxKeepAliveRequests(mkar);
-        setAttribute("maxKeepAliveRequests", "" + mkar);
-    }
-
-    /**
-     * Return the Keep-Alive policy for the connection.
-     */
-    public boolean getKeepAlive() {
-        return ((ep.getMaxKeepAliveRequests() != 0) && (ep.getMaxKeepAliveRequests() != 1));
-    }
-
-    /**
-     * Set the keep-alive policy for this connection.
-     */
-    public void setKeepAlive(boolean keepAlive) {
-        if (!keepAlive) {
-            setMaxKeepAliveRequests(1);
-        }
-    }
 
     public int getSocketCloseDelay() {
         return socketCloseDelay;
@@ -515,79 +187,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         setAttribute("socketCloseDelay", "" + d);
     }
 
-    public void setServer( String server ) {
-        this.server = server;
-    }
-
-    public String getServer() {
-        return server;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout( int timeouts ) {
-        timeout = timeouts;
-        setAttribute("timeout", "" + timeouts);
-    }
-
-    public void setProcessorCache(int processorCache) {
-        this.processorCache = processorCache;
-    }
-
     public void setOomParachute(int oomParachute) {
-        ep.setOomParachute(oomParachute);
+        ((NioEndpoint)endpoint).setOomParachute(oomParachute);
         setAttribute("oomParachute", Integer.valueOf(oomParachute));
     }
 
     // --------------------  SSL related properties --------------------
 
-    public String getKeystoreFile() { return ep.getKeystoreFile();}
-    public void setKeystoreFile(String s ) { ep.setKeystoreFile(s);}
-    public void setKeystore(String s) { setKeystoreFile(s);}
-    public String getKeystore(){ return getKeystoreFile();}
     
-    public String getKeyAlias() { return ep.getKeyAlias();}
-    public void setKeyAlias(String s ) { ep.setKeyAlias(s);}
-
-    
-    public String getAlgorithm() { return ep.getAlgorithm();}
-    public void setAlgorithm(String s ) { ep.setAlgorithm(s);}
-    
-    public void setClientauth(String s) {setClientAuth(s);}
-    public String getClientauth(){ return getClientAuth();}
-    public String getClientAuth() { return ep.getClientAuth();}
-    public void setClientAuth(String s ) { ep.setClientAuth(s);}
-    
-    public String getKeystorePass() { return ep.getKeystorePass();}
-    public void setKeystorePass(String s ) { ep.setKeystorePass(s);}
-    public void setKeypass(String s) { setKeystorePass(s);}
-    public String getKeypass() { return getKeystorePass();}
-    public String getKeystoreType() { return ep.getKeystoreType();}
-    public void setKeystoreType(String s ) { ep.setKeystoreType(s);}
-    public String getKeytype() { return getKeystoreType();}
-    public void setKeytype(String s ) { setKeystoreType(s);}
-
-    public void setTruststoreFile(String f){ep.setTruststoreFile(f);}
-    public String getTruststoreFile(){return ep.getTruststoreFile();}
-    public void setTruststorePass(String p){ep.setTruststorePass(p);}
-    public String getTruststorePass(){return ep.getTruststorePass();}
-    public void setTruststoreType(String t){ep.setTruststoreType(t);}
-    public String getTruststoreType(){ return ep.getTruststoreType();}
-    
-    
-    public String getSslProtocol() { return ep.getSslProtocol();}
-    public void setSslProtocol(String s) { ep.setSslProtocol(s);}
-    
-    public String getCiphers() { return ep.getCiphers();}
-    public void setCiphers(String s) { ep.setCiphers(s);}
-    
-    public boolean getSSLEnabled() { return ep.isSSLEnabled(); }
-    public void setSSLEnabled(boolean SSLEnabled) { ep.setSSLEnabled(SSLEnabled); }
-    
-    
-
     // --------------------  Connection handler --------------------
 
     static class Http11ConnectionHandler implements Handler {
@@ -602,7 +209,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11NioProcessor processor) {
-                boolean offer = proto.processorCache==-1?true:size.get() < proto.processorCache;
+                boolean offer = proto.getProcessorCache()==-1?true:size.get() < proto.getProcessorCache();
                 //avoid over growing our cache or add after we have stopped
                 boolean result = false;
                 if ( offer ) {
@@ -737,7 +344,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
                 processor.action(ActionCode.ACTION_START, null);
                 
-                if (proto.ep.isSSLEnabled() && (proto.sslImplementation != null)) {
+                if (proto.endpoint.isSSLEnabled() && (proto.sslImplementation != null)) {
                     if (socket instanceof SecureNioChannel) {
                         SecureNioChannel ch = (SecureNioChannel)socket;
                         processor.setSslSupport(proto.sslImplementation.getSSLSupport(ch.getSslEngine().getSession()));
@@ -798,20 +405,20 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
         public Http11NioProcessor createProcessor() {
             Http11NioProcessor processor = new Http11NioProcessor(
-              proto.maxHttpHeaderSize,
-              proto.ep);
+              proto.getMaxHttpHeaderSize(),
+              (NioEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
-            processor.setTimeout(proto.timeout);
-            processor.setDisableUploadTimeout(proto.disableUploadTimeout);
-            processor.setCompressionMinSize(proto.compressionMinSize);
-            processor.setCompression(proto.compression);
-            processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
-            processor.setCompressableMimeTypes(proto.compressableMimeTypes);
-            processor.setRestrictedUserAgents(proto.restrictedUserAgents);
-            processor.setSocketBuffer(proto.socketBuffer);
-            processor.setMaxSavePostSize(proto.maxSavePostSize);
-            processor.setServer(proto.server);
+            processor.setTimeout(proto.getTimeout());
+            processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
+            processor.setCompressionMinSize(proto.getCompressionMinSize());
+            processor.setCompression(proto.getCompression());
+            processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());
+            processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());
+            processor.setRestrictedUserAgents(proto.getRestrictedUserAgents());
+            processor.setSocketBuffer(proto.getSocketBuffer());
+            processor.setMaxSavePostSize(proto.getMaxSavePostSize());
+            processor.setServer(proto.getServer());
             register(processor);
             return processor;
         }
@@ -861,42 +468,4 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     protected static org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11NioProtocol.class);
 
-    // -------------------- Various implementation classes --------------------
-
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
-
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public int getProcessorCache() {
-        return processorCache;
-    }
-
-    public int getOomParachute() {
-        return ep.getOomParachute();
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-    }
-
-    public void preDeregister() throws Exception {
-    }
-
-    public void postDeregister() {
-    }
 }

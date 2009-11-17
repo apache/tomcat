@@ -17,23 +17,15 @@
 
 package org.apache.coyote.http11;
 
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Adapter;
-import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
@@ -42,7 +34,6 @@ import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -53,28 +44,23 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class Http11Protocol 
-    implements ProtocolHandler, MBeanRegistration {
+public class Http11Protocol extends AbstractHttp11Protocol {
 
 
     protected static org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------ Constructor
 
 
     public Http11Protocol() {
+        endpoint = new JIoEndpoint();
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         //setServerSoTimeout(Constants.DEFAULT_SERVER_SOCKET_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
+        
     }
 
     
@@ -82,73 +68,24 @@ public class Http11Protocol
 
 
     protected Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
-    protected JIoEndpoint endpoint = new JIoEndpoint();
-
-
-    // *
-    protected ObjectName tpOname = null;
-    // *
-    protected ObjectName rgOname = null;
 
 
     protected ServerSocketFactory socketFactory = null;
-    protected SSLImplementation sslImplementation = null;
+   
 
 
     // ----------------------------------------- ProtocolHandler Implementation
     // *
 
 
-    protected HashMap<String, Object> attributes = new HashMap<String, Object>();
 
-    
-    /**
-     * Pass config info
-     */
-    public void setAttribute(String name, Object value) {
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("http11protocol.setattribute", name, value));
-        }
-        attributes.put(name, value);
-    }
 
-    public Object getAttribute(String key) {
-        return attributes.get(key);
-    }
 
-    public Iterator<String> getAttributeNames() {
-        return attributes.keySet().iterator();
-    }
-
-    /**
-     * Set a property.
-     */
-    public boolean setProperty(String name, String value) {
-        setAttribute(name, value);
-        if (name.startsWith("socket.")) {
-            return endpoint.setProperty(name, value);
-        }
-        return true;
-    }
-
-    /**
-     * Get a property
-     */
-    public String getProperty(String name) {
-        return (String)getAttribute(name);
-    }
-
-    /**
-     * The adapter, used to call the connector.
-     */
-    protected Adapter adapter;
-    public void setAdapter(Adapter adapter) { this.adapter = adapter; }
-    public Adapter getAdapter() { return adapter; }
 
 
     public void init() throws Exception {
-        endpoint.setName(getName());
-        endpoint.setHandler(cHandler);
+        ((JIoEndpoint)endpoint).setName(getName());
+        ((JIoEndpoint)endpoint).setHandler(cHandler);
 
         // Verify the validity of the configured socket factory
         try {
@@ -156,10 +93,10 @@ public class Http11Protocol
                 sslImplementation =
                     SSLImplementation.getInstance(sslImplementationName);
                 socketFactory = sslImplementation.getServerSocketFactory();
-                endpoint.setServerSocketFactory(socketFactory);
+                ((JIoEndpoint)endpoint).setServerSocketFactory(socketFactory);
             } else if (socketFactoryName != null) {
                 socketFactory = (ServerSocketFactory) Class.forName(socketFactoryName).newInstance();
-                endpoint.setServerSocketFactory(socketFactory);
+                ((JIoEndpoint)endpoint).setServerSocketFactory(socketFactory);
             }
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.socketfactory.initerror"),
@@ -213,75 +150,12 @@ public class Http11Protocol
             log.info(sm.getString("http11protocol.start", getName()));
     }
 
-    public void pause() throws Exception {
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.pauseerror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.pause", getName()));
-    }
-
-    public void resume() throws Exception {
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.resumeerror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.resume", getName()));
-    }
-
-    public void destroy() throws Exception {
-        if (log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.stop", getName()));
-        endpoint.destroy();
-        if (tpOname!=null)
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if (rgOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-    }
-
-    public String getName() {
-        String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
-            if (encodedAddr.startsWith("/"))
-                encodedAddr = encodedAddr.substring(1);
-            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
-        }
-        return ("http-" + encodedAddr + endpoint.getPort());
-    }
 
     // ------------------------------------------------------------- Properties
 
     
-    /**
-     * Processor cache.
-     */
-    protected int processorCache = -1;
-    public int getProcessorCache() { return this.processorCache; }
-    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
-    protected int socketBuffer = 9000;
-    public int getSocketBuffer() { return socketBuffer; }
-    public void setSocketBuffer(int socketBuffer) { this.socketBuffer = socketBuffer; }
-
-    /**
-     * This field indicates if the protocol is secure from the perspective of
-     * the client (= https is used).
-     */
-    protected boolean secure;
-    public boolean getSecure() { return secure; }
-    public void setSecure(boolean b) { secure = b; }
-
-    protected boolean SSLEnabled = false;
-    public boolean isSSLEnabled() { return SSLEnabled;}
-    public void setSSLEnabled(boolean SSLEnabled) {this.SSLEnabled = SSLEnabled;}    
-    
+ 
     /**
      * Name of the socket factory.
      */
@@ -299,227 +173,6 @@ public class Http11Protocol
         setSecure(true);
     }
     
-    
-    // HTTP
-    /**
-     * Maximum number of requests which can be performed over a keepalive 
-     * connection. The default is the same as for Apache HTTP Server.
-     */
-    protected int maxKeepAliveRequests = 100;
-    public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }
-    public void setMaxKeepAliveRequests(int mkar) { 
-        maxKeepAliveRequests = mkar;
-        endpoint.setMaxKeepAliveRequests(mkar);
-    }
-
-    // HTTP
-    /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection. The default is the same as for
-     * Apache HTTP Server (15 000 milliseconds).
-     */
-    protected int keepAliveTimeout = -1;
-    public int getKeepAliveTimeout() { return keepAliveTimeout; }
-    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
-
-    // HTTP
-    /**
-     * This timeout represents the socket timeout which will be used while
-     * the adapter execution is in progress, unless disableUploadTimeout
-     * is set to true. The default is the same as for Apache HTTP Server
-     * (300 000 milliseconds).
-     */
-    protected int timeout = 300000;
-    public int getTimeout() { return timeout; }
-    public void setTimeout(int timeout) { this.timeout = timeout; }
-
-
-    // *
-    /**
-     * Maximum size of the post which will be saved when processing certain
-     * requests, such as a POST.
-     */
-    protected int maxSavePostSize = 4 * 1024;
-    public int getMaxSavePostSize() { return maxSavePostSize; }
-    public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
-
-
-    // HTTP
-    /**
-     * Maximum size of the HTTP message header.
-     */
-    protected int maxHttpHeaderSize = 8 * 1024;
-    public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }
-    public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
-
-
-    // HTTP
-    /**
-     * If true, the regular socket timeout will be used for the full duration
-     * of the connection.
-     */
-    protected boolean disableUploadTimeout = true;
-    public boolean getDisableUploadTimeout() { return disableUploadTimeout; }
-    public void setDisableUploadTimeout(boolean isDisabled) { disableUploadTimeout = isDisabled; }
-
-
-    // HTTP
-    /**
-     * Integrated compression support.
-     */
-    protected String compression = "off";
-    public String getCompression() { return compression; }
-    public void setCompression(String valueS) { compression = valueS; }
-    
-    
-    // HTTP
-    protected String noCompressionUserAgents = null;
-    public String getNoCompressionUserAgents() { return noCompressionUserAgents; }
-    public void setNoCompressionUserAgents(String valueS) { noCompressionUserAgents = valueS; }
-
-    
-    // HTTP
-    protected String compressableMimeTypes = "text/html,text/xml,text/plain";
-    public String getCompressableMimeType() { return compressableMimeTypes; }
-    public void setCompressableMimeType(String valueS) { compressableMimeTypes = valueS; }
-    
-    
-    // HTTP
-    protected int compressionMinSize = 2048;
-    public int getCompressionMinSize() { return compressionMinSize; }
-    public void setCompressionMinSize(int valueI) { compressionMinSize = valueI; }
-
-
-    // HTTP
-    /**
-     * User agents regular expressions which should be restricted to HTTP/1.0 support.
-     */
-    protected String restrictedUserAgents = null;
-    public String getRestrictedUserAgents() { return restrictedUserAgents; }
-    public void setRestrictedUserAgents(String valueS) { restrictedUserAgents = valueS; }
-    
-    // HTTP
-    /**
-     * Server header.
-     */
-    protected String server;
-    public void setServer( String server ) { this.server = server; }
-    public String getServer() { return server; }
-
-    public Executor getExecutor() { return endpoint.getExecutor(); }
-    public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
-    
-    public int getMaxThreads() { return endpoint.getMaxThreads(); }
-    public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
-
-    public int getThreadPriority() { return endpoint.getThreadPriority(); }
-    public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
-
-    public int getBacklog() { return endpoint.getBacklog(); }
-    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
-
-    public int getPort() { return endpoint.getPort(); }
-    public void setPort(int port) { endpoint.setPort(port); }
-
-    public InetAddress getAddress() { return endpoint.getAddress(); }
-    public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
-
-    public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
-    public void setTcpNoDelay(boolean tcpNoDelay) { endpoint.setTcpNoDelay(tcpNoDelay); }
-
-    public int getSoLinger() { return endpoint.getSoLinger(); }
-    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
-
-    public int getSoTimeout() { return endpoint.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
-
-    // HTTP
-    /**
-     * Return the Keep-Alive policy for the connection.
-     */
-    public boolean getKeepAlive() {
-        return ((maxKeepAliveRequests != 0) && (maxKeepAliveRequests != 1));
-    }
-
-    // HTTP
-    /**
-     * Set the keep-alive policy for this connection.
-     */
-    public void setKeepAlive(boolean keepAlive) {
-        if (!keepAlive) {
-            setMaxKeepAliveRequests(1);
-        }
-    }
-
-    /*
-     * Note: All the following are JSSE/java.io specific attributes.
-     */
-    
-    public String getKeystore() {
-        return (String) getAttribute("keystore");
-    }
-
-    public void setKeystore( String k ) {
-        setAttribute("keystore", k);
-    }
-
-    public String getKeypass() {
-        return (String) getAttribute("keypass");
-    }
-
-    public void setKeypass( String k ) {
-        attributes.put("keypass", k);
-        //setAttribute("keypass", k);
-    }
-
-    public String getKeytype() {
-        return (String) getAttribute("keystoreType");
-    }
-
-    public void setKeytype( String k ) {
-        setAttribute("keystoreType", k);
-    }
-
-    public String getClientauth() {
-        return (String) getAttribute("clientauth");
-    }
-
-    public void setClientauth( String k ) {
-        setAttribute("clientauth", k);
-    }
-
-    public String getProtocols() {
-        return (String) getAttribute("protocols");
-    }
-
-    public void setProtocols(String k) {
-        setAttribute("protocols", k);
-    }
-
-    public String getAlgorithm() {
-        return (String) getAttribute("algorithm");
-    }
-
-    public void setAlgorithm( String k ) {
-        setAttribute("algorithm", k);
-    }
-
-    public String getCiphers() {
-        return (String) getAttribute("ciphers");
-    }
-
-    public void setCiphers(String ciphers) {
-        setAttribute("ciphers", ciphers);
-    }
-
-    public String getKeyAlias() {
-        return (String) getAttribute("keyAlias");
-    }
-
-    public void setKeyAlias(String keyAlias) {
-        setAttribute("keyAlias", keyAlias);
-    }
-
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
     protected static class Http11ConnectionHandler implements Handler {
@@ -533,7 +186,7 @@ public class Http11Protocol
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11Processor processor) {
-                boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
+                boolean offer = (proto.getProcessorCache() == -1) ? true : (size.get() < proto.getProcessorCache());
                 //avoid over growing our cache or add after we have stopped
                 boolean result = false;
                 if ( offer ) {
@@ -623,20 +276,20 @@ public class Http11Protocol
         
         protected Http11Processor createProcessor() {
             Http11Processor processor =
-                new Http11Processor(proto.maxHttpHeaderSize, proto.endpoint);
+                new Http11Processor(proto.getMaxHttpHeaderSize(), (JIoEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
-            processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
-            processor.setKeepAliveTimeout(proto.keepAliveTimeout);
-            processor.setTimeout(proto.timeout);
-            processor.setDisableUploadTimeout(proto.disableUploadTimeout);
-            processor.setCompressionMinSize(proto.compressionMinSize);
-            processor.setCompression(proto.compression);
-            processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
-            processor.setCompressableMimeTypes(proto.compressableMimeTypes);
-            processor.setRestrictedUserAgents(proto.restrictedUserAgents);
-            processor.setSocketBuffer(proto.socketBuffer);
-            processor.setMaxSavePostSize(proto.maxSavePostSize);
-            processor.setServer(proto.server);
+            processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
+            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
+            processor.setTimeout(proto.getTimeout());
+            processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
+            processor.setCompressionMinSize(proto.getCompressionMinSize());
+            processor.setCompression(proto.getCompression());
+            processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());
+            processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());
+            processor.setRestrictedUserAgents(proto.getRestrictedUserAgents());
+            processor.setSocketBuffer(proto.getSocketBuffer());
+            processor.setMaxSavePostSize(proto.getMaxSavePostSize());
+            processor.setServer(proto.getServer());
             register(processor);
             return processor;
         }
@@ -685,35 +338,4 @@ public class Http11Protocol
     }
 
 
-    // -------------------- JMX related methods --------------------
-
-    // *
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
-
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-    }
-
-    public void preDeregister() throws Exception {
-    }
-
-    public void postDeregister() {
-    }
 }
