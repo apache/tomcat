@@ -323,7 +323,8 @@ public final class Cookies { // extends MultiMap {
                     if (version == 0 &&
                                 !CookieSupport.isV0Separator((char)bytes[pos]) &&
                                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
-                            !CookieSupport.isHttpSeparator((char)bytes[pos])) {
+                            !CookieSupport.isHttpSeparator((char)bytes[pos]) ||
+                            bytes[pos] == '=' && CookieSupport.ALLOW_EQUALS_IN_VALUE) {
                         // Token
                         valueStart=pos;
                         // getToken returns the position at the delimeter
