@@ -22,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
- * Encapsultes the contents of a resource.
+ * Encapsulates the contents of a resource.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$

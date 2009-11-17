@@ -750,7 +750,7 @@ public class FileDirContext extends BaseDirContext {
      * occurrence of "{i}". If null, equivalent to an empty array.
      * @param cons the search controls that control the search. If null, the
      * default search controls are used (equivalent to (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisy the
+     * @return an enumeration of SearchResults of the objects that satisfy the
      * filter; never null
      * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i}
      * expressions where i is outside the bounds of the array filterArgs
@@ -847,7 +847,7 @@ public class FileDirContext extends BaseDirContext {
      * List the resources which are members of a collection.
      *
      * @param file Collection
-     * @return Vector containg NamingEntry objects
+     * @return Vector containing NamingEntry objects
      */
     protected ArrayList<NamingEntry> list(File file) {
 
