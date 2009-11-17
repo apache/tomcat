@@ -28,7 +28,7 @@ import javax.naming.spi.ObjectFactory;
 import org.apache.naming.TransactionRef;
 
 /**
- * Object factory for User trasactions.
+ * Object factory for User transactions.
  * 
  * @author Remy Maucherat
  * @version $Revision$ $Date$
@@ -54,7 +54,7 @@ public class TransactionFactory
 
 
     /**
-     * Crete a new User transaction instance.
+     * Create a new User transaction instance.
      * 
      * @param obj The reference object describing the DataSource
      */

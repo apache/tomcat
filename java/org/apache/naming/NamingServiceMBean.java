@@ -59,7 +59,7 @@ public interface NamingServiceMBean {
     
     
     /**
-     * Retruns the JNDI component name.
+     * Returns the JNDI component name.
      */
     public String getName();
     

@@ -1342,7 +1342,7 @@ public abstract class BaseDirContext implements DirContext {
      * occurrence of "{i}". If null, equivalent to an empty array.
      * @param cons the search controls that control the search. If null, the 
      * default search controls are used (equivalent to (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisy the 
+     * @return an enumeration of SearchResults of the objects that satisfy the 
      * filter; never null
      * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
      * expressions where i is outside the bounds of the array filterArgs

@@ -72,7 +72,7 @@ public class ResourceRef
      * 
      * @param resourceClass Resource class
      * @param scope Resource scope
-     * @param auth Resource authetication
+     * @param auth Resource authentication
      */
     public ResourceRef(String resourceClass, String description, 
                        String scope, String auth) {
@@ -85,7 +85,7 @@ public class ResourceRef
      * 
      * @param resourceClass Resource class
      * @param scope Resource scope
-     * @param auth Resource authetication
+     * @param auth Resource authentication
      */
     public ResourceRef(String resourceClass, String description, 
                        String scope, String auth, String factory,
