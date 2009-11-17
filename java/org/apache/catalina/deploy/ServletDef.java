@@ -207,4 +207,17 @@ public class ServletDef implements Serializable {
         securityRoleRefs.add(securityRoleRef);
     }
 
+    
+    /**
+     * The multipart configuration, if any, for this servlet
+     */
+    private MultipartDef multipartDef = new MultipartDef();
+    
+    public MultipartDef getMultipartDef() {
+        return this.multipartDef;
+    }
+    
+    public void setMultipartDef(MultipartDef multipartDef) {
+        this.multipartDef = multipartDef;
+    }
 }
