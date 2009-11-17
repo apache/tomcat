@@ -376,112 +376,6 @@ public class NioEndpoint extends AbstractEndpoint {
 
 
 
-    public String adjustRelativePath(String path, String relativeTo) {
-        File f = new File(path);
-        if ( !f.isAbsolute()) {
-            path = relativeTo + File.separator + path;
-            f = new File(path);
-        }
-        if (!f.exists()) {
-            log.warn("configured file:["+path+"] does not exist.");
-        }
-        return path;
-    }
-    
-    public String defaultIfNull(String val, String defaultValue) {
-        if (val==null) return defaultValue;
-        else return val;
-    }
-    // --------------------  SSL related properties --------------------
-    protected String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
-    public void setTruststoreFile(String s) {
-        s = adjustRelativePath(s,System.getProperty("catalina.base"));
-        this.truststoreFile = s;
-    }
-    public String getTruststoreFile() {return truststoreFile;}
-    protected String truststorePass = System.getProperty("javax.net.ssl.trustStorePassword");
-    public void setTruststorePass(String truststorePass) {this.truststorePass = truststorePass;}
-    public String getTruststorePass() {return truststorePass;}
-    protected String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-    public void setTruststoreType(String truststoreType) {this.truststoreType = truststoreType;}
-    public String getTruststoreType() {return truststoreType;}
-
-    protected String keystoreFile = System.getProperty("user.home")+"/.keystore";
-    public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) { 
-        s = adjustRelativePath(s,System.getProperty("catalina.base"));
-        this.keystoreFile = s; 
-    }
-    public void setKeystore(String s ) { setKeystoreFile(s);}
-    public String getKeystore() { return getKeystoreFile();}
-
-    String keyAlias = null;
-    public String getKeyAlias() { return keyAlias;}
-    public void setKeyAlias(String s ) { keyAlias = s;}
-    
-    
-    protected String algorithm = "SunX509";
-    public String getAlgorithm() { return algorithm;}
-    public void setAlgorithm(String s ) { this.algorithm = s;}
-
-    protected String clientAuth = "false";
-    public String getClientAuth() { return clientAuth;}
-    public void setClientAuth(String s ) { this.clientAuth = s;}
-    
-    protected String keystorePass = "changeit";
-    public String getKeystorePass() { return keystorePass;}
-    public void setKeystorePass(String s ) { this.keystorePass = s;}
-    
-    protected String keystoreType = "JKS";
-    public String getKeystoreType() { return keystoreType;}
-    public void setKeystoreType(String s ) { this.keystoreType = s;}
-
-    protected String sslProtocol = "TLS"; 
-    public String getSslProtocol() { return sslProtocol;}
-    public void setSslProtocol(String s) { sslProtocol = s;}
-    
-    protected String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
-    protected String[] sslEnabledProtocolsarr =  new String[0];
-    public void setSslEnabledProtocols(String s) {
-        this.sslEnabledProtocols = s;
-        StringTokenizer t = new StringTokenizer(s,",");
-        sslEnabledProtocolsarr = new String[t.countTokens()];
-        for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
-    }
-    
-    protected String ciphers = null;
-    protected String[] ciphersarr = new String[0];
-    public String getCiphers() { return ciphers;}
-    public void setCiphers(String s) { 
-        ciphers = s;
-        if ( s == null ) ciphersarr = new String[0];
-        else {
-            StringTokenizer t = new StringTokenizer(s,",");
-            ciphersarr = new String[t.countTokens()];
-            for (int i=0; i<ciphersarr.length; i++ ) ciphersarr[i] = t.nextToken();
-        }
-    }
-
-    protected int sessionCacheSize = 0;
-    public int getSessionCacheSize() { return sessionCacheSize;}
-    public void setSessionCacheSize(int i) { sessionCacheSize = i;}
-
-    protected int sessionCacheTimeout = 86400;
-    public int getSessionCacheTimeout() { return sessionCacheTimeout;}
-    public void setSessionCacheTimeout(int i) { sessionCacheTimeout = i;}
-
-    /**
-     * SSL engine.
-     */
-    protected boolean SSLEnabled = false;
-    @Override
-    public boolean isSSLEnabled() { return SSLEnabled;}
-    @Override
-    public void setSSLEnabled(boolean SSLEnabled) {this.SSLEnabled = SSLEnabled;}
-
-    protected boolean secure = false;
-    public boolean getSecure() { return secure;}
-    public void setSecure(boolean b) { secure = b;}
 
     public void setSelectorPool(NioSelectorPool selectorPool) {
         this.selectorPool = selectorPool;
@@ -637,8 +531,8 @@ public class NioEndpoint extends AbstractEndpoint {
             SSLSessionContext sessionContext =
                 sslContext.getServerSessionContext();
             if (sessionContext != null) {
-                sessionContext.setSessionCacheSize(sessionCacheSize);
-                sessionContext.setSessionTimeout(sessionCacheTimeout);
+                sessionContext.setSessionCacheSize(getSessionCacheSize());
+                sessionContext.setSessionTimeout(getSessionCacheTimeout());
             }
         }
         
@@ -861,8 +755,8 @@ public class NioEndpoint extends AbstractEndpoint {
             engine.setWantClientAuth(true);
         }
         engine.setUseClientMode(false);
-        if ( ciphersarr.length > 0 ) engine.setEnabledCipherSuites(ciphersarr);
-        if ( sslEnabledProtocolsarr.length > 0 ) engine.setEnabledProtocols(sslEnabledProtocolsarr);
+        if ( getCiphersArray().length > 0 ) engine.setEnabledCipherSuites(getCiphersArray());
+        if ( getSslEnabledProtocolsArray().length > 0 ) engine.setEnabledProtocols(getSslEnabledProtocolsArray());
         
         return engine;
     }
