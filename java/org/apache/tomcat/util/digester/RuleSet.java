@@ -23,7 +23,7 @@ package org.apache.tomcat.util.digester;
  * <p>Public interface defining a shorthand means of configuring a complete
  * set of related <code>Rule</code> definitions, possibly associated with
  * a particular namespace URI, in one operation.  To use an instance of a
- * class that imlements this interface:</p>
+ * class that implements this interface:</p>
  * <ul>
  * <li>Create a concrete implementation of this interface.</li>
  * <li>Optionally, you can configure a <code>RuleSet</code> to be relevant

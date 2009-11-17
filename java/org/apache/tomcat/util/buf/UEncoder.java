@@ -123,7 +123,7 @@ public final class UEncoder {
     }
     
     /**
-     * Utility funtion to re-encode the URL.
+     * Utility function to re-encode the URL.
      * Still has problems with charset, since UEncoder mostly
      * ignores it.
      */

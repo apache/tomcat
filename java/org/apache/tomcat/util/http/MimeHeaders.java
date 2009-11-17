@@ -71,7 +71,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *  Memory-efficient repository for Mime Headers. When the object is recycled, it
  *  will keep the allocated headers[] and all the MimeHeaderField - no GC is generated.
  *
- *  For input headers it is possible to use the MessageByte for Fileds - so no GC
+ *  For input headers it is possible to use the MessageByte for Fields - so no GC
  *  will be generated.
  *
  *  The only garbage is generated when using the String for header names/values -
@@ -353,10 +353,10 @@ public class MimeHeaders {
 }
 
 /** Enumerate the distinct header names.
-    Each nextElement() is O(n) ( a comparation is
+    Each nextElement() is O(n) ( a comparison is
     done with all previous elements ).
 
-    This is less frequesnt than add() -
+    This is less frequent than add() -
     we want to keep add O(1).
 */
 class NamesEnumerator implements Enumeration<String> {

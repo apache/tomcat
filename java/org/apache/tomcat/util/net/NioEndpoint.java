@@ -1175,7 +1175,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 //set interest ops to 0 so we don't get multiple
-                                //invokations for both read and write on separate threads
+                                //Invocations for both read and write on separate threads
                                 reg(sk, attachment, 0);
                                 //read goes before write
                                 if (sk.isReadable()) {
@@ -1325,7 +1325,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         cancelledKey(key, SocketStatus.ERROR,true);//TODO this is not yet being used
                     } else if (ka.getComet() && ka.getCometNotify() ) {
                         ka.setCometNotify(false);
-                        reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
+                        reg(key,ka,0);//avoid multiple calls, this gets reregistered after invocation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||

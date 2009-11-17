@@ -748,7 +748,7 @@ public final class IntrospectionUtils {
             Method myMethods[] = findMethods(obj.getClass());
             for (int i = 0; i < myMethods.length; i++) {
                 if (methodN.equals(myMethods[i].getName())) {
-                    // check if it's overriden
+                    // check if it's overridden
                     Class<?> declaring = myMethods[i].getDeclaringClass();
                     Class<?> parentOfDeclaring = declaring.getSuperclass();
                     // this works only if the base class doesn't extend

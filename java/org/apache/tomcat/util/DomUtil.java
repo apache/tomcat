@@ -50,7 +50,7 @@ public class DomUtil {
 
     // -------------------- DOM utils --------------------
 
-    /** Get the trimed text content of a node or null if there is no text
+    /** Get the trimmed text content of a node or null if there is no text
      */
     public static String getContent(Node n ) {
         if( n==null ) return null;
@@ -63,7 +63,7 @@ public class DomUtil {
     }
 
     /** Get the first element child.
-     * @param parent lookup direct childs
+     * @param parent lookup direct children
      * @param name name of the element. If null return the first element.
      */
     public static Node getChild( Node parent, String name ) {

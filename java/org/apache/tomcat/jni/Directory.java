@@ -28,7 +28,7 @@ public class Directory {
     /**
      * Create a new directory on the file system.
      * @param path the path for the directory to be created. (use / on all systems)
-     * @param perm Permissions for the new direcoty.
+     * @param perm Permissions for the new directory.
      * @param pool the pool to use.
      */
     public static native int make(String path, int perm, long pool);
@@ -37,7 +37,7 @@ public class Directory {
      * 'mkdir -p'. Creates intermediate directories as required. No error
      * will be reported if PATH already exists.
      * @param path the path for the directory to be created. (use / on all systems)
-     * @param perm Permissions for the new direcoty.
+     * @param perm Permissions for the new directory.
      * @param pool the pool to use.
      */
     public static native int makeRecursive(String path, int perm, long pool);

@@ -43,7 +43,7 @@ abstract public class AbstractRulesImpl implements Rules {
     
     /** Digester using this <code>Rules</code> implementation */
     private Digester digester;
-    /** Namespace uri to assoicate with subsequent <code>Rule</code>'s */
+    /** Namespace uri to associate with subsequent <code>Rule</code>'s */
     private String namespaceURI;
     
     // ------------------------------------------------------------- Properties
