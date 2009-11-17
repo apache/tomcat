@@ -137,7 +137,6 @@ public class NioBlockingSelector {
      * take up a lot of CPU cycles.
      * @param buf ByteBuffer - the buffer containing the data, we will read as until we have read at least one byte or we timed out
      * @param socket SocketChannel - the socket to write data to
-     * @param selector Selector - the selector to use for blocking, if null then a busy read will be initiated
      * @param readTimeout long - the timeout for this read operation in milliseconds, -1 means no timeout
      * @return int - returns the number of bytes read
      * @throws EOFException if read returns -1

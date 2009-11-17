@@ -185,11 +185,6 @@ public class TldLocationsCache {
      *
      * @param ctxt the servlet context of the web application in which Jasper 
      * is running
-     * @param redeployMode if true, then the compiler will allow redeploying 
-     * a tag library from the same jar, at the expense of slowing down the
-     * server a bit. Note that this may only work on JDK 1.3.1_01a and later,
-     * because of JDK bug 4211817 fixed in this release.
-     * If redeployMode is false, a faster but less capable mode will be used.
      */
     public TldLocationsCache(ServletContext ctxt) {
         this.ctxt = ctxt;

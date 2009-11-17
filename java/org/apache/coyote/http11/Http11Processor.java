@@ -139,7 +139,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     /**
      * Process pipelined HTTP requests on the specified socket.
      *
-     * @param socket Socket from which the HTTP requests will be read
+     * @param socketWrapper Socket from which the HTTP requests will be read
      *               and the HTTP responses will be written.
      *  
      * @throws IOException error during an I/O operation

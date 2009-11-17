@@ -86,7 +86,7 @@ public interface ClusterManager extends Manager {
    public boolean doDomainReplication();
 
    /**
-    * @param sendClusterDomainOnly Flag value.
+    * @param domainReplication Flag value.
     * @since 5.5.10
     */
    public void setDomainReplication(boolean domainReplication);

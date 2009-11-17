@@ -324,13 +324,10 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
 
     /**
-     * Invoke the next filter in this chain, passing the specified request
-     * and response.  If there are no more filters in this chain, invoke
-     * the <code>service()</code> method of the servlet itself.
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
+     * Process the event, using the security manager if the option is enabled.
+     * 
+     * @param event the event to process
+     * 
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet exception occurs
      */

@@ -145,7 +145,6 @@ public class XByteBuffer
      * Appends the data to the buffer. If the data is incorrectly formatted, ie, the data should always start with the
      * header, false will be returned and the data will be discarded.
      * @param b - bytes to be appended
-     * @param off - the offset to extract data from
      * @param len - the number of bytes to append.
      * @return true if the data was appended correctly. Returns false if the package is incorrect, ie missing header or something, or the length of data is 0
      */
@@ -330,8 +329,7 @@ public class XByteBuffer
     
     /**
      * Creates a complete data package
-     * @param indata - the message data to be contained within the package
-     * @param compressed - compression flag for the indata buffer
+     * @param cdata - the message data to be contained within the package
      * @return - a full package (header,size,data,footer)
      * 
      */
@@ -423,9 +421,9 @@ public class XByteBuffer
 
     
     /**
-     * Converts an integer to four bytes
-     * @param n - the integer
-     * @return - four bytes in an array
+     * Converts a boolean to a 1-byte array
+     * @param bool - the integer
+     * @return - 1-byte array
      * @deprecated use toBytes(boolean,byte[],int)
      */
     @Deprecated
@@ -440,11 +438,6 @@ public class XByteBuffer
         return data;
     }
     
-    /**
-     * 
-     * @param <any> long
-     * @return use
-     */
     public static boolean toBoolean(byte[] b, int offset) {
         return b[offset] != 0;
     }
@@ -582,8 +575,7 @@ public class XByteBuffer
     /**
      * Serializes a message into cluster data
      * @param msg ClusterMessage
-     * @param compress boolean
-     * @return 
+     * @return serialized content as byte[] array 
      * @throws IOException
      */
     public static byte[] serialize(Serializable msg) throws IOException {
