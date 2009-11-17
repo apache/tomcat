@@ -697,21 +697,27 @@ public interface HttpServletRequest extends ServletRequest {
     
     
     /**
-     * 
+     * Return a collection of all uploaded Parts.
      * @return
+     * @throws IOException           if an I/O error occurs
+     * @throws IllegalStateException if size limits are exceeded
+     * @throws ServletException      if the request is not multipart/form-data
      * @since Servlet 3.0
-     * TODO SERVLET3 - Add comments
      */
-    public Collection<Part> getParts() throws IOException, ServletException;
+    public Collection<Part> getParts() throws IOException,
+            IllegalStateException, ServletException;
     
     
     /**
-     * 
+     * Gets the named Part or null if the Part does not exist. Triggers upload
+     * of all Parts. 
      * @param name
      * @return
-     * @throws IllegalArgumentException
+     * @throws IOException           if an I/O error occurs
+     * @throws IllegalStateException if size limits are exceeded
+     * @throws ServletException      if the request is not multipart/form-data
      * @since Servlet 3.0
-     * TODO SERVLET3 - Add comments
      */
-    public Part getPart(String name);
+    public Part getPart(String name) throws IOException, IllegalStateException,
+            ServletException; 
 }
