@@ -196,6 +196,7 @@ public class FileCleaningTracker {
          * Run the reaper thread that will delete files as their associated
          * marker objects are reclaimed by the garbage collector.
          */
+        @Override
         public void run() {
             // thread exits when exitWhenFinished is true and there are no more tracked objects
             while (exitWhenFinished == false || trackers.size() > 0) {
