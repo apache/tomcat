@@ -160,7 +160,7 @@ public class McastServiceImpl
      * @param bind - the bind address (not sure this is used yet)
      * @param mcastAddress - the mcast address
      * @param service - the callback service
-     * @param disableLoopbackMode - disable loopbackMode
+     * @param localLoopbackDisabled - disable loopbackMode
      * @throws IOException
      */
     public McastServiceImpl(
@@ -465,7 +465,7 @@ public class McastServiceImpl
 
     /**
      * Send a ping
-     * @throws Exception
+     * @throws IOException
      */ 
     public void send(boolean checkexpired) throws IOException{
         send(checkexpired,null);

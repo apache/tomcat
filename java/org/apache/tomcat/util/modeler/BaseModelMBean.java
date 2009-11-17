@@ -926,23 +926,23 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     // ------------------------------------------------ PersistentMBean Methods
 
 
-    /**
-     * Instantiates this MBean instance from data found in the persistent
-     * store.  The data loaded could include attribute and operation values.
-     * This method should be called during construction or initialization
-     * of the instance, and before the MBean is registered with the
-     * <code>MBeanServer</code>.
-     *
-     * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation does
-     * not support persistence.</p>
-     *
-     * @exception InstanceNotFoundException if the managed resource object
-     *  cannot be found
-     * @exception MBeanException if the initializer of the object throws
-     *  an exception
-     * @exception RuntimeOperationsException if an exception is reported
-     *  by the persistence mechanism
-     */
+//    /**
+//     * Instantiates this MBean instance from data found in the persistent
+//     * store.  The data loaded could include attribute and operation values.
+//     * This method should be called during construction or initialization
+//     * of the instance, and before the MBean is registered with the
+//     * <code>MBeanServer</code>.
+//     *
+//     * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation does
+//     * not support persistence.</p>
+//     *
+//     * @exception InstanceNotFoundException if the managed resource object
+//     *  cannot be found
+//     * @exception MBeanException if the initializer of the object throws
+//     *  an exception
+//     * @exception RuntimeOperationsException if an exception is reported
+//     *  by the persistence mechanism
+//     */
 //    public void load() throws InstanceNotFoundException,
 //        MBeanException, RuntimeOperationsException {
 //        // XXX If a context was set, use it to load the data
@@ -953,22 +953,22 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 //    }
 
 
-    /**
-     * Capture the current state of this MBean instance and write it out
-     * to the persistent store.  The state stored could include attribute
-     * and operation values.  If one of these methods of persistence is not
-     * supported, a "service not found" exception will be thrown.
-     *
-     * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation does
-     * not support persistence.</p>
-     *
-     * @exception InstanceNotFoundException if the managed resource object
-     *  cannot be found
-     * @exception MBeanException if the initializer of the object throws
-     *  an exception, or persistence is not supported
-     * @exception RuntimeOperationsException if an exception is reported
-     *  by the persistence mechanism
-     */
+//    /**
+//     * Capture the current state of this MBean instance and write it out
+//     * to the persistent store.  The state stored could include attribute
+//     * and operation values.  If one of these methods of persistence is not
+//     * supported, a "service not found" exception will be thrown.
+//     *
+//     * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation does
+//     * not support persistence.</p>
+//     *
+//     * @exception InstanceNotFoundException if the managed resource object
+//     *  cannot be found
+//     * @exception MBeanException if the initializer of the object throws
+//     *  an exception, or persistence is not supported
+//     * @exception RuntimeOperationsException if an exception is reported
+//     *  by the persistence mechanism
+//     */
 //    public void store() throws InstanceNotFoundException,
 //        MBeanException, RuntimeOperationsException {
 //
@@ -981,20 +981,20 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 
     // --------------------  BaseModelMBean methods --------------------
 
-    /** Set the type of the mbean. This is used as a key to locate
-     * the description in the Registry.
-     *
-     * @param type the type of classname of the modeled object
-     */
+//    /** Set the type of the mbean. This is used as a key to locate
+//     * the description in the Registry.
+//     *
+//     * @param type the type of classname of the modeled object
+//     */
 //    void setModeledType( String type ) {
 //        initModelInfo(type);
 //        createResource();
 //    }
-    /** Set the type of the mbean. This is used as a key to locate
-     * the description in the Registry.
-     *
-     * @param type the type of classname of the modeled object
-     */
+//    /** Set the type of the mbean. This is used as a key to locate
+//     * the description in the Registry.
+//     *
+//     * @param type the type of classname of the modeled object
+//     */
 //    void initModelInfo( String type ) {
 //        try {
 //            if( log.isDebugEnabled())
@@ -1024,9 +1024,9 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 //        }
 //    }
 
-    /** Set the type of the mbean. This is used as a key to locate
-     * the description in the Registry.
-     */
+//    /** Set the type of the mbean. This is used as a key to locate
+//     * the description in the Registry.
+//     */
 //    protected void createResource() {
 //        try {
 //            //Thread.currentThread().setContextClassLoader(BaseModelMBean.class.getClassLoader());
@@ -1079,9 +1079,9 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     // ------------------------------------------------------ Protected Methods
 
 
-    /**
-     * Create and return a default <code>ModelMBeanInfo</code> object.
-     */
+//    /**
+//     * Create and return a default <code>ModelMBeanInfo</code> object.
+//     */
 //    protected ModelMBeanInfo createDefaultModelMBeanInfo() {
 //
 //        return (new ModelMBeanInfoSupport(this.getClass().getName(),
@@ -1090,15 +1090,15 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 //
 //    }
 
-    /**
-     * Is the specified <code>ModelMBeanInfo</code> instance valid?
-     *
-     * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation
-     * does not check anything, but this method can be overridden
-     * as required.</p>
-     *
-     * @param info The <code>ModelMBeanInfo object to check
-     */
+//    /**
+//     * Is the specified <code>ModelMBeanInfo</code> instance valid?
+//     *
+//     * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation
+//     * does not check anything, but this method can be overridden
+//     * as required.</p>
+//     *
+//     * @param info The <code>ModelMBeanInfo object to check
+//     */
 //    protected boolean isModelMBeanInfoValid(ModelMBeanInfo info) {
 //        return (true);
 //    }

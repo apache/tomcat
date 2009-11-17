@@ -48,7 +48,7 @@ public final class ReplicationStream extends ObjectInputStream {
      * Construct a new instance of CustomObjectInputStream
      *
      * @param stream The input stream we will read from
-     * @param classLoader The class loader used to instantiate objects
+     * @param classLoaders The class loader array used to instantiate objects
      *
      * @exception IOException if an input/output error occurs
      */

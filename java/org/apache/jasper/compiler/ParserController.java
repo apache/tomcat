@@ -126,7 +126,7 @@ class ParserController implements TagConstants {
      *
      * @param inFileName The path to the resource to be included.
      * @param parent The parent node of the include directive.
-     * @param jarFile The JAR file from which to read the included resource,
+     * @param jarFileUrl The JAR file from which to read the included resource,
      * or null of the included resource is to be read from the filesystem
      */
     public Node.Nodes parse(String inFileName, Node parent,

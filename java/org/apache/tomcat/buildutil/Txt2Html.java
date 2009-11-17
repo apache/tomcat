@@ -63,7 +63,7 @@ public class Txt2Html
     /**
      * Sets the files to be converted into HTML
      *
-     * @param fileset The fileset to be converted.
+     * @param fs The fileset to be converted.
      */
     public void addFileset( FileSet fs ) {
         filesets.add( fs );
@@ -72,7 +72,7 @@ public class Txt2Html
     /**
      * Perform the conversion
      *
-     * @param BuildException Thrown if an error occurs during execution of
+     * @throws BuildException if an error occurs during execution of
      *    this task.
      */
     @Override
