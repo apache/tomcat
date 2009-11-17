@@ -21,8 +21,9 @@ package org.apache.catalina.authenticator;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 
 
@@ -73,7 +74,7 @@ public final class NonLoginAuthenticator
      * created a response challenge already.
      *
      * @param request Request we are processing
-     * @param response Response we are creating
+     * @param response Response we are populating
      * @param config    Login configuration describing how authentication
      *              should be performed
      *
@@ -81,7 +82,7 @@ public final class NonLoginAuthenticator
      */
     @Override
     public boolean authenticate(Request request,
-                                Response response,
+                                HttpServletResponse response,
                                 LoginConfig config)
         throws IOException {
 

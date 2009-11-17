@@ -29,7 +29,6 @@ import org.apache.coyote.ActionCode;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 
 
@@ -84,7 +83,7 @@ public class SSLAuthenticator
      */
     @Override
     public boolean authenticate(Request request,
-                                Response response,
+                                HttpServletResponse response,
                                 LoginConfig config)
         throws IOException {
 

@@ -25,7 +25,6 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
@@ -48,31 +47,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
 public class BasicAuthenticator
     extends AuthenticatorBase {
     private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
-
-
-
-    /**
-     * Authenticate bytes.
-     */
-    public static final byte[] AUTHENTICATE_BYTES = {
-        (byte) 'W',
-        (byte) 'W',
-        (byte) 'W',
-        (byte) '-',
-        (byte) 'A',
-        (byte) 'u',
-        (byte) 't',
-        (byte) 'h',
-        (byte) 'e',
-        (byte) 'n',
-        (byte) 't',
-        (byte) 'i',
-        (byte) 'c',
-        (byte) 'a',
-        (byte) 't',
-        (byte) 'e'
-    };
-
 
    // ----------------------------------------------------- Instance Variables
 
@@ -116,7 +90,7 @@ public class BasicAuthenticator
      */
     @Override
     public boolean authenticate(Request request,
-                                Response response,
+                                HttpServletResponse response,
                                 LoginConfig config)
         throws IOException {
 
@@ -188,24 +162,18 @@ public class BasicAuthenticator
             }
         }
         
-
-        // Send an "unauthorized" response and an appropriate challenge
-        MessageBytes authenticate = 
-            response.getCoyoteResponse().getMimeHeaders()
-            .addValue(AUTHENTICATE_BYTES, 0, AUTHENTICATE_BYTES.length);
-        CharChunk authenticateCC = authenticate.getCharChunk();
-        authenticateCC.append("Basic realm=\"");
+        StringBuilder value = new StringBuilder(16);
+        value.append("Basic realm=\"");
         if (config.getRealmName() == null) {
-            authenticateCC.append(request.getServerName());
-            authenticateCC.append(':');
-            authenticateCC.append(Integer.toString(request.getServerPort()));
+            value.append(request.getServerName());
+            value.append(':');
+            value.append(Integer.toString(request.getServerPort()));
         } else {
-            authenticateCC.append(config.getRealmName());
+            value.append(config.getRealmName());
         }
-        authenticateCC.append('\"');        
-        authenticate.toChars();
+        value.append('\"');        
+        response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        //response.flushBuffer();
         return (false);
 
     }
