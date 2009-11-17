@@ -121,7 +121,7 @@ public class DirContextURLConnection
     
     
     /**
-     * Connect to the DirContext, and retrive the bound object, as well as
+     * Connect to the DirContext, and retrieve the bound object, as well as
      * its attributes. If no object is bound with the name specified in the
      * URL, then an IOException is thrown.
      * 

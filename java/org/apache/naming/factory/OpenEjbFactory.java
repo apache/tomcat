@@ -50,7 +50,7 @@ public class OpenEjbFactory implements ObjectFactory {
 
 
     /**
-     * Crete a new EJB instance using OpenEJB.
+     * Create a new EJB instance using OpenEJB.
      * 
      * @param obj The reference object describing the DataSource
      */

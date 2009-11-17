@@ -1544,7 +1544,7 @@ public class ProxyDirContext implements DirContext {
             }
         }
 
-        // Retriving object
+        // Retrieving object
         if ((exists) && (entry.resource == null) && (entry.context == null)) {
             try {
                 Object object = dirContext.lookup(name);
