@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
 public class BufferPool {
     protected static final Log log = LogFactory.getLog(BufferPool.class);
 
-    public static int DEFAULT_POOL_SIZE = 100*1024*1024; //100MB
+    public static final int DEFAULT_POOL_SIZE = 100*1024*1024; //100MB
 
 
 
