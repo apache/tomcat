@@ -191,7 +191,7 @@ public final class ActionCode {
         this.code=code;
     }
 
-    /** Action id, useable in switches and table indexes
+    /** Action id, usable in switches and table indexes
      */
     public int getCode() {
         return code;
