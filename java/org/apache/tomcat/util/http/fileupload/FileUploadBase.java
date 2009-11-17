@@ -1053,38 +1053,6 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Thrown to indicate that the request size is not specified. In other
-     * words, it is thrown, if the content-length header is missing or
-     * contains the value -1.
-     * @deprecated As of commons-fileupload 1.2, the presence of a
-     *   content-length header is no longer required.
-     */
-    public static class UnknownSizeException
-        extends FileUploadException {
-        /** The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = 7062279004812015273L;
-
-        /**
-         * Constructs a <code>UnknownSizeException</code> with no
-         * detail message.
-         */
-        public UnknownSizeException() {
-            super();
-        }
-
-        /**
-         * Constructs an <code>UnknownSizeException</code> with
-         * the specified detail message.
-         *
-         * @param message The detail message.
-         */
-        public UnknownSizeException(String message) {
-            super(message);
-        }
-    }
-
-    /**
      * Thrown to indicate that the request size exceeds the configured maximum.
      */
     public static class SizeLimitExceededException
