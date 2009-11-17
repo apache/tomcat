@@ -35,7 +35,7 @@ package org.apache.juli.logging;
  * </ol>
  * The mapping of these log levels to the concepts used by the underlying
  * logging system is implementation dependent.
- * The implemention should ensure, though, that this ordering behaves
+ * The implementation should ensure, though, that this ordering behaves
  * as expected.</p>
  *
  * <p>Performance is often a logging concern.

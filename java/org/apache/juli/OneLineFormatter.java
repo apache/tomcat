@@ -26,8 +26,8 @@ import java.util.logging.LogRecord;
 
 /**
  * Provides same information as default log format but on a single line to make
- * it easier to grep the logs. The only excpetion is stacktraces which are
- * always preceeded by whitespace to make it simple to skip them.
+ * it easier to grep the logs. The only exception is stacktraces which are
+ * always preceded by whitespace to make it simple to skip them.
  */
 /*
  * Date processing based on AccessLogValve.

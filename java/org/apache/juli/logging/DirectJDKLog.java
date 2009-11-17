@@ -50,7 +50,7 @@ class DirectJDKLog implements Log {
             }
             try {
                 Formatter fmt=(Formatter)Class.forName(SIMPLE_FMT).newInstance();
-                // it is also possible that the user modifed jre/lib/logging.properties - 
+                // it is also possible that the user modified jre/lib/logging.properties - 
                 // but that's really stupid in most cases
                 Logger root=Logger.getLogger("");
                 Handler handlers[]=root.getHandlers();
@@ -144,7 +144,7 @@ class DirectJDKLog implements Log {
     }    
 
     // from commons logging. This would be my number one reason why java.util.logging
-    // is bad - design by comitee can be really bad ! The impact on performance of 
+    // is bad - design by committee can be really bad ! The impact on performance of 
     // using java.util.logging - and the ugliness if you need to wrap it - is far
     // worse than the unfriendly and uncommon default format for logs. 
     

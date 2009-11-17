@@ -159,7 +159,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
      * a servlet the opportunity to call
      * <code>request.setCharacterEncoding()</code> first.</p>
      *
-     * @param request The servlet requset we are processing
+     * @param request The servlet request we are processing
      *
      * @exception ServletException if an invalid parameter value for the
      *  <code>jsp_precompile</code> parameter name is specified
