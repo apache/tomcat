@@ -89,9 +89,9 @@ public class ObjectReader {
      * Append new bytes to buffer.
      * @see XByteBuffer#countPackages()
      * @param data new transfer buffer
-     * @param off offset
      * @param len length in buffer
-     * @return number of messages that was sent to callback
+     * @param count whether to return the count
+     * @return number of messages that was sent to callback (or -1 if count == false)
      * @throws java.io.IOException
      */
     public int append(ByteBuffer data, int len, boolean count) throws java.io.IOException {

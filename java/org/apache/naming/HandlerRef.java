@@ -96,21 +96,11 @@ public class HandlerRef
     // ----------------------------------------------------------- Constructors
 
 
-    /**
-     * Service Reference.
-     * 
-     * @param serviceClass Service class
-     */
     public HandlerRef(String refname, String handlerClass) {
         this(refname, handlerClass, null, null);
     }
 
 
-    /**
-     * Service Reference.
-     * 
-     * @param serviceClass Service class
-     */
     public HandlerRef(String refname, String handlerClass,
                     String factory, String factoryLocation) {
         super(refname, factory, factoryLocation);

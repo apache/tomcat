@@ -18,7 +18,6 @@
 
 package org.apache.catalina.manager;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -31,7 +30,6 @@ import java.util.Vector;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.util.RequestUtil;
@@ -62,13 +60,11 @@ public class StatusTransformer {
 
 
     /**
-     * Process a GET request for the specified resource.
+     * Write an HTML or XML header.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
+     * @param writer the PrintWriter to use
+     * @param mode - 0 = HTML header, 1 = XML declaration
      *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
      */
     public static void writeHeader(PrintWriter writer, int mode) {
         if (mode == 0){
