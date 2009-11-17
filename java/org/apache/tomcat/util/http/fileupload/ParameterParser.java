@@ -224,9 +224,9 @@ public class ParameterParser {
      *
      * @return a map of name/value pairs
      */
-    public Map parse(final String str, char[] separators) {
+    public Map<String,String> parse(final String str, char[] separators) {
         if (separators == null || separators.length == 0) {
-            return new HashMap();
+            return new HashMap<String,String>();
         }
         char separator = separators[0];
         if (str != null) {
@@ -253,9 +253,9 @@ public class ParameterParser {
      *
      * @return a map of name/value pairs
      */
-    public Map parse(final String str, char separator) {
+    public Map<String,String> parse(final String str, char separator) {
         if (str == null) {
-            return new HashMap();
+            return new HashMap<String,String>();
         }
         return parse(str.toCharArray(), separator);
     }
@@ -270,11 +270,11 @@ public class ParameterParser {
      *
      * @return a map of name/value pairs
      */
-    public Map parse(final char[] chars, char separator) {
-        if (chars == null) {
-            return new HashMap();
+    public Map<String,String> parse(final char[] inputChars, char separator) {
+        if (inputChars == null) {
+            return new HashMap<String,String>();
         }
-        return parse(chars, 0, chars.length, separator);
+        return parse(inputChars, 0, inputChars.length, separator);
     }
 
     /**
@@ -289,17 +289,17 @@ public class ParameterParser {
      *
      * @return a map of name/value pairs
      */
-    public Map parse(
-        final char[] chars,
+    public Map<String,String> parse(
+        final char[] inputChars,
         int offset,
         int length,
         char separator) {
 
         if (chars == null) {
-            return new HashMap();
+            return new HashMap<String,String>();
         }
-        HashMap params = new HashMap();
-        this.chars = chars;
+        HashMap<String,String> params = new HashMap<String,String>();
+        this.chars = inputChars;
         this.pos = offset;
         this.len = length;
 
