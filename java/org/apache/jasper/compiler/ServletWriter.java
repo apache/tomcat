@@ -26,8 +26,8 @@ import java.io.PrintWriter;
  * @author Kin-man Chung
  */
 public class ServletWriter {
-    public static int TAB_WIDTH = 2;
-    public static String SPACES = "                              ";
+    public static final int TAB_WIDTH = 2;
+    public static final String SPACES = "                              ";
 
     // Current indent level:
     private int indent = 0;

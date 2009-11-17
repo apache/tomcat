@@ -32,7 +32,7 @@ public class MimeMap implements FileNameMap {
     // Defaults - all of them are "well-known" types,
     // you can add using normal web.xml.
     
-    public static Hashtable<String,String> defaultMap =
+    public static final Hashtable<String,String> defaultMap =
         new Hashtable<String,String>(101);
     static {
         defaultMap.put("txt", "text/plain");
