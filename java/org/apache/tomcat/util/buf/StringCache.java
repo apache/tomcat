@@ -30,7 +30,7 @@ import java.util.TreeMap;
 public class StringCache {
 
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( StringCache.class );
     
     

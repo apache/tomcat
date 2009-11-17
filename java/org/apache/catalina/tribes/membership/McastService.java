@@ -46,7 +46,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
 
 public class McastService implements MembershipService,MembershipListener,MessageListener {
 
-    private static org.apache.juli.logging.Log log =
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( McastService.class );
 
     /**

@@ -38,7 +38,7 @@ import java.util.Vector;
 public final class IntrospectionUtils {
 
     
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
     
     /**

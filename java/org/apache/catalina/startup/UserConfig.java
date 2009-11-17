@@ -45,7 +45,7 @@ public final class UserConfig
     implements LifecycleListener {
 
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( UserConfig.class );
 
     

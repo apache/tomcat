@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class XByteBuffer
 {
     
-    public static org.apache.juli.logging.Log log =
+    public static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( XByteBuffer.class );
     
     /**

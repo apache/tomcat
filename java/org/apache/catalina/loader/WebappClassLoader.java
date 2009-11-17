@@ -108,7 +108,7 @@ public class WebappClassLoader
     implements Lifecycle
  {
 
-    protected static org.apache.juli.logging.Log log=
+    protected static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WebappClassLoader.class );
 
     public static final boolean ENABLE_CLEAR_REFERENCES = 

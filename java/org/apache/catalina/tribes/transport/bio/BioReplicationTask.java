@@ -45,7 +45,7 @@ import org.apache.catalina.tribes.io.BufferPool;
 public class BioReplicationTask extends AbstractRxTask {
 
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationTask.class );
+    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationTask.class );
     
     protected Socket socket;
     protected ObjectReader reader;

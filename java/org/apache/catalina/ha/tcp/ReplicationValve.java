@@ -63,7 +63,7 @@ import org.apache.catalina.valves.ValveBase;
 public class ReplicationValve
     extends ValveBase implements ClusterValve {
     
-    private static org.apache.juli.logging.Log log =
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( ReplicationValve.class );
 
     // ----------------------------------------------------- Instance Variables

@@ -28,7 +28,7 @@ import javax.net.ssl.SSLSession;
    @author EKR
 */
 abstract public class SSLImplementation {
-    private static org.apache.juli.logging.Log logger =
+    private static final org.apache.juli.logging.Log logger =
         org.apache.juli.logging.LogFactory.getLog(SSLImplementation.class);
 
     // The default implementations in our search path

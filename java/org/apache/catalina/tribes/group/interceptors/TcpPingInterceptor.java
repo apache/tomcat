@@ -39,7 +39,7 @@ import org.apache.catalina.tribes.io.ChannelData;
 
 public class TcpPingInterceptor extends ChannelInterceptorBase {
     
-    protected static org.apache.juli.logging.Log log = 
+    protected static final org.apache.juli.logging.Log log = 
         org.apache.juli.logging.LogFactory.getLog(TcpPingInterceptor.class);
     
     protected static byte[] TCP_PING_DATA = new byte[] {
