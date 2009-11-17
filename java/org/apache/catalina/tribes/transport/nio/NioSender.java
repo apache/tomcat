@@ -49,7 +49,7 @@ import java.net.*;
  */
 public class NioSender extends AbstractSender implements DataSender{
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioSender.class);
+    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioSender.class);
 
 
 

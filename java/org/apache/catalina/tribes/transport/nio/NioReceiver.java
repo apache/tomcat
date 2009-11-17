@@ -46,7 +46,7 @@ import java.nio.channels.ClosedSelectorException;
  */
 public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioReceiver.class);
+    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioReceiver.class);
 
     /**
      * The string manager for this package.

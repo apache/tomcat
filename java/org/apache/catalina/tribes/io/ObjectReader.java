@@ -37,7 +37,7 @@ import org.apache.catalina.tribes.ChannelMessage;
  */
 public class ObjectReader {
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ObjectReader.class);
+    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ObjectReader.class);
 
     private XByteBuffer buffer;
 

@@ -638,7 +638,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @version 1.0
      */
     public static class HeartbeatThread extends Thread {
-        protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(HeartbeatThread.class);
+        protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(HeartbeatThread.class);
         protected static int counter = 1;
         protected static synchronized int inc() {
             return counter++;

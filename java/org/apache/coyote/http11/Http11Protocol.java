@@ -47,7 +47,7 @@ import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 public class Http11Protocol extends AbstractHttp11Protocol {
 
 
-    protected static org.apache.juli.logging.Log log
+    protected static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
 
 

@@ -28,7 +28,7 @@ package org.apache.jasper.security;
 
 public final class SecurityClassLoad {
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityClassLoad.class );
 
     public static void securityClassLoad(ClassLoader loader){

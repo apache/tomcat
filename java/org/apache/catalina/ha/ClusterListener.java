@@ -37,7 +37,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class ClusterListener implements ChannelListener {
 
-    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ClusterListener.class);
+    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ClusterListener.class);
 
 
     //--Instance Variables--------------------------------------

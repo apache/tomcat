@@ -37,7 +37,7 @@ import java.io.UnsupportedEncodingException;
 public class B2CConverter {
     
     
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( B2CConverter.class );
     
     private IntermediateInputStream iis;

@@ -66,7 +66,7 @@ public class WebXml {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(WebXml.class);
     
     // web.xml only elements

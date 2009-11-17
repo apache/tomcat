@@ -38,7 +38,7 @@ public class CatalinaProperties {
 
     // ------------------------------------------------------- Static Variables
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( CatalinaProperties.class );
 
     private static Properties properties = null;

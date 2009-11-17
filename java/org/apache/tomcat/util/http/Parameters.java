@@ -35,7 +35,7 @@ import org.apache.tomcat.util.collections.MultiMap;
 public final class Parameters extends MultiMap {
 
     
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(Parameters.class );
     
     // Transition: we'll use the same Hashtable( String->String[] )

@@ -39,7 +39,7 @@ import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
  */
 public class ReplicatedContext extends StandardContext implements LifecycleListener,MapOwner {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
-    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( ReplicatedContext.class );
+    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( ReplicatedContext.class );
     protected boolean startComplete = false;
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
     

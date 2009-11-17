@@ -61,7 +61,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static org.apache.juli.logging.Log log =
+    private static final org.apache.juli.logging.Log log =
         LogFactory.getLog(ApplicationFilterConfig.class);
 
     // ----------------------------------------------------------- Constructors

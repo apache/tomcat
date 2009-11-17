@@ -59,7 +59,7 @@ public class SelectorContext implements Context {
     public static final String IC_PREFIX = "IC_";
 
 
-    private static org.apache.juli.logging.Log log =
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(SelectorContext.class);
 
     // ----------------------------------------------------------- Constructors
