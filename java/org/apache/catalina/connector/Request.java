@@ -2380,13 +2380,22 @@ public class Request
                 null, null, null);
     }
     
-    public Collection<Part> getParts() {
+    public Collection<Part> getParts() throws IOException, IllegalStateException,
+            ServletException {
         // TODO SERVLET3 - file upload
         return null;
     }
     
-    public Part getPart(String name) throws IllegalArgumentException {
-        // TODO SERVLET3 - file upload
+    public Part getPart(String name) throws IOException, IllegalStateException,
+            ServletException {
+        Collection<Part> parts = getParts();
+        Iterator<Part> iterator = parts.iterator();
+        while (iterator.hasNext()) {
+            Part part = iterator.next();
+            if (name.equals(part.getName())) {
+                return part;
+            }
+        }
         return null;
     }
 
