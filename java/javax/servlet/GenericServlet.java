@@ -197,7 +197,7 @@ public abstract class GenericServlet
      * <code>super.init(config)</code>.
      *
      * @param config 			the <code>ServletConfig</code> object
-     *					that contains configutation
+     *					that contains configuration
      *					information for this servlet
      *
      * @exception ServletException 	if an exception occurs that

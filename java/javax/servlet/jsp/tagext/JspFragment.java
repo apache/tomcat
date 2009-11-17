@@ -60,7 +60,7 @@ public abstract class JspFragment {
      *
      * @param out The Writer to output the fragment to, or null if 
      *     output should be sent to JspContext.getOut().
-     * @throws javax.servlet.jsp.JspException Thrown if an error occured
+     * @throws javax.servlet.jsp.JspException Thrown if an error occurred
      *     while invoking this fragment.
      * @throws javax.servlet.jsp.SkipPageException Thrown if the page
      *     that (either directly or indirectly) invoked the tag handler that
