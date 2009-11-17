@@ -34,7 +34,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  */
 public class FastQueue {
 
-    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(FastQueue.class);
+    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(FastQueue.class);
 
     /**
      * This is the actual queue

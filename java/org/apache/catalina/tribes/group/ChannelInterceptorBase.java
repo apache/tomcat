@@ -29,7 +29,7 @@ import org.apache.catalina.tribes.Member;
 
 public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(
+    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(
         ChannelInterceptorBase.class);
 
     private ChannelInterceptor next;

@@ -53,7 +53,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
  */
 public class JspCompilationContext {
 
-    protected org.apache.juli.logging.Log log =
+    protected final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JspCompilationContext.class);
 
     protected Map<String, URL> tagFileJarUrls;

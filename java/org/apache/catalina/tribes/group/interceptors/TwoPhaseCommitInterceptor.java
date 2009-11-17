@@ -42,7 +42,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
 
     public static final byte[] START_DATA = new byte[] {113, 1, -58, 2, -34, -60, 75, -78, -101, -12, 32, -29, 32, 111, -40, 4};
     public static final byte[] END_DATA = new byte[] {54, -13, 90, 110, 47, -31, 75, -24, -81, -29, 36, 52, -58, 77, -110, 56};
-    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(TwoPhaseCommitInterceptor.class);
+    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(TwoPhaseCommitInterceptor.class);
 
     protected HashMap<UniqueId, MapEntry> messages = new HashMap<UniqueId, MapEntry>();
     protected long expire = 1000 * 60; //one minute expiration

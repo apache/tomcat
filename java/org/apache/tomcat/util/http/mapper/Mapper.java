@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public final class Mapper {
 
 
-    private static org.apache.juli.logging.Log logger =
+    private static final org.apache.juli.logging.Log logger =
         org.apache.juli.logging.LogFactory.getLog(Mapper.class);
     // ----------------------------------------------------- Instance Variables
 

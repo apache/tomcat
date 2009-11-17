@@ -55,7 +55,7 @@ import org.apache.catalina.tribes.util.Logs;
  */
 public class NioReplicationTask extends AbstractRxTask {
 
-    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( NioReplicationTask.class );
+    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( NioReplicationTask.class );
 
     private ByteBuffer buffer = null;
     private SelectionKey key;

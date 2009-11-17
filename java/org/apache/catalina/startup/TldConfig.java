@@ -66,7 +66,7 @@ public final class TldConfig  implements LifecycleListener {
     // Names of JARs that are known not to contain any TLDs
     private static HashSet<String> noTldJars;
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
 
     /**
