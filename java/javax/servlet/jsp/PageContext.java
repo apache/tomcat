@@ -433,7 +433,7 @@ abstract public class PageContext
      * ServletResponse state after invoking this call.
      *
      * <p>
-     * This method is kept for backwards compatiblity reasons.  Newly
+     * This method is kept for backwards compatibility reasons.  Newly
      * generated code should use PageContext.handlePageException(Throwable).
      *
      * @param e the exception to be handled

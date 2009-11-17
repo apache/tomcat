@@ -230,7 +230,7 @@ abstract public class TagLibraryInfo {
      * Returns an array of TagLibraryInfo objects representing the entire set 
      * of tag libraries (including this TagLibraryInfo) imported by taglib 
      * directives in the translation unit that references this TagLibraryInfo. 
-     * If a tag library is imported more than once and bound to different prefices, 
+     * If a tag library is imported more than once and bound to different prefixes, 
      * only the TagLibraryInfo bound to the first prefix must be included 
      * in the returned array.
      * 
