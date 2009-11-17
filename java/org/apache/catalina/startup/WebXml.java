@@ -43,6 +43,7 @@ import org.apache.catalina.deploy.JspPropertyGroup;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.MessageDestination;
 import org.apache.catalina.deploy.MessageDestinationRef;
+import org.apache.catalina.deploy.MultipartDef;
 import org.apache.catalina.deploy.ResourceBase;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.SecurityRoleRef;
@@ -561,6 +562,7 @@ public class WebXml {
                         roleRef.getName(), roleRef.getLink());
             }
             wrapper.setServletClass(servlet.getServletClass());
+            // TODO SERVLET3 - Multipart config
             context.addChild(wrapper);
         }
         for (String pattern : servletMappings.keySet()) {
@@ -699,6 +701,7 @@ public class WebXml {
                 }
             }
         }
+        filters.putAll(temp.getFilters());
 
         for (WebXml fragment : fragments) {
             for (JspPropertyGroup jspPropertyGroup : fragment.getJspPropertyGroups()) {
@@ -721,7 +724,7 @@ public class WebXml {
                 return false;
             }
         }
-        errorPages.putAll(temp.getErrorPages());
+        localeEncodingMappings.putAll(temp.getLocalEncodingMappings());
 
         if (getLoginConfig() == null) {
             LoginConfig tempLoginConfig = null;
@@ -766,6 +769,7 @@ public class WebXml {
                 return false;
             }
         }
+        mimeMappings.putAll(temp.getMimeMappings());
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getResourceEnvRefs(), resourceEnvRefs,
@@ -836,7 +840,7 @@ public class WebXml {
                 }
             }
         }
-
+        servlets.putAll(temp.getServlets());
         
         if (sessionTimeout == null) {
             for (WebXml fragment : fragments) {
@@ -919,7 +923,7 @@ public class WebXml {
         for (String key : fragmentMap.keySet()) {
             if (!mainMap.containsKey(key)) {
                 // Not defined in main web.xml
-                T value =fragmentMap.get(key);
+                T value = fragmentMap.get(key);
                 if (tempMap.containsKey(key)) {
                     if (value != null && !value.equals(
                             tempMap.get(key))) {
@@ -1019,10 +1023,62 @@ public class WebXml {
                 dest.addInitParameter(srcEntry.getKey(), srcEntry.getValue());
             }
         }
+        
+        if (dest.getMultipartDef() == null) {
+            dest.setMultipartDef(src.getMultipartDef());
+        } else if (src.getMultipartDef() != null) {
+            return mergeMultipartDef(src.getMultipartDef(),
+                    dest.getMultipartDef(), failOnConflict);
+        }
+        
         return true;
     }
 
+    private boolean mergeMultipartDef(MultipartDef src, MultipartDef dest,
+            boolean failOnConflict) {
 
+        if (dest.getLocation() == null) {
+            dest.setLocation(src.getLocation());
+        } else if (src.getLocation() != null) {
+            if (failOnConflict &&
+                    !src.getLocation().equals(dest.getLocation())) {
+                return false;
+            }
+        }
+
+        if (dest.getFileSizeThreshold() == null) {
+            dest.setFileSizeThreshold(src.getFileSizeThreshold());
+        } else if (src.getFileSizeThreshold() != null) {
+            if (failOnConflict &&
+                    !src.getFileSizeThreshold().equals(
+                            dest.getFileSizeThreshold())) {
+                return false;
+            }
+        }
+
+        if (dest.getMaxFileSize() == null) {
+            dest.setMaxFileSize(src.getMaxFileSize());
+        } else if (src.getLocation() != null) {
+            if (failOnConflict &&
+                    !src.getMaxFileSize().equals(dest.getMaxFileSize())) {
+                return false;
+            }
+        }
+
+        if (dest.getMaxRequestSize() == null) {
+            dest.setMaxRequestSize(src.getMaxRequestSize());
+        } else if (src.getMaxRequestSize() != null) {
+            if (failOnConflict &&
+                    !src.getMaxRequestSize().equals(
+                            dest.getMaxRequestSize())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    
     /**
      * Generates the sub-set of the web-fragment.xml files to be processed in
      * the order that the fragments must be processed as per the rules in the

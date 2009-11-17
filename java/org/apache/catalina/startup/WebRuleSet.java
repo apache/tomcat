@@ -368,6 +368,19 @@ public class WebRuleSet extends RuleSetBase {
                               "setServletClass", 0);
         digester.addCallMethod(fullPrefix + "/servlet/servlet-name",
                               "setServletName", 0);
+        
+        digester.addObjectCreate(fullPrefix + "/servlet/multipart-config",
+                                 "org.apache.catalina.deploy.MultipartDef");
+        digester.addSetNext(fullPrefix + "/servlet/multipart-config",
+                            "setMultipartConfig");
+        digester.addCallMethod(fullPrefix + "/servlet/multipart-config/location",
+                               "setLocation", 0);
+        digester.addCallMethod(fullPrefix + "/servlet/multipart-config/max-file-size",
+                               "setMaxFileSize", 0);
+        digester.addCallMethod(fullPrefix + "/servlet/multipart-config/max-request-size",
+                               "setMaxRequestSize", 0);
+        digester.addCallMethod(fullPrefix + "/servlet/multipart-config/file-size-threshold",
+                               "setFileSizeThreshold", 0);
 
         digester.addRule(fullPrefix + "/servlet-mapping",
                                new CallMethodMultiRule("addServletMapping", 2, 0));
