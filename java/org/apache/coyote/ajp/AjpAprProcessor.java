@@ -1295,7 +1295,7 @@ public class AjpAprProcessor implements ActionHook {
             }
 
             int len = chunk.getLength();
-            // 4 - hardcoded, byte[] marshalling overhead
+            // 4 - hardcoded, byte[] marshaling overhead
             // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
             int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
             int off = 0;

@@ -136,7 +136,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     /**
      * Flush the response.
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      * 
      */
     @Override
@@ -165,7 +165,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     /**
      * End request.
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     @Override
     public void endRequest() throws IOException {
@@ -180,7 +180,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
 
 
     /** 
-     * Send an acknoledgement.
+     * Send an acknowledgment.
      */
     @Override
     public void sendAck() throws IOException {
@@ -236,7 +236,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     /**
      * Commit the response.
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     @Override
     protected void commit()

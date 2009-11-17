@@ -20,7 +20,7 @@ package org.apache.coyote;
 import java.util.ArrayList;
 
 /** This can be moved to top level ( eventually with a better name ).
- *  It is currently used only as a JMX artifact, to agregate the data
+ *  It is currently used only as a JMX artifact, to aggregate the data
  *  collected from each RequestProcessor thread.
  */
 public class RequestGroupInfo {

@@ -389,7 +389,7 @@ public final class Response {
     }
 
     /**
-     * Called explicitely by user to set the Content-Language and
+     * Called explicitly by user to set the Content-Language and
      * the default encoding
      */
     public void setLocale(Locale locale) {
@@ -427,7 +427,7 @@ public final class Response {
      * of the response. This method must be called prior to writing output
      * using getWriter().
      *
-     * @param charset String containing the name of the chararacter encoding.
+     * @param charset String containing the name of the character encoding.
      */
     public void setCharacterEncoding(String charset) {
 

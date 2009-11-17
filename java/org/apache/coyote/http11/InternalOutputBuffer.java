@@ -196,7 +196,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
 
 
     /**
-     * Send an acknoledgement.
+     * Send an acknowledgment.
      */
     @Override
     public void sendAck()
@@ -215,7 +215,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
     /**
      * Commit the response.
      * 
-     * @throws IOException an undelying I/O error occured
+     * @throws IOException an underlying I/O error occurred
      */
     @Override
     protected void commit()
