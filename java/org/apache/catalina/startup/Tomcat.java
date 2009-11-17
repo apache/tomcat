@@ -723,7 +723,7 @@ public class Tomcat {
      * This is needed because we don't use the default web.xml, where this 
      * is encoded.
      */
-    public static final String[] DEFAULT_MIME_MAPPINGS = {
+    private static final String[] DEFAULT_MIME_MAPPINGS = {
         "abs", "audio/x-mpeg", 
         "ai", "application/postscript", 
         "aif", "audio/x-aiff", 
