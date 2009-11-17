@@ -341,7 +341,7 @@ public abstract class BaseDirContext implements DirContext {
      * Return the real path for a given virtual path, if possible; otherwise
      * return <code>null</code>.
      *
-     * @param path The path to the desired resource
+     * @param name The path to the desired resource
      */
     public String getRealPath(String name) {
         if (!aliases.isEmpty()) {

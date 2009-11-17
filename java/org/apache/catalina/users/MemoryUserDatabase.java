@@ -205,7 +205,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * Setting the readonly status of the user database
      *
-     * @param pathname The new pathname
+     * @param readonly the new status
      */
     public void setReadonly(boolean readonly) {
 

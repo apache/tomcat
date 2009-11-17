@@ -691,7 +691,7 @@ public class RemoteIpValve extends ValveBase {
      * Default value : <code>X-Forwarded-For</code>
      * </p>
      * 
-     * @param remoteIPHeader
+     * @param remoteIpHeader
      */
     public void setRemoteIpHeader(String remoteIpHeader) {
         this.remoteIpHeader = remoteIpHeader;
@@ -699,7 +699,7 @@ public class RemoteIpValve extends ValveBase {
     
     /**
      * <p>
-     * Comma delimited list of proxies that are trusted when they appear in the {@link #remoteIPHeader} header. Can be expressed as a
+     * Comma delimited list of proxies that are trusted when they appear in the {@link #remoteIpHeader} header. Can be expressed as a
      * regular expression.
      * </p>
      * <p>

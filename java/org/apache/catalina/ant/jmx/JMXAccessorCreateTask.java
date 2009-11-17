@@ -95,7 +95,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     }
     
     /**
-     * @param classLoader The classLoader to set.
+     * @param classLoaderName The classLoader to set.
      */
     public void setClassLoader(String classLoaderName) {
         this.classLoader = classLoaderName;

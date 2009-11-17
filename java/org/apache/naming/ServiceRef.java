@@ -91,24 +91,12 @@ public class ServiceRef
 
     // ----------------------------------------------------------- Constructors
 
-
-    /**
-     * Service Reference.
-     * 
-     * @param serviceClass Service class
-     */
     public ServiceRef(String refname, String serviceInterface, String[] serviceQname, 
                        String wsdl, String jaxrpcmapping) {
         this(refname, serviceInterface, serviceQname, wsdl, jaxrpcmapping,
                         null, null);
     }
 
-
-    /**
-     * Service Reference.
-     * 
-     * @param serviceClass Service class
-     */
     public ServiceRef(String refname, String serviceInterface, String[] serviceQname, 
                        String wsdl, String jaxrpcmapping,
                        String factory, String factoryLocation) {

@@ -46,7 +46,8 @@ public class LinkObject {
      * Construct a new element from the data object.
      * Sets the pointer to null.
      *
-     * @param key The key
+     * @param msg the message
+     * @param destination TBA
      * @param payload The data object.
      */
     public LinkObject(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
