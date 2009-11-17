@@ -53,7 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class ExtensionValidator {
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(ExtensionValidator.class);
 
     /**

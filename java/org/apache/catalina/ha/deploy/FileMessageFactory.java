@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/
-    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
+    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
             .getLog(FileMessageFactory.class);
 
     /**

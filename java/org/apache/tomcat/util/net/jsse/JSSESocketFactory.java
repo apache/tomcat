@@ -95,7 +95,7 @@ public class JSSESocketFactory
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
     
-    static org.apache.juli.logging.Log log =
+    static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
 
     protected boolean initialized;

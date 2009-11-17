@@ -124,7 +124,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public abstract class ContainerBase
     implements Container, Lifecycle, Pipeline, MBeanRegistration {
 
-    private static org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
 
     /**

@@ -37,7 +37,7 @@ import java.util.Iterator;
 public class WarWatcher {
 
     /*--Static Variables----------------------------------------*/
-    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
+    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
             .getLog(WarWatcher.class);
 
     /*--Instance Variables--------------------------------------*/

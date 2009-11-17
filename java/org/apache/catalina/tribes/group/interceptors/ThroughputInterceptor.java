@@ -37,7 +37,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * @version 1.0
  */
 public class ThroughputInterceptor extends ChannelInterceptorBase {
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class);
+    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class);
 
     double mbTx = 0;
     double mbAppTx = 0;

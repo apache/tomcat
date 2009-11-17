@@ -40,7 +40,7 @@ import java.io.ObjectOutputStream;
 
 public class DeltaRequest implements Externalizable {
 
-    public static org.apache.juli.logging.Log log =
+    public static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( DeltaRequest.class );
 
     /**
