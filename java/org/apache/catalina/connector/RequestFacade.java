@@ -996,11 +996,13 @@ public class RequestFacade implements HttpServletRequest {
         request.logout();
     }
     
-    public Collection<Part> getParts() {
+    public Collection<Part> getParts() throws IllegalStateException,
+            IOException, ServletException {
         return request.getParts();
     }
     
-    public Part getPart(String name) {
+    public Part getPart(String name) throws IllegalStateException, IOException,
+            ServletException {
         return request.getPart(name);
     }
 
