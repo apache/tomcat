@@ -884,7 +884,7 @@ public class SimpleTcpCluster
      * notify all listeners from receiving a new message is not ClusterMessage
      * emit Failure Event to LifecylceListener
      * 
-     * @param message
+     * @param msg
      *            received Message
      */
     public boolean accept(Serializable msg, Member sender) {

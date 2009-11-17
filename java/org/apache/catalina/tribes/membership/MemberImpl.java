@@ -75,7 +75,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      */
     protected int msgCount = 0;
     /**
-     * The number of milliseconds since this members was
+     * The number of milliseconds since this member was
      * created, is kept track of using the start time
      */
     protected long memberAliveTime = 0;
@@ -122,10 +122,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     /**
      * Construct a new member object
-     * @param name - the name of this member, cluster unique
-     * @param domain - the cluster domain name of this member
      * @param host - the tcp listen host
      * @param port - the tcp listen port
+     * @param aliveTime - the number of milliseconds since this member was created
      */
     public MemberImpl(String host,
                       int port,
@@ -164,7 +163,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Create a data package to send over the wire representing this member.
      * This is faster than serialization.
      * @return - the bytes for this member deserialized
-     * @throws Exception
      */
     public byte[] getData()  {
         return getData(true);

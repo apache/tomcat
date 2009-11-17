@@ -237,9 +237,9 @@ public class Embedded  extends StandardService {
 
 
     /**
-     * Enables or disables naming support.
+     * Enables or disables redirection.
      *
-     * @param useNaming The new use naming value
+     * @param redirectStreams The new redirection value
      */
     public void setRedirectStreams(boolean redirectStreams) {
 

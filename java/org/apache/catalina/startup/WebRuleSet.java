@@ -1013,7 +1013,7 @@ final class SoapHeaderRule extends Rule {
      *   no namespace
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
-     * @param bodyText The body text of this element
+     * @param text The body text of this element
      */
     @Override
     public void body(String namespace, String name, String text)
@@ -1048,7 +1048,7 @@ final class ServiceQnameRule extends Rule {
      *   no namespace
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
-     * @param bodyText The body text of this element
+     * @param text The body text of this element
      */
     @Override
     public void body(String namespace, String name, String text)

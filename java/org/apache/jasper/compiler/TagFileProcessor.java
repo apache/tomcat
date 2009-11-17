@@ -502,7 +502,7 @@ class TagFileProcessor {
      *            the current ParserController used in this compilation
      * @param name
      *            the tag name as specified in the TLD
-     * @param tagfile
+     * @param path
      *            the path for the tagfile
      * @param tagFileJarUrl
      *            the url for the Jar containign the tag file 

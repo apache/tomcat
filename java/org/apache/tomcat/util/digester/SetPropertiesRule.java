@@ -154,7 +154,7 @@ public class SetPropertiesRule extends Rule {
      * @param namespace the namespace URI of the matching element, or an 
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param theName the local name if the parser is namespace aware, or just 
      *   the element name otherwise
      * @param attributes The attribute list for this element
      */

@@ -105,7 +105,6 @@ final class StandardHostValve
      *
      * @param request Request to be processed
      * @param response Response to be produced
-     * @param valveContext Valve context used to forward to the next Valve
      *
      * @exception IOException if an input/output error occurred
      * @exception ServletException if a servlet error occurred
@@ -167,7 +166,7 @@ final class StandardHostValve
      *
      * @param request Request to be processed
      * @param response Response to be produced
-     * @param valveContext Valve context used to forward to the next Valve
+     * @param event the event
      *
      * @exception IOException if an input/output error occurred
      * @exception ServletException if a servlet error occurred

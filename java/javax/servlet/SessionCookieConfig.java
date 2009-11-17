@@ -79,8 +79,9 @@ public interface SessionCookieConfig {
     public boolean isSecure();
 
     /**
+     * Sets the maximum age.
      * 
-     * @param maxAge
+     * @param MaxAge the maximum age to set
      * @throws IllegalStateException
      */
     public void setMaxAge(int MaxAge);

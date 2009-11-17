@@ -149,15 +149,15 @@ public class LockOutRealm extends CombinedRealm {
      *
      * @param username Username of the Principal to look up
      * @param clientDigest Digest which has been submitted by the client
-     * @param nOnce Unique (or supposedly unique) token which has been used
+     * @param nonce Unique (or supposedly unique) token which has been used
      * for this request
-     * @param realm Realm name
+     * @param realmName Realm name
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
      */
     @Override
     public Principal authenticate(String username, String clientDigest,
-            String once, String nc, String cnonce, String qop,
+            String nonce, String nc, String cnonce, String qop,
             String realmName, String md5a2) {
 
         if (isLocked(username)) {
@@ -169,7 +169,7 @@ public class LockOutRealm extends CombinedRealm {
         }
 
         Principal authenticatedUser = super.authenticate(username, clientDigest,
-                once, nc, cnonce, qop, realmName, md5a2);
+                nonce, nc, cnonce, qop, realmName, md5a2);
         
         if (authenticatedUser == null) {
             registerAuthFailure(username);

@@ -72,8 +72,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      * Send a message to one or more members in the cluster
      * @param destination Member[] - the destinations, null or zero length means all
      * @param msg ClusterMessage - the message to send
-     * @param options int - sender options, see class documentation
-     * @return ClusterMessage[] - the replies from the members, if any.
+     * @param payload TBA
      */
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {

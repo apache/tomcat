@@ -89,7 +89,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
     /**
      * start cluster receiver
-     * @throws Exception
+     * @throws IOException
      * @see org.apache.catalina.tribes.ClusterReceiver#start()
      */
     @Override
