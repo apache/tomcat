@@ -105,7 +105,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     private HashMap<String,ManagedBean> descriptors =
         new HashMap<String,ManagedBean>();
 
-    /** List of managed byeans, keyed by class name
+    /** List of managed beans, keyed by class name
      */
     private HashMap<String,ManagedBean> descriptorsByClass =
         new HashMap<String,ManagedBean>();
@@ -236,9 +236,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * descriptors file. In the case of File and URL, if the extension is ".ser"
      * a serialized version will be loaded. 
      * 
-     * This method should be used to explicitely load metadata - but this is not
+     * This method should be used to explicitly load metadata - but this is not
      * required in most cases. The registerComponent() method will find metadata
-     * in the same pacakge.
+     * in the same package.
      * 
      * @param source
      */ 

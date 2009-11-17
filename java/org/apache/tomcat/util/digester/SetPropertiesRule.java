@@ -84,7 +84,7 @@ public class SetPropertiesRule extends Rule {
     }
     
     /** 
-     * <p>Constructor allows attribute->property mapping to be overriden.</p>
+     * <p>Constructor allows attribute->property mapping to be overridden.</p>
      *
      * <p>Two arrays are passed in. 
      * One contains the attribute names and the other the property names.
@@ -93,7 +93,7 @@ public class SetPropertiesRule extends Rule {
      * to the first string in the property name list and so on.</p>
      *
      * <p>If a property name is null or the attribute name has no matching
-     * property name, then this indicates that the attibute should be ignored.</p>
+     * property name, then this indicates that the attribute should be ignored.</p>
      * 
      * <h5>Example One</h5>
      * <p> The following constructs a rule that maps the <code>alt-city</code>

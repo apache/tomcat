@@ -56,7 +56,7 @@ import org.apache.juli.logging.LogFactory;
  *  - remove methods not used in tomcat and redundant/not very generic
  *  - must be created from the ManagedBean - I don't think there were any direct
  *    uses, but now it is required.
- *  - some of the gratuituous flexibility removed - instead this is more predictive and
+ *  - some of the gratuitous flexibility removed - instead this is more predictive and
  *    strict with the use cases.
  *  - all Method and metadata is stored in ManagedBean. BaseModelBMean and ManagedBean act
  *    like Object and Class. 
@@ -81,7 +81,7 @@ import org.apache.juli.logging.LogFactory;
  * Limitations:
  * <ul>
  * <li>Only managed resources of type <code>objectReference</code> are
- *     supportd.</li>
+ *     supported.</li>
  * <li>Caching of attribute values and operation results is not supported.
  *     All calls to <code>invoke()</code> are immediately executed.</li>
  * <li>Persistence of MBean attributes and operations is not supported.</li>
@@ -439,7 +439,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
         }
         //attributes.put( name, value );
 //        if( source != null ) {
-//            // this mbean is asscoiated with a source - maybe we want to persist
+//            // this mbean is associated with a source - maybe we want to persist
 //            source.updateField(oname, name, value);
 //        }
     }

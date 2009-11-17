@@ -145,7 +145,7 @@ public class Digester extends DefaultHandler {
      * allows Digester to be used in environments which are unfriendly to
      * JAXP1.1 (such as WebLogic 6.0).  Note that if you use this option you
      * have to configure namespace and validation support yourself, as these
-     * properties only affect the SAXParser and emtpy constructor.
+     * properties only affect the SAXParser and empty constructor.
      */
     public Digester(XMLReader reader) {
 
@@ -623,7 +623,7 @@ public class Digester extends DefaultHandler {
 
     
     /**
-     * Set the publid id of the current file being parse.
+     * Set the public id of the current file being parse.
      * @param publicId the DTD/Schema public's id.
      */
     public void setPublicId(String publicId){
@@ -1722,7 +1722,7 @@ public class Digester extends DefaultHandler {
      *  for a single parameter from the body of this element)
      * @param paramTypes Set of Java class names for the types
      *  of the expected parameters
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      * @see CallMethodRule
@@ -1751,7 +1751,7 @@ public class Digester extends DefaultHandler {
      * @param paramCount Number of expected parameters (or zero
      *  for a single parameter from the body of this element)
      * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      * @see CallMethodRule
@@ -2155,7 +2155,7 @@ public class Digester extends DefaultHandler {
      * @param pattern Element matching pattern
      * @param methodName Method name to call on the parent element
      * @param paramType Java class name of the expected parameter type
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      * @see SetNextRule
@@ -2289,7 +2289,7 @@ public class Digester extends DefaultHandler {
      * @param pattern Element matching pattern
      * @param methodName Method name to call on the parent element
      * @param paramType Java class name of the expected parameter type
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      * @see SetTopRule

@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 
 /** Efficient conversion of character to bytes.
  *  
- *  This uses the standard JDK mechansim - a writer - but provides mechanisms
+ *  This uses the standard JDK mechanism - a writer - but provides mechanisms
  *  to recycle all the objects that are used. It is compatible with JDK1.1 and up,
  *  ( nio is better, but it's not available even in 1.2 or 1.3 )
  * 
@@ -141,8 +141,8 @@ public final class C2BConverter {
 
 
 /**
- *  Special writer class, where close() is overritten. The default implementation
- *  would set byteOutputter to null, and the writter can't be recycled. 
+ *  Special writer class, where close() is overridden. The default implementation
+ *  would set byteOutputter to null, and the writer can't be recycled. 
  *
  *  Note that the flush method will empty the internal buffers _and_ call
  *  flush on the output stream - that's why we use an intermediary output stream
@@ -161,7 +161,7 @@ public final class C2BConverter {
  * 
  */
  final class	WriteConvertor extends OutputStreamWriter {
-    // stream with flush() and close(). overriden.
+    // stream with flush() and close(). overridden.
     private IntermediateOutputStream ios;
     
     // Has a private, internal byte[8192]
@@ -175,7 +175,7 @@ public final class C2BConverter {
 	ios=out;
     }
     
-    /** Overriden - will do nothing but reset internal state.
+    /** Overridden - will do nothing but reset internal state.
      */
     @Override
     public  final void close() throws IOException {
@@ -215,7 +215,7 @@ public final class C2BConverter {
 }
 
 
-/** Special output stream where close() is overriden, so super.close()
+/** Special output stream where close() is overridden, so super.close()
     is never called.
     
     This allows recycling. It can also be disabled, so callbacks will

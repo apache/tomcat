@@ -64,7 +64,7 @@ public class SetNextRule extends Rule {
      * @param digester The associated Digester
      * @param methodName Method name of the parent method to call
      * @param paramType Java class of the parent method's argument
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      *
@@ -98,7 +98,7 @@ public class SetNextRule extends Rule {
      *
      * @param methodName Method name of the parent method to call
      * @param paramType Java class of the parent method's argument
-     *  (if you wish to use a primitive type, specify the corresonding
+     *  (if you wish to use a primitive type, specify the corresponding
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      */
@@ -137,7 +137,7 @@ public class SetNextRule extends Rule {
      * <p>Is exact matching being used.</p>
      *
      * <p>This rule uses <code>org.apache.commons.beanutils.MethodUtils</code> 
-     * to introspect the relevent objects so that the right method can be called.
+     * to introspect the relevant objects so that the right method can be called.
      * Originally, <code>MethodUtils.invokeExactMethod</code> was used.
      * This matches methods very strictly 
      * and so may not find a matching method when one exists.
