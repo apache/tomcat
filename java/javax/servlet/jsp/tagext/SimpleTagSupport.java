@@ -156,7 +156,7 @@ public class SimpleTagSupport implements SimpleTag {
      * indicate in the description subelement an observable type.
      * The type should be a subtype of the tag handler implementation
      * class or void.
-     * This addititional constraint can be exploited by a
+     * This additional constraint can be exploited by a
      * specialized container that knows about that specific tag library,
      * as in the case of the JSP standard tag library.
      *
