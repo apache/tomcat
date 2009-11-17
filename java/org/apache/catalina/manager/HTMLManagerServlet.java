@@ -49,7 +49,8 @@ import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
-import org.apache.tomcat.util.http.fileupload.DiskFileUpload;
+import org.apache.tomcat.util.http.fileupload.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 
 /**
@@ -260,15 +261,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
     protected String upload(HttpServletRequest request) throws IOException {
         String message = "";
 
-        // Create a new file upload handler
-        DiskFileUpload upload = new DiskFileUpload();
-
         // Get the tempdir
         File tempdir = (File) getServletContext().getAttribute
             (ServletContext.TEMPDIR);
+
+        // Create a new file upload handler
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setRepository(tempdir.getCanonicalFile());
+        ServletFileUpload upload = new ServletFileUpload();
+        upload.setFileItemFactory(factory);
+        
         // Set upload parameters
         upload.setSizeMax(-1);
-        upload.setRepositoryPath(tempdir.getCanonicalPath());
     
         // Parse the request
         String basename = null;
