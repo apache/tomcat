@@ -228,7 +228,7 @@ public abstract class HttpServlet extends GenericServlet {
      * @param req   the request object that is passed to the servlet
      *
      * @param resp  the response object that the servlet
-     *                  uses to return the headers to the clien
+     *                  uses to return the headers to the client
      *
      * @exception IOException   if an input or output error occurs
      *
