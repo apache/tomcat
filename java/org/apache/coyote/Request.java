@@ -140,7 +140,7 @@ public final class Request {
     private ActionHook hook;
 
     private int bytesRead=0;
-    // Time of the request - usefull to avoid repeated calls to System.currentTime
+    // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTime = 0L;
     private int available = 0;
 
@@ -149,9 +149,9 @@ public final class Request {
 
 
     /**
-     * Get the instance id (or JVM route). Curently Ajp is sending it with each
+     * Get the instance id (or JVM route). Currently Ajp is sending it with each
      * request. In future this should be fixed, and sent only once ( or
-     * 'negociated' at config time so both tomcat and apache share the same name.
+     * 'negotiated' at config time so both tomcat and apache share the same name.
      * 
      * @return the instance id
      */

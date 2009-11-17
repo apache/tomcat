@@ -179,7 +179,7 @@ public class Http11AprProcessor implements ActionHook {
 
 
     /**
-     * Content delimitator for the request (if false, the connection will
+     * Content delimiter for the request (if false, the connection will
      * be closed at the end of the request).
      */
     protected boolean contentDelimitation = true;
@@ -271,7 +271,7 @@ public class Http11AprProcessor implements ActionHook {
 
 
     /**
-     * Minimum contentsize to make compression.
+     * Minimum content size to make compression.
      */
     protected int compressionMinSize = 2048;
 
@@ -412,7 +412,7 @@ public class Http11AprProcessor implements ActionHook {
     }
 
     /**
-     * Add a mime-type which will be compressable
+     * Add a mime-type which will be compressible
      * The mime-type String will be exactly matched
      * in the response mime-type header .
      *
@@ -425,7 +425,7 @@ public class Http11AprProcessor implements ActionHook {
 
 
     /**
-     * Set compressable mime-type list (this method is best when used with
+     * Set compressible mime-type list (this method is best when used with
      * a large number of connectors, where it would be better to have all of
      * them referenced a single array).
      */
@@ -435,7 +435,7 @@ public class Http11AprProcessor implements ActionHook {
 
 
     /**
-     * Set compressable mime-type list
+     * Set compressible mime-type list
      * List contains users agents separated by ',' :
      *
      * ie: "text/html,text/xml,text/plain"
@@ -975,7 +975,7 @@ public class Http11AprProcessor implements ActionHook {
 
         } else if (actionCode == ActionCode.ACTION_ACK) {
 
-            // Acknowlege request
+            // Acknowledge request
 
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
@@ -1434,7 +1434,7 @@ public class Http11AprProcessor implements ActionHook {
 
         if (valueMB == null || valueMB.isNull()) {
             // HTTP/1.0
-            // Default is what the socket tells us. Overriden if a host is
+            // Default is what the socket tells us. Overridden if a host is
             // found/parsed
             request.setServerPort(endpoint.getPort());
             return;
@@ -1518,7 +1518,7 @@ public class Http11AprProcessor implements ActionHook {
             || (acceptEncodingMB.indexOf("gzip") == -1))
             return false;
 
-        // Check if content is not allready gzipped
+        // Check if content is not already gzipped
         MessageBytes contentEncodingMB =
             response.getMimeHeaders().getValue("Content-Encoding");
 
@@ -1526,7 +1526,7 @@ public class Http11AprProcessor implements ActionHook {
             && (contentEncodingMB.indexOf("gzip") != -1))
             return false;
 
-        // If force mode, allways compress (test purposes only)
+        // If force mode, always compress (test purposes only)
         if (compressionLevel == 2)
            return true;
 
@@ -1544,7 +1544,7 @@ public class Http11AprProcessor implements ActionHook {
             }
         }
 
-        // Check if suffisant len to trig the compression
+        // Check if sufficient length to trigger the compression
         long contentLength = response.getContentLengthLong();
         if ((contentLength == -1)
             || (contentLength > compressionMinSize)) {

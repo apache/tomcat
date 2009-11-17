@@ -196,7 +196,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * using it.
      *
      * @throws IOException If an exception occurs during the underlying socket
-     * read operations, or if the given buffer is not big enough to accomodate
+     * read operations, or if the given buffer is not big enough to accommodate
      * the whole line.
      * @return true if data is properly fed; false if no data is available 
      * immediately and thread should be freed
@@ -346,7 +346,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
             while (!parsingRequestLineEol) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill(true, false)) //reques line parsing
+                    if (!fill(true, false)) //request line parsing
                         return false;
                 }
         

@@ -72,7 +72,7 @@ public class VoidInputFilter implements InputFilter {
 
 
     /**
-     * Set the associated reauest.
+     * Set the associated request.
      */
     public void setRequest(Request request) {
     }
