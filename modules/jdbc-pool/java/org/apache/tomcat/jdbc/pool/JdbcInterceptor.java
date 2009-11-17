@@ -72,7 +72,9 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      */
     private JdbcInterceptor next = null;
     /**
-     * Property that decides how we do string comparison, default is reference (==)
+     * Property that decides how we do string comparison, default is to use
+     * {@link String#equals(Object)}. If set to <code>false</code> then the
+     * equality operator (==) is used.
      */
     private boolean useEquals = true;
 
