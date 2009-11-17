@@ -77,8 +77,8 @@ commons-dbcp.home=${base.path}/commons-dbcp-r734404-src
 commons-dbcp-src.loc=http://people.apache.org/~markt/dev/commons-dbcp-r734404-src.tar.gz
 
 # ----- Commons Pool, version 1.1 or later -----
-commons-pool.home=${base.path}/commons-pool-1.5.3-src
-commons-pool-src.loc=${base-commons.loc}/pool/source/commons-pool-1.5.3-src.tar.gz
+commons-pool.home=${base.path}/commons-pool-1.5.4-src
+commons-pool-src.loc=${base-commons.loc}/pool/source/commons-pool-1.5.4-src.tar.gz
 
 # ----- NSIS, version 2.0 or later -----
 nsis.home=${base.path}/nsis-2.45
