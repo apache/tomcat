@@ -53,7 +53,7 @@ public class NamingEntry {
 
 
     /**
-     * The type instance variable is used to avoid unsing RTTI when doing
+     * The type instance variable is used to avoid using RTTI when doing
      * lookups.
      */
     public int type;

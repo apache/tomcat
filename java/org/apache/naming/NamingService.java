@@ -93,7 +93,7 @@ public final class NamingService
     
     
     /**
-     * Retruns the Catalina component name.
+     * Returns the Catalina component name.
      */
     public String getName() {
         return NAME;
