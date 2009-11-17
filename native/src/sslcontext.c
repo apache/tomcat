@@ -162,6 +162,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
     /* Set default password callback */
     SSL_CTX_set_default_passwd_cb(c->ctx, (pem_password_cb *)SSL_password_callback);
     SSL_CTX_set_default_passwd_cb_userdata(c->ctx, (void *)(&tcn_password_callback));
+    SSL_CTX_set_info_callback(c->ctx, SSL_callback_handshake);
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */

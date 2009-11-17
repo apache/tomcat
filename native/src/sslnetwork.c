@@ -181,6 +181,10 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
         return APR_ENOPOLL;    
     if (!con->sock)
         return APR_ENOTSOCK;        
+    if (con->reneg_state == RENEG_ABORT) {
+        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
+        return APR_ECONNABORTED;
+    }
     
     /* Check if the socket was already closed
      */    
@@ -384,6 +388,11 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
     int s, i, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
+    if (con->reneg_state == RENEG_ABORT) {
+        *len = 0;
+        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
+        return APR_ECONNABORTED;
+    }
     for (;;) {
         if ((s = SSL_read(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
@@ -440,6 +449,11 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
     int s, i, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
+    if (con->reneg_state == RENEG_ABORT) {
+        *len = 0;
+        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
+        return APR_ECONNABORTED;
+    }
     for (;;) {
         if ((s = SSL_write(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
@@ -575,6 +589,11 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
      *  ssl->state = SSL_ST_ACCEPT
      *  SSL_do_handshake()
      */
+    
+    /* Toggle the renegotiation state to allow the new
+     * handshake to proceed.
+     */
+    con->reneg_state = RENEG_ALLOW;      
     retVal = SSL_renegotiate(con->ssl);
     if (retVal <= 0)
         return APR_EGENERAL;
@@ -603,6 +622,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
         } else
             break;
     }
+    con->reneg_state = RENEG_REJECT;
    
     if (SSL_get_state(con->ssl) != SSL_ST_OK) {
         return APR_EGENERAL;

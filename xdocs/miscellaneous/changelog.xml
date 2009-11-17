@@ -36,6 +36,12 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.17 and 1.1.18">
+  <changelog>
+    <fix>
+      Fix CVE-2009-3555 SSL-Man-In-The-Middle attack. (mturk)
+    </fix>
+</section>
 <section name="Changes between 1.1.16 and 1.1.17">
   <changelog>
     <update>

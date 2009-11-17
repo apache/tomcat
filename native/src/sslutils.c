@@ -672,4 +672,41 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
     return ok;
 }
 
+/*
+ * This callback function is executed while OpenSSL processes the SSL
+ * handshake and does SSL record layer stuff.  It's used to trap
+ * client-initiated renegotiations, and for dumping everything to the
+ * log.
+ */
+void SSL_callback_handshake(const SSL *ssl, int where, int rc)
+{
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)SSL_get_app_data(ssl);
+
+    /* Retrieve the conn_rec and the associated SSLConnRec. */
+    if (con == NULL) {
+        return;
+    }
+
+
+    /* If the reneg state is to reject renegotiations, check the SSL
+     * state machine and move to ABORT if a Client Hello is being
+     * read. */
+    if ((where & SSL_CB_ACCEPT_LOOP) && con->reneg_state == RENEG_REJECT) {
+        int state = SSL_get_state(ssl);
+        
+        if (state == SSL3_ST_SR_CLNT_HELLO_A 
+            || state == SSL23_ST_SR_CLNT_HELLO_A) {
+            con->reneg_state = RENEG_ABORT;
+            /* XXX: rejecting client initiated renegotiation
+             */
+        }
+    }
+    /* If the first handshake is complete, change state to reject any
+     * subsequent client-initated renegotiation. */
+    else if ((where & SSL_CB_HANDSHAKE_DONE) && con->reneg_state == RENEG_INIT) {
+        con->reneg_state = RENEG_REJECT;
+    }
+
+}
+ 
 #endif

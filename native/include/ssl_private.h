@@ -256,12 +256,29 @@ struct tcn_ssl_ctxt_t {
     tcn_pass_cb_t   *cb_data;
 };
 
+  
 typedef struct {
     apr_pool_t     *pool;
     tcn_ssl_ctxt_t *ctx;
     SSL            *ssl;
     X509           *peer;
     int             shutdown_type;
+    /* Track the handshake/renegotiation state for the connection so
+     * that all client-initiated renegotiations can be rejected, as a
+     * partial fix for CVE-2009-3555.
+     */
+    enum { 
+        RENEG_INIT = 0, /* Before initial handshake */
+        RENEG_REJECT,   /* After initial handshake; any client-initiated
+                         * renegotiation should be rejected
+                         */
+        RENEG_ALLOW,    /* A server-initated renegotiation is taking
+                         * place (as dictated by configuration)
+                         */
+        RENEG_ABORT     /* Renegotiation initiated by client, abort the
+                         * connection
+                         */
+    } reneg_state;
     apr_socket_t   *sock;
     apr_pollset_t  *pollset;
 } tcn_ssl_conn_t;
@@ -287,6 +304,7 @@ DH         *SSL_dh_get_tmp_param(int);
 DH         *SSL_dh_get_param_from_file(const char *);
 RSA        *SSL_callback_tmp_RSA(SSL *, int, int);
 DH         *SSL_callback_tmp_DH(SSL *, int, int);
+void        SSL_callback_handshake(const SSL *, int, int);
 void        SSL_vhost_algo_id(const unsigned char *, unsigned char *, int);
 int         SSL_CTX_use_certificate_chain(SSL_CTX *, const char *, int);
 int         SSL_callback_SSL_verify(int, X509_STORE_CTX *);
