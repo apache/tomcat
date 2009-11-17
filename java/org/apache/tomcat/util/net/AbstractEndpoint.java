@@ -16,8 +16,10 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.StringTokenizer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -391,6 +393,110 @@ public abstract class AbstractEndpoint {
             }
         }
     }    
+    
+    public abstract void pause();
+    public abstract void resume();
+    public abstract void start() throws Exception;
+    public abstract void destroy() throws Exception;
+    public abstract void init() throws Exception;
+    
+    public String adjustRelativePath(String path, String relativeTo) {
+        File f = new File(path);
+        if ( !f.isAbsolute()) {
+            path = relativeTo + File.separator + path;
+            f = new File(path);
+        }
+        if (!f.exists()) {
+            log.warn("configured file:["+path+"] does not exist.");
+        }
+        return path;
+    }
+    
+    public String defaultIfNull(String val, String defaultValue) {
+        if (val==null) return defaultValue;
+        else return val;
+    }
+    // --------------------  SSL related properties --------------------
+    private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    public void setTruststoreFile(String s) {
+        s = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.truststoreFile = s;
+    }
+    public String getTruststoreFile() {return truststoreFile;}
+    private String truststorePass = System.getProperty("javax.net.ssl.trustStorePassword");
+    public void setTruststorePass(String truststorePass) {this.truststorePass = truststorePass;}
+    public String getTruststorePass() {return truststorePass;}
+    private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+    public void setTruststoreType(String truststoreType) {this.truststoreType = truststoreType;}
+    public String getTruststoreType() {return truststoreType;}
+
+    private String keystoreFile = System.getProperty("user.home")+"/.keystore";
+    public String getKeystoreFile() { return keystoreFile;}
+    public void setKeystoreFile(String s ) { 
+        s = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.keystoreFile = s; 
+    }
+    public void setKeystore(String s ) { setKeystoreFile(s);}
+    public String getKeystore() { return getKeystoreFile();}
+
+    private String keyAlias = null;
+    public String getKeyAlias() { return keyAlias;}
+    public void setKeyAlias(String s ) { keyAlias = s;}
+    
+    
+    private String algorithm = "SunX509";
+    public String getAlgorithm() { return algorithm;}
+    public void setAlgorithm(String s ) { this.algorithm = s;}
+
+    private String clientAuth = "false";
+    public String getClientAuth() { return clientAuth;}
+    public void setClientAuth(String s ) { this.clientAuth = s;}
+    
+    private String keystorePass = "changeit";
+    public String getKeystorePass() { return keystorePass;}
+    public void setKeystorePass(String s ) { this.keystorePass = s;}
+    
+    private String keystoreType = "JKS";
+    public String getKeystoreType() { return keystoreType;}
+    public void setKeystoreType(String s ) { this.keystoreType = s;}
+
+    private String sslProtocol = "TLS"; 
+    public String getSslProtocol() { return sslProtocol;}
+    public void setSslProtocol(String s) { sslProtocol = s;}
+    
+    private String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
+    private String[] sslEnabledProtocolsarr =  new String[0];
+    public String[] getSslEnabledProtocolsArray() { return this.sslEnabledProtocolsarr;}
+    public void setSslEnabledProtocols(String s) {
+        this.sslEnabledProtocols = s;
+        StringTokenizer t = new StringTokenizer(s,",");
+        sslEnabledProtocolsarr = new String[t.countTokens()];
+        for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
+    }
+    
+    private String ciphers = null;
+    private String[] ciphersarr = new String[0];
+    public String[] getCiphersArray() { return this.ciphersarr;}
+    public String getCiphers() { return ciphers;}
+    public void setCiphers(String s) { 
+        ciphers = s;
+        if ( s == null ) ciphersarr = new String[0];
+        else {
+            StringTokenizer t = new StringTokenizer(s,",");
+            ciphersarr = new String[t.countTokens()];
+            for (int i=0; i<ciphersarr.length; i++ ) ciphersarr[i] = t.nextToken();
+        }
+    }
+
+    private int sessionCacheSize = 0;
+    public int getSessionCacheSize() { return sessionCacheSize;}
+    public void setSessionCacheSize(int i) { sessionCacheSize = i;}
+
+    private int sessionCacheTimeout = 86400;
+    public int getSessionCacheTimeout() { return sessionCacheTimeout;}
+    public void setSessionCacheTimeout(int i) { sessionCacheTimeout = i;}
+
+
     
 }
 
