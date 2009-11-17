@@ -100,7 +100,7 @@ public class Import implements TagPlugin {
             ctxt.generateAttribute("charEncoding");
             ctxt.generateJavaSource(";");
             
-            //assign appropriate value tp the charset
+            //assign appropriate value to the charset
             ctxt.generateJavaSource("if(null != " + charEncodingName + " " +
                     "&& !" + charEncodingName + ".equals(\"\")){");
             ctxt.generateJavaSource("    " + charSetName + " = " 

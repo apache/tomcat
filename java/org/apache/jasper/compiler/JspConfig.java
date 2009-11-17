@@ -174,7 +174,7 @@ public class JspConfig {
                             extension = file.substring(file.indexOf('.')+1);
                         }
 
-                        // The url patterns are reconstructed as the follwoing:
+                        // The url patterns are reconstructed as the following:
                         // path != null, extension == null:  / or /foo/bar.ext
                         // path == null, extension != null:  *.ext
                         // path != null, extension == "*":   /foo/*

@@ -947,7 +947,7 @@ public class JspUtil {
 
     /**
      * Compute the canonical name from a Class instance. Note that a simple
-     * replacment of '$' with '.' of a binary name would not work, as '$' is a
+     * replacement of '$' with '.' of a binary name would not work, as '$' is a
      * legal Java Identifier character.
      * 
      * @param c

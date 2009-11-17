@@ -469,7 +469,7 @@ public class JspC implements Options {
     }
 
     /**
-     * Is the generation of SMAP info for JSR45 debuggin suppressed?
+     * Is the generation of SMAP info for JSR45 debugging suppressed?
      */
     public boolean isSmapSuppressed() {
         return smapSuppressed;
@@ -800,7 +800,7 @@ public class JspC implements Options {
     }
 
     /**
-     * Obtain JSP configuration informantion specified in web.xml.
+     * Obtain JSP configuration information specified in web.xml.
      */
     public JspConfig getJspConfig() {
         return jspConfig;
@@ -1381,7 +1381,7 @@ public class JspC implements Options {
                         f = new File(fParent);
                     }
 
-                    // If there is no acceptible candidate, uriRoot will
+                    // If there is no acceptable candidate, uriRoot will
                     // remain null to indicate to the CompilerContext to
                     // use the current working/user dir.
                 }

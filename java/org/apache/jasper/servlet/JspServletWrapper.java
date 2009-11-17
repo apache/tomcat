@@ -228,7 +228,7 @@ public class JspServletWrapper {
 
     /**
      * Compile and load a prototype for the Tag file.  This is needed
-     * when compiling tag files with circular dependencies.  A prototpe
+     * when compiling tag files with circular dependencies.  A prototype
      * (skeleton) with no dependencies on other other tag files is
      * generated and compiled.
      */

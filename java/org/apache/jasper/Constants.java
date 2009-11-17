@@ -178,7 +178,7 @@ public class Constants {
                 Arrays.asList(PRIVATE_CACHED_DTD_RESOURCE_PATHS));
     
     /**
-     * Default URLs to download the pluging for Netscape and IE.
+     * Default URLs to download the plugin for Netscape and IE.
      */
     public static final String NS_PLUGIN_URL = 
         "http://java.sun.com/products/plugin/";

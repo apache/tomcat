@@ -357,7 +357,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	}
 
 	/**
-	 * Synchronize variables before fragment invokation
+	 * Synchronize variables before fragment invocation
 	 */
 	public void syncBeforeInvoke() {
 		copyTagToPageScope(VariableInfo.NESTED);

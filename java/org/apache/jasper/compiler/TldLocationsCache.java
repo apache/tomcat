@@ -113,7 +113,7 @@ public class TldLocationsCache {
     private ServletContext ctxt;
 
     //*********************************************************************
-    // Constructor and Initilizations
+    // Constructor and Initializations
 
     /*
      * Initializes the set of JARs that are known not to contain any TLDs

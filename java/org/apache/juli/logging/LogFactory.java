@@ -34,7 +34,7 @@ import java.util.Properties;
  * that corresponds to their logger of choice. This completely avoids any discovery
  * problem, while still allowing the user to switch. 
  * 
- * Note that this implementation is not just a wrapper arround JDK logging ( like
+ * Note that this implementation is not just a wrapper around JDK logging ( like
  * the original commons-logging impl ). It adds 2 features - a simpler configuration
  * ( which is in fact a subset of log4j.properties ) and a formatter that is 
  * less ugly.   
@@ -104,7 +104,7 @@ public /* abstract */ class LogFactory {
      * <strong>Usage:</strong> Set this property when Java is invoked
      * and <code>LogFactory</code> will attempt to load a new instance 
      * of the given implementation class.
-     * For example, running the following ant scriplet:
+     * For example, running the following ant scriptlet:
      * <code><pre>
      *  &lt;java classname="${test.runner}" fork="yes" failonerror="${test.failonerror}"&gt;
      *     ...
@@ -348,7 +348,7 @@ public /* abstract */ class LogFactory {
      * <p>
      * The returned string is of form "classname@hashcode", ie is the same as
      * the return value of the Object.toString() method, but works even when
-     * the specified object's class has overidden the toString method.
+     * the specified object's class has overridden the toString method.
      * 
      * @param o may be null.
      * @return a string of form classname@hashcode, or "null" if param o is null.

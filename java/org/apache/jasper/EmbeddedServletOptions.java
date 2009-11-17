@@ -89,7 +89,7 @@ public final class EmbeddedServletOptions implements Options {
     private int checkInterval = 0;
     
     /**
-     * Is the generation of SMAP info for JSR45 debuggin suppressed?
+     * Is the generation of SMAP info for JSR45 debugging suppressed?
      */
     private boolean isSmapSuppressed = false;
     
@@ -224,7 +224,7 @@ public final class EmbeddedServletOptions implements Options {
     }
     
     /**
-     * Background JSP compile thread check intervall
+     * Background JSP compile thread check interval
      */
     public int getCheckInterval() {
         return checkInterval;
@@ -245,7 +245,7 @@ public final class EmbeddedServletOptions implements Options {
     }
     
     /**
-     * Is the generation of SMAP info for JSR45 debuggin suppressed?
+     * Is the generation of SMAP info for JSR45 debugging suppressed?
      */
     public boolean isSmapSuppressed() {
         return isSmapSuppressed;
