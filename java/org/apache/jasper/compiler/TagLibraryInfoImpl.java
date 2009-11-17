@@ -451,7 +451,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      * the TLD, in case the tag file is specified relative to it @param jarFile
      * The JAR file, in case the tag file is packaged in a JAR
      * 
-     * @return TagInfo correspoding to tag file directives
+     * @return TagInfo corresponding to tag file directives
      */
     private TagFileInfo createTagFileInfo(TreeNode elem, URL jarFileUrl)
             throws JasperException {

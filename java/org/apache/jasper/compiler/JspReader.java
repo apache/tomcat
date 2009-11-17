@@ -512,7 +512,7 @@ class JspReader {
     /**
      * Unregister the source file.
      * This method is used to implement file inclusion. Each included file
-     * gets a uniq identifier (which is the index in the array of source
+     * gets a unique identifier (which is the index in the array of source
      * files).
      *
      * @return The index of the now registered file.
@@ -617,7 +617,7 @@ class JspReader {
             return true;
         }
         // Note that although the current file is undefined here, "current"
-        // is not set to null just for convience, for it maybe used to
+        // is not set to null just for convenience, for it maybe used to
         // set the current (undefined) position.
         return false;
     }

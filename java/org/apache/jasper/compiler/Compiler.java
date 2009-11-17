@@ -380,8 +380,8 @@ public abstract class Compiler {
     /**
      * Determine if a compilation is necessary by checking the time stamp of the
      * JSP page with that of the corresponding .class or .java file. If the page
-     * has dependencies, the check is also extended to its dependeants, and so
-     * on. This method can by overidden by a subclasses of Compiler.
+     * has dependencies, the check is also extended to its dependents, and so
+     * on. This method can by overridden by a subclasses of Compiler.
      * 
      * @param checkClass
      *            If true, check against .class file, if false, check against

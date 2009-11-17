@@ -26,7 +26,7 @@ import org.apache.tomcat.JarScanner;
 
 /**
  * Provide a mechanism for Jasper to obtain a reference to the JarScanner
- * impementation.
+ * implementation.
  */
 public class JarScannerFactory {
 
@@ -37,7 +37,7 @@ public class JarScannerFactory {
     }
 
     /**
-     * Obtain the {@link JarScanner} associated with the specificed {@link
+     * Obtain the {@link JarScanner} associated with the specified {@link
      * ServletContext}. It is obtained via a context parameter.
      */
     public static JarScanner getJarScanner(ServletContext ctxt) {

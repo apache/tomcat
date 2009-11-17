@@ -263,7 +263,7 @@ public class UTF8Reader
         // NOTE: Having an offset value other than zero means that there was
         //       an error in the last character read. In this case, we have
         //       skipped the read so we don't consume any bytes past the 
-        //       error. By signalling the error on the next block read we
+        //       error. By signaling the error on the next block read we
         //       allow the method to return the most valid characters that
         //       it can on the previous block read. -Ac
         else {

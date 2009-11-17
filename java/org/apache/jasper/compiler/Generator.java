@@ -490,7 +490,7 @@ class Generator {
     }
 
     /**
-     * Generation of static initializers in preamble. For example, dependant
+     * Generation of static initializers in preamble. For example, dependent
      * list, el function map, prefix map. (shared by servlet and tag handler
      * preamble generation)
      */
@@ -1335,7 +1335,7 @@ class Generator {
 
             // Create bean
             /*
-             * Check if bean is alredy there
+             * Check if bean is already there
              */
             out.printin("if (");
             out.print(name);
@@ -1756,7 +1756,7 @@ class Generator {
                 out.printil("        throws Throwable {");
                 out.pushIndent();
 
-                // Initilaize local variables used in this method.
+                // Initialize local variables used in this method.
                 if (!isTagFile) {
                     out
                             .printil("PageContext pageContext = _jspx_page_context;");
@@ -2020,7 +2020,7 @@ class Generator {
             StringBuilder sb = new StringBuilder("out.write(\"");
             int initLength = sb.length();
             int count = JspUtil.CHUNKSIZE;
-            int srcLine = 0; // relative to starting srouce line
+            int srcLine = 0; // relative to starting source line
             for (int i = 0; i < text.length(); i++) {
                 char ch = text.charAt(i);
                 --count;
@@ -2779,7 +2779,7 @@ class Generator {
 
         /*
          * Creates a tag variable name by concatenating the given prefix and
-         * shortName and endcoded to make the resultant string a valid Java
+         * shortName and encoded to make the resultant string a valid Java
          * Identifier.
          */
         private String createTagVarName(String fullName, String prefix,
