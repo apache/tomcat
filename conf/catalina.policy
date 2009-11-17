@@ -14,14 +14,15 @@
 // limitations under the License.
 
 // ============================================================================
-// catalina.corepolicy - Security Policy Permissions for Tomcat 6
+// catalina.policy - Security Policy Permissions for Tomcat 7
 //
 // This file contains a default set of security policies to be enforced (by the
 // JVM) when Catalina is executed with the "-security" option.  In addition
 // to the permissions granted here, the following additional permissions are
-// granted to the codebase specific to each web application:
+// granted specific to each web application:
 //
-// * Read access to the document root directory
+// * Read access to its document root directory
+// * Read, write and delete access to its working directory
 //
 // $Id$
 // ============================================================================
@@ -64,18 +65,18 @@ grant codeBase "file:${catalina.home}/bin/commons-daemon.jar" {
 grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         permission java.util.PropertyPermission "java.util.logging.config.class", "read";
         permission java.util.PropertyPermission "java.util.logging.config.file", "read";
-        permission java.io.FilePermission "${java.home}${file.separator}lib${file.separator}logging.properties", "read"; 
-        permission java.lang.RuntimePermission "shutdownHooks";
-        permission java.io.FilePermission "${catalina.base}${file.separator}conf${file.separator}logging.properties", "read";
         permission java.util.PropertyPermission "catalina.base", "read";
-        permission java.util.logging.LoggingPermission "control";
+        permission java.io.FilePermission "${java.home}${file.separator}lib${file.separator}logging.properties", "read"; 
+        permission java.io.FilePermission "${catalina.base}${file.separator}conf${file.separator}logging.properties", "read";
         permission java.io.FilePermission "${catalina.base}${file.separator}logs", "read, write";
         permission java.io.FilePermission "${catalina.base}${file.separator}logs${file.separator}*", "read, write";
+        permission java.lang.RuntimePermission "shutdownHooks";
         permission java.lang.RuntimePermission "getClassLoader";
         permission java.lang.RuntimePermission "setContextClassLoader";
+        permission java.util.logging.LoggingPermission "control";
         // To enable per context logging configuration, permit read access to the appropriate file.
-        // Be sure that the logging configuration is secure before enabling such access
-        // eg for the examples web application:
+        // Be sure that the logging configuration is secure before enabling such access.
+        // E.g. for the examples web application:
         // permission java.io.FilePermission "${catalina.base}${file.separator}webapps${file.separator}examples${file.separator}WEB-INF${file.separator}classes${file.separator}logging.properties", "read";
 };
 
@@ -137,16 +138,16 @@ grant {
 
     // All JSPs need to be able to read this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat";
-    
+
     // Precompiled JSPs need access to these packages.
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.el";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime.*";
-    
+
     // Precompiled JSPs need access to these system properties.
     permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
     permission java.util.PropertyPermission "org.apache.el.parser.COERCE_TO_ZERO", "read";
-    
+
     // Applications using Comet need to be able to access this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
 };
@@ -166,21 +167,21 @@ grant {
 // the NOAA web server.  You might create a "grant" entries like this:
 //
 // The permissions granted to the context root directory apply to JSP pages.
-// grant codeBase "file:${catalina.home}/webapps/examples/-" {
+// grant codeBase "file:${catalina.base}/webapps/examples/-" {
 //      permission java.net.SocketPermission "dbhost.mycompany.com:5432", "connect";
 //      permission java.net.SocketPermission "*.noaa.gov:80", "connect";
 // };
 //
 // The permissions granted to the context WEB-INF/classes directory
-// grant codeBase "file:${catalina.home}/webapps/examples/WEB-INF/classes/-" {
+// grant codeBase "file:${catalina.base}/webapps/examples/WEB-INF/classes/-" {
 // };
 //
 // The permission granted to your JDBC driver
-// grant codeBase "jar:file:${catalina.home}/webapps/examples/WEB-INF/lib/driver.jar!/-" {
+// grant codeBase "jar:file:${catalina.base}/webapps/examples/WEB-INF/lib/driver.jar!/-" {
 //      permission java.net.SocketPermission "dbhost.mycompany.com:5432", "connect";
 // };
 // The permission granted to the scrape taglib
-// grant codeBase "jar:file:${catalina.home}/webapps/examples/WEB-INF/lib/scrape.jar!/-" {
+// grant codeBase "jar:file:${catalina.base}/webapps/examples/WEB-INF/lib/scrape.jar!/-" {
 //      permission java.net.SocketPermission "*.noaa.gov:80", "connect";
 // };
 
