@@ -47,7 +47,7 @@ import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 public class Http11Protocol extends AbstractHttp11Protocol {
 
 
-    protected static final org.apache.juli.logging.Log log
+    private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
 
 
@@ -83,6 +83,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
 
 
 
+    @Override
     public void init() throws Exception {
         ((JIoEndpoint)endpoint).setName(getName());
         ((JIoEndpoint)endpoint).setHandler(cHandler);
@@ -124,6 +125,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
 
     }
 
+    @Override
     public void start() throws Exception {
         if (this.domain != null) {
             try {
