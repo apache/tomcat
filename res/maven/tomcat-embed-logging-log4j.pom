@@ -18,7 +18,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat.embed</groupId>
-  <artifactId>tomcta-embed-logging-log4j</artifactId>
+  <artifactId>tomcat-embed-logging-log4j</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>log4j logging implementation for embedded Tomcat</description>
 </project>

@@ -18,7 +18,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat.embed</groupId>
-  <artifactId>tomcta-embed-logging-juli</artifactId>
+  <artifactId>tomcat-embed-logging-juli</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>JULI logging implementation for embedded Tomcat</description>
 </project>
