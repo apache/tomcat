@@ -41,7 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  * the time. The work-around is to initialise these singletons when Tomcat's
  * common class loader is the context class loader.
  * <p>
- * Locked usually files occur when a resource inside a JAR is accessed without
+ * Locked files usually occur when a resource inside a JAR is accessed without
  * first disabling Jar URL connection caching. The workaround is to disable this
  * caching by default. 
  */
