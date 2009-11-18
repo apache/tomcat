@@ -64,7 +64,7 @@ public final class JspRuntimeContext {
     /*
      * Counts how many times the webapp's JSPs have been reloaded.
      */
-    private AtomicInteger jspReloadCount;
+    private AtomicInteger jspReloadCount = new AtomicInteger(0);
 
     /**
      * Preload classes required at runtime by a JSP servlet so that
