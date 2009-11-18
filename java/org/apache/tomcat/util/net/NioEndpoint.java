@@ -34,7 +34,6 @@ import java.nio.channels.WritableByteChannel;
 import java.security.KeyStore;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
