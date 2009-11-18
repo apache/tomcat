@@ -69,6 +69,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
 
     /** Start the protocol
      */
+    @Override
     public void init() throws Exception {
         endpoint.setName(getName());
         ((NioEndpoint)endpoint).setHandler(cHandler);
@@ -85,6 +86,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
 
     }
 
+    @Override
     public void start() throws Exception {
         if( this.domain != null ) {
             try {
@@ -465,7 +467,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
     
 
 
-    protected static final org.apache.juli.logging.Log log
+    private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11NioProtocol.class);
 
 }
