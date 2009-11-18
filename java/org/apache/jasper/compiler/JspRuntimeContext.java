@@ -29,6 +29,7 @@ import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspFactory;
@@ -63,7 +64,7 @@ public final class JspRuntimeContext {
     /*
      * Counts how many times the webapp's JSPs have been reloaded.
      */
-    private int jspReloadCount;
+    private AtomicInteger jspReloadCount;
 
     /**
      * Preload classes required at runtime by a JSP servlet so that
@@ -110,29 +111,37 @@ public final class JspRuntimeContext {
         this.options = options;
 
         // Get the parent class loader
-        parentClassLoader = Thread.currentThread().getContextClassLoader();
-        if (parentClassLoader == null) {
-            parentClassLoader = this.getClass().getClassLoader();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader == null) {
+            loader = this.getClass().getClassLoader();
         }
 
         if (log.isDebugEnabled()) {
-            if (parentClassLoader != null) {
+            if (loader != null) {
                 log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
-                                               parentClassLoader.toString()));
+                                               loader.toString()));
             } else {
                 log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
                                                "<none>"));
             }
         }
 
-        initClassPath();
+        parentClassLoader =  loader;
+        classpath = initClassPath();
 
         if (context instanceof org.apache.jasper.servlet.JspCServletContext) {
+            codeSource = null;
+            permissionCollection = null;
             return;
         }
 
         if (Constants.IS_SECURITY_ENABLED) {
-            initSecurity();
+            SecurityHolder holder = initSecurity();
+            codeSource = holder.cs;
+            permissionCollection = holder.pc;
+        } else {
+            codeSource = null;
+            permissionCollection = null;
         }
 
         // If this web application context is running from a
@@ -150,13 +159,13 @@ public final class JspRuntimeContext {
     /**
      * This web applications ServletContext
      */
-    private ServletContext context;
-    private Options options;
-    private ClassLoader parentClassLoader;
-    private PermissionCollection permissionCollection;
-    private CodeSource codeSource;                    
-    private String classpath;
-    private long lastCheck = -1L;
+    private final ServletContext context;
+    private final Options options;
+    private final ClassLoader parentClassLoader;
+    private final PermissionCollection permissionCollection;
+    private final CodeSource codeSource;                    
+    private final String classpath;
+    private volatile long lastCheck = -1L;
 
     /**
      * Maps JSP pages to their JspServletWrapper's
@@ -247,8 +256,8 @@ public final class JspRuntimeContext {
     /**
      * Increments the JSP reload counter.
      */
-    public synchronized void incrementJspReloadCount() {
-        jspReloadCount++;
+    public void incrementJspReloadCount() {
+        jspReloadCount.incrementAndGet();
     }
 
     /**
@@ -256,8 +265,8 @@ public final class JspRuntimeContext {
      *
      * @param count Value to which to reset the JSP reload counter
      */
-    public synchronized void setJspReloadCount(int count) {
-        this.jspReloadCount = count;
+    public void setJspReloadCount(int count) {
+        jspReloadCount.set(count);
     }
 
     /**
@@ -266,7 +275,7 @@ public final class JspRuntimeContext {
      * @return The current value of the JSP reload counter
      */
     public int getJspReloadCount() {
-        return jspReloadCount;
+        return jspReloadCount.intValue();
     }
 
 
@@ -321,7 +330,7 @@ public final class JspRuntimeContext {
     /**
      * Method used to initialize classpath for compiles.
      */
-    private void initClassPath() {
+    private String initClassPath() {
 
         StringBuilder cpath = new StringBuilder();
         String sep = System.getProperty("path.separator");
@@ -348,23 +357,35 @@ public final class JspRuntimeContext {
             cp = options.getClassPath();
         }
 
-        classpath = cpath.toString() + cp;
+        String path = cpath.toString() + cp;
 
         if(log.isDebugEnabled()) {
-            log.debug("Compilation classpath initialized: " + getClassPath());
+            log.debug("Compilation classpath initialized: " + path);
         }
+        return path;
     }
 
+    // Helper class to allow initSecurity() to return two items
+    private static class SecurityHolder{
+        private final CodeSource cs;
+        private final PermissionCollection pc;
+        private SecurityHolder(CodeSource cs, PermissionCollection pc){
+            this.cs = cs;
+            this.pc = pc;
+        }
+    }
     /**
      * Method used to initialize SecurityManager data.
      */
-    private void initSecurity() {
+    private SecurityHolder initSecurity() {
 
         // Setup the PermissionCollection for this web app context
         // based on the permissions configured for the root of the
         // web app context directory, then add a file read permission
         // for that directory.
         Policy policy = Policy.getPolicy();
+        CodeSource source = null;
+        PermissionCollection permissions = null;
         if( policy != null ) {
             try {          
                 // Get the permissions for the web app context
@@ -378,21 +399,21 @@ public final class JspRuntimeContext {
                 }
                 File contextDir = new File(codeBase);
                 URL url = contextDir.getCanonicalFile().toURI().toURL();
-                codeSource = new CodeSource(url,(Certificate[])null);
-                permissionCollection = policy.getPermissions(codeSource);
+                source = new CodeSource(url,(Certificate[])null);
+                permissions = policy.getPermissions(source);
 
                 // Create a file read permission for web app context directory
                 if (!docBase.endsWith(File.separator)){
-                    permissionCollection.add
+                    permissions.add
                         (new FilePermission(docBase,"read"));
                     docBase = docBase + File.separator;
                 } else {
-                    permissionCollection.add
+                    permissions.add
                         (new FilePermission
                             (docBase.substring(0,docBase.length() - 1),"read"));
                 }
                 docBase = docBase + "-";
-                permissionCollection.add(new FilePermission(docBase,"read"));
+                permissions.add(new FilePermission(docBase,"read"));
 
                 // Spec says apps should have read/write for their temp
                 // directory. This is fine, as no security sensitive files, at
@@ -400,16 +421,16 @@ public final class JspRuntimeContext {
                 // will be written here.
                 String workDir = options.getScratchDir().toString();
                 if (!workDir.endsWith(File.separator)){
-                    permissionCollection.add
+                    permissions.add
                         (new FilePermission(workDir,"read,write"));
                     workDir = workDir + File.separator;
                 }
                 workDir = workDir + "-";
-                permissionCollection.add(new FilePermission(
+                permissions.add(new FilePermission(
                         workDir,"read,write,delete"));
 
                 // Allow the JSP to access org.apache.jasper.runtime.HttpJspBase
-                permissionCollection.add( new RuntimePermission(
+                permissions.add( new RuntimePermission(
                     "accessClassInPackage.org.apache.jasper.runtime") );
 
                 if (parentClassLoader instanceof URLClassLoader) {
@@ -431,19 +452,20 @@ public final class JspRuntimeContext {
                         }
                     }
                     if (jarUrl != null) {
-                        permissionCollection.add(
+                        permissions.add(
                                 new FilePermission(jarUrl,"read"));
-                        permissionCollection.add(
+                        permissions.add(
                                 new FilePermission(jarUrl.substring(4),"read"));
                     }
                     if (jndiUrl != null)
-                        permissionCollection.add(
+                        permissions.add(
                                 new FilePermission(jndiUrl,"read") );
                 }
             } catch(Exception e) {
                 context.log("Security Init for context failed",e);
             }
         }
+        return new SecurityHolder(source, permissions);
     }
 
 
