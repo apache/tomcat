@@ -48,18 +48,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class XByteBuffer
 {
     
-    public static final org.apache.juli.logging.Log log =
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( XByteBuffer.class );
     
     /**
      * This is a package header, 7 bytes (FLT2002)
      */
-    public static final byte[] START_DATA = {70,76,84,50,48,48,50};
+    private static final byte[] START_DATA = {70,76,84,50,48,48,50};
     
     /**
      * This is the package footer, 7 bytes (TLF2003)
      */
-    public static final byte[] END_DATA = {84,76,70,50,48,48,51};
+    private static final byte[] END_DATA = {84,76,70,50,48,48,51};
  
     /**
      * Variable to hold the data
@@ -331,7 +331,6 @@ public class XByteBuffer
      * Creates a complete data package
      * @param cdata - the message data to be contained within the package
      * @return - a full package (header,size,data,footer)
-     * 
      */
     public static byte[] createDataPackage(ChannelData cdata) {
 //        return createDataPackage(cdata.getDataPackage());
@@ -438,6 +437,12 @@ public class XByteBuffer
         return data;
     }
     
+    /**
+     * Converts a byte array entry to boolean
+     * @param b byte array
+     * @param offset within byte array
+     * @return true if byte array entry is non-zero, false otherwise
+     */
     public static boolean toBoolean(byte[] b, int offset) {
         return b[offset] != 0;
     }
@@ -549,7 +554,9 @@ public class XByteBuffer
         throws IOException, ClassNotFoundException, ClassCastException {
         return deserialize(data,offset,length,null);     
     }
-    public static AtomicInteger invokecount = new AtomicInteger(0);
+    
+    private static AtomicInteger invokecount = new AtomicInteger(0);
+    
     public static Serializable deserialize(byte[] data, int offset, int length, ClassLoader[] cls) 
         throws IOException, ClassNotFoundException, ClassCastException {
         invokecount.addAndGet(1);
