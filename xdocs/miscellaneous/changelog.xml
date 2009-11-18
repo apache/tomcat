@@ -41,6 +41,7 @@
     <fix>
       Fix CVE-2009-3555 SSL-Man-In-The-Middle attack. (mturk)
     </fix>
+  </changelog>
 </section>
 <section name="Changes between 1.1.16 and 1.1.17">
   <changelog>
