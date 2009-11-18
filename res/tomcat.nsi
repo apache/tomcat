@@ -100,7 +100,7 @@ ${StrRep}
     LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This includes documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
     LangString DESC_SecManager ${LANG_ENGLISH} "Install the Tomcat Manager administrative web application."
     LangString DESC_SecHostManager ${LANG_ENGLISH} "Install the Tomcat Host Manager administrative web application."
-    LangString DESC_SecExamples ${LANG_ENGLISH} "Install the Servlet and JSP example web applications."
+    LangString DESC_SecExamples ${LANG_ENGLISH} "Install the Servlet and JSP examples web application."
 
   ;Language
   !insertmacro MUI_LANGUAGE English
