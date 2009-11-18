@@ -39,7 +39,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
     
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(AbstractHttp11Protocol.class);
+    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(AbstractHttp11Protocol.class);
     
     protected ObjectName tpOname = null;
     protected ObjectName rgOname = null;
