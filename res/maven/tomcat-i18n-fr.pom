@@ -18,7 +18,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>tomcat-i18n-es</artifactId>
+  <artifactId>tomcat-i18n-fr</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>French translations</description>
 </project>
