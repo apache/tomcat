@@ -530,8 +530,14 @@ public class NioEndpoint extends AbstractEndpoint {
             SSLSessionContext sessionContext =
                 sslContext.getServerSessionContext();
             if (sessionContext != null) {
-                sessionContext.setSessionCacheSize(getSessionCacheSize());
-                sessionContext.setSessionTimeout(getSessionCacheTimeout());
+                if (getSessionCacheSize() != null) {
+                    sessionContext.setSessionCacheSize(
+                            Integer.parseInt(getSessionCacheSize()));
+                }
+                if (getSessionCacheTimeout() != null) {
+                    sessionContext.setSessionTimeout(
+                            Integer.parseInt(getSessionCacheTimeout()));
+                }
             }
         }
         
