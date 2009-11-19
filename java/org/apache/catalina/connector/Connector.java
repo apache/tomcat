@@ -284,12 +284,8 @@ public class Connector
          replacements.put("connectionLinger", "soLinger");
          replacements.put("connectionTimeout", "soTimeout");
          replacements.put("connectionUploadTimeout", "timeout");
-         replacements.put("clientAuth", "clientauth");
-         replacements.put("keystoreFile", "keystore");
          replacements.put("randomFile", "randomfile");
          replacements.put("rootFile", "rootfile");
-         replacements.put("keystorePass", "keypass");
-         replacements.put("keystoreType", "keytype");
          replacements.put("sslProtocols", "protocols");
      }
 

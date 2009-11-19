@@ -62,7 +62,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Generic properties - currently only socket.XXX properties
+     * Generic properties - currently only socket.xxx properties
      */
     @Override
     public boolean setProperty(String name, String value) {
@@ -70,10 +70,9 @@ public class JIoEndpoint extends AbstractEndpoint {
         try {
             if (name.startsWith(socketName)) {
                 return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
-            } else {
-                return IntrospectionUtils.setProperty(this,name,value);
             }
-        }catch ( Exception x ) {
+            return IntrospectionUtils.setProperty(this,name,value);
+        } catch ( Exception x ) {
             log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
             return false;
         }
@@ -85,16 +84,6 @@ public class JIoEndpoint extends AbstractEndpoint {
     protected int acceptorThreadCount = 0;
     public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
     public int getAcceptorThreadCount() { return acceptorThreadCount; }
-
-    /**
-     * Priority of the acceptor and poller threads.
-     */
-    protected int threadPriority = Thread.NORM_PRIORITY;
-    @Override
-    public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
-    @Override
-    public int getThreadPriority() { return threadPriority; }
-
     
     /**
      * Handling of accepted sockets.
@@ -211,6 +200,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 try {
                     socket.getSocket().close();
                 } catch (IOException e) {
+                    // Ignore
                 }
             } else {
                 //keepalive connection
@@ -226,6 +216,7 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     // -------------------- Public methods --------------------
 
+    @Override
     public void init()
         throws Exception {
 
@@ -239,6 +230,49 @@ public class JIoEndpoint extends AbstractEndpoint {
         if (serverSocketFactory == null) {
             serverSocketFactory = ServerSocketFactory.getDefault();
         }
+        if (isSSLEnabled()) {
+            serverSocketFactory.setAttribute(SSL_ATTR_ALGORITHM,
+                    getAlgorithm());
+            serverSocketFactory.setAttribute(SSL_ATTR_CLIENT_AUTH,
+                    getClientAuth());
+            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_FILE,
+                    getKeystoreFile());
+            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_PASS,
+                    getKeystorePass());
+            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_TYPE,
+                    getKeystoreType());
+            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_PROVIDER,
+                    getKeystoreProvider());
+            serverSocketFactory.setAttribute(SSL_ATTR_SSL_PROTOCOL,
+                    getSslProtocol());
+            serverSocketFactory.setAttribute(SSL_ATTR_CIPHERS,
+                    getCiphers());
+            serverSocketFactory.setAttribute(SSL_ATTR_KEY_ALIAS,
+                    getKeyAlias());
+            serverSocketFactory.setAttribute(SSL_ATTR_KEY_PASS,
+                    getKeyPass());
+            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_FILE,
+                    getTruststoreFile());
+            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_PASS,
+                    getTruststorePass());
+            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_TYPE,
+                    getTruststoreType());
+            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_PROVIDER,
+                    getTruststoreProvider());
+            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_ALGORITHM,
+                    getTruststoreAlgorithm());
+            serverSocketFactory.setAttribute(SSL_ATTR_CRL_FILE,
+                    getCrlFile());
+            serverSocketFactory.setAttribute(SSL_ATTR_TRUST_MAX_CERT_LENGTH,
+                    getTrustMaxCertLength());
+            serverSocketFactory.setAttribute(SSL_ATTR_SESSION_CACHE_SIZE,
+                    getSessionCacheSize());
+            serverSocketFactory.setAttribute(SSL_ATTR_SESSION_TIMEOUT,
+                    getSessionCacheTimeout());
+            serverSocketFactory.setAttribute(SSL_ATTR_ALLOW_UNSAFE_RENEG,
+                    getAllowUnsafeLegacyRenegotiation());
+        }
+
         if (serverSocket == null) {
             try {
                 if (getAddress() == null) {
@@ -265,8 +299,8 @@ public class JIoEndpoint extends AbstractEndpoint {
         
     }
     
-    public void start()
-        throws Exception {
+    @Override
+    public void start() throws Exception {
         // Initialize socket if not done before
         if (!initialized) {
             init();
@@ -290,6 +324,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
     public void pause() {
         if (running && !paused) {
             paused = true;
@@ -297,6 +332,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
     public void resume() {
         if (running) {
             paused = false;
@@ -314,6 +350,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     /**
      * Deallocate APR memory pools, and close server socket.
      */
+    @Override
     public void destroy() throws Exception {
         if (running) {
             stop();
