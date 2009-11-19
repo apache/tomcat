@@ -103,8 +103,8 @@ public class javaURLContextFactory
 
         // If the thread is not bound, return a shared writable context
         if (initialContext == null) {
-            if (initialContext == null) {
-                synchronized(this) {
+            synchronized(this) {
+                if (initialContext == null) {
                     initialContext = new NamingContext(
                             (Hashtable<String,Object>)environment, MAIN);
                 }
