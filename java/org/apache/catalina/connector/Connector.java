@@ -290,7 +290,6 @@ public class Connector
          replacements.put("rootFile", "rootfile");
          replacements.put("keystorePass", "keypass");
          replacements.put("keystoreType", "keytype");
-         replacements.put("sslProtocol", "protocol");
          replacements.put("sslProtocols", "protocols");
      }
 
