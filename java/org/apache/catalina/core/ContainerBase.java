@@ -378,9 +378,7 @@ public abstract class ContainerBase
 
 
     /**
-     * Return the Logger with which this Container is associated.  If there is
-     * no associated Logger, return the Logger associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
+     * Return the Logger for this Container.
      */
     public Log getLogger() {
 
