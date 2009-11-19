@@ -185,6 +185,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
 
         protected ConcurrentLinkedQueue<Http11Processor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11Processor>() {
+            private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11Processor processor) {
