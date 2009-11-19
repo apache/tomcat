@@ -53,7 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0
  */
 public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements RpcCallback, ChannelListener, MembershipListener, Heartbeat {
-    protected static final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
+    private static final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
 
     /**
      * The default initial capacity - MUST be a power of two.
