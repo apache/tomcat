@@ -325,49 +325,68 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public int getSoLinger() { return endpoint.getSoLinger(); }
     public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
+    // JSSE SSL attrbutes
+    public String getAlgorithm() { return endpoint.getAlgorithm();}
+    public void setAlgorithm(String s ) { endpoint.setAlgorithm(s);}
     
+    public String getClientAuth() { return endpoint.getClientAuth();}
+    public void setClientAuth(String s ) { endpoint.setClientAuth(s);}
+
     public String getKeystoreFile() { return endpoint.getKeystoreFile();}
     public void setKeystoreFile(String s ) { endpoint.setKeystoreFile(s);}
-    public void setKeystore(String s) { setKeystoreFile(s);}
-    public String getKeystore(){ return getKeystoreFile();}
-    public String getKeyAlias() { return (endpoint).getKeyAlias();}
-    public void setKeyAlias(String s ) { (endpoint).setKeyAlias(s);}
 
+    public String getKeystorePass() { return endpoint.getKeystorePass();}
+    public void setKeystorePass(String s ) { endpoint.setKeystorePass(s);}
     
-    public String getAlgorithm() { return (endpoint).getAlgorithm();}
-    public void setAlgorithm(String s ) { (endpoint).setAlgorithm(s);}
-    
-    public void setClientauth(String s) {setClientAuth(s);}
-    public String getClientauth(){ return getClientAuth();}
-    public String getClientAuth() { return (endpoint).getClientAuth();}
-    public void setClientAuth(String s ) { (endpoint).setClientAuth(s);}
-    
-    public String getKeystorePass() { return (endpoint).getKeystorePass();}
-    public void setKeystorePass(String s ) { (endpoint).setKeystorePass(s);}
-    public void setKeypass(String s) { setKeystorePass(s);}
-    public String getKeypass() { return getKeystorePass();}
-    public String getKeystoreType() { return (endpoint).getKeystoreType();}
-    public void setKeystoreType(String s ) { (endpoint).setKeystoreType(s);}
-    public String getKeytype() { return getKeystoreType();}
-    public void setKeytype(String s ) { setKeystoreType(s);}
+    public String getKeystoreType() { return endpoint.getKeystoreType();}
+    public void setKeystoreType(String s ) { endpoint.setKeystoreType(s);}
 
-    public void setTruststoreFile(String f){(endpoint).setTruststoreFile(f);}
-    public String getTruststoreFile(){return (endpoint).getTruststoreFile();}
-    public void setTruststorePass(String p){(endpoint).setTruststorePass(p);}
-    public String getTruststorePass(){return (endpoint).getTruststorePass();}
-    public void setTruststoreType(String t){(endpoint).setTruststoreType(t);}
-    public String getTruststoreType(){ return (endpoint).getTruststoreType();}
-    
-    
-    public String getSslProtocol() { return (endpoint).getSslProtocol();}
-    public void setSslProtocol(String s) { (endpoint).setSslProtocol(s);}
-    
-    public String getCiphers() { return (endpoint).getCiphers();}
-    public void setCiphers(String s) { (endpoint).setCiphers(s);}
-    
+    public String getKeystoreProvider() { return endpoint.getKeystoreProvider();}
+    public void setKeystoreProvider(String s ) { endpoint.setKeystoreProvider(s);}
 
+    public String getSslProtocol() { return endpoint.getSslProtocol();}
+    public void setSslProtocol(String s) { endpoint.setSslProtocol(s);}
+    
+    public String getCiphers() { return endpoint.getCiphers();}
+    public void setCiphers(String s) { endpoint.setCiphers(s);}
+
+    public String getKeyAlias() { return endpoint.getKeyAlias();}
+    public void setKeyAlias(String s ) { endpoint.setKeyAlias(s);}
+
+    public String getKeyPass() { return endpoint.getKeyPass();}
+    public void setKeyPass(String s ) { endpoint.setKeyPass(s);}
+    
+    public void setTruststoreFile(String f){ endpoint.setTruststoreFile(f);}
+    public String getTruststoreFile(){ return endpoint.getTruststoreFile();}
+
+    public void setTruststorePass(String p){ endpoint.setTruststorePass(p);}
+    public String getTruststorePass(){return endpoint.getTruststorePass();}
+
+    public void setTruststoreType(String t){ endpoint.setTruststoreType(t);}
+    public String getTruststoreType(){ return endpoint.getTruststoreType();}
+
+    public void setTruststoreProvider(String t){endpoint.setTruststoreProvider(t);}
+    public String getTruststoreProvider(){ return endpoint.getTruststoreProvider();}
+
+    public void setTruststoreAlgorithm(String a){endpoint.setTruststoreAlgorithm(a);}
+    public String getTruststoreAlgorithm(){ return endpoint.getTruststoreAlgorithm();}
+    
+    public void setTrustMaxCertLength(String s){endpoint.setTrustMaxCertLength(s);}
+    public String getTrustMaxCertLength(){ return endpoint.getTrustMaxCertLength();}
+    
+    public void setCrlFile(String s){endpoint.setCrlFile(s);}
+    public String getCrlFile(){ return endpoint.getCrlFile();}
+    
+    public void setSessionCacheSize(String s){endpoint.setSessionCacheSize(s);}
+    public String getSessionCacheSize(){ return endpoint.getTruststoreAlgorithm();}
+
+    public void setSessionTimeout(String s){endpoint.setTruststoreAlgorithm(s);}
+    public String getSessionTimeout(){ return endpoint.getTruststoreAlgorithm();}
+    
+    
     public abstract void init() throws Exception;
     public abstract void start() throws Exception;
+    
     // -------------------- JMX related methods --------------------
 
     // *
