@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * <p>
  * The <b>WarWatcher </b> watches the deployDir for changes made to the
@@ -37,8 +40,7 @@ import java.util.Iterator;
 public class WarWatcher {
 
     /*--Static Variables----------------------------------------*/
-    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
-            .getLog(WarWatcher.class);
+    private static final Log log = LogFactory.getLog(WarWatcher.class);
 
     /*--Instance Variables--------------------------------------*/
     /**

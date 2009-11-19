@@ -37,6 +37,9 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.tomcat.util.modeler.Registry;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 
 /**
  * <p>
@@ -59,8 +62,7 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class FarmWarDeployer extends ClusterListener implements ClusterDeployer, FileChangeListener {
     /*--Static Variables----------------------------------------*/
-    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
-            .getLog(FarmWarDeployer.class);
+    private static final Log log = LogFactory.getLog(FarmWarDeployer.class);
     /**
      * The descriptive information about this implementation.
      */

@@ -27,6 +27,9 @@ import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.UniqueId;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * A smart implementation of a stateful replicated map. uses primary/secondary backup strategy. 
  * One node is always the primary and one node is always the backup.
@@ -66,7 +69,7 @@ import org.apache.catalina.tribes.UniqueId;
  */
 public class LazyReplicatedMap extends AbstractReplicatedMap 
     implements RpcCallback, ChannelListener, MembershipListener {
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(LazyReplicatedMap.class);
+    private static final Log log = LogFactory.getLog(LazyReplicatedMap.class);
     
 
     

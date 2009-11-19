@@ -33,13 +33,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * @author Filip Hanik
  * @version 1.0
  */
 public class ReplicatedContext extends StandardContext implements LifecycleListener,MapOwner {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
-    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( ReplicatedContext.class );
+    private static final Log log = LogFactory.getLog( ReplicatedContext.class );
     protected boolean startComplete = false;
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
     
