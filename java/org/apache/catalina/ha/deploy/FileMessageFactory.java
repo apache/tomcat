@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * This factory is used to read files and write files by splitting them up into
  * smaller messages. So that entire files don't have to be read into memory.
@@ -42,8 +45,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/
-    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
-            .getLog(FileMessageFactory.class);
+    private static final Log log = LogFactory.getLog(FileMessageFactory.class);
 
     /**
      * The number of bytes that we read from file

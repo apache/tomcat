@@ -32,6 +32,7 @@ import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * <p>Title: </p>
@@ -47,7 +48,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public static final int OPTION_DIRECT_BUFFER = 0x0004;
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReceiverBase.class);
+    private static final Log log = LogFactory.getLog(ReceiverBase.class);
 
     private MessageListener listener;
     private String host = "auto";
@@ -444,10 +445,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setListener(MessageListener listener) {
         this.listener = listener;
-    }
-
-    public void setLog(Log log) {
-        ReceiverBase.log = log;
     }
 
     public void setPool(RxTaskPool pool) {
