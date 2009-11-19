@@ -116,6 +116,7 @@ public class JSSESocketFactory
 
 
     public JSSESocketFactory () {
+        // NOOP
     }
 
     @Override
@@ -207,7 +208,7 @@ public class JSSESocketFactory
     protected String[] getEnabledCiphers(String requestedCiphers,
                                          String[] supportedCiphers) {
 
-        String[] enabledCiphers = null;
+        String[] result = null;
 
         if (requestedCiphers != null) {
             Vector<String> vec = null;
@@ -261,14 +262,14 @@ public class JSSESocketFactory
             }           
 
             if (vec != null) {
-                enabledCiphers = new String[vec.size()];
-                vec.copyInto(enabledCiphers);
+                result = new String[vec.size()];
+                vec.copyInto(result);
             }
         } else {
-            enabledCiphers = sslProxy.getDefaultCipherSuites();
+            result = sslProxy.getDefaultCipherSuites();
         }
 
-        return enabledCiphers;
+        return result;
     }
      
     /*
@@ -526,11 +527,12 @@ public class JSSESocketFactory
 
         kms = kmf.getKeyManagers();
         if (keyAlias != null) {
+            String alias = keyAlias;
             if (JSSESocketFactory.defaultKeystoreType.equals(keystoreType)) {
-                keyAlias = keyAlias.toLowerCase();
+                alias = alias.toLowerCase();
             }
             for(int i=0; i<kms.length; i++) {
-                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], keyAlias);
+                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
             }
         }
 
@@ -636,6 +638,7 @@ public class JSSESocketFactory
                 try{
                     is.close();
                 } catch(Exception ex) {
+                    // Ignore
                 }
             }
         }
