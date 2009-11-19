@@ -42,8 +42,6 @@ import java.util.Collection;
 import java.util.Vector;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
@@ -159,42 +157,23 @@ public class JSSESocketFactory
         SSLSocket asock = null;
         try {
              asock = (SSLSocket)socket.accept();
-             if (!allowUnsafeLegacyRenegotiation) {
-                 asock.addHandshakeCompletedListener(
-                         new DisableSslRenegotiation());
-             }
         } catch (SSLException e){
           throw new SocketException("SSL handshake error" + e.toString());
         }
         return asock;
     }
     
-    private static class DisableSslRenegotiation 
-            implements HandshakeCompletedListener {
-        private volatile boolean completed = false;
-
-        public void handshakeCompleted(HandshakeCompletedEvent event) {
-            if (completed) {
-                try {
-                    log.warn("SSL renegotiation is disabled, closing connection");
-                    event.getSession().invalidate();
-                    event.getSocket().close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-            completed = true;
-        }
-    }
-
-
     @Override
     public void handshake(Socket sock) throws IOException {
-        //we do getSession instead of startHandshake() so we can call this multiple times
+        // We do getSession instead of startHandshake() so we can call this multiple times
     	SSLSession session = ((SSLSocket)sock).getSession();
         if (session.getCipherSuite().equals("SSL_NULL_WITH_NULL_NULL"))
         	throw new IOException("SSL handshake failed. Ciper suite in SSL Session is SSL_NULL_WITH_NULL_NULL");
-    	//((SSLSocket)sock).startHandshake();
+
+        if (!allowUnsafeLegacyRenegotiation) {
+            // Prevent futher handshakes by removing all cipher suites
+            ((SSLSocket) sock).setEnabledCipherSuites(new String[0]);
+        }
     }
 
     /*
