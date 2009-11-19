@@ -161,7 +161,6 @@ public class JSSESocketFactory
                  asock.addHandshakeCompletedListener(
                          new DisableSslRenegotiation());
              }
-             configureClientAuth(asock);
         } catch (SSLException e){
           throw new SocketException("SSL handshake error" + e.toString());
         }
@@ -745,17 +744,6 @@ public class JSSESocketFactory
         }
     }
 
-    /**
-     * Configure Client authentication for this version of JSSE.  The
-     * JSSE included in Java 1.4 supports the 'want' value.  Prior
-     * versions of JSSE will treat 'want' as 'false'.
-     * @param socket the SSLSocket
-     */
-    protected void configureClientAuth(SSLSocket socket){
-        // Per JavaDocs: SSLSockets returned from 
-        // SSLServerSocket.accept() inherit this setting.
-    }
-    
     /**
      * Configures the given SSL server socket with the requested cipher suites,
      * protocol versions, and need for client authentication
