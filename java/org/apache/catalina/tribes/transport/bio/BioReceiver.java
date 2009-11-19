@@ -27,6 +27,9 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  *
  * @author Filip Hanik
@@ -34,7 +37,7 @@ import org.apache.catalina.tribes.transport.AbstractRxTask;
  */
 public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(BioReceiver.class);
+    private static final Log log = LogFactory.getLog(BioReceiver.class);
 
     protected ServerSocket serverSocket;
 

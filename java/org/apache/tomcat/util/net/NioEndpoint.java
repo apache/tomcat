@@ -76,7 +76,7 @@ public class NioEndpoint extends AbstractEndpoint {
     // -------------------------------------------------------------- Constants
 
 
-    protected static final Log log = LogFactory.getLog(NioEndpoint.class);
+    private static final Log log = LogFactory.getLog(NioEndpoint.class);
 
 
     public static final int OP_REGISTER = 0x100; //register interest op

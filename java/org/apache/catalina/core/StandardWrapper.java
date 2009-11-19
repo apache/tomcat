@@ -60,6 +60,9 @@ import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Standard implementation of the <b>Wrapper</b> interface that represents
  * an individual servlet definition.  No child Containers are allowed, and
@@ -73,8 +76,7 @@ public class StandardWrapper
     extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
-    protected static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( StandardWrapper.class );
+    private static final Log log = LogFactory.getLog( StandardWrapper.class );
 
     protected static final String[] DEFAULT_SERVLET_METHODS = new String[] {
                                                     "GET", "HEAD", "POST" };
