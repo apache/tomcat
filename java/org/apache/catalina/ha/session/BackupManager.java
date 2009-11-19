@@ -31,13 +31,16 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  *@author Filip Hanik
  *@version 1.0
  */
 public class BackupManager extends StandardManager implements ClusterManager, MapOwner
 {
-    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BackupManager.class );
+    private static final Log log = LogFactory.getLog( BackupManager.class );
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
