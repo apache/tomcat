@@ -77,7 +77,40 @@ public abstract class AbstractEndpoint {
         public enum SocketState {
             OPEN, CLOSED, LONG
         }
-    }    
+    }
+    
+    // Standard SSL Configuration attributes
+    // JSSE
+    // Standard configuration attribute names
+    public static final String SSL_ATTR_ALGORITHM = "algorithm";
+    public static final String SSL_ATTR_CLIENT_AUTH = "clientAuth";
+    public static final String SSL_ATTR_KEYSTORE_FILE = "keystoreFile";
+    public static final String SSL_ATTR_KEYSTORE_PASS = "keystorePass";
+    public static final String SSL_ATTR_KEYSTORE_TYPE = "keystoreType";
+    public static final String SSL_ATTR_KEYSTORE_PROVIDER = "keystoreProvider";
+    public static final String SSL_ATTR_SSL_PROTOCOL = "sslProtocol";
+    public static final String SSL_ATTR_CIPHERS = "ciphers";
+    public static final String SSL_ATTR_CIPHERS_ARRAY = "ciphersArray";
+    public static final String SSL_ATTR_KEY_ALIAS = "keyAlias";
+    public static final String SSL_ATTR_KEY_PASS = "keyPass";
+    public static final String SSL_ATTR_TRUSTSTORE_FILE = "truststoreFile";
+    public static final String SSL_ATTR_TRUSTSTORE_PASS = "truststorePass";
+    public static final String SSL_ATTR_TRUSTSTORE_TYPE = "truststoreType";
+    public static final String SSL_ATTR_TRUSTSTORE_PROVIDER =
+        "truststoreProvider";
+    public static final String SSL_ATTR_TRUSTSTORE_ALGORITHM =
+        "truststoreAlgorithm";
+    public static final String SSL_ATTR_CRL_FILE =
+        "crlFile";
+    public static final String SSL_ATTR_TRUST_MAX_CERT_LENGTH =
+        "trustMaxCertLength";
+    public static final String SSL_ATTR_SESSION_CACHE_SIZE =
+        "sessionCacheSize";
+    public static final String SSL_ATTR_SESSION_TIMEOUT =
+        "sessionTimeout";
+    public static final String SSL_ATTR_ALLOW_UNSAFE_RENEG =
+        "allowUnsafeLegacyRenegotiation";
+
     // ----------------------------------------------------------------- Fields
 
 
@@ -414,36 +447,11 @@ public abstract class AbstractEndpoint {
     
     public String defaultIfNull(String val, String defaultValue) {
         if (val==null) return defaultValue;
-        else return val;
+        return val;
     }
+    
     // --------------------  SSL related properties --------------------
-    private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
-    public void setTruststoreFile(String s) {
-        s = adjustRelativePath(s,System.getProperty("catalina.base"));
-        this.truststoreFile = s;
-    }
-    public String getTruststoreFile() {return truststoreFile;}
-    private String truststorePass = System.getProperty("javax.net.ssl.trustStorePassword");
-    public void setTruststorePass(String truststorePass) {this.truststorePass = truststorePass;}
-    public String getTruststorePass() {return truststorePass;}
-    private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-    public void setTruststoreType(String truststoreType) {this.truststoreType = truststoreType;}
-    public String getTruststoreType() {return truststoreType;}
 
-    private String keystoreFile = System.getProperty("user.home")+"/.keystore";
-    public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) { 
-        s = adjustRelativePath(s,System.getProperty("catalina.base"));
-        this.keystoreFile = s; 
-    }
-    public void setKeystore(String s ) { setKeystoreFile(s);}
-    public String getKeystore() { return getKeystoreFile();}
-
-    private String keyAlias = null;
-    public String getKeyAlias() { return keyAlias;}
-    public void setKeyAlias(String s ) { keyAlias = s;}
-    
-    
     private String algorithm = "SunX509";
     public String getAlgorithm() { return algorithm;}
     public void setAlgorithm(String s ) { this.algorithm = s;}
@@ -452,7 +460,14 @@ public abstract class AbstractEndpoint {
     public String getClientAuth() { return clientAuth;}
     public void setClientAuth(String s ) { this.clientAuth = s;}
     
-    private String keystorePass = "changeit";
+    private String keystoreFile = System.getProperty("user.home")+"/.keystore";
+    public String getKeystoreFile() { return keystoreFile;}
+    public void setKeystoreFile(String s ) { 
+        String file = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.keystoreFile = file; 
+    }
+
+    private String keystorePass = null;
     public String getKeystorePass() { return keystorePass;}
     public void setKeystorePass(String s ) { this.keystorePass = s;}
     
@@ -460,20 +475,16 @@ public abstract class AbstractEndpoint {
     public String getKeystoreType() { return keystoreType;}
     public void setKeystoreType(String s ) { this.keystoreType = s;}
 
+    private String keystoreProvider = null;
+    public String getKeystoreProvider() { return keystoreProvider;}
+    public void setKeystoreProvider(String s ) { this.keystoreProvider = s;}
+
     private String sslProtocol = "TLS"; 
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
     
-    private String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
-    private String[] sslEnabledProtocolsarr =  new String[0];
-    public String[] getSslEnabledProtocolsArray() { return this.sslEnabledProtocolsarr;}
-    public void setSslEnabledProtocols(String s) {
-        this.sslEnabledProtocols = s;
-        StringTokenizer t = new StringTokenizer(s,",");
-        sslEnabledProtocolsarr = new String[t.countTokens()];
-        for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
-    }
-    
+    // Note: Some implementations use the comma separated string, some use
+    // the array
     private String ciphers = null;
     private String[] ciphersarr = new String[0];
     public String[] getCiphersArray() { return this.ciphersarr;}
@@ -488,15 +499,86 @@ public abstract class AbstractEndpoint {
         }
     }
 
-    private int sessionCacheSize = 0;
-    public int getSessionCacheSize() { return sessionCacheSize;}
-    public void setSessionCacheSize(int i) { sessionCacheSize = i;}
+    private String keyAlias = null;
+    public String getKeyAlias() { return keyAlias;}
+    public void setKeyAlias(String s ) { keyAlias = s;}
+    
+    private String keyPass = "changeit";
+    public String getKeyPass() { return keyPass;}
+    public void setKeyPass(String s ) { this.keyPass = s;}
 
-    private int sessionCacheTimeout = 86400;
-    public int getSessionCacheTimeout() { return sessionCacheTimeout;}
-    public void setSessionCacheTimeout(int i) { sessionCacheTimeout = i;}
+    private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    public String getTruststoreFile() {return truststoreFile;}
+    public void setTruststoreFile(String s) {
+        String file = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.truststoreFile = file;
+    }
 
+    private String truststorePass =
+        System.getProperty("javax.net.ssl.trustStorePassword");
+    public String getTruststorePass() {return truststorePass;}
+    public void setTruststorePass(String truststorePass) {
+        this.truststorePass = truststorePass;
+    }
+    
+    private String truststoreType =
+        System.getProperty("javax.net.ssl.trustStoreType");
+    public String getTruststoreType() {return truststoreType;}
+    public void setTruststoreType(String truststoreType) {
+        this.truststoreType = truststoreType;
+    }
+
+    private String truststoreProvider = null;
+    public String getTruststoreProvider() {return truststoreProvider;}
+    public void setTruststoreProvider(String truststoreProvider) {
+        this.truststoreProvider = truststoreProvider;
+    }
+
+    private String truststoreAlgorithm = null;
+    public String getTruststoreAlgorithm() {return truststoreAlgorithm;}
+    public void setTruststoreAlgorithm(String truststoreAlgorithm) {
+        this.truststoreAlgorithm = truststoreAlgorithm;
+    }
+
+    private String crlFile = null;
+    public String getCrlFile() {return crlFile;}
+    public void setCrlFile(String crlFile) {
+        this.crlFile = crlFile;
+    }
+
+    private String trustMaxCertLength = null;
+    public String getTrustMaxCertLength() {return trustMaxCertLength;}
+    public void setTrustMaxCertLength(String trustMaxCertLength) {
+        this.trustMaxCertLength = trustMaxCertLength;
+    }
+
+    private String sessionCacheSize = null;
+    public String getSessionCacheSize() { return sessionCacheSize;}
+    public void setSessionCacheSize(String s) { sessionCacheSize = s;}
+
+    private String sessionCacheTimeout = "86400";
+    public String getSessionCacheTimeout() { return sessionCacheTimeout;}
+    public void setSessionCacheTimeout(String s) { sessionCacheTimeout = s;}
+
+    private String allowUnsafeLegacyRenegotiation = null;
+    public String getAllowUnsafeLegacyRenegotiation() {
+        return allowUnsafeLegacyRenegotiation;
+    }
+    public void setAllowUnsafeLegacyRenegotiation(String s) {
+        allowUnsafeLegacyRenegotiation = s;
+    }
 
     
+    
+    private String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
+    private String[] sslEnabledProtocolsarr =  new String[0];
+    public String[] getSslEnabledProtocolsArray() { return this.sslEnabledProtocolsarr;}
+    public void setSslEnabledProtocols(String s) {
+        this.sslEnabledProtocols = s;
+        StringTokenizer t = new StringTokenizer(s,",");
+        sslEnabledProtocolsarr = new String[t.countTokens()];
+        for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
+    }
+        
 }
 
