@@ -58,6 +58,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.res.StringManager;
 
 /*
@@ -276,11 +277,13 @@ public class JSSESocketFactory
      * Gets the SSL server's keystore password.
      */
     protected String getKeystorePassword() {
-        String keyPass = (String)attributes.get("keypass");
+        String keyPass = (String)attributes.get(
+                AbstractEndpoint.SSL_ATTR_KEY_PASS);
         if (keyPass == null) {
             keyPass = defaultKeyPass;
         }
-        String keystorePass = (String)attributes.get("keystorePass");
+        String keystorePass = (String)attributes.get(
+                AbstractEndpoint.SSL_ATTR_KEYSTORE_PASS);
         if (keystorePass == null) {
             keystorePass = keyPass;
         }
@@ -293,7 +296,8 @@ public class JSSESocketFactory
     protected KeyStore getKeystore(String type, String provider, String pass)
             throws IOException {
 
-        String keystoreFile = (String)attributes.get("keystore");
+        String keystoreFile = (String)attributes.get(
+                AbstractEndpoint.SSL_ATTR_KEYSTORE_FILE);
         if (keystoreFile == null)
             keystoreFile = defaultKeystoreFile;
 
@@ -307,7 +311,8 @@ public class JSSESocketFactory
             String keystoreProvider) throws IOException {
         KeyStore trustStore = null;
 
-        String truststoreFile = (String)attributes.get("truststoreFile");
+        String truststoreFile = (String)attributes.get(
+                AbstractEndpoint.SSL_ATTR_TRUSTSTORE_FILE);
         if(truststoreFile == null) {
             truststoreFile = System.getProperty("javax.net.ssl.trustStore");
         }
@@ -315,7 +320,8 @@ public class JSSESocketFactory
             log.debug("Truststore = " + truststoreFile);
         }
 
-        String truststorePassword = (String)attributes.get("truststorePass");
+        String truststorePassword = (String)attributes.get(
+                AbstractEndpoint.SSL_ATTR_TRUSTSTORE_PASS);
         if( truststorePassword == null) {
             truststorePassword =
                 System.getProperty("javax.net.ssl.trustStorePassword");
@@ -327,7 +333,8 @@ public class JSSESocketFactory
             log.debug("TrustPass = " + truststorePassword);
         }
 
-        String truststoreType = (String)attributes.get("truststoreType");
+        String truststoreType = (String)attributes.get(
+                AbstractEndpoint.SSL_ATTR_TRUSTSTORE_TYPE);
         if( truststoreType == null) {
             truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
         }
@@ -339,7 +346,8 @@ public class JSSESocketFactory
         }
 
         String truststoreProvider =
-            (String)attributes.get("truststoreProvider");
+            (String)attributes.get(
+                    AbstractEndpoint.SSL_ATTR_TRUSTSTORE_PROVIDER);
         if( truststoreProvider == null) {
             truststoreProvider =
                 System.getProperty("javax.net.ssl.trustStoreProvider");
@@ -416,7 +424,8 @@ public class JSSESocketFactory
     void init() throws IOException {
         try {
 
-            String clientAuthStr = (String) attributes.get("clientauth");
+            String clientAuthStr = (String) attributes.get(
+                    AbstractEndpoint.SSL_ATTR_CLIENT_AUTH);
             if("true".equalsIgnoreCase(clientAuthStr) ||
                "yes".equalsIgnoreCase(clientAuthStr)) {
                 requireClientAuth = true;
@@ -425,27 +434,32 @@ public class JSSESocketFactory
             }
 
             // SSL protocol variant (e.g., TLS, SSL v3, etc.)
-            String protocol = (String) attributes.get("protocol");
+            String protocol = (String) attributes.get(
+                    AbstractEndpoint.SSL_ATTR_SSL_PROTOCOL);
             if (protocol == null) {
                 protocol = defaultProtocol;
             }
 
             // Certificate encoding algorithm (e.g., SunX509)
-            String algorithm = (String) attributes.get("algorithm");
+            String algorithm = (String) attributes.get(
+                    AbstractEndpoint.SSL_ATTR_ALGORITHM);
             if (algorithm == null) {
                 algorithm = KeyManagerFactory.getDefaultAlgorithm();
             }
 
-            String keystoreType = (String) attributes.get("keystoreType");
+            String keystoreType = (String) attributes.get(
+                    AbstractEndpoint.SSL_ATTR_KEYSTORE_TYPE);
             if (keystoreType == null) {
                 keystoreType = defaultKeystoreType;
             }
 
             String keystoreProvider =
-                (String) attributes.get("keystoreProvider");
+                (String) attributes.get(
+                        AbstractEndpoint.SSL_ATTR_KEYSTORE_PROVIDER);
 
             String trustAlgorithm =
-                (String)attributes.get("truststoreAlgorithm");
+                (String)attributes.get(
+                        AbstractEndpoint.SSL_ATTR_TRUSTSTORE_ALGORITHM);
             if( trustAlgorithm == null ) {
                 trustAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
             }
@@ -453,24 +467,28 @@ public class JSSESocketFactory
             // Create and init SSLContext
             SSLContext context = SSLContext.getInstance(protocol); 
             context.init(getKeyManagers(keystoreType, keystoreProvider,
-                                 algorithm,
-                                 (String) attributes.get("keyAlias")),
-                         getTrustManagers(keystoreType, keystoreProvider,
-                                 trustAlgorithm),
-                         new SecureRandom());
+                    algorithm,
+                    (String) attributes.get(AbstractEndpoint.SSL_ATTR_KEY_ALIAS)),
+                    getTrustManagers(keystoreType, keystoreProvider,
+                            trustAlgorithm),
+                    new SecureRandom());
 
             // Configure SSL session cache
             int sessionCacheSize;
-            if (attributes.get("sessionCacheSize") != null) {
+            if (attributes.get(
+                    AbstractEndpoint.SSL_ATTR_SESSION_CACHE_SIZE) != null) {
                 sessionCacheSize = Integer.parseInt(
-                        (String)attributes.get("sessionCacheSize"));
+                        (String)attributes.get(
+                                AbstractEndpoint.SSL_ATTR_SESSION_CACHE_SIZE));
             } else {
                 sessionCacheSize = defaultSessionCacheSize;
             }
             int sessionCacheTimeout;
-            if (attributes.get("sessionCacheTimeout") != null) {
+            if (attributes.get(
+                    AbstractEndpoint.SSL_ATTR_SESSION_TIMEOUT) != null) {
                 sessionCacheTimeout = Integer.parseInt(
-                        (String)attributes.get("sessionCacheTimeout"));
+                        (String)attributes.get(
+                                AbstractEndpoint.SSL_ATTR_SESSION_TIMEOUT));
             } else {
                 sessionCacheTimeout = defaultSessionTimeout;
             }
@@ -485,13 +503,14 @@ public class JSSESocketFactory
             sslProxy = context.getServerSocketFactory();
 
             // Determine which cipher suites to enable
-            String requestedCiphers = (String)attributes.get("ciphers");
-            enabledCiphers =
-                getEnabledCiphers(requestedCiphers,
-                        sslProxy.getSupportedCipherSuites());
+            String requestedCiphers = (String)attributes.get(
+                    AbstractEndpoint.SSL_ATTR_CIPHERS);
+            enabledCiphers = getEnabledCiphers(requestedCiphers,
+                    sslProxy.getSupportedCipherSuites());
 
             allowUnsafeLegacyRenegotiation =
-                "true".equals(attributes.get("allowUnsafeLegacyRenegotiation"));
+                "true".equals(attributes.get(
+                        AbstractEndpoint.SSL_ATTR_ALLOW_UNSAFE_RENEG));
             
             // Check the SSL config is OK
             checkConfig();
@@ -545,7 +564,8 @@ public class JSSESocketFactory
     protected TrustManager[] getTrustManagers(String keystoreType,
             String keystoreProvider, String algorithm)
         throws Exception {
-        String crlf = (String) attributes.get("crlFile");
+        String crlf = (String) attributes.get(
+                AbstractEndpoint.SSL_ATTR_CRL_FILE);
         
         TrustManager[] tms = null;
         
@@ -593,7 +613,8 @@ public class JSSESocketFactory
             CertStore store = CertStore.getInstance("Collection", csp);
             xparams.addCertStore(store);
             xparams.setRevocationEnabled(true);
-            String trustLength = (String)attributes.get("trustMaxCertLength");
+            String trustLength = (String)attributes.get(
+                    AbstractEndpoint.SSL_ATTR_TRUST_MAX_CERT_LENGTH);
             if(trustLength != null) {
                 try {
                     xparams.setMaxPathLength(Integer.parseInt(trustLength));
