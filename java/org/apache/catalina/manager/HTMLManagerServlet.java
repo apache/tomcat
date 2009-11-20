@@ -38,6 +38,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -258,9 +259,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         return buffer.toString();
     }
 
-    protected String upload(HttpServletRequest request) throws IOException {
+    protected String upload(HttpServletRequest request)
+            throws IOException, ServletException {
         String message = "";
 
+        // TODO - Rewrite this to use the Servlet 3 file upload API
+        Part part = request.getPart("deployWar");
+        
         // Get the tempdir
         File tempdir = (File) getServletContext().getAttribute
             (ServletContext.TEMPDIR);

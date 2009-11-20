@@ -19,6 +19,7 @@
 package org.apache.catalina;
 
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -334,4 +335,17 @@ public interface Wrapper extends Container {
     public void unload() throws ServletException;
 
 
+    /**
+     * Get the multi-part configuration for the associated servlet. If no
+     * multi-part configuration has been defined, then <code>null</code> will be
+     * returned.
+     */
+    public MultipartConfigElement getMultipartConfig();
+    
+    
+    /**
+     * Set the multi-part configuration for the associated servlet. To clear the
+     * multi-part configuration specify <code>null</code> as the new value.
+     */
+    public void setMultipartConfig(MultipartConfigElement multipartConfig);
 }

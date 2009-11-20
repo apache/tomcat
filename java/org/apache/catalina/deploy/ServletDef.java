@@ -211,7 +211,7 @@ public class ServletDef implements Serializable {
     /**
      * The multipart configuration, if any, for this servlet
      */
-    private MultipartDef multipartDef = new MultipartDef();
+    private MultipartDef multipartDef = null;
     
     public MultipartDef getMultipartDef() {
         return this.multipartDef;

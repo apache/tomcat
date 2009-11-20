@@ -36,39 +36,39 @@ public class MultipartDef {
     }
     
     
-    private Long maxFileSize;
+    private String maxFileSize;
 
-    public Long getMaxFileSize() {
+    public String getMaxFileSize() {
         return maxFileSize;
     }
 
-    public void setMaxFileSize(Long maxFileSize) {
+    public void setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
     }
     
     
-    private Long maxRequestSize;
+    private String maxRequestSize;
 
-    public Long getMaxRequestSize() {
+    public String getMaxRequestSize() {
         return maxRequestSize;
     }
 
-    public void setMaxRequestSize(Long maxRequestSize) {
+    public void setMaxRequestSize(String maxRequestSize) {
         this.maxRequestSize = maxRequestSize;
     }
 
     
-    private Integer fileSizeThreshold;
+    private String fileSizeThreshold;
     
-    public Integer getFileSizeThreshold() {
+    public String getFileSizeThreshold() {
         return fileSizeThreshold;
     }
 
-    public void setFileSizeThreshold(Integer fileSizeThreshold) {
+    public void setFileSizeThreshold(String fileSizeThreshold) {
         this.fileSizeThreshold = fileSizeThreshold;
     }
 
-    
+
     // ---------------------------------------------------------- Object methods
 
     @Override
