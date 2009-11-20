@@ -35,6 +35,7 @@ import javax.management.NotificationEmitter;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -254,6 +255,11 @@ public class StandardWrapper
     protected long loadTime=0;
     protected int classLoadTime=0;
     
+    /**
+     * Multipart config
+     */
+    protected MultipartConfigElement multipartConfig = null;
+
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.init</code> is invoked.
@@ -1475,6 +1481,14 @@ public class StandardWrapper
 
     public int getClassLoadTime() {
         return classLoadTime;
+    }
+
+    public MultipartConfigElement getMultipartConfig() {
+        return multipartConfig;
+    }
+
+    public void setMultipartConfig(MultipartConfigElement multipartConfig) {
+        this.multipartConfig = multipartConfig;
     }
 
     // -------------------------------------------------------- Package Methods

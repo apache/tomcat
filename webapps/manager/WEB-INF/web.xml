@@ -17,9 +17,9 @@
 -->
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-   version="2.5"> 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+  version="3.0">  
 
   <display-name>Tomcat Manager Application</display-name>
   <description>
@@ -42,6 +42,12 @@
       <param-name>debug</param-name>
       <param-value>2</param-value>
     </init-param>
+    <multipart-config>
+      <!-- 50MB max -->
+      <max-file-size>52428800</max-file-size>
+      <max-request-size>52428800</max-request-size>
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
   </servlet>
   <servlet>
     <servlet-name>Status</servlet-name>

@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.MultipartConfigElement;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ContextEjb;
@@ -562,7 +564,22 @@ public class WebXml {
                         roleRef.getName(), roleRef.getLink());
             }
             wrapper.setServletClass(servlet.getServletClass());
-            // TODO SERVLET3 - Multipart config
+            MultipartDef multipartdef = servlet.getMultipartDef();
+            if (multipartdef != null) {
+                if (multipartdef.getMaxFileSize() != null &&
+                        multipartdef.getMaxRequestSize()!= null &&
+                        multipartdef.getFileSizeThreshold() != null) {
+                    wrapper.setMultipartConfig(new MultipartConfigElement(
+                            multipartdef.getLocation(),
+                            Long.parseLong(multipartdef.getMaxFileSize()),
+                            Long.parseLong(multipartdef.getMaxRequestSize()),
+                            Integer.parseInt(
+                                    multipartdef.getFileSizeThreshold())));
+                } else {
+                    wrapper.setMultipartConfig(new MultipartConfigElement(
+                            multipartdef.getLocation()));
+                }
+            }
             context.addChild(wrapper);
         }
         for (String pattern : servletMappings.keySet()) {
