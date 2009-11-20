@@ -372,7 +372,8 @@ public class WebRuleSet extends RuleSetBase {
         digester.addObjectCreate(fullPrefix + "/servlet/multipart-config",
                                  "org.apache.catalina.deploy.MultipartDef");
         digester.addSetNext(fullPrefix + "/servlet/multipart-config",
-                            "setMultipartConfig");
+                            "setMultipartDef",
+                            "org.apache.catalina.deploy.MultipartDef");
         digester.addCallMethod(fullPrefix + "/servlet/multipart-config/location",
                                "setLocation", 0);
         digester.addCallMethod(fullPrefix + "/servlet/multipart-config/max-file-size",
