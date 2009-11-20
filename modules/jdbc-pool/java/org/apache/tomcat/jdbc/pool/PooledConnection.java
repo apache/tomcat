@@ -69,6 +69,11 @@ public class PooledConnection {
      * The underlying database connection
      */
     private volatile java.sql.Connection connection;
+    
+    /**
+     * If using a XAConnection underneath.
+     */
+    private volatile javax.sql.XAConnection xaConnection;
     /**
      * When we track abandon traces, this string holds the thread dump
      */
@@ -142,6 +147,47 @@ public class PooledConnection {
                 log.debug("Unable to disconnect previous connection.", x);
             } //catch
         } //end if
+        if (poolProperties.getDataSource()==null && poolProperties.getDataSourceJNDI()!=null) {
+            //TODO lookup JNDI name
+        }
+        
+        if (poolProperties.getDataSource()!=null) {
+            connectUsingDataSource();
+        } else {
+            connectUsingDriver();
+        }
+        
+        //set up the default state, unless we expect the interceptor to do it
+        if (poolProperties.getJdbcInterceptors()==null || poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName())<0) {
+            if (poolProperties.getDefaultReadOnly()!=null) connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
+            if (poolProperties.getDefaultAutoCommit()!=null) connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
+            if (poolProperties.getDefaultCatalog()!=null) connection.setCatalog(poolProperties.getDefaultCatalog());
+            if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+        }        
+        this.discarded = false;
+        this.lastConnected = System.currentTimeMillis();
+    }
+    
+    protected void connectUsingDataSource() throws SQLException {
+        if (poolProperties.getDataSource() instanceof javax.sql.XADataSource) {
+            javax.sql.XADataSource xds = (javax.sql.XADataSource)poolProperties.getDataSource();
+            if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
+                xaConnection = xds.getXAConnection(poolProperties.getUsername(), poolProperties.getPassword());
+                connection = xaConnection.getConnection();
+            } else {
+                xaConnection = xds.getXAConnection();
+                connection = xaConnection.getConnection();
+            }
+        } else {
+            javax.sql.DataSource ds = poolProperties.getDataSource();
+            if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
+                connection = ds.getConnection(poolProperties.getUsername(), poolProperties.getPassword());
+            } else {
+                connection = ds.getConnection();
+            }
+        }
+    }
+    protected void connectUsingDriver() throws SQLException {
         java.sql.Driver driver = null;
         try {
             driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
@@ -180,16 +226,6 @@ public class PooledConnection {
         if (connection==null) {
             throw new SQLException("Driver:"+driver+" returned null for URL:"+driverURL);
         }
-        
-        //set up the default state, unless we expect the interceptor to do it
-        if (poolProperties.getJdbcInterceptors()==null || poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName())<0) {
-            if (poolProperties.getDefaultReadOnly()!=null) connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
-            if (poolProperties.getDefaultAutoCommit()!=null) connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
-            if (poolProperties.getDefaultCatalog()!=null) connection.setCatalog(poolProperties.getDefaultCatalog());
-            if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
-        }        
-        this.discarded = false;
-        this.lastConnected = System.currentTimeMillis();
     }
     
     /**
@@ -229,6 +265,7 @@ public class PooledConnection {
             }
         }
         connection = null;
+        xaConnection = null;
         lastConnected = -1;
         if (finalize) parent.finalize(this);
     }
@@ -500,6 +537,14 @@ public class PooledConnection {
      */
     public java.sql.Connection getConnection() {
         return this.connection;
+    }
+    
+    /**
+     * Returns the underlying XA connection
+     * @return the underlying XA connection as it was returned from the Datasource
+     */
+    public javax.sql.XAConnection getXAConnection() {
+        return this.xaConnection;
     }
     
     

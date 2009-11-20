@@ -88,6 +88,9 @@
       <li>Get JMX notifications and log entries when connections are suspected for being abandoned. This is similar to
           the <code>removeAbandonedTimeout</code> but it doesn't take any action, only reports the information. 
           This is achieved using the <code>suspectTimeout</code> attribute.</li> 
+      <li>Connections can be retrieved from a <code>java.sql.Driver</code> or a <code>javax.sql.DataSource</code>
+          This is achieved using the <code>dataSource</code> and <code>dataSourceJNDI</code> attributes.</li>
+      <li>XA connection support</li>
     </ol>
   </p>
 
@@ -399,6 +402,14 @@
            checking will be performed. Suspect checking only takes place if the timeout value is larger than 0 and
            the connection was not abandoned or if abandon check is disabled. If a connection is suspect a WARN message gets
            logged and a JMX notification gets sent once. 
+      </p>
+    </attribute>
+    <attribute name="dataSource" required="false">
+      <p>(javax.sql.DataSource)  
+      </p>
+    </attribute>
+    <attribute name="dataSourceJNDI" required="false">
+      <p>(String) 
       </p>
     </attribute>
   </attributes>  

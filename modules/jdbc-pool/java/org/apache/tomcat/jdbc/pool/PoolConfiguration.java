@@ -717,5 +717,39 @@ public interface PoolConfiguration {
      */
     public int getSuspectTimeout();
     
+    /**
+     * Injects a datasource that will be used to retrieve/create connections.
+     * If a data source is set, the {@link PoolConfiguration#getUrl()} and {@link PoolConfiguration#getDriverClassName()} methods are ignored
+     * and not used by the pool. If the {@link PoolConfiguration#getUsername()} and {@link PoolConfiguration#getPassword()}
+     * values are set, the method {@link javax.sql.DataSource#getConnection(String, String)} method will be called instead of the
+     * {@link javax.sql.DataSource#getConnection()} method.
+     * If the data source implements {@link javax.sql.XADataSource} the methods 
+     * {@link javax.sql.XADataSource#getXAConnection()} and {@link javax.sql.XADataSource#getXAConnection(String,String)}
+     * will be invoked.  
+     * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
+     */
+    public void setDataSource(javax.sql.DataSource ds);
+    
+    /**
+     * Returns a datasource, if one exists that is being used to create connections.
+     * This method will return null if the pool is using a {@link java.sql.Driver}
+     * @return the {@link javax.sql.DataSource} to be used for creating connections to be pooled or null if a Driver is used.
+     */
+    public javax.sql.DataSource getDataSource();
+    
+    /**
+     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(javax.sql.DataSource)}
+     * But instead of injecting the object, specify the JNDI location.
+     * After a successful JNDI look, the {@link PoolConfiguration#getDataSource()} will not return null. 
+     * @param jndiDS -the JNDI string @TODO specify the rules here.
+     */
+    public void setDataSourceJNDI(String jndiDS);
+    
+    /**
+     * Returns the JNDI string configured for data source usage.
+     * @return
+     */
+    public String getDataSourceJNDI();
+    
 
 }

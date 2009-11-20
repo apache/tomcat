@@ -277,7 +277,7 @@ public class ConnectionPool {
         }
 
         try {
-            getProxyConstructor(con.getConnection() instanceof XAConnection);
+            getProxyConstructor(con.getXAConnection() != null);
             //create the proxy
             //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new facade
             Connection connection = (Connection)proxyClassConstructor.newInstance(new Object[] { handler });
