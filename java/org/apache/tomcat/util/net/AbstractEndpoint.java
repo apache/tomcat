@@ -312,7 +312,7 @@ public abstract class AbstractEndpoint {
             if (name.startsWith(socketName)) {
                 return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
             } else {
-                return IntrospectionUtils.setProperty(this,name,value);
+                return IntrospectionUtils.setProperty(this,name,value,false);
             }
         }catch ( Exception x ) {
             log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
