@@ -295,7 +295,7 @@ public class ParameterParser {
         int length,
         char separator) {
 
-        if (chars == null) {
+        if (inputChars == null) {
             return new HashMap<String,String>();
         }
         HashMap<String,String> params = new HashMap<String,String>();
