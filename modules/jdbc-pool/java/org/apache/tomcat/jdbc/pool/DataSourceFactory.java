@@ -104,6 +104,10 @@ public class DataSourceFactory implements ObjectFactory {
     protected static final String PROP_USE_EQUALS = "useEquals";
     protected static final String PROP_USE_CON_LOCK = "useLock";
     
+    protected static final String PROP_DATASOURCE= "dataSource";
+    protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
+    
+    
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
     
     public static final String OBJECT_NAME = "object_name";
@@ -147,7 +151,9 @@ public class DataSourceFactory implements ObjectFactory {
         OBJECT_NAME,
         PROP_ABANDONWHENPERCENTAGEFULL,
         PROP_MAXAGE,
-        PROP_USE_CON_LOCK
+        PROP_USE_CON_LOCK,
+        PROP_DATASOURCE,
+        PROP_DATASOURCE_JNDI,
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -425,6 +431,16 @@ public class DataSourceFactory implements ObjectFactory {
             poolProperties.setUseLock(Boolean.parseBoolean(value));
         }
         
+        value = properties.getProperty(PROP_DATASOURCE);
+        if (value != null) {
+            //this should never happen
+            log.error("Can't set dataSource property as a string, this must be a javax.sql.DataSource object.");
+        }
+        
+        value = properties.getProperty(PROP_DATASOURCE_JNDI);
+        if (value != null) {
+            poolProperties.setDataSourceJNDI(value);
+        }
         return poolProperties;
     }
 
