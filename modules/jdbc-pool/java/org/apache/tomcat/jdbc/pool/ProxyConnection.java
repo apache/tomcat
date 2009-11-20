@@ -19,6 +19,8 @@ package org.apache.tomcat.jdbc.pool;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+
+import javax.sql.XAConnection;
 /**
  * A ProxyConnection object is the bottom most interceptor that wraps an object of type 
  * {@link PooledConnection}. The ProxyConnection intercepts three methods:
@@ -95,6 +97,17 @@ public class ProxyConnection extends JdbcInterceptor {
             return this.toString();
         } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
             return connection.getConnection();
+        } else if (method.getClass().equals(XAConnection.class)) {
+            try {
+                return method.invoke(connection.getXAConnection(),args);
+            }catch (Throwable t) {
+                if (t instanceof InvocationTargetException) {
+                    InvocationTargetException it = (InvocationTargetException)t;
+                    throw it.getCause()!=null?it.getCause():it;
+                } else {
+                    throw t;
+                }
+            }
         }
         if (isClosed()) throw new SQLException("Connection has already been closed.");
         if (compare(UNWRAP_VAL,method)) {

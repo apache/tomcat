@@ -1011,4 +1011,33 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setName(name);
     }
     
+    /** 
+     * {@inheritDoc}
+     */
+    public void setDataSource(javax.sql.DataSource ds) {
+        getPoolProperties().setDataSource(ds);
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public javax.sql.DataSource getDataSource() {
+        return getPoolProperties().getDataSource();
+    }
+    
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setDataSourceJNDI(String jndiDS) {
+        getPoolProperties().setDataSourceJNDI(jndiDS);
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public String getDataSourceJNDI() {
+        return getPoolProperties().getDataSourceJNDI();
+    }
+    
 }
