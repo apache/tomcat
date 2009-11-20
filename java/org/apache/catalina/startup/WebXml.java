@@ -18,6 +18,7 @@
 
 package org.apache.catalina.startup;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -566,18 +568,23 @@ public class WebXml {
             wrapper.setServletClass(servlet.getServletClass());
             MultipartDef multipartdef = servlet.getMultipartDef();
             if (multipartdef != null) {
+                String location = multipartdef.getLocation();
+                if (location == null || location.length() == 0) {
+                    location = ((File) context.getServletContext().getAttribute(
+                            ServletContext.TEMPDIR)).getAbsolutePath();
+                }
                 if (multipartdef.getMaxFileSize() != null &&
                         multipartdef.getMaxRequestSize()!= null &&
                         multipartdef.getFileSizeThreshold() != null) {
                     wrapper.setMultipartConfig(new MultipartConfigElement(
-                            multipartdef.getLocation(),
+                            location,
                             Long.parseLong(multipartdef.getMaxFileSize()),
                             Long.parseLong(multipartdef.getMaxRequestSize()),
                             Integer.parseInt(
                                     multipartdef.getFileSizeThreshold())));
                 } else {
                     wrapper.setMultipartConfig(new MultipartConfigElement(
-                            multipartdef.getLocation()));
+                            location));
                 }
             }
             context.addChild(wrapper);
