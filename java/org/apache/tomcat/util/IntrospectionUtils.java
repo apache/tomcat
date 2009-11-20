@@ -258,6 +258,9 @@ public final class IntrospectionUtils {
      * you can have setDebug(1).
      */
     public static boolean setProperty(Object o, String name, String value) {
+        return setProperty(o,name,value,true);
+    }
+    public static boolean setProperty(Object o, String name, String value,boolean invokeSetProperty) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
