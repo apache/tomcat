@@ -679,7 +679,11 @@ public interface HttpServletRequest extends ServletRequest {
      * 
      * @param username
      * @param password
-     * @throws ServletException
+     * @throws ServletException If any of {@link #getRemoteUser()},
+     *         {@link #getUserPrincipal()} or {@link #getAuthType()} are
+     *         non-null, if the configured authenticator does not support
+     *         user name and password authentication or if the authentication
+     *         fails
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
@@ -689,7 +693,7 @@ public interface HttpServletRequest extends ServletRequest {
     
     /**
      * 
-     * @throws ServletException
+     * @throws ServletException If the logout fails
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */

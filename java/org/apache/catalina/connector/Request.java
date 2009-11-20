@@ -20,6 +20,7 @@ package org.apache.catalina.connector;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -65,12 +67,14 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
+import org.apache.catalina.core.StandardPart;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
+import org.apache.jasper.compiler.ServletWriter;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -79,7 +83,12 @@ import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.fileupload.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.util.http.fileupload.ServletFileUpload;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase.InvalidContentTypeException;
 import org.apache.tomcat.util.http.mapper.MappingData;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tools.ant.util.CollectionUtils;
@@ -2335,11 +2344,7 @@ public class Request
     }
     
     /**
-     * @throws ServletException If any of {@link #getRemoteUser()},
-     *         {@link #getUserPrincipal()} or {@link #getAuthType()} are
-     *         non-null, if the configured authenticator does not support
-     *         user name and password authentication or if the authentication
-     *         fails
+     * {@inheritDoc}
      */
     public void login(String username, String password)
     throws ServletException {
@@ -2377,31 +2382,63 @@ public class Request
     }
 
     /**
-     * @throws ServletException If the logout fails
+     * {@inheritDoc}
      */
     public void logout() throws ServletException {
         context.getAuthenticator().register(this, getResponse(), null,
                 null, null, null);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Part> getParts() throws IOException, IllegalStateException,
             ServletException {
-        
-        String contentType = getContentType();
-        if (contentType == null ||
-                !contentType.startsWith(FileUploadBase.MULTIPART_FORM_DATA)) {
-            return Collections.emptyList();
-        }
         
         MultipartConfigElement mce = getWrapper().getMultipartConfig();
         if (mce == null) {
             return Collections.emptyList();
         }
         
-        // TODO SERVLET3 - file upload
-        return Collections.emptyList();
+        File location = new File(mce.getLocation());
+        
+        if (!location.isAbsolute() || !location.isDirectory()) {
+            throw new IOException(
+                    sm.getString("coyoteRequest.uploadLocationInvalid",
+                            location));
+        }
+        
+        // Create a new file upload handler
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setRepository(location.getCanonicalFile());
+        factory.setSizeThreshold(mce.getFileSizeThreshold());
+        
+        ServletFileUpload upload = new ServletFileUpload();
+        upload.setFileItemFactory(factory);
+        upload.setFileSizeMax(mce.getMaxFileSize());
+        upload.setSizeMax(mce.getMaxRequestSize());
+        
+        List<Part> result = new ArrayList<Part>();
+        try {
+           List<FileItem> items = upload.parseRequest(this);
+           for (FileItem item : items) {
+                result.add(new StandardPart(item, mce));
+            }
+            
+        } catch (InvalidContentTypeException e) {
+            throw new ServletException(e);
+        } catch (FileUploadBase.SizeException e) {
+            throw new IllegalStateException(e);
+        } catch (FileUploadException e) {
+            throw new IOException();
+        }
+        
+        return result;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Part getPart(String name) throws IOException, IllegalStateException,
             ServletException {
         Collection<Part> parts = getParts();
