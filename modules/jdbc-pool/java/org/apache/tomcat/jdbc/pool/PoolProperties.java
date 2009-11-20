@@ -73,8 +73,10 @@ public class PoolProperties implements PoolConfiguration {
     protected int abandonWhenPercentageFull = 0;
     protected long maxAge = 0;
     protected boolean useLock = false;
-    private InterceptorDefinition[] interceptors = null;
+    protected InterceptorDefinition[] interceptors = null;
     protected int suspectTimeout = 0;
+    protected javax.sql.DataSource dataSource = null;
+    protected String dataSourceJNDI = null;
     
     
     /** 
@@ -868,6 +870,36 @@ public class PoolProperties implements PoolConfiguration {
     @Override
     public void setUseLock(boolean useLock) {
         this.useLock = useLock;
+    }
+    
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setDataSource(javax.sql.DataSource ds) {
+        this.dataSource = ds;
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public javax.sql.DataSource getDataSource() {
+        return dataSource;
+    }
+    
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setDataSourceJNDI(String jndiDS) {
+        this.dataSourceJNDI = jndiDS;
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public String getDataSourceJNDI() {
+        return this.dataSourceJNDI;
     }
     
         

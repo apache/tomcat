@@ -570,5 +570,34 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
    public void setSuspectTimeout(int seconds) {
        //no op
    }
+   
+   /** 
+    * {@inheritDoc}
+    */
+   public void setDataSource(javax.sql.DataSource ds) {
+       getPoolProperties().setDataSource(ds);
+   }
+   
+   /** 
+    * {@inheritDoc}
+    */
+   public javax.sql.DataSource getDataSource() {
+       return getPoolProperties().getDataSource();
+   }
+   
+   
+   /** 
+    * {@inheritDoc}
+    */
+   public void setDataSourceJNDI(String jndiDS) {
+       //noop
+   }
+   
+   /** 
+    * {@inheritDoc}
+    */
+   public String getDataSourceJNDI() {
+       return getPoolProperties().getDataSourceJNDI();
+   }
 
 }
