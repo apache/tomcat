@@ -31,6 +31,13 @@ public interface Part {
     public long getSize();
     public void write(String fileName) throws IOException;
     public void delete() throws IOException;
+    
+    /**
+     * Obtains the value of the specified mime header for the part.
+     * @param name Header name
+     * @return The header value or <code>null</code> if the header is not
+     *         present
+     */
     public String getHeader(String name);
     public Collection<String> getHeaders(String name);
     public Collection<String> getHeaderNames();
