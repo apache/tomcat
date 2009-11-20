@@ -27,6 +27,7 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -77,8 +79,10 @@ import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.mapper.MappingData;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tools.ant.util.CollectionUtils;
 
 
 /**
@@ -2382,8 +2386,20 @@ public class Request
     
     public Collection<Part> getParts() throws IOException, IllegalStateException,
             ServletException {
+        
+        String contentType = getContentType();
+        if (contentType == null ||
+                !contentType.startsWith(FileUploadBase.MULTIPART_FORM_DATA)) {
+            return Collections.emptyList();
+        }
+        
+        MultipartConfigElement mce = getWrapper().getMultipartConfig();
+        if (mce == null) {
+            return Collections.emptyList();
+        }
+        
         // TODO SERVLET3 - file upload
-        return null;
+        return Collections.emptyList();
     }
     
     public Part getPart(String name) throws IOException, IllegalStateException,
