@@ -962,6 +962,8 @@ final class IgnoreAnnotationsRule extends Rule {
         String value = attributes.getValue("metadata-complete");
         if ("true".equals(value)) {
             webxml.setMetadataComplete(true);
+        } else if ("false".equals(value)) {
+            webxml.setMetadataComplete(false);
         }
         if (digester.getLogger().isDebugEnabled()) {
             digester.getLogger().debug
