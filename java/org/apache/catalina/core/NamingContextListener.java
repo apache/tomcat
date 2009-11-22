@@ -239,6 +239,8 @@ public class NamingContextListener
                     (sm.getString("naming.namingContextCreationFailed", e));
             }
 
+            namingResources.addPropertyChangeListener(this);
+
             // Binding the naming context to the class loader
             if (container instanceof Context) {
                 // Setting the context in read only mode
@@ -253,7 +255,6 @@ public class NamingContextListener
             }
 
             if (container instanceof Server) {
-                namingResources.addPropertyChangeListener(this);
                 org.apache.naming.factory.ResourceLinkFactory.setGlobalContext
                     (namingContext);
                 try {
@@ -448,9 +449,7 @@ public class NamingContextListener
 
 
     /**
-     * Process property change events.  Currently, only listens to such events
-     * on the <code>NamingResources</code> instance for the global naming
-     * resources.
+     * Process property change events.
      *
      * @param event The property change event that has occurred
      */
@@ -481,7 +480,7 @@ public class NamingContextListener
 
 
     /**
-     * Process a property change on the global naming resources, by making the
+     * Process a property change on the naming resources, by making the
      * corresponding addition or removal to the associated JNDI context.
      *
      * @param name Property name of the change to be processed
@@ -491,9 +490,6 @@ public class NamingContextListener
     private void processGlobalResourcesChange(String name,
                                               Object oldValue,
                                               Object newValue) {
-
-        // NOTE - It seems that the Context for global JNDI resources
-        // is left in read-write mode, so we do not have to change it here
 
         if (name.equals("ejb")) {
             if (oldValue != null) {
