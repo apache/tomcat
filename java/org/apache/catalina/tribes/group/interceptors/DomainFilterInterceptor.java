@@ -104,4 +104,13 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
     public void setDomain(byte[] domain) {
         this.domain = domain;
     }
+
+    public void setDomain(String domain) {
+        if ( domain == null ) return;
+        if (domain.startsWith("{"))
+            setDomain(org.apache.catalina.tribes.util.Arrays.fromString(domain));
+	    else
+            setDomain(org.apache.catalina.tribes.util.Arrays.convert(domain));
+    }
+
 }
