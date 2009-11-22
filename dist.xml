@@ -77,6 +77,28 @@
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
   </filterset>
 
+  <!-- Files that need to have their line endings changed for src distros -->
+  <patternset id="src.files" >
+    <include name="**/*.MF,**/*.TXT"/>
+    <include name="**/*.am,**/*.amd64,**/*.autoconf,**/*.awk,**/*.bat"/>
+    <include name="**/*.c,**/*.classpath,**/*.conf,**/*.css"/>
+    <include name="**/*.def,**/*.default,**/*.dsp,**/*.dsw,**/*.dtd"/>
+    <include name="**/*.exp,**/*.h,**/*.html,**/*.hw"/>
+    <include name="**/*.ia64,**/*.in,**/*.ini,**/*.ism"/>
+    <include name=",**/*.java,**/*.jsp,**/*.jspf,**/*.jspx"/>
+    <include name="**/*.launch,**/*.layout,**/*.lib,**/*.libdir,**/*.linux"/>
+    <include name="**/*.m4,**/*.mak,**/*.manifest,**/*.mc"/>
+    <include name="**/*.mdl,**/*.minimal,**/*.mk,**/*.module"/>
+    <include name="**/*.netware,**/*.nsi"/>
+    <include name="**/*.patch,**/*.pl,**/*.policy,**/*.pro,**/*.project"/>
+    <include name="**/*.properties,**/*.qclsrc,**/*.rc,**/*.reg"/>
+    <include name="**/*.sample,**/*.sh,**/*.shtml,**/*.sln"/>
+    <include name="**/*.solaris,**/*.spec"/>
+    <include name="**/*.tag,**/*.tasks,**/*.tld,**/*.tmpl,**/*.txt"/>
+    <include name="**/*.vbs,**/*.vc,**/*.vcproj"/>
+    <include name="**/*.x86,**/*.xml,**/*.xsd,**/*.xsl"/>
+  </patternset>
+
   <!-- ====================== COMBO: Clean All Directories ================ -->
   <target name="clean"
    description="Clean all components">
@@ -590,6 +612,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the source code distribution in zip format -->
   <target name="package-src-zip">
+    <fixcrlf srcdir="${tomcat.dist}/src" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset id="src.files"/>
+    </fixcrlf>
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip">
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </zip>
@@ -602,9 +628,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the source code distribution in tar.gz format -->
   <target name="package-src-tgz">
-    <fixcrlf srcdir="${tomcat.dist}/src"
-        excludes="**/*.bin,**/*.bmp,**/*.dia,**/*.exe,**/*.gif,**/*.ico,**/*.jar,**/*.jpg,**/*.pdf,**/*.rtf,**/*.war"
-          eol="lf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}/src" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset id="src.files"/>
+    </fixcrlf>
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
