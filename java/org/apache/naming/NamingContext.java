@@ -470,7 +470,7 @@ public class NamingContext implements Context {
         
         if (name.size() > 1) {
             if (entry.type == NamingEntry.CONTEXT) {
-                ((Context) entry.value).unbind(name.getSuffix(1));
+                ((Context) entry.value).destroySubcontext(name.getSuffix(1));
             } else {
                 throw new NamingException
                     (sm.getString("namingContext.contextExpected"));
