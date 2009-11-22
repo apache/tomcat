@@ -69,8 +69,6 @@
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
 
-  <!-- JAR artifacts -->
-
   <!-- Version info filter set -->
   <filterset id="version.filters">
     <filter token="VERSION" value="${version}"/>
