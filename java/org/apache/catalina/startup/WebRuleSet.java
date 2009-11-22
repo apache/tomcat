@@ -631,6 +631,7 @@ public class WebRuleSet extends RuleSetBase {
 final class SetLoginConfig extends Rule {
     protected boolean isLoginConfigSet = false;
     public SetLoginConfig() {
+        // NO-OP
     }
 
     @Override
@@ -653,6 +654,7 @@ final class SetLoginConfig extends Rule {
 final class SetJspConfig extends Rule {
     protected boolean isJspConfigSet = false;
     public SetJspConfig() {
+        // NO-OP
     }
 
     @Override
@@ -675,6 +677,7 @@ final class SetJspConfig extends Rule {
 final class SetSessionConfig extends Rule {
     protected boolean isSessionConfigSet = false;
     public SetSessionConfig() {
+        // NO-OP
     }
 
     @Override
@@ -698,6 +701,7 @@ final class SetSessionConfig extends Rule {
 final class SetAuthConstraintRule extends Rule {
 
     public SetAuthConstraintRule() {
+        // NO-OP
     }
 
     @Override
@@ -723,6 +727,7 @@ final class SetAuthConstraintRule extends Rule {
 final class SetDistributableRule extends Rule {
 
     public SetDistributableRule() {
+        // NO-OP
     }
 
     @Override
@@ -789,6 +794,7 @@ final class SetPublicIdRule extends Rule {
 final class ServletDefCreateRule extends Rule {
 
     public ServletDefCreateRule() {
+        // NO-OP
     }
 
     @Override
@@ -946,6 +952,7 @@ final class CallMethodMultiRule extends CallMethodRule {
 final class IgnoreAnnotationsRule extends Rule {
 
     public IgnoreAnnotationsRule() {
+        // NO-OP
     }
 
     @Override
@@ -971,6 +978,7 @@ final class IgnoreAnnotationsRule extends Rule {
 final class AbsoluteOrderingRule extends Rule {
     
     public AbsoluteOrderingRule() {
+        // NO-OP
     }
     
     @Override
@@ -987,6 +995,7 @@ final class AbsoluteOrderingRule extends Rule {
 final class RelativeOrderingRule extends Rule {
     
     public RelativeOrderingRule() {
+        // NO-OP
     }
     
     @Override
@@ -1004,6 +1013,7 @@ final class RelativeOrderingRule extends Rule {
 final class SoapHeaderRule extends Rule {
 
     public SoapHeaderRule() {
+        // NO-OP
     }
 
     /**
@@ -1039,6 +1049,7 @@ final class SoapHeaderRule extends Rule {
 final class ServiceQnameRule extends Rule {
 
     public ServiceQnameRule() {
+        // NO-OP
     }
 
     /**
