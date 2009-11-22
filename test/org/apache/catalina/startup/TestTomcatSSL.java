@@ -71,7 +71,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         tomcat.getConnector().setProperty("sslProtocol",
             "tls");
         // test runs in output/tmp
-        tomcat.getConnector().setAttribute("keystore", 
+        tomcat.getConnector().setAttribute("keystoreFile", 
             "../../test/org/apache/catalina/startup/test.keystore");
     }
     
