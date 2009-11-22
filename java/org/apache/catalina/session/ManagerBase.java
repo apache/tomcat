@@ -709,6 +709,15 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     public void destroy() {
         if( oname != null )
             Registry.getRegistry(null, null).unregisterComponent(oname);
+        if (randomIS!=null) {
+            try {
+                randomIS.close();
+            } catch (IOException ioe) {
+                log.warn("Failed to close randomIS.");
+            }
+            randomIS=null;
+        }
+
         initialized=false;
         oname = null;
     }
