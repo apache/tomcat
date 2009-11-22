@@ -293,7 +293,7 @@ public final class TldConfig  implements LifecycleListener {
     }
 
     public void addApplicationListener( String s ) {
-        //if(log.isDebugEnabled())
+        if(log.isDebugEnabled())
             log.debug( "Add tld listener " + s);
         listeners.add(s);
     }
@@ -322,7 +322,7 @@ public final class TldConfig  implements LifecycleListener {
      * 
      * @exception Exception if a fatal input/output or parsing error occurs
      */
-    public void execute() throws Exception {
+    public void execute() {
         long t1=System.currentTimeMillis();
 
         /*
