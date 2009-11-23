@@ -57,8 +57,8 @@ public class McastServiceImpl
     /**
      * Internal flag used for the listen thread that listens to the multicasting socket.
      */
-    protected boolean doRunSender = false;
-    protected boolean doRunReceiver = false;
+    protected volatile boolean doRunSender = false;
+    protected volatile boolean doRunReceiver = false;
     protected int startLevel = 0;
     /**
      * Socket that we intend to listen to
@@ -575,7 +575,7 @@ public class McastServiceImpl
     }//class SenderThread
 
     protected static class RecoveryThread extends Thread {
-        static boolean running = false;
+        static volatile boolean running = false;
         McastServiceImpl parent = null;
         public RecoveryThread(McastServiceImpl parent) {
             this.parent = parent;
