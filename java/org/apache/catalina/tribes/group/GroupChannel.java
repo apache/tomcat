@@ -644,7 +644,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             return counter++;
         }
 
-        protected boolean doRun = true;
+        protected volatile boolean doRun = true;
         protected GroupChannel channel;
         protected long sleepTime;
         public HeartbeatThread(GroupChannel channel, long sleepTime) {
