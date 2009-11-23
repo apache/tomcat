@@ -383,6 +383,12 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public void setSessionTimeout(String s){endpoint.setTruststoreAlgorithm(s);}
     public String getSessionTimeout(){ return endpoint.getTruststoreAlgorithm();}
     
+    public void setAllowUnsafeLegacyRenegotiation(String s) {
+        endpoint.setAllowUnsafeLegacyRenegotiation(s);
+    }
+    public String getAllowUnsafeLegacyRenegotiation() {
+        return endpoint.getAllowUnsafeLegacyRenegotiation();
+    }
     
     public abstract void init() throws Exception;
     public abstract void start() throws Exception;
