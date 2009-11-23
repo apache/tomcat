@@ -28,6 +28,8 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 
@@ -38,6 +40,9 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * @version 1.0
  */
 public class GzipInterceptor extends ChannelInterceptorBase {
+
+    private static final Log log = LogFactory.getLog(GzipInterceptor.class);
+
     public static final int DEFAULT_BUFFER_SIZE = 2048;
     
     @Override

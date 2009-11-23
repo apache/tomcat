@@ -32,6 +32,8 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.UUIDGenerator;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * <p>Title: Auto merging leader election algorithm</p>
@@ -120,6 +122,8 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  */
 public class NonBlockingCoordinator extends ChannelInterceptorBase {
     
+    private static final Log log = LogFactory.getLog(NonBlockingCoordinator.class);
+
     /**
      * header for a coordination message
      */

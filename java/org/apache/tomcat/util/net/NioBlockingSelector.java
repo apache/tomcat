@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class NioBlockingSelector {
     
-    protected static final Log log = LogFactory.getLog(NioBlockingSelector.class);
+    private static final Log log = LogFactory.getLog(NioBlockingSelector.class);
     
     private static int threadCounter = 0;
     

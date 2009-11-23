@@ -43,7 +43,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
  */
 
 public class DataSourceProxy implements PoolConfiguration {
-    protected static final Log log = LogFactory.getLog(DataSourceProxy.class);
+    private static final Log log = LogFactory.getLog(DataSourceProxy.class);
     
     protected volatile ConnectionPool pool = null;
     

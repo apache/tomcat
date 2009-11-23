@@ -57,7 +57,7 @@ public class AprEndpoint extends AbstractEndpoint {
     // -------------------------------------------------------------- Constants
 
 
-    protected static final Log log = LogFactory.getLog(AprEndpoint.class);
+    private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
 
     // ----------------------------------------------------------------- Fields

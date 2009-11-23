@@ -47,7 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
-    protected static final Log log =
+    private static final Log log =
         LogFactory.getLog(JreMemoryLeakPreventionListener.class);
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);

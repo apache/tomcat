@@ -24,6 +24,8 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.RpcCallback;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical 
@@ -51,7 +53,7 @@ import org.apache.catalina.tribes.group.RpcCallback;
  */
 public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback, ChannelListener, MembershipListener {
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReplicatedMap.class);
+    private static final Log log = LogFactory.getLog(ReplicatedMap.class);
 
 //------------------------------------------------------------------------------
 //              CONSTRUCTORS / DESTRUCTORS

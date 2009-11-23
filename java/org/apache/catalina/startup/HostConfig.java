@@ -44,6 +44,8 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.IOTools;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.Registry;
@@ -60,8 +62,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public class HostConfig
     implements LifecycleListener {
     
-    protected static final org.apache.juli.logging.Log log=
-         org.apache.juli.logging.LogFactory.getLog( HostConfig.class );
+    private static final Log log = LogFactory.getLog( HostConfig.class );
 
     // ----------------------------------------------------- Instance Variables
 

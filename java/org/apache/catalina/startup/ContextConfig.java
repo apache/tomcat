@@ -58,6 +58,8 @@ import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.res.StringManager;
@@ -79,8 +81,7 @@ import org.xml.sax.SAXParseException;
 public class ContextConfig
     implements LifecycleListener {
 
-    protected static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( ContextConfig.class );
+    private static final Log log = LogFactory.getLog( ContextConfig.class );
 
     // ----------------------------------------------------- Instance Variables
 
