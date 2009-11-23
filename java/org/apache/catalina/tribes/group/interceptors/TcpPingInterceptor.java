@@ -52,7 +52,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
 
     protected boolean useThread = false;
     protected boolean staticOnly = false;
-    protected boolean running = true;
+    protected volatile boolean running = true;
     protected PingThread thread = null;
     protected static AtomicInteger cnt = new AtomicInteger(0);
     
