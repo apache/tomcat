@@ -38,6 +38,8 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -55,6 +57,11 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author fhanik
  */
 public class Http11Processor extends AbstractHttp11Processor implements ActionHook {
+
+    /**
+     * Logger.
+     */
+    private static final Log log = LogFactory.getLog(Http11Processor.class);
 
    // ------------------------------------------------------------ Constructor
 

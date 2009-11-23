@@ -74,7 +74,7 @@ public abstract class RequestBase implements BayeuxRequest {
     
     protected HashMap<String, Object> response = null;
     
-    protected static final Log log = LogFactory.getLog(RequestBase.class);
+    private static final Log log = LogFactory.getLog(RequestBase.class);
     
     protected int reconnectInterval = 1000;
     

@@ -27,6 +27,8 @@ import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.BufferPool;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A worker thread class which can drain channels and echo-back the input. Each
@@ -45,7 +47,7 @@ import org.apache.catalina.tribes.io.BufferPool;
 public class BioReplicationTask extends AbstractRxTask {
 
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationTask.class );
+    private static final Log log = LogFactory.getLog( BioReplicationTask.class );
     
     protected Socket socket;
     protected ObjectReader reader;

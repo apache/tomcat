@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
  * @version 1.0
  */
 public class Arrays {
-    protected static final Log log = LogFactory.getLog(Arrays.class);
+    private static final Log log = LogFactory.getLog(Arrays.class);
     
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
         if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");

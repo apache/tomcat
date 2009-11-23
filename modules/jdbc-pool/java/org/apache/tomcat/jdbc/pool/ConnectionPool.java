@@ -58,7 +58,7 @@ public class ConnectionPool {
     /**
      * Logger
      */
-    protected static final Log log = LogFactory.getLog(ConnectionPool.class);
+    private static final Log log = LogFactory.getLog(ConnectionPool.class);
 
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE

@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.jasper.JasperException;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -60,7 +62,8 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
  */
 public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
-    
+    private final Log log = LogFactory.getLog(JDTCompiler.class); // must not be static
+   
     /** 
      * Compile the servlet from .java file to .class file
      */

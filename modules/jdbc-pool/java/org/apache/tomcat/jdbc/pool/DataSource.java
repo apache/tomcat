@@ -26,6 +26,10 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.sql.XADataSource;
 
+import org.apache.jasper.compiler.AntCompiler;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 
 /**
  * A DataSource that can be instantiated through IoC and implements the DataSource interface
@@ -35,6 +39,7 @@ import javax.sql.XADataSource;
  * @version 1.0
  */
 public class DataSource extends DataSourceProxy implements MBeanRegistration,javax.sql.DataSource,XADataSource, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean {
+    private static final Log log = LogFactory.getLog(DataSource.class);
 
     /**
      * Constructor for reflection only. A default set of pool properties will be created.

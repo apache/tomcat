@@ -26,13 +26,15 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.util.UUIDGenerator;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A channel to handle RPC messaging
  * @author Filip Hanik
  */
 public class RpcChannel implements ChannelListener{
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(RpcChannel.class);
+    private static final Log log = LogFactory.getLog(RpcChannel.class);
     
     public static final int FIRST_REPLY = 1;
     public static final int MAJORITY_REPLY = 2;

@@ -27,6 +27,8 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * 
@@ -39,8 +41,7 @@ import org.apache.catalina.tribes.io.ChannelData;
 
 public class TcpPingInterceptor extends ChannelInterceptorBase {
     
-    protected static final org.apache.juli.logging.Log log = 
-        org.apache.juli.logging.LogFactory.getLog(TcpPingInterceptor.class);
+    private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
     
     protected static byte[] TCP_PING_DATA = new byte[] {
         79, -89, 115, 72, 121, -33, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,

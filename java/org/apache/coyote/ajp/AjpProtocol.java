@@ -36,6 +36,8 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -55,8 +57,7 @@ public class AjpProtocol
     implements ProtocolHandler, MBeanRegistration {
     
     
-    protected static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(AjpProtocol.class);
+    private static final Log log = LogFactory.getLog(AjpProtocol.class);
 
     /**
      * The string manager for this package.

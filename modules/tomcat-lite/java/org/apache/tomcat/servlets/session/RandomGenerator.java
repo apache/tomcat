@@ -40,7 +40,7 @@ public class RandomGenerator {
     protected DataInputStream randomIS=null;
     protected String devRandomSource="/dev/urandom";
 
-    protected static Logger log = Logger.getLogger(RandomGenerator.class.getName());
+    private static final Logger log = Logger.getLogger(RandomGenerator.class.getName());
 
     /**
      * The message digest algorithm to be used when generating session
