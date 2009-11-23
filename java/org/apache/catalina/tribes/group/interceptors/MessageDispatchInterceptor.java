@@ -42,7 +42,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
 
     protected long maxQueueSize = 1024*1024*64; //64MB
     protected FastQueue queue = new FastQueue();
-    protected boolean run = false;
+    protected volatile boolean run = false;
     protected Thread msgDispatchThread = null;
     protected long currentSize = 0;
     protected boolean useDeepClone = true;
