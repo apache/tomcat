@@ -97,7 +97,7 @@ public class JspC implements Options {
             "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
 
     // Logger
-    protected static final Log log = LogFactory.getLog(JspC.class);
+    private static final Log log = LogFactory.getLog(JspC.class);
 
     protected static final String SWITCH_VERBOSE = "-v";
     protected static final String SWITCH_HELP = "-help";

@@ -35,6 +35,9 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import java.util.LinkedList;
 import java.util.Set;
 import java.nio.channels.CancelledKeyException;
@@ -46,7 +49,7 @@ import java.nio.channels.ClosedSelectorException;
  */
 public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioReceiver.class);
+    private static final Log log = LogFactory.getLog(NioReceiver.class);
 
     /**
      * The string manager for this package.

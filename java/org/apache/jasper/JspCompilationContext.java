@@ -36,6 +36,8 @@ import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.ServletWriter;
 import org.apache.jasper.servlet.JasperLoader;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A place holder for various things that are used through out the JSP
@@ -53,8 +55,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
  */
 public class JspCompilationContext {
 
-    protected final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(JspCompilationContext.class);
+    private final Log log = LogFactory.getLog(JspCompilationContext.class); // must not be static
 
     protected Map<String, URL> tagFileJarUrls;
     protected boolean isPackagedTagFile;

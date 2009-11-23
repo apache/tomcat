@@ -35,7 +35,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * logger
      */
-    protected static final Log log = LogFactory.getLog(ConnectionPool.class);
+    private static final Log log = LogFactory.getLog(ConnectionPool.class);
 
     /**
      * the connection pool

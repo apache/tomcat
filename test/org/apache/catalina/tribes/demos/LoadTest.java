@@ -41,7 +41,7 @@ import org.apache.juli.logging.LogFactory;
  * @version 1.0
  */
 public class LoadTest implements MembershipListener,ChannelListener, Runnable {
-    protected static final Log log = LogFactory.getLog(LoadTest.class);
+    private static final Log log = LogFactory.getLog(LoadTest.class);
     public static int size = 24000;
     public static Object mutex = new Object();
     public boolean doRun = true;

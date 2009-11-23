@@ -41,7 +41,7 @@ public class GenericParser{
     /**
      * The Log to which all SAX event related logging calls will be made.
      */
-    protected static final Log log =
+    private static final Log log =
         LogFactory.getLog("org.apache.commons.digester.Digester.sax");
 
     /**

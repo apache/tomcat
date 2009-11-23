@@ -43,6 +43,8 @@ import org.apache.catalina.tribes.io.BufferPool;
 import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.util.Logs;
 import org.apache.catalina.tribes.util.Arrays;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * The default implementation of a Channel.<br>
@@ -54,6 +56,8 @@ import org.apache.catalina.tribes.util.Arrays;
  * @version $Revision$, $Date$
  */
 public class GroupChannel extends ChannelInterceptorBase implements ManagedChannel {
+    private static final Log log = LogFactory.getLog(GroupChannel.class);
+
     /**
      * Flag to determine if the channel manages its own heartbeat
      * If set to true, the channel will start a local thread for the heart beat.
@@ -638,7 +642,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @version 1.0
      */
     public static class HeartbeatThread extends Thread {
-        protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(HeartbeatThread.class);
+        private static final Log log = LogFactory.getLog(HeartbeatThread.class);
         protected static int counter = 1;
         protected static synchronized int inc() {
             return counter++;
