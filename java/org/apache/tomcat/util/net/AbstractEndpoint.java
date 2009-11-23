@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
@@ -503,7 +504,7 @@ public abstract class AbstractEndpoint {
     public String getKeyAlias() { return keyAlias;}
     public void setKeyAlias(String s ) { keyAlias = s;}
     
-    private String keyPass = "changeit";
+    private String keyPass = JSSESocketFactory.DEFAULT_KEY_PASS;
     public String getKeyPass() { return keyPass;}
     public void setKeyPass(String s ) { this.keyPass = s;}
 
