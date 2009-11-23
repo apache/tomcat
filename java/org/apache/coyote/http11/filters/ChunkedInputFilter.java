@@ -281,10 +281,10 @@ public class ChunkedInputFilter implements InputFilter {
                 trailer = true;
             } else if (!trailer) { 
                 //don't read data after the trailer
-                if (HexUtils.DEC[buf[pos]] != -1) {
+                if (HexUtils.getDec(buf[pos]) != -1) {
                     readDigit = true;
                     result *= 16;
-                    result += HexUtils.DEC[buf[pos]];
+                    result += HexUtils.getDec(buf[pos]);
                 } else {
                     //we shouldn't allow invalid, non hex characters
                     //in the chunked header

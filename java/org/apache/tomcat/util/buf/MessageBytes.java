@@ -526,7 +526,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         while (current > 0) {
             int digit = current % 10;
             current = current / 10;
-            buf[end++] = HexUtils.HEX[digit];
+            buf[end++] = HexUtils.getHex(digit);
         }
         byteC.setOffset(0);
         byteC.setEnd(end);
@@ -568,7 +568,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         while (current > 0) {
             int digit = (int) (current % 10);
             current = current / 10;
-            buf[end++] = HexUtils.HEX[digit];
+            buf[end++] = HexUtils.getHex(digit);
         }
         byteC.setOffset(0);
         byteC.setEnd(end);
