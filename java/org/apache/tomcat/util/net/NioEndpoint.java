@@ -53,6 +53,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
+import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
@@ -504,7 +505,11 @@ public class NioEndpoint extends AbstractEndpoint {
         // Initialize SSL if needed
         if (isSSLEnabled()) {
             // Initialize SSL
-            char[] passphrase = getKeystorePass().toCharArray();
+            String keystorePass = getKeystorePass();
+            if (keystorePass == null) {
+                keystorePass = JSSESocketFactory.DEFAULT_KEY_PASS;
+            }
+            char[] passphrase = keystorePass.toCharArray();
 
             char[] tpassphrase = (getTruststorePass()!=null)?getTruststorePass().toCharArray():passphrase;
             String ttype = (getTruststoreType()!=null)?getTruststoreType():getKeystoreType();
