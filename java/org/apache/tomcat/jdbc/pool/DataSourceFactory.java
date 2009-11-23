@@ -55,7 +55,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  */
 public class DataSourceFactory implements ObjectFactory {
-    protected static final Log log = LogFactory.getLog(DataSourceFactory.class);
+    private static final Log log = LogFactory.getLog(DataSourceFactory.class);
 
     protected final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
     protected final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
