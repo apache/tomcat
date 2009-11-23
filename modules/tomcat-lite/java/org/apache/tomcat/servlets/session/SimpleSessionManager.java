@@ -47,7 +47,7 @@ import org.apache.tomcat.addons.UserSessionManager;
  * @author Craig R. McClanahan
  */
 public class SimpleSessionManager implements UserSessionManager {
-    protected static Logger log = Logger.getLogger(SimpleSessionManager.class.getName());
+    static final Logger log = Logger.getLogger(SimpleSessionManager.class.getName());
 
     protected RandomGenerator randomG = new RandomGenerator();
     

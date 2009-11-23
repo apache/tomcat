@@ -25,6 +25,8 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.transport.bio.util.FastQueue;
 import org.apache.catalina.tribes.transport.bio.util.LinkObject;
 import org.apache.catalina.tribes.UniqueId;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  *
@@ -38,7 +40,7 @@ import org.apache.catalina.tribes.UniqueId;
  * @version 1.0
  */
 public class MessageDispatchInterceptor extends ChannelInterceptorBase implements Runnable {
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(MessageDispatchInterceptor.class);
+    private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
 
     protected long maxQueueSize = 1024*1024*64; //64MB
     protected FastQueue queue = new FastQueue();

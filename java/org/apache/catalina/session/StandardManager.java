@@ -46,6 +46,8 @@ import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleSupport;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 /**
  * Standard implementation of the <b>Manager</b> interface that provides
  * simple session persistence across restarts of this component (such as
@@ -64,6 +66,8 @@ import org.apache.catalina.security.SecurityUtil;
 public class StandardManager
     extends ManagerBase
     implements Lifecycle, PropertyChangeListener {
+
+    private final Log log = LogFactory.getLog(StandardManager.class); // must not be static
 
     // ---------------------------------------------------- Security Classes
     private class PrivilegedDoLoad

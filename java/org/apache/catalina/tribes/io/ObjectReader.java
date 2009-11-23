@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 
@@ -37,7 +39,7 @@ import org.apache.catalina.tribes.ChannelMessage;
  */
 public class ObjectReader {
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ObjectReader.class);
+    private static final Log log = LogFactory.getLog(ObjectReader.class);
 
     private XByteBuffer buffer;
 

@@ -33,6 +33,8 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Main JSP compiler class. This class uses Ant for compiling.
@@ -46,8 +48,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
  */
 public abstract class Compiler {
     
-    protected org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
-            .getLog(Compiler.class);
+    private final Log log = LogFactory.getLog(Compiler.class); // must not be static
 
     // ----------------------------------------------------- Instance Variables
 
