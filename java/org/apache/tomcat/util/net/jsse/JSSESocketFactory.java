@@ -84,15 +84,15 @@ public class JSSESocketFactory
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
-    // defaults
+    // Defaults - made public where re-used
     static String defaultProtocol = "TLS";
     static boolean defaultClientAuth = false;
     static String defaultKeystoreType = "JKS";
     private static final String defaultKeystoreFile
         = System.getProperty("user.home") + "/.keystore";
-    private static final String defaultKeyPass = "changeit";
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
+    public static final String DEFAULT_KEY_PASS = "changeit";
     
     static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
@@ -259,7 +259,7 @@ public class JSSESocketFactory
         String keyPass = (String)attributes.get(
                 AbstractEndpoint.SSL_ATTR_KEY_PASS);
         if (keyPass == null) {
-            keyPass = defaultKeyPass;
+            keyPass = DEFAULT_KEY_PASS;
         }
         String keystorePass = (String)attributes.get(
                 AbstractEndpoint.SSL_ATTR_KEYSTORE_PASS);
