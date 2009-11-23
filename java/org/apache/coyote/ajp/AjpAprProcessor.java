@@ -33,6 +33,8 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -61,8 +63,7 @@ public class AjpAprProcessor implements ActionHook {
     /**
      * Logger.
      */
-    protected static final org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(AjpAprProcessor.class);
+    private static final Log log = LogFactory.getLog(AjpAprProcessor.class);
 
     /**
      * The string manager for this package.

@@ -41,6 +41,8 @@ import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLSocket;
@@ -69,8 +71,7 @@ public class Http11AprProcessor implements ActionHook {
     /**
      * Logger.
      */
-    protected static final org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(Http11AprProcessor.class);
+    private static final Log log = LogFactory.getLog(Http11AprProcessor.class);
 
     /**
      * The string manager for this package.

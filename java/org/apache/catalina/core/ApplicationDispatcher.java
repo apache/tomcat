@@ -68,7 +68,7 @@ import org.apache.tomcat.util.res.StringManager;
 final class ApplicationDispatcher
     implements RequestDispatcher {
 
-    protected static final Log log = LogFactory.getLog(ApplicationDispatcher.class);
+    private static final Log log = LogFactory.getLog(ApplicationDispatcher.class);
 
     protected class PrivilegedForward
             implements PrivilegedExceptionAction<Void> {

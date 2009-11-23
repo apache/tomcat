@@ -25,6 +25,8 @@ import java.io.PrintStream;
 import java.util.StringTokenizer;
 
 import org.apache.jasper.JasperException;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -44,7 +46,9 @@ import org.apache.tools.ant.types.PatternSet;
  */
 public class AntCompiler extends Compiler {
 
-    protected static Object javacLock = new Object();
+    private final Log log = LogFactory.getLog(AntCompiler.class); // must not be static
+    
+    protected static final Object javacLock = new Object();
 
     static {
         System.setErr(new SystemLogHandler(System.err));

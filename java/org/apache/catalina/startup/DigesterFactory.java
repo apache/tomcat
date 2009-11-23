@@ -21,6 +21,8 @@ package org.apache.catalina.startup;
 import java.net.URL;
 
 import org.apache.catalina.util.SchemaResolver;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
@@ -33,8 +35,7 @@ public class DigesterFactory {
     /**
      * The log.
      */
-   protected static final org.apache.juli.logging.Log log = 
-       org.apache.juli.logging.LogFactory.getLog(DigesterFactory.class);
+    private static final Log log = LogFactory.getLog(DigesterFactory.class);
 
     /**
      * Create a <code>Digester</code> parser with no <code>Rule</code>

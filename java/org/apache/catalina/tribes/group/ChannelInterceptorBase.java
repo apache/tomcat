@@ -20,6 +20,8 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Abstract class for the interceptor base class.
@@ -29,8 +31,7 @@ import org.apache.catalina.tribes.Member;
 
 public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(
-        ChannelInterceptorBase.class);
+    private static final Log log = LogFactory.getLog(ChannelInterceptorBase.class);
 
     private ChannelInterceptor next;
     private ChannelInterceptor previous;

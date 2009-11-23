@@ -17,6 +17,8 @@
 
 package org.apache.coyote.ajp;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -38,8 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class AjpMessage {
 
 
-    protected static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(AjpMessage.class);
+    private static final Log log = LogFactory.getLog(AjpMessage.class);
 
     /**
      * The string manager for this package.

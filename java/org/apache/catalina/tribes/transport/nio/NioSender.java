@@ -30,6 +30,9 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.RemoteProcessException;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import java.io.EOFException;
 import java.net.*;
 
@@ -49,7 +52,7 @@ import java.net.*;
  */
 public class NioSender extends AbstractSender implements DataSender{
 
-    protected static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioSender.class);
+    private static final Log log = LogFactory.getLog(NioSender.class);
 
 
 

@@ -45,7 +45,7 @@ public class NioSelectorPool {
     
     protected static int threadCount = 0;
     
-    protected static final Log log = LogFactory.getLog(NioSelectorPool.class);
+    private static final Log log = LogFactory.getLog(NioSelectorPool.class);
 
     protected final static boolean SHARED =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.net.NioSelectorShared", "true")).booleanValue();
