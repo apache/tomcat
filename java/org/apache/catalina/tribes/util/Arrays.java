@@ -62,10 +62,17 @@ public class Arrays {
     public static String toString(byte[] data, int offset, int length, boolean asInt) {
         StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
-            if (asInt) buf.append((int)data[offset++]);
-            else buf.append(data[offset++]);
-            for (int i = offset; i < length; i++) {
-                buf.append(", ").append(data[i]);
+            int i = offset;
+            if (asInt) {
+                buf.append(data[i++] & 0xff);
+                for (; i < length; i++) {
+                    buf.append(", ").append(data[i] & 0xff);
+                }
+            } else {
+                buf.append(data[i++]);
+                for (; i < length; i++) {
+                    buf.append(", ").append(data[i]);
+                }
             }
         }
         buf.append("}");
