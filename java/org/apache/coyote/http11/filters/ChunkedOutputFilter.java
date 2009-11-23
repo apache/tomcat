@@ -118,7 +118,7 @@ public class ChunkedOutputFilter implements OutputFilter {
         while (current > 0) {
             int digit = current % 16;
             current = current / 16;
-            chunkLength[pos--] = HexUtils.HEX[digit];
+            chunkLength[pos--] = HexUtils.getHex(digit);
         }
         chunkHeader.setBytes(chunkLength, pos + 1, 9 - pos);
         buffer.doWrite(chunkHeader, res);
