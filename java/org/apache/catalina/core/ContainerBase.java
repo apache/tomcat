@@ -278,7 +278,7 @@ public abstract class ContainerBase
     /**
      * The background thread completion semaphore.
      */
-    private boolean threadDone = false;
+    private volatile boolean threadDone = false;
 
 
     // ------------------------------------------------------------- Properties
