@@ -194,7 +194,7 @@ public class NioBlockingSelector {
 
     
     protected class BlockPoller extends Thread {
-        protected boolean run = true;
+        protected volatile boolean run = true;
         protected Selector selector = null;
         protected ConcurrentLinkedQueue<Runnable> events = new ConcurrentLinkedQueue<Runnable>();
         public void disable() { run = false; selector.wakeup();}
