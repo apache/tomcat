@@ -188,7 +188,8 @@ public final class ExtensionValidator {
                     continue;
                 }
                 Resource resource = (Resource) obj;
-                Manifest jmanifest = getManifest(resource.streamContent());
+                inputStream = resource.streamContent();
+                Manifest jmanifest = getManifest(inputStream);
                 if (jmanifest != null) {
                     ManifestResource mre = new ManifestResource(
                                                 binding.getName(),
@@ -200,6 +201,14 @@ public final class ExtensionValidator {
         } catch (NamingException nex) {
             // Jump out of the check for this application because it 
             // has no resources
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (Throwable t) {
+                    // Ignore
+                }
+            }
         }
 
         return validateManifestResources(appName, appManifestResources);
