@@ -74,7 +74,6 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
-import org.apache.jasper.compiler.ServletWriter;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -91,7 +90,6 @@ import org.apache.tomcat.util.http.fileupload.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase.InvalidContentTypeException;
 import org.apache.tomcat.util.http.mapper.MappingData;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tools.ant.util.CollectionUtils;
 
 
 /**

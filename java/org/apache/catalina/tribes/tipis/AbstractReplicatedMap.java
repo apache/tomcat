@@ -360,6 +360,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
     
     public Member[] getMapMembersExcl(Member[] exclude) {
         synchronized (mapMembers) {
+            @SuppressWarnings("unchecked") // mapMembers has the correct type
             HashMap<Member, Long> list = (HashMap<Member, Long>)mapMembers.clone();
             for (int i=0; i<exclude.length;i++) list.remove(exclude[i]);
             return getMapMembers(list);
@@ -438,9 +439,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param complete boolean
      */
     public void replicate(boolean complete) {
-        Iterator i = super.entrySet().iterator();
+        Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
         while (i.hasNext()) {
-            Map.Entry e = (Map.Entry) i.next();
+            Map.Entry<?,?> e = i.next();
             replicate(e.getKey(), complete);
         } //while
 
@@ -458,7 +459,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                     synchronized (stateMutex) {
                         msg = (MapMessage) resp[0].getMessage();
                         msg.deserialize(getExternalLoaders());
-                        ArrayList list = (ArrayList) msg.getValue();
+                        ArrayList<?> list = (ArrayList<?>) msg.getValue();
                         for (int i = 0; i < list.size(); i++) {
                             messageReceived( (Serializable) list.get(i), resp[0].getSource());
                         } //for
@@ -511,9 +512,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
             synchronized (stateMutex) { //make sure we dont do two things at the same time
                 ArrayList<MapMessage> list = new ArrayList<MapMessage>();
-                Iterator i = super.entrySet().iterator();
+                Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
                 while (i.hasNext()) {
-                    Map.Entry e = (Map.Entry) i.next();
+                    Map.Entry<?,?> e = i.next();
                     MapEntry entry = (MapEntry) super.get(e.getKey());
                     if ( entry != null && entry.isSerializable() ) {
                         boolean copy = (mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY);
@@ -671,9 +672,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
         if ( memberAdded ) {
             synchronized (stateMutex) {
-                Iterator i = super.entrySet().iterator();
+                Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
                 while (i.hasNext()) {
-                    Map.Entry e = (Map.Entry) i.next();
+                    Map.Entry<?,?> e = i.next();
                     MapEntry entry = (MapEntry) super.get(e.getKey());
                     if ( entry == null ) continue;
                     if (entry.isPrimary() && (entry.getBackupNodes() == null || entry.getBackupNodes().length == 0)) {
@@ -723,9 +724,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
         
-        Iterator i = super.entrySet().iterator();
+        Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
         while (i.hasNext()) {
-            Map.Entry e = (Map.Entry) i.next();
+            Map.Entry<?,?> e = i.next();
             MapEntry entry = (MapEntry) super.get(e.getKey());
             if (entry==null) continue;
             if (entry.isPrimary() && inSet(member,entry.getBackupNodes())) {
@@ -902,11 +903,11 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             for ( int i=0; i<mbrs.length;i++ ) {
                 System.out.println("Mbr["+(i+1)+"="+mbrs[i].getName());
             }
-            Iterator i = super.entrySet().iterator();
+            Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             int cnt = 0;
 
             while (i.hasNext()) {
-                Map.Entry e = (Map.Entry) i.next();
+                Map.Entry<?,?> e = i.next();
                 System.out.println( (++cnt) + ". " + super.get(e.getKey()));
             }
             System.out.println("EndMap]\n\n");
@@ -961,9 +962,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
          */
         @Override
         public void putAll(Map m) {
-            Iterator i = m.entrySet().iterator();
+            Iterator<Map.Entry<?,?>> i = m.entrySet().iterator();
             while ( i.hasNext() ) {
-                Map.Entry entry = (Map.Entry)i.next();
+                Map.Entry<?,?> entry = i.next();
                 put(entry.getKey(),entry.getValue());
             }
         }
@@ -989,9 +990,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             if ( value == null ) {
                 return super.containsValue(value);
             } else {
-                Iterator i = super.entrySet().iterator();
+                Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
                 while (i.hasNext()) {
-                    Map.Entry e = (Map.Entry) i.next();
+                    Map.Entry<?,?> e = i.next();
                     MapEntry entry = (MapEntry) super.get(e.getKey());
                     if (entry!=null && entry.isPrimary() && value.equals(entry.getValue())) return true;
                 }//while
@@ -1025,9 +1026,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         @Override
         public Set<MapEntry> entrySet() {
             LinkedHashSet<MapEntry> set = new LinkedHashSet<MapEntry>(super.size());
-            Iterator i = super.entrySet().iterator();
+            Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             while ( i.hasNext() ) {
-                Map.Entry e = (Map.Entry)i.next();
+                Map.Entry<?,?> e = i.next();
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
                 if ( entry != null && entry.isPrimary() ) {
@@ -1042,9 +1043,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             //todo implement
             //should only return keys where this is active.
             LinkedHashSet<Object> set = new LinkedHashSet<Object>(super.size());
-            Iterator i = super.entrySet().iterator();
+            Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             while ( i.hasNext() ) {
-                Map.Entry e = (Map.Entry)i.next();
+                Map.Entry<?,?> e = i.next();
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
                 if ( entry!=null && entry.isPrimary() ) set.add(key);
@@ -1059,9 +1060,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             //todo, implement a counter variable instead
             //only count active members in this node
             int counter = 0;
-            Iterator it = super.entrySet().iterator();
+            Iterator<Map.Entry<?,?>> it = super.entrySet().iterator();
             while (it!=null && it.hasNext() ) {
-                Map.Entry e = (Map.Entry) it.next();
+                Map.Entry<?,?> e = it.next();
                 if ( e != null ) {
                     MapEntry entry = (MapEntry) super.get(e.getKey());
                     if (entry!=null && entry.isPrimary() && entry.getValue() != null) counter++;
@@ -1078,9 +1079,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         @Override
         public Collection<Object> values() {
             ArrayList<Object> values = new ArrayList<Object>();
-            Iterator i = super.entrySet().iterator();
+            Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             while ( i.hasNext() ) {
-                Map.Entry e = (Map.Entry)i.next();
+                Map.Entry<?,?> e = i.next();
                 MapEntry entry = (MapEntry)super.get(e.getKey());
                 if (entry!=null && entry.isPrimary() && entry.getValue()!=null) values.add(entry.getValue());
             }

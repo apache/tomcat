@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletContext;
 import javax.servlet.http.Part;
 
 import org.apache.tomcat.util.http.fileupload.DiskFileItem;
