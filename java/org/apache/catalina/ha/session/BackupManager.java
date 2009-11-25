@@ -308,6 +308,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     public String listSessionIdsFull() {
         StringBuilder sb=new StringBuilder();
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+        @SuppressWarnings("unchecked") // sessions is of type Map<String, Session>
         Iterator<String> keys = map.keySetFull().iterator();
         while (keys.hasNext()) {
             sb.append(keys.next()).append(" ");
