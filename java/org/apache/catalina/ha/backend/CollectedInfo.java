@@ -56,7 +56,7 @@ public class CollectedInfo {
         mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
         String onStr = "*:type=ThreadPool,*";
         ObjectName objectName = new ObjectName(onStr);
-        Set set = mBeanServer.queryMBeans(objectName, null);
+        Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
         Iterator<ObjectInstance> iterator = set.iterator();
         while (iterator.hasNext()) {
             ObjectInstance oi = iterator.next();
