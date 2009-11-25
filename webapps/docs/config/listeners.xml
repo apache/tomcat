@@ -256,6 +256,13 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
         case by case basis as required. Defaults to <code>true</code>.</p>
       </attribute>
 
+      <attribute name="xmlParsingProtection" required="false">
+        <p>Enables protection so that parsing XML files within a web application
+        does not result in a memopry leak. Note that memory profilers may not
+        display the GC root associated with this leak making it particularly
+        hard to diagnose. Defaults to <code>true</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

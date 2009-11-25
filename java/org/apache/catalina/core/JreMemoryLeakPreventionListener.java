@@ -23,6 +23,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -75,6 +77,17 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         this.urlCacheProtection = urlCacheProtection;
     }
 
+    /**
+     * XML parsing can pin a web application class loader in memory. This is
+     * particularly nasty as profilers (at least YourKit and Eclispe MAT) don't
+     * idenitfy any GC roots related to this. 
+     */
+    protected boolean xmlParsingProtection = true;
+    public boolean isXmlParsingProtection() { return xmlParsingProtection; }
+    public void setXmlParsingProtection(boolean xmlParsingProtection) {
+        this.xmlParsingProtection = xmlParsingProtection;
+    }
+    
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
@@ -122,7 +135,23 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                             "jreLeakListener.jarUrlConnCacheFail"), e);
                 } catch (IOException e) {
                     log.error(sm.getString(
-                    "jreLeakListener.jarUrlConnCacheFail"), e);
+                            "jreLeakListener.jarUrlConnCacheFail"), e);
+                }
+            }
+            
+            /*
+             * Haven't got to the root of what is going on with this leak but if
+             * a web app is the first to make the calls below the web
+             * application class loader will be pinned in memory.
+             */
+            if (xmlParsingProtection) {
+                DocumentBuilderFactory factory =
+                    DocumentBuilderFactory.newInstance();
+                try {
+                    factory.newDocumentBuilder();
+                } catch (ParserConfigurationException e) {
+                    log.error(sm.getString(
+                            "jreLeakListener.xmlParseFail"), e);
                 }
             }
         }
