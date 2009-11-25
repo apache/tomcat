@@ -451,10 +451,9 @@ public class ReplicationValve
      * @param containerCluster
      */
     protected void sendCrossContextSession(CatalinaCluster containerCluster) {
-        Object sessions = crossContextSessions.get();
-        if(sessions != null && sessions instanceof List
-                && ((List<Session>)sessions).size() >0) {
-            for(Iterator<Session> iter = ((List<Session>)sessions).iterator(); iter.hasNext() ;) {          
+        List<DeltaSession> sessions = crossContextSessions.get();
+        if(sessions != null && sessions.size() >0) {
+            for(Iterator<DeltaSession> iter = sessions.iterator(); iter.hasNext() ;) {          
                 Session session = iter.next();
                 if(log.isDebugEnabled())
                     log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",  
@@ -479,10 +478,9 @@ public class ReplicationValve
             ((DeltaSession)contextSession).setPrimarySession(true);
         }
         if(isCrossContext) {
-            Object sessions = crossContextSessions.get();
-            if(sessions != null && sessions instanceof List
-               && ((List<Session>)sessions).size() >0) {
-                Iterator<Session> iter = ((List<Session>)sessions).iterator();
+            List<DeltaSession> sessions = crossContextSessions.get();
+            if(sessions != null && sessions.size() >0) {
+                Iterator<DeltaSession> iter = sessions.iterator();
                 for(; iter.hasNext() ;) {          
                     Session session = iter.next();
                     resetDeltaRequest(session);
