@@ -51,7 +51,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     private static final Log log =
         LogFactory.getLog(JreMemoryLeakPreventionListener.class);
-    protected static final StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
     /**
@@ -59,7 +59,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
      * application. Defaults to <code>true</code>.
      */
-    protected boolean appContextProtection = true;
+    private boolean appContextProtection = true;
     public boolean isAppContextProtection() { return appContextProtection; }
     public void setAppContextProtection(boolean appContextProtection) {
         this.appContextProtection = appContextProtection;
@@ -71,7 +71,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * {@link URLConnection}s, regardless of type. Defaults to
      * <code>true</code>.
      */
-    protected boolean urlCacheProtection = true;
+    private boolean urlCacheProtection = true;
     public boolean isUrlCacheProtection() { return urlCacheProtection; }
     public void setUrlCacheProtection(boolean urlCacheProtection) {
         this.urlCacheProtection = urlCacheProtection;
@@ -82,7 +82,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * particularly nasty as profilers (at least YourKit and Eclispe MAT) don't
      * idenitfy any GC roots related to this. 
      */
-    protected boolean xmlParsingProtection = true;
+    private boolean xmlParsingProtection = true;
     public boolean isXmlParsingProtection() { return xmlParsingProtection; }
     public void setXmlParsingProtection(boolean xmlParsingProtection) {
         this.xmlParsingProtection = xmlParsingProtection;
