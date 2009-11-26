@@ -79,6 +79,19 @@ public class ObjectManager {
     }
 
     /**
+     * Create or get a new object with the given name.
+     */
+    public String getProperty(String key) {
+        for (ObjectManager p : children) {
+            String o = p.getProperty(key);
+            if (o != null) {
+                return o;
+            }
+        }        
+        return null;
+    }
+
+    /**
      * Helper for typed get.
      */
     public Object get(Class c) {
@@ -93,6 +106,6 @@ public class ObjectManager {
         new ArrayList<ObjectManager>(); 
     
     public void register(ObjectManager om) {
-        om.children.add(this);
+        children.add(om);
     }    
 }
