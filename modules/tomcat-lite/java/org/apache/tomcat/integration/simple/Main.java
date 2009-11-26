@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.integration.simple;
 
-import org.apache.tomcat.integration.ObjectManager;
 
 /**
  * Replacement for tomcat-lite specific Main, using the simple 
@@ -28,17 +27,34 @@ import org.apache.tomcat.integration.ObjectManager;
  * @author Costin Manolache
  */
 public class Main {
+    static boolean running = true;
+    static Object lock = new Object();
+    
+    public static void stop() {
+        running = false;
+        synchronized (lock) {
+            lock.notify();
+        }
+    }
+    
+    public static void waitStop() {
+        while (running) {
+            try {
+                synchronized (lock) {
+                    lock.wait();
+                }
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 
     public static void main(String args[]) 
-    throws Exception {
-        SimpleObjectManager om = new SimpleObjectManager();
-        
-        // Will process CLI. 
-        // 'config' will load a config file.
-        om.bind("Main.args", args);
+            throws Exception {
+        // '--config' will load a config file.
+        SimpleObjectManager om = new SimpleObjectManager(args);
 
-        Runnable main = (Runnable) om.get("Main");
-        if (main == null) {
+        String run = (String) om.getProperty("RUN");
+        if (run == null) {
             // TODO: look for a pre-defined name in local dir, resource,
             // manifest
             System.err.println("Using default tomcat-lite configuration");
@@ -50,16 +66,16 @@ public class Main {
             
             String cfgFile = "org/apache/tomcat/lite/config.properties";
             om.loadResource(cfgFile);
-            main = (Runnable) om.get("Main");
+            run = (String) om.getProperty("RUN");
         }
         
-        // add JMX support
-        ObjectManager jmx = (ObjectManager) om.get("JMX");
-        if (jmx != null) {
-            jmx.register(om);
+        String[] runNames = run.split(",");
+        for (String name: runNames) {
+            Object main = om.get(name);
+            if (main instanceof Runnable) {
+                ((Runnable) main).run();
+            }
         }
-
-        main.run();
-
+        
     }    
 }
