@@ -1,0 +1,93 @@
+/*
+ */
+package org.apache.tomcat.lite.io;
+
+import java.io.IOException;
+
+// TODO: dump to a file, hex, etc.
+/**
+ * For debug - will print all bytes that go trough the channel
+ */
+public class DumpChannel extends IOChannel {
+    
+    IOBuffer in = new IOBuffer(this);
+    IOBuffer out = new IOBuffer(this);
+    
+    public DumpChannel(String id) {
+        this.id = id;
+    }
+    
+    public String toString() {
+        return "Dump-" + id + "-" + net.toString();
+    }
+    
+    @Override
+    public void handleReceived(IOChannel ch) throws IOException {
+        processInput(ch.getIn());
+    }
+
+    private void processInput(IOBuffer netIn) throws IOException {
+        boolean any = false;
+        while (true) {
+            BBucket first = netIn.popFirst();
+            if (first == null) {
+                if (netIn.isClosedAndEmpty()) {
+                    out("IN", first, true);
+                    in.close();
+                    any = true;
+                }
+                if (any) {
+                    sendHandleReceivedCallback();
+                }
+                return;
+            }
+            any = true;
+            out("IN", first, false);
+            in.queue(first);
+        }
+    }
+
+    public void startSending() throws IOException {
+        while (true) {
+            BBucket first = out.popFirst();
+            if (first == null) {
+                if (out.isClosedAndEmpty()) {
+                    out("OUT", first, true);
+                    net.getOut().close();
+                }
+                
+                net.startSending();
+                return;
+            }
+            // Dump
+            out("OUT", first, net.getOut().isAppendClosed());
+            net.getOut().queue(first);
+        }
+    }
+    
+    private void out(String dir, BBucket first, boolean closed) {
+        // Dump
+        if (first != null) {
+            String hd = Hex.getHexDump(first.array(), first.position(), 
+                    first.remaining(), true);
+            System.err.println("\n" + dir + ": " + id + " " +
+                    (closed ? "CLS" : "") +
+                    + first.remaining() + "\n" + 
+                    hd);
+        } else {
+            System.err.println("\n" + dir + ": " + id + " " +
+                    (closed ? "CLS" : "") +
+                     "END\n"); 
+        }
+    }
+    
+    @Override
+    public IOBuffer getIn() {
+        return in;
+    }
+
+    @Override
+    public IOBuffer getOut() {
+        return out;
+    }
+}
