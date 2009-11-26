@@ -37,10 +37,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.tomcat.servlets.util.FastHttpDateFormat;
 import org.apache.tomcat.servlets.util.Range;
 import org.apache.tomcat.servlets.util.RequestUtil;
 import org.apache.tomcat.servlets.util.UrlUtils;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
