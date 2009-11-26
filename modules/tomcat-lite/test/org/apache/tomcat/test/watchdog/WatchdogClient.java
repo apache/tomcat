@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.test.watchdog;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -26,15 +27,13 @@ import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.apache.tomcat.util.DomUtil;
+import org.apache.tomcat.servlets.config.deploy.DomUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class WatchdogClient {
-
-  protected String base = "../watchdog";
         
   protected String goldenDir; 
   protected String testMatch;
@@ -51,11 +50,13 @@ public class WatchdogClient {
   Properties props = new Properties();
   
   protected void beforeSuite() {
-      
   }
   
   protected void afterSuite(TestResult res) {
-      
+  }
+  
+  public Test getSuite() {
+      return getSuite(8080);
   }
   
   /** 
@@ -66,11 +67,11 @@ public class WatchdogClient {
    * @param testMatch Prefix of tests to be run
    * @return
    */
-  public Test getSuite() {
+  public Test getSuite(int port) {
     TestSuite tests = new WatchdogTests();
     tests.setName(this.getClass().getSimpleName());
     
-    props.setProperty("port", "8080");
+    props.setProperty("port", Integer.toString(port));
     props.setProperty("host", "localhost");
     props.setProperty("wgdir", 
         goldenDir);
@@ -112,28 +113,38 @@ public class WatchdogClient {
               }
           }
           testName = testName + ";" + this.getClass().getName();
-          WatchdogTest test = new WatchdogTest(watchE, props, testName);
+          WatchdogTestCase test = new WatchdogTestCase(watchE, props, testName);
           tests.addTest(test);
         }
-        
-        //        if (targetSuite.countTestCases() > 0) { 
-        //          tests.addTest(targetSuite);
-        //              }
       }
       
     } catch (IOException e) {
-      e.printStackTrace();
+        e.printStackTrace();
     } catch (SAXException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
     } catch (ParserConfigurationException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
     }
     return tests;
   }
   
   // --------- Inner classes -------------
+
+  protected String getWatchdogdir() {
+      String path = System.getProperty("watchdog.home");
+      if (path != null) {
+          return path;
+      }
+      path = "..";
+      for (int i = 0; i < 10; i++) {
+          File f = new File(path + "/watchdog");
+          if (f.exists()) {
+              return f.getAbsolutePath();
+          }
+          path = path + "/..";
+      }
+      return null;
+  }
 
   public class WatchdogTests extends TestSuite {
       public void run(TestResult res) {
@@ -142,5 +153,5 @@ public class WatchdogClient {
           afterSuite(res);
       }
   }
-  
+
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.lite;
+package org.apache.coyote.servlet;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,13 +31,14 @@ public class LiteWatchdogServletTests extends WatchdogClient {
   
   
   public LiteWatchdogServletTests() {
-      goldenDir = base + "/src/clients/org/apache/jcheck/servlet/client/";
+      port = 8115;      
+      goldenDir = getWatchdogdir() + "/src/clients/org/apache/jcheck/servlet/client/";
       testMatch = 
           //"HttpServletResponseWrapperSetStatusMsgTest";
           //"ServletContextAttributeAddedEventTest";
           null;
           // ex: "ServletToJSP";
-      file = base + "/src/conf/servlet-gtest.xml";
+      file = getWatchdogdir() + "/src/conf/servlet-gtest.xml";
       targetMatch = "gtestservlet-test";
   }
   
@@ -45,13 +46,9 @@ public class LiteWatchdogServletTests extends WatchdogClient {
       // required for the tests
       System.setProperty("org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER",
               "true");
-      String path = System.getProperty("watchdog.home");
-      if (path != null) {
-          base = path;
-      }
       
       try {
-          initServerWithWatchdog(base);
+          initServerWithWatchdog(getWatchdogdir());
       } catch (ServletException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
@@ -61,8 +58,10 @@ public class LiteWatchdogServletTests extends WatchdogClient {
       }
   }
   
+  int port = 8115;
+  
   protected void addConnector(TomcatLite liteServer) {
-      LiteTestHelper.addConnector(liteServer, 8080, true);      
+      LiteTestHelper.addConnector(liteServer, port, true);      
   }
   
   public void initServerWithWatchdog(String wdDir) throws ServletException, 
@@ -106,6 +105,6 @@ public class LiteWatchdogServletTests extends WatchdogClient {
   public static Test suite() {
       // The individual targets are dups - and bad ones, 
       // RequestWrapper are missing part of the URL
-      return new LiteWatchdogServletTests().getSuite();
+      return new LiteWatchdogServletTests().getSuite(8115);
   }
 }

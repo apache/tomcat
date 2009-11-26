@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.lite;
+package org.apache.coyote.servlet;
 
 
 import junit.framework.Test;
@@ -23,6 +23,7 @@ public class LiteWatchdogJspTests  extends LiteWatchdogServletTests {
     
     public LiteWatchdogJspTests() {
         super();
+        port = 8017;
         testMatch = 
             //"precompileNegativeTest";
             null;
@@ -36,15 +37,15 @@ public class LiteWatchdogJspTests  extends LiteWatchdogServletTests {
                 "positiveIncludeCtxRelativeHtmlTest",
                 "precompileNegativeTest"
             }; 
-        file = base + "/src/conf/jsp-gtest.xml";
+        file = getWatchdogdir() + "/src/conf/jsp-gtest.xml";
         goldenDir = 
-            base + "/src/clients/org/apache/jcheck/jsp/client/";
+            getWatchdogdir() + "/src/clients/org/apache/jcheck/jsp/client/";
         targetMatch = "jsp-test";
         
     }
     
     public static Test suite() {
-        return new LiteWatchdogJspTests().getSuite();
+        return new LiteWatchdogJspTests().getSuite(8017);
     }
     
 }
