@@ -1,60 +1,161 @@
 <?xml version="1.0"?>
-<project name="Tomcat Lite" default="tomcat-lite.jar" basedir="../..">
+<project name="Tomcat Lite" default="tomcat-lite.jar" 
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         basedir=".">
 
     <property file="${user.home}/build.properties" />
     <property file="${basedir}/build.properties" />
     <property file="${basedir}/build.properties.default" />
 
-    <property name="tomcat.build" value="${basedir}/output/build" />
-    <property name="tomcat.src" value="${basedir}/java" />
-    <property name="tomcat.lite.src" value="${basedir}/modules/tomcat-lite" />
-    
-    <property name="classes" value="${basedir}/output/tomcat-lite/classes" />
-    <property name="jar.dir" value="${basedir}/output/tomcat-lite/" />
+    <property name="tomcat.base" value="${basedir}/../.." />
+    <property name="tomcat.src" value="${tomcat.base}/java" />
+    <property name="tomcat.build" value="${tomcat.base}/output/build" />
+
+    <property name="tomcat.lite.src" value="${basedir}/" />
+    <property name="classes" value="${basedir}/target/tomcat-lite/classes" />
+    <property name="test-classes" value="${basedir}/target/tomcat-lite/test-classes" />
+    <property name="jar.dir" value="${basedir}/target/tomcat-lite/" />
     <property name="MAIN" value="org.apache.tomcat.integration.simple.Main"/>
+    <property name="compile.source" value="1.6"/>
+ 
+    <!-- All Ivy downloads -->
+    <path id='lite-classpath'>
+        <fileset dir='target/lib' includes="*.jar" />
+    </path>
 
-    <target name="compile">
-        <mkdir dir="${classes}" />
-	<!-- Tomcat deps first -->
+    <path id='head-classpath'>
+        <pathelement location="${tomcat.build}/../classes" />
+        <pathelement location="target/lib/asm.jar" />
+        <pathelement location="target/lib/asm-tree.jar" />                
+        <pathelement location="target/lib/junit.jar"/>
+        <pathelement location="target/lib/commons-codec.jar"/>
+    </path>
+
+     
+    <target name="compile" 
+           description="Build against tomcat head">
         <javac destdir="${classes}"
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
                source="${compile.source}"
                optimize="${compile.optimize}"
-               srcdir="${tomcat.src}"
-               encoding="ISO-8859-1"
-        >
-            <include name="javax/servlet/**" />
-            <include name="javax/annotation/**" />
-            <!--include name="org/apache/coyote/**" />
-            <include name="org/apache/tomcat/util/**" /-->
-            <includesfile name="${tomcat.lite.src}/coyote-nio.files"/>
-            <include name="org/apache/jasper/**" />
-        </javac>
-
-        <javac destdir="${classes}"
-               debug="${compile.debug}"
-               deprecation="${compile.deprecation}"
-               source="${compile.source}"
-               optimize="${compile.optimize}"
-               encoding="ISO-8859-1"
-        >
+               encoding="ISO-8859-1">
             <src path="${tomcat.lite.src}/java" />
+            <classpath refid="head-classpath" />
+            <exclude name="**/ServletApi25.java"/>
+        </javac>
+        <copy todir="${classes}">
+            <fileset dir="${tomcat.lite.src}/java" 
+                includes="**/*.properties **/*.xml" />
+        </copy>
+    </target>
+    
+    <target name="compile25" 
+        description="Build against 2.5 servlet API, similar with the maven">
+        <mkdir dir="${classes}" />
+        <javac destdir="${classes}"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               source="${compile.source}"
+               optimize="${compile.optimize}"
+               encoding="ISO-8859-1"
+        >
+            <classpath refid="lite-classpath" />
+            <src path="${tomcat.lite.src}/java" />
+            <exclude name="**/ServletApi30.java"/>
+            <exclude name="org/apache/tomcat/coyote/servlet/*.java"/>
         </javac>
 
         <copy todir="${classes}">
-            <fileset dir="${tomcat.lite.src}/java" includes="**/*.properties **/*.xml" />
-            <fileset dir="${tomcat.src}"
-                     includes="org/apache/tomcat/util/**/*.properties org/apache/tomcat/util/**/*.xml"
-            />
-            <fileset dir="${tomcat.src}"
-                     includes="javax/servlet/**/*.properties"
-            />
-            <fileset dir="${tomcat.src}"
-                     includes="org/apache/coyote/**/*.properties org/apache/coyote/**/*.xml"
-            />
+            <fileset dir="${tomcat.lite.src}/java" 
+                includes="**/*.properties **/*.xml" />
+        </copy>
+    </target>
+
+    <target name="test" depends="test30,test25"/>
+
+    <target name="test30" depends="compile">
+        <mkdir dir="${test-classes}"/>
+        <javac destdir="${test-classes}"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               source="${compile.source}"
+               optimize="${compile.optimize}"
+               encoding="ISO-8859-1"
+        >
+            <classpath refid="head-classpath" />
+            <classpath path="${classes}" />
+            <src path="${tomcat.lite.src}/test" />
+        </javac>
+        <copy todir="${test-classes}">
+            <fileset dir="${tomcat.lite.src}/test" 
+                includes="**/*.properties **/*.xml  **/*.keystore" />
         </copy>
 
+        <!-- Need to run it in tomcat to find output/build/webapps --> 
+        <junit printsummary="yes" fork="yes" dir="${tomcat.base}"
+            >
+            <classpath refid="head-classpath" />
+            <classpath path="${test-classes}" />
+            <classpath path="${classes}" />
+
+          <formatter type="plain" usefile="false" />
+
+          <batchtest>
+            <fileset dir="test" >
+              <!-- Include all by default -->
+                <include name="**/*Test.java" />
+                <include name="**/*Tests.java" />
+              <!-- Exclude TestAll ortherwise there will be duplicated -->
+              <exclude name="**/TestAll.java" />
+              <!-- Exclude helper classes -->
+              <exclude name="**/Tester*.java" />
+            </fileset>
+           </batchtest>
+            </junit>
+    </target>
+    
+    <target name="test25" depends="compile25">
+        <mkdir dir="${test-classes}"/>
+        <javac destdir="${test-classes}"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               source="${compile.source}"
+               optimize="${compile.optimize}"
+               encoding="ISO-8859-1"
+        >
+            <classpath refid="lite-classpath" />
+            <classpath path="${classes}" />
+            <classpath path="target/lib/junit.jar"/>
+            <classpath path="target/lib/commons-codec.jar"/>
+            <src path="${tomcat.lite.src}/test" />
+            <exclude name="org/apache/coyote/**"/>
+        </javac>
+        <copy todir="${test-classes}">
+            <fileset dir="${tomcat.lite.src}/test" 
+                includes="**/*.properties **/*.xml **/*.keystore" />
+        </copy>
+
+        <junit printsummary="yes" fork="yes">
+            <classpath refid="lite-classpath" />
+            <classpath path="${test-classes}" />
+            <classpath path="${classes}" />
+
+          <formatter type="plain" usefile="false" />
+
+          <batchtest>
+            <fileset dir="test" >
+                <exclude name="org/apache/coyote/**" />
+              <!-- Include all by default -->
+              <include name="**/*Test.java" />
+              <include name="**/*Tests.java" />
+              <!-- Exclude TestAll ortherwise there will be duplicated -->
+                <exclude name="**/TestAll.java" />
+              <!-- Exclude helper classes -->
+              <exclude name="**/Tester*.java" />
+            </fileset>
+           </batchtest>
+            </junit>
     </target>
 
     <target name="clean">
@@ -66,54 +167,56 @@
     <target name="tomcat-lite.jar" depends="compile,pack_tomcat-lite.jar" />
 
     <target name="pack_tomcat-lite.jar">
-        <!-- individually packed jars for servlet support-->
         <mkdir dir="${jar.dir}/jar" />
         <jar destfile="${jar.dir}/jar/tomcat-lite.jar">
             <manifest>
-                  <attribute name="Main-Class" value="${MAIN}"/>
-              </manifest>
+                <attribute name="Main-Class" value="${MAIN}"/>
+            </manifest>
             <fileset dir="${classes}">
                 <include name ="org/apache/tomcat/lite/**" />
                 <include name ="org/apache/tomcat/servlets/**" />
             </fileset>
         </jar>
-	<copy file="${tomcat.build}/lib/annotations-api.jar" todir="${jar.dir}/jar"/>
-	<copy file="${tomcat.build}/lib/servlet-api.jar" todir="${jar.dir}/jar"/>
-        <copy file="${tomcat.build}/lib/tomcat-coyote.jar" todir="${jar.dir}/jar"/>
-        
-        <!-- Jasper jars -->
-        <mkdir dir="${jar.dir}/jasper" />
-        <copy file="${tomcat.build}/lib/el-api.jar" todir="${jar.dir}/jasper"/> 
-        <copy file="${tomcat.build}/lib/jsp-api.jar" todir="${jar.dir}/jasper"/>
-        <copy file="${tomcat.build}/lib/jasper.jar" todir="${jar.dir}/jasper"/> 
-        <copy file="${tomcat.build}/lib/jasper-el.jar" todir="${jar.dir}/jasper"/>
-        
-        <!-- Bundles -->
-        <!-- All included: javax, jasper, coyote, tomcat-lite -->
-        <jar destfile="${jar.dir}/tomcat-lite-all.jar">
-            <manifest>
-                  <attribute name="Main-Class" value="${MAIN}"/>
-              </manifest>
-            <fileset dir="${classes}">
-            </fileset>
-        </jar>
-
-        <!-- Tomcat lite without jasper -->
-        <jar destfile="${jar.dir}/tomcat-lite+javax+coyote.jar">
-             <manifest>
-                 <attribute name="Main-Class" value="${MAIN}"/>
-             </manifest>
-             <fileset dir="${classes}">
-                 <exclude name ="org/apache/jasper/**" />
-                 <exclude name ="org/apache/el/**" />
-             </fileset>
-        </jar>
-        
-        
     </target>
 
     <target name="run">
-        <java jar="${jar.dir}/tomcat-lite-ALL.jar"/>
+        <java jar="${jar.dir}/tomcat-lite.jar"/>
     </target>
-    
+
+    <!-- Boilreplate for dependencies -->
+
+    <property name="ivy.install.version" value="2.1.0" />
+    <condition property="ivy.home" value="${env.IVY_HOME}">
+        <isset property="env.IVY_HOME" />
+    </condition>
+    <property name="ivy.home" value="${basedir}/target/ivy" />
+    <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+    <available file="${ivy.jar.file}" property="ivy.exist"/>
+
+    <target name="download-ivy" unless="ivy.exist">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
+                 dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+        <!-- try to load ivy here from ivy home, in case the user has not already dropped
+                  it into ant's lib dir (note that the latter copy will always take precedence).
+                  We will not fail as long as local lib dir exists (it may be empty) and
+                  ivy is in at least one of ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                     uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <target name="download" depends="init-ivy">
+        <mkdir dir="target/lib"/>
+        <ivy:resolve file="pom.xml" conf="compile" />
+        <ivy:retrieve pattern="target/lib/[artifact].[ext]"/>
+    </target>
+
 </project>
