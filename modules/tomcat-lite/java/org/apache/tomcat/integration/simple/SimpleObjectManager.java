@@ -24,111 +24,162 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.tomcat.integration.DynamicObject;
 import org.apache.tomcat.integration.ObjectManager;
-import org.apache.tomcat.util.IntrospectionUtils;
 
 /**
- * This is a very small 'dependency injection'/registry poor-man substitute,
+ * This is a very small 'dependency injection'/registry poor-man substitute, 
  * based on old tomcat IntrospectionUtils ( which is based on ant ).
  * Alternative would be to just pick one of spring/guice/etc and use it.
  * This class is a bit smaller and should be enough for simple use.
- *
- * How it works:
+ * 
+ * How it works: 
  *  - when bound, simple properties are injected in the objects using
  *  the old IntrospectionUtils, same as in original Tomcat server.xml
- *
+ *   
  *  - object creation using class name - properties injected as well.
  *  Similar with how server.xml or ant works.
- *
- *  - it is based on a big Properties file, with command line arguments
+ *  
+ *  - it is based on a big Properties file, with command line arguments 
  *  merged in.
- *
+ *  
  * Tomcat doesn't require any of the features - they are just used to
- * allow configuration in 'default' mode, when no other framework is
- * used.
- *
+ * allow configuration in 'default' mode, when no other framework is 
+ * used.  
+ * 
  * See the Spring example for an alternative. I believe most POJO frameworks
- * can be supported.
- *
+ * can be supported. 
+ * 
  * @author Costin Manolache
  */
 public class SimpleObjectManager extends ObjectManager {
-    static Logger log = Logger.getLogger(SimpleObjectManager.class.getName());
+    public static final String ARGS = "Main.args";
 
+    static Logger log = Logger.getLogger(SimpleObjectManager.class.getName());
+    
     protected Properties props = new Properties();
     protected Map<String, Object> objects = new HashMap();
-    ObjectManager om;
-
+    
     public SimpleObjectManager() {
         // Register PropertiesSpi
     }
 
     public SimpleObjectManager(String[] args) {
         this();
-        bind("Main.args", args);
+        bind(ARGS, args);
     }
-
+    
     public void loadResource(String res) {
         InputStream in = this.getClass().getClassLoader()
             .getResourceAsStream(res);
-        load(in);
+        if (in != null) {
+            load(in);
+        }
     }
-
+    
     public void register(ObjectManager om) {
-        this.om = om;
         super.register(om);
     }
-
+    
     public ObjectManager getObjectManager() {
-        return om;
+        return this;
     }
 
     public void load(InputStream is) {
         try {
             props.load(is);
+            processIncludes();
         } catch (IOException e) {
             throw new RuntimeException("Error loading default config");
         }
     }
-
+    
+    // resolve included "config". Very basic, just one, etc.
+    private void processIncludes() throws IOException {
+        String value = props.getProperty("config");
+        if (value == null) {
+            value = props.getProperty("include");
+            if (value != null) {
+                props.remove("include");
+            }
+        } else {
+            // avoid loop
+            props.remove("config");
+        }
+        if (value == null) {
+            return;
+        }
+        if (new File(value).exists()) {
+            load(new FileInputStream(value));                    
+        } else {
+            loadResource(value);
+        }
+    }
+    
     public Properties getProperties() {
         return props;
     }
-
+    
     @Override
     public void unbind(String name) {
+        // Children
+        // TODO: call @destroy
+        super.unbind(name);
     }
 
     @Override
     public void bind(String name, Object o) {
         //log.info("Bound: " + name + " " + o);
 
-        if ("Main.args".equals(name)) {
+        if (ARGS.equals(name)) {
             try {
                 processArgs((String[]) o, props);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-
-        // TODO: can I make 'inject' public - Guice seems to
+        
+        // TODO: can I make 'inject' public - Guice seems to 
         // support this.
         inject(name, o);
+        
+        // Children
+        super.bind(name, o);
     }
 
     @Override
     public Object get(String key) {
         // Use same syntax as Spring props.
+        Object res = null;
         String prop = props.getProperty(key + ".(class)");
         if (prop != null) {
-            Object res = loadClass(prop);
-            inject(key, res);
-            return res;
+            res = loadClass(prop);
         }
 
-        return null;
+        if (res == null) {
+            res = super.get(key);
+        }
+        
+        if (res == null) {
+            // Maybe it's just a class name
+            res = loadClass(key);
+        }
+        
+        if (res != null) {
+            inject(key, res);
+        }
+        return res;
+    }
+    
+    public String getProperty(String key) {
+        String prop = props.getProperty(key);
+        if (prop != null) {
+            return prop;
+        }
+        return super.getProperty(key);
     }
 
     private void inject(String name, Object o) {
@@ -136,13 +187,18 @@ public class SimpleObjectManager extends ObjectManager {
         String pref = name + ".";
         int prefLen = pref.length();
 
-        for (String k: props.stringPropertyNames()) {
+        DynamicObject dyno = new DynamicObject(o.getClass());
+        dyno.setAttribute(o, "ObjectManager", this);
+
+        for (Object kObj: props.keySet()) {
+            if (!(kObj instanceof String)) {continue;}
+            String k = (String) kObj;
             if (k.startsWith(pref)) {
                 if (k.endsWith(")")) {
-                    continue; // special
+                    continue; // special 
                 }
                 String value = props.getProperty(k);
-                value = IntrospectionUtils.replaceProperties(value,
+                value = AntProperties.replaceProperties(value, 
                         props, null);
                 String p = k.substring(prefLen);
                 int idx = p.indexOf(".");
@@ -150,38 +206,45 @@ public class SimpleObjectManager extends ObjectManager {
                     // ignore suffix - indexed properties
                     p = p.substring(0, idx);
                 }
-                IntrospectionUtils.setProperty(o, p, value);
-                log.info("Setting: " + name + " " + k + " " + value);
+                dyno.setProperty(o, p, value);
+                if (log.isLoggable(Level.FINE)) {
+                    log.info("Setting: " + name + " " + k + " " + value);
+                }
             }
         }
+        
+
         // We could do cooler things - inject objects, etc.
     }
-
+    
+    
     private Object loadClass(String className) {
         try {
             Class c = Class.forName(className);
+            if (c.isInterface()) {
+                return null;
+            }
             Object ext = c.newInstance();
             return ext;
         } catch (Throwable e) {
-            e.printStackTrace();
             return null;
-        }
+        }        
     }
-
+    
     /**
      * Populate properties based on CLI:
      *  -key value
      *  --key=value
-     *
+     *  
      *  --config=FILE - load a properties file
-     *
+     *  
      * @param args
      * @param p
      * @param meta
      * @return everything after the first non arg not starting with '-'
-     * @throws IOException
+     * @throws IOException 
      */
-    public String[] processArgs(String[] args, Properties props)
+    public String[] processArgs(String[] args, Properties props) 
             throws IOException {
 
         for (int i = 0; i < args.length; i++) {
@@ -193,10 +256,11 @@ public class SimpleObjectManager extends ObjectManager {
             } else {
                 String [] res = new String[args.length - i];
                 System.arraycopy(args, i, res, 0, res.length);
+                processIncludes();
                 return res;
             }
-
-            String name = arg;
+            
+            String name = arg; 
             int eq = arg.indexOf("=");
             String value = null;
             if (eq > 0) {
@@ -210,16 +274,11 @@ public class SimpleObjectManager extends ObjectManager {
                 value = args[i];
             }
 
-            if ("config".equals(arg)) {
-                if (new File(value).exists()) {
-                    load(new FileInputStream(value));
-                } else {
-                    loadResource(value);
-                }
-            } else {
-                props.put(name, value);
-            }
+            props.put(name, value);
+            
         }
+        
+        processIncludes();
         return new String[] {};
-    }
+    }    
 }
