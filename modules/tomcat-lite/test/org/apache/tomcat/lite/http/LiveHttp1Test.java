@@ -138,12 +138,7 @@ public class LiveHttp1Test extends TestCase {
 
         httpClient.sendRequest();
         
-        try {
-            httpClient.readAll(bodyRecvBuffer, to);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            return;
-        }
-        fail("Error");
+        httpClient.readAll(bodyRecvBuffer, to);
+        assertEquals(0, bodyRecvBuffer.remaining());
     }
 }
