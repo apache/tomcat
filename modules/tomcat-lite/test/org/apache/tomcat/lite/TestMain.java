@@ -192,8 +192,8 @@ public class TestMain {
             proxy = new HttpProxyService()
                 .withHttpClient(testClient);
             testProxy.setPort(port);
-            testProxy.setDebugHttp(true);
-            testProxy.setDebug(true);
+//            testProxy.setDebugHttp(true);
+//            testProxy.setDebug(true);
 
             // dispatcher rejects 'http://'
             testProxy.setHttpService(proxy);
