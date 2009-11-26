@@ -22,12 +22,10 @@ import java.util.HashMap;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.tomcat.addons.UserTemplateClassMapper;
-import org.apache.tomcat.integration.ObjectManager;
 
 
 /** 
@@ -39,20 +37,22 @@ public class WildcardTemplateServlet extends HttpServlet {
     // for the '*.jsp' case - need to keep track of the jsps
     HashMap<String, Servlet> jsps=new HashMap<String, Servlet>();
 
-    UserTemplateClassMapper mapper;
+    BaseJspLoader mapper;
     
     /** 
      * If called from a <jsp-file> servlet, compile the servlet and init it.
      */
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        ObjectManager om = 
-            (ObjectManager) config.getServletContext().getAttribute(ObjectManager.ATTRIBUTE);
-        mapper = 
-            (UserTemplateClassMapper) om.get(
-                    UserTemplateClassMapper.class);
-        if (mapper == null) {
-            mapper = new SimpleTemplateClassMapper();
+        String mapperCN = config.getInitParameter("mapper");
+        if (mapperCN == null) {
+            throw new UnavailableException("can't create mapper");
+        }
+        try {
+            Class c = Class.forName(mapperCN);
+            mapper = (BaseJspLoader) c.newInstance();
+        } catch (Throwable t) {
+            throw new UnavailableException("can't create mapper");
         }
     }
 

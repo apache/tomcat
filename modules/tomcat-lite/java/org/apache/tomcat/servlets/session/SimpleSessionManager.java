@@ -33,7 +33,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.tomcat.addons.UserSessionManager;
 
 // TODO: move 'expiring objects' to a separate utility class
 // TODO: hook the background thread

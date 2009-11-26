@@ -57,7 +57,7 @@ public final class RequestUtil {
      */
     public static String encodeCookie(Cookie cookie) {
 
-        StringBuilder buf = new StringBuilder( cookie.getName() );
+        StringBuffer buf = new StringBuffer( cookie.getName() );
         buf.append("=");
         buf.append(cookie.getValue());
 

@@ -31,14 +31,15 @@ import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.servlets.util.URLEncoder;
 
 /**
  * Handles directory listing
  */
-public class Dir2Html  extends HttpServlet {
+public class Dir2Html {
 
     /**
      * Array containing the safe characters set.
@@ -112,50 +113,6 @@ public class Dir2Html  extends HttpServlet {
 
 
     // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Finalize this servlet.
-     */
-    public void destroy() {
-    }
-
-
-    /**
-     * Initialize this servlet.
-     */
-    public void init() throws ServletException {
-    }
-
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
-        throws IOException, ServletException {
-
-        // Serve the requested resource, including the data content
-        //serveResource(request, response, true);
-
-    }
-
-
-    protected void doHead(HttpServletRequest request,
-                          HttpServletResponse response)
-        throws IOException, ServletException {
-
-        // Serve the requested resource, without the data content
-        //serveResource(request, response, false);
-
-    }
-
-
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
-        throws IOException, ServletException {
-        doGet(request, response);
-    }
-
-
-
-    
 
     /**
      * Serve the specified resource, optionally including the data content.
