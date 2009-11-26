@@ -40,11 +40,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.tomcat.addons.Filesystem;
-import org.apache.tomcat.integration.ObjectManager;
-import org.apache.tomcat.integration.simple.ServletHelper;
 import org.apache.tomcat.servlets.util.Range;
+import org.apache.tomcat.servlets.util.URLEncoder;
 
 /**
  * The default resource-serving servlet for most web applications,
@@ -126,8 +123,6 @@ public class DefaultServlet  extends HttpServlet {
 
 
     // --------------------------------------------------------- Public Methods
-
-    protected ObjectManager om;
     protected Filesystem fs;
 
     /**
@@ -135,14 +130,15 @@ public class DefaultServlet  extends HttpServlet {
      */
     public void destroy() {
     }
-
-
+    
     /**
      * Initialize this servlet.
      */
     public void init() throws ServletException {
-        om = ServletHelper.getObjectManager(getServletContext());
-        fs = (Filesystem) om.get(Filesystem.class.getName());
+        if (fs == null) {
+            // R/O - no write
+            fs = new Filesystem();
+        }
 
         String realPath = getServletContext().getRealPath("/");
         basePath = new File(realPath);
@@ -517,9 +513,8 @@ public class DefaultServlet  extends HttpServlet {
                 && (request.getHeader("Range") == null) )
                 || (ranges == FULL) ) {
 
-            processFullFile(response, content, resFile, contentType, 
-                            contentLength, ostream, writer);
-
+            processSingleRange(response, content, resFile, contentType, 
+                    ostream, writer, ranges, contentLength);
         } else {
 
             if ((ranges == null) || (ranges.isEmpty()))
@@ -531,7 +526,7 @@ public class DefaultServlet  extends HttpServlet {
             if (ranges.size() == 1) {
 
                 processSingleRange(response, content, resFile, contentType, 
-                                   ostream, writer, ranges);
+                        ostream, writer, ranges, contentLength);
 
             } else {
 
@@ -572,13 +567,19 @@ public class DefaultServlet  extends HttpServlet {
     }
 
 
-    private void processSingleRange(HttpServletResponse response, boolean content, File resFile, String contentType, ServletOutputStream ostream, PrintWriter writer, ArrayList ranges) throws IOException {
-        Range range = (Range) ranges.get(0);
-        response.addHeader("Content-Range", "bytes "
-                           + range.start
-                           + "-" + range.end + "/"
-                           + range.length);
-        long length = range.end - range.start + 1;
+    private void processSingleRange(HttpServletResponse response, boolean content, File resFile, String contentType, ServletOutputStream ostream, PrintWriter writer, ArrayList ranges,
+            long contentLength) throws IOException {
+        Range range = null;
+        long length = contentLength;
+        
+        if (ranges != null && ranges.size() > 0) {
+            range = (Range) ranges.get(0);
+            response.addHeader("Content-Range", "bytes "
+                    + range.start
+                    + "-" + range.end + "/"
+                    + range.length);
+            length = range.end - range.start + 1;
+        }
         if (length < Integer.MAX_VALUE) {
             response.setContentLength((int) length);
         } else {
@@ -596,43 +597,34 @@ public class DefaultServlet  extends HttpServlet {
             } catch (IllegalStateException e) {
                 // Silent catch
             }
-            if (ostream != null) {
-                FileCopyUtils.copy(resFile, ostream, range);
-            } else {
-                FileCopyUtils.copy(resFile, writer, range, fileEncoding);
-            }
-        }
-    }
-
-
-    private void processFullFile(HttpServletResponse response, boolean content, File resFile, String contentType, long contentLength, ServletOutputStream ostream, PrintWriter writer) throws IOException {
-        // Set the appropriate output headers
-        if (contentType != null) {
-            response.setContentType(contentType);
-        }
-        if ((contentLength >= 0)) {
-            if (contentLength < Integer.MAX_VALUE) {
-                response.setContentLength((int) contentLength);
-            } else {
-                // Set the content-length as String to be able to use a long
-                response.setHeader("content-length", "" + contentLength);
-            }
-        }
-
-        // Copy the input stream to our output stream (if requested)
-        if (content) {
+            InputStream is = null;
             try {
-                response.setBufferSize(output);
-            } catch (IllegalStateException e) {
-                // Silent catch
-            }
-            if (ostream != null) {
-                FileCopyUtils.copy(resFile, ostream);
-            } else {
-                FileCopyUtils.copy(resFile, writer, fileEncoding);
+                is = new FileInputStream(resFile);
+                if (ostream != null) {
+                    if (range == null) {
+                        CopyUtils.copy(is, ostream);
+                    } else {
+                        CopyUtils.copyRange(is, ostream, range.start, range.end);
+                    }
+                } else {Reader reader;
+                    if (fileEncoding == null) {
+                        reader = new InputStreamReader(is);
+                    } else {
+                        reader = new InputStreamReader(is,
+                                                       fileEncoding);
+                    }
+                    if (range == null) {
+                        CopyUtils.copyRange(reader, writer);                        
+                    } else {
+                        CopyUtils.copyRange(reader, writer, range.start, range.end);
+                    }
+                }
+            } finally {
+                is.close();
             }
         }
     }
+
 
     public static String lastModifiedHttp(File resFile) {
         String lastModifiedHttp = null;
