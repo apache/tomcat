@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.lite;
+package org.apache.coyote.servlet;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
-import org.apache.tomcat.lite.coyote.CoyoteConnector;
+import org.apache.tomcat.lite.SimpleServlet;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class LiteTestHelper {

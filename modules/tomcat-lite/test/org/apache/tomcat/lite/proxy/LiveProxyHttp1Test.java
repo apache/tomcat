@@ -14,30 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.lite;
+package org.apache.tomcat.lite.proxy;
 
-import junit.framework.TestCase;
 
-import org.apache.tomcat.util.buf.ByteChunk;
+import java.io.IOException;
 
-public class TomcatLiteSimpleTest extends TestCase {
+import org.apache.tomcat.lite.http.LiveHttp1Test;
 
-  protected TomcatLite lite = new TomcatLite(); 
-  
-  public void setUp() throws Exception {
-      LiteTestHelper.initServletsAndRun(lite, 8804);
+
+public class LiveProxyHttp1Test extends LiveHttp1Test {
+    public void setUp() throws IOException {
+        // All tests in super, but with client pointing to 
+        // the proxy server, which in turn hits the real server.
+        clientPort = 8903;
+        super.setUp();
   }
-  
-  public void tearDown() throws Exception {
-    lite.stop();
-  }
-  
-  public void testSimpleRequest() throws Exception {
-    ByteChunk resb = 
-        LiteTestHelper.getUrl("http://localhost:8804/test1/1stTest");
-    assertTrue(resb.length() > 0);
-    assertEquals("Hello world", resb.toString());
-  }
-
   
 }
