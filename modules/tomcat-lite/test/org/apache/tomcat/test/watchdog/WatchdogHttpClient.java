@@ -37,7 +37,7 @@ public class WatchdogHttpClient {
     
     static int debug = 0;
     
-    public static void dispatch(GTest client) throws Exception {
+    public static void dispatch(WatchdogTestImpl client) throws Exception {
         HashMap requestHeaders = client.requestHeaders;
         String host = client.host;
         int port = client.port;
@@ -45,7 +45,14 @@ public class WatchdogHttpClient {
         String request = client.request;
         
         // XXX headers are ignored
-        Socket socket = new Socket( host, port );
+        Socket socket;
+        try {
+            socket = new Socket( host, port );
+        } catch (IOException ex) {
+            System.out.println( " Socket Exception: " + ex );
+            return;
+        }
+        //socket.setSoTimeout(10000);
         
         //socket obtained, rebuild the request.
         rebuildRequest(client, client.request, socket);
@@ -57,7 +64,7 @@ public class WatchdogHttpClient {
 
         OutputStream out = new BufferedOutputStream( 
                                socket.getOutputStream() );
-        StringBuilder reqbuf = new StringBuilder( 128 );
+        StringBuffer reqbuf = new StringBuffer( 128 );
 
         // set the Host header
         client.setHeaderDetails( "Host:" + host + ":" + port, requestHeaders, true );
@@ -92,7 +99,7 @@ public class WatchdogHttpClient {
             Iterator iter = requestHeaders.keySet().iterator();
                         
             while ( iter.hasNext() ) {
-                StringBuilder tmpBuf = new StringBuilder(32);
+                StringBuffer tmpBuf = new StringBuffer(32);
                 String headerKey = ( String ) iter.next();
                         ArrayList values = (ArrayList) requestHeaders.get( headerKey );
                         String[] value = (String[]) values.toArray( new String[ values.size() ] );
@@ -168,7 +175,6 @@ public class WatchdogHttpClient {
                 
         } catch ( SocketException ex ) {
             System.out.println( " Socket Exception: " + ex );
-            ex.printStackTrace();
         } finally {
                 if ( debug > 0 ) {
                         System.out.println( " closing socket" );
@@ -187,7 +193,7 @@ public class WatchdogHttpClient {
      * @return a <code>byte[]</code> representation of the response
      */
     private static byte[] readBody( InputStream input ) {
-        StringBuilder sb = new StringBuilder( 255 );
+        StringBuffer sb = new StringBuffer( 255 );
         while ( true ) {
             try {
                 int ch = input.read();
@@ -222,7 +228,7 @@ public class WatchdogHttpClient {
      */
     private static String read( InputStream input ) throws IOException {
         // Read the next line from the input stream
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
 
         while ( true ) {
             try {
@@ -265,7 +271,7 @@ public class WatchdogHttpClient {
      *
      * @exception IOException if an input/output error occurs
      */
-    private static HashMap parseHeaders( GTest client, InputStream is ) throws IOException {
+    private static HashMap parseHeaders( WatchdogTestImpl client, InputStream is ) throws IOException {
         HashMap headers = new HashMap();
         client.cookieVector = new Vector();
 
@@ -307,7 +313,7 @@ public class WatchdogHttpClient {
      *
      * @exception Exception if an error occurs
      */
-    private static void rebuildRequest(GTest client, String req, Socket socket) throws Exception {
+    private static void rebuildRequest(WatchdogTestImpl client, String req, Socket socket) throws Exception {
         client.request = client.replaceMarkers(req, socket );
         String addressString = client.request.substring( client.request.indexOf( "/" ), client.request.indexOf( "HTTP" ) ).trim();
 
