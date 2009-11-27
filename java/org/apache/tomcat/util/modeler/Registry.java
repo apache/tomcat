@@ -429,8 +429,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         Iterator<ManagedBean> items = descriptors.values().iterator();
         while (items.hasNext()) {
             ManagedBean item = items.next();
-            if ((group == null) && (item.getGroup() == null)) {
-                results.add(item.getName());
+            if ((group == null)) {
+                if (item.getGroup() == null){
+                    results.add(item.getName());
+                }
             } else if (group.equals(item.getGroup())) {
                 results.add(item.getName());
             }
@@ -678,7 +680,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         } else if( source instanceof InputStream ) {
             type=param;
             inputsource=source;
-        } else if( source instanceof Class ) {
+        } else if( source instanceof Class<?> ) {
             location=((Class<?>)source).getName();
             type=param;
             inputsource=source;
