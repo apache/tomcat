@@ -54,11 +54,8 @@ public final class ApplicationFilterFactory {
 
     // ----------------------------------------------------------- Constructors
 
-
-    /*
-     * Prevent instantiation outside of the getInstanceMethod().
-     */
     private ApplicationFilterFactory() {
+        // Prevent instantiation outside of the getInstanceMethod().
     }
 
 
@@ -334,54 +331,26 @@ public final class ApplicationFilterFactory {
     private boolean matchDispatcher(FilterMap filterMap, DispatcherType type) {
         switch (type) {
             case FORWARD : {
-                if (filterMap.getDispatcherMapping() == FilterMap.FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.FORWARD_ERROR ||
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_ERROR_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_FORWARD_INCLUDE) {
+                if ((filterMap.getDispatcherMapping() & FilterMap.FORWARD) > 0) {
                         return true;
                 }
                 break;
             }
             case INCLUDE : {
-                if (filterMap.getDispatcherMapping() == FilterMap.INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_ERROR ||
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_ERROR_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_FORWARD_INCLUDE) {
-                        return true;
+                if ((filterMap.getDispatcherMapping() & FilterMap.INCLUDE) > 0) {
+                    return true;
                 }
                 break;
             }
             case REQUEST : {
-                if (filterMap.getDispatcherMapping() == FilterMap.REQUEST ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_FORWARD_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD_INCLUDE) {
-                        return true;
+                if ((filterMap.getDispatcherMapping() & FilterMap.REQUEST) > 0) {
+                    return true;
                 }
                 break;
             }
             case ERROR : {
-                if (filterMap.getDispatcherMapping() == FilterMap.ERROR ||
-                    filterMap.getDispatcherMapping() == FilterMap.FORWARD_ERROR || 
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_ERROR || 
-                    filterMap.getDispatcherMapping() == FilterMap.INCLUDE_ERROR_FORWARD || 
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_FORWARD_INCLUDE ||
-                    filterMap.getDispatcherMapping() == FilterMap.REQUEST_ERROR_INCLUDE) {
-                        return true;
+                if ((filterMap.getDispatcherMapping() & FilterMap.ERROR) > 0) {
+                    return true;
                 }
                 break;
             }
