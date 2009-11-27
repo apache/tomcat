@@ -354,6 +354,12 @@ public final class ApplicationFilterFactory {
                 }
                 break;
             }
+            case ASYNC : {
+                if ((filterMap.getDispatcherMapping() & FilterMap.ASYNC) > 0) {
+                    return true;
+                }
+                break;
+            }
         }
         return false;
     }
