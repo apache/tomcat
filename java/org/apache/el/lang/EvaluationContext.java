@@ -54,6 +54,7 @@ public final class EvaluationContext extends ELContext {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification in super-class
     public Object getContext(Class key) {
         return this.elContext.getContext(key);
     }
@@ -69,6 +70,7 @@ public final class EvaluationContext extends ELContext {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification in super-class
     public void putContext(Class key, Object contextObject) {
         this.elContext.putContext(key, contextObject);
     }
