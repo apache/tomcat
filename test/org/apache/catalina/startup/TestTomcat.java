@@ -18,7 +18,11 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,8 +99,33 @@ public class TestTomcat extends TomcatBaseTest {
             if (url == null) {
                 res.getWriter().write("null");
             } else {
-                res.getWriter().write(url.toString());
+                res.getWriter().write(url.toString() + "\n");
+                res.getWriter().write("The first 20 characters of that resource are:\n");
+
+                // Read some content from the resource
+                URLConnection conn = url.openConnection();
+                
+                InputStream is = null;
+                Reader reader = null;
+                char cbuf[] = new char[20];
+                try {
+                    is = conn.getInputStream();
+                    reader = new InputStreamReader(is);
+                    reader.read(cbuf);
+                    res.getWriter().write(cbuf);
+                } finally {
+                    if (reader != null) {
+                        try { reader.close(); } catch(IOException ioe) {/*Ignore*/}
+                    }
+                    if (is != null) {
+                        try { is.close(); } catch(IOException ioe) {/*Ignore*/}
+                    }
+                }
+                
+                
             }
+            
+            
         }
     }
     
@@ -242,9 +271,12 @@ public class TestTomcat extends TomcatBaseTest {
         
         tomcat.start();
         
+        ByteChunk res = new ByteChunk();
+        
         int rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/testGetResource", new ByteChunk(), null);
+                "/testGetResource", res, null);
         assertEquals(HttpServletResponse.SC_OK, rc);
+        assertTrue(res.toString().contains("<?xml version=\"1.0\" "));
     }
 
 }
