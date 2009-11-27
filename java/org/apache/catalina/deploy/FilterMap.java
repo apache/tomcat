@@ -52,6 +52,7 @@ public class FilterMap implements Serializable {
     public static final int FORWARD = 2;
     public static final int INCLUDE = 4;
     public static final int REQUEST = 8;
+    public static final int ASYNC = 16;
     
     // represents nothing having been set. This will be seen 
     // as equal to a REQUEST
@@ -134,22 +135,7 @@ public class FilterMap implements Serializable {
     /**
      *
      * This method will be used to set the current state of the FilterMap
-     * representing the state of when filters should be applied:
-     *
-     *        ERROR
-     *        FORWARD
-     *        FORWARD_ERROR
-     *        INCLUDE
-     *        INCLUDE_ERROR
-     *        INCLUDE_ERROR_FORWARD
-     *        REQUEST
-     *        REQUEST_ERROR
-     *        REQUEST_ERROR_INCLUDE
-     *        REQUEST_ERROR_FORWARD_INCLUDE
-     *        REQUEST_INCLUDE
-     *        REQUEST_FORWARD,
-     *        REQUEST_FORWARD_INCLUDE
-     *
+     * representing the state of when filters should be applied.
      */
     public void setDispatcher(String dispatcherString) {
         String dispatcher = dispatcherString.toUpperCase();
@@ -166,6 +152,9 @@ public class FilterMap implements Serializable {
         }  else if (dispatcher.equals(DispatcherType.ERROR.name())) {
             // apply ERROR to the global dispatcherMapping.
             dispatcherMapping |= ERROR;
+        }  else if (dispatcher.equals(DispatcherType.ASYNC.name())) {
+            // apply ERROR to the global dispatcherMapping.
+            dispatcherMapping |= ASYNC;
         }
     }
     
