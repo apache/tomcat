@@ -66,9 +66,9 @@ public class FilterMap implements Serializable {
     
     // represents nothing having been set. This will be seen 
     // as equal to a REQUEST
-    private static final int NOT_SET = -1;
+    private static final int NOT_SET = 0;
     
-    private int dispatcherMapping=NOT_SET;
+    private int dispatcherMapping = NOT_SET;
     
     private String filterName = null;    
 
@@ -166,54 +166,17 @@ public class FilterMap implements Serializable {
         String dispatcher = dispatcherString.toUpperCase();
         
         if (dispatcher.equals(DispatcherType.FORWARD.name())) {
-
             // apply FORWARD to the global dispatcherMapping.
-            switch (dispatcherMapping) {
-                case NOT_SET  :  dispatcherMapping = FORWARD; break;
-                case ERROR : dispatcherMapping = FORWARD_ERROR; break;
-                case INCLUDE  :  dispatcherMapping = INCLUDE_FORWARD; break;
-                case INCLUDE_ERROR  :  dispatcherMapping = INCLUDE_ERROR_FORWARD; break;
-                case REQUEST : dispatcherMapping = REQUEST_FORWARD; break;
-                case REQUEST_ERROR : dispatcherMapping = REQUEST_ERROR_FORWARD; break;
-                case REQUEST_ERROR_INCLUDE : dispatcherMapping = REQUEST_ERROR_FORWARD_INCLUDE; break;
-                case REQUEST_INCLUDE : dispatcherMapping = REQUEST_FORWARD_INCLUDE; break;
-            }
+            dispatcherMapping |= FORWARD;
         } else if (dispatcher.equals(DispatcherType.INCLUDE.name())) {
             // apply INCLUDE to the global dispatcherMapping.
-            switch (dispatcherMapping) {
-                case NOT_SET  :  dispatcherMapping = INCLUDE; break;
-                case ERROR : dispatcherMapping = INCLUDE_ERROR; break;
-                case FORWARD  :  dispatcherMapping = INCLUDE_FORWARD; break;
-                case FORWARD_ERROR  :  dispatcherMapping = INCLUDE_ERROR_FORWARD; break;
-                case REQUEST : dispatcherMapping = REQUEST_INCLUDE; break;
-                case REQUEST_ERROR : dispatcherMapping = REQUEST_ERROR_INCLUDE; break;
-                case REQUEST_ERROR_FORWARD : dispatcherMapping = REQUEST_ERROR_FORWARD_INCLUDE; break;
-                case REQUEST_FORWARD : dispatcherMapping = REQUEST_FORWARD_INCLUDE; break;
-            }
+            dispatcherMapping |= INCLUDE;
         } else if (dispatcher.equals(DispatcherType.REQUEST.name())) {
             // apply REQUEST to the global dispatcherMapping.
-            switch (dispatcherMapping) {
-                case NOT_SET  :  dispatcherMapping = REQUEST; break;
-                case ERROR : dispatcherMapping = REQUEST_ERROR; break;
-                case FORWARD  :  dispatcherMapping = REQUEST_FORWARD; break;
-                case FORWARD_ERROR  :  dispatcherMapping = REQUEST_ERROR_FORWARD; break;
-                case INCLUDE  :  dispatcherMapping = REQUEST_INCLUDE; break;
-                case INCLUDE_ERROR  :  dispatcherMapping = REQUEST_ERROR_INCLUDE; break;
-                case INCLUDE_FORWARD : dispatcherMapping = REQUEST_FORWARD_INCLUDE; break;
-                case INCLUDE_ERROR_FORWARD : dispatcherMapping = REQUEST_ERROR_FORWARD_INCLUDE; break;
-            }
+            dispatcherMapping |= REQUEST;
         }  else if (dispatcher.equals(DispatcherType.ERROR.name())) {
             // apply ERROR to the global dispatcherMapping.
-            switch (dispatcherMapping) {
-                case NOT_SET  :  dispatcherMapping = ERROR; break;
-                case FORWARD  :  dispatcherMapping = FORWARD_ERROR; break;
-                case INCLUDE  :  dispatcherMapping = INCLUDE_ERROR; break;
-                case INCLUDE_FORWARD : dispatcherMapping = INCLUDE_ERROR_FORWARD; break;
-                case REQUEST : dispatcherMapping = REQUEST_ERROR; break;
-                case REQUEST_INCLUDE : dispatcherMapping = REQUEST_ERROR_INCLUDE; break;
-                case REQUEST_FORWARD : dispatcherMapping = REQUEST_ERROR_FORWARD; break;
-                case REQUEST_FORWARD_INCLUDE : dispatcherMapping = REQUEST_ERROR_FORWARD_INCLUDE; break;
-            }
+            dispatcherMapping |= ERROR;
         }
     }
     
