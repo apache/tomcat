@@ -28,7 +28,7 @@ public class ListELResolver extends ELResolver {
 
 	private final boolean readOnly;
 
-	private final static Class<? extends List> UNMODIFIABLE =
+	private final static Class<?> UNMODIFIABLE =
 	    Collections.unmodifiableList(new ArrayList<Object>()).getClass();
 
 	public ListELResolver() {
@@ -46,9 +46,9 @@ public class ListELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof List) {
+		if (base instanceof List<?>) {
 			context.setPropertyResolved(true);
-			List<Object> list = (List<Object>) base;
+			List<?> list = (List<?>) base;
 			int idx = coerce(property);
 			if (idx < 0 || idx >= list.size()) {
 				return null;
@@ -66,9 +66,9 @@ public class ListELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof List) {
+		if (base instanceof List<?>) {
 			context.setPropertyResolved(true);
-			List<Object> list = (List<Object>) base;
+			List<?> list = (List<?>) base;
 			int idx = coerce(property);
 			if (idx < 0 || idx >= list.size()) {
 				return null;
@@ -89,8 +89,9 @@ public class ListELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof List) {
+		if (base instanceof List<?>) {
 			context.setPropertyResolved(true);
+			@SuppressWarnings("unchecked") // Must be OK to cast to Object
 			List<Object> list = (List<Object>) base;
 
 			if (this.readOnly) {
@@ -117,9 +118,9 @@ public class ListELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof List) {
+		if (base instanceof List<?>) {
 			context.setPropertyResolved(true);
-			List<Object> list = (List<Object>) base;
+			List<?> list = (List<?>) base;
 			int idx = coerce(property);
 			if (idx < 0 || idx >= list.size()) {
 				throw new PropertyNotFoundException(
@@ -133,8 +134,8 @@ public class ListELResolver extends ELResolver {
 
 	@Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		if (base instanceof List) {
-			FeatureDescriptor[] descs = new FeatureDescriptor[((List) base).size()];
+		if (base instanceof List<?>) {
+			FeatureDescriptor[] descs = new FeatureDescriptor[((List<?>) base).size()];
 			for (int i = 0; i < descs.length; i++) {
 				descs[i] = new FeatureDescriptor();
 				descs[i].setDisplayName("["+i+"]");
@@ -152,7 +153,7 @@ public class ListELResolver extends ELResolver {
 
 	@Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
-		if (base != null && base instanceof List) {
+		if (base instanceof List<?>) { // implies base != null
 			return Integer.class;
 		}
 		return null;
