@@ -162,7 +162,7 @@ public final class ApplicationContextFacade
         }
     }
 
-
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Set<String> getResourcePaths(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()){
             return (Set<String>)doPrivileged("getResourcePaths",
@@ -246,6 +246,7 @@ public final class ApplicationContextFacade
     /**
      * @deprecated
      */
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     @Deprecated
     public Enumeration<Servlet> getServlets() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -259,6 +260,7 @@ public final class ApplicationContextFacade
     /**
      * @deprecated
      */
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     @Deprecated
     public Enumeration<String> getServletNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -330,6 +332,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Enumeration<String> getInitParameterNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Enumeration<String>) doPrivileged(
@@ -349,6 +352,7 @@ public final class ApplicationContextFacade
      }
 
 
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Enumeration<String> getAttributeNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Enumeration<String>) doPrivileged(
@@ -427,7 +431,7 @@ public final class ApplicationContextFacade
         }
     }
 
-
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -482,6 +486,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -503,6 +508,7 @@ public final class ApplicationContextFacade
     }
     
     
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (EnumSet<SessionTrackingMode>)
@@ -512,7 +518,7 @@ public final class ApplicationContextFacade
         }
     }
 
-
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (EnumSet<SessionTrackingMode>)
@@ -588,6 +594,7 @@ public final class ApplicationContextFacade
 
 
     @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public <T extends EventListener> T createListener(Class<T> c)
             throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -642,6 +649,7 @@ public final class ApplicationContextFacade
 
 
     @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Map<String, ? extends FilterRegistration>) doPrivileged(
@@ -664,6 +672,7 @@ public final class ApplicationContextFacade
 
 
     @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Map<String, ? extends ServletRegistration>) doPrivileged(
