@@ -54,6 +54,13 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
     @Override
     public synchronized void start() throws LifecycleException {
         if ( this.started ) return;
+        if( !initialized ) { 
+            try {
+                init();
+            } catch( Exception ex ) {
+                throw new LifecycleException("Error initializaing ", ex);
+            }
+        }
         super.addLifecycleListener(this);            
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
