@@ -100,14 +100,15 @@ public class ResourceBundleELResolver extends ELResolver {
 	}
 
 	@Override
+    @SuppressWarnings("unchecked") // Can't use Iterator<FeatureDescriptor> because API needs to match specification
     public Iterator getFeatureDescriptors(ELContext context, Object base) {
 		if (base instanceof ResourceBundle) {
 			List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>();
-			Enumeration e = ((ResourceBundle) base).getKeys();
+			Enumeration<String> e = ((ResourceBundle) base).getKeys();
 			FeatureDescriptor feat;
 			String key;
 			while (e.hasMoreElements()) {
-				key = (String) e.nextElement();
+				key = e.nextElement();
 				feat = new FeatureDescriptor();
 				feat.setDisplayName(key);
 				feat.setExpert(false);

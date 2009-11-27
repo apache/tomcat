@@ -27,8 +27,8 @@ import java.util.Map;
 
 public class MapELResolver extends ELResolver {
 
-	private final static Class UNMODIFIABLE = Collections.unmodifiableMap(
-			new HashMap()).getClass();
+	private final static Class<?> UNMODIFIABLE = Collections.unmodifiableMap(
+			new HashMap<Object, Object>()).getClass();
 
 	private final boolean readOnly;
 
@@ -47,9 +47,9 @@ public class MapELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof Map) {
+		if (base instanceof Map<?,?>) {
 			context.setPropertyResolved(true);
-			return ((Map) base).get(property);
+			return ((Map<?,?>) base).get(property);
 		}
 		
 		return null;
@@ -62,9 +62,9 @@ public class MapELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof Map) {
+		if (base instanceof Map<?,?>) {
 			context.setPropertyResolved(true);
-			Object obj = ((Map) base).get(property);
+			Object obj = ((Map<?,?>) base).get(property);
 			return (obj != null) ? obj.getClass() : null;
 		}
 		
@@ -80,7 +80,7 @@ public class MapELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof Map) {
+		if (base instanceof Map<?, ?>) {
 			context.setPropertyResolved(true);
 
 			if (this.readOnly) {
@@ -90,7 +90,9 @@ public class MapELResolver extends ELResolver {
 			}
 
 			try {
-				((Map) base).put(property, value);
+			    @SuppressWarnings("unchecked") // Must be OK
+			    Map<Object, Object> map = ((Map<Object, Object>) base);
+			    map.put(property, value);
 			} catch (UnsupportedOperationException e) {
 				throw new PropertyNotWritableException(e);
 			}
@@ -104,7 +106,7 @@ public class MapELResolver extends ELResolver {
 			throw new NullPointerException();
 		}
 
-		if (base instanceof Map) {
+		if (base instanceof Map<?, ?>) {
 			context.setPropertyResolved(true);
 			return this.readOnly || UNMODIFIABLE.equals(base.getClass());
 		}
@@ -114,8 +116,8 @@ public class MapELResolver extends ELResolver {
 
 	@Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		if (base instanceof Map) {
-			Iterator itr = ((Map) base).keySet().iterator();
+		if (base instanceof Map<?, ?>) {
+			Iterator<?> itr = ((Map<?, ?>) base).keySet().iterator();
 			List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>();
 			Object key;
 			FeatureDescriptor desc;
@@ -138,7 +140,7 @@ public class MapELResolver extends ELResolver {
 
 	@Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
-		if (base instanceof Map) {
+		if (base instanceof Map<?, ?>) {
 			return Object.class;
 		}
 		return null;
