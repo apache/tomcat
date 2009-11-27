@@ -17,9 +17,13 @@
 
 package org.apache.el;
 
+import java.io.File;
+import java.util.Date;
+
 import javax.el.ValueExpression;
 
 import org.apache.el.ExpressionFactoryImpl;
+import org.apache.el.lang.ELSupport;
 import org.apache.jasper.el.ELContextImpl;
 
 import junit.framework.TestCase;
@@ -45,6 +49,28 @@ public class TestELEvaluation extends TestCase {
     public void testMisc() {
         // From bug 45451 - not a parser bug
         assertEquals("\\", evaluateExpression("\\\\"));
+    }
+
+    private void compareBoth(String msg, int expected, Object o1, Object o2){
+        int i1 = ELSupport.compare(o1, o2);
+        int i2 = ELSupport.compare(o2, o1);
+        assertEquals(msg,expected, i1);
+        assertEquals(msg,expected, -i2);
+    }
+
+    public void testElSupportCompare(){
+        compareBoth("Nulls should compare equal", 0, null, null);
+        compareBoth("Null should compare equal to \"\"", 0, "", null);
+        compareBoth("Null should be less than File()",-1, null, new File(""));
+        compareBoth("Null should be less than Date()",-1, null, new Date());
+        compareBoth("Date(0) should be less than Date(1)",-1, new Date(0), new Date(1));        
+        try {
+            compareBoth("Should not compare",0, new Date(), new File(""));
+            fail("Expecting ClassCastException");
+        } catch (ClassCastException expected) {
+            // Expected
+        }
+        assertTrue(null == null);
     }
 
     // ************************************************************************
