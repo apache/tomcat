@@ -39,6 +39,7 @@ public abstract class ELContext {
         this.resolved = false;
     }
     
+    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
     public Object getContext(Class key) {
         if (this.map == null) {
             return null;
@@ -46,6 +47,7 @@ public abstract class ELContext {
         return this.map.get(key);
     }
     
+    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
     public void putContext(Class key, Object contextObject) throws NullPointerException {
         if (key == null || contextObject == null) {
             throw new NullPointerException();
