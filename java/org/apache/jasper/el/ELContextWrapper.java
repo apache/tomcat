@@ -55,6 +55,7 @@ public final class ELContextWrapper extends ELContext {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match super-class specification
     public Object getContext(Class key) {
         return this.target.getContext(key);
     }
@@ -70,6 +71,7 @@ public final class ELContextWrapper extends ELContext {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match super-class specification
     public void putContext(Class key, Object contextObject) throws NullPointerException {
         this.target.putContext(key, contextObject);
     }
