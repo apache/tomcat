@@ -229,7 +229,8 @@ public class BeanELResolver extends ELResolver {
 			this.type = descriptor.getPropertyType();
 		}
 
-		public Class getPropertyType() {
+		@SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
+        public Class getPropertyType() {
 			return this.type;
 		}
 
@@ -285,7 +286,7 @@ public class BeanELResolver extends ELResolver {
 		return props.get(ctx, prop);
 	}
 
-	private final static Method getMethod(Class type, Method m) {
+	private final static Method getMethod(Class<?> type, Method m) {
 		if (m == null || Modifier.isPublic(type.getModifiers())) {
 			return m;
 		}
