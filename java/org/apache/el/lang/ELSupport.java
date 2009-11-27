@@ -50,10 +50,33 @@ public class ELSupport {
     }
 
     /**
-     * @param obj0
-     * @param obj1
-     * @return
-     * @throws EvaluationException
+     * Compare two objects, after coercing to the same type if appropriate.
+     * 
+     * If the objects are identical, or they are equal according to 
+     * {@link #equals(Object, Object)} then return 0.
+     * 
+     * If either object is a BigDecimal, then coerce both to BigDecimal first.
+     * Similarly for Double(Float), BigInteger, and Long(Integer, Char, Short, Byte).
+     *  
+     * Otherwise, check that the first object is an instance of Comparable, and compare
+     * against the second object. If that is null, return 1, otherwise
+     * return the result of comparing against the second object.
+     * 
+     * Similarly, if the second object is Comparable, if the first is null, return -1,
+     * else return the result of comparing against the first object.
+     * 
+     * A null object is considered as:
+     * <ul>
+     * <li>ZERO when compared with Numbers</li>
+     * <li>the empty string for String compares</li>
+     * <li>Otherwise null is considered to be lower than anything else.</li>
+     * </ul>
+     * 
+     * @param obj0 first object
+     * @param obj1 second object
+     * @return -1, 0, or 1 if this object is less than, equal to, or greater than val.
+     * @throws ELException if neither object is Comparable
+     * @throws ClassCastException if the objects are not mutually comparable
      */
     public final static int compare(final Object obj0, final Object obj1)
             throws ELException {
@@ -83,20 +106,32 @@ public class ELSupport {
         if (obj0 instanceof String || obj1 instanceof String) {
             return coerceToString(obj0).compareTo(coerceToString(obj1));
         }
-        if (obj0 instanceof Comparable) {
-            return (obj1 != null) ? ((Comparable) obj0).compareTo(obj1) : 1;
+        if (obj0 instanceof Comparable<?>) {
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> comparable = (Comparable<Object>) obj0;
+            return (obj1 != null) ? comparable.compareTo(obj1) : 1;
         }
-        if (obj1 instanceof Comparable) {
-            return (obj0 != null) ? -((Comparable) obj1).compareTo(obj0) : -1;
+        if (obj1 instanceof Comparable<?>) {
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> comparable = (Comparable<Object>) obj1;
+            return (obj0 != null) ? -comparable.compareTo(obj0) : -1;
         }
         throw new ELException(MessageFactory.get("error.compare", obj0, obj1));
     }
 
     /**
-     * @param obj0
-     * @param obj1
-     * @return
-     * @throws EvaluationException
+     * Compare two objects for equality, after coercing to the same type if appropriate.
+     * 
+     * If the objects are identical (including both null) return true.
+     * If either object is null, return false.
+     * If either object is Boolean, coerce both to Boolean and check equality.
+     * Similarly for Enum, String, BigDecimal, Double(Float), Long(Integer, Short, Byte, Character)
+     * Otherwise default to using Object.equals().
+     * 
+     * @param obj0 the first object
+     * @param obj1 the second object
+     * @return true if the objects are equal
+     * @throws ELException
      */
     public final static boolean equals(final Object obj0, final Object obj1)
             throws ELException {
@@ -148,14 +183,17 @@ public class ELSupport {
             return null;
         }
         if (obj.getClass().isEnum()) {
-            return (Enum) obj;
+            return (Enum<?>) obj;
         }
         return Enum.valueOf(type, obj.toString());
     }
 
     /**
-     * @param obj
-     * @return
+     * Convert an object to Boolean.
+     * Null and empty string are false.
+     * @param obj the object to convert
+     * @return the Boolean value of the object
+     * @throws IllegalArgumentException if object is not Boolean or String
      */
     public final static Boolean coerceToBoolean(final Object obj)
             throws IllegalArgumentException {
@@ -304,16 +342,17 @@ public class ELSupport {
     }
 
     /**
+     * Coerce an object to a string
      * @param obj
-     * @return
+     * @return the String value of the object
      */
     public final static String coerceToString(final Object obj) {
         if (obj == null) {
             return "";
         } else if (obj instanceof String) {
             return (String) obj;
-        } else if (obj instanceof Enum) {
-            return ((Enum) obj).name();
+        } else if (obj instanceof Enum<?>) {
+            return ((Enum<?>) obj).name();
         } else {
             return obj.toString();
         }
@@ -377,8 +416,9 @@ public class ELSupport {
     }
 
     /**
-     * @param obj
-     * @return
+     * Check if an array contains any {@code null} entries.
+     * @param obj array to be checked
+     * @return true if the array contains a {@code null}
      */
     public final static boolean containsNulls(final Object[] obj) {
         for (int i = 0; i < obj.length; i++) {
