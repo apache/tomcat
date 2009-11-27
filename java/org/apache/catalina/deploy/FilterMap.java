@@ -53,16 +53,16 @@ public class FilterMap implements Serializable {
     public static final int FORWARD_ERROR =3;  
     public static final int INCLUDE = 4;
     public static final int INCLUDE_ERROR  = 5;
-    public static final int INCLUDE_ERROR_FORWARD  =6;
-    public static final int INCLUDE_FORWARD  = 7;
+    public static final int INCLUDE_FORWARD  = 6;
+    public static final int INCLUDE_ERROR_FORWARD  =7;
     public static final int REQUEST = 8;
     public static final int REQUEST_ERROR = 9;
-    public static final int REQUEST_ERROR_FORWARD = 10;
-    public static final int REQUEST_ERROR_FORWARD_INCLUDE = 11;
-    public static final int REQUEST_ERROR_INCLUDE = 12;
-    public static final int REQUEST_FORWARD = 13;
-    public static final int REQUEST_INCLUDE = 14;
-    public static final int REQUEST_FORWARD_INCLUDE= 15;
+    public static final int REQUEST_FORWARD = 10;
+    public static final int REQUEST_ERROR_FORWARD = 11;
+    public static final int REQUEST_INCLUDE = 12;
+    public static final int REQUEST_ERROR_INCLUDE = 13;
+    public static final int REQUEST_FORWARD_INCLUDE= 14;
+    public static final int REQUEST_ERROR_FORWARD_INCLUDE = 15;
     
     // represents nothing having been set. This will be seen 
     // as equal to a REQUEST
@@ -221,7 +221,8 @@ public class FilterMap implements Serializable {
         // per the SRV.6.2.5 absence of any dispatcher elements is
         // equivalent to a REQUEST value
         if (dispatcherMapping == NOT_SET) return REQUEST;
-        else return dispatcherMapping; 
+        
+        return dispatcherMapping; 
     }
 
 
