@@ -112,9 +112,21 @@ public class WebappClassLoader
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WebappClassLoader.class );
 
+    /**
+     * List of ThreadGroup names to ignore when scanning for web application
+     * started threads that need to be shut down.
+     */
+    private static final List<String> JVM_THREAD_GROUP_NAMES =
+        new ArrayList<String>();
+
     public static final boolean ENABLE_CLEAR_REFERENCES = 
         Boolean.valueOf(System.getProperty("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "true")).booleanValue();
     
+    static {
+        JVM_THREAD_GROUP_NAMES.add("system");
+        JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
+    }
+
     protected class PrivilegedFindResourceByName
         implements PrivilegedAction<ResourceEntry> {
 
@@ -1555,7 +1567,7 @@ public class WebappClassLoader
         clearReferences();
 
         started = false;
-
+        
         int length = files.length;
         for (int i = 0; i < length; i++) {
             files[i] = null;
@@ -1636,6 +1648,9 @@ public class WebappClassLoader
         // De-register any remaining JDBC drivers
         clearReferencesJdbc();
 
+        // Stop any threads the web application started
+        clearReferencesThreads();
+        
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
         if (ENABLE_CLEAR_REFERENCES) {
@@ -1654,25 +1669,25 @@ public class WebappClassLoader
     }
 
 
+    /**
+     * Deregister any JDBC drivers registered by the webapp that the webapp
+     * forgot. This is made unnecessary complex because a) DriverManager
+     * checks the class loader of the calling class (it would be much easier
+     * if it checked the context class loader) b) using reflection would
+     * create a dependency on the DriverManager implementation which can,
+     * and has, changed.
+     * 
+     * We can't just create an instance of JdbcLeakPrevention as it will be
+     * loaded by the common class loader (since it's .class file is in the
+     * $CATALINA_HOME/lib directory). This would fail DriverManager's check
+     * on the class loader of the calling class. So, we load the bytes via
+     * our parent class loader but define the class with this class loader
+     * so the JdbcLeakPrevention looks like a webapp class to the
+     * DriverManager.
+     * 
+     * If only apps cleaned up after themselves...
+     */
     private final void clearReferencesJdbc() {
-        /*
-         * Deregister any JDBC drivers registered by the webapp that the webapp
-         * forgot. This is made unnecessary complex because a) DriverManager
-         * checks the class loader of the calling class (it would be much easier
-         * if it checked the context class loader) b) using reflection would
-         * create a dependency on the DriverManager implementation which can,
-         * and has, changed.
-         * 
-         * We can't just create an instance of JdbcLeakPrevention as it will be
-         * loaded by the common class loader (since it's .class file is in the
-         * $CATALINA_HOME/lib directory). This would fail DriverManager's check
-         * on the class loader of the calling class. So, we load the bytes via
-         * our parent class loader but define the class with this class loader
-         * so the JdbcLeakPrevention looks like a webapp class to the
-         * DriverManager.
-         * 
-         * If only apps cleaned up after themselves...
-         */
         InputStream is = getResourceAsStream(
                 "org/apache/catalina/loader/JdbcLeakPrevention.class");
         // We know roughly how big the class will be (~ 1K) so allow 2k as a
@@ -1699,8 +1714,7 @@ public class WebappClassLoader
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
-                log.error(sm.getString(
-                        "webappClassLoader.uncleareredReferenceJbdc", name));
+                log.error(sm.getString("webappClassLoader.clearJbdc", name));
             }
         } catch (Exception e) {
             // So many things to go wrong above...
@@ -1793,7 +1807,7 @@ public class WebappClassLoader
     }
 
 
-    protected void nullInstance(Object instance) {
+    private void nullInstance(Object instance) {
         if (instance == null) {
             return;
         }
@@ -1836,6 +1850,56 @@ public class WebappClassLoader
                     log.debug("Could not set field " + field.getName() 
                             + " to null in object instance of class " 
                             + instance.getClass().getName(), t);
+                }
+            }
+        }
+    }
+
+
+    private void clearReferencesThreads() {
+        // Get the current thread group 
+        ThreadGroup tg = Thread.currentThread( ).getThreadGroup( );
+        // Find the root thread group
+        while (tg.getParent() != null) {
+            tg = tg.getParent();
+        }
+        
+        int threadCountGuess = tg.activeCount() + 50;
+        Thread[] threads = new Thread[threadCountGuess];
+        int threadCountActual = tg.enumerate(threads);
+        // Make sure we don't miss any threads
+        while (threadCountActual == threadCountGuess) {
+            threadCountGuess *=2;
+            threads = new Thread[threadCountGuess];
+            // Note tg.enumerate(Thread[]) silently ignores any threads that
+            // can't fit into the array 
+            threadCountActual = tg.enumerate(threads);
+        }
+        
+        // Iterate over the set of threads
+        for (Thread thread : threads) {
+            if (thread != null) {
+                if (thread.getContextClassLoader() == this) {
+                    // Don't warn about this thread
+                    if (thread == Thread.currentThread()) {
+                        continue;
+                    }
+                    
+                    // Skip threads that have already died
+                    if (!thread.isAlive()) {
+                        continue;
+                    }
+
+                    // Don't warn about JVM controlled threads
+                    if (thread.getThreadGroup() != null &&
+                            JVM_THREAD_GROUP_NAMES.contains(
+                                    thread.getThreadGroup().getName())) {
+                        continue;
+                    }
+                   
+                    log.error(sm.getString("webappClassLoader.warnThread",
+                            thread.getName()));
+
                 }
             }
         }
