@@ -21,7 +21,9 @@ package org.apache.catalina.loader;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * This class is loaded by the {@link WebappClassLoader} to enable it to
@@ -36,14 +38,28 @@ import java.util.Enumeration;
  */
 public class JdbcLeakPrevention {
 
-    public void clearJdbcDriverRegistrations() throws SQLException {
+    /* 
+     * This driver is visible to all classloaders but is loaded by the system
+     * class loader so there is no need to unload it.
+     */
+    private static final String JDBC_ODBC_BRIDGE_DRIVER =
+        "sun.jdbc.odbc.JdbcOdbcDriver";
+    
+    public List<String> clearJdbcDriverRegistrations() throws SQLException {
+        List<String> driverNames = new ArrayList<String>();
+        
         // Unregister any JDBC drivers loaded by the class loader that loaded
         // this class - ie the webapp class loader
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
+            if (JDBC_ODBC_BRIDGE_DRIVER.equals(
+                    driver.getClass().getCanonicalName())) {
+                continue;
+            }
+            driverNames.add(driver.getClass().getCanonicalName());
             DriverManager.deregisterDriver(driver);
         }
-        
+        return driverNames;
     }
 }
