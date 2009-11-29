@@ -1633,6 +1633,28 @@ public class WebappClassLoader
      */
     protected void clearReferences() {
 
+        // De-register any remaining JDBC drivers
+        clearReferencesJdbc();
+
+        // Null out any static or final fields from loaded classes,
+        // as a workaround for apparent garbage collection bugs
+        if (ENABLE_CLEAR_REFERENCES) {
+            clearReferencesStaticFinal();
+        }
+        
+         // Clear the IntrospectionUtils cache.
+        IntrospectionUtils.clear();
+        
+        // Clear the classloader reference in common-logging
+        org.apache.juli.logging.LogFactory.release(this);
+        
+        // Clear the classloader reference in the VM's bean introspector
+        java.beans.Introspector.flushCaches();
+
+    }
+
+
+    private final void clearReferencesJdbc() {
         /*
          * Deregister any JDBC drivers registered by the webapp that the webapp
          * forgot. This is made unnecessary complex because a) DriverManager
@@ -1693,89 +1715,81 @@ public class WebappClassLoader
                 }
             }
         }
+    }
+
+
+    private final void clearReferencesStaticFinal() {
         
-        // Null out any static or final fields from loaded classes,
-        // as a workaround for apparent garbage collection bugs
-        if (ENABLE_CLEAR_REFERENCES) {
-            Collection<ResourceEntry> values =
-                ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
-            Iterator<ResourceEntry> loadedClasses = values.iterator();
-            //
-            // walk through all loaded class to trigger initialization for
-            //    any uninitialized classes, otherwise initialization of
-            //    one class may call a previously cleared class.
-            while(loadedClasses.hasNext()) {
-                ResourceEntry entry = loadedClasses.next();
-                if (entry.loadedClass != null) {
-                    Class<?> clazz = entry.loadedClass;
-                    try {
-                        Field[] fields = clazz.getDeclaredFields();
-                        for (int i = 0; i < fields.length; i++) {
-                            if(Modifier.isStatic(fields[i].getModifiers())) {
-                                fields[i].get(null);
-                                break;
-                            }
+        @SuppressWarnings("unchecked")
+        Collection<ResourceEntry> values =
+            ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
+        Iterator<ResourceEntry> loadedClasses = values.iterator();
+        //
+        // walk through all loaded class to trigger initialization for
+        //    any uninitialized classes, otherwise initialization of
+        //    one class may call a previously cleared class.
+        while(loadedClasses.hasNext()) {
+            ResourceEntry entry = loadedClasses.next();
+            if (entry.loadedClass != null) {
+                Class<?> clazz = entry.loadedClass;
+                try {
+                    Field[] fields = clazz.getDeclaredFields();
+                    for (int i = 0; i < fields.length; i++) {
+                        if(Modifier.isStatic(fields[i].getModifiers())) {
+                            fields[i].get(null);
+                            break;
                         }
-                    } catch(Throwable t) {
-                        // Ignore
                     }
+                } catch(Throwable t) {
+                    // Ignore
                 }
             }
-            loadedClasses = values.iterator();
-            while (loadedClasses.hasNext()) {
-                ResourceEntry entry = loadedClasses.next();
-                if (entry.loadedClass != null) {
-                    Class<?> clazz = entry.loadedClass;
-                    try {
-                        Field[] fields = clazz.getDeclaredFields();
-                        for (int i = 0; i < fields.length; i++) {
-                            Field field = fields[i];
-                            int mods = field.getModifiers();
-                            if (field.getType().isPrimitive() 
-                                    || (field.getName().indexOf("$") != -1)) {
-                                continue;
-                            }
-                            if (Modifier.isStatic(mods)) {
-                                try {
-                                    field.setAccessible(true);
-                                    if (Modifier.isFinal(mods)) {
-                                        if (!((field.getType().getName().startsWith("java."))
-                                                || (field.getType().getName().startsWith("javax.")))) {
-                                            nullInstance(field.get(null));
-                                        }
-                                    } else {
-                                        field.set(null, null);
-                                        if (log.isDebugEnabled()) {
-                                            log.debug("Set field " + field.getName() 
-                                                    + " to null in class " + clazz.getName());
-                                        }
+        }
+        loadedClasses = values.iterator();
+        while (loadedClasses.hasNext()) {
+            ResourceEntry entry = loadedClasses.next();
+            if (entry.loadedClass != null) {
+                Class<?> clazz = entry.loadedClass;
+                try {
+                    Field[] fields = clazz.getDeclaredFields();
+                    for (int i = 0; i < fields.length; i++) {
+                        Field field = fields[i];
+                        int mods = field.getModifiers();
+                        if (field.getType().isPrimitive() 
+                                || (field.getName().indexOf("$") != -1)) {
+                            continue;
+                        }
+                        if (Modifier.isStatic(mods)) {
+                            try {
+                                field.setAccessible(true);
+                                if (Modifier.isFinal(mods)) {
+                                    if (!((field.getType().getName().startsWith("java."))
+                                            || (field.getType().getName().startsWith("javax.")))) {
+                                        nullInstance(field.get(null));
                                     }
-                                } catch (Throwable t) {
+                                } else {
+                                    field.set(null, null);
                                     if (log.isDebugEnabled()) {
-                                        log.debug("Could not set field " + field.getName() 
-                                                + " to null in class " + clazz.getName(), t);
+                                        log.debug("Set field " + field.getName() 
+                                                + " to null in class " + clazz.getName());
                                     }
+                                }
+                            } catch (Throwable t) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Could not set field " + field.getName() 
+                                            + " to null in class " + clazz.getName(), t);
                                 }
                             }
                         }
-                    } catch (Throwable t) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Could not clean fields for class " + clazz.getName(), t);
-                        }
+                    }
+                } catch (Throwable t) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Could not clean fields for class " + clazz.getName(), t);
                     }
                 }
             }
         }
         
-         // Clear the IntrospectionUtils cache.
-        IntrospectionUtils.clear();
-        
-        // Clear the classloader reference in common-logging
-        org.apache.juli.logging.LogFactory.release(this);
-        
-        // Clear the classloader reference in the VM's bean introspector
-        java.beans.Introspector.flushCaches();
-
     }
 
 
@@ -1796,25 +1810,24 @@ public class WebappClassLoader
                 if (Modifier.isStatic(mods) && Modifier.isFinal(mods)) {
                     // Doing something recursively is too risky
                     continue;
-                } else {
-                    Object value = field.get(instance);
-                    if (null != value) {
-                        Class<? extends Object> valueClass = value.getClass();
-                        if (!loadedByThisOrChild(valueClass)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Not setting field " + field.getName() +
-                                        " to null in object of class " + 
-                                        instance.getClass().getName() +
-                                        " because the referenced object was of type " +
-                                        valueClass.getName() + 
-                                        " which was not loaded by this WebappClassLoader.");
-                            }
-                        } else {
-                            field.set(instance, null);
-                            if (log.isDebugEnabled()) {
-                                log.debug("Set field " + field.getName() 
-                                        + " to null in class " + instance.getClass().getName());
-                            }
+                }
+                Object value = field.get(instance);
+                if (null != value) {
+                    Class<? extends Object> valueClass = value.getClass();
+                    if (!loadedByThisOrChild(valueClass)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Not setting field " + field.getName() +
+                                    " to null in object of class " + 
+                                    instance.getClass().getName() +
+                                    " because the referenced object was of type " +
+                                    valueClass.getName() + 
+                                    " which was not loaded by this WebappClassLoader.");
+                        }
+                    } else {
+                        field.set(instance, null);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Set field " + field.getName() 
+                                    + " to null in class " + instance.getClass().getName());
                         }
                     }
                 }
