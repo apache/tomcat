@@ -3259,12 +3259,17 @@ public class StandardContext
             throw new IllegalStateException
                 (sm.getString("containerBase.notStarted", logName()));
 
+        String path = getPath();
+        if (path.length() == 0) {
+            path = "/";
+        }
+
         // Make sure reloading is enabled
         //      if (!reloadable)
         //          throw new IllegalStateException
         //              (sm.getString("standardContext.notReloadable"));
         if(log.isInfoEnabled())
-            log.info(sm.getString("standardContext.reloadingStarted"));
+            log.info(sm.getString("standardContext.reloadingStarted", path));
 
         // Stop accepting requests temporarily
         setPaused(true);
@@ -3282,6 +3287,9 @@ public class StandardContext
         }
 
         setPaused(false);
+
+        if(log.isInfoEnabled())
+            log.info(sm.getString("standardContext.reloadingCompleted", path));
 
     }
 
