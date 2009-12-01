@@ -244,7 +244,17 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
         application do not result in a memory leak. Note that a call to this
         method will be triggered as part of the web application stop process so
         it is strongly recommended that this protection is enabled. The default
-        is <code>true</code></p>
+        is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="gcDaemonProtection" required="false">
+        <p>Enables protection so that calls to
+        <code>sun.misc.GC.requestLatency(long)</code> triggered by a web
+        application do not result in a memory leak. Use of RMI is likely to
+        trigger a call to this method. A side effect of enabling this protection
+        is the creation of a thread named "GC Daemon". The protection is uses
+        reflection to access internal Sun classes and may generate errors on
+        startup on non-Sun JVMs. The default is <code>true</code>.</p>
       </attribute>
 
       <attribute name="urlCacheProtection" required="false">
