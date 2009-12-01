@@ -18,6 +18,8 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -80,12 +82,25 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     /**
      * XML parsing can pin a web application class loader in memory. This is
      * particularly nasty as profilers (at least YourKit and Eclispe MAT) don't
-     * idenitfy any GC roots related to this. 
+     * identify any GC roots related to this. 
      */
     private boolean xmlParsingProtection = true;
     public boolean isXmlParsingProtection() { return xmlParsingProtection; }
     public void setXmlParsingProtection(boolean xmlParsingProtection) {
         this.xmlParsingProtection = xmlParsingProtection;
+    }
+    
+    /**
+     * Protect against the memory leak caused when the first call to
+     * <code>sun.misc.GC.requestLatency(long)</code> is triggered by a web
+     * application. This first call will start a GC Daemon thread with the
+     * thread's context class loader configured to be the web application class
+     * loader. Defaults to <code>true</code>.
+     */
+    private boolean gcDaemonProtection = true;
+    public boolean isGcDaemonProtection() { return gcDaemonProtection; }
+    public void setGcDaemonProtection(boolean gcDaemonProtection) {
+        this.gcDaemonProtection = gcDaemonProtection;
     }
     
     @Override
@@ -150,8 +165,36 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 try {
                     factory.newDocumentBuilder();
                 } catch (ParserConfigurationException e) {
-                    log.error(sm.getString(
-                            "jreLeakListener.xmlParseFail"), e);
+                    log.error(sm.getString("jreLeakListener.xmlParseFail"), e);
+                }
+            }
+            
+            /*
+             * Several components end up calling:
+             * sun.misc.GC.requestLatency(long)
+             * 
+             * Those libraries / components known to trigger memory leaks due to
+             * eventual calls to requestLatency(long) are:
+             * - javax.management.remote.rmi.RMIConnectorServer.start()
+             */
+            if (gcDaemonProtection) {
+                try {
+                    Class<?> clazz = Class.forName("sun.misc.GC");
+                    Method method = clazz.getDeclaredMethod("requestLatency",
+                            new Class[] {long.class});
+                    method.invoke(null, Long.valueOf(3600000));
+                } catch (ClassNotFoundException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (SecurityException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (NoSuchMethodException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (IllegalArgumentException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (IllegalAccessException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (InvocationTargetException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
                 }
             }
         }
