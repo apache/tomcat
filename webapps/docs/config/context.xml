@@ -328,6 +328,17 @@
         of the flag is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="clearReferencesStatic" required = "false">
+        <p>If <code>true</code>, Tomcat attempts to null out any static or final
+        fields from loaded classes when a web application is stopped as a work
+        around for apparent garbage collection bugs and application coding
+        errors. There have been some issues reported with log4j when this
+        is <code>true</code>. Applications without memory leaks using recent
+        JVMs should operate correctly with this attribute set to
+        <code>false</code>. If not specified, the default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="processTlds" required="false">
         <p>Whether the context should process TLDs on startup.  The default
         is true.  The false setting is intended for special cases
