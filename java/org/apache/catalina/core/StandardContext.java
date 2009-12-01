@@ -711,13 +711,13 @@ public class StandardContext
     /**
      * Attribute value used to turn on/off XML validation
      */
-     private boolean tldValidation = false;
+    private boolean tldValidation = false;
 
 
     /**
      * Attribute value used to turn on/off TLD XML namespace validation
      */
-     private boolean tldNamespaceAware = false;
+    private boolean tldNamespaceAware = false;
 
 
     /**
@@ -736,8 +736,17 @@ public class StandardContext
      */
     private JarScanner jarScanner = null;
 
-
-
+    /**
+     * Should Tomcat attempt to null out any static or final fields from loaded
+     * classes when a web application is stopped as a work around for apparent
+     * garbage collection bugs and application coding errors. There have been
+     * some issues reported with log4j when this option is true. Applications
+     * without memory leaks using recent JVMs should operate correctly with this
+     * option set to <code>false</code>. If not specified, the default value of
+     * <code>false</code> will be used. 
+     */
+    private boolean clearReferencesStatic = false;
+    
     // ----------------------------------------------------- Context Properties
 
 
@@ -2066,6 +2075,32 @@ public class StandardContext
      */
     public void setSaveConfig(boolean saveConfig) {
         this.saveConfig = saveConfig;
+    }
+
+
+    /**
+     * Return the clearReferencesStatic flag for this Context.
+     */
+    public boolean getClearReferencesStatic() {
+
+        return (this.clearReferencesStatic);
+
+    }
+
+
+    /**
+     * Set the clearReferencesStatic feature for this Context.
+     *
+     * @param clearReferencesStatic The new flag value
+     */
+    public void setClearReferencesStatic(boolean clearReferencesStatic) {
+
+        boolean oldClearReferencesStatic = this.clearReferencesStatic;
+        this.clearReferencesStatic = clearReferencesStatic;
+        support.firePropertyChange("clearReferencesStatic",
+                                   oldClearReferencesStatic,
+                                   this.clearReferencesStatic);
+
     }
 
 
