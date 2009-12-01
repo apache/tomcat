@@ -637,8 +637,13 @@ public class WebappLoader
             classLoader = createClassLoader();
             classLoader.setResources(container.getResources());
             classLoader.setDelegate(this.delegate);
-            if (container instanceof StandardContext)
-                classLoader.setAntiJARLocking(((StandardContext) container).getAntiJARLocking());
+            if (container instanceof StandardContext) {
+                classLoader.setAntiJARLocking(
+                        ((StandardContext) container).getAntiJARLocking());
+                classLoader.setClearReferencesStatic(
+                        ((StandardContext) container).getClearReferencesStatic());
+                
+            }
 
             for (int i = 0; i < repositories.length; i++) {
                 classLoader.addRepository(repositories[i]);

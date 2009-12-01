@@ -119,9 +119,6 @@ public class WebappClassLoader
     private static final List<String> JVM_THREAD_GROUP_NAMES =
         new ArrayList<String>();
 
-    public static final boolean ENABLE_CLEAR_REFERENCES = 
-        Boolean.valueOf(System.getProperty("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "true")).booleanValue();
-    
     static {
         JVM_THREAD_GROUP_NAMES.add("system");
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
@@ -411,6 +408,17 @@ public class WebappClassLoader
     protected Permission allPermission = new java.security.AllPermission();
 
 
+    /**
+     * Should Tomcat attempt to null out any static or final fields from loaded
+     * classes when a web application is stopped as a work around for apparent
+     * garbage collection bugs and application coding errors. There have been
+     * some issues reported with log4j when this option is true. Applications
+     * without memory leaks using recent JVMs should operate correctly with this
+     * option set to <code>false</code>. If not specified, the default value of
+     * <code>false</code> will be used. 
+     */
+    private boolean clearReferencesStatic = false;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -563,6 +571,25 @@ public class WebappClassLoader
      protected void setParentClassLoader(ClassLoader pcl) {
          parent = pcl;
      }
+
+     /**
+      * Return the clearReferencesStatic flag for this Context.
+      */
+     public boolean getClearReferencesStatic() {
+         return (this.clearReferencesStatic);
+     }
+
+
+     /**
+      * Set the clearReferencesStatic feature for this Context.
+      *
+      * @param clearReferencesStatic The new flag value
+      */
+     public void setClearReferencesStatic(boolean clearReferencesStatic) {
+         this.clearReferencesStatic = clearReferencesStatic;
+     }
+
+
 
     // ------------------------------------------------------- Reloader Methods
 
@@ -1653,7 +1680,7 @@ public class WebappClassLoader
         
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
-        if (ENABLE_CLEAR_REFERENCES) {
+        if (clearReferencesStatic) {
             clearReferencesStaticFinal();
         }
         
