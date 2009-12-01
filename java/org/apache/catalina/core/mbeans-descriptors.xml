@@ -755,12 +755,12 @@
                writeable="false" />
 
     <attribute name="loadTime"
-               description="Load time"
+               description="Time taken to load and initialise the Servlet"
                type="long"
                writeable="false" />
 
     <attribute name="classLoadTime"
-               description="Class loading time"
+               description="Time taken to load the Servlet class"
                type="int"
                writeable="false" />
 
