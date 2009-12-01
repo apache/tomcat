@@ -338,6 +338,8 @@ public class JspUtil {
             c = float.class;
         else if ("double".equals(type))
             c = double.class;
+        else if ("void".equals(type))
+            c = void.class;
         else if (type.indexOf('[') < 0)
             c = loader.loadClass(type);
 
