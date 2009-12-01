@@ -68,7 +68,9 @@ public class Membership
     public Object clone() {
         synchronized (membersLock) {
             Membership clone = new Membership(local, memberComparator);
-            clone.map = (HashMap<MemberImpl, MbrEntry>) map.clone();
+            @SuppressWarnings("unchecked") // map is correct type already
+            final HashMap<MemberImpl, MbrEntry> tmpclone = (HashMap<MemberImpl, MbrEntry>) map.clone();
+            clone.map = tmpclone;
             clone.members = new MemberImpl[members.length];
             System.arraycopy(members,0,clone.members,0,members.length);
             return clone;
@@ -110,8 +112,8 @@ public class Membership
      * Notify the membership that this member has announced itself.
      *
      * @param member - the member that just pinged us
-     * @return - true if this member is new to the cluster, false otherwise.
-     * @return - false if this member is the local member or updated.
+     * @return - true if this member is new to the cluster, false otherwise.<br/>
+     * - false if this member is the local member or updated.
      */
     public synchronized boolean memberAlive(MemberImpl member) {
         boolean result = false;

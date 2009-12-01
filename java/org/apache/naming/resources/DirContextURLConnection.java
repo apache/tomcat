@@ -256,7 +256,7 @@ public class DirContextURLConnection
       }
 
       if (attributes == null)
-          return (Collections.EMPTY_MAP);
+          return (Collections.emptyMap());
 
       HashMap<String,List<String>> headerFields =
           new HashMap<String,List<String>>(attributes.size());
@@ -347,6 +347,7 @@ public class DirContextURLConnection
     /**
      * Get object content.
      */
+    @SuppressWarnings("unchecked") // overridden method uses raw type Class[]
     @Override
     public Object getContent(Class[] classes)
         throws IOException {
