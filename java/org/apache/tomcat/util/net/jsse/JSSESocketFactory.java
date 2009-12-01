@@ -92,6 +92,7 @@ public class JSSESocketFactory
         = System.getProperty("user.home") + "/.keystore";
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
+    private static final String ALLOW_ALL_SUPPORTED_CIPHERS = "ALL";
     public static final String DEFAULT_KEY_PASS = "changeit";
     
     static final org.apache.juli.logging.Log log =
@@ -189,6 +190,10 @@ public class JSSESocketFactory
                                          String[] supportedCiphers) {
 
         String[] result = null;
+
+        if (ALLOW_ALL_SUPPORTED_CIPHERS.equals(requestedCiphers)) {
+            return supportedCiphers;
+        }
 
         if (requestedCiphers != null) {
             Vector<String> vec = null;
