@@ -24,7 +24,10 @@ import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.Reference;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,6 +48,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -419,6 +423,17 @@ public class WebappClassLoader
      */
     private boolean clearReferencesStatic = false;
 
+    /**
+     * Should Tomcat attempt to termiate threads that have been started by the
+     * web application? Stopping threads is performed via the deprecated (for
+     * goo reason) <code>Thread.stop()</code> method and is likely to result in
+     * instability. As such, enabling this should be viewed as an option of last
+     * resort in a development environment and is not recommended in a
+     * production environment. If not specified, the default value of
+     * <code>false</code> will be used. 
+     */
+    private boolean clearReferencesStopThreads = false;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -589,6 +604,24 @@ public class WebappClassLoader
          this.clearReferencesStatic = clearReferencesStatic;
      }
 
+
+     /**
+      * Return the clearReferencesStatic flag for this Context.
+      */
+     public boolean getClearReferencesStopThreads() {
+         return (this.clearReferencesStopThreads);
+     }
+
+
+     /**
+      * Set the clearReferencesStatic feature for this Context.
+      *
+      * @param clearReferencesStatic The new flag value
+      */
+     public void setClearReferencesStopThreads(
+             boolean clearReferencesStopThreads) {
+         this.clearReferencesStopThreads = clearReferencesStopThreads;
+     }
 
 
     // ------------------------------------------------------- Reloader Methods
@@ -1678,6 +1711,12 @@ public class WebappClassLoader
         // Stop any threads the web application started
         clearReferencesThreads();
         
+        // Clear any ThreadLocals loaded by this class loader
+        clearReferencesThreadLocals();
+        
+        // Clear RMI Targets loaded by this class loader
+        clearReferencesRmiTargets();
+
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
         if (clearReferencesStatic) {
@@ -1883,7 +1922,200 @@ public class WebappClassLoader
     }
 
 
+    @SuppressWarnings("deprecation")
     private void clearReferencesThreads() {
+        Thread[] threads = getThreads();
+        
+        // Iterate over the set of threads
+        for (Thread thread : threads) {
+            if (thread != null) {
+                ClassLoader ccl = thread.getContextClassLoader();
+                if (ccl != null && ccl == this) {
+                    // Don't warn about this thread
+                    if (thread == Thread.currentThread()) {
+                        continue;
+                    }
+                    
+                    // Skip threads that have already died
+                    if (!thread.isAlive()) {
+                        continue;
+                    }
+
+                    // Don't warn about JVM controlled threads
+                    ThreadGroup tg = thread.getThreadGroup();
+                    if (tg != null &&
+                            JVM_THREAD_GROUP_NAMES.contains(tg.getName())) {
+                        continue;
+                    }
+                   
+                    log.error(sm.getString("webappClassLoader.warnThread",
+                            thread.getName()));
+                    
+                    // Don't try an stop the threads unless explicitly
+                    // configured to do so
+                    if (!clearReferencesStopThreads) {
+                        continue;
+                    }
+                    
+                    // If the thread has been started via an executor, try
+                    // shutting down the executor
+                    try {
+                        Field targetField =
+                            thread.getClass().getDeclaredField("target");
+                        targetField.setAccessible(true);
+                        Object target = targetField.get(thread);
+                        
+                        if (target != null &&
+                                target.getClass().getCanonicalName().equals(
+                                "java.util.concurrent.ThreadPoolExecutor.Worker")) {
+                            Field executorField =
+                                target.getClass().getDeclaredField("this$0");
+                            executorField.setAccessible(true);
+                            Object executor = executorField.get(target);
+                            if (executor instanceof ThreadPoolExecutor) {
+                                ((ThreadPoolExecutor) executor).shutdownNow();
+                            }
+                        }
+                    } catch (SecurityException e) {
+                        log.warn(sm.getString(
+                                "webappClassLoader.stopThreadFail",
+                                thread.getName()), e);
+                    } catch (NoSuchFieldException e) {
+                        log.warn(sm.getString(
+                                "webappClassLoader.stopThreadFail",
+                                thread.getName()), e);
+                    } catch (IllegalArgumentException e) {
+                        log.warn(sm.getString(
+                                "webappClassLoader.stopThreadFail",
+                                thread.getName()), e);
+                    } catch (IllegalAccessException e) {
+                        log.warn(sm.getString(
+                                "webappClassLoader.stopThreadFail",
+                                thread.getName()), e);
+                    }
+
+                    // This method is deprecated and for good reason. This is
+                    // very risky code but is only only option at this point
+                    // A *very* good reason for apps to do this clean-up
+                    // themselves
+                    thread.stop();
+                }
+            }
+        }
+    }
+
+    
+    private void clearReferencesThreadLocals() {
+        Thread[] threads = getThreads();
+
+        try {
+            // Make the fields in the Thread class that store ThreadLocals
+            // accessible
+            Field threadLocalsField =
+                Thread.class.getDeclaredField("threadLocals");
+            threadLocalsField.setAccessible(true);
+            Field inheritableThreadLocalsField =
+                Thread.class.getDeclaredField("inheritableThreadLocals");
+            inheritableThreadLocalsField.setAccessible(true);
+            // Make the underlying array of ThreadLoad.ThreadLocalMap.Entry objects
+            // accessible
+            Class<?> tlmClass =
+                Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
+            Field tableField = tlmClass.getDeclaredField("table");
+            tableField.setAccessible(true);
+            
+            for (int i = 0; i < threads.length; i++) {
+                Object threadLocalMap;
+                if (threads[i] != null) {
+                    // Clear the first map
+                    threadLocalMap = threadLocalsField.get(threads[i]);
+                    clearThreadLocalMap(threadLocalMap, tableField);
+                    // Clear the second map
+                    threadLocalMap =
+                        inheritableThreadLocalsField.get(threads[i]);
+                    clearThreadLocalMap(threadLocalMap, tableField);
+                }
+            }
+        } catch (SecurityException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        } catch (NoSuchFieldException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        } catch (ClassNotFoundException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        } catch (IllegalArgumentException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        } catch (IllegalAccessException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        } catch (NoSuchMethodException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        } catch (InvocationTargetException e) {
+            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail"), e);
+        }       
+    }
+
+
+    /*
+     * Clears the given thread local map object. Also pass in the field that
+     * points to the internal table to save re-calculating it on every
+     * call to this method.
+     */
+    private void clearThreadLocalMap(Object map, Field internalTableField)
+            throws NoSuchMethodException, IllegalAccessException,
+            NoSuchFieldException, InvocationTargetException {
+        if (map != null) {
+            Method mapRemove =
+                map.getClass().getDeclaredMethod("remove",
+                        ThreadLocal.class);
+            mapRemove.setAccessible(true);
+            Object[] table = (Object[]) internalTableField.get(map);
+            if (table != null) {
+                for (int j =0; j < table.length; j++) {
+                    if (table[j] != null) {
+                        boolean remove = false;
+                        // Check the key
+                        Field keyField =
+                            Reference.class.getDeclaredField("referent");
+                        keyField.setAccessible(true);
+                        Object key = keyField.get(table[j]);
+                        if (this.equals(key) || (key != null &&
+                                this == key.getClass().getClassLoader())) {
+                            remove = true;
+                        }
+                        // Check the value
+                        Field valueField =
+                            table[j].getClass().getDeclaredField("value");
+                        valueField.setAccessible(true);
+                        Object value = valueField.get(table[j]);
+                        if (this.equals(value) || (value != null &&
+                                this == value.getClass().getClassLoader())) {
+                            remove = true;
+                        }
+                        if (remove) {
+                            Object entry = ((Reference<?>) table[j]).get();
+                            Object[] args = new Object[4];
+                            if (key != null) {
+                                args[0] = key.getClass().getCanonicalName();
+                                args[1] = key.toString();
+                            }
+                            if (value != null) {
+                                args[2] = value.getClass().getCanonicalName();
+                                args[3] = value.toString();
+                            }
+                            log.error(sm.getString(
+                                    "webappClassLoader.clearThreadLocal",
+                                    args));
+                            mapRemove.invoke(map, entry);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Get the set of current threads as an array.
+     */
+    private Thread[] getThreads() {
         // Get the current thread group 
         ThreadGroup tg = Thread.currentThread( ).getThreadGroup( );
         // Find the root thread group
@@ -1903,36 +2135,77 @@ public class WebappClassLoader
             threadCountActual = tg.enumerate(threads);
         }
         
-        // Iterate over the set of threads
-        for (Thread thread : threads) {
-            if (thread != null) {
-                if (thread.getContextClassLoader() == this) {
-                    // Don't warn about this thread
-                    if (thread == Thread.currentThread()) {
-                        continue;
-                    }
-                    
-                    // Skip threads that have already died
-                    if (!thread.isAlive()) {
-                        continue;
-                    }
-
-                    // Don't warn about JVM controlled threads
-                    if (thread.getThreadGroup() != null &&
-                            JVM_THREAD_GROUP_NAMES.contains(
-                                    thread.getThreadGroup().getName())) {
-                        continue;
-                    }
-                   
-                    log.error(sm.getString("webappClassLoader.warnThread",
-                            thread.getName()));
-
-                }
-            }
-        }
+        return threads;
     }
 
 
+    /**
+     * This depends on the internals of the Sun JVM so it does everything by
+     * reflection.
+     */
+    private void clearReferencesRmiTargets() {
+        try {
+            // Need access to the ccl field of sun.rmi.transport.Target
+            Class<?> objectTargetClass =
+                Class.forName("sun.rmi.transport.Target");
+            Field cclField = objectTargetClass.getDeclaredField("ccl");
+            cclField.setAccessible(true);
+
+            // Clear the objTable map
+            Class<?> objectTableClass =
+                Class.forName("sun.rmi.transport.ObjectTable");
+            Field objTableField = objectTableClass.getDeclaredField("objTable");
+            objTableField.setAccessible(true);
+            Object objTable = objTableField.get(null);
+            if (objTable == null) {
+                return;
+            }
+            
+            // Iterate over the values in the table
+            if (objTable instanceof Map<?,?>) {
+                Iterator<?> iter = ((Map<?,?>) objTable).values().iterator();
+                while (iter.hasNext()) {
+                    Object obj = iter.next();
+                    Object cclObject = cclField.get(obj);
+                    if (this == cclObject) {
+                        iter.remove();
+                    }
+                }
+            }
+
+            // Clear the implTable map
+            Field implTableField = objectTableClass.getDeclaredField("implTable");
+            implTableField.setAccessible(true);
+            Object implTable = implTableField.get(null);
+            if (implTable == null) {
+                return;
+            }
+            
+            // Iterate over the values in the table
+            if (implTable instanceof Map<?,?>) {
+                Iterator<?> iter = ((Map<?,?>) implTable).values().iterator();
+                while (iter.hasNext()) {
+                    Object obj = iter.next();
+                    Object cclObject = cclField.get(obj);
+                    if (this == cclObject) {
+                        iter.remove();
+                    }
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            log.info(sm.getString("webappClassLoader.clearRmiInfo"), e);
+        } catch (SecurityException e) {
+            log.warn(sm.getString("webappClassLoader.clearRmiFail"), e);
+        } catch (NoSuchFieldException e) {
+            log.warn(sm.getString("webappClassLoader.clearRmiFail"), e);
+        } catch (IllegalArgumentException e) {
+            log.warn(sm.getString("webappClassLoader.clearRmiFail"), e);
+        } catch (IllegalAccessException e) {
+            log.warn(sm.getString("webappClassLoader.clearRmiFail"), e);
+        }
+    }
+    
+    
     /**
      * Determine whether a class was loaded by this class loader or one of
      * its child class loaders.
