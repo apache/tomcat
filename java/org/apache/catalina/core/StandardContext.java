@@ -739,7 +739,7 @@ public class StandardContext
     /**
      * Should Tomcat attempt to null out any static or final fields from loaded
      * classes when a web application is stopped as a work around for apparent
-     * garbage collection bugs and application coding errors. There have been
+     * garbage collection bugs and application coding errors? There have been
      * some issues reported with log4j when this option is true. Applications
      * without memory leaks using recent JVMs should operate correctly with this
      * option set to <code>false</code>. If not specified, the default value of
@@ -747,6 +747,17 @@ public class StandardContext
      */
     private boolean clearReferencesStatic = false;
     
+    /**
+     * Should Tomcat attempt to termiate threads that have been started by the
+     * web application? Stopping threads is performed via the deprecated (for
+     * good reason) <code>Thread.stop()</code> method and is likely to result in
+     * instability. As such, enabling this should be viewed as an option of last
+     * resort in a development environment and is not recommended in a
+     * production environment. If not specified, the default value of
+     * <code>false</code> will be used. 
+     */
+    private boolean clearReferencesStopThreads = false;
+
     // ----------------------------------------------------- Context Properties
 
 
@@ -2100,6 +2111,33 @@ public class StandardContext
         support.firePropertyChange("clearReferencesStatic",
                                    oldClearReferencesStatic,
                                    this.clearReferencesStatic);
+
+    }
+
+
+    /**
+     * Return the clearReferencesStopThreads flag for this Context.
+     */
+    public boolean getClearReferencesStopThreads() {
+
+        return (this.clearReferencesStopThreads);
+
+    }
+
+
+    /**
+     * Set the clearReferencesStatic feature for this Context.
+     *
+     * @param clearReferencesStatic The new flag value
+     */
+    public void setClearReferencesStopThreads(
+            boolean clearReferencesStopThreads) {
+
+        boolean oldClearReferencesStopThreads = this.clearReferencesStopThreads;
+        this.clearReferencesStopThreads = clearReferencesStopThreads;
+        support.firePropertyChange("clearReferencesStopThreads",
+                                   oldClearReferencesStopThreads,
+                                   this.clearReferencesStopThreads);
 
     }
 

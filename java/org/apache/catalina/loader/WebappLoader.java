@@ -642,7 +642,8 @@ public class WebappLoader
                         ((StandardContext) container).getAntiJARLocking());
                 classLoader.setClearReferencesStatic(
                         ((StandardContext) container).getClearReferencesStatic());
-                
+                classLoader.setClearReferencesStopThreads(
+                        ((StandardContext) container).getClearReferencesStopThreads());
             }
 
             for (int i = 0; i < repositories.length; i++) {
