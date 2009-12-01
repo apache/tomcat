@@ -342,16 +342,10 @@ public class ManagerServlet
             } else {
                 deploy(writer, path, tag);
             }
-        } else if (command.equals("/install")) {
-            // Deprecated
-            deploy(writer, config, path, war, false);
         } else if (command.equals("/list")) {
             list(writer);
         } else if (command.equals("/reload")) {
             reload(writer, path);
-        } else if (command.equals("/remove")) {
-            // Deprecated
-            undeploy(writer, path);
         } else if (command.equals("/resources")) {
             resources(writer, type);
         } else if (command.equals("/roles")) {
