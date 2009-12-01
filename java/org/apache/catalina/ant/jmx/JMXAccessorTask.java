@@ -631,7 +631,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             TabularDataSupport data = (TabularDataSupport) result;
             for (Iterator<Object> iter = data.keySet().iterator(); iter.hasNext();) {
                 Object key = iter.next();
-                for (Iterator<Object> iter1 = ((List<Object>) key).iterator(); iter1.hasNext();) {
+                for (Iterator<?> iter1 = ((List<?>) key).iterator(); iter1.hasNext();) {
                     Object key1 = iter1.next();
                     CompositeData valuedata = data.get(new Object[] { key1 });
                     Object value = valuedata.get("value");
