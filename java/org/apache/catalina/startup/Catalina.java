@@ -182,8 +182,7 @@ public class Catalina extends Embedded {
     public void process(String args[]) {
 
         setAwait(true);
-        setCatalinaHome();
-        setCatalinaBase();
+        initDirs();
         try {
             if (arguments(args)) {
                 if (starting) {
@@ -440,26 +439,6 @@ public class Catalina extends Embedded {
 
     }
 
-
-    /**
-     * Set the <code>catalina.base</code> System property to the current
-     * working directory if it has not been set.
-     * @deprecated Use initDirs()
-     */
-    @Deprecated
-    public void setCatalinaBase() {
-        initDirs();
-    }
-
-    /**
-     * Set the <code>catalina.home</code> System property to the current
-     * working directory if it has not been set.
-     * @deprecated Use initDirs()
-     */
-    @Deprecated
-    public void setCatalinaHome() {
-        initDirs();
-    }
 
     /**
      * Start a new server instance.
