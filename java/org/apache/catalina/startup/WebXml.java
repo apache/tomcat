@@ -568,23 +568,18 @@ public class WebXml {
             wrapper.setServletClass(servlet.getServletClass());
             MultipartDef multipartdef = servlet.getMultipartDef();
             if (multipartdef != null) {
-                String location = multipartdef.getLocation();
-                if (location == null || location.length() == 0) {
-                    location = ((File) context.getServletContext().getAttribute(
-                            ServletContext.TEMPDIR)).getAbsolutePath();
-                }
                 if (multipartdef.getMaxFileSize() != null &&
                         multipartdef.getMaxRequestSize()!= null &&
                         multipartdef.getFileSizeThreshold() != null) {
-                    wrapper.setMultipartConfig(new MultipartConfigElement(
-                            location,
+                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
+                            multipartdef.getLocation(),
                             Long.parseLong(multipartdef.getMaxFileSize()),
                             Long.parseLong(multipartdef.getMaxRequestSize()),
                             Integer.parseInt(
                                     multipartdef.getFileSizeThreshold())));
                 } else {
-                    wrapper.setMultipartConfig(new MultipartConfigElement(
-                            location));
+                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
+                            multipartdef.getLocation()));
                 }
             }
             context.addChild(wrapper);

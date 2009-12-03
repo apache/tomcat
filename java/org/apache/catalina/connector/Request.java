@@ -2393,12 +2393,19 @@ public class Request
     public Collection<Part> getParts() throws IOException, IllegalStateException,
             ServletException {
         
-        MultipartConfigElement mce = getWrapper().getMultipartConfig();
+        MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
         if (mce == null) {
             return Collections.emptyList();
         }
         
-        File location = new File(mce.getLocation());
+        File location;
+        String locationStr = mce.getLocation();
+        if (locationStr == null || locationStr.length() == 0) {
+            location = ((File) context.getServletContext().getAttribute(
+                    ServletContext.TEMPDIR));
+        } else {
+            location = new File(locationStr);
+        }
         
         if (!location.isAbsolute() || !location.isDirectory()) {
             throw new IOException(
