@@ -184,7 +184,13 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                             new Class[] {long.class});
                     method.invoke(null, Long.valueOf(3600000));
                 } catch (ClassNotFoundException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                    if (System.getProperty("java.vendor").startsWith("Sun")) {
+                        log.error(sm.getString(
+                                "jreLeakListener.gcDaemonFail"), e);
+                    } else {
+                        log.debug(sm.getString(
+                                "jreLeakListener.gcDaemonFail"), e);
+                    }
                 } catch (SecurityException e) {
                     log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
                 } catch (NoSuchMethodException e) {
