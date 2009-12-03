@@ -340,12 +340,12 @@ public interface Wrapper extends Container {
      * multi-part configuration has been defined, then <code>null</code> will be
      * returned.
      */
-    public MultipartConfigElement getMultipartConfig();
+    public MultipartConfigElement getMultipartConfigElement();
     
     
     /**
      * Set the multi-part configuration for the associated servlet. To clear the
      * multi-part configuration specify <code>null</code> as the new value.
      */
-    public void setMultipartConfig(MultipartConfigElement multipartConfig);
+    public void setMultipartConfigElement(MultipartConfigElement multipartConfig);
 }
