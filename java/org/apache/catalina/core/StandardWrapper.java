@@ -44,6 +44,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
@@ -258,7 +259,7 @@ public class StandardWrapper
     /**
      * Multipart config
      */
-    protected MultipartConfigElement multipartConfig = null;
+    protected MultipartConfigElement multipartConfigElement = null;
 
     /**
      * Static class array used when the SecurityManager is turned on and 
@@ -1052,6 +1053,15 @@ public class StandardWrapper
                     (sm.getString("standardWrapper.instantiate", actualClass), e);
             }
 
+            if (multipartConfigElement == null) {
+                MultipartConfig annotation =
+                        servlet.getClass().getAnnotation(MultipartConfig.class);
+                if (annotation != null) {
+                    multipartConfigElement =
+                            new MultipartConfigElement(annotation);
+                }
+            }
+
             // Special handling for ContainerServlet instances
             if ((servlet instanceof ContainerServlet) &&
                   (isContainerProvidedServlet(actualClass) ||
@@ -1483,12 +1493,13 @@ public class StandardWrapper
         return classLoadTime;
     }
 
-    public MultipartConfigElement getMultipartConfig() {
-        return multipartConfig;
+    public MultipartConfigElement getMultipartConfigElement() {
+        return multipartConfigElement;
     }
 
-    public void setMultipartConfig(MultipartConfigElement multipartConfig) {
-        this.multipartConfig = multipartConfig;
+    public void setMultipartConfigElement(
+            MultipartConfigElement multipartConfigElement) {
+        this.multipartConfigElement = multipartConfigElement;
     }
 
     // -------------------------------------------------------- Package Methods
