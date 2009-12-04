@@ -52,7 +52,7 @@ public class WatchdogHttpClient {
             System.out.println( " Socket Exception: " + ex );
             return;
         }
-        //socket.setSoTimeout(10000);
+        //socket.setSoTimeout(2000);
         
         //socket obtained, rebuild the request.
         rebuildRequest(client, client.request, socket);
@@ -144,7 +144,6 @@ public class WatchdogHttpClient {
             // write the request
             out.write( reqbytes, 0, reqbytes.length );
             out.flush();
-            reqbuf = null;
         } catch ( Exception ex1 ) {
             System.out.println( " Error writing request " + ex1 );
                 if ( debug > 0 ) {
@@ -385,9 +384,9 @@ public class WatchdogHttpClient {
          * @exception IOException if an error occurs
          */
         private void fill() throws IOException {
-            if (markpos < 0)
+            if (markpos < 0) {
                 pos = 0;        /* no mark: throw away the buffer */
-            else if (pos >= buf.length)  /* no room left in buffer */
+            } else if (pos >= buf.length)  {/* no room left in buffer */
                 if (markpos > 0) {  /* can throw away early part of the buffer */
                     int sz = pos - markpos;
                     System.arraycopy(buf, markpos, buf, 0, sz);
@@ -404,10 +403,12 @@ public class WatchdogHttpClient {
                     System.arraycopy(buf, 0, nbuf, 0, pos);
                     buf = nbuf;
                 }
-                count = pos;
-                int n = in.read(buf, pos, buf.length - pos); 
-                if (n > 0)
+            }
+            count = pos;
+            int n = in.read(buf, pos, buf.length - pos); 
+            if (n > 0) {
                 count = n + pos;
+            }
         }
     }
     

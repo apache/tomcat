@@ -11,13 +11,13 @@ public class DefaultHttpConnector {
     }
 
     public synchronized static HttpConnector get() {
-        if (DefaultHttpConnector.defaultHttpConnector == null) {
-            DefaultHttpConnector.defaultHttpConnector = 
-                new HttpConnector(new SocketConnector());
+        if (DefaultHttpConnector.socketConnector == null) {
+            socketConnector = 
+                new SocketConnector();
         }
-        return DefaultHttpConnector.defaultHttpConnector;
+        return new HttpConnector(socketConnector);
     }
     
-    private static HttpConnector defaultHttpConnector;
+    private static SocketConnector socketConnector;
 
 }

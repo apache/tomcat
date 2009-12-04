@@ -18,6 +18,7 @@ package org.apache.tomcat.lite.http.services;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.apache.tomcat.lite.http.Http11Connection;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
@@ -43,7 +44,7 @@ public class EchoCallback implements HttpService {
         res.setContentType(contentType);
         
         IOBuffer tmp = new IOBuffer(null);
-        req.serialize(tmp);
+        Http11Connection.serialize(req, tmp);
         
         sproc.getOut().append("REQ HEAD:\n");
         sproc.getOut().append(tmp.readAll(null));

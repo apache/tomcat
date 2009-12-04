@@ -94,13 +94,12 @@ public class HttpsTest extends TestCase {
     }       
 
     
-    private void checkResponse(HttpConnector httpClient) throws Exception {
-        HttpChannel ch = httpClient.get("localhost", port);
-        ch.getRequest().setRequestURI("/hello");
-        ch.getRequest().setProtocol("HTTP/1.0");
-        // problems with keep alive !!!
-        ch.sendRequest();
-        BBuffer res = ch.readAll(null, 1000000);
+    private void checkResponse(HttpConnector httpCon) throws Exception {
+        HttpRequest ch = httpCon.request("localhost", port);
+        ch.setRequestURI("/hello");
+        ch.setProtocol("HTTP/1.0");
+        ch.send();
+        BBuffer res = ch.readAll();
         
         assertTrue(res.toString().indexOf("Hello") >= 0);
     }    
@@ -120,12 +119,11 @@ public class HttpsTest extends TestCase {
     public void testSimpleRequestGoogle() throws Exception {
         SslConnector sslCon = new SslConnector();
         httpClient = new HttpConnector(sslCon);
-        HttpChannel client = httpClient.get("www.google.com", 443);
-        client.getRequest().setRequestURI("/accounts/ServiceLogin");
-        client.sendRequest();
+        HttpRequest client = httpClient.request("www.google.com", 443);
+        client.setRequestURI("/accounts/ServiceLogin");
+        client.send();
         
-        BBuffer res = BBuffer.allocate(10000);
-        client.readAll(res, 1000000);
+        BBuffer res = client.readAll();
         assertTrue(res.toString().indexOf("<title>Google Accounts</title>") > 0);
     }
         

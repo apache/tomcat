@@ -33,8 +33,9 @@ public abstract class IOConnector {
         throws IOException; 
 
     // TODO: failures ? 
+    // TODO: use String target or url
     public abstract void connect(String host, int port, 
-                                      IOConnector.ConnectedCallback sc) throws IOException;
+            IOConnector.ConnectedCallback sc) throws IOException;
     
     public void stop() {
         
