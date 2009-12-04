@@ -149,9 +149,8 @@ public class DirContextURLConnection
                     if (contextName != null) {
                         if (!path.startsWith(contextName + "/")) {
                             return;
-                        } else {
-                            path = path.substring(contextName.length());
                         }
+                        path = path.substring(contextName.length());
                     }
                 }
                 object = context.lookup(path);
@@ -209,6 +208,7 @@ public class DirContextURLConnection
             try {
                 connect();
             } catch (IOException e) {
+                // Ignore
             }
         }
 
@@ -222,6 +222,7 @@ public class DirContextURLConnection
                 Date lmDate = (Date) lastModified.get();
                 return lmDate.getTime();
             } catch (Exception e) {
+                // Ignore
             }
         }
 
@@ -252,6 +253,7 @@ public class DirContextURLConnection
           try {
               connect();
           } catch (IOException e) {
+              //Ignore
           }
       }
 
@@ -296,6 +298,7 @@ public class DirContextURLConnection
             try {
                 connect();
             } catch (IOException e) {
+                // Ignore
             }
         }
         
@@ -352,11 +355,11 @@ public class DirContextURLConnection
     public Object getContent(Class[] classes)
         throws IOException {
         
-        Object object = getContent();
+        Object obj = getContent();
         
         for (int i = 0; i < classes.length; i++) {
-            if (classes[i].isInstance(object))
-                return object;
+            if (classes[i].isInstance(obj))
+                return obj;
         }
         
         return null;
@@ -376,12 +379,13 @@ public class DirContextURLConnection
         
         if (resource == null) {
             throw new FileNotFoundException();
-        } else {
-            // Reopen resource
-            try {
-                resource = (Resource) context.lookup(getURL().getFile());
-            } catch (NamingException e) {
-            }
+        }
+
+        // Reopen resource
+        try {
+            resource = (Resource) context.lookup(getURL().getFile());
+        } catch (NamingException e) {
+            // Ignore
         }
         
         return (resource.streamContent());
