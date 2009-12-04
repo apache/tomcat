@@ -421,8 +421,13 @@ public class DirContextURLConnection
         
         if (collection != null) {
             try {
+                String file = getURL().getFile();
+                // This will be of the form /<hostname>/<contextpath/file name
+                // Strip off the hostname and the contextpath
+                int start = file.indexOf('/', file.indexOf('/', 1) + 1);
+                
                 NamingEnumeration<NameClassPair> enumeration =
-                    context.list(getURL().getFile());
+                    context.list(file.substring(start));
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
                     result.addElement(ncp.getName());
