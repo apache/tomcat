@@ -108,25 +108,4 @@ public final class INVOKEINTERFACE extends InvokeInstruction {
         cs[ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length] = ExceptionConstants.UNSATISFIED_LINK_ERROR;
         return cs;
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitExceptionThrower(this);
-        v.visitTypedInstruction(this);
-        v.visitStackConsumer(this);
-        v.visitStackProducer(this);
-        v.visitLoadClass(this);
-        v.visitCPInstruction(this);
-        v.visitFieldOrMethod(this);
-        v.visitInvokeInstruction(this);
-        v.visitINVOKEINTERFACE(this);
-    }
 }

@@ -40,19 +40,4 @@ public class ATHROW extends Instruction implements UnconditionalBranch, Exceptio
             org.apache.tomcat.util.bcel.ExceptionConstants.THROWABLE
         };
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitUnconditionalBranch(this);
-        v.visitExceptionThrower(this);
-        v.visitATHROW(this);
-    }
 }
