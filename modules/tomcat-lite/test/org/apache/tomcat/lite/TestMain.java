@@ -19,6 +19,7 @@ import org.apache.tomcat.lite.http.DefaultHttpConnector;
 import org.apache.tomcat.lite.http.Dispatcher;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
+import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.BaseMapper.ContextMapping;
 import org.apache.tomcat.lite.http.HttpConnector.HttpChannelEvents;
 import org.apache.tomcat.lite.http.services.EchoCallback;
@@ -48,12 +49,12 @@ public class TestMain {
     public static HttpConnector testClient = DefaultHttpConnector.get();
     public static HttpConnector testServer = new HttpConnector(serverCon);
     public static HttpConnector testProxy = new HttpConnector(serverCon);
-    
+
     static Dispatcher mcb;
     static HttpProxyService proxy;
 
    
-    public static HttpConnector getTestServer() {
+    public static HttpConnector initTestEnv() {
         if (defaultServer == null) {
             defaultServer = new TestMain();
             defaultServer.run();
@@ -61,11 +62,17 @@ public class TestMain {
         return defaultServer.testServer;
     }
 
+    public static HttpConnector getClientAndInit() {
+        if (defaultServer == null) {
+            defaultServer = new TestMain();
+            defaultServer.run();
+        }
+        return defaultServer.testClient;
+    }
+
 
     public static void initTestCallback(Dispatcher d) {
         BaseMapper.ContextMapping mCtx = d.addContext(null, "", null, null, null, null);
-//      testServer.setDebugHttp(true);
-//      testServer.setDebug(true);
         
         d.addWrapper(mCtx, "/", new StaticContentService()
             .setContentType("text/html")
@@ -98,8 +105,8 @@ public class TestMain {
 
         BBuffer out = BBuffer.allocate();
 
-        HttpChannel aclient = DefaultHttpConnector.get().get(url);
-        aclient.sendRequest();
+        HttpRequest aclient = DefaultHttpConnector.get().request(url);
+        aclient.send();
         aclient.readAll(out, 
                 //Long.MAX_VALUE);//
                 2000000);
@@ -194,6 +201,8 @@ public class TestMain {
             testProxy.setPort(port);
 //            testProxy.setDebugHttp(true);
 //            testProxy.setDebug(true);
+//            testClient.setDebug(true);
+//            testClient.setDebugHttp(true);
 
             // dispatcher rejects 'http://'
             testProxy.setHttpService(proxy);
@@ -214,8 +223,9 @@ public class TestMain {
                 e.printStackTrace();
             }
             
-            port = basePort + 443;
-            
+//            testServer.setDebugHttp(true);
+//            testServer.setDebug(true);
+
         }   
         
         Runtime.getRuntime().addShutdownHook(new Thread() {

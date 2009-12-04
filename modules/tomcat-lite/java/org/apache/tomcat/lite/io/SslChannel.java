@@ -91,7 +91,7 @@ public class SslChannel extends IOChannel implements Runnable {
     
     
     @Override
-    public void setSink(IOChannel net) {
+    public void setSink(IOChannel net) throws IOException {
         try {
             initSsl();
             super.setSink(net);
@@ -223,13 +223,15 @@ public class SslChannel extends IOChannel implements Runnable {
         SSLEngineResult wrap = sslEngine.wrap(EMPTY, 
                 myNetOutData);
         myNetOutData.flip();
+        if (wrap.getStatus() != Status.CLOSED) {
+            System.err.println("Unexpected status " + wrap);
+        }
         net.getOut().write(myNetOutData);
         // TODO: timer to close socket if we don't get
         // clean close handshake
     }
     
     private synchronized void startRealSending() throws IOException {
-        IOBuffer netOut = net.getOut();
         while (true) {
         
             myAppOutData.compact();
@@ -411,6 +413,7 @@ public class SslChannel extends IOChannel implements Runnable {
     @Override
     public void handleReceived(IOChannel ch) throws IOException {
         processInput(net.getIn(), in);
+        // Maybe we don't have data - that's fine.
         sendHandleReceivedCallback();
     }
 

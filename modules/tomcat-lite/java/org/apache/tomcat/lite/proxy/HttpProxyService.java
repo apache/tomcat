@@ -106,7 +106,6 @@ public class HttpProxyService implements HttpService {
             serverNet.getOut().queue(OK);
             serverNet.startSending();
 
-            serverHttp.resetBuffers(); // no buffers
             serverHttp.release(); // no longer used
         }
     }
@@ -230,7 +229,7 @@ public class HttpProxyService implements HttpService {
         serverHttp.setDataReceivedCallback(copy);
         copy.handleReceived(serverHttp);
 
-        httpClient.sendRequest();
+        httpClient.send();
         
 
         //serverHttp.handleReceived(serverHttp.getSink());
@@ -280,7 +279,6 @@ public class HttpProxyService implements HttpService {
                 clientHttpReq.getHttpChannel().setDataReceivedCallback(copy);
                 copy.handleReceived(clientHttpReq.getHttpChannel());
 
-                serverHttp.sendHeaders();
                 serverHttp.startSending();
                 
                 

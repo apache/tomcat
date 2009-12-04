@@ -28,7 +28,7 @@ public class ProxyTest extends TestCase {
   String resStr;
     
   public void setUp() throws Exception {
-      TestMain.getTestServer();
+      TestMain.initTestEnv();
   }
   
   public void tearDown() throws IOException {

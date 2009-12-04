@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
+import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.BufferedIOReader;
 import org.apache.tomcat.lite.io.CBuffer;
@@ -346,11 +348,6 @@ public abstract class HttpMessage {
     public void setCommitted(boolean b) {
         commited = b;
     }
-
-    // Not used in coyote connector ( hack )
-    
-    public void sendHead() throws IOException {
-    }
     
     public HttpChannel getHttpChannel() {
         return httpCh;
@@ -382,6 +379,27 @@ public abstract class HttpMessage {
         return reader;
     }
     
+    public BBuffer readAll(BBuffer chunk, long to) throws IOException {
+        return httpCh.readAll(chunk, to);
+    }
+    
+    public BBuffer readAll() throws IOException {
+        return httpCh.readAll(null, httpCh.ioTimeout);
+    }
+    
+    /** 
+     * We're done with this object, it can be recycled.
+     * Any use after this should throw exception or affect an 
+     *  unrelated request.
+     */
+    public void release() throws IOException {
+        httpCh.release();
+    }
+
+    public void setCompletedCallback(RequestCompleted doneAllCallback) throws IOException {
+        httpCh.setCompletedCallback(doneAllCallback);
+    }
+    
     /** 
      * Returns a buffered reader. 
      */
@@ -395,26 +413,6 @@ public abstract class HttpMessage {
         return writer;
     }
     
-    //
-    public abstract void serialize(IOBuffer out) throws IOException;
-    
-    
-    public void serializeHeaders(IOBuffer rawSendBuffers2) throws IOException {
-        MultiMap mimeHeaders = getMimeHeaders();
-        
-        for (int i = 0; i < mimeHeaders.size(); i++) {
-            CBuffer name = mimeHeaders.getName(i);
-            CBuffer value = mimeHeaders.getValue(i);
-            if (name.length() == 0 || value.length() == 0) {
-                continue;
-            }
-            rawSendBuffers2.append(name);
-            rawSendBuffers2.append(HttpChannel.COLON);
-            rawSendBuffers2.append(value);
-            rawSendBuffers2.append(BBuffer.CRLF_BYTES);
-        }
-        rawSendBuffers2.append(BBuffer.CRLF_BYTES);
-    }
     
     protected void processMimeHeaders() {
         for (int idx = 0; idx < getMsgBytes().headerCount; idx++) {

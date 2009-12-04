@@ -64,29 +64,6 @@ public class HttpResponse extends HttpMessage {
         return status;
     }
 
-    public void sendHead() throws IOException {
-        httpCh.sendHeaders();
-    }
-
-    /** 
-     * Convert the response to bytes, ready to send.
-     */
-    public void serialize(IOBuffer rawSendBuffers2) throws IOException {
-        
-        rawSendBuffers2.append(protocol()).append(' ');
-        String status = Integer.toString(getStatus());   
-        rawSendBuffers2.append(status).append(' ');
-        if (getMessageBuffer().length() > 0) {
-            rawSendBuffers2.append(getMessage());
-        } else {
-            rawSendBuffers2
-                .append(getMessage(getStatus()));
-        }
-        rawSendBuffers2.append(BBuffer.CRLF_BYTES);
-        // Headers
-        super.serializeHeaders(rawSendBuffers2);
-    }
-
     public HttpRequest getRequest() {
         return getHttpChannel().getRequest();
     }
@@ -96,36 +73,12 @@ public class HttpResponse extends HttpMessage {
         protocol().set(getMsgBytes().protocol());                
         message.set(getMsgBytes().message());
         processMimeHeaders();
-        
-        
         // TODO: if protocol == 1.0 and we requested 1.1, downgrade getHttpChannel().pro
-        int status = 500;
         try {
             status = getStatus();
         } catch (Throwable t) {
             getHttpChannel().log.warning("Invalid status " + getMsgBytes().status() + " " + getMessage());
         }
-        HttpBody body = (HttpBody) getBody();
-        body.noBody = !hasBody();
-
-        // Will parse 'connection:close', set close on end
-        getHttpChannel().processConnectionHeader(getMimeHeaders());
-        
-        body.processContentDelimitation();
-        
-        if (body.statusDropsConnection(status)) {
-            getHttpChannel().closeStreamOnEnd("response status drops connection");
-        }
-        
-        if (body.isDone()) {
-            body.close();
-        }
-
-        if (!body.isContentDelimited()) {
-            getHttpChannel().closeStreamOnEnd("not content delimited");
-        }
-        
-        
     }
 
     /**
@@ -159,7 +112,7 @@ public class HttpResponse extends HttpMessage {
      *  Common messages are cached.
      *
      */
-    private BBucket getMessage( int status ) {
+    BBucket getMessage( int status ) {
         // method from Response.
 
         // Does HTTP requires/allow international messages or
@@ -174,10 +127,15 @@ public class HttpResponse extends HttpMessage {
         case 404:
             return st_404;
         }
-        return stats.get(status);
+        BBucket bb = stats.get(status);
+        if (bb == null) {
+            return st_unknown;
+        }
+        return bb;
     }
     
     
+    static BBucket st_unknown = BBuffer.wrapper("No Message");
     static BBucket st_200 = BBuffer.wrapper("OK");
     static BBucket st_302= BBuffer.wrapper("Moved Temporarily");
     static BBucket st_400= BBuffer.wrapper("Bad Request");

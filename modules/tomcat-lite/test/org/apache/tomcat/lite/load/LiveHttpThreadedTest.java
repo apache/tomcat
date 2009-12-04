@@ -25,11 +25,12 @@ import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.http.DefaultHttpConnector;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
+import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
 import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
 
 public class LiveHttpThreadedTest extends TestCase {
-  HttpConnector staticMain = TestMain.getTestServer();
+  HttpConnector staticMain = TestMain.initTestEnv();
   
   
   int tCount = 1;
@@ -104,13 +105,13 @@ public class LiveHttpThreadedTest extends TestCase {
   };
   
   void makeRequest(int i, boolean block) throws Exception {
-    HttpChannel cstate = DefaultHttpConnector.get().get("localhost", 8802);
+    HttpRequest cstate = DefaultHttpConnector.get().request("localhost", 8802);
     
-    cstate.getRequest().requestURI().set("/hello");
+    cstate.requestURI().set("/hello");
     cstate.setCompletedCallback(reqCallback);
     
     // Send the request, wait response
-    cstate.sendRequest();
+    cstate.send();
   }
   
 }

@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.tomcat.lite.http.HttpChannel.HttpService;
 import org.apache.tomcat.lite.http.MultiMap.Entry;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBuffer;
@@ -61,6 +62,8 @@ public class HttpRequest extends HttpMessage {
     boolean ssl = false;
     
     boolean async = false;
+
+    CBuffer requestURL = CBuffer.newInstance();
     
     private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -97,6 +100,7 @@ public class HttpRequest extends HttpMessage {
         schemeMB.recycle();
         methodMB.set("GET");
         requestURI.recycle();
+        requestURL.recycle();
         queryMB.recycle();
         decodedUriMB.recycle();
         
@@ -298,6 +302,30 @@ public class HttpRequest extends HttpMessage {
         return requestURI;
     }
     
+    public CBuffer requestURL() {
+        CBuffer url = requestURL;
+        url.recycle();
+        
+        String scheme = getScheme();
+        int port = getServerPort();
+        if (port < 0)
+            port = 80; // Work around java.net.URL bug
+
+        url.append(scheme);
+        url.append("://");
+        url.append(getServerName());
+        if ((scheme.equals("http") && (port != 80))
+            || (scheme.equals("https") && (port != 443))) {
+            url.append(':');
+            url.append(port);
+        }
+        // Decoded !!
+        url.append(getRequestURI());
+
+        return (url);
+
+    }
+
     /** 
      * Not decoded - %xx as in original.
      * @return
@@ -427,29 +455,33 @@ public class HttpRequest extends HttpMessage {
         this.localPort = port;
     }
     
-    public void sendHead() throws IOException {
-        httpCh.sendRequestHeaders(httpCh);
+    public HttpResponse waitResponse() throws IOException {
+        return waitResponse(httpCh.ioTimeout);
     }
 
-    /** 
-     * Convert the request to bytes, ready to send.
-     */
-    public void serialize(IOBuffer rawSendBuffers2) throws IOException {
-        rawSendBuffers2.append(method());
-        rawSendBuffers2.append(BBuffer.SP);
-
-        // TODO: encode or use decoded
-        rawSendBuffers2.append(requestURI());
-        if (queryString().length() > 0) {
-            rawSendBuffers2.append("?");
-            rawSendBuffers2.append(queryString());
+    public void send(HttpService headersCallback, long timeout) throws IOException {
+        if (headersCallback != null) {
+            httpCh.setHttpService(headersCallback);
         }
 
-        rawSendBuffers2.append(BBuffer.SP);
-        rawSendBuffers2.append(protocol());
-        rawSendBuffers2.append(BBuffer.CRLF_BYTES);
+        httpCh.send();
+    }
+    
+    public void send(HttpService headersCallback) throws IOException {
+        send(headersCallback, httpCh.ioTimeout);
+    }
+
+    public void send() throws IOException {
+        send(null, httpCh.ioTimeout);
+    }
+    
+    public HttpResponse waitResponse(long timeout) throws IOException {
+        // TODO: close out if post
+        httpCh.send();
         
-        super.serializeHeaders(rawSendBuffers2);
+        httpCh.headersReceivedLock.waitSignal(timeout);
+        
+        return httpCh.getResponse();
     }
 
     /**
@@ -467,10 +499,15 @@ public class HttpRequest extends HttpMessage {
         }
 
         BBuffer valueBC = hostHF.valueB;
+        if (valueBC == null) {
+            valueBC = BBuffer.allocate();
+            hostHF.getValue().toAscii(valueBC);
+        }
         byte[] valueB = valueBC.array();
         int valueL = valueBC.getLength();
         int valueS = valueBC.getStart();
-        int colonPos = -1;
+        
+        int colonPos = valueBC.indexOf(':', 0);
         
         serverNameMB.recycle();
 
@@ -492,10 +529,8 @@ public class HttpRequest extends HttpMessage {
 
         if (colonPos < 0) {
             if (!ssl) {
-                // 80 - Default HTTP port
                 setServerPort(80);
             } else {
-                // 443 - Default HTTPS port
                 setServerPort(443);
             }
         } else {
@@ -823,6 +858,7 @@ public class HttpRequest extends HttpMessage {
 
         // URL decode and normalize
         decodedUri.append(getMsgBytes().url());
+        
         getURLDecoder().urlDecode(decodedUri, false); 
         
         // Need to normalize again - %decoding may decode /
@@ -833,47 +869,8 @@ public class HttpRequest extends HttpMessage {
         }
         decodedURI().set(decodedUri);
 
-        httpCh.processProtocol();
-
         // default response protocol
         httpCh.getResponse().protocol().set(getMsgBytes().protocol());            
-
-        // requested connection:close/keepAlive and proto
-        httpCh.processConnectionHeader(getMimeHeaders());
-
-        httpCh.processExpectation();
-
-        httpCh.receiveBody.processContentDelimitation();
-        // Spec: 
-        // The presence of a message-body in a request is signaled by the 
-        // inclusion of a Content-Length or Transfer-Encoding header field in 
-        // the request's message-headers
-        // Server should read - but ignore
-
-        httpCh.receiveBody.noBody = !httpCh.receiveBody.isContentDelimited();
-
-        httpCh.receiveBody.updateCloseOnEnd();
-
-        /*
-         * The presence of a message-body in a request is signaled by the 
-         * inclusion of a Content-Length or Transfer-Encoding header field in 
-         * the request's message-headers. A message-body MUST NOT be included 
-         * in a request if the specification of the request method 
-         * (section 5.1.1) does not allow sending an entity-body in requests. 
-         * A server SHOULD read and forward a message-body on any request; if the request method does not include defined semantics for an entity-body, then the message-body SHOULD be ignored when handling the request.
-         */
-        if (!httpCh.receiveBody.isContentDelimited()) {
-            // No body
-            httpCh.getIn().close();
-        } 
-
-        CBuffer valueMB = getMimeHeaders().getHeader("host");
-        // Check host header
-//        if (httpCh.http11 && (valueMB == null)) {
-//            httpCh.error = true;
-//            // 400 - Bad request
-//            httpCh.getResponse().setStatus(400);
-//        }
     }
 
     
@@ -977,4 +974,13 @@ public class HttpRequest extends HttpMessage {
         return bb;
     }
 
+    public String toString() {
+        IOBuffer out = new IOBuffer();
+        try {
+            Http11Connection.serialize(this, out);
+            return out.readAll(null).toString();
+        } catch (IOException e) {
+            return "Invalid request";
+        }
+    }
 }

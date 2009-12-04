@@ -162,6 +162,12 @@ public class CBuffer extends CBucket implements Cloneable,
         return this;
     }
 
+    public CBuffer append(int i) {
+        // TODO: can be optimizeed...
+        append(Integer.toString(i));
+        return this;
+    }
+
     /**
      * Add data to the buffer
      */
@@ -261,7 +267,13 @@ public class CBuffer extends CBucket implements Cloneable,
         return this;
     }
     
-    
+
+    public void toAscii(BBuffer bb) {
+        for (int i = start; i < end; i++) {
+            bb.append(value[i]);
+        }
+    }
+
     /**
      *  Append and advance CharBuffer.
      * 
