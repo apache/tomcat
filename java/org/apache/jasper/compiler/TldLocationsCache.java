@@ -166,6 +166,7 @@ public class TldLocationsCache {
         noTldJars.add("dnsns.jar");
         noTldJars.add("tools.jar");
         noTldJars.add("sunpkcs11.jar");
+        noTldJars.add("sunec.jar");
         // Apple J2SE runtime
         noTldJars.add("apple_provider.jar");
         noTldJars.add("AppleScriptEngine.jar");
