@@ -64,11 +64,12 @@ public class Http11Connection extends HttpConnection {
     
     public Http11Connection(HttpConnector httpConnector) {
         this.httpConnector = httpConnector;
-        debug = true; //httpConnector.debug;
+        if (httpConnector != null) {
+            debug = httpConnector.debugHttp;
+        }
     }
 
     public void beforeRequest() {
-        log.info("Before request");
         activeHttp = null;
         endSent = false;
         keepAlive = true;
@@ -269,8 +270,9 @@ public class Http11Connection extends HttpConnection {
     }
 
     void closeStreamOnEnd(String cause) {
-        if (debug) 
+        if (debug) {
             log.info("Not reusing connection because: " + cause);
+        }
         keepAlive = false;
     }
 
@@ -411,7 +413,7 @@ public class Http11Connection extends HttpConnection {
             } 
 
         } else {
-            receiveBodyState.noBody = http.getResponse().hasBody();
+            receiveBodyState.noBody = !http.getResponse().hasBody();
             
             updateKeepAlive(http.getResponse().getMimeHeaders(), false);
             
@@ -751,6 +753,12 @@ public class Http11Connection extends HttpConnection {
                 http.getRequest());
 
 
+        CBuffer method = http.getRequest().method();
+        if (method.equals("GET") || method.equals("HEAD")) {
+            // TODO: add the others
+            sendBodyState.noBody = true;
+        }
+        
         // 1.0: The presence of an entity body in a request is signaled by 
         // the inclusion of a Content-Length header field in the request 
         // message headers. HTTP/1.0 requests containing an entity body 
@@ -953,13 +961,14 @@ public class Http11Connection extends HttpConnection {
         // ( like 'upgrade')
 
         CBuffer value = headers.getHeader(CONNECTION);
-        String conHeader = (value == null) ? null : value.toString();
-        if (conHeader != null) {
-            if (CLOSE.equalsIgnoreCase(conHeader)) {
+        // TODO: split it by space
+        if (value != null) {
+            value.toLower();
+            if (value.indexOf(CLOSE) >= 0) {
                 // 1.1 ( but we accept it for 1.0 too )
                 closeStreamOnEnd("connection close");
             }
-            if (http10 && conHeader.indexOf(KEEPALIVE_S) < 0) {
+            if (http10 && value.indexOf(KEEPALIVE_S) < 0) {
                 // Keep-Alive required for http/1.0
                 closeStreamOnEnd("connection != keep alive");
             }
@@ -1362,6 +1371,7 @@ public class Http11Connection extends HttpConnection {
             chunked = false;
             remaining = 0; 
             contentLength = -1;
+            noBody = false;
         }
         public boolean isContentDelimited() {
             return chunked || contentLength >= 0;
