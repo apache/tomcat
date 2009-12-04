@@ -40,18 +40,4 @@ public class FLOAD extends LoadInstruction {
     public FLOAD(int n) {
         super(org.apache.tomcat.util.bcel.Constants.FLOAD, org.apache.tomcat.util.bcel.Constants.FLOAD_0, n);
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        super.accept(v);
-        v.visitFLOAD(this);
-    }
 }

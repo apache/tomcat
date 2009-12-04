@@ -278,13 +278,4 @@ public class InstructionHandle implements java.io.Serializable {
         }
         return attributes.values();
     }
-
-
-    /** Convenience method, simply calls accept() on the contained instruction.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        instruction.accept(v);
-    }
 }

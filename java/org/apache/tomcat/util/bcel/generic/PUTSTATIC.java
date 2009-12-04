@@ -55,25 +55,4 @@ public class PUTSTATIC extends FieldInstruction implements ExceptionThrower, Pop
         cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length] = ExceptionConstants.INCOMPATIBLE_CLASS_CHANGE_ERROR;
         return cs;
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitExceptionThrower(this);
-        v.visitStackConsumer(this);
-        v.visitPopInstruction(this);
-        v.visitTypedInstruction(this);
-        v.visitLoadClass(this);
-        v.visitCPInstruction(this);
-        v.visitFieldOrMethod(this);
-        v.visitFieldInstruction(this);
-        v.visitPUTSTATIC(this);
-    }
 }

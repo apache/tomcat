@@ -511,17 +511,6 @@ public abstract class Instruction implements Cloneable, Serializable {
     }
 
 
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public abstract void accept( Visitor v );
-
-
     /** Get Comparator object used in the equals() method to determine
      * equality of instructions.
      *
