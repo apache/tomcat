@@ -446,7 +446,7 @@ public class WebXml {
 
     // Attributes not defined in web.xml or web-fragment.xml
     
-    // URL of web-fragment
+    // URL of JAR / exploded JAR for this web-fragment
     private URL uRL = null;
     public void setURL(URL url) { this.uRL = url; }
     public URL getURL() { return uRL; }
