@@ -2,7 +2,10 @@
  */
 package org.apache.tomcat.lite.io;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 // TODO: dump to a file, hex, etc.
 /**
@@ -12,6 +15,7 @@ public class DumpChannel extends IOChannel {
     
     IOBuffer in = new IOBuffer(this);
     IOBuffer out = new IOBuffer(this);
+    static final boolean dumpToFile = false;
     
     public DumpChannel(String id) {
         this.id = id;
@@ -65,7 +69,9 @@ public class DumpChannel extends IOChannel {
         }
     }
     
-    private void out(String dir, BBucket first, boolean closed) {
+    static int did = 0;
+    
+    protected void out(String dir, BBucket first, boolean closed) {
         // Dump
         if (first != null) {
             String hd = Hex.getHexDump(first.array(), first.position(), 
@@ -76,8 +82,17 @@ public class DumpChannel extends IOChannel {
                     hd);
         } else {
             System.err.println("\n" + dir + ": " + id + " " +
-                    (closed ? "CLS" : "") +
+                    (closed ? "CLS " : "") +
                      "END\n"); 
+        }
+        if (dumpToFile && first != null) {
+            try {
+                OutputStream os = new FileOutputStream("dmp" + did++);
+                os.write(first.array(), first.position(), first.remaining());
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } 
         }
     }
     

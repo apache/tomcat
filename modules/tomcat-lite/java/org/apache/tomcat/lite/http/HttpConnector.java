@@ -15,10 +15,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
+import org.apache.tomcat.lite.http.SpdyConnection.SpdyConnectionManager;
+import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.BBucket;
+import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
+import org.apache.tomcat.lite.io.IOConnector.DataReceivedCallback;
 
 /**
  * Manages HttpChannels and associated socket pool.
@@ -41,6 +45,8 @@ public class HttpConnector {
         public void onDestroy(HttpChannel ch, HttpConnector con) throws IOException;
     }
     
+    HttpConnectionManager conManager = new HttpConnectionManager();
+    
     private static Logger log = Logger.getLogger("HttpConnector");
     private int maxHttpPoolSize = 20;
     
@@ -49,7 +55,7 @@ public class HttpConnector {
     
     private Queue<HttpChannel> httpChannelPool = new ConcurrentLinkedQueue<HttpChannel>();
 
-    private IOConnector ioConnector;
+    protected IOConnector ioConnector;
     
     boolean debugHttp = false;
     boolean debug = false;
@@ -67,8 +73,13 @@ public class HttpConnector {
     public AtomicInteger reusedChannels = new AtomicInteger();
 
     public ConnectionPool cpool = new ConnectionPool();
-    
         
+    // Host + context mapper.
+    Dispatcher dispatcher;
+    protected HttpService defaultService;
+    int port = 8080;
+    
+    
     public HttpConnector(IOConnector ioConnector) {
         this.ioConnector = ioConnector;
         dispatcher = new Dispatcher();
@@ -152,19 +163,30 @@ public class HttpConnector {
     }
 
     public HttpChannel get(String host, int port) throws IOException {
-        HttpChannel http = get(false, host, port);
-        http.setTarget(host, port);
+        HttpChannel http = get(false);
+        http.setTarget(host + ":" + port);
         return http;
     }
     
     public HttpChannel getServer() {
         try {
-            return get(true, null, 0);
+            return get(true);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
+    }
+
+    public HttpRequest request(String host, int port) throws IOException {
+        HttpChannel http = get(false);
+        http.setTarget(host + ":" + port);
+        return http.getRequest();
+        
+    }
+
+    public HttpRequest request(CharSequence urlString) throws IOException {
+        return get(urlString).getRequest();
     }
     
     /**
@@ -183,15 +205,15 @@ public class HttpConnector {
             port = secure ? 443: 80;
         }
         // TODO: insert SSL filter
-        HttpChannel http = get(false, host, port);
-        http.setTarget(host, port);
+        HttpChannel http = get(false);
+        http.setTarget(host + ":" + port);
         String path = url.getFile(); // path + qry
         // TODO: query string
         http.getRequest().requestURI().set(path);
         return http;
     }
     
-    protected HttpChannel get(boolean server, CharSequence host, int port) throws IOException {
+    protected HttpChannel get(boolean server) throws IOException {
         HttpChannel processor = null;
         synchronized (httpChannelPool) {
             processor = httpChannelPool.poll();
@@ -210,8 +232,7 @@ public class HttpConnector {
         }
         processor.serverMode(server);
         if (debug) {
-            log.info((reuse ? "REUSE ": "Create ")
-                    + host + ":" + port + 
+            log.info((reuse ? "REUSE ": "Create ") +
                     (server? " S" : "")
                     + " id=" + processor.ser + 
                     " " + processor +
@@ -238,75 +259,8 @@ public class HttpConnector {
                                 boolean keepOpen) 
             throws IOException {
         // Now handle net - note that we could have reused the async object
-        if (serverMode) {
-            BBucket first = ch.getIn().peekFirst();
-            if (first != null) {
-                HttpChannel http = getServer();
-                if (debug) {
-                    http.trace("PIPELINED request " + first + " " + http.httpService); 
-                }
-                http.setChannel(ch);
-                http.setHttpService(defaultService);
-                
-                // In case it was disabled
-                if (ch != null) {
-                    if (ch.isOpen()) {
-                        ch.readInterest(true);
-                    }
-                    // Notify that data was received. The callback must deal with
-                    // pre-existing data.
-                    ch.sendHandleReceivedCallback();
-                }
-                http.handleReceived(http.getSink());
-                return;
-            }
-        }
-        if (serverMode && !serverKeepAlive) {
-            keepOpen = false;
-        }
-        if (!serverMode && !clientKeepAlive) {
-            keepOpen = false;
-        }
         
 
-        if (keepOpen) {
-            // reuse the socket
-            if (serverMode) {
-                if (debug) {
-                    log.info(">>> server socket KEEP_ALIVE " + ch.getTarget() + 
-                            " " + ch);
-                }
-                ch.readInterest(true);
-                ch.setDataReceivedCallback(receiveCallback);
-                ch.setDataFlushedCallback(null);
-                
-                cpool.returnChannel(ch);
-                // TODO: timeout event to close it
-                //                ch.setTimer(10000, new Runnable() {
-                //                    @Override
-                //                    public void run() {
-                //                        System.err.println("Keep alive timeout");
-                //                    }
-                //                });
-            } else {
-                if (debug) {
-                    log.info(">>> client socket KEEP_ALIVE " + ch.getTarget() + 
-                            " " + ch);
-                }
-                ch.readInterest(true);
-                ch.setDataReceivedCallback(clientReceiveCallback);
-                ch.setDataFlushedCallback(null);
-                
-                cpool.returnChannel(ch);
-            }
-        } else { 
-            if (debug) {
-                log.info("--- Close socket, no keepalive " + ch);
-            }
-            if (ch != null) {
-                ch.close();
-            }
-        }
     }
     
     protected void returnToPool(HttpChannel http) throws IOException {
@@ -321,7 +275,7 @@ public class HttpConnector {
         
         // No more data - release the object
         synchronized (httpChannelPool) {
-            http.resetBuffers();
+            http.setConnection(null);
             http.setConnector(null);
             if (httpChannelPool.contains(http)) {
                 System.err.println("dup ? ");                
@@ -341,11 +295,6 @@ public class HttpConnector {
         return ioConnector;
     }
     
-    // Host + context mapper.
-    Dispatcher dispatcher;
-    HttpService defaultService;
-    int port = 8080;
-    
     
     public void setHttpService(HttpService s) {
         defaultService = s;
@@ -353,7 +302,7 @@ public class HttpConnector {
     
     public void start() throws IOException {
         if (ioConnector != null) {
-            ioConnector.acceptor(new AcceptorCallback(this, defaultService), 
+            ioConnector.acceptor(new AcceptorCallback(), 
                     Integer.toString(port), null);
         }
     }
@@ -369,85 +318,214 @@ public class HttpConnector {
         }
     }
     
-    private static class AcceptorCallback implements IOConnector.ConnectedCallback {
+    protected void connectAndSend(HttpChannel httpCh) throws IOException {
+        String target = httpCh.getTarget();
+        // TODO: SSL 
+        HttpConnection ch = cpool.getChannel(target);
+
+        if (ch == null) {
+            if (debug) {
+                httpCh.trace("HTTP_CONNECT: New connection " + target);
+            }
+            IOConnector.ConnectedCallback connected =
+                new HttpConnectedCallback(this, httpCh);
+            
+            // will call sendRequestHeaders
+            String[] hostPort = target.split(":");
+            int targetPort = hostPort.length > 1 ? 
+                    Integer.parseInt(hostPort[1]) : 80;
+            getIOConnector().connect(hostPort[0], targetPort,
+                    connected);
+        } else {
+            if (debug) {
+                httpCh.trace("HTTP_CONNECT: Reuse connection " + target + " " + this);
+            }
+            // TODO retry if closed
+            ch.beforeRequest();
+            httpCh.setConnection(ch);
+            ch.sendRequest(httpCh);
+        }
+    }
+    
+    static class HttpConnectedCallback implements IOConnector.ConnectedCallback {
         HttpConnector httpCon;
-        HttpService callback;
+        HttpChannel httpCh;
         
-        public AcceptorCallback(HttpConnector asyncHttpConnector,
-                HttpService headersReceived) {
-            this.httpCon = asyncHttpConnector;
-            this.callback = headersReceived;
+        public HttpConnectedCallback(HttpConnector httpConnector,
+                HttpChannel httpCh2) {
+            this.httpCh = httpCh2;
+            this.httpCon = httpConnector;
         }
 
         @Override
-        public void handleConnected(IOChannel accepted) throws IOException {
-            HttpChannel shttp = httpCon.getServer();
-            if (callback != null) {
-                shttp.setHttpService(callback);
-            }
+        public void handleConnected(IOChannel ch) throws IOException {
             if (httpCon.debugHttp) {
-                IOChannel ch = new DumpChannel("");
-                accepted.addFilterAfter(ch);
-                shttp.setChannel(ch);
-            } else {
-                shttp.setChannel(accepted);
+                IOChannel ch1 = new DumpChannel("");
+                ch.addFilterAfter(ch1);
+                ch = ch1;                        
             }
-            // TODO: JSSE filter
-            
-
-            // Will read any data in the channel.
-            
-            accepted.handleReceived(accepted);
+            httpCon.handleConnected(ch, httpCh);
         }
+    }
 
+    HttpConnection newConnection() {
+        return conManager.newConnection(this);
     }
 
 
-    private IOConnector.DataReceivedCallback receiveCallback = 
-        new IOConnector.DataReceivedCallback() {
-        /** For keepalive - for server
-         * 
-         * @param peer
-         * @throws IOException
-         */
+    private class AcceptorCallback implements IOConnector.ConnectedCallback {
         @Override
-        public void handleReceived(IOChannel net) throws IOException {
-            cpool.stopKeepAlive(net);
-            if (!net.isOpen()) {
-                return;
-            }
-            HttpChannel shttp = getServer();
-            shttp.setChannel(net);
-            shttp.setHttpService(defaultService);
-            net.sendHandleReceivedCallback();
+        public void handleConnected(IOChannel accepted) throws IOException {
+            System.err.println("ACCEPTED " + accepted);
+            handleAccepted(accepted);
         }
-    };
+    }
 
+    public HttpConnection handleAccepted(IOChannel accepted) throws IOException {
+        // TODO: reuse
+        HttpConnection shttp = newConnection();
+        shttp.serverMode = true;
 
-    // Sate-less, just closes the net.
-    private IOConnector.DataReceivedCallback clientReceiveCallback = 
-        new IOConnector.DataReceivedCallback() {
-        
-        @Override
-        public void handleReceived(IOChannel net) throws IOException {
-            if (!net.isOpen()) {
-                cpool.stopKeepAlive(net);
-                return;
-            }
-            log.warning("Unexpected message from server in client keep alive " 
-                    + net.getIn());
-            if (net.isOpen()) {
-                net.close();
-            }
+        if (debugHttp) {
+            log.info("Accepted " + accepted.getFirst().getPort(true));
+            IOChannel ch = new DumpChannel("");
+            accepted.addFilterAfter(ch);
+            shttp.setSink(ch);
+        } else {
+            shttp.setSink(accepted);
         }
+        // TODO: JSSE filter
         
-    };
+
+        // Will read any data in the channel.
+        
+        accepted.handleReceived(accepted);
+        return shttp;
+    }
 
     public HttpConnector setPort(int port2) {
         this.port = port2;
         return this;
     }
     
+    public void handleConnected(IOChannel net, HttpChannel httpCh) 
+            throws IOException {
+        if (!net.isOpen()) {
+            httpCh.abort("Can't connect");
+            return;
+        }
+        HttpConnection httpStream = newConnection();
+        httpStream.setSink(net);
+
+        // TODO: add it to the cpool
+        httpCh.setConnection(httpStream);
+        
+        httpStream.sendRequest(httpCh);
+    }
+
+    public static class HttpConnectionManager {
+        public HttpConnection newConnection(HttpConnector con) {
+            return new Http11Connection(con);
+        }
+        
+        public HttpConnection getFromPool(RemoteServer t) {
+            return t.connections.remove(t.connections.size() - 1);            
+        }
+    }
+    
+    /**
+     * Actual HTTP/1.1 wire protocol. 
+     *  
+     */
+    public static class HttpConnection extends IOChannel
+        implements DataReceivedCallback
+    {
+        protected HttpConnector httpConnector;
+        protected boolean serverMode;
+
+        protected BBuffer headRecvBuf = BBuffer.allocate(8192);
+        
+
+        @Override
+        public void handleReceived(IOChannel ch) throws IOException {
+            dataReceived(ch.getIn());
+        }
+
+        protected HttpChannel checkHttpChannel() throws IOException {
+            return null;
+        }
+        
+        /** 
+         * Called before a new request is sent, on a channel that is 
+         * reused.
+         */
+        public void beforeRequest() {
+        }
+
+        public void setSink(IOChannel ch) throws IOException {
+            this.net = ch;
+            ch.setDataReceivedCallback(this);
+            ch.setDataFlushedCallback(this);
+            // we may have data in the buffer;
+            handleReceived(ch);
+        }
+
+
+        /** 
+         * Incoming data.
+         */
+        public void dataReceived(IOBuffer iob) throws IOException {
+            
+        }
+        
+        /** 
+         * Framing error, client interrupt, etc.
+         */
+        public void abort(HttpChannel http, String t) throws IOException {
+        }
+        
+        protected void sendRequest(HttpChannel http) 
+            throws IOException {
+        }
+        
+        protected void sendResponseHeaders(HttpChannel http) 
+            throws IOException {
+        }
+
+        public void startSending(HttpChannel http) throws IOException {
+        }
+
+        @Override
+        public IOBuffer getIn() {
+            return net.getIn();
+        }
+
+        @Override
+        public IOBuffer getOut() {
+            return net.getOut();
+        }
+
+        @Override
+        public void startSending() throws IOException {
+        }
+        
+        /** Called when the outgoing stream is closed:
+         * - by an explicit call to close()
+         * - when all content has been sent. 
+         */
+        protected void outClosed(HttpChannel http) throws IOException {
+        }
+
+        protected void endSendReceive(HttpChannel httpChannel) throws IOException {
+            return;
+        }
+
+        public void withExtraBuffer(BBuffer received) {
+            return;
+        }
+        
+    }
+
     /** 
      * Connections for one remote host.
      * This should't be restricted by IP:port or even hostname,
@@ -455,10 +533,9 @@ public class HttpConnector {
      */
     public static class RemoteServer {
         public ConnectionPool pool;
-        public ArrayList<IOChannel> connections = new ArrayList<IOChannel>();
+        public ArrayList<HttpConnection> connections = new ArrayList<HttpConnection>();
     }
 
-    
     // TODO: add timeouts, limits per host/total, expire old entries 
     // TODO: discover apr and use it
     
@@ -510,7 +587,7 @@ public class HttpConnector {
          * are connected to equivalent servers ( LB ) 
          * @throws IOException 
          */
-        public IOChannel getChannel(CharSequence key) throws IOException {
+        public HttpConnection getChannel(CharSequence key) throws IOException {
             RemoteServer t = null;
             synchronized (hosts) {
                 t = hosts.get(key);
@@ -519,32 +596,23 @@ public class HttpConnector {
                     return null;
                 }
             }
-            IOChannel res = null;
+            HttpConnection res = null;
             synchronized (t) {
                 if (t.connections.size() == 0) {
                     misses.incrementAndGet();
-                    hosts.remove(key); 
                     return null;
                 } // one may be added - no harm.
-                res = t.connections.remove(t.connections.size() - 1);
-
-                if (t.connections.size() == 0) {
-                    hosts.remove(key); 
-                } 
-                if (res == null) {
-                    log.fine("Null connection ?");
-                    misses.incrementAndGet();
-                    return null;
-                }
+                
+                res = conManager.getFromPool(t);
                 
                 if (!res.isOpen()) {
                     res.setDataReceivedCallback(null);
                     res.close();
                     log.fine("Already closed " + res);
-                    //res.keepAliveServer = null;
                     res = null;
+                    misses.incrementAndGet();
+                    return null;
                 }
-                
                 waitingSockets.decrementAndGet();
             }
             hits.incrementAndGet();
@@ -557,7 +625,7 @@ public class HttpConnector {
         /**
          * Must be called in IOThread for the channel
          */
-        public void returnChannel(IOChannel ch) 
+        public void returnChannel(HttpConnection ch) 
                 throws IOException {
             CharSequence key = ch.getTarget(); 
             if (key == null) {
@@ -595,10 +663,7 @@ public class HttpConnector {
             
             ch.ts = System.currentTimeMillis();
             synchronized (t) {
-                // sdata.keepAliveServer = t;
                 t.connections.add(ch);      
-                //sdata.ch.setDataCallbacks(readable, null, cc);
-                ch.readInterest(true);
             }
         }
         
@@ -621,5 +686,11 @@ public class HttpConnector {
                 }
             }
         }
+    }
+
+    public HttpConnector withConnectionManager(
+            HttpConnectionManager connectionManager) {
+        this.conManager = connectionManager;
+        return this;
     }
 }

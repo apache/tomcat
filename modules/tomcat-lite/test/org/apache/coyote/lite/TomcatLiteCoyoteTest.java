@@ -64,7 +64,7 @@ public class TomcatLiteCoyoteTest extends TestCase {
         HttpConnector clientCon = DefaultHttpConnector.get();
         HttpChannel ch = clientCon.get("localhost", 8885);
         ch.getRequest().setRequestURI("/examples/servlets/servlet/HelloWorldExample");
-        ch.sendRequest();
+        ch.getRequest().send();
         BBuffer res = ch.readAll(null, 0);
         
         assertTrue(res.toString().indexOf("<title>Hello World!</title>") >= 0);

@@ -158,7 +158,7 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
         }
     }
 
-    public void setSink(IOChannel previous) {
+    public void setSink(IOChannel previous) throws IOException {
         this.net = previous;
     }
 
@@ -170,8 +170,9 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     
     /** 
      * Called to add an filter _after_ the current channel.
+     * @throws IOException 
      */
-    public IOChannel addFilterAfter(IOChannel next) {
+    public IOChannel addFilterAfter(IOChannel next) throws IOException {
         this.app = next;
         app.setSink(this);
 
@@ -182,6 +183,9 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
 
         dataReceivedCallback = null;
         dataFlushedCallback = null;
+        
+        // we may have data in our buffers
+        next.handleReceived(this);
         return this;
     }
 

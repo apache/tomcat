@@ -330,11 +330,11 @@ public class BBuffer implements Cloneable, Serializable,
         return true;
     }
 
-    public byte get(int off) {
+    public int get(int off) {
         if (start + off >= end) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        return buff[start + off];
+        return buff[start + off] & 0xFF;
     }
 
     /** 
@@ -495,7 +495,10 @@ public class BBuffer implements Cloneable, Serializable,
 //        }
 //        return true;
 //    }
-
+    public int indexOf(String src) {
+        return indexOf(src, 0, src.length(), 0);
+    }
+    
     public int indexOf(String src, int srcOff, int srcLen, int myOff) {
         char first = src.charAt(srcOff);
 
@@ -635,7 +638,9 @@ public class BBuffer implements Cloneable, Serializable,
         return start;
     }
 
-    
+    public void advance(int len) {
+        start += len;
+    }
 
     @Override
     public void position(int newStart) {
@@ -645,6 +650,11 @@ public class BBuffer implements Cloneable, Serializable,
     public void put(byte b) {
         makeSpace(1);
         buff[end++] = b;
+    }
+
+    public void putByte(int b) {
+        makeSpace(1);
+        buff[end++] = (byte) b;
     }
 
     public int read(BBuffer res) {
@@ -899,19 +909,17 @@ public class BBuffer implements Cloneable, Serializable,
         }
     }
 
-    public int substract() {
-
-        if ((end - start) == 0) {
+    public int read() {
+        if (end  == start) {
             return -1;
         }
-
         return (buff[start++] & 0xFF);
 
     }
 
     public int substract(BBuffer src) {
 
-        if ((end - start) == 0) {
+        if (end == start) {
             return -1;
         }
 
@@ -945,7 +953,7 @@ public class BBuffer implements Cloneable, Serializable,
     public String toString(String enc) {
         if (null == buff) {
             return null;
-        } else if (end - start == 0) {
+        } else if (end == start) {
             return "";
         }
         
@@ -1188,6 +1196,6 @@ public class BBuffer implements Cloneable, Serializable,
             super.setBytesInternal(b, off, len);
         }
     }
-    
+
     
 }

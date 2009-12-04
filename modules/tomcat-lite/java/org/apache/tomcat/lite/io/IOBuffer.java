@@ -63,7 +63,6 @@ public class IOBuffer {
     
     // ===== Buffer access =====
     
-    BBucket first;
     
     /**
      * Return first non-empty buffer.
@@ -88,7 +87,6 @@ public class IOBuffer {
                     buffers.removeFirst();
                     o = (buffers.size() == 0) ? null : buffers.getFirst();                    
                 } else {
-                    first = o;
                     return o;
                 }
             }
@@ -103,7 +101,18 @@ public class IOBuffer {
     
 
     public void advance(int len) {
-        first.position(first.position() + len);
+        while (len > 0) {
+            BBucket first = peekFirst();
+            if (first == null) {
+                return;
+            }
+            if (len > first.remaining()) {
+                len -= first.remaining();
+                first.position(first.limit());
+            } else {
+                first.position(first.position() + len);                
+            }
+        }
     }
 
     public void queue(String s) throws IOException {
@@ -250,16 +259,21 @@ public class IOBuffer {
     // =================== Helper methods ==================
 
     /**
-     * Non-blocking.
+     * Non-blocking read.
+     * 
+     * @return -1 if EOF, -2 if no data available, or 0..255 for normal read.
      */
     public int read() throws IOException {
+        if (isClosedAndEmpty()) {
+            return -1;
+        }
         BBucket bucket = peekFirst();
         if (bucket == null) {
-            return -1;
+            return -2;
         }
         int res = bucket.array()[bucket.position()];
         bucket.position(bucket.position() + 1);
-        return res;
+        return res & 0xFF;
     }
     
     public int peek() throws IOException {
@@ -348,6 +362,16 @@ public class IOBuffer {
         
     }
 
+    public int read(BBuffer bb, int len) throws IOException {
+        bb.makeSpace(len);
+        int rd = read(bb.array(), bb.limit(), len);
+        if (rd < 0) {
+            return rd;
+        }
+        bb.limit(bb.limit() + rd);
+        return rd;
+    }
+    
     /**
      * Non-blocking read.
      */
@@ -478,23 +502,35 @@ public class IOBuffer {
                 cs.remaining());
     }
     
+    /**
+     *  Append a buffer. The buffer will not be modified.
+     */
     public IOBuffer append(BBucket cs) throws IOException {
         append(cs.array(), cs.position(), cs.remaining());
         return this;
     }
-    
+
+    /**
+     *  Append a buffer. The buffer will not be modified.
+     */
+    public IOBuffer append(BBucket cs, int len) throws IOException {
+        append(cs.array(), cs.position(), len);
+        return this;
+    }
+
     public IOBuffer append(IOBuffer cs) throws IOException {
         for (int i = 0; i < cs.getBufferCount(); i++) {
-            Object o = cs.peekBucket(i);
-            if (o instanceof BBucket) {
-                append((BBucket)o);
-            } else if (o instanceof ByteBuffer) {
-                append((ByteBuffer) o);
-            } else if (o instanceof CharSequence) {
-                append((CharSequence) o);                
-            } else {
-                throw new IOException("Unknown type " + o);
-            }
+            BBucket o = cs.peekBucket(i);
+            append(o);
+        }
+
+        return this;        
+    }
+
+    public IOBuffer append(IOBuffer cs, int len) throws IOException {
+        for (int i = 0; i < cs.getBufferCount(); i++) {
+            BBucket o = cs.peekBucket(i);
+            append(o);
         }
 
         return this;        
@@ -505,7 +541,7 @@ public class IOBuffer {
         append(data, 0, data.length);
         return this;
     }
-    
+
     public IOBuffer append(char c) throws IOException {
         ByteBuffer bb = getWriteBuffer();
         bb.put((byte) c);
@@ -571,16 +607,14 @@ public class IOBuffer {
             if (closeQueued) {
                 throw new IOException("Closed");
             }
-            synchronized (buffers) {
-                BBucket last = (buffers.size() == 0) ? 
-                        null : buffers.getLast();
-                if (last == null || last != appendable ||
-                        last.array().length - last.limit() < 16) {
-                    last = BBuffer.allocate(ALLOC_SIZE);
-                }
-                appending = true;
-                appendable = (BBuffer) last;            
+            BBucket last = (buffers.size() == 0) ? 
+                    null : buffers.getLast();
+            if (last == null || last != appendable ||
+                    last.array().length - last.limit() < 16) {
+                last = BBuffer.allocate(ALLOC_SIZE);
             }
+            appending = true;
+            appendable = (BBuffer) last;            
             
             if (writeBuffer == null || writeBuffer.array() != appendable.array()) {
                 writeBuffer = ByteBuffer.wrap(appendable.array());
@@ -592,10 +626,10 @@ public class IOBuffer {
     }        
     
     public void releaseWriteBuffer(int read) throws IOException {
-        if (!appending) {
-            throw new IOException("Not appending");
-        }
         synchronized (buffers) {
+            if (!appending) {
+                throw new IOException("Not appending");
+            }
             if (writeBuffer != null) {
                 if (read > 0) {
                     appendable.limit(writeBuffer.position());
@@ -607,8 +641,8 @@ public class IOBuffer {
                     notifyDataAvailable(appendable);                
                 }
             }
+            appending = false;
         }
-        appending = false;
     }
 
     
