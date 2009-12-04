@@ -104,8 +104,6 @@ public class StaticContentService implements HttpService  {
           }
           res.setContentType(contentType);
       
-          res.sendHead();
-
           if (chunked) {
               res.getBody()
                   .queue(BBuffer.wrapper(mb, 0, mb.remaining()));

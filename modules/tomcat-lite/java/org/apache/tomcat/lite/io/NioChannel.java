@@ -79,7 +79,6 @@ public class NioChannel implements ByteChannel {
         .append(readInterest ? "R/" : "")
         .append(outClosed ? "Out-CLOSE/" : "")
         .append(inClosed ? "In-CLOSE/" : "")
-        .append(selKey == null ? -1 : ((SelectionKey) (selKey)).interestOps())
         .append("/")
         .append(channel.toString());
         

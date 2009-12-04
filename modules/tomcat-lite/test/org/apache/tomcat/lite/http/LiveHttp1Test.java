@@ -22,25 +22,24 @@ import junit.framework.TestCase;
 
 import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.CBuffer;
 import org.apache.tomcat.lite.io.SocketConnector;
 
 public class LiveHttp1Test extends TestCase {
     // Proxy tests extend this class, run same tests via proxy on 8903 
     protected int clientPort = 8802;
 
-    HttpChannel httpClient;
+    HttpRequest httpClient;
 
     BBuffer bodyRecvBuffer = BBuffer.allocate(1024);
 
-    int to = 1000;
+    int to = 1000000;
 
     public void setUp() throws IOException {
         // DefaultHttpConnector.get().setDebug(true);
         // DefaultHttpConnector.get().setDebugHttp(true);
-        TestMain.getTestServer();
+        TestMain.initTestEnv();
 
-        httpClient = DefaultHttpConnector.get().get("localhost", clientPort);
+        httpClient = DefaultHttpConnector.get().request("localhost", clientPort);
 
         bodyRecvBuffer.recycle();
     }
@@ -53,9 +52,9 @@ public class LiveHttp1Test extends TestCase {
     }
 
     public void testSimpleRequest() throws Exception {
-        httpClient.getRequest().requestURI().set("/hello");
+        httpClient.requestURI().set("/hello");
 
-        httpClient.sendRequest();
+        httpClient.send();
         httpClient.readAll(bodyRecvBuffer, to);
         assertEquals("Hello world", bodyRecvBuffer.toString());
     }
@@ -75,18 +74,18 @@ public class LiveHttp1Test extends TestCase {
     }
 
     public void testSimpleChunkedRequest() throws Exception {
-        httpClient.getRequest().requestURI().set("/chunked/foo");
-        httpClient.sendRequest();
+        httpClient.requestURI().set("/chunked/foo");
+        httpClient.send();
         httpClient.readAll(bodyRecvBuffer, to);
         assertTrue(bodyRecvBuffer.toString().indexOf("AAA") >= 0);
     }
 
     // Check waitResponseHead()
     public void testRequestHead() throws Exception {
-        httpClient.getRequest().requestURI().set("/echo/foo");
+        httpClient.requestURI().set("/echo/foo");
 
         // Send the request, wait response
-        httpClient.sendRequest();
+        httpClient.send();
 
         httpClient.readAll(bodyRecvBuffer, to);
         assertTrue(bodyRecvBuffer.toString().indexOf("GET /echo/foo") > 0);
@@ -109,19 +108,19 @@ public class LiveHttp1Test extends TestCase {
     }
 
     public void notFound() throws Exception {
-        httpClient.getRequest().requestURI().set("/foo");
-        httpClient.sendRequest();
+        httpClient.requestURI().set("/foo");
+        httpClient.send();
         httpClient.readAll(bodyRecvBuffer, to);
     }
 
     // compression not implemented
     public void testGzipRequest() throws Exception {
-        httpClient.getRequest().requestURI().set("/hello");
-        httpClient.getRequest().setHeader("accept-encoding",
+        httpClient.requestURI().set("/hello");
+        httpClient.setHeader("accept-encoding",
             "gzip");
 
         // Send the request, wait response
-        httpClient.sendRequest();
+        httpClient.send();
         // cstate.waitResponseHead(10000); // headers are received
         // ByteChunk data = new ByteChunk(1024);
         // acstate.serializeResponse(acstate.res, data);
@@ -133,10 +132,10 @@ public class LiveHttp1Test extends TestCase {
     }
 
     public void testWrongPort() throws Exception {
-        httpClient = DefaultHttpConnector.get().get("localhost", 18904);
-        httpClient.getRequest().requestURI().set("/hello");
+        httpClient = DefaultHttpConnector.get().request("localhost", 18904);
+        httpClient.requestURI().set("/hello");
 
-        httpClient.sendRequest();
+        httpClient.send();
         
         httpClient.readAll(bodyRecvBuffer, to);
         assertEquals(0, bodyRecvBuffer.remaining());

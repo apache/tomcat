@@ -12,12 +12,9 @@ import org.apache.tomcat.lite.io.MemoryIOConnector.MemoryIOChannel;
 import junit.framework.TestCase;
 
 public class OneTest extends TestCase {
-    MemoryIOConnector.MemoryIOChannel net = new MemoryIOChannel();
-    HttpChannel http = new HttpChannel()
-        .serverMode(true).withBuffers(net);
  
     public void setUp() throws Exception {
-        TestMain.getTestServer();
+        TestMain.initTestEnv();
     }
     
     public void tearDown() throws IOException {
