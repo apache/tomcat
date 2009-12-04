@@ -15,10 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
-import org.apache.tomcat.lite.http.SpdyConnection.SpdyConnectionManager;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.DumpChannel;
-import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
@@ -376,7 +374,6 @@ public class HttpConnector {
     private class AcceptorCallback implements IOConnector.ConnectedCallback {
         @Override
         public void handleConnected(IOChannel accepted) throws IOException {
-            System.err.println("ACCEPTED " + accepted);
             handleAccepted(accepted);
         }
     }
