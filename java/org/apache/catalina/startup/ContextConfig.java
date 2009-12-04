@@ -26,7 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,6 +63,8 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.naming.resources.DirContextURLConnection;
+import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.res.StringManager;
@@ -1241,8 +1246,15 @@ public class ContextConfig
         
         if (!webXml.isMetadataComplete()) {
             // Process /WEB-INF/classes for annotations
-            // TODO SERVLET3
-
+            URL webinfClasses;
+            try {
+                webinfClasses =
+                    context.getServletContext().getResource("/WEB-INF/classes");
+                processAnnotationsUrl(webinfClasses, webXml);
+            } catch (MalformedURLException e) {
+                log.error(sm.getString("contextConfig.webinfClassesUrl"), e);
+            }
+            
             // Have to process JARs for fragments
             Map<String,WebXml> fragments = processJarsForWebFragments();
             
@@ -1252,7 +1264,7 @@ public class ContextConfig
 
             // Process JARs for annotations - only need to process those
             // fragments we are going to use
-            processAnnotationsInJars(orderedFragments);
+            processAnnotations(orderedFragments);
 
             // Merge fragment into application
             if (ok) {
@@ -1476,6 +1488,173 @@ public class ContextConfig
         return callback.getFragments();
     }
 
+    protected void processAnnotations(Set<WebXml> fragments) {
+        for(WebXml fragment : fragments) {
+            if (!fragment.isMetadataComplete()) {
+                URL url = fragment.getURL();
+                processAnnotationsUrl(url, fragment);
+            }
+        }
+    }
+
+    protected void processAnnotationsUrl(URL url, WebXml fragment) {
+        if (url == null) {
+            // Nothing to do.
+            return;
+        } else if ("jar".equals(url.getProtocol())) {
+            processAnnotationsJar(url, fragment);
+        } else if ("jndi".equals(url.getProtocol())) {
+            processAnnotationsJndi(url, fragment);
+        } else if ("file".equals(url.getProtocol())) {
+            try {
+                processAnnotationsFile(new File(url.toURI()), fragment);
+            } catch (URISyntaxException e) {
+                log.error(sm.getString("contextConfig.fileUrl", url), e);
+            }
+        } else {
+            log.error(sm.getString("contextConfig.unknownUrlProtocol",
+                    url.getProtocol(), url));
+        }
+        
+    }
+
+
+    protected void processAnnotationsJar(URL url, WebXml fragment) {
+        JarFile jarFile = null;
+        
+        try {
+            URLConnection urlConn = url.openConnection();
+            JarURLConnection jarUrlConn;
+            if (!(urlConn instanceof JarURLConnection)) {
+                // This should never happen
+                sm.getString("contextConfig.jarUrl", url);
+                return;
+            }
+            
+            jarUrlConn = (JarURLConnection) urlConn;
+            jarUrlConn.setUseCaches(false);
+            jarFile = jarUrlConn.getJarFile();
+            
+            Enumeration<JarEntry> jarEntries = jarFile.entries();
+            while (jarEntries.hasMoreElements()) {
+                JarEntry jarEntry = jarEntries.nextElement();
+                String entryName = jarEntry.getName();
+                if (entryName.endsWith(".class")) {
+                    InputStream is = null;
+                    try {
+                        is = jarFile.getInputStream(jarEntry);
+                        processAnnotationsStream(is, fragment);
+                    } catch (IOException e) {
+                        log.error(sm.getString("contextConfig.inputStreamJar",
+                                entryName, url),e);
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (Throwable t) {
+                                // ignore
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.error(sm.getString("contextConfig.jarFile", url), e);
+        } finally {
+            if (jarFile != null) {
+                try {
+                    jarFile.close();
+                } catch (Throwable t) {
+                    // ignore
+                }
+            }
+        }
+    }
+
+    
+    protected void processAnnotationsJndi(URL url, WebXml fragment) {
+        try {
+            URLConnection urlConn = url.openConnection();
+            DirContextURLConnection dcUrlConn;
+            if (!(urlConn instanceof DirContextURLConnection)) {
+                // This should never happen
+                sm.getString("contextConfig.jndiUrl", url);
+                return;
+            }
+            
+            dcUrlConn = (DirContextURLConnection) urlConn;
+            dcUrlConn.setUseCaches(false);
+            
+            String ct = dcUrlConn.getContentType();
+            if (ResourceAttributes.COLLECTION_TYPE.equals(ct)) {
+                // Collection
+                Enumeration<String> dirs = dcUrlConn.list();
+                while (dirs.hasMoreElements()) {
+                    String dir = dirs.nextElement();
+                    URL dirUrl = new URL(url.toString() + '/' + dir);
+                    processAnnotationsJndi(dirUrl, fragment);
+                }
+                
+            } else {
+                // Single file
+                if (url.getPath().endsWith(".class")) {
+                    InputStream is = null;
+                    try {
+                        is = dcUrlConn.getInputStream();
+                        processAnnotationsStream(is, fragment);
+                    } catch (IOException e) {
+                        log.error(sm.getString("contextConfig.inputStreamJndi",
+                                url),e);
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (Throwable t) {
+                                // ignore
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.error(sm.getString("contextConfig.jarFile", url), e);
+        }
+    }
+    
+    
+    protected void processAnnotationsFile(File file, WebXml fragment) {
+        
+        if (file.isDirectory()) {
+            String[] dirs = file.list();
+            for (String dir : dirs) {
+                processAnnotationsFile(new File(file,dir), fragment);
+            }
+        } else if (file.canRead() && file.getName().endsWith(".class")) {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(file);
+                processAnnotationsStream(fis, fragment);
+            } catch (IOException e) {
+                log.error(sm.getString("contextConfig.inputStreamFile",
+                        file.getAbsolutePath()),e);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (Throwable t) {
+                        // ignore
+                    }
+                }
+            }
+        }
+    }
+
+
+    protected void processAnnotationsStream(InputStream is, WebXml fragment) {
+        // TODO SERVLET 3
+    }
+
+    
     private class FragmentJarScannerCallback implements JarScannerCallback {
 
         private static final String FRAGMENT_LOCATION =
@@ -1563,16 +1742,6 @@ public class ContextConfig
         
         public Map<String,WebXml> getFragments() {
             return fragments;
-        }
-    }
-
-
-    protected void processAnnotationsInJars(Set<WebXml> fragments) {
-        for(WebXml fragment : fragments) {
-            if (!fragment.isMetadataComplete()) {
-                // Scan jar for annotations, add to fragment
-                // TODO SERVLET3
-            }
         }
     }
 
