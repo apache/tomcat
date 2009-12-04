@@ -120,6 +120,7 @@ public class HttpsTest extends TestCase {
         SslConnector sslCon = new SslConnector();
         httpClient = new HttpConnector(sslCon);
         HttpRequest client = httpClient.request("www.google.com", 443);
+        client.getHttpChannel().setIOTimeout(2000);
         client.setRequestURI("/accounts/ServiceLogin");
         client.send();
         
