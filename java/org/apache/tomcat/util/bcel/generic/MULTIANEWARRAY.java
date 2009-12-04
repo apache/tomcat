@@ -125,22 +125,4 @@ public class MULTIANEWARRAY extends CPInstruction implements LoadClass, Allocati
         }
         return (t instanceof ObjectType) ? (ObjectType) t : null;
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitLoadClass(this);
-        v.visitAllocationInstruction(this);
-        v.visitExceptionThrower(this);
-        v.visitTypedInstruction(this);
-        v.visitCPInstruction(this);
-        v.visitMULTIANEWARRAY(this);
-    }
 }
