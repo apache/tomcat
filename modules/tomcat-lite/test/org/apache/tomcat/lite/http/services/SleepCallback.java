@@ -61,7 +61,7 @@ public class SleepCallback extends StaticContentService {
         }
         res.setContentType(contentType);
 
-        res.sendHead();
+        res.flush();
 
         Thread.currentThread().sleep(t2);
 

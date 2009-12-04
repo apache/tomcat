@@ -144,6 +144,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
         try {
             synchronized(in) {
                 // data between 0 and position
+                int total = 0;
                 while (true) {
                     if (in.isAppendClosed()) { // someone closed me ?
                         ch.inputClosed(); // remove read interest.
@@ -165,9 +166,9 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
                     }
                     
                     if (read < 0) {
-                        ch.inputClosed();
                         // mark the in buffer as closed
                         in.close();
+                        ch.inputClosed();
                         sendHandleReceivedCallback();
                         return;
                     }
@@ -177,6 +178,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
                         }
                         return;
                     }
+                    total += read;
                     newData = true;
                 }
             }

@@ -54,6 +54,10 @@ public class Dispatcher implements HttpService {
     }
 
     public void runService(HttpChannel ch) {
+        runService(ch, true);
+    }
+    
+    public void runService(HttpChannel ch, boolean recycle) {
         MappingData mapRes = ch.getRequest().getMappingData();
         HttpService h = (HttpService) mapRes.getServiceObject();
         try {
@@ -61,11 +65,12 @@ public class Dispatcher implements HttpService {
             h.service(ch.getRequest(), ch.getResponse());
             if (!ch.getRequest().isAsyncStarted()) {
                 ch.complete();
-                ch.release(); // recycle objects.
+                if (recycle) {
+                    ch.release(); // recycle objects.
+                }
             } else {
                 // Nothing - complete must be called when done.
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch( Throwable t ) {
@@ -75,11 +80,24 @@ public class Dispatcher implements HttpService {
     
     @Override
     public void service(HttpRequest httpReq, HttpResponse httpRes) throws IOException {
-        service(httpReq, httpRes, false);
+        service(httpReq, httpRes, false, true);
+    }
+
+    /** 
+     * Process the request/response in the current thread, without
+     * release ( recycle ) at the end.
+     * 
+     * For use by tests and/or in-memory running of servlets.
+     * 
+     * If no connection is associated with the request - the 
+     * output will remain in the out buffer.
+     */
+    public void run(HttpRequest httpReq, HttpResponse httpRes) throws IOException {
+        service(httpReq, httpRes, true, false);
     }
 
     
-    public void service(HttpRequest httpReq, HttpResponse httpRes, boolean noThread) 
+    public void service(HttpRequest httpReq, HttpResponse httpRes, boolean noThread, boolean recycle) 
             throws IOException {
         long t0 = System.currentTimeMillis();
         HttpChannel http = httpReq.getHttpChannel();
@@ -104,7 +122,7 @@ public class Dispatcher implements HttpService {
               }
               
               if (mapRes.service.selectorThread || noThread) {
-                  runService(http);
+                  runService(http, recycle);
               } else {
                   tp.execute(httpReq.getHttpChannel().dispatcherRunnable);
               }

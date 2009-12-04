@@ -4,14 +4,14 @@ package org.apache.tomcat.lite.http;
 
 import java.io.IOException;
 
-import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.CBuffer;
-
 import junit.framework.TestCase;
+
+import org.apache.tomcat.lite.io.BBuffer;
 
 public class HttpChannelTest extends TestCase {
 
     HttpChannel ch = new HttpChannel().serverMode(true);
+    Http11Connection con = new Http11Connection(null).serverMode();
     HttpRequest req = ch.getRequest();
     
     
@@ -39,7 +39,6 @@ public class HttpChannelTest extends TestCase {
     BBuffer f3 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b\r\r");
     BBuffer f4 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b\r\n\r");
 
-    
     public void reqTest(String lineS, String method, String req, 
             String qry, String proto) throws IOException {
         BBuffer line = BBuffer.wrapper(lineS);
@@ -47,7 +46,7 @@ public class HttpChannelTest extends TestCase {
         protoB.recycle();
         requestB.recycle();
         methodB.recycle();
-        ch.parseRequestLine(line, methodB, requestB, queryB, protoB);
+        con.parseRequestLine(line, methodB, requestB, queryB, protoB);
         assertEquals(proto, protoB.toString());
         assertEquals(req, requestB.toString());
         assertEquals(qry, queryB.toString());
@@ -62,7 +61,7 @@ public class HttpChannelTest extends TestCase {
     private MultiMap processQry(String qry) throws IOException {
         BBuffer head = BBuffer.wrapper("GET /a?" + qry + " HTTP/1.0\n" +
         		"Host: a\n\n");
-        ch.parseMessage(head);
+        con.parseMessage(ch, head);
         MultiMap params = req.getParameters();
         return params;
     }
@@ -82,7 +81,7 @@ public class HttpChannelTest extends TestCase {
             String expLine, String expRest) throws IOException {
         head = BBuffer.wrapper(headS);
         head.readLine(line);
-        ch.parseHeader(head, line, name, value);
+        con.parseHeader(ch, head, line, name, value);
         
         assertEquals(expName, name.toString());
         assertEquals(expValue, value.toString());
@@ -111,7 +110,7 @@ public class HttpChannelTest extends TestCase {
         statusB.recycle();
         msgB.recycle();
         BBuffer line = BBuffer.wrapper(lineS);
-        ch.parseResponseLine(line, 
+        con.parseResponseLine(line, 
                 protoB, statusB, msgB);
         assertEquals(proto, protoB.toString());
         assertEquals(status, statusB.toString());

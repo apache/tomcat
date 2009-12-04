@@ -41,10 +41,9 @@ import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
 import org.apache.tomcat.lite.http.MappingData;
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
-import org.apache.tomcat.lite.io.WrappedException;
 import org.apache.tomcat.lite.io.CBuffer;
 import org.apache.tomcat.lite.io.MemoryIOConnector;
-import org.apache.tomcat.lite.io.CBuffer;
+import org.apache.tomcat.lite.io.WrappedException;
 
 /**
  * Helper allowing to run servlets using Tomcat lite http server.

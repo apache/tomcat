@@ -17,48 +17,41 @@ import org.apache.tomcat.lite.io.IOConnector;
 import org.apache.tomcat.lite.io.MemoryIOConnector;
 import org.apache.tomcat.lite.io.MemoryIOConnector.MemoryIOChannel;
 
+// TODO: rename to Http11ConnectionTest
 public class HttpChannelInMemoryTest extends TestCase {
-    
-    MemoryIOConnector memoryServerConnector =  new MemoryIOConnector();
-    MemoryIOConnector memoryClientConnector = 
-        new MemoryIOConnector().withServer(memoryServerConnector);
+    /**
+     *  Connection under test 
+     */
+    Http11Connection conn;
 
+    /** 
+     * Last http channel created by the connection
+     */
+    HttpChannel http;
     
-    // Used for pipelined requests - after the first request is 
-    // processed, a new HttpChannel is used ( first may still be 
-    // in use )
-    HttpChannel lastServer;
-    
-    // The server channel will use this for I/O...
+    // Input/output for the connection
     MemoryIOConnector.MemoryIOChannel net = new MemoryIOChannel();
 
-    HttpConnector serverConnector = new HttpConnector(memoryServerConnector) {
-        @Override
-        public HttpChannel get(CharSequence target) throws IOException {
-            throw new IOException();
-        }
-        public HttpChannel getServer() {
-            lastServer = new HttpChannel().serverMode(true);
-            lastServer.withBuffers(net);
-            lastServer.setConnector(this);
-            //lastServer.withIOConnector(memoryServerConnector);
-            return lastServer;
-        }
-    };
+    HttpConnector serverConnector = new HttpConnector(null);
 
-    HttpConnector httpClient = new HttpConnector(memoryClientConnector);
-
+    // Callback results for callback tests
     boolean hasBody = false;
     boolean bodyDone = false;
     boolean bodySentDone = false;
     boolean headersDone = false;
     boolean allDone = false;
     
-    
-    HttpChannel http = serverConnector.getServer();
-    
     public void setUp() throws IOException {
+        // Requests will not be serviced - you must manually generate
+        // the response.
         serverConnector.setHttpService(null);
+    
+        conn = new Http11Connection(serverConnector) {
+            protected HttpChannel checkHttpChannel() throws IOException {
+                return http = super.checkHttpChannel();
+            }
+        }.serverMode();
+        conn.setSink(net);
     }
     
    
@@ -80,6 +73,7 @@ public class HttpChannelInMemoryTest extends TestCase {
         "\r\n";
         net.getIn().append(req);        
         
+        //http = lastServer.get(0);
         assertTrue(http.getRequest().method().equals("GET"));
         assertTrue(http.getRequest().protocol().equals("HTTP/1.1"));
         assertEquals(http.getRequest().getMimeHeaders().size(), 4);
@@ -96,7 +90,7 @@ public class HttpChannelInMemoryTest extends TestCase {
         // now second response must be in. 
         // the connector will create a new http channel
         
-        http = lastServer;
+        //http = lastServer.get(1);
         
         assertTrue(http.getRequest().method().equals("HEAD"));
         assertTrue(http.getRequest().protocol().equals("HTTP/1.1"));
@@ -105,12 +99,101 @@ public class HttpChannelInMemoryTest extends TestCase {
                 .equals("Foo.com"));
     }
 
+    public void testHttp11Close() throws IOException {
+        String req = "GET /index.html?q=b&c=d HTTP/1.1\r\n" +
+        "Host:  Foo.com\n" + 
+        "Connection: close\n" +
+        "\n"; 
+        net.getIn().append(req);        
+        
+        assertTrue(http.getRequest().method().equals("GET"));
+        assertTrue(http.getRequest().protocol().equals("HTTP/1.1"));
+        
+        http.getOut().append("Response1");
+        http.getOut().close();
+        http.startSending();
+        http.release(); 
+        
+        assertTrue(net.out.indexOf("connection:close") > 0);
+        assertFalse(net.isOpen());
+    }
+
+    public void testHttp10Close() throws IOException {
+        String req = "GET /index.html?q=b&c=d HTTP/1.0\r\n" +
+        "Host:  Foo.com \n" + 
+        "\r\n"; 
+        net.getIn().append(req);        
+        
+        assertTrue(http.getRequest().method().equals("GET"));
+        assertTrue(http.getRequest().protocol().equals("HTTP/1.0"));
+        
+        http.getOut().append("Response1");
+        http.getOut().close();
+        http.startSending();
+        
+        assertTrue(net.out.indexOf("connection:close") > 0);
+        assertFalse(net.isOpen());
+    }
+
+    public void testHttp10KA() throws IOException {
+        String req = "GET /index.html?q=b&c=d HTTP/1.0\r\n" +
+        "Connection: Keep-Alive\n" +
+        "Host:  Foo.com \n" + 
+        "\r\n"; 
+        net.getIn().append(req);        
+        
+        assertTrue(http.getRequest().method().equals("GET"));
+        assertTrue(http.getRequest().protocol().equals("HTTP/1.0"));
+        
+        http.getOut().append("Hi");
+        http.getOut().close();
+        http.startSending();
+        
+        // after request
+        assertEquals(conn.activeHttp, null);
+        
+        assertTrue(net.out.indexOf("connection:keep-alive") > 0);
+        assertTrue(net.isOpen());
+        // inserted since we can calculate the response
+        assertEquals(http.getResponse().getHeader("Content-Length"),
+                   "2");
+    }
+    
+    public void testHttp10KANoCL() throws IOException {
+        String req = "GET /index.html?q=b&c=d HTTP/1.0\r\n" +
+        "Connection: Keep-Alive\n" +
+        "Host:  Foo.com \n" + 
+        "\r\n"; 
+        net.getIn().append(req);        
+        
+        assertTrue(http.getRequest().method().equals("GET"));
+        assertTrue(http.getRequest().protocol().equals("HTTP/1.0"));
+        
+        http.getOut().append("Hi");
+        http.startSending();
+
+        http.getOut().append("After");
+        http.getOut().close();
+        http.startSending();
+        
+        // after request
+        assertEquals(conn.activeHttp, null);
+        
+        assertFalse(net.out.indexOf("connection:keep-alive") > 0);
+        assertFalse(net.isOpen());
+        // inserted since we can calculate the response
+        assertEquals(http.getResponse().getHeader("Content-Length"),
+                null);
+        assertEquals(http.getResponse().getHeader("Transfer-Encoding"),
+                null);
+    }
+    
     public void testMultiLineHead() throws IOException {
-        http.getNet().getIn().append("GET / HTTP/1.0\n" +
+        net.getIn().append("GET / HTTP/1.0\n" +
                 "Cookie: 1234\n" +
                 "  456 \n" +
                 "Connection:   Close\n\n");
-        http.getNet().getIn().close();
+        net.getIn().close();
         
         MultiMap headers = http.getRequest().getMimeHeaders();
         CBuffer cookie = headers.getHeader("Cookie");
@@ -118,20 +201,20 @@ public class HttpChannelInMemoryTest extends TestCase {
         assertEquals(conn.toString(), "Close");
         assertEquals(cookie.toString(), "1234 456");
         
-        assertEquals(http.headRecvBuf.toString(), 
+        assertEquals(http.conn.headRecvBuf.toString(), 
                 "GET / HTTP/1.0\n" +
                 "Cookie: 1234 456   \n" + // \n -> trailing space
                 "Connection:   Close\n\n");
     }
 
     public void testCloseSocket() throws IOException {
-        http.getNet().getIn().append("GET / HTTP/1.1\n"
+        net.getIn().append("GET / HTTP/1.1\n"
                 + "Host: localhost\n"
                 + "\n");
-        assertTrue(http.keepAlive());
+        assertTrue(((Http11Connection)http.conn).keepAlive());
 
-        http.getNet().getIn().close();
-        assertFalse(http.keepAlive());
+        net.getIn().close();
+        assertFalse(((Http11Connection)http.conn).keepAlive());
     }
     
     public void test2ReqByte2Byte() throws IOException {
@@ -166,7 +249,6 @@ public class HttpChannelInMemoryTest extends TestCase {
         
         http.release(); // now second response must be in
         
-        http = lastServer;
         assertTrue(http.getRequest().method().equals("HEAD"));
         assertTrue(http.getRequest().protocol().equals("HTTP/1.1"));
         assertTrue(http.getRequest().getMimeHeaders().size() == 2);
@@ -182,14 +264,16 @@ public class HttpChannelInMemoryTest extends TestCase {
     }
     
     public void testEndWithoutFlushCallbacks() throws IOException {
+        
+        net.getIn().append(POST);
+
+        net.getIn().close();
         http.setCompletedCallback(new RequestCompleted() {
             public void handle(HttpChannel data, Object extra)
             throws IOException {
                 allDone = true;
             }
         });
-        http.getNet().getIn().append(POST);
-        http.getNet().getIn().close();
         
         http.sendBody.queue("Hi");
         http.getOut().close();
@@ -200,41 +284,48 @@ public class HttpChannelInMemoryTest extends TestCase {
     }
 
     public void testCallbacks() throws IOException {
-        http.setCompletedCallback(new RequestCompleted() {
-            public void handle(HttpChannel data, Object extra)
-            throws IOException {
-                allDone = true;
-            }
-        });
-        http.setHttpService(new HttpService() {
+        // already accepted - will change
+        serverConnector.setHttpService(new HttpService() {
             public void service(HttpRequest httpReq, HttpResponse httpRes)
-            throws IOException {
+                    throws IOException {
+                
                 headersDone = true;
-            }
-        });
-        http.setDataReceivedCallback(new IOConnector.DataReceivedCallback() {
-            @Override
-            public void handleReceived(IOChannel ch) throws IOException {
-                if (ch.getIn().isAppendClosed()) {
-                    bodyDone = true;
-                }
-            }
-        });
-        http.setDataFlushedCallback(new IOConnector.DataFlushedCallback() {
-            @Override
-            public void handleFlushed(IOChannel ch) throws IOException {
-                if (ch.getOut().isAppendClosed()) {
-                    bodySentDone = true;
-                }
+                HttpChannel http = httpReq.getHttpChannel();
+                
+                http.setCompletedCallback(new RequestCompleted() {
+                    public void handle(HttpChannel data, Object extra)
+                    throws IOException {
+                        allDone = true;
+                    }
+                });
+                http.setDataReceivedCallback(new IOConnector.DataReceivedCallback() {
+                    @Override
+                    public void handleReceived(IOChannel ch) throws IOException {
+                        if (ch.getIn().isAppendClosed()) {
+                            bodyDone = true;
+                        }
+                    }
+                });
+                http.setDataFlushedCallback(new IOConnector.DataFlushedCallback() {
+                    @Override
+                    public void handleFlushed(IOChannel ch) throws IOException {
+                        if (ch.getOut().isAppendClosed()) {
+                            bodySentDone = true;
+                        }
+                    }
+                });
             }
         });
 
         // Inject the request
-        http.getNet().getIn().append(POST);
+        net.getIn().append("POST / HTTP/1.0\n" +
+                "Connection: Close\n" +
+                "Content-Length: 4\n\n" +
+                "1");
         assertTrue(headersDone);
-        http.getNet().getIn().append("1234");
+        net.getIn().append("234");
         
-        http.getNet().getIn().close();
+        net.getIn().close();
         assertTrue(bodyDone);
         
         
@@ -253,17 +344,16 @@ public class HttpChannelInMemoryTest extends TestCase {
         "1234"; 
 
     public void testClose() throws IOException {
-        http.getNet().getIn().append(POST);
-        http.getNet().getIn().close();
-        
-        HttpBody receiveBody = http.receiveBody;
+        net.getIn().append(POST);
+        net.getIn().close();
+
+        IOBuffer receiveBody = http.receiveBody;
         IOBuffer appData = receiveBody;
         BBuffer res = BBuffer.allocate(1000);
         appData.readAll(res);
         
         assertEquals(res.toString(), "1234");
-        assertFalse(http.keepAlive());
-        assertFalse(http.keepAlive());
+        assertFalse(((Http11Connection)http.conn).keepAlive());
         
         http.sendBody.queue(res);
         http.getOut().close();
@@ -275,13 +365,13 @@ public class HttpChannelInMemoryTest extends TestCase {
     }
     
     public void testReadLine() throws Exception {
-        http.getNet().getIn().append("POST / HTTP/1.0\n" +
+        net.getIn().append("POST / HTTP/1.0\n" +
         		"Content-Length: 28\n\n" +
                 "Line 1\n" +
                 "Line 2\r\n" +
                 "Line 3\r" +
                 "Line 4");
-        http.getNet().getIn().close();
+        net.getIn().close();
         
         BufferedReader r = http.getRequest().getReader();
         assertEquals("Line 1", r.readLine());

@@ -25,9 +25,6 @@ import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
 import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.MemoryIOConnector;
-import org.apache.tomcat.lite.io.MemoryIOConnector.MemoryIOChannel;
-import org.apache.tomcat.lite.servlet.TomcatLite;
 
 /**
  * Example of testing servlets without using sockets.
@@ -37,12 +34,10 @@ import org.apache.tomcat.lite.servlet.TomcatLite;
 public class TomcatLiteNoConnectorTest extends TestCase {
 
   TomcatLite lite;
-  MemoryIOConnector net;
   HttpConnector con;
   
   public void setUp() throws Exception {
-      net = new MemoryIOConnector();
-      con = new HttpConnector(net);
+      con = new HttpConnector(null);
       
       lite = new TomcatLite();
       lite.setHttpConnector(con);
@@ -55,39 +50,21 @@ public class TomcatLiteNoConnectorTest extends TestCase {
     lite.stop();
   }
   
-
   public void testSimpleRequest() throws Exception {
-      MemoryIOConnector.MemoryIOChannel ch = new MemoryIOChannel();
-      
       HttpChannel httpCh = con.getServer();
-      httpCh.withBuffers(ch);
       
       HttpRequest req = httpCh.getRequest();
       req.setURI("/test1/1stTest");
 
       HttpResponse res = httpCh.getResponse();
       
-      lite.getHttpConnector().getDispatcher().service(req, res, true);
-      // req/res will be recycled
-      
-      // parse out to a response
-      BBuffer out = ch.out;
-      MemoryIOChannel clientCh = new MemoryIOChannel();
-      clientCh.getIn().append(out);
-      
-      HttpChannel client = con.get("localhost", 80);
-      client.withBuffers(clientCh);
-      clientCh.handleReceived(clientCh);
-      
-      
-      HttpResponse cres = client.getResponse();
-      assertEquals(res.getStatus(), 200);
+      lite.getHttpConnector().getDispatcher().service(req, res, true, false);
     
-      BBuffer resBody = BBuffer.allocate(200);
-      cres.getBody().readAll(resBody);
+      BBuffer resBody = res.getBody().readAll(null);
       assertEquals("Hello world", resBody.toString());
-      assertEquals(cres.getHeader("Foo"), "Bar");
-      assertEquals(cres.getStatus(), 200);
+
+      assertEquals(res.getHeader("Foo"), "Bar");
+      assertEquals(res.getStatus(), 200);
   }
   
 //

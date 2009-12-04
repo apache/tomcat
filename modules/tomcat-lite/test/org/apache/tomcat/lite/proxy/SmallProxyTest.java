@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
+import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.io.MemoryIOConnector;
 import org.apache.tomcat.lite.io.MemoryIOConnector.MemoryIOChannel;
 
@@ -20,14 +21,13 @@ public class SmallProxyTest extends TestCase {
         new MemoryIOConnector().withServer(memoryServerConnector);
 
     
-    HttpConnector httpPool = new HttpConnector(memoryServerConnector) {
+    HttpConnector httpCon = new HttpConnector(memoryServerConnector) {
         @Override
         public HttpChannel get(CharSequence target) throws IOException {
             throw new IOException();
         }
         public HttpChannel getServer() {
             lastServer = new HttpChannel().serverMode(true);
-            lastServer.withBuffers(net);
             lastServer.setConnector(this);
             //lastServer.withIOConnector(memoryServerConnector);
             return lastServer;
@@ -65,9 +65,12 @@ public class SmallProxyTest extends TestCase {
     
     MemoryIOConnector.MemoryIOChannel net = new MemoryIOChannel();
     HttpChannel http;
+
+    HttpConnection serverConnection;
     
     public void setUp() throws IOException {
-        http = httpPool.getServer();
+        http = httpCon.getServer();
+        serverConnection = httpCon.handleAccepted(net);
     }
  
     /**
@@ -75,13 +78,13 @@ public class SmallProxyTest extends TestCase {
      * @throws IOException
      */
     public void testProxy() throws IOException {
-        http.setHttpService(new HttpProxyService()
+        httpCon.setHttpService(new HttpProxyService()
             .withSelector(memoryClientConnector)
             .withHttpClient(httpClient));
 
-        http.getNet().getIn().append("GET http://www.cyberluca.com/ HTTP/1.0\n" +
+        net.getIn().append("GET http://www.apache.org/ HTTP/1.0\n" +
                 "Connection: Close\n\n");
-        http.getNet().getIn().close();
+        net.getIn().close();
         
         // lastClient.rawSendBuffers has the request sent by proxy
         lastClient.getNet().getIn()

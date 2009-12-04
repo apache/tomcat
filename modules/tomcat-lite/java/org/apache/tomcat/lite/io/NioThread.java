@@ -104,7 +104,7 @@ public class NioThread implements Runnable {
   // time events.
   private long minSleep = 100;
 
-  boolean daemon = true;
+  boolean daemon = false;
   
   // TODO: trace log - record all events with timestamps, replay
 
@@ -408,7 +408,7 @@ public class NioThread implements Runnable {
               ch.callback.handleConnected(ch);
           }
       } catch (Throwable t) {
-          log.warning("Error in connect, closing ");
+          log.warning("Error in connect, closing " + t);
           close(ch, t);
           try {
               if (ch.callback != null) {
@@ -463,6 +463,9 @@ public class NioThread implements Runnable {
       if (channel instanceof SocketChannel) {
           SocketChannel sc = (SocketChannel) channel;
           if (sc.isOpen() && sc.isConnected()) {
+              if (debug) {
+                  log.info("Half shutdown " + ch);
+              }
               sc.socket().shutdownOutput(); // TCP end to the other side
           }
       }
@@ -499,7 +502,9 @@ public class NioThread implements Runnable {
                   SocketChannel sc = (SocketChannel) channel;
 
                   if (sc.isConnected()) {
-                      //System.err.println("Close socket, opened=" + o);
+                      if (debug) {
+                          log.info("Close socket, opened=" + o);
+                      }
                       try {
                           sc.socket().shutdownInput();
                       } catch(IOException io1) {
@@ -526,8 +531,7 @@ public class NioThread implements Runnable {
               }
       }
       } catch (IOException ex2) {
-          log.severe("SelectorThread: Error closing socket " + ex2);
-          ex2.printStackTrace();
+          log.log(Level.SEVERE, "SelectorThread: Error closing socket ", ex2);
       }
   }
 
@@ -559,7 +563,7 @@ public class NioThread implements Runnable {
               selectorData.zeroReads = 0;
           } else if (done < 0) {
               if (debug) {
-                  log.info("SelectorThread: EOF while reading");
+                  log.info("SelectorThread: EOF while reading " + selectorData);
               }
           } else {
               // need more...
