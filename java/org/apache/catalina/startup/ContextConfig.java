@@ -244,6 +244,7 @@ public class ContextConfig
         noFragmentJars.add("dnsns.jar");
         noFragmentJars.add("tools.jar");
         noFragmentJars.add("sunpkcs11.jar");
+        noFragmentJars.add("sunec.jar");
         // Apple J2SE runtime
         noFragmentJars.add("apple_provider.jar");
         noFragmentJars.add("AppleScriptEngine.jar");
