@@ -198,7 +198,7 @@ public class HttpChannelInMemoryTest extends TestCase {
         MultiMap headers = http.getRequest().getMimeHeaders();
         CBuffer cookie = headers.getHeader("Cookie");
         CBuffer conn = headers.getHeader("Connection");
-        assertEquals(conn.toString(), "Close");
+        assertEquals(conn.toString(), "close");
         assertEquals(cookie.toString(), "1234 456");
         
         assertEquals(http.conn.headRecvBuf.toString(), 
