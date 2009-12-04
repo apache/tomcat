@@ -55,25 +55,4 @@ public class GETSTATIC extends FieldInstruction implements PushInstruction, Exce
         cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length] = ExceptionConstants.INCOMPATIBLE_CLASS_CHANGE_ERROR;
         return cs;
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitStackProducer(this);
-        v.visitPushInstruction(this);
-        v.visitExceptionThrower(this);
-        v.visitTypedInstruction(this);
-        v.visitLoadClass(this);
-        v.visitCPInstruction(this);
-        v.visitFieldOrMethod(this);
-        v.visitFieldInstruction(this);
-        v.visitGETSTATIC(this);
-    }
 }

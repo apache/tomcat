@@ -28,18 +28,4 @@ public class DUP_X1 extends StackInstruction {
     public DUP_X1() {
         super(org.apache.tomcat.util.bcel.Constants.DUP_X1);
     }
-
-
-    /**
-     * Call corresponding visitor method(s). The order is:
-     * Call visitor methods of implemented interfaces first, then
-     * call methods according to the class hierarchy in descending order,
-     * i.e., the most specific visitXXX() call comes last.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitStackInstruction(this);
-        v.visitDUP_X1(this);
-    }
 }
