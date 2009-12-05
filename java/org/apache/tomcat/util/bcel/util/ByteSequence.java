@@ -43,9 +43,7 @@ public final class ByteSequence extends DataInputStream {
     }
 
 
-    final void unreadByte() {
-        byte_stream.unreadByte();
-    }
+    
 
     private static final class ByteArrayStream extends ByteArrayInputStream {
 
@@ -57,12 +55,5 @@ public final class ByteSequence extends DataInputStream {
         final int getPosition() {
             return pos;
         } // is protected in ByteArrayInputStream
-
-
-        final void unreadByte() {
-            if (pos > 0) {
-                pos--;
-            }
-        }
     }
 }

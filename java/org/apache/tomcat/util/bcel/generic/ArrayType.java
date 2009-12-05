@@ -30,24 +30,10 @@ public final class ArrayType extends ReferenceType {
     private Type basic_type;
 
 
-    /**
-     * Convenience constructor for array type, e.g. int[]
-     *
-     * @param type array type, e.g. T_INT
-     */
-    public ArrayType(byte type, int dimensions) {
-        this(BasicType.getType(type), dimensions);
-    }
+    
 
 
-    /**
-     * Convenience constructor for reference array type, e.g. Object[]
-     *
-     * @param class_name complete name of class (java.lang.String, e.g.)
-     */
-    public ArrayType(String class_name, int dimensions) {
-        this(new ObjectType(class_name), dimensions);
-    }
+    
 
 
     /**
@@ -82,30 +68,13 @@ public final class ArrayType extends ReferenceType {
     }
 
 
-    /**
-     * @return basic type of array, i.e., for int[][][] the basic type is int
-     */
-    public Type getBasicType() {
-        return basic_type;
-    }
+    
 
 
-    /**
-     * @return element type of array, i.e., for int[][][] the element type is int[][]
-     */
-    public Type getElementType() {
-        if (dimensions == 1) {
-            return basic_type;
-        }
-        return new ArrayType(basic_type, dimensions - 1);
-    }
+    
 
 
-    /** @return number of dimensions of array
-     */
-    public int getDimensions() {
-        return dimensions;
-    }
+    
 
 
     /** @return a hash code value for the object.

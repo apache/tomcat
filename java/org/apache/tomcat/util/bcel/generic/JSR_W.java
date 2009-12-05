@@ -36,10 +36,7 @@ public class JSR_W extends JsrInstruction {
     }
 
 
-    public JSR_W(InstructionHandle target) {
-        super(org.apache.tomcat.util.bcel.Constants.JSR_W, target);
-        length = 5;
-    }
+    
 
 
     /**

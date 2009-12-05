@@ -13,21 +13,7 @@ public class EnumElementValueGen extends ElementValueGen
 
 	private int valueIdx;
 
-	/**
-	 * This ctor assumes the constant pool already contains the right type and
-	 * value - as indicated by typeIdx and valueIdx. This ctor is used for
-	 * deserialization
-	 */
-	protected EnumElementValueGen(int typeIdx, int valueIdx,
-			ConstantPoolGen cpool)
-	{
-		super(ElementValueGen.ENUM_CONSTANT, cpool);
-		if (type != ENUM_CONSTANT)
-			throw new RuntimeException(
-					"Only element values of type enum can be built with this ctor - type specified: " + type);
-		this.typeIdx = typeIdx;
-		this.valueIdx = valueIdx;
-	}
+	
 
 	/**
 	 * Return immutable variant of this EnumElementValue
@@ -40,12 +26,7 @@ public class EnumElementValueGen extends ElementValueGen
 				.getConstantPool());
 	}
 
-	public EnumElementValueGen(ObjectType t, String value, ConstantPoolGen cpool)
-	{
-		super(ElementValueGen.ENUM_CONSTANT, cpool);
-		typeIdx = cpool.addUtf8(t.getSignature());// was addClass(t);
-		valueIdx = cpool.addUtf8(value);// was addString(value);
-	}
+	
 
 	public EnumElementValueGen(EnumElementValue value, ConstantPoolGen cpool,
 			boolean copyPoolEntries)
@@ -107,13 +88,7 @@ public class EnumElementValueGen extends ElementValueGen
 		// ((ConstantUtf8)getConstantPool().getConstant(cu8.getStringIndex())).getBytes();
 	}
 
-	public int getValueIndex()
-	{
-		return valueIdx;
-	}
+	
 
-	public int getTypeIndex()
-	{
-		return typeIdx;
-	}
+	
 }

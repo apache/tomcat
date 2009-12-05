@@ -106,17 +106,9 @@ public abstract class Annotations extends Attribute {
     }
 
 
-    /**
-     * @return the number of annotation entries in this annotation
-     */
-    public final int getNumAnnotations() {
-        return annotation_table_length;
-    }
     
-    public boolean isRuntimeVisible()
-    {
-    	return isRuntimeVisible;
-    }
+    
+    
     
     protected void writeAnnotations(DataOutputStream dos) throws IOException
 	{

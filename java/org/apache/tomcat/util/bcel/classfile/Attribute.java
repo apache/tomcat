@@ -91,31 +91,9 @@ public abstract class Attribute implements Cloneable, Node, Serializable
 
 	private static Map readers = new HashMap();
 
-	/**
-	 * Add an Attribute reader capable of parsing (user-defined) attributes
-	 * named "name". You should not add readers for the standard attributes such
-	 * as "LineNumberTable", because those are handled internally.
-	 * 
-	 * @param name
-	 *            the name of the attribute as stored in the class file
-	 * @param r
-	 *            the reader object
-	 */
-	public static void addAttributeReader(String name, AttributeReader r)
-	{
-		readers.put(name, r);
-	}
+	
 
-	/**
-	 * Remove attribute reader
-	 * 
-	 * @param name
-	 *            the name of the attribute as stored in the class file
-	 */
-	public static void removeAttributeReader(String name)
-	{
-		readers.remove(name);
-	}
+	
 
 	/*
 	 * Class method reads one attribute from the input data stream. This method
@@ -226,39 +204,13 @@ public abstract class Attribute implements Cloneable, Node, Serializable
 		return c.getBytes();
 	}
 
-	/**
-	 * @return Length of attribute field in bytes.
-	 */
-	public final int getLength()
-	{
-		return length;
-	}
+	
 
-	/**
-	 * @param length
-	 *            length in bytes.
-	 */
-	public final void setLength(int length)
-	{
-		this.length = length;
-	}
+	
 
-	/**
-	 * @param name_index
-	 *            of attribute.
-	 */
-	public final void setNameIndex(int name_index)
-	{
-		this.name_index = name_index;
-	}
+	
 
-	/**
-	 * @return Name index in constant pool of attribute name.
-	 */
-	public final int getNameIndex()
-	{
-		return name_index;
-	}
+	
 
 	/**
 	 * @return Tag of attribute, i.e., its type. Value may not be altered, thus
@@ -269,24 +221,9 @@ public abstract class Attribute implements Cloneable, Node, Serializable
 		return tag;
 	}
 
-	/**
-	 * @return Constant pool used by this object.
-	 * @see ConstantPool
-	 */
-	public final ConstantPool getConstantPool()
-	{
-		return constant_pool;
-	}
+	
 
-	/**
-	 * @param constant_pool
-	 *            Constant pool to be used for this object.
-	 * @see ConstantPool
-	 */
-	public final void setConstantPool(ConstantPool constant_pool)
-	{
-		this.constant_pool = constant_pool;
-	}
+	
 
 	/**
 	 * Use copy() if you want to have a deep copy(), i.e., with all references

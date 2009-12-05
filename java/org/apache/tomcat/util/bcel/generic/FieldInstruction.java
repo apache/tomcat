@@ -34,12 +34,7 @@ public abstract class FieldInstruction extends FieldOrMethod implements TypedIns
     }
 
 
-    /**
-     * @param index to constant pool
-     */
-    protected FieldInstruction(short opcode, int index) {
-        super(opcode, index);
-    }
+    
 
 
     /**
@@ -72,9 +67,5 @@ public abstract class FieldInstruction extends FieldOrMethod implements TypedIns
     }
 
 
-    /** @return name of referenced field.
-     */
-    public String getFieldName( ConstantPoolGen cpg ) {
-        return getName(cpg);
-    }
+    
 }

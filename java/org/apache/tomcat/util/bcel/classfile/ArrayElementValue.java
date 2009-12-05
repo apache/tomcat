@@ -60,8 +60,5 @@ public class ArrayElementValue extends ElementValue
 		return evalues;
 	}
 
-	public int getElementValuesArraySize()
-	{
-		return evalues.length;
-	}
+	
 }

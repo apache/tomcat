@@ -19,7 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.generic.Type;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
@@ -48,13 +47,7 @@ public final class Field extends FieldOrMethod {
     };
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public Field(Field c) {
-        super(c);
-    }
+    
 
 
     /**
@@ -67,29 +60,10 @@ public final class Field extends FieldOrMethod {
     }
 
 
-    /**
-     * @param access_flags Access rights of field
-     * @param name_index Points to field name in constant pool
-     * @param signature_index Points to encoded signature
-     * @param attributes Collection of attributes
-     * @param constant_pool Array of constants
-     */
-    public Field(int access_flags, int name_index, int signature_index, Attribute[] attributes,
-            ConstantPool constant_pool) {
-        super(access_flags, name_index, signature_index, attributes, constant_pool);
-    }
+    
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitField(this);
-    }
+    
 
 
     /**
@@ -134,36 +108,16 @@ public final class Field extends FieldOrMethod {
     }
 
 
-    /**
-     * @return deep copy of this field
-     */
-    public final Field copy( ConstantPool _constant_pool ) {
-        return (Field) copy_(_constant_pool);
-    }
+    
 
 
-    /**
-     * @return type of field
-     */
-    public Type getType() {
-        return Type.getReturnType(getSignature());
-    }
+    
 
 
-    /**
-     * @return Comparison strategy object
-     */
-    public static BCELComparator getComparator() {
-        return _cmp;
-    }
+    
 
 
-    /**
-     * @param comparator Comparison strategy object
-     */
-    public static void setComparator( BCELComparator comparator ) {
-        _cmp = comparator;
-    }
+    
 
 
     /**

@@ -163,11 +163,7 @@ public abstract class LocalVariableInstruction extends Instruction implements Ty
     }
 
 
-    /** @return canonical tag for instruction, e.g., ALOAD for ALOAD_0
-     */
-    public short getCanonicalTag() {
-        return canon_tag;
-    }
+    
 
 
     /**

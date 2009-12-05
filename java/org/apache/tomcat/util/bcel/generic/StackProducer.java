@@ -25,7 +25,5 @@ package org.apache.tomcat.util.bcel.generic;
  */
 public interface StackProducer {
 
-    /** @return how many words are produced on stack
-     */
-    public int produceStack( ConstantPoolGen cpg );
+    
 }

@@ -73,10 +73,5 @@ public class ReturnaddressType extends Type {
     }
 
 
-    /**
-     * @return the target of this ReturnaddressType
-     */
-    public InstructionHandle getTarget() {
-        return returnTarget;
-    }
+    
 }

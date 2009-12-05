@@ -40,17 +40,7 @@ public class IINC extends LocalVariableInstruction {
     }
 
 
-    /**
-     * @param n index of local variable
-     * @param c increment factor
-     */
-    public IINC(int n, int c) {
-        super(); // Default behaviour of LocalVariableInstruction causes error
-        this.opcode = org.apache.tomcat.util.bcel.Constants.IINC;
-        this.length = (short) 3;
-        setIndex(n); // May set wide as side effect
-        setIncrement(c);
-    }
+    
 
 
     /**
@@ -119,21 +109,10 @@ public class IINC extends LocalVariableInstruction {
     }
 
 
-    /**
-     * @return increment factor
-     */
-    public final int getIncrement() {
-        return c;
-    }
+    
 
 
-    /**
-     * Set increment factor.
-     */
-    public final void setIncrement( int c ) {
-        this.c = c;
-        setWide();
-    }
+    
 
 
     /** @return int type

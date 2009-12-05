@@ -39,13 +39,7 @@ public final class Synthetic extends Attribute {
     private byte[] bytes;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use copy() for a physical copy.
-     */
-    public Synthetic(Synthetic c) {
-        this(c.getNameIndex(), c.getLength(), c.getBytes(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -107,20 +101,10 @@ public final class Synthetic extends Attribute {
     }
 
 
-    /**
-     * @return data bytes.
-     */
-    public final byte[] getBytes() {
-        return bytes;
-    }
+    
 
 
-    /**
-     * @param bytes
-     */
-    public final void setBytes( byte[] bytes ) {
-        this.bytes = bytes;
-    }
+    
 
 
     /**

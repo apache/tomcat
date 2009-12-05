@@ -37,13 +37,7 @@ public final class SourceFile extends Attribute {
     private int sourcefile_index;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public SourceFile(SourceFile c) {
-        this(c.getNameIndex(), c.getLength(), c.getSourceFileIndex(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -103,20 +97,10 @@ public final class SourceFile extends Attribute {
     }
 
 
-    /**
-     * @return Index in constant pool of source file name.
-     */
-    public final int getSourceFileIndex() {
-        return sourcefile_index;
-    }
+    
 
 
-    /**
-     * @param sourcefile_index
-     */
-    public final void setSourceFileIndex( int sourcefile_index ) {
-        this.sourcefile_index = sourcefile_index;
-    }
+    
 
 
     /**

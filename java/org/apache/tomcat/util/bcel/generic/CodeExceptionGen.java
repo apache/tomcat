@@ -38,7 +38,6 @@ public final class CodeExceptionGen implements InstructionTargeter, Cloneable, j
     private InstructionHandle start_pc;
     private InstructionHandle end_pc;
     private InstructionHandle handler_pc;
-    private ObjectType catch_type;
 
 
     /**
@@ -55,24 +54,10 @@ public final class CodeExceptionGen implements InstructionTargeter, Cloneable, j
         setStartPC(start_pc);
         setEndPC(end_pc);
         setHandlerPC(handler_pc);
-        this.catch_type = catch_type;
     }
 
 
-    /**
-     * Get CodeException object.<BR>
-     *
-     * This relies on that the instruction list has already been dumped
-     * to byte code or or that the `setPositions' methods has been
-     * called for the instruction list.
-     *
-     * @param cp constant pool
-     */
-    public CodeException getCodeException( ConstantPoolGen cp ) {
-        return new CodeException(start_pc.getPosition(), end_pc.getPosition()
-                + end_pc.getInstruction().getLength(), handler_pc.getPosition(),
-                (catch_type == null) ? 0 : cp.addClass(catch_type));
-    }
+    
 
 
     /* Set start of handler 
@@ -102,70 +87,25 @@ public final class CodeExceptionGen implements InstructionTargeter, Cloneable, j
     }
 
 
-    /**
-     * @param old_ih old target, either start or end
-     * @param new_ih new target
-     */
-    public void updateTarget( InstructionHandle old_ih, InstructionHandle new_ih ) {
-        boolean targeted = false;
-        if (start_pc == old_ih) {
-            targeted = true;
-            setStartPC(new_ih);
-        }
-        if (end_pc == old_ih) {
-            targeted = true;
-            setEndPC(new_ih);
-        }
-        if (handler_pc == old_ih) {
-            targeted = true;
-            setHandlerPC(new_ih);
-        }
-        if (!targeted) {
-            throw new ClassGenException("Not targeting " + old_ih + ", but {" + start_pc + ", "
-                    + end_pc + ", " + handler_pc + "}");
-        }
-    }
+    
 
 
-    /**
-     * @return true, if ih is target of this handler
-     */
-    public boolean containsTarget( InstructionHandle ih ) {
-        return (start_pc == ih) || (end_pc == ih) || (handler_pc == ih);
-    }
+    
 
 
-    /** Sets the type of the Exception to catch. Set 'null' for ANY. */
-    public void setCatchType( ObjectType catch_type ) {
-        this.catch_type = catch_type;
-    }
+    
 
 
-    /** Gets the type of the Exception to catch, 'null' for ANY. */
-    public ObjectType getCatchType() {
-        return catch_type;
-    }
+    
 
 
-    /** @return start of handled region (inclusive)
-     */
-    public InstructionHandle getStartPC() {
-        return start_pc;
-    }
+    
 
 
-    /** @return end of handled region (inclusive)
-     */
-    public InstructionHandle getEndPC() {
-        return end_pc;
-    }
+    
 
 
-    /** @return start of handler
-     */
-    public InstructionHandle getHandlerPC() {
-        return handler_pc;
-    }
+    
 
 
     public String toString() {

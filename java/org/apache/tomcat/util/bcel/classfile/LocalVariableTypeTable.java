@@ -48,10 +48,7 @@ public class LocalVariableTypeTable extends Attribute {
   private int             local_variable_type_table_length; // Table of local
   private LocalVariable[] local_variable_type_table;        // variables
 
-  public LocalVariableTypeTable(LocalVariableTypeTable c) {
-    this(c.getNameIndex(), c.getLength(), c.getLocalVariableTypeTable(),
-	 c.getConstantPool());
-  }
+  
 
   public LocalVariableTypeTable(int name_index, int length,
 			    LocalVariable[] local_variable_table,
@@ -83,17 +80,9 @@ public class LocalVariableTypeTable extends Attribute {
       local_variable_type_table[i].dump(file);
   }
 
-  public final LocalVariable[] getLocalVariableTypeTable() {
-    return local_variable_type_table;
-  }    
+      
 
-  public final LocalVariable getLocalVariable(int index) {
-    for(int i=0; i < local_variable_type_table_length; i++)
-      if(local_variable_type_table[i].getIndex() == index)
-	return local_variable_type_table[i];
-
-    return null;
-  }
+  
 
   public final void setLocalVariableTable(LocalVariable[] local_variable_table)
   {
@@ -131,5 +120,5 @@ public class LocalVariableTypeTable extends Attribute {
     return c;
   }
 
-  public final int getTableLength() { return local_variable_type_table_length; }
+  
 }

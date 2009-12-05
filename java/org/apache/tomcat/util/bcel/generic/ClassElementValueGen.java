@@ -6,7 +6,6 @@ import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ConstantUtf8;
 import org.apache.tomcat.util.bcel.classfile.ClassElementValue;
 import org.apache.tomcat.util.bcel.generic.ConstantPoolGen;
-import org.apache.tomcat.util.bcel.generic.ObjectType;
 import org.apache.tomcat.util.bcel.generic.ElementValueGen;
 
 public class ClassElementValueGen extends ElementValueGen
@@ -16,18 +15,9 @@ public class ClassElementValueGen extends ElementValueGen
 	// For 'class' this points to the class entry in the cpool
 	private int idx;
 
-	protected ClassElementValueGen(int typeIdx, ConstantPoolGen cpool)
-	{
-		super(ElementValueGen.CLASS, cpool);
-		this.idx = typeIdx;
-	}
+	
 
-	public ClassElementValueGen(ObjectType t, ConstantPoolGen cpool)
-	{
-		super(ElementValueGen.CLASS, cpool);
-		// this.idx = cpool.addClass(t);
-		idx = cpool.addUtf8(t.getSignature());
-	}
+	
 
 	/**
 	 * Return immutable variant of this ClassElementValueGen
@@ -52,10 +42,7 @@ public class ClassElementValueGen extends ElementValueGen
 		}
 	}
 
-	public int getIndex()
-	{
-		return idx;
-	}
+	
 
 	public String getClassString()
 	{

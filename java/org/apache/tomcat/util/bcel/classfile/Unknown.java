@@ -20,7 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -47,26 +46,10 @@ public final class Unknown extends Attribute {
     private static Map unknown_attributes = new HashMap();
 
 
-    /** @return array of unknown attributes, but just one for each kind.
-     */
-    static Unknown[] getUnknownAttributes() {
-        Unknown[] unknowns = new Unknown[unknown_attributes.size()];
-        Iterator entries = unknown_attributes.values().iterator();
-        for (int i = 0; entries.hasNext(); i++) {
-            unknowns[i] = (Unknown) entries.next();
-        }
-        unknown_attributes.clear();
-        return unknowns;
-    }
+    
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public Unknown(Unknown c) {
-        this(c.getNameIndex(), c.getLength(), c.getBytes(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -130,12 +113,7 @@ public final class Unknown extends Attribute {
     }
 
 
-    /**
-     * @return data bytes.
-     */
-    public final byte[] getBytes() {
-        return bytes;
-    }
+    
 
 
     /**
@@ -146,12 +124,7 @@ public final class Unknown extends Attribute {
     }
 
 
-    /**
-     * @param bytes the bytes to set
-     */
-    public final void setBytes( byte[] bytes ) {
-        this.bytes = bytes;
-    }
+    
 
 
     /**

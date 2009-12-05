@@ -50,26 +50,7 @@ public abstract class Select extends BranchInstruction implements VariableLength
     }
 
 
-    /**
-     * (Match, target) pairs for switch.
-     * `Match' and `targets' must have the same length of course.
-     *
-     * @param match array of matching values
-     * @param targets instruction targets
-     * @param defaultTarget default instruction target
-     */
-    Select(short opcode, int[] match, InstructionHandle[] targets, InstructionHandle defaultTarget) {
-        super(opcode, defaultTarget);
-        this.targets = targets;
-        for (int i = 0; i < targets.length; i++) {
-            notifyTarget(null, targets[i], this);
-        }
-        this.match = match;
-        if ((match_length = match.length) != targets.length) {
-            throw new ClassGenException("Match and target array have not the same length: Match length: " + match.length + " Target length: " + targets.length);
-        }
-        indices = new int[match_length];
-    }
+    
 
 
     /**
@@ -211,12 +192,7 @@ public abstract class Select extends BranchInstruction implements VariableLength
     }
 
 
-    /**
-     * @return array of match indices
-     */
-    public int[] getMatchs() {
-        return match;
-    }
+    
 
 
     /**

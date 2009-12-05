@@ -93,16 +93,7 @@ public abstract class Constant implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @return deep copy of this constant
-     */
-    public Constant copy() {
-        try {
-            return (Constant) super.clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
+    
 
 
     public Object clone() throws CloneNotSupportedException {
@@ -148,20 +139,10 @@ public abstract class Constant implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @return Comparison strategy object
-     */
-    public static BCELComparator getComparator() {
-        return _cmp;
-    }
+    
 
 
-    /**
-     * @param comparator Comparison strategy object
-     */
-    public static void setComparator( BCELComparator comparator ) {
-        _cmp = comparator;
-    }
+    
 
 
     /**

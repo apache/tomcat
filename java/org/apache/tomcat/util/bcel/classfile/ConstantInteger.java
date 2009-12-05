@@ -45,12 +45,7 @@ public final class ConstantInteger extends Constant implements ConstantObject {
     }
 
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantInteger(ConstantInteger c) {
-        this(c.getBytes());
-    }
+    
 
 
     /** 
@@ -96,12 +91,7 @@ public final class ConstantInteger extends Constant implements ConstantObject {
     }
 
 
-    /**
-     * @param bytes the raw bytes that represent this integer
-     */
-    public final void setBytes( int bytes ) {
-        this.bytes = bytes;
-    }
+    
 
 
     /**
@@ -112,9 +102,5 @@ public final class ConstantInteger extends Constant implements ConstantObject {
     }
 
 
-    /** @return Integer object
-     */
-    public Object getConstantValue( ConstantPool cp ) {
-        return new Integer(bytes);
-    }
+    
 }

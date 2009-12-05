@@ -25,5 +25,5 @@ package org.apache.tomcat.util.bcel.generic;
  */
 public interface TypedInstruction {
 
-    public Type getType( ConstantPoolGen cpg );
+    
 }
