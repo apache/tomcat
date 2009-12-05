@@ -83,28 +83,13 @@ public final class BranchHandle extends InstructionHandle {
     }
 
 
-    /**
-     * Pass new target to instruction.
-     */
-    public void setTarget( InstructionHandle ih ) {
-        bi.setTarget(ih);
-    }
+    
 
 
-    /**
-     * Update target of instruction.
-     */
-    public void updateTarget( InstructionHandle old_ih, InstructionHandle new_ih ) {
-        bi.updateTarget(old_ih, new_ih);
-    }
+    
 
 
-    /**
-     * @return target of instruction.
-     */
-    public InstructionHandle getTarget() {
-        return bi.getTarget();
-    }
+    
 
 
     /** 

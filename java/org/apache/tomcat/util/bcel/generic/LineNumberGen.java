@@ -44,25 +44,10 @@ public class LineNumberGen implements InstructionTargeter, Cloneable, java.io.Se
     }
 
 
-    /**
-     * @return true, if ih is target of this line number
-     */
-    public boolean containsTarget( InstructionHandle ih ) {
-        return this.ih == ih;
-    }
+    
 
 
-    /**
-     * @param old_ih old target
-     * @param new_ih new target
-     */
-    public void updateTarget( InstructionHandle old_ih, InstructionHandle new_ih ) {
-        if (old_ih != ih) {
-            throw new ClassGenException("Not targeting " + old_ih + ", but " + ih + "}");
-        } else {
-            setInstruction(new_ih);
-        }
-    }
+    
 
 
     /**
@@ -92,9 +77,7 @@ public class LineNumberGen implements InstructionTargeter, Cloneable, java.io.Se
     }
 
 
-    public InstructionHandle getInstruction() {
-        return ih;
-    }
+    
 
 
     public void setSourceLine( int src_line ) {
@@ -102,7 +85,5 @@ public class LineNumberGen implements InstructionTargeter, Cloneable, java.io.Se
     }
 
 
-    public int getSourceLine() {
-        return src_line;
-    }
+    
 }

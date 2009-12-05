@@ -36,12 +36,7 @@ public final class LineNumber implements Cloneable, Node, Serializable {
     private int line_number; // number in source file
 
 
-    /**
-     * Initialize from another object.
-     */
-    public LineNumber(LineNumber c) {
-        this(c.getStartPC(), c.getLineNumber());
-    }
+    
 
 
     /**
@@ -64,16 +59,7 @@ public final class LineNumber implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitLineNumber(this);
-    }
+    
 
 
     /**
@@ -88,36 +74,16 @@ public final class LineNumber implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @return Corresponding source line
-     */
-    public final int getLineNumber() {
-        return line_number;
-    }
+    
 
 
-    /**
-     * @return PC in code
-     */
-    public final int getStartPC() {
-        return start_pc;
-    }
+    
 
 
-    /**
-     * @param line_number the source line number
-     */
-    public final void setLineNumber( int line_number ) {
-        this.line_number = line_number;
-    }
+    
 
 
-    /**
-     * @param start_pc the pc for this line number
-     */
-    public final void setStartPC( int start_pc ) {
-        this.start_pc = start_pc;
-    }
+    
 
 
     /**

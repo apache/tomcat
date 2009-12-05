@@ -36,13 +36,7 @@ public final class ConstantValue extends Attribute {
     private int constantvalue_index;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public ConstantValue(ConstantValue c) {
-        this(c.getNameIndex(), c.getLength(), c.getConstantValueIndex(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -96,20 +90,10 @@ public final class ConstantValue extends Attribute {
     }
 
 
-    /**
-     * @return Index in constant pool of constant value.
-     */
-    public final int getConstantValueIndex() {
-        return constantvalue_index;
-    }
+    
 
 
-    /**
-     * @param constantvalue_index the index info the constant pool of this constant value
-     */
-    public final void setConstantValueIndex( int constantvalue_index ) {
-        this.constantvalue_index = constantvalue_index;
-    }
+    
 
 
     /**

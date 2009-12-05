@@ -37,9 +37,7 @@ public class LDC_W extends LDC {
     }
 
 
-    public LDC_W(int index) {
-        super(index);
-    }
+    
 
 
     /**

@@ -59,25 +59,15 @@ public class EnclosingMethod extends Attribute {
 		// return (EnclosingMethod)clone();
 	}
 	
-	// Accessors
-	public final int getEnclosingClassIndex() { return classIndex; }  
-	public final int getEnclosingMethodIndex(){ return methodIndex;}
+	  
 	
-	public final void setEnclosingClassIndex(int idx) {classIndex = idx;}
-	public final void setEnclosingMethodIndex(int idx){methodIndex= idx;}
+	
+	
+	
 
-	public final ConstantClass getEnclosingClass() {
-		ConstantClass c = 
-			(ConstantClass)constant_pool.getConstant(classIndex,Constants.CONSTANT_Class);
-		return c;
-	}
 	
-	public final ConstantNameAndType getEnclosingMethod() {
-		if (methodIndex == 0) return null;
-		ConstantNameAndType nat = 
-			(ConstantNameAndType)constant_pool.getConstant(methodIndex,Constants.CONSTANT_NameAndType);
-		return nat;
-	}
+	
+	
 
     public final void dump(DataOutputStream file) throws IOException {
 	    super.dump(file);

@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.classfile.LocalVariable;
 
 /** 
@@ -39,27 +38,7 @@ public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Clo
     private InstructionHandle start, end;
 
 
-    /**
-     * Generate a local variable that with index `index'. Note that double and long
-     * variables need two indexs. Index indices have to be provided by the user.
-     *
-     * @param index index of local variable
-     * @param name its name
-     * @param type its type
-     * @param start from where the instruction is valid (null means from the start)
-     * @param end until where the instruction is valid (null means to the end)
-     */
-    public LocalVariableGen(int index, String name, Type type, InstructionHandle start,
-            InstructionHandle end) {
-        if ((index < 0) || (index > Constants.MAX_SHORT)) {
-            throw new ClassGenException("Invalid index index: " + index);
-        }
-        this.name = name;
-        this.type = type;
-        this.index = index;
-        setStart(start);
-        setEnd(end);
-    }
+    
 
 
     /**
@@ -89,9 +68,7 @@ public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Clo
     }
 
 
-    public void setIndex( int index ) {
-        this.index = index;
-    }
+    
 
 
     public int getIndex() {
@@ -114,9 +91,7 @@ public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Clo
     }
 
 
-    public Type getType() {
-        return type;
-    }
+    
 
 
     public InstructionHandle getStart() {
@@ -141,33 +116,10 @@ public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Clo
     }
 
 
-    /**
-     * @param old_ih old target, either start or end
-     * @param new_ih new target
-     */
-    public void updateTarget( InstructionHandle old_ih, InstructionHandle new_ih ) {
-        boolean targeted = false;
-        if (start == old_ih) {
-            targeted = true;
-            setStart(new_ih);
-        }
-        if (end == old_ih) {
-            targeted = true;
-            setEnd(new_ih);
-        }
-        if (!targeted) {
-            throw new ClassGenException("Not targeting " + old_ih + ", but {" + start + ", " + end
-                    + "}");
-        }
-    }
+    
 
 
-    /**
-     * @return true, if ih is target of this variable
-     */
-    public boolean containsTarget( InstructionHandle ih ) {
-        return (start == ih) || (end == ih);
-    }
+    
 
 
     /** @return a hash code value for the object.

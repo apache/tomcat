@@ -64,16 +64,7 @@ public class AnnotationEntry implements Node, Constants, Serializable {
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        //	    v.visitAnnotationEntry(this);
-    }
+    
 
 
     /**
@@ -94,12 +85,7 @@ public class AnnotationEntry implements Node, Constants, Serializable {
     }
 
 
-    /**
-     * @return the number of element value pairs in this annotation entry
-     */
-    public final int getNumElementValuePairs() {
-        return num_element_value_pairs;
-    }
+    
 
 
     /**
@@ -132,21 +118,5 @@ public class AnnotationEntry implements Node, Constants, Serializable {
 		element_value_pairs.add(elementNameValuePair);
 	}
 
-	public String toShortString()
-	{
-		StringBuffer result = new StringBuffer();
-		result.append("@");
-		result.append(getAnnotationType());
-		if (getElementValuePairs().length > 0)
-		{
-			result.append("(");
-			for (int i = 0; i < getElementValuePairs().length; i++)
-			{
-				ElementValuePair element = getElementValuePairs()[i];
-				result.append(element.toShortString());
-			}
-			result.append(")");
-		}
-		return result.toString();
-	}
+	
 }

@@ -18,8 +18,6 @@ package org.apache.tomcat.util.bcel.generic;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.ExceptionConstants;
 import org.apache.tomcat.util.bcel.classfile.ConstantPool;
 import org.apache.tomcat.util.bcel.util.ByteSequence;
 
@@ -43,14 +41,7 @@ public final class INVOKEINTERFACE extends InvokeInstruction {
     }
 
 
-    public INVOKEINTERFACE(int index, int nargs) {
-        super(Constants.INVOKEINTERFACE, index);
-        length = 5;
-        if (nargs < 1) {
-            throw new ClassGenException("Number of arguments must be > 0 " + nargs);
-        }
-        this.nargs = nargs;
-    }
+    
 
 
     /**
@@ -65,13 +56,7 @@ public final class INVOKEINTERFACE extends InvokeInstruction {
     }
 
 
-    /**
-     * The <B>count</B> argument according to the Java Language Specification,
-     * Second Edition.
-     */
-    public int getCount() {
-        return nargs;
-    }
+    
 
 
     /**
@@ -98,14 +83,5 @@ public final class INVOKEINTERFACE extends InvokeInstruction {
     }
 
 
-    public Class[] getExceptions() {
-        Class[] cs = new Class[4 + ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length + 3] = ExceptionConstants.INCOMPATIBLE_CLASS_CHANGE_ERROR;
-        cs[ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length + 2] = ExceptionConstants.ILLEGAL_ACCESS_ERROR;
-        cs[ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length + 1] = ExceptionConstants.ABSTRACT_METHOD_ERROR;
-        cs[ExceptionConstants.EXCS_INTERFACE_METHOD_RESOLUTION.length] = ExceptionConstants.UNSATISFIED_LINK_ERROR;
-        return cs;
-    }
+    
 }

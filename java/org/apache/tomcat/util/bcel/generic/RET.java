@@ -42,10 +42,7 @@ public class RET extends Instruction implements IndexedInstruction, TypedInstruc
     }
 
 
-    public RET(int index) {
-        super(org.apache.tomcat.util.bcel.Constants.RET, (short) 2);
-        setIndex(index); // May set wide as side effect
-    }
+    
 
 
     /**

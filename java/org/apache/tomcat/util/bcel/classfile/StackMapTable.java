@@ -88,12 +88,7 @@ public final class StackMapTable extends Attribute implements Node {
     }
 
 
-    /**
-     * @return Array of stack map entries
-     */
-    public final StackMapTableEntry[] getStackMapTable() {
-        return map;
-    }
+    
 
 
     /**
@@ -147,7 +142,5 @@ public final class StackMapTable extends Attribute implements Node {
     }
 
 
-    public final int getMapLength() {
-        return map_length;
-    }
+    
 }

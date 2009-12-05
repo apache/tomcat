@@ -52,14 +52,7 @@ public final class Code extends Attribute {
     private Attribute[] attributes; // or LocalVariable
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use copy() for a physical copy.
-     */
-    public Code(Code c) {
-        this(c.getNameIndex(), c.getLength(), c.getMaxStack(), c.getMaxLocals(), c.getCode(), c
-                .getExceptionTable(), c.getAttributes(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -156,26 +149,10 @@ public final class Code extends Attribute {
     }
 
 
-    /**
-     * @return Collection of code attributes.
-     * @see Attribute
-     */
-    public final Attribute[] getAttributes() {
-        return attributes;
-    }
+    
 
 
-    /**
-     * @return LineNumberTable of Code, if it has one
-     */
-    public LineNumberTable getLineNumberTable() {
-        for (int i = 0; i < attributes_count; i++) {
-            if (attributes[i] instanceof LineNumberTable) {
-                return (LineNumberTable) attributes[i];
-            }
-        }
-        return null;
-    }
+    
 
 
     /**
@@ -191,37 +168,16 @@ public final class Code extends Attribute {
     }
 
 
-    /**
-     * @return Actual byte code of the method.
-     */
-    public final byte[] getCode() {
-        return code;
-    }
+    
 
 
-    /**
-     * @return Table of handled exceptions.
-     * @see CodeException
-     */
-    public final CodeException[] getExceptionTable() {
-        return exception_table;
-    }
+    
 
 
-    /**
-     * @return Number of local variables.
-     */
-    public final int getMaxLocals() {
-        return max_locals;
-    }
+    
 
 
-    /**
-     * @return Maximum size of stack used by this method.
-     */
-    public final int getMaxStack() {
-        return max_stack;
-    }
+    
 
 
     /**
@@ -278,20 +234,10 @@ public final class Code extends Attribute {
     }
 
 
-    /**
-     * @param max_locals maximum number of local variables
-     */
-    public final void setMaxLocals( int max_locals ) {
-        this.max_locals = max_locals;
-    }
+    
 
 
-    /**
-     * @param max_stack maximum stack size
-     */
-    public final void setMaxStack( int max_stack ) {
-        this.max_stack = max_stack;
-    }
+    
 
 
     /**

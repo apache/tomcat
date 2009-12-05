@@ -35,9 +35,7 @@ public class JSR extends JsrInstruction implements VariableLengthInstruction {
     }
 
 
-    public JSR(InstructionHandle target) {
-        super(org.apache.tomcat.util.bcel.Constants.JSR, target);
-    }
+    
 
 
     /**

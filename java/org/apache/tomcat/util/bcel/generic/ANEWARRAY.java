@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import org.apache.tomcat.util.bcel.ExceptionConstants;
-
 /** 
  * ANEWARRAY -  Create new array of references
  * <PRE>Stack: ..., count -&gt; ..., arrayref</PRE>
@@ -36,25 +34,11 @@ public class ANEWARRAY extends CPInstruction implements LoadClass, AllocationIns
     }
 
 
-    public ANEWARRAY(int index) {
-        super(org.apache.tomcat.util.bcel.Constants.ANEWARRAY, index);
-    }
+    
 
 
-    public Class[] getExceptions() {
-        Class[] cs = new Class[1 + ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length] = ExceptionConstants.NEGATIVE_ARRAY_SIZE_EXCEPTION;
-        return cs;
-    }
+    
 
 
-    public ObjectType getLoadClassType( ConstantPoolGen cpg ) {
-        Type t = getType(cpg);
-        if (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBasicType();
-        }
-        return (t instanceof ObjectType) ? (ObjectType) t : null;
-    }
+    
 }

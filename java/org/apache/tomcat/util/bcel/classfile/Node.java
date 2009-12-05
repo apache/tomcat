@@ -24,5 +24,5 @@ package org.apache.tomcat.util.bcel.classfile;
  */
 public interface Node {
 
-    public void accept( Visitor obj );
+    
 }

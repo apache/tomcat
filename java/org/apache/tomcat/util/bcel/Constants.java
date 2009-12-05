@@ -34,65 +34,29 @@ public interface Constants {
    *  */
   public final static short MINOR_1_1 = 3;
 
-  /** Major version number of class files for Java 1.2.
-   *  @see #MINOR_1_2
-   *  */
-  public final static short MAJOR_1_2 = 46;
+  
 
-  /** Minor version number of class files for Java 1.2.
-   *  @see #MAJOR_1_2
-   *  */
-  public final static short MINOR_1_2 = 0;
+  
 
-  /** Major version number of class files for Java 1.2.
-   *  @see #MINOR_1_2
-   *  */
-  public final static short MAJOR_1_3 = 47;
+  
 
-  /** Minor version number of class files for Java 1.3.
-   *  @see #MAJOR_1_3
-   *  */
-  public final static short MINOR_1_3 = 0;
+  
 
-  /** Major version number of class files for Java 1.3.
-   *  @see #MINOR_1_3
-   *  */
-  public final static short MAJOR_1_4 = 48;
+  
 
-  /** Minor version number of class files for Java 1.4.
-   *  @see #MAJOR_1_4
-   *  */
-  public final static short MINOR_1_4 = 0;
+  
 
-  /** Major version number of class files for Java 1.4.
-   *  @see #MINOR_1_4
-   *  */
-  public final static short MAJOR_1_5 = 49;
+  
 
-  /** Minor version number of class files for Java 1.5.
-   *  @see #MAJOR_1_5
-   *  */
-  public final static short MINOR_1_5 = 0;
+  
 
-  /** Major version number of class files for Java 1.5.
-   *  @see #MINOR_1_5
-   *  */
-  public final static short MAJOR_1_6 = 50;
+  
 
-  /** Minor version number of class files for Java 1.6.
-   *  @see #MAJOR_1_6
-   *  */
-  public final static short MINOR_1_6 = 0;
+  
 
-  /** Default major version number.  Class file is for Java 1.1.
-   *  @see #MAJOR_1_1
-   *  */
-  public final static short MAJOR = MAJOR_1_1;
+  
 
-  /** Default major version number.  Class file is for Java 1.1.
-   *  @see #MAJOR_1_1
-   *  */
-  public final static short MINOR     = MINOR_1_1;
+  
 
   /** Maximum value for an unsigned short.
    */
@@ -102,22 +66,11 @@ public interface Constants {
    */
   public final static int MAX_BYTE  = 255; // 2^8 - 1
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see <a href='http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html#2877'>Flag definitions for Fields in the Java Virtual Machine Specification (2nd edition).</a>
-   *  @see <a href='http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html#1513'>Flag definitions for Methods in the Java Virtual Machine Specification (2nd edition).</a>
-   *  @see <a href='http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html#88478'>Flag definitions for Classes in the Java Virtual Machine Specification (2nd edition).</a>
-   */
-  public final static short ACC_PUBLIC       = 0x0001;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_PRIVATE      = 0x0002;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_PROTECTED    = 0x0004;
+  
 
   /** One of the access flags for fields, methods, or classes.
    *  @see #ACC_PUBLIC
@@ -129,35 +82,17 @@ public interface Constants {
    */
   public final static short ACC_FINAL        = 0x0010;
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_SYNCHRONIZED = 0x0020;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_SYPER        = 0x0020;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_VOLATILE     = 0x0040;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_BRIDGE       = 0x0040;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_TRANSIENT    = 0x0080;
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_VARARGS      = 0x0080;
+  
 
   /** One of the access flags for fields, methods, or classes.
    *  @see #ACC_PUBLIC
@@ -174,20 +109,11 @@ public interface Constants {
    */
   public final static short ACC_ABSTRACT     = 0x0400;
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_STRICT       = 0x0800;
   
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_SYNTHETIC    = 0x1000;
+  
+  
 
-  /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
-   */
-  public final static short ACC_ANNOTATION   = 0x2000;
+  
 
   /** One of the access flags for fields, methods, or classes.
    *  @see #ACC_PUBLIC
@@ -253,82 +179,34 @@ public interface Constants {
     "CONSTANT_Methodref", "CONSTANT_InterfaceMethodref",
     "CONSTANT_NameAndType" };
 
-  /** The name of the static initializer, also called &quot;class
-   *  initialization method&quot; or &quot;interface initialization
-   *   method&quot;. This is &quot;&lt;clinit&gt;&quot;.
-   */
-  public final static String STATIC_INITIALIZER_NAME = "<clinit>";
+  
 
-  /** The name of every constructor method in a class, also called
-   * &quot;instance initialization method&quot;. This is &quot;&lt;init&gt;&quot;.
-   */
-  public final static String CONSTRUCTOR_NAME = "<init>";
+  
 
-  /** The names of the interfaces implemented by arrays */
-  public final static String[] INTERFACES_IMPLEMENTED_BY_ARRAYS = {"java.lang.Cloneable", "java.io.Serializable"};
+  
 
-  /**
-   * One of the limitations of the Java Virtual Machine.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html#88659"> The Java Virtual Machine Specification, Second Edition, page 152, chapter 4.10.</a>
-   */
-  public static final int MAX_CP_ENTRIES     = 65535;
+  
 
-  /**
-   * One of the limitations of the Java Virtual Machine.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html#88659"> The Java Virtual Machine Specification, Second Edition, page 152, chapter 4.10.</a>
-   */
-  public static final int MAX_CODE_SIZE      = 65536; //bytes
+  
 
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short NOP              = 0;
+  
 
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ACONST_NULL      = 1;
+  
 
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_M1        = 2;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_0         = 3;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_1         = 4;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_2         = 5;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_3         = 6;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_4         = 7;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ICONST_5         = 8;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short LCONST_0         = 9;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short LCONST_1         = 10;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FCONST_0         = 11;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FCONST_1         = 12;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FCONST_2         = 13;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DCONST_0         = 14;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DCONST_1         = 15;
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short BIPUSH           = 16;
@@ -542,33 +420,15 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short SASTORE          = 86;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short POP              = 87;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short POP2             = 88;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DUP              = 89;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DUP_X1           = 90;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DUP_X2           = 91;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DUP2             = 92;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DUP2_X1          = 93;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DUP2_X2          = 94;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short SWAP             = 95;
+  
+  
+  
+  
+  
+  
+  
+  
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short IADD             = 96;
@@ -719,36 +579,20 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short I2B              = 145;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short INT2BYTE         = 145; // Old notion
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short I2C              = 146;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short INT2CHAR         = 146; // Old notion
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short I2S              = 147;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short INT2SHORT        = 147; // Old notion
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short LCMP             = 148;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FCMPL            = 149;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FCMPG            = 150;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DCMPL            = 151;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DCMPG            = 152;
+  
+  
+  
+  
+  
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short IFEQ             = 153;
@@ -842,18 +686,14 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INVOKESPECIAL    = 183;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short INVOKENONVIRTUAL = 183; // Old name in JDK 1.0
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INVOKESTATIC     = 184;
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INVOKEINTERFACE  = 185;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short INVOKEDYNAMIC    = 186;
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short NEW              = 187;
@@ -863,24 +703,16 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short ANEWARRAY        = 189;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ARRAYLENGTH      = 190;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ATHROW           = 191;
+  
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short CHECKCAST        = 192;
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INSTANCEOF       = 193;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short MONITORENTER     = 194;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short MONITOREXIT      = 195;
+  
+  
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short WIDE             = 196;
@@ -903,106 +735,31 @@ public interface Constants {
   /** JVM internal opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html#60105">Reserved opcodes in the Java Virtual Machine Specification</a> */
   public static final short BREAKPOINT                = 202;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short LDC_QUICK                 = 203;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short LDC_W_QUICK               = 204;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short LDC2_W_QUICK              = 205;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short GETFIELD_QUICK            = 206;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short PUTFIELD_QUICK            = 207;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short GETFIELD2_QUICK           = 208;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short PUTFIELD2_QUICK           = 209;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short GETSTATIC_QUICK           = 210;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short PUTSTATIC_QUICK           = 211;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short GETSTATIC2_QUICK          = 212;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short PUTSTATIC2_QUICK          = 213;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKEVIRTUAL_QUICK       = 214;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKENONVIRTUAL_QUICK    = 215;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKESUPER_QUICK         = 216;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKESTATIC_QUICK        = 217;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKEINTERFACE_QUICK     = 218;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKEVIRTUALOBJECT_QUICK = 219;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short NEW_QUICK                 = 221;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short ANEWARRAY_QUICK           = 222;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short MULTIANEWARRAY_QUICK      = 223;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short CHECKCAST_QUICK           = 224;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INSTANCEOF_QUICK          = 225;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short INVOKEVIRTUAL_QUICK_W     = 226;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short GETFIELD_QUICK_W          = 227;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/first_edition/html/Quick.doc.html#10673">Specification of _quick opcodes in the Java Virtual Machine Specification (version 1)</a>
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/ChangesAppendix.doc.html#448885">Why the _quick opcodes were removed from the second version of the Java Virtual Machine Specification.</a> */
-  public static final short PUTFIELD_QUICK_W          = 228;
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   /** JVM internal opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html#60105">Reserved opcodes in the Java Virtual Machine Specification</a> */
   public static final short IMPDEP1                   = 254;
@@ -1010,16 +767,8 @@ public interface Constants {
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html#60105">Reserved opcodes in the Java Virtual Machine Specification</a> */
   public static final short IMPDEP2                   = 255;
 
-  /**
-   * BCEL virtual instruction for pushing an arbitrary data type onto the stack.  Will be converted to the appropriate JVM
-   * opcode when the class is dumped.
-   */
-  public static final short PUSH             = 4711;
-  /**
-   * BCEL virtual instruction for either LOOKUPSWITCH or TABLESWITCH.  Will be converted to the appropriate JVM
-   * opcode when the class is dumped.
-   */
-  public static final short SWITCH           = 4712;
+  
+  
 
   /** Illegal opcode. */
   public static final short  UNDEFINED      = -1;
@@ -1071,16 +820,7 @@ public interface Constants {
     "void", "array", "object", "unknown", "address"
   };
 
-  /** The primitive class names corresponding to the T_XX constants,
-   * e.g., CLASS_TYPE_NAMES[T_INT] = "java.lang.Integer"
-   */
-  public static final String[] CLASS_TYPE_NAMES = {
-    ILLEGAL_TYPE, ILLEGAL_TYPE,  ILLEGAL_TYPE, ILLEGAL_TYPE,
-    "java.lang.Boolean", "java.lang.Character", "java.lang.Float",
-    "java.lang.Double", "java.lang.Byte", "java.lang.Short",
-    "java.lang.Integer", "java.lang.Long", "java.lang.Void",
-    ILLEGAL_TYPE, ILLEGAL_TYPE,  ILLEGAL_TYPE,  ILLEGAL_TYPE
-  };
+  
 
   /** The signature characters corresponding to primitive types,
    * e.g., SHORT_TYPE_NAMES[T_INT] = "I"
@@ -1430,12 +1170,12 @@ public interface Constants {
   /** Constants used in the StackMap attribute.
    */
   public static final byte ITEM_Bogus      = 0;
-  public static final byte ITEM_Integer    = 1;
-  public static final byte ITEM_Float      = 2;
-  public static final byte ITEM_Double     = 3;
-  public static final byte ITEM_Long       = 4;
-  public static final byte ITEM_Null       = 5;
-  public static final byte ITEM_InitObject = 6;
+  
+  
+  
+  
+  
+  
   public static final byte ITEM_Object     = 7;
   public static final byte ITEM_NewObject  = 8;
 

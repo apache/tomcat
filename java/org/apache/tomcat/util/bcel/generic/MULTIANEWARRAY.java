@@ -18,7 +18,6 @@ package org.apache.tomcat.util.bcel.generic;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.apache.tomcat.util.bcel.ExceptionConstants;
 import org.apache.tomcat.util.bcel.classfile.ConstantPool;
 import org.apache.tomcat.util.bcel.util.ByteSequence;
 
@@ -43,14 +42,7 @@ public class MULTIANEWARRAY extends CPInstruction implements LoadClass, Allocati
     }
 
 
-    public MULTIANEWARRAY(int index, short dimensions) {
-        super(org.apache.tomcat.util.bcel.Constants.MULTIANEWARRAY, index);
-        if (dimensions < 1) {
-            throw new ClassGenException("Invalid dimensions value: " + dimensions);
-        }
-        this.dimensions = dimensions;
-        length = 4;
-    }
+    
 
 
     /**
@@ -74,12 +66,7 @@ public class MULTIANEWARRAY extends CPInstruction implements LoadClass, Allocati
     }
 
 
-    /**
-     * @return number of dimensions to be created
-     */
-    public final short getDimensions() {
-        return dimensions;
-    }
+    
 
 
     /**
@@ -108,21 +95,8 @@ public class MULTIANEWARRAY extends CPInstruction implements LoadClass, Allocati
     }
 
 
-    public Class[] getExceptions() {
-        Class[] cs = new Class[2 + ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length + 1] = ExceptionConstants.NEGATIVE_ARRAY_SIZE_EXCEPTION;
-        cs[ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length] = ExceptionConstants.ILLEGAL_ACCESS_ERROR;
-        return cs;
-    }
+    
 
 
-    public ObjectType getLoadClassType( ConstantPoolGen cpg ) {
-        Type t = getType(cpg);
-        if (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBasicType();
-        }
-        return (t instanceof ObjectType) ? (ObjectType) t : null;
-    }
+    
 }

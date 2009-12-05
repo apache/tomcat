@@ -36,12 +36,7 @@ public final class ConstantUtf8 extends Constant {
     private String bytes;
 
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantUtf8(ConstantUtf8 c) {
-        this(c.getBytes());
-    }
+    
 
 
     /**
@@ -100,12 +95,7 @@ public final class ConstantUtf8 extends Constant {
     }
 
 
-    /**
-     * @param bytes the raw bytes of this Utf-8
-     */
-    public final void setBytes( String bytes ) {
-        this.bytes = bytes;
-    }
+    
 
 
     /**

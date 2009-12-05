@@ -37,12 +37,7 @@ public class LOOKUPSWITCH extends Select {
     }
 
 
-    public LOOKUPSWITCH(int[] match, InstructionHandle[] targets, InstructionHandle defaultTarget) {
-        super(org.apache.tomcat.util.bcel.Constants.LOOKUPSWITCH, match, targets, defaultTarget);
-        length = (short) (9 + match_length * 8); /* alignment remainder assumed
-         * 0 here, until dump time. */
-        fixed_length = length;
-    }
+    
 
 
     /**

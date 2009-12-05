@@ -38,12 +38,7 @@ public abstract class InvokeInstruction extends FieldOrMethod implements Excepti
     }
 
 
-    /**
-     * @param index to constant pool
-     */
-    protected InvokeInstruction(short opcode, int index) {
-        super(opcode, index);
-    }
+    
 
 
     /**
@@ -94,11 +89,7 @@ public abstract class InvokeInstruction extends FieldOrMethod implements Excepti
     }
 
 
-    /** @return name of referenced method.
-     */
-    public String getMethodName( ConstantPoolGen cpg ) {
-        return getName(cpg);
-    }
+    
 
 
     /** @return return type of referenced method.
@@ -108,9 +99,5 @@ public abstract class InvokeInstruction extends FieldOrMethod implements Excepti
     }
 
 
-    /** @return argument types of referenced method.
-     */
-    public Type[] getArgumentTypes( ConstantPoolGen cpg ) {
-        return Type.getArgumentTypes(getSignature(cpg));
-    }
+    
 }

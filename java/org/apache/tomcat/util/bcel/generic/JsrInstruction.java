@@ -25,9 +25,7 @@ package org.apache.tomcat.util.bcel.generic;
 public abstract class JsrInstruction extends BranchInstruction implements UnconditionalBranch,
         TypedInstruction, StackProducer {
 
-    JsrInstruction(short opcode, InstructionHandle target) {
-        super(opcode, target);
-    }
+    
 
 
     /**
