@@ -60,13 +60,7 @@ public class ElementValuePair
 		return elementNameIndex;
 	}
 
-	public String toShortString()
-	{
-		StringBuffer result = new StringBuffer();
-		result.append(getNameString()).append("=").append(
-				getValue().toShortString());
-		return result.toString();
-	}
+	
 	
 	protected void dump(DataOutputStream dos) throws IOException {
 		dos.writeShort(elementNameIndex); // u2 name of the element

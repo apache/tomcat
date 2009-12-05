@@ -37,13 +37,7 @@ public final class InnerClasses extends Attribute {
     private int number_of_classes;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public InnerClasses(InnerClasses c) {
-        this(c.getNameIndex(), c.getLength(), c.getInnerClasses(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -106,12 +100,7 @@ public final class InnerClasses extends Attribute {
     }
 
 
-    /**
-     * @return array of inner class "records"
-     */
-    public final InnerClass[] getInnerClasses() {
-        return inner_classes;
-    }
+    
 
 
     /**

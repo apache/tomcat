@@ -34,152 +34,73 @@ public abstract class AccessFlags implements java.io.Serializable {
     }
 
 
-    /**
-     * @param a inital access flags
-     */
-    public AccessFlags(int a) {
-        access_flags = a;
-    }
+    
 
 
-    /** 
-     * @return Access flags of the object aka. "modifiers".
-     */
-    public final int getAccessFlags() {
-        return access_flags;
-    }
+    
 
 
-    /** 
-     * @return Access flags of the object aka. "modifiers".
-     */
-    public final int getModifiers() {
-        return access_flags;
-    }
+    
 
 
-    /** Set access flags aka "modifiers".
-     * @param access_flags Access flags of the object. 
-     */
-    public final void setAccessFlags( int access_flags ) {
-        this.access_flags = access_flags;
-    }
+    
 
 
-    /** Set access flags aka "modifiers".
-     * @param access_flags Access flags of the object. 
-     */
-    public final void setModifiers( int access_flags ) {
-        setAccessFlags(access_flags);
-    }
+    
 
 
-    private final void setFlag( int flag, boolean set ) {
-        if ((access_flags & flag) != 0) { // Flag is set already
-            if (!set) {
-                access_flags ^= flag;
-            }
-        } else { // Flag not set
-            if (set) {
-                access_flags |= flag;
-            }
-        }
-    }
+    
 
 
-    public final void isPublic( boolean flag ) {
-        setFlag(Constants.ACC_PUBLIC, flag);
-    }
+    
 
 
-    public final boolean isPublic() {
-        return (access_flags & Constants.ACC_PUBLIC) != 0;
-    }
+    
 
 
-    public final void isPrivate( boolean flag ) {
-        setFlag(Constants.ACC_PRIVATE, flag);
-    }
+    
 
 
-    public final boolean isPrivate() {
-        return (access_flags & Constants.ACC_PRIVATE) != 0;
-    }
+    
 
 
-    public final void isProtected( boolean flag ) {
-        setFlag(Constants.ACC_PROTECTED, flag);
-    }
+    
 
 
-    public final boolean isProtected() {
-        return (access_flags & Constants.ACC_PROTECTED) != 0;
-    }
+    
 
 
-    public final void isStatic( boolean flag ) {
-        setFlag(Constants.ACC_STATIC, flag);
-    }
+    
 
 
-    public final boolean isStatic() {
-        return (access_flags & Constants.ACC_STATIC) != 0;
-    }
+    
 
 
-    public final void isFinal( boolean flag ) {
-        setFlag(Constants.ACC_FINAL, flag);
-    }
+    
 
 
-    public final boolean isFinal() {
-        return (access_flags & Constants.ACC_FINAL) != 0;
-    }
+    
 
 
-    public final void isSynchronized( boolean flag ) {
-        setFlag(Constants.ACC_SYNCHRONIZED, flag);
-    }
+    
 
 
-    public final boolean isSynchronized() {
-        return (access_flags & Constants.ACC_SYNCHRONIZED) != 0;
-    }
+    
 
 
-    public final void isVolatile( boolean flag ) {
-        setFlag(Constants.ACC_VOLATILE, flag);
-    }
+    
 
 
-    public final boolean isVolatile() {
-        return (access_flags & Constants.ACC_VOLATILE) != 0;
-    }
+    
 
 
-    public final void isTransient( boolean flag ) {
-        setFlag(Constants.ACC_TRANSIENT, flag);
-    }
+    
 
 
-    public final boolean isTransient() {
-        return (access_flags & Constants.ACC_TRANSIENT) != 0;
-    }
+    
 
 
-    public final void isNative( boolean flag ) {
-        setFlag(Constants.ACC_NATIVE, flag);
-    }
-
-
-    public final boolean isNative() {
-        return (access_flags & Constants.ACC_NATIVE) != 0;
-    }
-
-
-    public final void isInterface( boolean flag ) {
-        setFlag(Constants.ACC_INTERFACE, flag);
-    }
+    
 
 
     public final boolean isInterface() {
@@ -187,52 +108,32 @@ public abstract class AccessFlags implements java.io.Serializable {
     }
 
 
-    public final void isAbstract( boolean flag ) {
-        setFlag(Constants.ACC_ABSTRACT, flag);
-    }
+    
 
 
-    public final boolean isAbstract() {
-        return (access_flags & Constants.ACC_ABSTRACT) != 0;
-    }
+    
 
 
-    public final void isStrictfp( boolean flag ) {
-        setFlag(Constants.ACC_STRICT, flag);
-    }
+    
 
 
-    public final boolean isStrictfp() {
-        return (access_flags & Constants.ACC_STRICT) != 0;
-    }
+    
 
 
-    public final void isSynthetic( boolean flag ) {
-        setFlag(Constants.ACC_SYNTHETIC, flag);
-    }
+    
 
 
-    public final boolean isSynthetic() {
-        return (access_flags & Constants.ACC_SYNTHETIC) != 0;
-    }
+    
 
 
-    public final void isAnnotation( boolean flag ) {
-        setFlag(Constants.ACC_ANNOTATION, flag);
-    }
+    
 
 
-    public final boolean isAnnotation() {
-        return (access_flags & Constants.ACC_ANNOTATION) != 0;
-    }
+    
 
 
-    public final void isEnum( boolean flag ) {
-        setFlag(Constants.ACC_ENUM, flag);
-    }
+    
 
 
-    public final boolean isEnum() {
-        return (access_flags & Constants.ACC_ENUM) != 0;
-    }
+    
 }

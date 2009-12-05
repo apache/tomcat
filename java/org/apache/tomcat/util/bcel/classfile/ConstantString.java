@@ -36,12 +36,7 @@ public final class ConstantString extends Constant implements ConstantObject {
     private int string_index; // Identical to ConstantClass except for this name
 
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantString(ConstantString c) {
-        this(c.getStringIndex());
-    }
+    
 
 
     /** 
@@ -96,12 +91,7 @@ public final class ConstantString extends Constant implements ConstantObject {
     }
 
 
-    /**
-     * @param string_index the index into the constant of the string value
-     */
-    public final void setStringIndex( int string_index ) {
-        this.string_index = string_index;
-    }
+    
 
 
     /**
@@ -112,17 +102,8 @@ public final class ConstantString extends Constant implements ConstantObject {
     }
 
 
-    /** @return String object
-     */
-    public Object getConstantValue( ConstantPool cp ) {
-        Constant c = cp.getConstant(string_index, Constants.CONSTANT_Utf8);
-        return ((ConstantUtf8) c).getBytes();
-    }
+    
 
 
-    /** @return dereferenced string
-     */
-    public String getBytes( ConstantPool cp ) {
-        return (String) getConstantValue(cp);
-    }
+    
 }

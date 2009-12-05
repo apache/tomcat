@@ -41,12 +41,7 @@ public class BIPUSH extends Instruction implements ConstantPushInstruction {
     }
 
 
-    /** Push byte on stack
-     */
-    public BIPUSH(byte b) {
-        super(org.apache.tomcat.util.bcel.Constants.BIPUSH, (short) 2);
-        this.b = b;
-    }
+    
 
 
     /**

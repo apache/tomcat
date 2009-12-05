@@ -39,10 +39,7 @@ public class LDC extends CPInstruction implements PushInstruction, ExceptionThro
     }
 
 
-    public LDC(int index) {
-        super(org.apache.tomcat.util.bcel.Constants.LDC_W, index);
-        setSize();
-    }
+    
 
 
     // Adjust to proper size
@@ -89,23 +86,7 @@ public class LDC extends CPInstruction implements PushInstruction, ExceptionThro
     }
 
 
-    public Object getValue( ConstantPoolGen cpg ) {
-        org.apache.tomcat.util.bcel.classfile.Constant c = cpg.getConstantPool().getConstant(index);
-        switch (c.getTag()) {
-            case org.apache.tomcat.util.bcel.Constants.CONSTANT_String:
-                int i = ((org.apache.tomcat.util.bcel.classfile.ConstantString) c).getStringIndex();
-                c = cpg.getConstantPool().getConstant(i);
-                return ((org.apache.tomcat.util.bcel.classfile.ConstantUtf8) c).getBytes();
-            case org.apache.tomcat.util.bcel.Constants.CONSTANT_Float:
-                return new Float(((org.apache.tomcat.util.bcel.classfile.ConstantFloat) c).getBytes());
-            case org.apache.tomcat.util.bcel.Constants.CONSTANT_Integer:
-                return new Integer(((org.apache.tomcat.util.bcel.classfile.ConstantInteger) c).getBytes());
-            case org.apache.tomcat.util.bcel.Constants.CONSTANT_Class:
-                return c;
-            default: // Never reached
-                throw new RuntimeException("Unknown or invalid constant type at " + index);
-        }
-    }
+    
 
 
     public Type getType( ConstantPoolGen cpg ) {
@@ -124,7 +105,5 @@ public class LDC extends CPInstruction implements PushInstruction, ExceptionThro
     }
 
 
-    public Class[] getExceptions() {
-        return org.apache.tomcat.util.bcel.ExceptionConstants.EXCS_STRING_RESOLUTION;
-    }
+    
 }

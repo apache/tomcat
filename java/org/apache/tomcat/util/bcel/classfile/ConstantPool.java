@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import org.apache.tomcat.util.bcel.Constants;
@@ -80,16 +79,7 @@ public class ConstantPool implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitConstantPool(this);
-    }
+    
 
 
     /**
@@ -191,20 +181,7 @@ public class ConstantPool implements Cloneable, Node, Serializable {
     }
 
 
-    /** 
-     * Dump constant pool to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    public void dump( DataOutputStream file ) throws IOException {
-        file.writeShort(constant_pool_count);
-        for (int i = 1; i < constant_pool_count; i++) {
-            if (constant_pool[i] != null) {
-                constant_pool[i].dump(file);
-            }
-        }
-    }
+    
 
 
     /**
@@ -247,13 +224,7 @@ public class ConstantPool implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @return Array of constants.
-     * @see    Constant
-     */
-    public Constant[] getConstantPool() {
-        return constant_pool;
-    }
+    
 
 
     /**
@@ -304,12 +275,7 @@ public class ConstantPool implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @param constant Constant to set
-     */
-    public void setConstant( int index, Constant constant ) {
-        constant_pool[index] = constant;
-    }
+    
 
 
     /**
@@ -333,21 +299,5 @@ public class ConstantPool implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @return deep copy of this constant pool
-     */
-    public ConstantPool copy() {
-        ConstantPool c = null;
-        try {
-            c = (ConstantPool) clone();
-            c.constant_pool = new Constant[constant_pool_count];
-            for (int i = 1; i < constant_pool_count; i++) {
-                if (constant_pool[i] != null) {
-                    c.constant_pool[i] = constant_pool[i].copy();
-                }
-            }
-        } catch (CloneNotSupportedException e) {
-        }
-        return c;
-    }
+    
 }

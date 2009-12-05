@@ -38,12 +38,7 @@ public final class ConstantNameAndType extends Constant {
     private int signature_index; // and its signature.
 
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantNameAndType(ConstantNameAndType c) {
-        this(c.getNameIndex(), c.getSignatureIndex());
-    }
+    
 
 
     /**
@@ -101,11 +96,7 @@ public final class ConstantNameAndType extends Constant {
     }
 
 
-    /** @return name
-     */
-    public final String getName( ConstantPool cp ) {
-        return cp.constantToString(getNameIndex(), Constants.CONSTANT_Utf8);
-    }
+    
 
 
     /**
@@ -116,27 +107,13 @@ public final class ConstantNameAndType extends Constant {
     }
 
 
-    /** @return signature
-     */
-    public final String getSignature( ConstantPool cp ) {
-        return cp.constantToString(getSignatureIndex(), Constants.CONSTANT_Utf8);
-    }
+    
 
 
-    /**
-     * @param name_index the name index of this constant
-     */
-    public final void setNameIndex( int name_index ) {
-        this.name_index = name_index;
-    }
+    
 
 
-    /**
-     * @param signature_index the signature index in the constant pool of this type
-     */
-    public final void setSignatureIndex( int signature_index ) {
-        this.signature_index = signature_index;
-    }
+    
 
 
     /**

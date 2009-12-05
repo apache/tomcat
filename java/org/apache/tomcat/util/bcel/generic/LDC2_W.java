@@ -34,9 +34,7 @@ public class LDC2_W extends CPInstruction implements PushInstruction, TypedInstr
     }
 
 
-    public LDC2_W(int index) {
-        super(org.apache.tomcat.util.bcel.Constants.LDC2_W, index);
-    }
+    
 
 
     public Type getType( ConstantPoolGen cpg ) {
@@ -51,15 +49,5 @@ public class LDC2_W extends CPInstruction implements PushInstruction, TypedInstr
     }
 
 
-    public Number getValue( ConstantPoolGen cpg ) {
-        org.apache.tomcat.util.bcel.classfile.Constant c = cpg.getConstantPool().getConstant(index);
-        switch (c.getTag()) {
-            case org.apache.tomcat.util.bcel.Constants.CONSTANT_Long:
-                return new Long(((org.apache.tomcat.util.bcel.classfile.ConstantLong) c).getBytes());
-            case org.apache.tomcat.util.bcel.Constants.CONSTANT_Double:
-                return new Double(((org.apache.tomcat.util.bcel.classfile.ConstantDouble) c).getBytes());
-            default: // Never reached
-                throw new RuntimeException("Unknown or invalid constant type at " + index);
-        }
-    }
+    
 }

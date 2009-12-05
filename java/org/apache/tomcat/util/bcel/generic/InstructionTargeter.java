@@ -28,8 +28,8 @@ package org.apache.tomcat.util.bcel.generic;
  */
 public interface InstructionTargeter {
 
-    public boolean containsTarget( InstructionHandle ih );
+    
 
 
-    public void updateTarget( InstructionHandle old_ih, InstructionHandle new_ih );
+    
 }

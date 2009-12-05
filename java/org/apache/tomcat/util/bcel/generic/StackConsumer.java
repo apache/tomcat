@@ -24,7 +24,5 @@ package org.apache.tomcat.util.bcel.generic;
  */
 public interface StackConsumer {
 
-    /** @return how many words are consumed from stack
-     */
-    public int consumeStack( ConstantPoolGen cpg );
+    
 }

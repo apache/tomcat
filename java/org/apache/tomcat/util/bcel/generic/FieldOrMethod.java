@@ -38,12 +38,7 @@ public abstract class FieldOrMethod extends CPInstruction implements LoadClass {
     }
 
 
-    /**
-     * @param index to constant pool
-     */
-    protected FieldOrMethod(short opcode, int index) {
-        super(opcode, index);
-    }
+    
 
 
     /** @return signature of referenced method/field.
@@ -56,14 +51,7 @@ public abstract class FieldOrMethod extends CPInstruction implements LoadClass {
     }
 
 
-    /** @return name of referenced method/field.
-     */
-    public String getName( ConstantPoolGen cpg ) {
-        ConstantPool cp = cpg.getConstantPool();
-        ConstantCP cmr = (ConstantCP) cp.getConstant(index);
-        ConstantNameAndType cnat = (ConstantNameAndType) cp.getConstant(cmr.getNameAndTypeIndex());
-        return ((ConstantUtf8) cp.getConstant(cnat.getNameIndex())).getBytes();
-    }
+    
 
 
     /** @return name of the referenced class/interface
@@ -88,41 +76,11 @@ public abstract class FieldOrMethod extends CPInstruction implements LoadClass {
     }
 
 
-    /** @return type of the referenced class/interface
-     * @deprecated If the instruction references an array class,
-     *    the ObjectType returned will be invalid.  Use
-     *    getReferenceType() instead.
-     */
-    public ObjectType getClassType( ConstantPoolGen cpg ) {
-        return new ObjectType(getClassName(cpg));
-    }
+    
 
 
-    /**
-     * Return the reference type representing the class, interface,
-     * or array class referenced by the instruction.
-     * @param cpg the ConstantPoolGen used to create the instruction
-     * @return an ObjectType (if the referenced class type is a class
-     *   or interface), or an ArrayType (if the referenced class
-     *   type is an array class)
-     */
-    public ReferenceType getReferenceType( ConstantPoolGen cpg ) {
-        ConstantPool cp = cpg.getConstantPool();
-        ConstantCP cmr = (ConstantCP) cp.getConstant(index);
-        String className = cp.getConstantString(cmr.getClassIndex(),
-                org.apache.tomcat.util.bcel.Constants.CONSTANT_Class);
-        if (className.startsWith("[")) {
-            return (ArrayType) Type.getType(className);
-        } else {
-            className = className.replace('/', '.');
-            return new ObjectType(className);
-        }
-    }
+    
 
 
-    /** @return type of the referenced class/interface
-     */
-    public ObjectType getLoadClassType( ConstantPoolGen cpg ) {
-        return getClassType(cpg);
-    }
+    
 }

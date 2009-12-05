@@ -94,13 +94,7 @@ public class AnnotationDefault extends Attribute
 		default_value = defaultValue;
 	}
 
-	/**
-	 * @return the default value
-	 */
-	public final ElementValue getDefaultValue()
-	{
-		return default_value;
-	}
+	
 
 	public Attribute copy(ConstantPool _constant_pool)
 	{

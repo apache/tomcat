@@ -38,10 +38,7 @@ public class SimpleElementValue extends ElementValue
 		return index;
 	}
 
-	public void setIndex(int index)
-	{
-		this.index = index;
-	}
+	
 
 	public String getValueString()
 	{

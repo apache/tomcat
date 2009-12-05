@@ -28,12 +28,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantFieldref extends ConstantCP {
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantFieldref(ConstantFieldref c) {
-        super(Constants.CONSTANT_Fieldref, c.getClassIndex(), c.getNameAndTypeIndex());
-    }
+    
 
 
     /**
