@@ -45,13 +45,7 @@ public final class ConstantFloat extends Constant implements ConstantObject {
     }
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public ConstantFloat(ConstantFloat c) {
-        this(c.getBytes());
-    }
+    
 
 
     /** 
@@ -97,12 +91,7 @@ public final class ConstantFloat extends Constant implements ConstantObject {
     }
 
 
-    /**
-     * @param bytes the raw bytes that represent this float
-     */
-    public final void setBytes( float bytes ) {
-        this.bytes = bytes;
-    }
+    
 
 
     /**
@@ -113,9 +102,5 @@ public final class ConstantFloat extends Constant implements ConstantObject {
     }
 
 
-    /** @return Float object
-     */
-    public Object getConstantValue( ConstantPool cp ) {
-        return new Float(bytes);
-    }
+    
 }

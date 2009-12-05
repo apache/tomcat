@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import org.apache.tomcat.util.bcel.ExceptionConstants;
-
 /** 
  * CHECKCAST - Check whether object is of given type
  * <PRE>Stack: ..., objectref -&gt; ..., objectref</PRE>
@@ -36,30 +34,11 @@ public class CHECKCAST extends CPInstruction implements LoadClass, ExceptionThro
     }
 
 
-    /** Check whether object is of given type
-     * @param index index to class in constant pool
-     */
-    public CHECKCAST(int index) {
-        super(org.apache.tomcat.util.bcel.Constants.CHECKCAST, index);
-    }
+    
 
 
-    /** @return exceptions this instruction may cause
-     */
-    public Class[] getExceptions() {
-        Class[] cs = new Class[1 + ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION.length] = ExceptionConstants.CLASS_CAST_EXCEPTION;
-        return cs;
-    }
+    
 
 
-    public ObjectType getLoadClassType( ConstantPoolGen cpg ) {
-        Type t = getType(cpg);
-        if (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBasicType();
-        }
-        return (t instanceof ObjectType) ? (ObjectType) t : null;
-    }
+    
 }

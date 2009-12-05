@@ -36,10 +36,7 @@ public class GOTO_W extends GotoInstruction {
     }
 
 
-    public GOTO_W(InstructionHandle target) {
-        super(org.apache.tomcat.util.bcel.Constants.GOTO_W, target);
-        length = 5;
-    }
+    
 
 
     /**

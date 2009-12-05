@@ -16,9 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.ExceptionConstants;
-
 /** 
  * INVOKESPECIAL - Invoke instance method; special handling for superclass, private
  * and instance initialization method invocations
@@ -38,19 +35,8 @@ public class INVOKESPECIAL extends InvokeInstruction {
     }
 
 
-    public INVOKESPECIAL(int index) {
-        super(Constants.INVOKESPECIAL, index);
-    }
+    
 
 
-    public Class[] getExceptions() {
-        Class[] cs = new Class[4 + ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length + 3] = ExceptionConstants.UNSATISFIED_LINK_ERROR;
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length + 2] = ExceptionConstants.ABSTRACT_METHOD_ERROR;
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length + 1] = ExceptionConstants.INCOMPATIBLE_CLASS_CHANGE_ERROR;
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length] = ExceptionConstants.NULL_POINTER_EXCEPTION;
-        return cs;
-    }
+    
 }

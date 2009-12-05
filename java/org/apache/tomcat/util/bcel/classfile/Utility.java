@@ -16,28 +16,12 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FilterReader;
 import java.io.FilterWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.generic.AnnotationEntryGen;
-import org.apache.tomcat.util.bcel.generic.ConstantPoolGen;
 import org.apache.tomcat.util.bcel.util.ByteSequence;
 
 /**
@@ -168,10 +152,7 @@ public abstract class Utility {
     }
 
 
-    public static final String codeToString( byte[] code, ConstantPool constant_pool, int index,
-            int length ) {
-        return codeToString(code, constant_pool, index, length, true);
-    }
+    
 
 
     /**
@@ -427,10 +408,7 @@ public abstract class Utility {
     }
 
 
-    public static final String codeToString( ByteSequence bytes, ConstantPool constant_pool )
-            throws IOException {
-        return codeToString(bytes, constant_pool, true);
-    }
+    
 
 
     /**
@@ -484,145 +462,34 @@ public abstract class Utility {
     }
 
 
-    /**
-     * @return `flag' with bit `i' set to 1
-     */
-    public static final int setBit( int flag, int i ) {
-        return flag | pow2(i);
-    }
+    
 
 
-    /**
-     * @return `flag' with bit `i' set to 0
-     */
-    public static final int clearBit( int flag, int i ) {
-        int bit = pow2(i);
-        return (flag & bit) == 0 ? flag : flag ^ bit;
-    }
+    
 
 
-    /**
-     * @return true, if bit `i' in `flag' is set
-     */
-    public static final boolean isSet( int flag, int i ) {
-        return (flag & pow2(i)) != 0;
-    }
+    
 
 
-    /**
-     * Converts string containing the method return and argument types 
-     * to a byte code method signature.
-     *
-     * @param  ret Return type of method
-     * @param  argv Types of method arguments
-     * @return Byte code representation of method signature
-     */
-    public final static String methodTypeToSignature( String ret, String[] argv )
-            throws ClassFormatException {
-        StringBuffer buf = new StringBuffer("(");
-        String str;
-        if (argv != null) {
-            for (int i = 0; i < argv.length; i++) {
-                str = getSignature(argv[i]);
-                if (str.endsWith("V")) {
-                    throw new ClassFormatException("Invalid type: " + argv[i]);
-                }
-                buf.append(str);
-            }
-        }
-        str = getSignature(ret);
-        buf.append(")").append(str);
-        return buf.toString();
-    }
+    
 
 
-    /**
-     * @param  signature    Method signature
-     * @return Array of argument types
-     * @throws  ClassFormatException  
-     */
-    public static final String[] methodSignatureArgumentTypes( String signature )
-            throws ClassFormatException {
-        return methodSignatureArgumentTypes(signature, true);
-    }
+    
 
 
-    /**
-     * @param  signature    Method signature
-     * @param chopit Shorten class names ?
-     * @return Array of argument types
-     * @throws  ClassFormatException  
-     */
-    public static final String[] methodSignatureArgumentTypes( String signature, boolean chopit )
-            throws ClassFormatException {
-        List vec = new ArrayList();
-        int index;
-        try { // Read all declarations between for `(' and `)'
-            if (signature.charAt(0) != '(') {
-                throw new ClassFormatException("Invalid method signature: " + signature);
-            }
-            index = 1; // current string position
-            while (signature.charAt(index) != ')') {
-                vec.add(signatureToString(signature.substring(index), chopit));
-                //corrected concurrent private static field acess
-                index += unwrap(consumed_chars); // update position
-            }
-        } catch (StringIndexOutOfBoundsException e) { // Should never occur
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
-        }
-        return (String[]) vec.toArray(new String[vec.size()]);
-    }
+    
 
 
-    /**
-     * @param  signature    Method signature
-     * @return return type of method
-     * @throws  ClassFormatException  
-     */
-    public static final String methodSignatureReturnType( String signature )
-            throws ClassFormatException {
-        return methodSignatureReturnType(signature, true);
-    }
+    
 
 
-    /**
-     * @param  signature    Method signature
-     * @param chopit Shorten class names ?
-     * @return return type of method
-     * @throws  ClassFormatException  
-     */
-    public static final String methodSignatureReturnType( String signature, boolean chopit )
-            throws ClassFormatException {
-        int index;
-        String type;
-        try {
-            // Read return type after `)'
-            index = signature.lastIndexOf(')') + 1;
-            type = signatureToString(signature.substring(index), chopit);
-        } catch (StringIndexOutOfBoundsException e) { // Should never occur
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
-        }
-        return type;
-    }
+    
 
 
-    /**
-     * Converts method signature to string with all class names compacted.
-     *
-     * @param signature to convert
-     * @param name of method
-     * @param access flags of method
-     * @return Human readable signature
-     */
-    public static final String methodSignatureToString( String signature, String name, String access ) {
-        return methodSignatureToString(signature, name, access, true);
-    }
+    
 
 
-    public static final String methodSignatureToString( String signature, String name,
-            String access, boolean chopit ) {
-        return methodSignatureToString(signature, name, access, chopit, null);
-    }
+    
 
 
     /**
@@ -839,113 +706,7 @@ public abstract class Utility {
     }
 
 
-    /** Parse Java type such as "char", or "java.lang.String[]" and return the
-     * signature in byte code format, e.g. "C" or "[Ljava/lang/String;" respectively.
-     *
-     * @param  type Java type
-     * @return byte code signature
-     */
-    public static String getSignature( String type ) {
-        StringBuffer buf = new StringBuffer();
-        char[] chars = type.toCharArray();
-        boolean char_found = false, delim = false;
-        int index = -1;
-        loop: for (int i = 0; i < chars.length; i++) {
-            switch (chars[i]) {
-                case ' ':
-                case '\t':
-                case '\n':
-                case '\r':
-                case '\f':
-                    if (char_found) {
-                        delim = true;
-                    }
-                    break;
-                case '[':
-                    if (!char_found) {
-                        throw new RuntimeException("Illegal type: " + type);
-                    }
-                    index = i;
-                    break loop;
-                default:
-                    char_found = true;
-                    if (!delim) {
-                        buf.append(chars[i]);
-                    }
-            }
-        }
-        int brackets = 0;
-        if (index > 0) {
-            brackets = countBrackets(type.substring(index));
-        }
-        type = buf.toString();
-        buf.setLength(0);
-        for (int i = 0; i < brackets; i++) {
-            buf.append('[');
-        }
-        boolean found = false;
-        for (int i = Constants.T_BOOLEAN; (i <= Constants.T_VOID) && !found; i++) {
-            if (Constants.TYPE_NAMES[i].equals(type)) {
-                found = true;
-                buf.append(Constants.SHORT_TYPE_NAMES[i]);
-            }
-        }
-        if (!found) {
-            buf.append('L').append(type.replace('.', '/')).append(';');
-        }
-        return buf.toString();
-    }
-
-
-    private static int countBrackets( String brackets ) {
-        char[] chars = brackets.toCharArray();
-        int count = 0;
-        boolean open = false;
-        for (int i = 0; i < chars.length; i++) {
-            switch (chars[i]) {
-                case '[':
-                    if (open) {
-                        throw new RuntimeException("Illegally nested brackets:" + brackets);
-                    }
-                    open = true;
-                    break;
-                case ']':
-                    if (!open) {
-                        throw new RuntimeException("Illegally nested brackets:" + brackets);
-                    }
-                    open = false;
-                    count++;
-                    break;
-                default:
-                    // Don't care
-            }
-        }
-        if (open) {
-            throw new RuntimeException("Illegally nested brackets:" + brackets);
-        }
-        return count;
-    }
-
-
-    /**
-     * Return type of method signature as a byte value as defined in <em>Constants</em>
-     *
-     * @param  signature in format described above
-     * @return type of method signature
-     * @see    Constants
-     */
-    public static final byte typeOfMethodSignature( String signature ) throws ClassFormatException {
-        int index;
-        try {
-            if (signature.charAt(0) != '(') {
-                throw new ClassFormatException("Invalid method signature: " + signature);
-            }
-            index = signature.lastIndexOf(')') + 1;
-            return typeOfSignature(signature.substring(index));
-        } catch (StringIndexOutOfBoundsException e) {
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
-        }
-    }
+    
 
 
     /**
@@ -989,17 +750,7 @@ public abstract class Utility {
     }
 
 
-    /** Map opcode names to opcode numbers. E.g., return Constants.ALOAD for "aload"
-     */
-    public static short searchOpcode( String name ) {
-        name = name.toLowerCase(Locale.ENGLISH);
-        for (short i = 0; i < Constants.OPCODE_NAMES.length; i++) {
-            if (Constants.OPCODE_NAMES[i].equals(name)) {
-                return i;
-            }
-        }
-        return -1;
-    }
+    
 
 
     /**
@@ -1069,64 +820,22 @@ public abstract class Utility {
     }
 
 
-    static final boolean equals( byte[] a, byte[] b ) {
-        int size;
-        if ((size = a.length) != b.length) {
-            return false;
-        }
-        for (int i = 0; i < size; i++) {
-            if (a[i] != b[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
+    
 
 
-    public static final void printArray( PrintStream out, Object[] obj ) {
-        out.println(printArray(obj, true));
-    }
+    
 
 
-    public static final void printArray( PrintWriter out, Object[] obj ) {
-        out.println(printArray(obj, true));
-    }
+    
 
 
-    public static final String printArray( Object[] obj ) {
-        return printArray(obj, true);
-    }
+    
 
 
-    public static final String printArray( Object[] obj, boolean braces ) {
-        return printArray(obj, braces, false);
-    }
+    
 
 
-    public static final String printArray( Object[] obj, boolean braces, boolean quote ) {
-        if (obj == null) {
-            return null;
-        }
-        StringBuffer buf = new StringBuffer();
-        if (braces) {
-            buf.append('{');
-        }
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[i] != null) {
-                buf.append((quote ? "\"" : "")).append(obj[i].toString()).append(
-                        (quote ? "\"" : ""));
-            } else {
-                buf.append("null");
-            }
-            if (i < obj.length - 1) {
-                buf.append(", ");
-            }
-        }
-        if (braces) {
-            buf.append('}');
-        }
-        return buf.toString();
-    }
+    
 
 
     /** @return true, if character is one of (a, ... z, A, ... Z, 0, ... 9, _)
@@ -1137,72 +846,10 @@ public abstract class Utility {
     }
 
 
-    /** Encode byte array it into Java identifier string, i.e., a string
-     * that only contains the following characters: (a, ... z, A, ... Z,
-     * 0, ... 9, _, $).  The encoding algorithm itself is not too
-     * clever: if the current byte's ASCII value already is a valid Java
-     * identifier part, leave it as it is. Otherwise it writes the
-     * escape character($) followed by <p><ul><li> the ASCII value as a
-     * hexadecimal string, if the value is not in the range
-     * 200..247</li> <li>a Java identifier char not used in a lowercase
-     * hexadecimal string, if the value is in the range
-     * 200..247</li><ul></p>
-     *
-     * <p>This operation inflates the original byte array by roughly 40-50%</p>
-     *
-     * @param bytes the byte array to convert
-     * @param compress use gzip to minimize string
-     */
-    public static String encode( byte[] bytes, boolean compress ) throws IOException {
-        if (compress) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            GZIPOutputStream gos = new GZIPOutputStream(baos);
-            gos.write(bytes, 0, bytes.length);
-            gos.close();
-            baos.close();
-            bytes = baos.toByteArray();
-        }
-        CharArrayWriter caw = new CharArrayWriter();
-        JavaWriter jw = new JavaWriter(caw);
-        for (int i = 0; i < bytes.length; i++) {
-            int in = bytes[i] & 0x000000ff; // Normalize to unsigned
-            jw.write(in);
-        }
-        return caw.toString();
-    }
+    
 
 
-    /** Decode a string back to a byte array.
-     *
-     * @param s the string to convert
-     * @param uncompress use gzip to uncompress the stream of bytes
-     */
-    public static byte[] decode( String s, boolean uncompress ) throws IOException {
-        char[] chars = s.toCharArray();
-        CharArrayReader car = new CharArrayReader(chars);
-        JavaReader jr = new JavaReader(car);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int ch;
-        while ((ch = jr.read()) >= 0) {
-            bos.write(ch);
-        }
-        bos.close();
-        car.close();
-        jr.close();
-        byte[] bytes = bos.toByteArray();
-        if (uncompress) {
-            GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(bytes));
-            byte[] tmp = new byte[bytes.length * 3]; // Rough estimate
-            int count = 0;
-            int b;
-            while ((b = gis.read()) >= 0) {
-                tmp[count++] = (byte) b;
-            }
-            bytes = new byte[count];
-            System.arraycopy(tmp, 0, bytes, 0, count);
-        }
-        return bytes;
-    }
+    
 
     // A-Z, g-z, _, $
     private static final int FREE_CHARS = 48;
@@ -1347,179 +994,9 @@ public abstract class Utility {
     }
 
 
-    /**
-     * Converts a list of AnnotationGen objects into a set of attributes 
-     * that can be attached to the class file.
-     *
-     * @param cp The constant pool gen where we can create the necessary name refs
-     * @param vec A list of AnnotationGen objects
-     */
-    public static Attribute[] getAnnotationAttributes(ConstantPoolGen cp,List vec) {
-    	
-    	if (vec.isEmpty()) return new Attribute[0];
-    	
-    	try {
-    		int countVisible   = 0;
-    		int countInvisible = 0;
-    	
-    		//  put the annotations in the right output stream
-    		for (int i=0; i<vec.size(); i++) {
-    			AnnotationEntryGen a = (AnnotationEntryGen)vec.get(i);
-    			if (a.isRuntimeVisible()) countVisible++;
-    			else			   countInvisible++;
-    		}
-    	
-    		ByteArrayOutputStream rvaBytes = new ByteArrayOutputStream();
-    		ByteArrayOutputStream riaBytes = new ByteArrayOutputStream();
-    		DataOutputStream rvaDos = new DataOutputStream(rvaBytes);
-    		DataOutputStream riaDos = new DataOutputStream(riaBytes);
-    	
-    		rvaDos.writeShort(countVisible);
-    		riaDos.writeShort(countInvisible);
-
-    		// put the annotations in the right output stream
-    		for (int i=0; i<vec.size(); i++) {
-    			AnnotationEntryGen a = (AnnotationEntryGen)vec.get(i);
-    			if (a.isRuntimeVisible()) a.dump(rvaDos);
-    			else			   a.dump(riaDos);
-    		}
-
-      rvaDos.close();
-      riaDos.close();
-      
-      byte[] rvaData = rvaBytes.toByteArray();
-      byte[] riaData = riaBytes.toByteArray();
-      
-      int rvaIndex = -1;
-      int riaIndex = -1;
-      
-      if (rvaData.length>2) rvaIndex = cp.addUtf8("RuntimeVisibleAnnotations");
-      if (riaData.length>2) riaIndex = cp.addUtf8("RuntimeInvisibleAnnotations");
-
-    	List newAttributes = new ArrayList();
-    	if (rvaData.length>2) {
-    		
-    		newAttributes.add(
-    		  new RuntimeVisibleAnnotations(rvaIndex,rvaData.length,new DataInputStream(new ByteArrayInputStream(rvaData)),cp.getConstantPool()));
-    	}
-    	if (riaData.length>2) {
-    		newAttributes.add(
-    		  new RuntimeInvisibleAnnotations(riaIndex,riaData.length,new DataInputStream(new ByteArrayInputStream(riaData)),cp.getConstantPool()));
-    	}
-
-    	return (Attribute[])newAttributes.toArray(new Attribute[newAttributes.size()]);
-    	} catch (IOException e) {
-    		System.err.println("IOException whilst processing annotations");
-  		e.printStackTrace();
-  	}
-    	return null;
-    }
+    
 
 
-    /**
-	 * Annotations against a class are stored in one of four attribute kinds:
-	 * - RuntimeVisibleParameterAnnotations
-	 * - RuntimeInvisibleParameterAnnotations
-	 */
-	public static Attribute[] getParameterAnnotationAttributes(
-			ConstantPoolGen cp,
-			List[] /*Array of lists, array size depends on #params */vec)
-	{
-		int visCount[] = new int[vec.length];
-		int totalVisCount = 0;
-		int invisCount[] = new int[vec.length];
-		int totalInvisCount = 0;
-		try
-		{
-			for (int i = 0; i < vec.length; i++)
-			{
-				List l = vec[i];
-				if (l != null)
-				{
-					for (Iterator iter = l.iterator(); iter.hasNext();)
-					{
-						AnnotationEntryGen element = (AnnotationEntryGen) iter.next();
-						if (element.isRuntimeVisible())
-						{
-							visCount[i]++;
-							totalVisCount++;
-						}
-						else
-						{
-							invisCount[i]++;
-							totalInvisCount++;
-						}
-					}
-				}
-			}
-			// Lets do the visible ones
-			ByteArrayOutputStream rvaBytes = new ByteArrayOutputStream();
-			DataOutputStream rvaDos = new DataOutputStream(rvaBytes);
-			rvaDos.writeByte(vec.length); // First goes number of parameters
-			for (int i = 0; i < vec.length; i++)
-			{
-				rvaDos.writeShort(visCount[i]);
-				if (visCount[i] > 0)
-				{
-					List l = vec[i];
-					for (Iterator iter = l.iterator(); iter.hasNext();)
-					{
-						AnnotationEntryGen element = (AnnotationEntryGen) iter.next();
-						if (element.isRuntimeVisible())
-							element.dump(rvaDos);
-					}
-				}
-			}
-			rvaDos.close();
-			// Lets do the invisible ones
-			ByteArrayOutputStream riaBytes = new ByteArrayOutputStream();
-			DataOutputStream riaDos = new DataOutputStream(riaBytes);
-			riaDos.writeByte(vec.length); // First goes number of parameters
-			for (int i = 0; i < vec.length; i++)
-			{
-				riaDos.writeShort(invisCount[i]);
-				if (invisCount[i] > 0)
-				{
-					List l = vec[i];
-					for (Iterator iter = l.iterator(); iter.hasNext();)
-					{
-						AnnotationEntryGen element = (AnnotationEntryGen) iter.next();
-						if (!element.isRuntimeVisible())
-							element.dump(riaDos);
-					}
-				}
-			}
-			riaDos.close();
-			byte[] rvaData = rvaBytes.toByteArray();
-			byte[] riaData = riaBytes.toByteArray();
-			int rvaIndex = -1;
-			int riaIndex = -1;
-			if (totalVisCount > 0)
-				rvaIndex = cp.addUtf8("RuntimeVisibleParameterAnnotations");
-			if (totalInvisCount > 0)
-				riaIndex = cp.addUtf8("RuntimeInvisibleParameterAnnotations");
-			List newAttributes = new ArrayList();
-			if (totalVisCount > 0)
-			{
-				newAttributes
-						.add(new RuntimeVisibleParameterAnnotations(rvaIndex,
-								rvaData.length, new DataInputStream(new ByteArrayInputStream(rvaData)), cp.getConstantPool()));
-			}
-			if (totalInvisCount > 0)
-			{
-				newAttributes
-						.add(new RuntimeInvisibleParameterAnnotations(riaIndex,
-								riaData.length, new DataInputStream(new ByteArrayInputStream(riaData)), cp.getConstantPool()));
-			}
-			return (Attribute[]) newAttributes.toArray(new Attribute[newAttributes.size()]);
-		}
-		catch (IOException e)
-		{
-			System.err
-					.println("IOException whilst processing parameter annotations");
-			e.printStackTrace();
-		}
-		return null;
-	}
+    
 
 }

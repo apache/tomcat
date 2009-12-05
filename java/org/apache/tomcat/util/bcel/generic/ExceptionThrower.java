@@ -38,5 +38,5 @@ package org.apache.tomcat.util.bcel.generic;
  */
 public interface ExceptionThrower {
 
-    public java.lang.Class[] getExceptions();
+    
 }

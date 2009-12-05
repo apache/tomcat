@@ -16,9 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.ExceptionConstants;
-
 /** 
  * GETFIELD - Fetch field from object
  * <PRE>Stack: ..., objectref -&gt; ..., value</PRE>
@@ -39,9 +36,7 @@ public class GETFIELD extends FieldInstruction implements ExceptionThrower, Stac
     }
 
 
-    public GETFIELD(int index) {
-        super(Constants.GETFIELD, index);
-    }
+    
 
 
     public int produceStack( ConstantPoolGen cpg ) {
@@ -49,12 +44,5 @@ public class GETFIELD extends FieldInstruction implements ExceptionThrower, Stac
     }
 
 
-    public Class[] getExceptions() {
-        Class[] cs = new Class[2 + ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length + 1] = ExceptionConstants.INCOMPATIBLE_CLASS_CHANGE_ERROR;
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length] = ExceptionConstants.NULL_POINTER_EXCEPTION;
-        return cs;
-    }
+    
 }

@@ -89,26 +89,11 @@ public abstract class ParameterAnnotations extends Attribute {
     }
 
 
-    /**
-     * @return the parameter annotation entry table
-     */
-    public final ParameterAnnotationEntry[] getParameterAnnotationTable() {
-        return parameter_annotation_table;
-    }
+    
 
 
-    /**
-     * returns the array of parameter annotation entries in this parameter annotation
-     */
-    public ParameterAnnotationEntry[] getParameterAnnotationEntries() {
-        return parameter_annotation_table;
-    }
+    
 
 
-    /**
-     * @return the number of parameter annotation entries in this parameter annotation
-     */
-    public final int getNumParameterAnnotation() {
-        return num_parameters;
-    }
+    
 }

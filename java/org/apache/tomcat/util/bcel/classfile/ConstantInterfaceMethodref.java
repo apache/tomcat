@@ -28,12 +28,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantInterfaceMethodref extends ConstantCP {
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantInterfaceMethodref(ConstantInterfaceMethodref c) {
-        super(Constants.CONSTANT_InterfaceMethodref, c.getClassIndex(), c.getNameAndTypeIndex());
-    }
+    
 
 
     /**

@@ -17,74 +17,25 @@ public class SimpleElementValueGen extends ElementValueGen
 	// For 'class' this points to the class entry in the cpGen
 	private int idx;
 
-	// ctors for each supported type... type could be inferred but for now lets
-	// force it to be passed
-	/**
-	 * Protected ctor used for deserialization, doesn't *put* an entry in the
-	 * constant pool, assumes the one at the supplied index is correct.
-	 */
-	protected SimpleElementValueGen(int type, int idx, ConstantPoolGen cpGen)
-	{
-		super(type, cpGen);
-		this.idx = idx;
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, int value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addInteger(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, long value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addLong(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, double value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addDouble(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, float value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addFloat(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, short value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addInteger(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, byte value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addInteger(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, char value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addInteger(value);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, boolean value)
-	{
-		super(type, cpGen);
-		if (value)
-			idx = cpGen.addInteger(1);
-		else
-			idx = cpGen.addInteger(0);
-	}
+	
 
-	public SimpleElementValueGen(int type, ConstantPoolGen cpGen, String value)
-	{
-		super(type, cpGen);
-		idx = cpGen.addUtf8(value);
-	}
+	
 
 	/**
 	 * The boolean controls whether we copy info from the 'old' constant pool to
@@ -155,28 +106,11 @@ public class SimpleElementValueGen extends ElementValueGen
 		return new SimpleElementValue(type, idx, cpGen.getConstantPool());
 	}
 
-	public int getIndex()
-	{
-		return idx;
-	}
+	
 
-	public String getValueString()
-	{
-		if (type != STRING)
-			throw new RuntimeException(
-					"Dont call getValueString() on a non STRING ElementValue");
-		ConstantUtf8 c = (ConstantUtf8) cpGen.getConstant(idx);
-		return c.getBytes();
-	}
+	
 
-	public int getValueInt()
-	{
-		if (type != PRIMITIVE_INT)
-			throw new RuntimeException(
-					"Dont call getValueString() on a non STRING ElementValue");
-		ConstantInteger c = (ConstantInteger) cpGen.getConstant(idx);
-		return c.getBytes();
-	}
+	
 
 	// Whatever kind of value it is, return it as a string
 	public String stringifyValue()

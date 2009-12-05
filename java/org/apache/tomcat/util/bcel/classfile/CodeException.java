@@ -45,12 +45,7 @@ public final class CodeException implements Cloneable, Constants, Node, Serializ
      */
 
 
-    /**
-     * Initialize from another object.
-     */
-    public CodeException(CodeException c) {
-        this(c.getStartPC(), c.getEndPC(), c.getHandlerPC(), c.getCatchType());
-    }
+    
 
 
     /**
@@ -82,16 +77,7 @@ public final class CodeException implements Cloneable, Constants, Node, Serializ
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitCodeException(this);
-    }
+    
 
 
     /**
@@ -108,69 +94,28 @@ public final class CodeException implements Cloneable, Constants, Node, Serializ
     }
 
 
-    /**
-     * @return 0, if the handler catches any exception, otherwise it points to
-     * the exception class which is to be caught.
-     */
-    public final int getCatchType() {
-        return catch_type;
-    }
+    
 
 
-    /**
-     * @return Exclusive end index of the region where the handler is active.
-     */
-    public final int getEndPC() {
-        return end_pc;
-    }
+    
 
 
-    /**
-     * @return Starting address of exception handler, relative to the code.
-     */
-    public final int getHandlerPC() {
-        return handler_pc;
-    }
+    
 
 
-    /**
-     * @return Inclusive start index of the region where the handler is active.
-     */
-    public final int getStartPC() {
-        return start_pc;
-    }
+    
 
 
-    /**
-     * @param catch_type the type of exception that is caught
-     */
-    public final void setCatchType( int catch_type ) {
-        this.catch_type = catch_type;
-    }
+    
 
 
-    /**
-     * @param end_pc end of handled block
-     */
-    public final void setEndPC( int end_pc ) {
-        this.end_pc = end_pc;
-    }
+    
 
 
-    /**
-     * @param handler_pc where the actual code is
-     */
-    public final void setHandlerPC( int handler_pc ) {
-        this.handler_pc = handler_pc;
-    }
+    
 
 
-    /**
-     * @param start_pc start of handled block
-     */
-    public final void setStartPC( int start_pc ) {
-        this.start_pc = start_pc;
-    }
+    
 
 
     /**
@@ -197,9 +142,7 @@ public final class CodeException implements Cloneable, Constants, Node, Serializ
     }
 
 
-    public final String toString( ConstantPool cp ) {
-        return toString(cp, true);
-    }
+    
 
 
     /**

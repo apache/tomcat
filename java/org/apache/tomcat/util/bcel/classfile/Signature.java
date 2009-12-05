@@ -36,13 +36,7 @@ public final class Signature extends Attribute {
     private int signature_index;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public Signature(Signature c) {
-        this(c.getNameIndex(), c.getLength(), c.getSignatureIndex(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -96,20 +90,10 @@ public final class Signature extends Attribute {
     }
 
 
-    /**
-     * @return Index in constant pool of source file name.
-     */
-    public final int getSignatureIndex() {
-        return signature_index;
-    }
+    
 
 
-    /**
-     * @param signature_index the index info the constant pool of this signature
-     */
-    public final void setSignatureIndex( int signature_index ) {
-        this.signature_index = signature_index;
-    }
+    
 
 
     /**
@@ -129,130 +113,6 @@ public final class Signature extends Attribute {
         MyByteArrayInputStream(String data) {
             super(data.getBytes());
         }
-
-
-        final int mark() {
-            return pos;
-        }
-
-
-        final String getData() {
-            return new String(buf);
-        }
-
-
-        final void reset( int p ) {
-            pos = p;
-        }
-
-
-        final void unread() {
-            if (pos > 0) {
-                pos--;
-            }
-        }
-    }
-
-
-    private static boolean identStart( int ch ) {
-        return ch == 'T' || ch == 'L';
-    }
-
-
-    private static final void matchIdent( MyByteArrayInputStream in, StringBuffer buf ) {
-        int ch;
-        if ((ch = in.read()) == -1) {
-            throw new RuntimeException("Illegal signature: " + in.getData()
-                    + " no ident, reaching EOF");
-        }
-        //System.out.println("return from ident:" + (char)ch);
-        if (!identStart(ch)) {
-            StringBuffer buf2 = new StringBuffer();
-            int count = 1;
-            while (Character.isJavaIdentifierPart((char) ch)) {
-                buf2.append((char) ch);
-                count++;
-                ch = in.read();
-            }
-            if (ch == ':') { // Ok, formal parameter
-                in.skip("Ljava/lang/Object".length());
-                buf.append(buf2);
-                ch = in.read();
-                in.unread();
-                //System.out.println("so far:" + buf2 + ":next:" +(char)ch);
-            } else {
-                for (int i = 0; i < count; i++) {
-                    in.unread();
-                }
-            }
-            return;
-        }
-        StringBuffer buf2 = new StringBuffer();
-        ch = in.read();
-        do {
-            buf2.append((char) ch);
-            ch = in.read();
-            //System.out.println("within ident:"+ (char)ch);
-        } while ((ch != -1) && (Character.isJavaIdentifierPart((char) ch) || (ch == '/')));
-        buf.append(buf2.toString().replace('/', '.'));
-        //System.out.println("regular return ident:"+ (char)ch + ":" + buf2);
-        if (ch != -1) {
-            in.unread();
-        }
-    }
-
-
-    private static final void matchGJIdent( MyByteArrayInputStream in, StringBuffer buf ) {
-        int ch;
-        matchIdent(in, buf);
-        ch = in.read();
-        if ((ch == '<') || ch == '(') { // Parameterized or method
-            //System.out.println("Enter <");
-            buf.append((char) ch);
-            matchGJIdent(in, buf);
-            while (((ch = in.read()) != '>') && (ch != ')')) { // List of parameters
-                if (ch == -1) {
-                    throw new RuntimeException("Illegal signature: " + in.getData()
-                            + " reaching EOF");
-                }
-                //System.out.println("Still no >");
-                buf.append(", ");
-                in.unread();
-                matchGJIdent(in, buf); // Recursive call
-            }
-            //System.out.println("Exit >");
-            buf.append((char) ch);
-        } else {
-            in.unread();
-        }
-        ch = in.read();
-        if (identStart(ch)) {
-            in.unread();
-            matchGJIdent(in, buf);
-        } else if (ch == ')') {
-            in.unread();
-            return;
-        } else if (ch != ';') {
-            throw new RuntimeException("Illegal signature: " + in.getData() + " read " + (char) ch);
-        }
-    }
-
-
-    public static String translate( String s ) {
-        //System.out.println("Sig:" + s);
-        StringBuffer buf = new StringBuffer();
-        matchGJIdent(new MyByteArrayInputStream(s), buf);
-        return buf.toString();
-    }
-
-
-    public static final boolean isFormalParameterList( String s ) {
-        return s.startsWith("<") && (s.indexOf(':') > 0);
-    }
-
-
-    public static final boolean isActualParameterList( String s ) {
-        return s.startsWith("L") && s.endsWith(">;");
     }
 
 

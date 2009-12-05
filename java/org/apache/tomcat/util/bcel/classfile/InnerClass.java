@@ -40,13 +40,7 @@ public final class InnerClass implements Cloneable, Node, Serializable {
     private int inner_access_flags;
 
 
-    /**
-     * Initialize from another object.
-     */
-    public InnerClass(InnerClass c) {
-        this(c.getInnerClassIndex(), c.getOuterClassIndex(), c.getInnerNameIndex(), c
-                .getInnerAccessFlags());
-    }
+    
 
 
     /**
@@ -75,16 +69,7 @@ public final class InnerClass implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitInnerClass(this);
-    }
+    
 
 
     /**
@@ -101,68 +86,28 @@ public final class InnerClass implements Cloneable, Node, Serializable {
     }
 
 
-    /**
-     * @return access flags of inner class.
-     */
-    public final int getInnerAccessFlags() {
-        return inner_access_flags;
-    }
+    
 
 
-    /**
-     * @return class index of inner class.
-     */
-    public final int getInnerClassIndex() {
-        return inner_class_index;
-    }
+    
 
 
-    /**
-     * @return name index of inner class.
-     */
-    public final int getInnerNameIndex() {
-        return inner_name_index;
-    }
+    
 
 
-    /**
-     * @return class index of outer class.
-     */
-    public final int getOuterClassIndex() {
-        return outer_class_index;
-    }
+    
 
 
-    /**
-     * @param inner_access_flags access flags for this inner class
-     */
-    public final void setInnerAccessFlags( int inner_access_flags ) {
-        this.inner_access_flags = inner_access_flags;
-    }
+    
 
 
-    /**
-     * @param inner_class_index index into the constant pool for this class
-     */
-    public final void setInnerClassIndex( int inner_class_index ) {
-        this.inner_class_index = inner_class_index;
-    }
+    
 
 
-    /**
-     * @param inner_name_index index into the constant pool for this class's name
-     */
-    public final void setInnerNameIndex( int inner_name_index ) {
-        this.inner_name_index = inner_name_index;
-    }
+    
 
 
-    /**
-     * @param outer_class_index index into the constant pool for the owning class
-     */
-    public final void setOuterClassIndex( int outer_class_index ) {
-        this.outer_class_index = outer_class_index;
-    }
+    
 
 
     /**

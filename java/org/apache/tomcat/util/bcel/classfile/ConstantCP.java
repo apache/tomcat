@@ -20,8 +20,6 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /** 
  * Abstract super class for Fieldref and Methodref constants.
  *
@@ -38,12 +36,7 @@ public abstract class ConstantCP extends Constant {
     protected int class_index, name_and_type_index;
 
 
-    /**
-     * Initialize from another object.
-     */
-    public ConstantCP(ConstantCP c) {
-        this(c.getTag(), c.getClassIndex(), c.getNameAndTypeIndex());
-    }
+    
 
 
     /**
@@ -98,28 +91,13 @@ public abstract class ConstantCP extends Constant {
     }
 
 
-    /**
-     * @param class_index points to Constant_class 
-     */
-    public final void setClassIndex( int class_index ) {
-        this.class_index = class_index;
-    }
+    
 
 
-    /**
-     * @return Class this field belongs to.
-     */
-    public String getClass( ConstantPool cp ) {
-        return cp.constantToString(class_index, Constants.CONSTANT_Class);
-    }
+    
 
 
-    /**
-     * @param name_and_type_index points to Constant_NameAndType
-     */
-    public final void setNameAndTypeIndex( int name_and_type_index ) {
-        this.name_and_type_index = name_and_type_index;
-    }
+    
 
 
     /**

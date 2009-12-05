@@ -36,10 +36,7 @@ public interface Repository extends java.io.Serializable {
     public void storeClass( JavaClass clazz );
 
 
-    /**
-     * Remove class from repository
-     */
-    public void removeClass( JavaClass clazz );
+    
 
 
     /**
@@ -56,18 +53,11 @@ public interface Repository extends java.io.Serializable {
     public JavaClass loadClass( String className ) throws java.lang.ClassNotFoundException;
 
 
-    /**
-     * Find the JavaClass instance for the given run-time class object
-     */
-    public JavaClass loadClass( Class clazz ) throws java.lang.ClassNotFoundException;
+    
 
 
-    /** Clear all entries from cache.
-     */
-    public void clear();
+    
 
 
-    /** Get the ClassPath associated with this Repository
-     */
-    public ClassPath getClassPath();
+    
 }

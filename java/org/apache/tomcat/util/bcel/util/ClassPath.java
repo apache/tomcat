@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.util;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -26,12 +25,10 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -189,49 +186,11 @@ public class ClassPath implements Serializable {
         return getClassFile(name, suffix).getInputStream();
     }
 
-    /**
-     * @param name fully qualified resource name, e.g. java/lang/String.class
-     * @return InputStream supplying the resource, or null if no resource with that name.
-     */
-    public InputStream getResourceAsStream(String name) {
-        for (int i = 0; i < paths.length; i++) {
-            InputStream is;
-            if ((is = paths[i].getResourceAsStream(name)) != null) {
-                return is;
-            }
-        }
-        return null;
-    }
     
-    /**
-     * @param name fully qualified resource name, e.g. java/lang/String.class
-     * @return URL supplying the resource, or null if no resource with that name.
-     */
-    public URL getResource(String name) {
-        for (int i = 0; i < paths.length; i++) {
-            URL url;
-            if ((url = paths[i].getResource(name)) != null) {
-                return url;
-            }
-        }
-        return null;
-    }
+    
+    
 
-    /**
-     * @param name fully qualified resource name, e.g. java/lang/String.class
-     * @return An Enumeration of URLs supplying the resource, or an
-     * empty Enumeration if no resource with that name.
-     */
-    public Enumeration getResources(String name) {
-        Vector results = new Vector();
-        for (int i = 0; i < paths.length; i++) {
-            URL url;
-            if ((url = paths[i].getResource(name)) != null) {
-                results.add(url);
-            }
-        }
-        return results.elements();
-    }
+    
 
     /**
      * @param name fully qualified file name, e.g. java/lang/String
@@ -249,70 +208,19 @@ public class ClassPath implements Serializable {
     }
 
 
-    /**
-     * @param name fully qualified class name, e.g. java.lang.String
-     * @return input stream for class
-     */
-    public ClassFile getClassFile( String name ) throws IOException {
-        return getClassFile(name, ".class");
-    }
+    
 
 
-    /**
-     * @param name fully qualified file name, e.g. java/lang/String
-     * @param suffix file name ends with suffix, e.g. .java
-     * @return byte array for file on class path
-     */
-    public byte[] getBytes( String name, String suffix ) throws IOException {
-        DataInputStream dis = null;
-        try {
-            InputStream is = getInputStream(name, suffix);
-            if (is == null) {
-                throw new IOException("Couldn't find: " + name + suffix);
-            }
-            dis = new DataInputStream(is);
-            byte[] bytes = new byte[is.available()];
-            dis.readFully(bytes);
-            return bytes;
-        } finally {
-            if (dis != null) {
-                dis.close();
-            }
-        }
-    }
+    
 
 
-    /**
-     * @return byte array for class
-     */
-    public byte[] getBytes( String name ) throws IOException {
-        return getBytes(name, ".class");
-    }
+    
 
 
-    /**
-     * @param name name of file to search for, e.g. java/lang/String.java
-     * @return full (canonical) path for file
-     */
-    public String getPath( String name ) throws IOException {
-        int index = name.lastIndexOf('.');
-        String suffix = "";
-        if (index > 0) {
-            suffix = name.substring(index);
-            name = name.substring(0, index);
-        }
-        return getPath(name, suffix);
-    }
+    
 
 
-    /**
-     * @param name name of file to search for, e.g. java/lang/String
-     * @param suffix file name suffix, e.g. .java
-     * @return full (canonical) path for file, if it exists
-     */
-    public String getPath( String name, String suffix ) throws IOException {
-        return getClassFile(name, suffix).getPath();
-    }
+    
 
     private static abstract class PathEntry implements Serializable {
 
@@ -330,25 +238,16 @@ public class ClassPath implements Serializable {
         public abstract InputStream getInputStream() throws IOException;
 
 
-        /** @return canonical path to class file.
-         */
-        public abstract String getPath();
+        
 
 
-        /** @return base path of found class, i.e. class is contained relative
-         * to that path, which may either denote a directory, or zip file
-         */
-        public abstract String getBase();
+        
 
 
-        /** @return modification time of class file.
-         */
-        public abstract long getTime();
+        
 
 
-        /** @return size of class file.
-         */
-        public abstract long getSize();
+        
     }
 
     private static class Dir extends PathEntry {
@@ -387,30 +286,6 @@ public class ClassPath implements Serializable {
 
                 public InputStream getInputStream() throws IOException {
                     return new FileInputStream(file);
-                }
-
-
-                public String getPath() {
-                    try {
-                        return file.getCanonicalPath();
-                    } catch (IOException e) {
-                        return null;
-                    }
-                }
-
-
-                public long getTime() {
-                    return file.lastModified();
-                }
-
-
-                public long getSize() {
-                    return file.length();
-                }
-
-
-                public String getBase() {
-                    return dir;
                 }
             } : null;
         }
@@ -458,26 +333,6 @@ public class ClassPath implements Serializable {
 
                 public InputStream getInputStream() throws IOException {
                     return zip.getInputStream(entry);
-                }
-
-
-                public String getPath() {
-                    return entry.toString();
-                }
-
-
-                public long getTime() {
-                    return entry.getTime();
-                }
-
-
-                public long getSize() {
-                    return entry.getSize();
-                }
-
-
-                public String getBase() {
-                    return zip.getName();
                 }
             };
         }

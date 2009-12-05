@@ -50,9 +50,7 @@ public abstract class FieldGenOrMethodGen extends AccessFlags implements NamedAn
     }
 
 
-    public Type getType() {
-        return type;
-    }
+    
 
 
     /** @return name of method/field.
@@ -67,9 +65,7 @@ public abstract class FieldGenOrMethodGen extends AccessFlags implements NamedAn
     }
 
 
-    public ConstantPoolGen getConstantPool() {
-        return cp;
-    }
+    
 
 
     public void setConstantPool( ConstantPoolGen cp ) {
@@ -89,36 +85,17 @@ public abstract class FieldGenOrMethodGen extends AccessFlags implements NamedAn
         attribute_vec.add(a);
     }
     
-    public void addAnnotationEntry(AnnotationEntryGen ag)
-	{
-		annotation_vec.add(ag);
-	}
-
-
-    /**
-     * Remove an attribute.
-     */
-    public void removeAttribute( Attribute a ) {
-        attribute_vec.remove(a);
-    }
     
-    public void removeAnnotationEntry(AnnotationEntryGen ag)
-	{
-		annotation_vec.remove(ag);
-	}
 
 
-    /**
-     * Remove all attributes.
-     */
-    public void removeAttributes() {
-        attribute_vec.clear();
-    }
     
-    public void removeAnnotationEntries()
-	{
-		annotation_vec.clear();
-	}
+    
+    
+
+
+    
+    
+    
 
 
     /**
@@ -130,11 +107,7 @@ public abstract class FieldGenOrMethodGen extends AccessFlags implements NamedAn
         return attributes;
     }
     
-    public AnnotationEntryGen[] getAnnotationEntries() {
-    	AnnotationEntryGen[] annotations = new AnnotationEntryGen[annotation_vec.size()];
-      	annotation_vec.toArray(annotations);
-      	return annotations;
-      }
+    
 
 
     /** @return signature of method/field.

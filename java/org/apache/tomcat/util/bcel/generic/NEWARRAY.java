@@ -42,15 +42,10 @@ public class NEWARRAY extends Instruction implements AllocationInstruction, Exce
     }
 
 
-    public NEWARRAY(byte type) {
-        super(org.apache.tomcat.util.bcel.Constants.NEWARRAY, (short) 2);
-        this.type = type;
-    }
+    
 
 
-    public NEWARRAY(BasicType type) {
-        this(type.getType());
-    }
+    
 
 
     /**
@@ -71,12 +66,7 @@ public class NEWARRAY extends Instruction implements AllocationInstruction, Exce
     }
 
 
-    /**
-     * @return type of constructed array
-     */
-    public final Type getType() {
-        return new ArrayType(BasicType.getType(type), 1);
-    }
+    
 
 
     /**
@@ -96,9 +86,5 @@ public class NEWARRAY extends Instruction implements AllocationInstruction, Exce
     }
 
 
-    public Class[] getExceptions() {
-        return new Class[] {
-            org.apache.tomcat.util.bcel.ExceptionConstants.NEGATIVE_ARRAY_SIZE_EXCEPTION
-        };
-    }
+    
 }
