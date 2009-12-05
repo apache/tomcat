@@ -39,13 +39,7 @@ public final class ExceptionTable extends Attribute {
     private int[] exception_index_table; // constant pool
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use copy() for a physical copy.
-     */
-    public ExceptionTable(ExceptionTable c) {
-        this(c.getNameIndex(), c.getLength(), c.getExceptionIndexTable(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -107,33 +101,13 @@ public final class ExceptionTable extends Attribute {
     }
 
 
-    /**
-     * @return Array of indices into constant pool of thrown exceptions.
-     */
-    public final int[] getExceptionIndexTable() {
-        return exception_index_table;
-    }
+    
 
 
-    /**
-     * @return Length of exception table.
-     */
-    public final int getNumberOfExceptions() {
-        return number_of_exceptions;
-    }
+    
 
 
-    /**
-     * @return class names of thrown exceptions
-     */
-    public final String[] getExceptionNames() {
-        String[] names = new String[number_of_exceptions];
-        for (int i = 0; i < number_of_exceptions; i++) {
-            names[i] = constant_pool.getConstantString(exception_index_table[i],
-                    Constants.CONSTANT_Class).replace('/', '.');
-        }
-        return names;
-    }
+    
 
 
     /**

@@ -41,10 +41,7 @@ public class SIPUSH extends Instruction implements ConstantPushInstruction {
     }
 
 
-    public SIPUSH(short b) {
-        super(org.apache.tomcat.util.bcel.Constants.SIPUSH, (short) 3);
-        this.b = b;
-    }
+    
 
 
     /**
@@ -78,9 +75,5 @@ public class SIPUSH extends Instruction implements ConstantPushInstruction {
     }
 
 
-    /** @return Type.SHORT
-     */
-    public Type getType( ConstantPoolGen cp ) {
-        return Type.SHORT;
-    }
+    
 }

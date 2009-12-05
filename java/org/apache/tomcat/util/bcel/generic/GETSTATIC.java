@@ -16,9 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.ExceptionConstants;
-
 /** 
  * GETSTATIC - Fetch static field from class
  * <PRE>Stack: ..., -&gt; ..., value</PRE>
@@ -38,9 +35,7 @@ public class GETSTATIC extends FieldInstruction implements PushInstruction, Exce
     }
 
 
-    public GETSTATIC(int index) {
-        super(Constants.GETSTATIC, index);
-    }
+    
 
 
     public int produceStack( ConstantPoolGen cpg ) {
@@ -48,11 +43,5 @@ public class GETSTATIC extends FieldInstruction implements PushInstruction, Exce
     }
 
 
-    public Class[] getExceptions() {
-        Class[] cs = new Class[1 + ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length];
-        System.arraycopy(ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION, 0, cs, 0,
-                ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length);
-        cs[ExceptionConstants.EXCS_FIELD_AND_METHOD_RESOLUTION.length] = ExceptionConstants.INCOMPATIBLE_CLASS_CHANGE_ERROR;
-        return cs;
-    }
+    
 }

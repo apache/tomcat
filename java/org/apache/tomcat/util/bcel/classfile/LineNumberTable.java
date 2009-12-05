@@ -37,13 +37,7 @@ public final class LineNumberTable extends Attribute {
     private LineNumber[] line_number_table; // Table of line/numbers pairs
 
 
-    /*
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use copy() for a physical copy.
-     */
-    public LineNumberTable(LineNumberTable c) {
-        this(c.getNameIndex(), c.getLength(), c.getLineNumberTable(), c.getConstantPool());
-    }
+    
 
 
     /*
@@ -105,12 +99,7 @@ public final class LineNumberTable extends Attribute {
     }
 
 
-    /**
-     * @return Array of (pc offset, line number) pairs.
-     */
-    public final LineNumber[] getLineNumberTable() {
-        return line_number_table;
-    }
+    
 
 
     /**
@@ -145,47 +134,7 @@ public final class LineNumberTable extends Attribute {
     }
 
 
-    /**
-     * Map byte code positions to source code lines.
-     *
-     * @param pos byte code offset
-     * @return corresponding line in source code
-     */
-    public int getSourceLine( int pos ) {
-        int l = 0, r = line_number_table_length - 1;
-        if (r < 0) {
-            return -1;
-        }
-        int min_index = -1, min = -1;
-        /* Do a binary search since the array is ordered.
-         */
-        do {
-            int i = (l + r) / 2;
-            int j = line_number_table[i].getStartPC();
-            if (j == pos) {
-                return line_number_table[i].getLineNumber();
-            } else if (pos < j) {
-                r = i - 1;
-            } else {
-                l = i + 1;
-            }
-            /* If exact match can't be found (which is the most common case)
-             * return the line number that corresponds to the greatest index less
-             * than pos.
-             */
-            if (j < pos && j > min) {
-                min = j;
-                min_index = i;
-            }
-        } while (l <= r);
-        /* It's possible that we did not find any valid entry for the bytecode
-         * offset we were looking for.
-         */
-        if (min_index < 0) {
-            return -1;
-        }
-        return line_number_table[min_index].getLineNumber();
-    }
+    
 
 
     /**
@@ -202,7 +151,5 @@ public final class LineNumberTable extends Attribute {
     }
 
 
-    public final int getTableLength() {
-        return line_number_table_length;
-    }
+    
 }

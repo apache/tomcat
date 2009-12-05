@@ -36,13 +36,7 @@ public class LocalVariableTable extends Attribute {
     private LocalVariable[] local_variable_table; // variables
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use copy() for a physical copy.
-     */
-    public LocalVariableTable(LocalVariableTable c) {
-        this(c.getNameIndex(), c.getLength(), c.getLocalVariableTable(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -104,12 +98,7 @@ public class LocalVariableTable extends Attribute {
     }
 
 
-    /**
-     * @return Array of local variables of method.
-     */
-    public final LocalVariable[] getLocalVariableTable() {
-        return local_variable_table;
-    }
+    
 
 
     /** 
@@ -132,26 +121,7 @@ public class LocalVariableTable extends Attribute {
     }
 
 
-    /** 
-     * @return matching variable using index when variable is used at supplied pc
-     * 
-     * @param index the variable slot
-     * @param pc the current pc that this variable is alive
-     * 
-     * @return the LocalVariable that matches or null if not found
-     */
-    public final LocalVariable getLocalVariable( int index, int pc ) {
-        for (int i = 0; i < local_variable_table_length; i++) {
-            if (local_variable_table[i].getIndex() == index) {
-                int start_pc = local_variable_table[i].getStartPC();
-                int end_pc = start_pc + local_variable_table[i].getLength();
-                if ((pc >= start_pc) && (pc <= end_pc)) {
-                    return local_variable_table[i];
-                }
-            }
-        }
-        return null;
-    }
+    
 
 
     public final void setLocalVariableTable( LocalVariable[] local_variable_table ) {
@@ -191,7 +161,5 @@ public class LocalVariableTable extends Attribute {
     }
 
 
-    public final int getTableLength() {
-        return local_variable_table_length;
-    }
+    
 }

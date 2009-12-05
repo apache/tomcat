@@ -121,54 +121,34 @@ public final class StackMapEntry implements Cloneable {
     }
 
 
-    public void setByteCodeOffset( int b ) {
-        byte_code_offset = b;
-    }
+    
 
 
-    public int getByteCodeOffset() {
-        return byte_code_offset;
-    }
+    
 
 
-    public void setNumberOfLocals( int n ) {
-        number_of_locals = n;
-    }
+    
 
 
-    public int getNumberOfLocals() {
-        return number_of_locals;
-    }
+    
 
 
-    public void setTypesOfLocals( StackMapType[] t ) {
-        types_of_locals = t;
-    }
+    
 
 
-    public StackMapType[] getTypesOfLocals() {
-        return types_of_locals;
-    }
+    
 
 
-    public void setNumberOfStackItems( int n ) {
-        number_of_stack_items = n;
-    }
+    
 
 
-    public int getNumberOfStackItems() {
-        return number_of_stack_items;
-    }
+    
 
 
-    public void setTypesOfStackItems( StackMapType[] t ) {
-        types_of_stack_items = t;
-    }
+    
 
 
-    public StackMapType[] getTypesOfStackItems() {
-        return types_of_stack_items;
-    }
+    
 
 
     /**
@@ -183,30 +163,11 @@ public final class StackMapEntry implements Cloneable {
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitStackMapEntry(this);
-    }
+    
 
 
-    /**
-     * @return Constant pool used by this object.
-     */
-    public final ConstantPool getConstantPool() {
-        return constant_pool;
-    }
+    
 
 
-    /**
-     * @param constant_pool Constant pool to be used for this object.
-     */
-    public final void setConstantPool( ConstantPool constant_pool ) {
-        this.constant_pool = constant_pool;
-    }
+    
 }

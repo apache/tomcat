@@ -35,13 +35,7 @@ public final class Deprecated extends Attribute {
     private byte[] bytes;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public Deprecated(Deprecated c) {
-        this(c.getNameIndex(), c.getLength(), c.getBytes(), c.getConstantPool());
-    }
+    
 
 
     /**
@@ -101,20 +95,10 @@ public final class Deprecated extends Attribute {
     }
 
 
-    /**
-     * @return data bytes.
-     */
-    public final byte[] getBytes() {
-        return bytes;
-    }
+    
 
 
-    /**
-     * @param bytes the raw bytes that represents this byte array
-     */
-    public final void setBytes( byte[] bytes ) {
-        this.bytes = bytes;
-    }
+    
 
 
     /**

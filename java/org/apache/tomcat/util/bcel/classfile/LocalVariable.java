@@ -43,14 +43,7 @@ public final class LocalVariable implements Constants, Cloneable, Node, Serializ
     private ConstantPool constant_pool;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use copy() for a physical copy.
-     */
-    public LocalVariable(LocalVariable c) {
-        this(c.getStartPC(), c.getLength(), c.getNameIndex(), c.getSignatureIndex(), c.getIndex(),
-                c.getConstantPool());
-    }
+    
 
 
     /**
@@ -83,16 +76,7 @@ public final class LocalVariable implements Constants, Cloneable, Node, Serializ
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitLocalVariable(this);
-    }
+    
 
 
     /**
@@ -110,20 +94,10 @@ public final class LocalVariable implements Constants, Cloneable, Node, Serializ
     }
 
 
-    /**
-     * @return Constant pool used by this object.
-     */
-    public final ConstantPool getConstantPool() {
-        return constant_pool;
-    }
+    
 
 
-    /**
-     * @return Variable is valid within getStartPC() .. getStartPC()+getLength()
-     */
-    public final int getLength() {
-        return length;
-    }
+    
 
 
     /**
@@ -136,12 +110,7 @@ public final class LocalVariable implements Constants, Cloneable, Node, Serializ
     }
 
 
-    /**
-     * @return Index in constant pool of variable name.
-     */
-    public final int getNameIndex() {
-        return name_index;
-    }
+    
 
 
     /**
@@ -154,12 +123,7 @@ public final class LocalVariable implements Constants, Cloneable, Node, Serializ
     }
 
 
-    /**
-     * @return Index in constant pool of variable signature.
-     */
-    public final int getSignatureIndex() {
-        return signature_index;
-    }
+    
 
 
     /**
@@ -170,60 +134,25 @@ public final class LocalVariable implements Constants, Cloneable, Node, Serializ
     }
 
 
-    /**
-     * @return Start of range where he variable is valid
-     */
-    public final int getStartPC() {
-        return start_pc;
-    }
+    
 
 
-    /**
-     * @param constant_pool Constant pool to be used for this object.
-     */
-    public final void setConstantPool( ConstantPool constant_pool ) {
-        this.constant_pool = constant_pool;
-    }
+    
 
 
-    /**
-     * @param length the length of this local variable
-     */
-    public final void setLength( int length ) {
-        this.length = length;
-    }
+    
 
 
-    /**
-     * @param name_index the index into the constant pool for the name of this variable
-     */
-    public final void setNameIndex( int name_index ) {
-        this.name_index = name_index;
-    }
+    
 
 
-    /**
-     * @param signature_index the index into the constant pool for the signature of this variable
-     */
-    public final void setSignatureIndex( int signature_index ) {
-        this.signature_index = signature_index;
-    }
+    
 
 
-    /**
-     * @param index the index in the local variable table of this variable
-     */
-    public final void setIndex( int index ) {
-        this.index = index;
-    }
+    
 
 
-    /**
-     * @param start_pc Specify range where the local variable is valid.
-     */
-    public final void setStartPC( int start_pc ) {
-        this.start_pc = start_pc;
-    }
+    
 
 
     /**

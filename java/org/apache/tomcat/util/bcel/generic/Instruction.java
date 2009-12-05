@@ -19,7 +19,6 @@ package org.apache.tomcat.util.bcel.generic;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Locale;
 import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.classfile.ConstantPool;
 import org.apache.tomcat.util.bcel.util.ByteSequence;
@@ -101,28 +100,7 @@ public abstract class Instruction implements Cloneable, Serializable {
     }
 
 
-    /**
-     * Use with caution, since `BranchInstruction's have a `target' reference which
-     * is not copied correctly (only basic types are). This also applies for 
-     * `Select' instructions with their multiple branch targets.
-     *
-     * @see BranchInstruction
-     * @return (shallow) copy of an instruction
-     */
-    public Instruction copy() {
-        Instruction i = null;
-        // "Constant" instruction, no need to duplicate
-        if (InstructionConstants.INSTRUCTIONS[this.getOpcode()] != null) {
-            i = this;
-        } else {
-            try {
-                i = (Instruction) clone();
-            } catch (CloneNotSupportedException e) {
-                System.err.println(e);
-            }
-        }
-        return i;
-    }
+    
 
 
     /**
@@ -511,21 +489,10 @@ public abstract class Instruction implements Cloneable, Serializable {
     }
 
 
-    /** Get Comparator object used in the equals() method to determine
-     * equality of instructions.
-     *
-     * @return currently used comparator for equals()
-     */
-    public static InstructionComparator getComparator() {
-        return cmp;
-    }
+    
 
 
-    /** Set comparator to be used for equals().
-     */
-    public static void setComparator( InstructionComparator c ) {
-        cmp = c;
-    }
+    
 
 
     /** Check for equality, delegated to comparator

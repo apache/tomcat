@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -83,16 +81,7 @@ public class InstructionHandle implements java.io.Serializable {
     }
 
 
-    /**
-     * Temporarily swap the current instruction, without disturbing
-     * anything. Meant to be used by a debugger, implementing
-     * breakpoints. Current instruction is returned.
-     */
-    public Instruction swapInstruction( Instruction i ) {
-        Instruction oldInstruction = instruction;
-        instruction = i;
-        return oldInstruction;
-    }
+    
 
 
     /*private*/protected InstructionHandle(Instruction i) {
@@ -157,27 +146,10 @@ public class InstructionHandle implements java.io.Serializable {
     }
 
 
-    /**
-     * Delete contents, i.e., remove user access and make handle reusable.
-     */
-    void dispose() {
-        next = prev = null;
-        instruction.dispose();
-        instruction = null;
-        i_position = -1;
-        attributes = null;
-        removeAllTargeters();
-        addHandle();
-    }
+    
 
 
-    /** Remove all targeters, if any.
-     */
-    public void removeAllTargeters() {
-        if (targeters != null) {
-            targeters.clear();
-        }
-    }
+    
 
 
     /**
@@ -202,22 +174,10 @@ public class InstructionHandle implements java.io.Serializable {
     }
 
 
-    public boolean hasTargeters() {
-        return (targeters != null) && (targeters.size() > 0);
-    }
+    
 
 
-    /**
-     * @return null, if there are no targeters
-     */
-    public InstructionTargeter[] getTargeters() {
-        if (!hasTargeters()) {
-            return new InstructionTargeter[0];
-        }
-        InstructionTargeter[] t = new InstructionTargeter[targeters.size()];
-        targeters.toArray(t);
-        return t;
-    }
+    
 
 
     /** @return a (verbose) string representation of the contained instruction. 
@@ -234,48 +194,14 @@ public class InstructionHandle implements java.io.Serializable {
     }
 
 
-    /** Add an attribute to an instruction handle.
-     *
-     * @param key the key object to store/retrieve the attribute
-     * @param attr the attribute to associate with this handle
-     */
-    public void addAttribute( Object key, Object attr ) {
-        if (attributes == null) {
-            attributes = new HashMap(3);
-        }
-        attributes.put(key, attr);
-    }
+    
 
 
-    /** Delete an attribute of an instruction handle.
-     *
-     * @param key the key object to retrieve the attribute
-     */
-    public void removeAttribute( Object key ) {
-        if (attributes != null) {
-            attributes.remove(key);
-        }
-    }
+    
 
 
-    /** Get attribute of an instruction handle.
-     *
-     * @param key the key object to store/retrieve the attribute
-     */
-    public Object getAttribute( Object key ) {
-        if (attributes != null) {
-            return attributes.get(key);
-        }
-        return null;
-    }
+    
 
 
-    /** @return all attributes associated with this handle
-     */
-    public Collection getAttributes() {
-        if (attributes == null) {
-            attributes = new HashMap(3);
-        }
-        return attributes.values();
-    }
+    
 }

@@ -82,12 +82,7 @@ public class SyntheticRepository implements Repository {
     }
 
 
-    /**
-     * Remove class from repository
-     */
-    public void removeClass( JavaClass clazz ) {
-        _loadedClasses.remove(clazz.getClassName());
-    }
+    
 
 
     /**
@@ -131,44 +126,7 @@ public class SyntheticRepository implements Repository {
     }
 
 
-    /**
-     * Find the JavaClass object for a runtime Class object.
-     * If a class with the same name is already in this Repository,
-     * the Repository version is returned.  Otherwise, getResourceAsStream()
-     * is called on the Class object to find the class's representation.
-     * If the representation is found, it is added to the Repository.
-     *
-     * @see Class
-     * @param clazz the runtime Class object
-     * @return JavaClass object for given runtime class
-     * @throws ClassNotFoundException if the class is not in the
-     *   Repository, and its representation could not be found
-     */
-    public JavaClass loadClass( Class clazz ) throws ClassNotFoundException {
-    	InputStream clsStream = null;
-    	try{
-	        String className = clazz.getName();
-	        JavaClass repositoryClass = findClass(className);
-	        if (repositoryClass != null) {
-	            return repositoryClass;
-	        }
-	        String name = className;
-	        int i = name.lastIndexOf('.');
-	        if (i > 0) {
-	            name = name.substring(i + 1);
-	        }
-	        clsStream = clazz.getResourceAsStream(name + ".class");
-	        return loadClass(clsStream, className);
-    	} finally {
-    		try{
-	    		if (clsStream != null){
-	    			clsStream.close();
-	    		}
-    		} catch(IOException ioe){
-    			//don't care
-    		}
-    	}
-    }
+    
 
 
     private JavaClass loadClass( InputStream is, String className ) throws ClassNotFoundException {
@@ -187,16 +145,8 @@ public class SyntheticRepository implements Repository {
     }
 
 
-    /** ClassPath associated with the Repository.
-     */
-    public ClassPath getClassPath() {
-        return _path;
-    }
+    
 
 
-    /** Clear all entries from cache.
-     */
-    public void clear() {
-        _loadedClasses.clear();
-    }
+    
 }

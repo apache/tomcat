@@ -37,18 +37,7 @@ public class TABLESWITCH extends Select {
     }
 
 
-    /**
-     * @param match sorted array of match values, match[0] must be low value, 
-     * match[match_length - 1] high value
-     * @param targets where to branch for matched values
-     * @param defaultTarget default branch
-     */
-    public TABLESWITCH(int[] match, InstructionHandle[] targets, InstructionHandle defaultTarget) {
-        super(org.apache.tomcat.util.bcel.Constants.TABLESWITCH, match, targets, defaultTarget);
-        length = (short) (13 + match_length * 4); /* Alignment remainder assumed
-         * 0 here, until dump time */
-        fixed_length = length;
-    }
+    
 
 
     /**

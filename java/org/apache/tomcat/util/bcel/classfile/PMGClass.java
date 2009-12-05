@@ -35,14 +35,7 @@ public final class PMGClass extends Attribute {
     private int pmg_class_index, pmg_index;
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public PMGClass(PMGClass c) {
-        this(c.getNameIndex(), c.getLength(), c.getPMGIndex(), c.getPMGClassIndex(), c
-                .getConstantPool());
-    }
+    
 
 
     /**
@@ -99,36 +92,16 @@ public final class PMGClass extends Attribute {
     }
 
 
-    /**
-     * @return Index in constant pool of source file name.
-     */
-    public final int getPMGClassIndex() {
-        return pmg_class_index;
-    }
+    
 
 
-    /**
-     * @param pmg_class_index
-     */
-    public final void setPMGClassIndex( int pmg_class_index ) {
-        this.pmg_class_index = pmg_class_index;
-    }
+    
 
 
-    /**
-     * @return Index in constant pool of source file name.
-     */
-    public final int getPMGIndex() {
-        return pmg_index;
-    }
+    
 
 
-    /**
-     * @param pmg_index
-     */
-    public final void setPMGIndex( int pmg_index ) {
-        this.pmg_index = pmg_index;
-    }
+    
 
 
     /**

@@ -26,7 +26,5 @@ package org.apache.tomcat.util.bcel.classfile;
  */
 public interface ConstantObject {
 
-    /** @return object representing the constant, e.g., Long for ConstantLong
-     */
-    public abstract Object getConstantValue( ConstantPool cp );
+    
 }

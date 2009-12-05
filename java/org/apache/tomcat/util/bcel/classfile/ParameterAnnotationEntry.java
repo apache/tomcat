@@ -48,30 +48,11 @@ public class ParameterAnnotationEntry implements Node, Constants {
     }
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        //	    v.visitParameterAnnotationEntry(this);
-    }
+    
 
 
-    /**
-     * @return the number of annotation entries in this parameter annotation
-     */
-    public final int getNumAnnotations() {
-        return annotation_table_length;
-    }
+    
 
 
-    /**
-     * returns the array of annotation entries in this annotation
-     */
-    public AnnotationEntry[] getAnnotationEntries() {
-        return annotation_table;
-    }
+    
 }

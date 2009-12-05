@@ -19,7 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.generic.Type;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
@@ -57,13 +56,7 @@ public final class Method extends FieldOrMethod {
     }
 
 
-    /**
-     * Initialize from another object. Note that both objects use the same
-     * references (shallow copy). Use clone() for a physical copy.
-     */
-    public Method(Method c) {
-        super(c);
-    }
+    
 
 
     /**
@@ -78,29 +71,10 @@ public final class Method extends FieldOrMethod {
     }
 
 
-    /**
-     * @param access_flags Access rights of method
-     * @param name_index Points to field name in constant pool
-     * @param signature_index Points to encoded signature
-     * @param attributes Collection of attributes
-     * @param constant_pool Array of constants
-     */
-    public Method(int access_flags, int name_index, int signature_index, Attribute[] attributes,
-            ConstantPool constant_pool) {
-        super(access_flags, name_index, signature_index, attributes, constant_pool);
-    }
+    
 
 
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitMethod(this);
-    }
+    
 
 
     /**
@@ -142,16 +116,7 @@ public final class Method extends FieldOrMethod {
     }
 
 
-    /** @return LineNumberTable of code attribute if any, i.e. the call is forwarded
-     * to the Code atribute.
-     */
-    public final LineNumberTable getLineNumberTable() {
-        Code code = getCode();
-        if (code == null) {
-            return null;
-        }
-        return code.getLineNumberTable();
-    }
+    
 
 
     /**
@@ -190,44 +155,19 @@ public final class Method extends FieldOrMethod {
     }
 
 
-    /**
-     * @return deep copy of this method
-     */
-    public final Method copy( ConstantPool _constant_pool ) {
-        return (Method) copy_(_constant_pool);
-    }
+    
 
 
-    /**
-     * @return return type of method
-     */
-    public Type getReturnType() {
-        return Type.getReturnType(getSignature());
-    }
+    
 
 
-    /**
-     * @return array of method argument types
-     */
-    public Type[] getArgumentTypes() {
-        return Type.getArgumentTypes(getSignature());
-    }
+    
 
 
-    /**
-     * @return Comparison strategy object
-     */
-    public static BCELComparator getComparator() {
-        return _cmp;
-    }
+    
 
 
-    /**
-     * @param comparator Comparison strategy object
-     */
-    public static void setComparator( BCELComparator comparator ) {
-        _cmp = comparator;
-    }
+    
 
 
     /**

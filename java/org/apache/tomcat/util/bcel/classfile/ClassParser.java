@@ -78,28 +78,10 @@ public final class ClassParser {
     }
 
 
-    /** Parse class from given .class file.
-     *
-     * @param file_name file name
-     */
-    public ClassParser(String file_name) {
-        is_zip = false;
-        this.file_name = file_name;
-        fileOwned = true;
-    }
+    
 
 
-    /** Parse class from given .class file in a ZIP-archive
-     *
-     * @param zip_file zip file name
-     * @param file_name file name
-     */
-    public ClassParser(String zip_file, String file_name) {
-        is_zip = true;
-        fileOwned = true;
-        this.zip_file = zip_file;
-        this.file_name = file_name;
-    }
+    
 
 
     /**

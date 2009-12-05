@@ -24,9 +24,7 @@ package org.apache.tomcat.util.bcel.generic;
  */
 public abstract class GotoInstruction extends BranchInstruction implements UnconditionalBranch {
 
-    GotoInstruction(short opcode, InstructionHandle target) {
-        super(opcode, target);
-    }
+    
 
 
     /**

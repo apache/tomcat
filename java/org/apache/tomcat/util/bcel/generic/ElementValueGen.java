@@ -1,11 +1,9 @@
 package org.apache.tomcat.util.bcel.generic;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.classfile.AnnotationElementValue;
-import org.apache.tomcat.util.bcel.classfile.AnnotationEntry;
 import org.apache.tomcat.util.bcel.classfile.ArrayElementValue;
 import org.apache.tomcat.util.bcel.classfile.ClassElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValue;
@@ -29,10 +27,7 @@ public abstract class ElementValueGen
 	 */
 	public abstract ElementValue getElementValue();
 
-	public int getElementValueType()
-	{
-		return type;
-	}
+	
 
 	public abstract String stringifyValue();
 
@@ -64,64 +59,7 @@ public abstract class ElementValueGen
 
 	public static final int PRIMITIVE_BOOLEAN = 'Z';
 
-	public static ElementValueGen readElementValue(DataInputStream dis,
-			ConstantPoolGen cpGen) throws IOException
-	{
-		int type = dis.readUnsignedByte();
-		switch (type)
-		{
-		case 'B': // byte
-			return new SimpleElementValueGen(PRIMITIVE_BYTE, dis
-					.readUnsignedShort(), cpGen);
-		case 'C': // char
-			return new SimpleElementValueGen(PRIMITIVE_CHAR, dis
-					.readUnsignedShort(), cpGen);
-		case 'D': // double
-			return new SimpleElementValueGen(PRIMITIVE_DOUBLE, dis
-					.readUnsignedShort(), cpGen);
-		case 'F': // float
-			return new SimpleElementValueGen(PRIMITIVE_FLOAT, dis
-					.readUnsignedShort(), cpGen);
-		case 'I': // int
-			return new SimpleElementValueGen(PRIMITIVE_INT, dis
-					.readUnsignedShort(), cpGen);
-		case 'J': // long
-			return new SimpleElementValueGen(PRIMITIVE_LONG, dis
-					.readUnsignedShort(), cpGen);
-		case 'S': // short
-			return new SimpleElementValueGen(PRIMITIVE_SHORT, dis
-					.readUnsignedShort(), cpGen);
-		case 'Z': // boolean
-			return new SimpleElementValueGen(PRIMITIVE_BOOLEAN, dis
-					.readUnsignedShort(), cpGen);
-		case 's': // String
-			return new SimpleElementValueGen(STRING, dis.readUnsignedShort(),
-					cpGen);
-		case 'e': // Enum constant
-			return new EnumElementValueGen(dis.readUnsignedShort(), dis
-					.readUnsignedShort(), cpGen);
-		case 'c': // Class
-			return new ClassElementValueGen(dis.readUnsignedShort(), cpGen);
-		case '@': // Annotation
-			// TODO: isRuntimeVisible ??????????
-			// FIXME
-			return new AnnotationElementValueGen(ANNOTATION,
-					new AnnotationEntryGen(AnnotationEntry.read(dis, cpGen
-							.getConstantPool(), true), cpGen, false), cpGen);
-		case '[': // Array
-			int numArrayVals = dis.readUnsignedShort();
-			ElementValue[] evalues = new ElementValue[numArrayVals];
-			for (int j = 0; j < numArrayVals; j++)
-			{
-				evalues[j] = ElementValue.readElementValue(dis, cpGen
-						.getConstantPool());
-			}
-			return new ArrayElementValueGen(ARRAY, evalues, cpGen);
-		default:
-			throw new RuntimeException(
-					"Unexpected element value kind in annotation: " + type);
-		}
-	}
+	
 
 	protected ConstantPoolGen getConstantPool()
 	{

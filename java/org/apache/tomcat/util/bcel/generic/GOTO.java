@@ -35,9 +35,7 @@ public class GOTO extends GotoInstruction implements VariableLengthInstruction {
     }
 
 
-    public GOTO(InstructionHandle target) {
-        super(org.apache.tomcat.util.bcel.Constants.GOTO, target);
-    }
+    
 
 
     /**

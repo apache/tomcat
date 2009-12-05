@@ -14,25 +14,9 @@ public class ArrayElementValueGen extends ElementValueGen
 	// modify ...
 	private List /* ElementValueGen */evalues;
 
-	public ArrayElementValueGen(ConstantPoolGen cp)
-	{
-		super(ARRAY, cp);
-		evalues = new ArrayList();
-	}
+	
 
-	public ArrayElementValueGen(int type, ElementValue[] datums,
-			ConstantPoolGen cpool)
-	{
-		super(type, cpool);
-		if (type != ARRAY)
-			throw new RuntimeException(
-					"Only element values of type array can be built with this ctor - type specified: " + type);
-		this.evalues = new ArrayList();
-		for (int i = 0; i < datums.length; i++)
-		{
-			evalues.add(datums[i]);
-		}
-	}
+	
 
 	/**
 	 * Return immutable variant of this ArrayElementValueGen
@@ -92,18 +76,9 @@ public class ArrayElementValueGen extends ElementValueGen
 		return sb.toString();
 	}
 
-	public List getElementValues()
-	{
-		return evalues;
-	}
+	
 
-	public int getElementValuesSize()
-	{
-		return evalues.size();
-	}
+	
 
-	public void addElement(ElementValueGen gen)
-	{
-		evalues.add(gen);
-	}
+	
 }

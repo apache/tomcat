@@ -34,21 +34,11 @@ public class INSTANCEOF extends CPInstruction implements LoadClass, ExceptionThr
     }
 
 
-    public INSTANCEOF(int index) {
-        super(org.apache.tomcat.util.bcel.Constants.INSTANCEOF, index);
-    }
+    
 
 
-    public Class[] getExceptions() {
-        return org.apache.tomcat.util.bcel.ExceptionConstants.EXCS_CLASS_AND_INTERFACE_RESOLUTION;
-    }
+    
 
 
-    public ObjectType getLoadClassType( ConstantPoolGen cpg ) {
-        Type t = getType(cpg);
-        if (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBasicType();
-        }
-        return (t instanceof ObjectType) ? (ObjectType) t : null;
-    }
+    
 }

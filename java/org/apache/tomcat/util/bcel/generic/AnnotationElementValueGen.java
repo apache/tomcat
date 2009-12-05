@@ -10,21 +10,9 @@ public class AnnotationElementValueGen extends ElementValueGen
 	// For annotation element values, this is the annotation
 	private AnnotationEntryGen a;
 
-	public AnnotationElementValueGen(AnnotationEntryGen a, ConstantPoolGen cpool)
-	{
-		super(ANNOTATION, cpool);
-		this.a = a;
-	}
+	
 
-	public AnnotationElementValueGen(int type, AnnotationEntryGen annotation,
-			ConstantPoolGen cpool)
-	{
-		super(type, cpool);
-		if (type != ANNOTATION)
-			throw new RuntimeException(
-					"Only element values of type annotation can be built with this ctor - type specified: " + type);
-		this.a = annotation;
-	}
+	
 
 	public AnnotationElementValueGen(AnnotationElementValue value,
 			ConstantPoolGen cpool, boolean copyPoolEntries)
@@ -53,8 +41,5 @@ public class AnnotationElementValueGen extends ElementValueGen
 				.getConstantPool());
 	}
 
-	public AnnotationEntryGen getAnnotation()
-	{
-		return a;
-	}
+	
 }

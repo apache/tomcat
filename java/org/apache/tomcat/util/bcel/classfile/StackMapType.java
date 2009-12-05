@@ -72,9 +72,7 @@ public final class StackMapType implements Cloneable {
     }
 
 
-    public byte getType() {
-        return type;
-    }
+    
 
 
     public void setIndex( int t ) {
@@ -133,24 +131,10 @@ public final class StackMapType implements Cloneable {
     }
 
 
-    /**
-     * @return deep copy of this object
-     */
-    public StackMapType copy() {
-        try {
-            return (StackMapType) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
+    
 
 
-    /**
-     * @return Constant pool used by this object.
-     */
-    public final ConstantPool getConstantPool() {
-        return constant_pool;
-    }
+    
 
 
     /**

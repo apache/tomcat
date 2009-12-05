@@ -1,6 +1,5 @@
 package org.apache.tomcat.util.bcel.generic;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,11 +57,6 @@ public class AnnotationEntryGen
 		return out;
 	}
 
-	private AnnotationEntryGen(ConstantPoolGen cpool)
-	{
-		this.cpool = cpool;
-	}
-
 	/**
 	 * Retrieve an immutable version of this AnnotationGen
 	 */
@@ -79,31 +73,9 @@ public class AnnotationEntryGen
 		return a;
 	}
 
-	public AnnotationEntryGen(ObjectType type,
-			List /* ElementNameValuePairGen */elements, boolean vis,
-			ConstantPoolGen cpool)
-	{
-		this.cpool = cpool;
-		this.typeIndex = cpool.addUtf8(type.getSignature());
-		evs = elements;
-		isRuntimeVisible = vis;
-	}
+	
 
-	public static AnnotationEntryGen read(DataInputStream dis,
-			ConstantPoolGen cpool, boolean b) throws IOException
-	{
-		AnnotationEntryGen a = new AnnotationEntryGen(cpool);
-		a.typeIndex = dis.readUnsignedShort();
-		int elemValuePairCount = dis.readUnsignedShort();
-		for (int i = 0; i < elemValuePairCount; i++)
-		{
-			int nidx = dis.readUnsignedShort();
-			a.addElementNameValuePair(new ElementValuePairGen(nidx,
-					ElementValueGen.readElementValue(dis, cpool), cpool));
-		}
-		a.isRuntimeVisible(b);
-		return a;
-	}
+	
 
 	public void dump(DataOutputStream dos) throws IOException
 	{
@@ -116,17 +88,9 @@ public class AnnotationEntryGen
 		}
 	}
 
-	public void addElementNameValuePair(ElementValuePairGen evp)
-	{
-		if (evs == null)
-			evs = new ArrayList();
-		evs.add(evp);
-	}
+	
 
-	public int getTypeIndex()
-	{
-		return typeIndex;
-	}
+	
 
 	public final String getTypeSignature()
 	{
@@ -142,13 +106,7 @@ public class AnnotationEntryGen
 									// Utility.signatureToString(getTypeSignature());
 	}
 
-	/**
-	 * Returns list of ElementNameValuePair objects
-	 */
-	public List getValues()
-	{
-		return evs;
-	}
+	
 
 	public String toString()
 	{
@@ -164,27 +122,7 @@ public class AnnotationEntryGen
 		return s.toString();
 	}
 
-	public String toShortString()
-	{
-		StringBuffer s = new StringBuffer();
-		s.append("@" + getTypeName() + "(");
-		for (int i = 0; i < evs.size(); i++)
-		{
-			s.append(evs.get(i));
-			if (i + 1 < evs.size())
-				s.append(",");
-		}
-		s.append(")");
-		return s.toString();
-	}
+	
 
-	private void isRuntimeVisible(boolean b)
-	{
-		isRuntimeVisible = b;
-	}
-
-	public boolean isRuntimeVisible()
-	{
-		return isRuntimeVisible;
-	}
+	
 }

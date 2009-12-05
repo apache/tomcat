@@ -47,21 +47,9 @@ public class ElementValuePairGen
 				.getConstantPool());
 	}
 
-	protected ElementValuePairGen(int idx, ElementValueGen value,
-			ConstantPoolGen cpool)
-	{
-		this.nameIdx = idx;
-		this.value = value;
-		this.cpool = cpool;
-	}
+	
 
-	public ElementValuePairGen(String name, ElementValueGen value,
-			ConstantPoolGen cpool)
-	{
-		this.nameIdx = cpool.addUtf8(name);
-		this.value = value;
-		this.cpool = cpool;
-	}
+	
 
 	protected void dump(DataOutputStream dos) throws IOException
 	{
@@ -69,10 +57,7 @@ public class ElementValuePairGen
 		value.dump(dos);
 	}
 
-	public int getNameIndex()
-	{
-		return nameIdx;
-	}
+	
 
 	public final String getNameString()
 	{
@@ -80,10 +65,7 @@ public class ElementValuePairGen
 		return ((ConstantUtf8) cpool.getConstant(nameIdx)).getBytes();
 	}
 
-	public final ElementValueGen getValue()
-	{
-		return value;
-	}
+	
 
 	public String toString()
 	{
