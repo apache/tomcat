@@ -27,7 +27,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
  */
-public class ParameterAnnotationEntry implements Node, Constants {
+public class ParameterAnnotationEntry implements Constants {
 
     private int annotation_table_length;
     private AnnotationEntry[] annotation_table;

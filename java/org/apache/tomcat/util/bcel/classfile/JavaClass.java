@@ -38,13 +38,10 @@ import org.apache.tomcat.util.bcel.util.SyntheticRepository;
  * @see org.apache.tomcat.util.bcel.generic.ClassGen
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class JavaClass extends AccessFlags implements Cloneable, Node, Comparable {
+public class JavaClass extends AccessFlags implements Cloneable, Comparable {
 
     private String file_name;
-    private String package_name;
     private String source_file_name = "<Unknown>";
-    private int class_name_index;
-    private int superclass_name_index;
     private String class_name;
     private String superclass_name;
     private int major, minor; // Compiler version
@@ -55,11 +52,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     private Method[] methods; // methods defined in the class
     private Attribute[] attributes; // attributes defined in the class
     private AnnotationEntry[] annotations;   // annotations defined on the class
-    private byte source = HEAP; // Generated in memory
-    private boolean isAnonymous = false;
-    private boolean isNested = false;
-    private boolean computedNestedTypeStatus = false;
-    public static final byte HEAP = 1;
+    
     public static final byte FILE = 2;
     public static final byte ZIP = 3;
     
@@ -124,8 +117,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
         if (methods == null) {
             methods = new Method[0];
         }
-        this.class_name_index = class_name_index;
-        this.superclass_name_index = superclass_name_index;
         this.file_name = file_name;
         this.major = major;
         this.minor = minor;
@@ -136,7 +127,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
         this.methods = methods;
         this.attributes = attributes;
         annotationsOutOfDate = true;
-        this.source = source;
         // Get source file name if available
         for (int i = 0; i < attributes.length; i++) {
             if (attributes[i] instanceof SourceFile) {
@@ -150,12 +140,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
          */
         class_name = constant_pool.getConstantString(class_name_index, Constants.CONSTANT_Class);
         class_name = Utility.compactClassName(class_name, false);
-        int index = class_name.lastIndexOf('.');
-        if (index < 0) {
-            package_name = "";
-        } else {
-            package_name = class_name.substring(0, index);
-        }
         if (superclass_name_index > 0) {
             // May be zero -> class is java.lang.Object
             superclass_name = constant_pool.getConstantString(superclass_name_index,
@@ -366,27 +350,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     }
 
 
-    /** Equivalent to runtime "instanceof" operator.
-     *
-     * @return true if this JavaClass is derived from the super class
-     * @throws ClassNotFoundException if superclasses or superinterfaces
-     *   of this object can't be found
-     */
-    public final boolean instanceOf( JavaClass super_class ) throws ClassNotFoundException {
-        if (this.equals(super_class)) {
-            return true;
-        }
-        JavaClass[] super_classes = getSuperClasses();
-        for (int i = 0; i < super_classes.length; i++) {
-            if (super_classes[i].equals(super_class)) {
-                return true;
-            }
-        }
-        if (super_class.isInterface()) {
-            return implementationOf(super_class);
-        }
-        return false;
-    }
+    
 
 
     /**

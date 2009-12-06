@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -66,19 +65,6 @@ public final class Signature extends Attribute {
 
 
     /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        //System.err.println("Visiting non-standard Signature object");
-        v.visitSignature(this);
-    }
-
-
-    /**
      * Dump source file attribute to file stream in binary format.
      *
      * @param file Output file stream
@@ -104,17 +90,6 @@ public final class Signature extends Attribute {
                 Constants.CONSTANT_Utf8);
         return c.getBytes();
     }
-
-    /**
-     * Extends ByteArrayInputStream to make 'unreading' chars possible.
-     */
-    private static final class MyByteArrayInputStream extends ByteArrayInputStream {
-
-        MyByteArrayInputStream(String data) {
-            super(data.getBytes());
-        }
-    }
-
 
     /**
      * @return String representation

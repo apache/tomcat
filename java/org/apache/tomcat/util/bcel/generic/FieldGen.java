@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import java.util.List;
 import org.apache.tomcat.util.bcel.classfile.Field;
 import org.apache.tomcat.util.bcel.classfile.Utility;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
@@ -59,18 +58,6 @@ public class FieldGen extends FieldGenOrMethodGen {
     public String getSignature() {
         return type.getSignature();
     }
-
-    private List observers;
-
-
-    
-
-
-    
-
-
-    
-
 
     public String getInitValue() {
         if (value != null) {

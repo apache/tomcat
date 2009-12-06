@@ -31,7 +31,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     LocalVariableTable
  */
-public final class LocalVariable implements Constants, Cloneable, Node, Serializable {
+public final class LocalVariable implements Constants, Cloneable, Serializable {
 
     private int start_pc; // Range in which the variable is valid
     private int length;

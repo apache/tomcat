@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see InnerClasses
  */
-public final class InnerClass implements Cloneable, Node, Serializable {
+public final class InnerClass implements Cloneable, Serializable {
 
     private int inner_class_index;
     private int outer_class_index;
