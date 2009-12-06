@@ -42,7 +42,7 @@ public abstract class Annotations extends Attribute {
      */
     public Annotations(byte annotation_type, int name_index, int length, DataInputStream file,
             ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException {
-        this(annotation_type, name_index, length, (AnnotationEntry[]) null, constant_pool, isRuntimeVisible);
+        this(annotation_type, name_index, length, (AnnotationEntry[]) null, constant_pool);
         annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
@@ -59,7 +59,7 @@ public abstract class Annotations extends Attribute {
      * @param constant_pool Array of constants
      */
     public Annotations(byte annotation_type, int name_index, int length,
-            AnnotationEntry[] annotation_table, ConstantPool constant_pool , boolean isRuntimeVisible) {
+            AnnotationEntry[] annotation_table, ConstantPool constant_pool) {
         super(annotation_type, name_index, length, constant_pool);
         setAnnotationTable(annotation_table);
     }

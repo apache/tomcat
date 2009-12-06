@@ -45,7 +45,6 @@ public class ConstantPoolGen implements java.io.Serializable {
     protected int size; 
     protected Constant[] constants;
     protected int index = 1; // First entry (0) used by JVM
-    private static final String NAT_DELIM = "%";
 
     private static class Index implements java.io.Serializable {
 
@@ -83,21 +82,6 @@ public class ConstantPoolGen implements java.io.Serializable {
             System.arraycopy(cs, 0, constants, 0, index);
         }
     }
-
-    private Map class_table = new HashMap();
-
-
-    /**
-     * Look for ConstantClass in ConstantPool named `str'.
-     *
-     * @param str String to search for
-     * @return index on success, -1 otherwise
-     */
-    public int lookupClass( String str ) {
-        Index index = (Index) class_table.get(str.replace('.', '/'));
-        return (index != null) ? index.index : -1;
-    }
-
 
     /** 
      * Look for ConstantInteger in ConstantPool.
@@ -285,22 +269,6 @@ public class ConstantPoolGen implements java.io.Serializable {
         return ret;
     }
 
-    private Map n_a_t_table = new HashMap();
-
-
-    /** 
-     * Look for ConstantNameAndType in ConstantPool.
-     *
-     * @param name of variable/method
-     * @param signature of variable/method
-     * @return index on success, -1 otherwise
-     */
-    public int lookupNameAndType( String name, String signature ) {
-        Index _index = (Index) n_a_t_table.get(name + NAT_DELIM + signature);
-        return (_index != null) ? _index.index : -1;
-    }
-
-    
     /**
      * @param i index in constant pool
      * @return constant pool entry at index i

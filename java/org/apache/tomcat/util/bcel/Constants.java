@@ -24,13 +24,9 @@ package org.apache.tomcat.util.bcel;
  */
 public interface Constants {
 
-  /** Maximum value for an unsigned short.
-   */
-  public final static int MAX_SHORT = 65535; // 2^16 - 1
+  
 
-  /** Maximum value for an unsigned byte.
-   */
-  public final static int MAX_BYTE  = 255; // 2^8 - 1
+  
 
   /** One of the access flags for fields, methods, or classes.
    *  @see #ACC_PUBLIC
@@ -135,29 +131,6 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short ALOAD            = 25;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ILOAD_0          = 26;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short LLOAD_0          = 30;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FLOAD_0          = 34;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DLOAD_0          = 38;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ALOAD_0          = 42;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ALOAD_3          = 45;
 
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
@@ -174,29 +147,6 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short ASTORE           = 58;
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ISTORE_0         = 59;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short LSTORE_0         = 63;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short FSTORE_0         = 67;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short DSTORE_0         = 71;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ASTORE_0         = 75;
-  
-  /** Java VM opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
-  public static final short ASTORE_3         = 78;
   
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
@@ -321,16 +271,10 @@ public interface Constants {
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short JSR_W            = 201;
 
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html#60105">Reserved opcodes in the Java Virtual Machine Specification</a> */
-  public static final short BREAKPOINT                = 202;
   
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html#60105">Reserved opcodes in the Java Virtual Machine Specification</a> */
-  public static final short IMPDEP1                   = 254;
-  /** JVM internal opcode.
-   * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html#60105">Reserved opcodes in the Java Virtual Machine Specification</a> */
-  public static final short IMPDEP2                   = 255;
+  
+  
+  
 
   /** Illegal opcode. */
   public static final short  UNDEFINED      = -1;
@@ -362,16 +306,13 @@ public interface Constants {
 
   /** Void data type (non-standard). */
   public static final byte T_VOID      = 12; // Non-standard
-  /** Array data type. */
-  public static final byte T_ARRAY     = 13;
+  
   /** Object data type. */
   public static final byte T_OBJECT    = 14;
-  /** Reference data type (deprecated). */
-  public static final byte T_REFERENCE = 14; // Deprecated
+  
   /** Unknown data type. */
   public static final byte T_UNKNOWN   = 15;
-  /** Address data type. */
-  public static final byte T_ADDRESS   = 16;
+  
 
   /** The primitive type names corresponding to the T_XX constants,
    * e.g., TYPE_NAMES[T_INT] = "int"
@@ -578,117 +519,9 @@ public interface Constants {
     ILLEGAL_OPCODE, "impdep1", "impdep2"
   };
 
-  /**
-   * Number of words consumed on operand stack by instructions.
-   * Indexed by opcode.  CONSUME_STACK[FALOAD] = number of words
-   * consumed from the stack by a faload instruction.
-   */ 
-  public static final int[] CONSUME_STACK = {
-    0/*nop*/, 0/*aconst_null*/, 0/*iconst_m1*/, 0/*iconst_0*/, 0/*iconst_1*/,
-    0/*iconst_2*/, 0/*iconst_3*/, 0/*iconst_4*/, 0/*iconst_5*/, 0/*lconst_0*/,
-    0/*lconst_1*/, 0/*fconst_0*/, 0/*fconst_1*/, 0/*fconst_2*/, 0/*dconst_0*/,
-    0/*dconst_1*/, 0/*bipush*/, 0/*sipush*/, 0/*ldc*/, 0/*ldc_w*/, 0/*ldc2_w*/, 0/*iload*/,
-    0/*lload*/, 0/*fload*/, 0/*dload*/, 0/*aload*/, 0/*iload_0*/, 0/*iload_1*/, 0/*iload_2*/,
-    0/*iload_3*/, 0/*lload_0*/, 0/*lload_1*/, 0/*lload_2*/, 0/*lload_3*/, 0/*fload_0*/,
-    0/*fload_1*/, 0/*fload_2*/, 0/*fload_3*/, 0/*dload_0*/, 0/*dload_1*/, 0/*dload_2*/,
-    0/*dload_3*/, 0/*aload_0*/, 0/*aload_1*/, 0/*aload_2*/, 0/*aload_3*/, 2/*iaload*/,
-    2/*laload*/, 2/*faload*/, 2/*daload*/, 2/*aaload*/, 2/*baload*/, 2/*caload*/, 2/*saload*/,
-    1/*istore*/, 2/*lstore*/, 1/*fstore*/, 2/*dstore*/, 1/*astore*/, 1/*istore_0*/,
-    1/*istore_1*/, 1/*istore_2*/, 1/*istore_3*/, 2/*lstore_0*/, 2/*lstore_1*/,
-    2/*lstore_2*/, 2/*lstore_3*/, 1/*fstore_0*/, 1/*fstore_1*/, 1/*fstore_2*/,
-    1/*fstore_3*/, 2/*dstore_0*/, 2/*dstore_1*/, 2/*dstore_2*/, 2/*dstore_3*/,
-    1/*astore_0*/, 1/*astore_1*/, 1/*astore_2*/, 1/*astore_3*/, 3/*iastore*/, 4/*lastore*/,
-    3/*fastore*/, 4/*dastore*/, 3/*aastore*/, 3/*bastore*/, 3/*castore*/, 3/*sastore*/,
-    1/*pop*/, 2/*pop2*/, 1/*dup*/, 2/*dup_x1*/, 3/*dup_x2*/, 2/*dup2*/, 3/*dup2_x1*/,
-    4/*dup2_x2*/, 2/*swap*/, 2/*iadd*/, 4/*ladd*/, 2/*fadd*/, 4/*dadd*/, 2/*isub*/, 4/*lsub*/,
-    2/*fsub*/, 4/*dsub*/, 2/*imul*/, 4/*lmul*/, 2/*fmul*/, 4/*dmul*/, 2/*idiv*/, 4/*ldiv*/,
-    2/*fdiv*/, 4/*ddiv*/, 2/*irem*/, 4/*lrem*/, 2/*frem*/, 4/*drem*/, 1/*ineg*/, 2/*lneg*/,
-    1/*fneg*/, 2/*dneg*/, 2/*ishl*/, 3/*lshl*/, 2/*ishr*/, 3/*lshr*/, 2/*iushr*/, 3/*lushr*/,
-    2/*iand*/, 4/*land*/, 2/*ior*/, 4/*lor*/, 2/*ixor*/, 4/*lxor*/, 0/*iinc*/,
-    1/*i2l*/, 1/*i2f*/, 1/*i2d*/, 2/*l2i*/, 2/*l2f*/, 2/*l2d*/, 1/*f2i*/, 1/*f2l*/,
-    1/*f2d*/, 2/*d2i*/, 2/*d2l*/, 2/*d2f*/, 1/*i2b*/, 1/*i2c*/, 1/*i2s*/, 
-    4/*lcmp*/, 2/*fcmpl*/, 2/*fcmpg*/, 4/*dcmpl*/, 4/*dcmpg*/, 1/*ifeq*/, 1/*ifne*/,
-    1/*iflt*/, 1/*ifge*/, 1/*ifgt*/, 1/*ifle*/, 2/*if_icmpeq*/, 2/*if_icmpne*/, 2/*if_icmplt*/,
-    2 /*if_icmpge*/, 2/*if_icmpgt*/, 2/*if_icmple*/, 2/*if_acmpeq*/, 2/*if_acmpne*/,
-    0/*goto*/, 0/*jsr*/, 0/*ret*/, 1/*tableswitch*/, 1/*lookupswitch*/, 1/*ireturn*/,
-    2/*lreturn*/, 1/*freturn*/, 2/*dreturn*/, 1/*areturn*/, 0/*return*/, 0/*getstatic*/,
-    UNPREDICTABLE/*putstatic*/, 1/*getfield*/, UNPREDICTABLE/*putfield*/,
-    UNPREDICTABLE/*invokevirtual*/, UNPREDICTABLE/*invokespecial*/,
-    UNPREDICTABLE/*invokestatic*/,
-    UNPREDICTABLE/*invokeinterface*/, UNDEFINED, 0/*new*/, 1/*newarray*/, 1/*anewarray*/,
-    1/*arraylength*/, 1/*athrow*/, 1/*checkcast*/, 1/*instanceof*/, 1/*monitorenter*/,
-    1/*monitorexit*/, 0/*wide*/, UNPREDICTABLE/*multianewarray*/, 1/*ifnull*/, 1/*ifnonnull*/,
-    0/*goto_w*/, 0/*jsr_w*/, 0/*breakpoint*/, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNPREDICTABLE/*impdep1*/, UNPREDICTABLE/*impdep2*/
-  };
+  
 
-  /**
-   * Number of words produced onto operand stack by instructions.
-   * Indexed by opcode.  CONSUME_STACK[DALOAD] = number of words
-   * consumed from the stack by a daload instruction.
-   */ 
-  public static final int[] PRODUCE_STACK = {
-    0/*nop*/, 1/*aconst_null*/, 1/*iconst_m1*/, 1/*iconst_0*/, 1/*iconst_1*/,
-    1/*iconst_2*/, 1/*iconst_3*/, 1/*iconst_4*/, 1/*iconst_5*/, 2/*lconst_0*/,
-    2/*lconst_1*/, 1/*fconst_0*/, 1/*fconst_1*/, 1/*fconst_2*/, 2/*dconst_0*/,
-    2/*dconst_1*/, 1/*bipush*/, 1/*sipush*/, 1/*ldc*/, 1/*ldc_w*/, 2/*ldc2_w*/, 1/*iload*/,
-    2/*lload*/, 1/*fload*/, 2/*dload*/, 1/*aload*/, 1/*iload_0*/, 1/*iload_1*/, 1/*iload_2*/,
-    1/*iload_3*/, 2/*lload_0*/, 2/*lload_1*/, 2/*lload_2*/, 2/*lload_3*/, 1/*fload_0*/,
-    1/*fload_1*/, 1/*fload_2*/, 1/*fload_3*/, 2/*dload_0*/, 2/*dload_1*/, 2/*dload_2*/,
-    2/*dload_3*/, 1/*aload_0*/, 1/*aload_1*/, 1/*aload_2*/, 1/*aload_3*/, 1/*iaload*/,
-    2/*laload*/, 1/*faload*/, 2/*daload*/, 1/*aaload*/, 1/*baload*/, 1/*caload*/, 1/*saload*/,
-    0/*istore*/, 0/*lstore*/, 0/*fstore*/, 0/*dstore*/, 0/*astore*/, 0/*istore_0*/,
-    0/*istore_1*/, 0/*istore_2*/, 0/*istore_3*/, 0/*lstore_0*/, 0/*lstore_1*/,
-    0/*lstore_2*/, 0/*lstore_3*/, 0/*fstore_0*/, 0/*fstore_1*/, 0/*fstore_2*/,
-    0/*fstore_3*/, 0/*dstore_0*/, 0/*dstore_1*/, 0/*dstore_2*/, 0/*dstore_3*/,
-    0/*astore_0*/, 0/*astore_1*/, 0/*astore_2*/, 0/*astore_3*/, 0/*iastore*/, 0/*lastore*/,
-    0/*fastore*/, 0/*dastore*/, 0/*aastore*/, 0/*bastore*/, 0/*castore*/, 0/*sastore*/,
-    0/*pop*/, 0/*pop2*/, 2/*dup*/, 3/*dup_x1*/, 4/*dup_x2*/, 4/*dup2*/, 5/*dup2_x1*/,
-    6/*dup2_x2*/, 2/*swap*/, 1/*iadd*/, 2/*ladd*/, 1/*fadd*/, 2/*dadd*/, 1/*isub*/, 2/*lsub*/,
-    1/*fsub*/, 2/*dsub*/, 1/*imul*/, 2/*lmul*/, 1/*fmul*/, 2/*dmul*/, 1/*idiv*/, 2/*ldiv*/,
-    1/*fdiv*/, 2/*ddiv*/, 1/*irem*/, 2/*lrem*/, 1/*frem*/, 2/*drem*/, 1/*ineg*/, 2/*lneg*/,
-    1/*fneg*/, 2/*dneg*/, 1/*ishl*/, 2/*lshl*/, 1/*ishr*/, 2/*lshr*/, 1/*iushr*/, 2/*lushr*/,
-    1/*iand*/, 2/*land*/, 1/*ior*/, 2/*lor*/, 1/*ixor*/, 2/*lxor*/,
-    0/*iinc*/, 2/*i2l*/, 1/*i2f*/, 2/*i2d*/, 1/*l2i*/, 1/*l2f*/, 2/*l2d*/, 1/*f2i*/,
-    2/*f2l*/, 2/*f2d*/, 1/*d2i*/, 2/*d2l*/, 1/*d2f*/,
-    1/*i2b*/, 1/*i2c*/, 1/*i2s*/, 1/*lcmp*/, 1/*fcmpl*/, 1/*fcmpg*/,
-    1/*dcmpl*/, 1/*dcmpg*/, 0/*ifeq*/, 0/*ifne*/, 0/*iflt*/, 0/*ifge*/, 0/*ifgt*/, 0/*ifle*/,
-    0/*if_icmpeq*/, 0/*if_icmpne*/, 0/*if_icmplt*/, 0/*if_icmpge*/, 0/*if_icmpgt*/,
-    0/*if_icmple*/, 0/*if_acmpeq*/, 0/*if_acmpne*/, 0/*goto*/, 1/*jsr*/, 0/*ret*/,
-    0/*tableswitch*/, 0/*lookupswitch*/, 0/*ireturn*/, 0/*lreturn*/, 0/*freturn*/,
-    0/*dreturn*/, 0/*areturn*/, 0/*return*/, UNPREDICTABLE/*getstatic*/, 0/*putstatic*/,
-    UNPREDICTABLE/*getfield*/, 0/*putfield*/, UNPREDICTABLE/*invokevirtual*/,
-    UNPREDICTABLE/*invokespecial*/, UNPREDICTABLE/*invokestatic*/,
-    UNPREDICTABLE/*invokeinterface*/, UNDEFINED, 1/*new*/, 1/*newarray*/, 1/*anewarray*/,
-    1/*arraylength*/, 1/*athrow*/, 1/*checkcast*/, 1/*instanceof*/, 0/*monitorenter*/,
-    0/*monitorexit*/, 0/*wide*/, 1/*multianewarray*/, 0/*ifnull*/, 0/*ifnonnull*/,
-    0/*goto_w*/, 1/*jsr_w*/, 0/*breakpoint*/, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-    UNDEFINED, UNPREDICTABLE/*impdep1*/, UNPREDICTABLE/*impdep2*/
-  };
+  
 
   /** Attributes and their corresponding names.
    */

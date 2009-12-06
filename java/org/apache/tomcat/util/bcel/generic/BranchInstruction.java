@@ -18,7 +18,6 @@ package org.apache.tomcat.util.bcel.generic;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.apache.tomcat.util.bcel.util.ByteSequence;
 
 /** 
  * Abstract super class for branching instructions like GOTO, IFEQ, etc..
@@ -95,22 +94,6 @@ public abstract class BranchInstruction extends Instruction implements Instructi
 
 
     /**
-     * Called by InstructionList.setPositions when setting the position for every
-     * instruction. In the presence of variable length instructions `setPositions'
-     * performs multiple passes over the instruction list to calculate the
-     * correct (byte) positions and offsets by calling this function.
-     *
-     * @param offset additional offset caused by preceding (variable length) instructions
-     * @param max_offset the maximum offset that may be caused by these instructions
-     * @return additional offset caused by possible change of this instruction's length
-     */
-    protected int updatePosition( int offset, int max_offset ) {
-        position += offset;
-        return 0;
-    }
-
-
-    /**
      * Long output format:
      *
      * &lt;position in byte code&gt;
@@ -141,31 +124,6 @@ public abstract class BranchInstruction extends Instruction implements Instructi
             }
         }
         return s + " -> " + t;
-    }
-
-
-    /**
-     * Read needed data (e.g. index) from file. Conversion to a InstructionHandle
-     * is done in InstructionList(byte[]).
-     *
-     * @param bytes input stream
-     * @param wide wide prefix?
-     * @see InstructionList
-     */
-    protected void initFromFile( ByteSequence bytes, boolean wide ) throws IOException {
-        length = 3;
-        index = bytes.readShort();
-    }
-
-
-    
-
-
-    /**
-     * @return target of branch instruction
-     */
-    public InstructionHandle getTarget() {
-        return target;
     }
 
 
