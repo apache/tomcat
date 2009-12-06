@@ -68,18 +68,6 @@ public final class PMGClass extends Attribute {
 
 
     /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        System.err.println("Visiting non-standard PMGClass object");
-    }
-
-
-    /**
      * Dump source file attribute to file stream in binary format.
      *
      * @param file Output file stream

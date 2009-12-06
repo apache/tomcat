@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.bcel.generic;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import org.apache.tomcat.util.bcel.classfile.Utility;
 
@@ -45,7 +44,6 @@ public class InstructionHandle implements java.io.Serializable {
     Instruction instruction;
     protected int i_position = -1; // byte code offset of instruction
     private Set targeters;
-    private Map attributes;
 
 
     public final InstructionHandle getNext() {
@@ -91,18 +89,7 @@ public class InstructionHandle implements java.io.Serializable {
     private static InstructionHandle ih_list = null; // List of reusable handles
 
 
-    /** Factory method.
-     */
-    static final InstructionHandle getInstructionHandle( Instruction i ) {
-        if (ih_list == null) {
-            return new InstructionHandle(i);
-        } else {
-            InstructionHandle ih = ih_list;
-            ih_list = ih.next;
-            ih.setInstruction(i);
-            return ih;
-        }
-    }
+    
 
 
     /**

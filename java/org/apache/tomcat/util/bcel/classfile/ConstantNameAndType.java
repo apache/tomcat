@@ -64,18 +64,6 @@ public final class ConstantNameAndType extends Constant {
 
 
     /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitConstantNameAndType(this);
-    }
-
-
-    /**
      * Dump name and signature index to file stream in binary format.
      *
      * @param file Output file stream

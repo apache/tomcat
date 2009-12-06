@@ -31,8 +31,8 @@ public interface NamedAndTyped {
     
 
 
-    public void setName( String name );
+    
 
 
-    public void setType( Type type );
+    
 }

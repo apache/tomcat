@@ -16,10 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.generic;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.classfile.AccessFlags;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
@@ -36,16 +32,7 @@ public class ClassGen extends AccessFlags implements Cloneable {
 
     /* Corresponds to the fields found in a JavaClass object.
      */
-    private String class_name, super_class_name, file_name;
-    private int class_name_index = -1, superclass_name_index = -1;
-    private int major = Constants.MAJOR_1_1, minor = Constants.MINOR_1_1;
-    private ConstantPoolGen cp; // Template for building up constant pool
-    // ArrayLists instead of arrays to gather fields, methods, etc.
-    private List field_vec = new ArrayList();
-    private List method_vec = new ArrayList();
-    private List attribute_vec = new ArrayList();
-    private List interface_vec = new ArrayList();
-    private List annotation_vec = new ArrayList();
+    private String class_name;
 	
     private static BCELComparator _cmp = new BCELComparator() {
 
@@ -61,88 +48,13 @@ public class ClassGen extends AccessFlags implements Cloneable {
             return THIS.getClassName().hashCode();
         }
     };
-
-
-    
-
-
-    
-
-
     
     
     public String getClassName() {
         return class_name;
     }
 
-
     
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-    
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-    private ArrayList observers;
-
-
-    
-
-
-    
-
-
-    
-
-
     public Object clone() {
         try {
             return super.clone();
@@ -152,13 +64,7 @@ public class ClassGen extends AccessFlags implements Cloneable {
         }
     }
 
-
     
-
-
-    
-
-
     /**
      * Return value as defined by given BCELComparator strategy.
      * By default two ClassGen objects are said to be equal when
