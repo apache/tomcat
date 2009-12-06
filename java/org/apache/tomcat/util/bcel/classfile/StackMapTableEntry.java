@@ -48,7 +48,7 @@ public final class StackMapTableEntry implements Cloneable {
      * @throws IOException
      */
     StackMapTableEntry(DataInputStream file, ConstantPool constant_pool) throws IOException {
-        this(file.read(), -1, -1, null, -1, null, constant_pool);
+        this(file.read(), -1, -1, null, -1, null);
         
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
         	byte_code_offset_delta = frame_type - Constants.SAME_FRAME;
@@ -94,7 +94,7 @@ public final class StackMapTableEntry implements Cloneable {
 
     public StackMapTableEntry(int tag, int byte_code_offset_delta, int number_of_locals,
             StackMapType[] types_of_locals, int number_of_stack_items,
-            StackMapType[] types_of_stack_items, ConstantPool constant_pool) {
+            StackMapType[] types_of_stack_items) {
     	this.frame_type = tag;
         this.byte_code_offset_delta = byte_code_offset_delta;
         this.number_of_locals = number_of_locals;
