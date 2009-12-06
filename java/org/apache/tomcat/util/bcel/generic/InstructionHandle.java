@@ -40,20 +40,16 @@ import org.apache.tomcat.util.bcel.classfile.Utility;
  */
 public class InstructionHandle implements java.io.Serializable {
 
-    InstructionHandle next, prev; // Will be set from the outside
+    InstructionHandle next; // Will be set from the outside
     Instruction instruction;
     protected int i_position = -1; // byte code offset of instruction
     private Set targeters;
 
 
-    public final InstructionHandle getNext() {
-        return next;
-    }
+    
 
 
-    public final InstructionHandle getPrev() {
-        return prev;
-    }
+    
 
 
     public final Instruction getInstruction() {
@@ -87,26 +83,6 @@ public class InstructionHandle implements java.io.Serializable {
     }
 
     private static InstructionHandle ih_list = null; // List of reusable handles
-
-
-    
-
-
-    /**
-     * Called by InstructionList.setPositions when setting the position for every
-     * instruction. In the presence of variable length instructions `setPositions()'
-     * performs multiple passes over the instruction list to calculate the
-     * correct (byte) positions and offsets by calling this function.
-     *
-     * @param offset additional offset caused by preceding (variable length) instructions
-     * @param max_offset the maximum offset that may be caused by these instructions
-     * @return additional offset caused by possible change of this instruction's length
-     */
-    protected int updatePosition( int offset, int max_offset ) {
-        i_position += offset;
-        return 0;
-    }
-
 
     /** @return the position, i.e., the byte code offset of the contained
      * instruction. This is accurate only after

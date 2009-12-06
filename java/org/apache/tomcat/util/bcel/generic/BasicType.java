@@ -40,30 +40,7 @@ public final class BasicType extends Type {
     }
 
 
-    public static final BasicType getType( byte type ) {
-        switch (type) {
-            case Constants.T_VOID:
-                return VOID;
-            case Constants.T_BOOLEAN:
-                return BOOLEAN;
-            case Constants.T_BYTE:
-                return BYTE;
-            case Constants.T_SHORT:
-                return SHORT;
-            case Constants.T_CHAR:
-                return CHAR;
-            case Constants.T_INT:
-                return INT;
-            case Constants.T_LONG:
-                return LONG;
-            case Constants.T_DOUBLE:
-                return DOUBLE;
-            case Constants.T_FLOAT:
-                return FLOAT;
-            default:
-                throw new ClassGenException("Invalid type: " + type);
-        }
-    }
+    
 
 
     /** @return a hash code value for the object.

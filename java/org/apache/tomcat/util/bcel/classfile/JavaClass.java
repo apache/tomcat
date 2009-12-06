@@ -18,13 +18,9 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeSet;
 import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
-import org.apache.tomcat.util.bcel.util.ClassQueue;
-import org.apache.tomcat.util.bcel.util.SyntheticRepository;
 
 /**
  * Represents a Java class, i.e., the data structures, constant pool,
@@ -75,13 +71,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
             return THIS.getClassName().hashCode();
         }
     };
-    /**
-     * In cases where we go ahead and create something,
-     * use the default SyntheticRepository, because we
-     * don't know any better.
-     */
-    private transient org.apache.tomcat.util.bcel.util.Repository repository = SyntheticRepository
-            .getInstance();
 
 
     /**
@@ -104,7 +93,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
      */
     public JavaClass(int class_name_index, int superclass_name_index, String file_name, int major,
             int minor, int access_flags, ConstantPool constant_pool, int[] interfaces,
-            Field[] fields, Method[] methods, Attribute[] attributes, byte source) {
+            Field[] fields, Method[] methods, Attribute[] attributes) {
         if (interfaces == null) {
             interfaces = new int[0];
         }
@@ -213,55 +202,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
     }
 
 
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    /**
-     * @return Names of implemented interfaces.
-     */
-    public String[] getInterfaceNames() {
-        return interface_names;
-    }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    /**
-     * @return Superclass name.
-     */
-    public String getSuperclassName() {
-        return superclass_name;
-    }
-
-
     /**
      * @return String representing class contents.
      */
@@ -333,120 +273,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
     public final boolean isSuper() {
         return (access_flags & Constants.ACC_SUPER) != 0;
     }
-
-
-    
-    
-    
-    
-    
-    
-    /**
-     * Sets the ClassRepository which loaded the JavaClass.
-     * Should be called immediately after parsing is done.
-     */
-    public void setRepository( org.apache.tomcat.util.bcel.util.Repository repository ) {
-        this.repository = repository;
-    }
-
-
-    
-
-
-    /**
-     * @return true, if this class is an implementation of interface inter
-     * @throws ClassNotFoundException if superclasses or superinterfaces
-     *   of this class can't be found
-     */
-    public boolean implementationOf( JavaClass inter ) throws ClassNotFoundException {
-        if (!inter.isInterface()) {
-            throw new IllegalArgumentException(inter.getClassName() + " is no interface");
-        }
-        if (this.equals(inter)) {
-            return true;
-        }
-        JavaClass[] super_interfaces = getAllInterfaces();
-        for (int i = 0; i < super_interfaces.length; i++) {
-            if (super_interfaces[i].equals(inter)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @return the superclass for this JavaClass object, or null if this
-     * is java.lang.Object
-     * @throws ClassNotFoundException if the superclass can't be found
-     */
-    public JavaClass getSuperClass() throws ClassNotFoundException {
-        if ("java.lang.Object".equals(getClassName())) {
-            return null;
-        }
-        return repository.loadClass(getSuperclassName());
-    }
-
-
-    /**
-     * @return list of super classes of this class in ascending order, i.e.,
-     * java.lang.Object is always the last element
-     * @throws ClassNotFoundException if any of the superclasses can't be found
-     */
-    public JavaClass[] getSuperClasses() throws ClassNotFoundException {
-        JavaClass clazz = this;
-        List allSuperClasses = new ArrayList();
-        for (clazz = clazz.getSuperClass(); clazz != null; clazz = clazz.getSuperClass()) {
-            allSuperClasses.add(clazz);
-        }
-        return (JavaClass[]) allSuperClasses.toArray(new JavaClass[allSuperClasses.size()]);
-    }
-
-
-    /**
-     * Get interfaces directly implemented by this JavaClass.
-     */
-    public JavaClass[] getInterfaces() throws ClassNotFoundException {
-        String[] _interfaces = getInterfaceNames();
-        JavaClass[] classes = new JavaClass[_interfaces.length];
-        for (int i = 0; i < _interfaces.length; i++) {
-            classes[i] = repository.loadClass(_interfaces[i]);
-        }
-        return classes;
-    }
-
-
-    /**
-     * Get all interfaces implemented by this JavaClass (transitively).
-     */
-    public JavaClass[] getAllInterfaces() throws ClassNotFoundException {
-        ClassQueue queue = new ClassQueue();
-        Set allInterfaces = new TreeSet();
-        queue.enqueue(this);
-        while (!queue.empty()) {
-            JavaClass clazz = queue.dequeue();
-            JavaClass souper = clazz.getSuperClass();
-            JavaClass[] _interfaces = clazz.getInterfaces();
-            if (clazz.isInterface()) {
-                allInterfaces.add(clazz);
-            } else {
-                if (souper != null) {
-                    queue.enqueue(souper);
-                }
-            }
-            for (int i = 0; i < _interfaces.length; i++) {
-                queue.enqueue(_interfaces[i]);
-            }
-        }
-        return (JavaClass[]) allInterfaces.toArray(new JavaClass[allInterfaces.size()]);
-    }
-
-
-    
-
-
-    
-
 
     /**
      * Return value as defined by given BCELComparator strategy.

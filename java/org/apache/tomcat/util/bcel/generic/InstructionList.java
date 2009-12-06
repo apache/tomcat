@@ -51,30 +51,6 @@ public class InstructionList implements Serializable {
     
 
 
-    /**
-     * Search for given Instruction reference, start at beginning of list.
-     *
-     * @param i instruction to search for
-     * @return instruction found on success, null otherwise
-     */
-    private InstructionHandle findInstruction1( Instruction i ) {
-        for (InstructionHandle ih = start; ih != null; ih = ih.next) {
-            if (ih.instruction == i) {
-                return ih;
-            }
-        }
-        return null;
-    }
-
-
-    public boolean contains( Instruction i ) {
-        return findInstruction1(i) != null;
-    }
-
-
-    
-
-
     public String toString() {
         return toString(true);
     }
