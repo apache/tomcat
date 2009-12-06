@@ -20,8 +20,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.classfile.ConstantPool;
-import org.apache.tomcat.util.bcel.util.ByteSequence;
 
 /** 
  * Abstract super class for all Java byte codes.
@@ -93,61 +91,6 @@ public abstract class Instruction implements Cloneable, Serializable {
 
 
     /**
-     * @return mnemonic for instruction with sumbolic references resolved
-     */
-    public String toString( ConstantPool cp ) {
-        return toString(false);
-    }
-
-
-    
-
-
-    /**
-     * Read needed data (e.g. index) from file.
-     *
-     * @param bytes byte sequence to read from
-     * @param wide "wide" instruction flag
-     */
-    protected void initFromFile( ByteSequence bytes, boolean wide ) throws IOException {
-    }
-
-
-    
-
-    /**
-     * This method also gives right results for instructions whose
-     * effect on the stack depends on the constant pool entry they
-     * reference.
-     *  @return Number of words consumed from stack by this instruction,
-     * or Constants.UNPREDICTABLE, if this can not be computed statically
-     */
-    public int consumeStack( ConstantPoolGen cpg ) {
-        return Constants.CONSUME_STACK[opcode];
-    }
-
-
-    /**
-     * This method also gives right results for instructions whose
-     * effect on the stack depends on the constant pool entry they
-     * reference.
-     * @return Number of words produced onto stack by this instruction,
-     * or Constants.UNPREDICTABLE, if this can not be computed statically
-     */
-    public int produceStack( ConstantPoolGen cpg ) {
-        return Constants.PRODUCE_STACK[opcode];
-    }
-
-
-    /**
-     * @return this instructions opcode
-     */
-    public short getOpcode() {
-        return opcode;
-    }
-
-
-    /**
      * @return length (in bytes) of instruction
      */
     public int getLength() {
@@ -159,13 +102,6 @@ public abstract class Instruction implements Cloneable, Serializable {
      */
     void dispose() {
     }
-
-
-    
-
-
-    
-
 
     /** Check for equality, delegated to comparator
      * @return true if that is an Instruction and has the same opcode

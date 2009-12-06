@@ -705,45 +705,7 @@ public abstract class Utility {
     
 
 
-    /**
-     * Return type of signature as a byte value as defined in <em>Constants</em>
-     *
-     * @param  signature in format described above
-     * @return type of signature
-     * @see    Constants
-     */
-    public static final byte typeOfSignature( String signature ) throws ClassFormatException {
-        try {
-            switch (signature.charAt(0)) {
-                case 'B':
-                    return Constants.T_BYTE;
-                case 'C':
-                    return Constants.T_CHAR;
-                case 'D':
-                    return Constants.T_DOUBLE;
-                case 'F':
-                    return Constants.T_FLOAT;
-                case 'I':
-                    return Constants.T_INT;
-                case 'J':
-                    return Constants.T_LONG;
-                case 'L':
-                    return Constants.T_REFERENCE;
-                case '[':
-                    return Constants.T_ARRAY;
-                case 'V':
-                    return Constants.T_VOID;
-                case 'Z':
-                    return Constants.T_BOOLEAN;
-                case 'S':
-                    return Constants.T_SHORT;
-                default:
-                    throw new ClassFormatException("Invalid method signature: " + signature);
-            }
-        } catch (StringIndexOutOfBoundsException e) {
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
-        }
-    }
+    
 
 
     
@@ -834,12 +796,7 @@ public abstract class Utility {
     
 
 
-    /** @return true, if character is one of (a, ... z, A, ... Z, 0, ... 9, _)
-     */
-    public static boolean isJavaIdentifierPart( char ch ) {
-        return ((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z'))
-                || ((ch >= '0') && (ch <= '9')) || (ch == '_');
-    }
+    
 
 
     

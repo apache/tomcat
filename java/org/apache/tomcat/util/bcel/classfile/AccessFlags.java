@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * Super class for all objects that have modifiers like private, final, ...
  * I.e. classes, fields, and methods.
@@ -103,9 +101,7 @@ public abstract class AccessFlags implements java.io.Serializable {
     
 
 
-    public final boolean isInterface() {
-        return (access_flags & Constants.ACC_INTERFACE) != 0;
-    }
+    
 
 
     
