@@ -68,10 +68,6 @@ public class LocalVariableTypeTable extends Attribute {
       local_variable_type_table[i] = new LocalVariable(dis, cpool);
   }
 
-  public void accept(Visitor v) {
-    v.visitLocalVariableTypeTable(this);
-  }
-
   public final void dump(DataOutputStream file) throws IOException
   {
     super.dump(file);

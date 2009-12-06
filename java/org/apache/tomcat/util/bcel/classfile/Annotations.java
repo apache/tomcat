@@ -31,7 +31,6 @@ public abstract class Annotations extends Attribute {
 
     private int annotation_table_length;
     private AnnotationEntry[] annotation_table; // Table of annotations
-    private boolean isRuntimeVisible;
 
 
     /**
@@ -63,19 +62,6 @@ public abstract class Annotations extends Attribute {
             AnnotationEntry[] annotation_table, ConstantPool constant_pool , boolean isRuntimeVisible) {
         super(annotation_type, name_index, length, constant_pool);
         setAnnotationTable(annotation_table);
-        this.isRuntimeVisible = isRuntimeVisible;
-    }
-
-
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitAnnotation(this);
     }
 
 

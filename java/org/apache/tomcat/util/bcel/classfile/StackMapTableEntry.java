@@ -40,7 +40,6 @@ public final class StackMapTableEntry implements Cloneable {
     private StackMapType[] types_of_locals;
     private int number_of_stack_items;
     private StackMapType[] types_of_stack_items;
-    private ConstantPool constant_pool;
 
 
     /**
@@ -102,7 +101,6 @@ public final class StackMapTableEntry implements Cloneable {
         this.types_of_locals = types_of_locals;
         this.number_of_stack_items = number_of_stack_items;
         this.types_of_stack_items = types_of_stack_items;
-        this.constant_pool = constant_pool;
     }
 
 

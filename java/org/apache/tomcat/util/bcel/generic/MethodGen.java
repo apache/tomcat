@@ -46,22 +46,10 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  */
 public class MethodGen extends FieldGenOrMethodGen {
 
-    private String class_name;
     private Type[] arg_types;
-    private String[] arg_names;
-    private int max_locals;
-    private int max_stack;
     private InstructionList il;
-    private boolean strip_attributes;
     private List variable_vec = new ArrayList();
-    private List line_number_vec = new ArrayList();
-    private List exception_vec = new ArrayList();
     private List throws_vec = new ArrayList();
-    private List code_attrs_vec = new ArrayList();
-    
-    private List[] param_annotations; // Array of lists containing AnnotationGen objects
-    private boolean hasParameterAnnotations = false;
-    private boolean haveUnpackedParameterAnnotations = false;
     
     private static BCELComparator _cmp = new BCELComparator() {
 
@@ -78,24 +66,6 @@ public class MethodGen extends FieldGenOrMethodGen {
             return THIS.getSignature().hashCode() ^ THIS.getName().hashCode();
         }
     };
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**
@@ -169,151 +139,9 @@ public class MethodGen extends FieldGenOrMethodGen {
     }
 
 
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-    
-    
-      
-      
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
     public String getSignature() {
         return Type.getMethodSignature(type, arg_types);
     }
-
-
-    
-
-
-    
-
-
-    
-
-    
-
-    
-
-
-    
-
-    private List observers;
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

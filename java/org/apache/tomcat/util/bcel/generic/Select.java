@@ -195,12 +195,7 @@ public abstract class Select extends BranchInstruction implements VariableLength
     
 
 
-    /**
-     * @return array of match target offsets
-     */
-    public int[] getIndices() {
-        return indices;
-    }
+    
 
 
     /**
