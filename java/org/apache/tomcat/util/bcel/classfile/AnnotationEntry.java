@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:dbrosius@mebigfatguy.com">D. Brosius</A>
  * @since 5.3
  */
-public class AnnotationEntry implements Node, Constants, Serializable {
+public class AnnotationEntry implements Constants, Serializable {
 
     private int type_index;
     private int num_element_value_pairs;

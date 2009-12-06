@@ -30,7 +30,7 @@ import java.io.Serializable;
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     LineNumberTable
  */
-public final class LineNumber implements Cloneable, Node, Serializable {
+public final class LineNumber implements Cloneable, Serializable {
 
     private int start_pc; // Program Counter (PC) corresponds to line
     private int line_number; // number in source file

@@ -18,7 +18,6 @@ package org.apache.tomcat.util.bcel.generic;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.classfile.AccessFlags;
 import org.apache.tomcat.util.bcel.classfile.Attribute;
 
@@ -35,19 +34,14 @@ public abstract class FieldGenOrMethodGen extends AccessFlags implements NamedAn
     protected Type type;
     protected ConstantPoolGen cp;
     private List attribute_vec = new ArrayList();
-    protected ArrayList       annotation_vec= new ArrayList();
+    
 
 
     protected FieldGenOrMethodGen() {
     }
 
 
-    public void setType( Type type ) {
-        if (type.getType() == Constants.T_ADDRESS) {
-            throw new IllegalArgumentException("Type can not be " + type);
-        }
-        this.type = type;
-    }
+    
 
 
     
@@ -60,30 +54,16 @@ public abstract class FieldGenOrMethodGen extends AccessFlags implements NamedAn
     }
 
 
-    public void setName( String name ) {
-        this.name = name;
-    }
+    
 
 
     
 
 
-    public void setConstantPool( ConstantPoolGen cp ) {
-        this.cp = cp;
-    }
+    
 
 
-    /**
-     * Add an attribute to this method. Currently, the JVM knows about
-     * the `Code', `ConstantValue', `Synthetic' and `Exceptions'
-     * attributes. Other attributes will be ignored by the JVM but do no
-     * harm.
-     *
-     * @param a attribute to be added
-     */
-    public void addAttribute( Attribute a ) {
-        attribute_vec.add(a);
-    }
+    
     
     
 

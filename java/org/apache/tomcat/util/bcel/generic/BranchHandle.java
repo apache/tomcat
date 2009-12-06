@@ -43,15 +43,7 @@ public final class BranchHandle extends InstructionHandle {
     private static BranchHandle bh_list = null; // List of reusable handles
 
 
-    static final BranchHandle getBranchHandle( BranchInstruction i ) {
-        if (bh_list == null) {
-            return new BranchHandle(i);
-        }
-        BranchHandle bh = bh_list;
-        bh_list = (BranchHandle) bh.next;
-        bh.setInstruction(i);
-        return bh;
-    }
+    
 
 
     /** Handle adds itself to the list of resuable handles.

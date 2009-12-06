@@ -158,12 +158,7 @@ public abstract class BranchInstruction extends Instruction implements Instructi
     }
 
 
-    /**
-     * @return target offset in byte code
-     */
-    public final int getIndex() {
-        return index;
-    }
+    
 
 
     /**

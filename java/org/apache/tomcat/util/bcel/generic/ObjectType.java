@@ -38,11 +38,7 @@ public class ObjectType extends ReferenceType {
     }
 
 
-    /** @return name of referenced class
-     */
-    public String getClassName() {
-        return class_name;
-    }
+    
 
 
     /** @return a hash code value for the object.

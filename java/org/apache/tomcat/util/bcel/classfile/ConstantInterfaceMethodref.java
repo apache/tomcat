@@ -42,23 +42,5 @@ public final class ConstantInterfaceMethodref extends ConstantCP {
     }
 
 
-    /**
-     * @param class_index Reference to the class containing the method
-     * @param name_and_type_index and the method signature
-     */
-    public ConstantInterfaceMethodref(int class_index, int name_and_type_index) {
-        super(Constants.CONSTANT_InterfaceMethodref, class_index, name_and_type_index);
-    }
-
-
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitConstantInterfaceMethodref(this);
-    }
+    
 }

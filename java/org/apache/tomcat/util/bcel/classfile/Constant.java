@@ -31,7 +31,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Constant implements Cloneable, Node, Serializable {
+public abstract class Constant implements Cloneable, Serializable {
 
     private static BCELComparator _cmp = new BCELComparator() {
 
@@ -61,16 +61,6 @@ public abstract class Constant implements Cloneable, Node, Serializable {
     Constant(byte tag) {
         this.tag = tag;
     }
-
-
-    /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public abstract void accept( Visitor v );
 
 
     public abstract void dump( DataOutputStream file ) throws IOException;
