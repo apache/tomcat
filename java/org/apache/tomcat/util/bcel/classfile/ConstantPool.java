@@ -34,7 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see     org.apache.tomcat.util.bcel.generic.ConstantPoolGen
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class ConstantPool implements Cloneable, Node, Serializable {
+public class ConstantPool implements Cloneable, Serializable {
 
     private int constant_pool_count;
     private Constant[] constant_pool;

@@ -27,7 +27,7 @@ import org.apache.tomcat.util.bcel.classfile.Attribute;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class FieldOrMethod extends AccessFlags implements Cloneable, Node {
+public abstract class FieldOrMethod extends AccessFlags implements Cloneable {
 
     protected int name_index; // Points to field name in constant pool 
     protected int signature_index; // Points to encoded signature
@@ -36,18 +36,8 @@ public abstract class FieldOrMethod extends AccessFlags implements Cloneable, No
     
     protected ConstantPool constant_pool;
 
-    private String signatureAttributeString = null;
-    private boolean searchedForSignatureAttribute = false;
-    
-
-    // Annotations are collected from certain attributes, don't do it more than necessary!
-    private boolean annotationsOutOfDate = true;
-
     FieldOrMethod() {
     }
-
-
-    
 
 
     /**
@@ -85,12 +75,6 @@ public abstract class FieldOrMethod extends AccessFlags implements Cloneable, No
     }
 
 
-    
-
-
-    
-
-
     /**
      * @param attributes Collection of object attributes.
      */
@@ -99,25 +83,7 @@ public abstract class FieldOrMethod extends AccessFlags implements Cloneable, No
         attributes_count = (attributes == null) ? 0 : attributes.length;
     }
 
-
     
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
     /**
      * @return Name of object, i.e., method name or field name
      */
@@ -136,13 +102,4 @@ public abstract class FieldOrMethod extends AccessFlags implements Cloneable, No
         c = (ConstantUtf8) constant_pool.getConstant(signature_index, Constants.CONSTANT_Utf8);
         return c.getBytes();
     }
-
-
-    
-
-	
-
-	
-
-	
 }

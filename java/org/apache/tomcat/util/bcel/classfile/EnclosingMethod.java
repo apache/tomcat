@@ -49,10 +49,6 @@ public class EnclosingMethod extends Attribute {
 	    methodIndex = methodIdx;
 	}
 
-	public void accept(Visitor v) {
-	  v.visitEnclosingMethod(this);
-	}
-
 	public Attribute copy(ConstantPool constant_pool) {
 		throw new RuntimeException("Not implemented yet!");
 		// is this next line sufficient?

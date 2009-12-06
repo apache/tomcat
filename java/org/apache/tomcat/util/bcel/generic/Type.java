@@ -235,7 +235,6 @@ public abstract class Type implements java.io.Serializable {
     static int getArgumentTypesSize( String signature ) {
         int res = 0;
         int index;
-        Type[] types;
         try { // Read all declarations between for `(' and `)'
             if (signature.charAt(0) != '(') {
                 throw new ClassFormatException("Invalid method signature: " + signature);

@@ -47,7 +47,7 @@ import org.apache.tomcat.util.bcel.classfile.ConstantUtf8;
  * @see Deprecated
  * @see Signature
  */
-public abstract class Attribute implements Cloneable, Node, Serializable
+public abstract class Attribute implements Cloneable, Serializable
 {
 	protected int name_index; // Points to attribute name in constant pool
 
@@ -65,16 +65,6 @@ public abstract class Attribute implements Cloneable, Node, Serializable
 		this.length = length;
 		this.constant_pool = constant_pool;
 	}
-
-	/**
-	 * Called by objects that are traversing the nodes of the tree implicitely
-	 * defined by the contents of a Java class. I.e., the hierarchy of methods,
-	 * fields, attributes, etc. spawns a tree of objects.
-	 * 
-	 * @param v
-	 *            Visitor object
-	 */
-	public abstract void accept(Visitor v);
 
 	/**
 	 * Dump attribute to file stream in binary format.

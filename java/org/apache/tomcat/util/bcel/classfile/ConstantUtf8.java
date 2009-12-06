@@ -64,18 +64,6 @@ public final class ConstantUtf8 extends Constant {
 
 
     /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
-     *
-     * @param v Visitor object
-     */
-    public void accept( Visitor v ) {
-        v.visitConstantUtf8(this);
-    }
-
-
-    /**
      * Dump String in Utf8 format to file stream.
      *
      * @param file Output file stream

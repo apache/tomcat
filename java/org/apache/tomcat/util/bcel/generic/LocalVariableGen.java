@@ -76,9 +76,7 @@ public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Clo
     }
 
 
-    public void setName( String name ) {
-        this.name = name;
-    }
+    
 
 
     public String getName() {
@@ -86,9 +84,7 @@ public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Clo
     }
 
 
-    public void setType( Type type ) {
-        this.type = type;
-    }
+    
 
 
     
