@@ -18,7 +18,6 @@ package org.apache.tomcat.util.bcel.generic;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.apache.tomcat.util.bcel.util.ByteSequence;
 
 /** 
  * Select - Abstract super class for LOOKUPSWITCH and TABLESWITCH instructions.
@@ -51,32 +50,6 @@ public abstract class Select extends BranchInstruction implements VariableLength
 
 
     
-
-
-    /**
-     * Since this is a variable length instruction, it may shift the following
-     * instructions which then need to update their position.
-     *
-     * Called by InstructionList.setPositions when setting the position for every
-     * instruction. In the presence of variable length instructions `setPositions'
-     * performs multiple passes over the instruction list to calculate the
-     * correct (byte) positions and offsets by calling this function.
-     *
-     * @param offset additional offset caused by preceding (variable length) instructions
-     * @param max_offset the maximum offset that may be caused by these instructions
-     * @return additional offset caused by possible change of this instruction's length
-     */
-    protected int updatePosition( int offset, int max_offset ) {
-        position += offset; // Additional offset caused by preceding SWITCHs, GOTOs, etc.
-        short old_length = length;
-        /* Alignment on 4-byte-boundary, + 1, because of tag byte.
-         */
-        padding = (4 - ((position + 1) % 4)) % 4;
-        length = (short) (fixed_length + padding); // Update length
-        return length - old_length;
-    }
-
-
     /**
      * Dump instruction as byte code to stream out.
      * @param out Output stream
@@ -88,19 +61,6 @@ public abstract class Select extends BranchInstruction implements VariableLength
         }
         index = getTargetOffset(); // Write default target offset
         out.writeInt(index);
-    }
-
-
-    /**
-     * Read needed data (e.g. index) from file.
-     */
-    protected void initFromFile( ByteSequence bytes, boolean wide ) throws IOException {
-        padding = (4 - (bytes.getIndex() % 4)) % 4; // Compute number of pad bytes
-        for (int i = 0; i < padding; i++) {
-            bytes.readByte();
-        }
-        // Default branch target common for both cases (TABLESWITCH, LOOKUPSWITCH)
-        index = bytes.readInt();
     }
 
 

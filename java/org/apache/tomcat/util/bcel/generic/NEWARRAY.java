@@ -18,7 +18,6 @@ package org.apache.tomcat.util.bcel.generic;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.apache.tomcat.util.bcel.util.ByteSequence;
 
 /** 
  * NEWARRAY -  Create new array of basic type (int, short, ...)
@@ -75,16 +74,4 @@ public class NEWARRAY extends Instruction implements AllocationInstruction, Exce
     public String toString( boolean verbose ) {
         return super.toString(verbose) + " " + org.apache.tomcat.util.bcel.Constants.TYPE_NAMES[type];
     }
-
-
-    /**
-     * Read needed data (e.g. index) from file.
-     */
-    protected void initFromFile( ByteSequence bytes, boolean wide ) throws IOException {
-        type = bytes.readByte();
-        length = 2;
-    }
-
-
-    
 }

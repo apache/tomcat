@@ -68,22 +68,6 @@ public final class BranchHandle extends InstructionHandle {
     }
 
 
-    protected int updatePosition( int offset, int max_offset ) {
-        int x = bi.updatePosition(offset, max_offset);
-        i_position = bi.position;
-        return x;
-    }
-
-
-    
-
-
-    
-
-
-    
-
-
     /** 
      * Set new contents. Old instruction is disposed and may not be used anymore.
      */

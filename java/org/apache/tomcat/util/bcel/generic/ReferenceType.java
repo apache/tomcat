@@ -26,9 +26,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public abstract class ReferenceType extends Type {
 
-    protected ReferenceType(byte t, String s) {
-        super(t, s);
-    }
+    
 
 
     /** Class is non-abstract but not instantiable from the outside
