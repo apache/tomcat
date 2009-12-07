@@ -641,15 +641,6 @@ final class ApplicationDispatcher
         ApplicationFilterChain filterChain = factory.createFilterChain(request,
                                                                 wrapper,servlet);
         
-        Object origAsyncSupported = request.getAttribute(Globals.ASYNC_SUPPORTED_ATTR);
-        //we have a new filter chain, setup isAsyncSupported here
-        boolean filterAsyncSupported = filterChain.isAsyncSupported();
-        if (!filterAsyncSupported && request.isAsyncSupported()) {
-            //the request says we support it, but the filters don't
-            //TODO SERVLET3 - async
-            request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
-        }
-        
         // Call the service() method for the allocated servlet instance
         try {
             String jspFile = wrapper.getJspFile();
@@ -704,8 +695,6 @@ final class ApplicationDispatcher
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException",
                              wrapper.getName()), e);
             runtimeException = e;
-        } finally {
-            request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, origAsyncSupported);
         }
 
         // Release the filter chain (if any) for this request
@@ -715,7 +704,7 @@ final class ApplicationDispatcher
         } catch (Throwable e) {
             wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
                              wrapper.getName()), e);
-            // FIXME: Exception handling needs to be simpiler to what is in the StandardWrapperValue
+            // FIXME: Exception handling needs to be simpler to what is in the StandardWrapperValue
         }
 
         // Deallocate the allocated servlet instance
