@@ -51,16 +51,7 @@ public final class ConstantUtf8 extends Constant {
     }
 
 
-    /**
-     * @param bytes Data
-     */
-    public ConstantUtf8(String bytes) {
-        super(Constants.CONSTANT_Utf8);
-        if (bytes == null) {
-            throw new IllegalArgumentException("bytes must not be null!");
-        }
-        this.bytes = bytes;
-    }
+    
 
 
     /**
