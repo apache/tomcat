@@ -71,7 +71,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             if (name.startsWith(socketName)) {
                 return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
             }
-            return IntrospectionUtils.setProperty(this,name,value);
+            return super.setProperty(name, value);
         } catch ( Exception x ) {
             log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
             return false;
