@@ -28,10 +28,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
@@ -224,6 +222,11 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                 support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT,
                                           filter, request, response);
                 
+                if (request.isAsyncSupported() && "false".equalsIgnoreCase(
+                        filterConfig.getFilterDef().getAsyncSupported())) {
+                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
+                            Boolean.FALSE);
+                }
                 if( Globals.IS_SECURITY_ENABLED ) {
                     final ServletRequest req = request;
                     final ServletResponse res = response;
@@ -275,25 +278,17 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
             support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT,
                                       servlet, request, response);
-            ServletRequest wRequest; 
             if (request.isAsyncSupported()
                     && !support.getWrapper().isAsyncSupported()) {
-                if (request instanceof HttpServletRequest) {
-                    wRequest = new HttpServletRequestNoAsyc(
-                            (HttpServletRequest) request);
-                } else {
-                    // Must be a ServletRequest
-                    wRequest = new ServletRequestNoAsyc(request);
-                }
-            } else {
-                wRequest = request;
+                request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
+                        Boolean.FALSE);
             }
             // Use potentially wrapped request from this point
-            if ((wRequest instanceof HttpServletRequest) &&
+            if ((request instanceof HttpServletRequest) &&
                 (response instanceof HttpServletResponse)) {
                     
                 if( Globals.IS_SECURITY_ENABLED ) {
-                    final ServletRequest req = wRequest;
+                    final ServletRequest req = request;
                     final ServletResponse res = response;
                     Principal principal = 
                         ((HttpServletRequest) req).getUserPrincipal();
@@ -305,12 +300,11 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                                principal);   
                     args = null;
                 } else {  
-                    servlet.service(wRequest, response);
+                    servlet.service(request, response);
                 }
             } else {
-                servlet.service(wRequest, response);
+                servlet.service(request, response);
             }
-            // Stop using wrapped request now Servlet has been processed
             support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
                                       servlet, request, response);
         } catch (IOException e) {
@@ -586,42 +580,4 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
         this.support = support;
 
     }
-    
-    public boolean isAsyncSupported() {
-        boolean supported = true;
-        for (ApplicationFilterConfig config : filters) {
-            if (config!=null && config.getFilterDef()!=null) {
-                supported = supported & config.getFilterDef().isAsyncSupported();
-            }
-        }
-        return supported;
-    }
-
-
-    // --------------------------------- Wrapper classes for isAsyncSupported()
-    
-    private class HttpServletRequestNoAsyc extends HttpServletRequestWrapper {
-
-        public HttpServletRequestNoAsyc(HttpServletRequest request) {
-            super(request);
-        }
-        
-        @Override
-        public boolean isAsyncSupported() {
-            return false;
-        }
-    }
-
-    private class ServletRequestNoAsyc extends ServletRequestWrapper {
-
-        public ServletRequestNoAsyc(ServletRequest request) {
-            super(request);
-        }
-        
-        @Override
-        public boolean isAsyncSupported() {
-            return false;
-        }
-    }
-
 }
