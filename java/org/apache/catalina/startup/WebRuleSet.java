@@ -383,6 +383,10 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(fullPrefix + "/servlet/multipart-config/file-size-threshold",
                                "setFileSizeThreshold", 0);
 
+        digester.addCallMethod(fullPrefix + "/servlet/async-supported",
+                "setAsyncSupported", 0);
+
+        
         digester.addRule(fullPrefix + "/servlet-mapping",
                                new CallMethodMultiRule("addServletMapping", 2, 0));
         digester.addCallParam(fullPrefix + "/servlet-mapping/servlet-name", 1);

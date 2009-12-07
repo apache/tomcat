@@ -260,6 +260,11 @@ public class StandardWrapper
      * Multipart config
      */
     protected MultipartConfigElement multipartConfigElement = null;
+    
+    /**
+     * Async support
+     */
+    protected boolean asyncSupported = true;
 
     /**
      * Static class array used when the SecurityManager is turned on and 
@@ -1500,6 +1505,15 @@ public class StandardWrapper
     public void setMultipartConfigElement(
             MultipartConfigElement multipartConfigElement) {
         this.multipartConfigElement = multipartConfigElement;
+    }
+
+    @Override
+    public boolean isAsyncSupported() {
+        return asyncSupported;
+    }
+    
+    public void setAsyncSupported(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
     }
 
     // -------------------------------------------------------- Package Methods
