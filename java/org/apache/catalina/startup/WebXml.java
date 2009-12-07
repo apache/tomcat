@@ -18,7 +18,6 @@
 
 package org.apache.catalina.startup;
 
-import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -517,9 +515,6 @@ public class WebXml {
 
         // messageDestinations were ignored in Tomcat 6, so ignore here
         
-        // TODO SERVLET3 - This needs to be more fine-grained. Whether or not to
-        //                 process annotations on destroy() will depend on where
-        //                 the filter/servlet was loaded from. Joy.
         context.setIgnoreAnnotations(metadataComplete);
         for (String extension : mimeMappings.keySet()) {
             context.addMimeMapping(extension, mimeMappings.get(extension));
@@ -581,6 +576,10 @@ public class WebXml {
                     wrapper.setMultipartConfigElement(new MultipartConfigElement(
                             multipartdef.getLocation()));
                 }
+            }
+            if (servlet.getAsyncSupported() != null) {
+                wrapper.setAsyncSupported(
+                        Boolean.parseBoolean(servlet.getAsyncSupported()));
             }
             context.addChild(wrapper);
         }
@@ -1048,6 +1047,15 @@ public class WebXml {
         } else if (src.getMultipartDef() != null) {
             return mergeMultipartDef(src.getMultipartDef(),
                     dest.getMultipartDef(), failOnConflict);
+        }
+        
+        if (dest.getAsyncSupported() == null) {
+            dest.setAsyncSupported(src.getAsyncSupported());
+        } else if (src.getAsyncSupported() != null) {
+            if (failOnConflict &&
+                    !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
+                return false;
+            }
         }
         
         return true;

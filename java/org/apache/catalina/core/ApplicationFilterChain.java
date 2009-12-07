@@ -28,8 +28,10 @@ import javax.servlet.FilterChain;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
@@ -273,11 +275,25 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
             support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT,
                                       servlet, request, response);
-            if ((request instanceof HttpServletRequest) &&
+            ServletRequest wRequest; 
+            if (request.isAsyncSupported()
+                    && !support.getWrapper().isAsyncSupported()) {
+                if (request instanceof HttpServletRequest) {
+                    wRequest = new HttpServletRequestNoAsyc(
+                            (HttpServletRequest) request);
+                } else {
+                    // Must be a ServletRequest
+                    wRequest = new ServletRequestNoAsyc(request);
+                }
+            } else {
+                wRequest = request;
+            }
+            // Use potentially wrapped request from this point
+            if ((wRequest instanceof HttpServletRequest) &&
                 (response instanceof HttpServletResponse)) {
                     
                 if( Globals.IS_SECURITY_ENABLED ) {
-                    final ServletRequest req = request;
+                    final ServletRequest req = wRequest;
                     final ServletResponse res = response;
                     Principal principal = 
                         ((HttpServletRequest) req).getUserPrincipal();
@@ -289,11 +305,12 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                                principal);   
                     args = null;
                 } else {  
-                    servlet.service(request, response);
+                    servlet.service(wRequest, response);
                 }
             } else {
-                servlet.service(request, response);
+                servlet.service(wRequest, response);
             }
+            // Stop using wrapped request now Servlet has been processed
             support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
                                       servlet, request, response);
         } catch (IOException e) {
@@ -580,5 +597,31 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
         return supported;
     }
 
+
+    // --------------------------------- Wrapper classes for isAsyncSupported()
+    
+    private class HttpServletRequestNoAsyc extends HttpServletRequestWrapper {
+
+        public HttpServletRequestNoAsyc(HttpServletRequest request) {
+            super(request);
+        }
+        
+        @Override
+        public boolean isAsyncSupported() {
+            return false;
+        }
+    }
+
+    private class ServletRequestNoAsyc extends ServletRequestWrapper {
+
+        public ServletRequestNoAsyc(ServletRequest request) {
+            super(request);
+        }
+        
+        @Override
+        public boolean isAsyncSupported() {
+            return false;
+        }
+    }
 
 }
