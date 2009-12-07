@@ -260,7 +260,8 @@ public final class IntrospectionUtils {
     public static boolean setProperty(Object o, String name, String value) {
         return setProperty(o,name,value,true);
     }
-    public static boolean setProperty(Object o, String name, String value,boolean invokeSetProperty) {
+    public static boolean setProperty(Object o, String name, String value,
+            boolean invokeSetProperty) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
@@ -351,7 +352,8 @@ public final class IntrospectionUtils {
             }
 
             // Ok, no setXXX found, try a setProperty("name", "value")
-            if (setPropertyMethodBool != null || setPropertyMethodVoid != null) {
+            if (invokeSetProperty && (setPropertyMethodBool != null ||
+                    setPropertyMethodVoid != null)) {
                 Object params[] = new Object[2];
                 params[0] = name;
                 params[1] = value;
