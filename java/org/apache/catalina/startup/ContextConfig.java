@@ -29,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +41,14 @@ import java.util.jar.JarFile;
 
 import javax.servlet.ServletContext;
 
+import org.apache.tomcat.util.bcel.classfile.AnnotationElementValue;
+import org.apache.tomcat.util.bcel.classfile.AnnotationEntry;
+import org.apache.tomcat.util.bcel.classfile.ArrayElementValue;
+import org.apache.tomcat.util.bcel.classfile.ClassFormatException;
+import org.apache.tomcat.util.bcel.classfile.ClassParser;
+import org.apache.tomcat.util.bcel.classfile.ElementValue;
+import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
+import org.apache.tomcat.util.bcel.classfile.JavaClass;
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -61,6 +70,7 @@ import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.deploy.ServletDef;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.DirContextURLConnection;
@@ -1586,8 +1596,8 @@ public class ContextConfig
             dcUrlConn = (DirContextURLConnection) urlConn;
             dcUrlConn.setUseCaches(false);
             
-            String ct = dcUrlConn.getContentType();
-            if (ResourceAttributes.COLLECTION_TYPE.equals(ct)) {
+            String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
+            if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
                 // Collection
                 Enumeration<String> dirs = dcUrlConn.list();
                 while (dirs.hasMoreElements()) {
@@ -1618,7 +1628,7 @@ public class ContextConfig
                 }
             }
         } catch (IOException e) {
-            log.error(sm.getString("contextConfig.jarFile", url), e);
+            log.error(sm.getString("contextConfig.jndiUrl", url), e);
         }
     }
     
@@ -1651,10 +1661,123 @@ public class ContextConfig
     }
 
 
-    protected void processAnnotationsStream(InputStream is, WebXml fragment) {
-        // TODO SERVLET 3
+    protected void processAnnotationsStream(InputStream is, WebXml fragment)
+            throws ClassFormatException, IOException {
+        
+        ClassParser parser = new ClassParser(is, null);
+        JavaClass clazz = parser.parse();
+        String className = clazz.getClassName();
+        AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
+        
+        for (AnnotationEntry ae : annotationsEntries) {
+            String type = ae.getAnnotationType();
+            if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
+                processAnnotationWebServlet(className, ae, fragment);
+            } else {
+                // TODO SERVLET 3 - Other annotations
+                // Unknown annotation - ignore
+            }
+        }
     }
 
+    protected void processAnnotationWebServlet(String className,
+            AnnotationEntry ae, WebXml fragment) {
+        if (fragment.getServlets().containsKey(className)) {
+            // Skip this annotation. Entry in web.xml takes priority
+            return;
+        }
+        boolean mappingSet = false;
+        ServletDef servletDef = new ServletDef();
+        servletDef.setServletName(className);
+        servletDef.setServletClass(className);
+        String[] mappings = null;
+
+        ElementValuePair[] evps = ae.getElementValuePairs();
+        for (ElementValuePair evp : evps) {
+            String name = evp.getNameString();
+            if ("value".equals(name) || "urlPatterns".equals(name)) {
+                if (mappingSet) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "contextConfig.urlPatternValue", className));
+                }
+                mappingSet = true;
+                mappings = processAnnotationsUrlPatterns(evp.getValue());
+            } else if ("name".equals(name)) {
+                servletDef.setServletName(evp.getValue().stringifyValue());
+            } else if ("description".equals(name)) {
+                servletDef.setDescription(evp.getValue().stringifyValue());
+            } else if ("displayName".equals(name)) {
+                servletDef.setDisplayName(evp.getValue().stringifyValue());
+            } else if ("largeIcon".equals(name)) {
+                servletDef.setLargeIcon(evp.getValue().stringifyValue());
+            } else if ("smallIcon".equals(name)) {
+                servletDef.setSmallIcon(evp.getValue().stringifyValue());
+            } else if ("asyncSupported".equals(name)) {
+                servletDef.setAsyncSupported(evp.getValue().stringifyValue());
+            } else if ("loadOnStartup".equals(name)) {
+                servletDef.setLoadOnStartup(evp.getValue().stringifyValue());
+            } else if ("initParams".equals(name)) {
+                Map<String,String> initParams =
+                    processAnnotationWebInitParams(evp.getValue());
+                for (String paramName : initParams.keySet()) {
+                    servletDef.addInitParameter(paramName,
+                            initParams.get(paramName));
+                }
+            } else {
+                // Ignore
+            }
+        }
+        if (mappings != null) {
+            fragment.addServlet(servletDef);
+            for (String mapping : mappings) {
+                fragment.addServletMapping(mapping,
+                        servletDef.getServletName());
+            }
+        }
+    }
+
+    protected String[] processAnnotationsUrlPatterns(ElementValue ev) {
+        ArrayList<String> values = new ArrayList<String>();
+        if (ev instanceof ArrayElementValue) {
+            ElementValue[] arrayValues =
+                ((ArrayElementValue) ev).getElementValuesArray();
+            for (ElementValue value : arrayValues) {
+                values.add(value.stringifyValue());
+            }
+        } else {
+            values.add(ev.stringifyValue());
+        }
+        String[] result = new String[values.size()];
+        return values.toArray(result);
+    }
+    
+    protected Map<String,String> processAnnotationWebInitParams(
+            ElementValue ev) {
+        Map<String, String> result = new HashMap<String,String>();
+        if (ev instanceof ArrayElementValue) {
+            ElementValue[] arrayValues =
+                ((ArrayElementValue) ev).getElementValuesArray();
+            for (ElementValue value : arrayValues) {
+                if (value instanceof AnnotationElementValue) {
+                    ElementValuePair[] evps = ((AnnotationElementValue)
+                            value).getAnnotationEntry().getElementValuePairs();
+                    String initParamName = null;
+                    String initParamValue = null;
+                    for (ElementValuePair evp : evps) {
+                        if ("name".equals(evp.getNameString())) {
+                            initParamName = evp.getValue().stringifyValue();
+                        } else if ("value".equals(evp.getNameString())) {
+                            initParamValue = evp.getValue().stringifyValue();
+                        } else {
+                            // Ignore
+                        }
+                    }
+                    result.put(initParamName, initParamValue);
+                }
+            }
+        }
+        return result;
+    }
     
     private class FragmentJarScannerCallback implements JarScannerCallback {
 
