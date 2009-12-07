@@ -1673,6 +1673,8 @@ public class ContextConfig
             String type = ae.getAnnotationType();
             if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
                 processAnnotationWebServlet(className, ae, fragment);
+            }else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
+                fragment.addListener(className);
             } else {
                 // TODO SERVLET 3 - Other annotations
                 // Unknown annotation - ignore
