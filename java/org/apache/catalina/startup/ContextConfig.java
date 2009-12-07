@@ -1673,10 +1673,11 @@ public class ContextConfig
             String type = ae.getAnnotationType();
             if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
                 processAnnotationWebServlet(className, ae, fragment);
+            }else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
+                processAnnotationWebFilter(className, ae, fragment);
             }else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
                 fragment.addListener(className);
             } else {
-                // TODO SERVLET 3 - Other annotations
                 // Unknown annotation - ignore
             }
         }
@@ -1688,22 +1689,22 @@ public class ContextConfig
             // Skip this annotation. Entry in web.xml takes priority
             return;
         }
-        boolean mappingSet = false;
+        boolean urlPatternsSet = false;
         ServletDef servletDef = new ServletDef();
         servletDef.setServletName(className);
         servletDef.setServletClass(className);
-        String[] mappings = null;
+        String[] urlPatterns = null;
 
         ElementValuePair[] evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("value".equals(name) || "urlPatterns".equals(name)) {
-                if (mappingSet) {
+                if (urlPatternsSet) {
                     throw new IllegalArgumentException(sm.getString(
                             "contextConfig.urlPatternValue", className));
                 }
-                mappingSet = true;
-                mappings = processAnnotationsUrlPatterns(evp.getValue());
+                urlPatternsSet = true;
+                urlPatterns = processAnnotationsStringArray(evp.getValue());
             } else if ("name".equals(name)) {
                 servletDef.setServletName(evp.getValue().stringifyValue());
             } else if ("description".equals(name)) {
@@ -1729,16 +1730,82 @@ public class ContextConfig
                 // Ignore
             }
         }
-        if (mappings != null) {
+        if (urlPatterns != null) {
             fragment.addServlet(servletDef);
-            for (String mapping : mappings) {
-                fragment.addServletMapping(mapping,
+            for (String urlPattern : urlPatterns) {
+                fragment.addServletMapping(urlPattern,
                         servletDef.getServletName());
             }
         }
     }
 
-    protected String[] processAnnotationsUrlPatterns(ElementValue ev) {
+    protected void processAnnotationWebFilter(String className,
+            AnnotationEntry ae, WebXml fragment) {
+        if (fragment.getFilters().containsKey(className)) {
+            // Skip this annotation. Entry in web.xml takes priority
+            return;
+        }
+        boolean urlPatternsSet = false;
+        FilterDef filterDef = new FilterDef();
+        FilterMap filterMap = new FilterMap();
+        filterDef.setFilterName(className);
+        filterDef.setFilterClass(className);
+        String[] urlPatterns = null;
+
+        ElementValuePair[] evps = ae.getElementValuePairs();
+        for (ElementValuePair evp : evps) {
+            String name = evp.getNameString();
+            if ("value".equals(name) || "urlPatterns".equals(name)) {
+                if (urlPatternsSet) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "contextConfig.urlPatternValue", className));
+                }
+                urlPatternsSet = true;
+                urlPatterns = processAnnotationsStringArray(evp.getValue());
+                for (String urlPattern : urlPatterns) {
+                    filterMap.addURLPattern(urlPattern);
+                }
+            } else if ("filterName".equals(name)) {
+                filterDef.setFilterName(evp.getValue().stringifyValue());
+            } else if ("servletNames".equals(name)) {
+                String[] servletNames =
+                    processAnnotationsStringArray(evp.getValue());
+                for (String servletName : servletNames) {
+                    filterMap.addServletName(servletName);
+                }
+            } else if ("dispatcherTypes".equals(name)) {
+                String[] dispatcherTypes =
+                    processAnnotationsStringArray(evp.getValue());
+                for (String dispatcherType : dispatcherTypes) {
+                    filterMap.setDispatcher(dispatcherType);
+                }
+            } else if ("description".equals(name)) {
+                filterDef.setDescription(evp.getValue().stringifyValue());
+            } else if ("displayName".equals(name)) {
+                filterDef.setDisplayName(evp.getValue().stringifyValue());
+            } else if ("largeIcon".equals(name)) {
+                filterDef.setLargeIcon(evp.getValue().stringifyValue());
+            } else if ("smallIcon".equals(name)) {
+                filterDef.setSmallIcon(evp.getValue().stringifyValue());
+            } else if ("asyncSupported".equals(name)) {
+                filterDef.setAsyncSupported(evp.getValue().stringifyValue());
+            } else if ("initParams".equals(name)) {
+                Map<String,String> initParams =
+                    processAnnotationWebInitParams(evp.getValue());
+                for (String paramName : initParams.keySet()) {
+                    filterDef.addInitParameter(paramName,
+                            initParams.get(paramName));
+                }
+            } else {
+                // Ignore
+            }
+        }
+        fragment.addFilter(filterDef);
+        filterMap.setFilterName(filterDef.getFilterName());
+        fragment.addFilterMapping(filterMap);
+    }
+
+    protected String[] processAnnotationsStringArray(ElementValue ev) {
         ArrayList<String> values = new ArrayList<String>();
         if (ev instanceof ArrayElementValue) {
             ElementValue[] arrayValues =
