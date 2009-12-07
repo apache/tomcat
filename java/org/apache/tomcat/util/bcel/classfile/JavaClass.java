@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  * should see the <a href="../generic/ClassGen.html">ClassGen</a> class.
 
  * @version $Id$
- * @see org.apache.tomcat.util.bcel.generic.ClassGen
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class JavaClass extends AccessFlags implements Cloneable, Comparable {
@@ -49,8 +48,8 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
     private Attribute[] attributes; // attributes defined in the class
     private AnnotationEntry[] annotations;   // annotations defined on the class
     
-    public static final byte FILE = 2;
-    public static final byte ZIP = 3;
+    
+    
     
     
     

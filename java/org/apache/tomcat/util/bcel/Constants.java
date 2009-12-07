@@ -24,11 +24,7 @@ package org.apache.tomcat.util.bcel;
  */
 public interface Constants {
 
-  
-
-  
-
-  /** One of the access flags for fields, methods, or classes.
+    /** One of the access flags for fields, methods, or classes.
    *  @see #ACC_PUBLIC
    */
   public final static short ACC_FINAL        = 0x0010;
@@ -271,11 +267,6 @@ public interface Constants {
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short JSR_W            = 201;
 
-  
-  
-  
-  
-
   /** Illegal opcode. */
   public static final short  UNDEFINED      = -1;
   /** Illegal opcode. */
@@ -287,32 +278,18 @@ public interface Constants {
   /** Mnemonic for an illegal type. */
   public static final String ILLEGAL_TYPE   = "<illegal type>";
 
-  /** Boolean data type. */
-  public static final byte T_BOOLEAN = 4;
-  /** Char data type. */
-  public static final byte T_CHAR    = 5;
-  /** Float data type. */
-  public static final byte T_FLOAT   = 6;
-  /** Double data type. */
-  public static final byte T_DOUBLE  = 7;
   /** Byte data type. */
   public static final byte T_BYTE    = 8;
   /** Short data type. */
   public static final byte T_SHORT   = 9;
   /** Int data type. */
   public static final byte T_INT     = 10;
-  /** Long data type. */
-  public static final byte T_LONG    = 11;
 
-  /** Void data type (non-standard). */
-  public static final byte T_VOID      = 12; // Non-standard
-  
   /** Object data type. */
   public static final byte T_OBJECT    = 14;
   
   /** Unknown data type. */
   public static final byte T_UNKNOWN   = 15;
-  
 
   /** The primitive type names corresponding to the T_XX constants,
    * e.g., TYPE_NAMES[T_INT] = "int"
@@ -323,14 +300,7 @@ public interface Constants {
     "void", "array", "object", "unknown", "address"
   };
 
-  /** The signature characters corresponding to primitive types,
-   * e.g., SHORT_TYPE_NAMES[T_INT] = "I"
-   */
-  public static final String[] SHORT_TYPE_NAMES = {
-    ILLEGAL_TYPE, ILLEGAL_TYPE,  ILLEGAL_TYPE, ILLEGAL_TYPE,
-    "Z", "C", "F", "D", "B", "S", "I", "J",
-    "V", ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE
-  };
+  
 
   /**
    * Number of byte code operands for each opcode, i.e., number of bytes after the tag byte
