@@ -76,13 +76,7 @@ public class AnnotationEntry implements Constants, Serializable {
         return c.getBytes();
     }
     
-    /**
-     * @return the annotation type index
-     */
-    public int getAnnotationTypeIndex()
-    {
-    	return type_index;
-    }
+    
 
 
     
@@ -108,15 +102,9 @@ public class AnnotationEntry implements Constants, Serializable {
 	}
 
 
-	public boolean isRuntimeVisible()
-	{
-		return isRuntimeVisible;
-	}
+	
 
-	public void addElementNameValuePair(ElementValuePair elementNameValuePair)
-	{
-		element_value_pairs.add(elementNameValuePair);
-	}
+	
 
 	
 }

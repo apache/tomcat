@@ -55,10 +55,7 @@ public class ElementValuePair
 		return elementValue;
 	}
 
-	public int getNameIndex()
-	{
-		return elementNameIndex;
-	}
+	
 
 	
 	
