@@ -40,90 +40,23 @@ public class SimpleElementValue extends ElementValue
 
 	
 
-	public String getValueString()
-	{
-		if (type != STRING)
-			throw new RuntimeException(
-					"Dont call getValueString() on a non STRING ElementValue");
-		ConstantUtf8 c = (ConstantUtf8) cpool.getConstant(getIndex(),
-				Constants.CONSTANT_Utf8);
-		return c.getBytes();
-	}
+	
 
-	public int getValueInt()
-	{
-		if (type != PRIMITIVE_INT)
-			throw new RuntimeException(
-					"Dont call getValueString() on a non STRING ElementValue");
-		ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
-				Constants.CONSTANT_Integer);
-		return c.getBytes();
-	}
+	
 
-	public byte getValueByte()
-	{
-		if (type != PRIMITIVE_BYTE)
-			throw new RuntimeException(
-					"Dont call getValueByte() on a non BYTE ElementValue");
-		ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
-				Constants.CONSTANT_Integer);
-		return (byte) c.getBytes();
-	}
+	
 
-	public char getValueChar()
-	{
-		if (type != PRIMITIVE_CHAR)
-			throw new RuntimeException(
-					"Dont call getValueChar() on a non CHAR ElementValue");
-		ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
-				Constants.CONSTANT_Integer);
-		return (char) c.getBytes();
-	}
+	
 
-	public long getValueLong()
-	{
-		if (type != PRIMITIVE_LONG)
-			throw new RuntimeException(
-					"Dont call getValueLong() on a non LONG ElementValue");
-		ConstantLong j = (ConstantLong) cpool.getConstant(getIndex());
-		return j.getBytes();
-	}
+	
 
-	public float getValueFloat()
-	{
-		if (type != PRIMITIVE_FLOAT)
-			throw new RuntimeException(
-					"Dont call getValueFloat() on a non FLOAT ElementValue");
-		ConstantFloat f = (ConstantFloat) cpool.getConstant(getIndex());
-		return f.getBytes();
-	}
+	
 
-	public double getValueDouble()
-	{
-		if (type != PRIMITIVE_DOUBLE)
-			throw new RuntimeException(
-					"Dont call getValueDouble() on a non DOUBLE ElementValue");
-		ConstantDouble d = (ConstantDouble) cpool.getConstant(getIndex());
-		return d.getBytes();
-	}
+	
 
-	public boolean getValueBoolean()
-	{
-		if (type != PRIMITIVE_BOOLEAN)
-			throw new RuntimeException(
-					"Dont call getValueBoolean() on a non BOOLEAN ElementValue");
-		ConstantInteger bo = (ConstantInteger) cpool.getConstant(getIndex());
-		return (bo.getBytes() != 0);
-	}
+	
 
-	public short getValueShort()
-	{
-		if (type != PRIMITIVE_SHORT)
-			throw new RuntimeException(
-					"Dont call getValueShort() on a non SHORT ElementValue");
-		ConstantInteger s = (ConstantInteger) cpool.getConstant(getIndex());
-		return (short) s.getBytes();
-	}
+	
 
 	public String toString()
 	{

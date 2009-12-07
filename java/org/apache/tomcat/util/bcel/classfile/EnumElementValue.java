@@ -36,27 +36,11 @@ public class EnumElementValue extends ElementValue
 		return cu8.getBytes();
 	}
 
-	public String getEnumTypeString()
-	{
-		ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(typeIdx,
-				Constants.CONSTANT_Utf8);
-		return cu8.getBytes();// Utility.signatureToString(cu8.getBytes());
-	}
+	
 
-	public String getEnumValueString()
-	{
-		ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(valueIdx,
-				Constants.CONSTANT_Utf8);
-		return cu8.getBytes();
-	}
+	
 
-	public int getValueIndex()
-	{
-		return valueIdx;
-	}
+	
 
-	public int getTypeIndex()
-	{
-		return typeIdx;
-	}
+	
 }
