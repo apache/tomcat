@@ -17,17 +17,9 @@ public class ClassElementValue extends ElementValue
 		this.idx = idx;
 	}
 
-	public int getIndex()
-	{
-		return idx;
-	}
+	
 
-	public String getClassString()
-	{
-		ConstantUtf8 c = (ConstantUtf8) cpool.getConstant(idx,
-				Constants.CONSTANT_Utf8);
-		return c.getBytes();
-	}
+	
 
 	public String stringifyValue()
 	{

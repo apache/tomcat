@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.Constants;
 
  * @version $Id$
  * @see     Constant
- * @see     org.apache.tomcat.util.bcel.generic.ConstantPoolGen
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class ConstantPool implements Cloneable, Serializable {
