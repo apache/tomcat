@@ -27,7 +27,6 @@ import org.apache.tomcat.util.bcel.classfile.LocalVariable;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     LocalVariable
- * @see     MethodGen
  */
 public class LocalVariableGen implements InstructionTargeter, NamedAndTyped, Cloneable,
         java.io.Serializable {
