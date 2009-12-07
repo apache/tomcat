@@ -347,5 +347,17 @@ public interface Wrapper extends Container {
      * Set the multi-part configuration for the associated servlet. To clear the
      * multi-part configuration specify <code>null</code> as the new value.
      */
-    public void setMultipartConfigElement(MultipartConfigElement multipartConfig);
+    public void setMultipartConfigElement(
+            MultipartConfigElement multipartConfig);
+    
+    /**
+     * Does the associated Servlet support async processing? Defaults to
+     * <code>true</code>
+     */
+    public boolean isAsyncSupported();
+    
+    /**
+     * Set the async support for the associated servlet.
+     */
+    public void setAsyncSupported(boolean asyncSupport);
 }
