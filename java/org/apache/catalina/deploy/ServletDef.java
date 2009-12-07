@@ -220,4 +220,18 @@ public class ServletDef implements Serializable {
     public void setMultipartDef(MultipartDef multipartDef) {
         this.multipartDef = multipartDef;
     }
+    
+    
+    /**
+     * Does this servlet support async.
+     */
+    private String asyncSupported = null;
+    
+    public String getAsyncSupported() {
+        return this.asyncSupported;
+    }
+    
+    public void setAsyncSupported(String asyncSupported) {
+        this.asyncSupported = asyncSupported;
+    }
 }
