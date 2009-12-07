@@ -42,10 +42,7 @@ public abstract class ElementValue
 		this.cpool = cpool;
 	}
 
-	public int getElementValueType()
-	{
-		return type;
-	}
+	
 
 	public abstract String stringifyValue();
 
