@@ -284,9 +284,7 @@ public interface Constants {
   public static final byte T_SHORT   = 9;
   /** Int data type. */
   public static final byte T_INT     = 10;
-
-  /** Object data type. */
-  public static final byte T_OBJECT    = 14;
+  
   
   /** Unknown data type. */
   public static final byte T_UNKNOWN   = 15;

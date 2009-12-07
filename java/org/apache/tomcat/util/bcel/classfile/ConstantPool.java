@@ -39,12 +39,7 @@ public class ConstantPool implements Cloneable, Serializable {
     private Constant[] constant_pool;
 
 
-    /**
-     * @param constant_pool Array of constants
-     */
-    public ConstantPool(Constant[] constant_pool) {
-        setConstantPool(constant_pool);
-    }
+    
 
 
     /**
@@ -271,18 +266,6 @@ public class ConstantPool implements Cloneable, Serializable {
      */
     public int getLength() {
         return constant_pool_count;
-    }
-
-
-    
-
-
-    /**
-     * @param constant_pool
-     */
-    public void setConstantPool( Constant[] constant_pool ) {
-        this.constant_pool = constant_pool;
-        constant_pool_count = (constant_pool == null) ? 0 : constant_pool.length;
     }
 
 
