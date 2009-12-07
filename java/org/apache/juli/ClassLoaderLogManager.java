@@ -485,6 +485,33 @@ public class ClassLoaderLogManager extends LogManager {
     }
     
 
+    /**
+     * Need to override reset so the loggers loaded by the web applications can
+     * be shutdown.
+     */
+    @Override
+    public void reset() {
+        super.reset();
+        for (ClassLoaderLogInfo classLoaderLogInfo : classLoaderLoggers.values()) {
+            for (Logger logger : classLoaderLogInfo.loggers.values()) {
+                resetLogger(logger);
+            }
+        }
+    }
+    
+    private void resetLogger(Logger logger) {
+        
+        Handler[] handlers = logger.getHandlers();
+        for (Handler handler : handlers) {
+            logger.removeHandler(handler);
+            try {
+                handler.close();
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+    }
+
     // ---------------------------------------------------- LogNode Inner Class
 
 
