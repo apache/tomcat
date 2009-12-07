@@ -43,14 +43,7 @@ public abstract class BranchInstruction extends Instruction implements Instructi
     }
 
 
-    /** Common super constructor
-     * @param opcode Instruction opcode
-     * @param target instruction to branch to
-     */
-    protected BranchInstruction(short opcode, InstructionHandle target) {
-        super(opcode, (short) 3);
-        setTarget(target);
-    }
+    
 
 
     /**
