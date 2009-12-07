@@ -741,19 +741,7 @@ public abstract class Utility {
     }
 
 
-    /**
-     * Return a string for an integer justified left or right and filled up with
-     * `fill' characters if necessary.
-     *
-     * @param i integer to format
-     * @param length length of desired string
-     * @param left_justify format left or right
-     * @param fill fill character
-     * @return formatted int
-     */
-    public static final String format( int i, int length, boolean left_justify, char fill ) {
-        return fillup(Integer.toString(i), length, left_justify, fill);
-    }
+    
 
 
     /**
