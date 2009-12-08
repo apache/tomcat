@@ -704,7 +704,7 @@ final class ApplicationDispatcher
         } catch (Throwable e) {
             wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
                              wrapper.getName()), e);
-            // FIXME: Exception handling needs to be simpler to what is in the StandardWrapperValue
+            // FIXME: Exception handling needs to be similar to what is in the StandardWrapperValue
         }
 
         // Deallocate the allocated servlet instance
