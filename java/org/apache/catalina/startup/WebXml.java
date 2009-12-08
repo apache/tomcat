@@ -706,15 +706,19 @@ public class WebXml {
                     mergeFilter(entry.getValue(),
                             filters.get(entry.getKey()), false);
                 } else {
-                    if (!(mergeFilter(entry.getValue(),
-                            temp.getFilters().get(entry.getKey()), true))) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictFilter",
-                                entry.getKey(),
-                                fragment.getName(),
-                                fragment.getURL()));
-
-                        return false;
+                    if (temp.getFilters().containsKey(entry.getKey())) {
+                        if (!(mergeFilter(entry.getValue(),
+                                temp.getFilters().get(entry.getKey()), true))) {
+                            log.error(sm.getString(
+                                    "webXml.mergeConflictFilter",
+                                    entry.getKey(),
+                                    fragment.getName(),
+                                    fragment.getURL()));
+    
+                            return false;
+                        }
+                    } else {
+                        temp.getFilters().put(entry.getKey(), entry.getValue());
                     }
                 }
             }
@@ -845,15 +849,19 @@ public class WebXml {
                     mergeServlet(entry.getValue(),
                             servlets.get(entry.getKey()), false);
                 } else {
-                    if (!(mergeServlet(entry.getValue(),
-                            temp.getServlets().get(entry.getKey()), true))) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictServlet",
-                                entry.getKey(),
-                                fragment.getName(),
-                                fragment.getURL()));
-
-                        return false;
+                    if (temp.getServlets().containsKey(entry.getKey())) {
+                        if (!(mergeServlet(entry.getValue(),
+                                temp.getServlets().get(entry.getKey()), true))) {
+                            log.error(sm.getString(
+                                    "webXml.mergeConflictServlet",
+                                    entry.getKey(),
+                                    fragment.getName(),
+                                    fragment.getURL()));
+    
+                            return false;
+                        }
+                    } else {
+                        temp.getServlets().put(entry.getKey(), entry.getValue());
                     }
                 }
             }
