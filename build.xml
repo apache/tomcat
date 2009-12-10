@@ -570,6 +570,7 @@
 
     <!-- Copy other regular webapps -->
     <copy todir="${tomcat.build}/webapps">
+      <filterset refid="version.filters"/>
       <fileset dir="webapps">
         <include name="ROOT/**"/>
         <include name="examples/**"/>
