@@ -478,6 +478,31 @@
     JNDI Directory Realm component.</p>
 
 
+    <h3>UserDatabase Realm (org.apache.catalina.realm.UserDatabaseRealm)</h3>
+
+    <p>The <strong>UserDatabase Realm</strong> is a Realm implementation
+    that is based on a UserDatabase resource made available through the global
+    JNDI resources configured for this Tomcat instance.</p>
+
+    <p>The Memory Based Realm implementation supports the following
+    additional attributes:</p>
+
+    <attributes>
+
+      <attribute name="resourceName" required="true">
+        <p>The name of the resource that this realm will use for user, password
+        and role information.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>See the
+    <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
+    information on setting up container managed security using the UserDatabase
+    Realm component and the
+    <a href="../jndi-resources-howto.html">JNDI resources how-to</a> for more
+    information on how to configure a UserDatabase resource.</p>
+
     <h3>Memory Based Realm (org.apache.catalina.realm.MemoryRealm)</h3>
 
     <p>The <strong>Memory Based Realm</strong> is a simple Realm implementation
