@@ -932,19 +932,19 @@ public class Request
     /**
      * Return the names of all request attributes for this Request, or an
      * empty <code>Enumeration</code> if there are none. Note that the attribute
-     * names return will only be those for the attributes set via
+     * names returned will only be those for the attributes set via
      * {@link #setAttribute(String, Object)}. Tomcat internal attributes will
      * not be included although they are accessible via
      * {@link #getAttribute(String)}. The Tomcat internal attributes include:
      * <ul>
-     * <li>{@link Globals.DISPATCHER_TYPE_ATTR}</li>
-     * <li>{@link Globals.DISPATCHER_REQUEST_PATH_ATTR}</li>
-     * <li>{@link Globals.ASYNC_SUPPORTED_ATTR}</li>
-     * <li>{@link Globals.CERTIFICATES_ATTR} (SSL connections only)</li>
-     * <li>{@link Globals.CIPHER_SUITE_ATTR} (SSL connections only)</li>
-     * <li>{@link Globals.KEY_SIZE_ATTR} (SSL connections only)</li>
-     * <li>{@link Globals.SSL_SESSION_ID_ATTR} (SSL connections only)</li>
-     * <li>{@link Globals.SSL_SESSION_MGR_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#DISPATCHER_TYPE_ATTR}</li>
+     * <li>{@link Globals#DISPATCHER_REQUEST_PATH_ATTR}</li>
+     * <li>{@link Globals#ASYNC_SUPPORTED_ATTR}</li>
+     * <li>{@link Globals#CERTIFICATES_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#CIPHER_SUITE_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#KEY_SIZE_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#SSL_SESSION_ID_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#SSL_SESSION_MGR_ATTR} (SSL connections only)</li>
      * </ul>
      * The underlying connector may also expose request attributes. These all
      * have names starting with "org.apache.tomcat" and include:
@@ -2264,7 +2264,7 @@ public class Request
 
     /**
      * Get the event associated with the request.
-     * @return
+     * @return the event
      */
     public CometEventImpl getEvent() {
         if (event == null) {
@@ -2313,7 +2313,7 @@ public class Request
     
     /**
      * Not part of Servlet 3 spec but probably should be.
-     * @return
+     * @return true if the requested session ID was obtained from the SSL session
      */
     public boolean isRequestedSessionIdFromSSL() {
         return requestedSessionSSL;
