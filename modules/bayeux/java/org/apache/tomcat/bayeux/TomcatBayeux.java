@@ -105,7 +105,7 @@ public class TomcatBayeux implements Bayeux {
     }
     
     public List<Client> getClients() {
-        return java.util.Arrays.asList(clients.entrySet().toArray(new Client[0]));
+        return java.util.Arrays.asList(clients.values().toArray(new Client[0]));
     }
 
     public SecurityPolicy getSecurityPolicy() {
