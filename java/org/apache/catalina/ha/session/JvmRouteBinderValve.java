@@ -19,8 +19,6 @@ package org.apache.catalina.ha.session;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.http.Cookie;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -38,7 +36,6 @@ import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.ha.session.DeltaSession;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.PersistentManager;
 import org.apache.catalina.util.LifecycleSupport;
@@ -229,7 +226,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
                        && getCluster().getManager(((ClusterManager)manager).getName()) != null)
                      ||
                      (manager instanceof PersistentManager)))
-                 handlePossibleTurnover(request, response);
+                 handlePossibleTurnover(request);
         }
         // Pass this request on to the next valve in our pipeline
         getNext().invoke(request, response);
@@ -238,11 +235,10 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
     /**
      * handle possible session turn over.
      * 
-     * @see JvmRouteBinderValve#handleJvmRoute(Request, Response, String, String)
+     * @see JvmRouteBinderValve#handleJvmRoute(Request, String, String)
      * @param request current request
-     * @param response current response
      */
-    protected void handlePossibleTurnover(Request request, Response response) {
+    protected void handlePossibleTurnover(Request request) {
         String sessionID = request.getRequestedSessionId() ;
         if (sessionID != null) {
             long t1 = System.currentTimeMillis();
@@ -252,7 +248,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
                     log.debug(sm.getString("jvmRoute.missingJvmRouteAttribute"));
                 return;
             }
-            handleJvmRoute( request, response, sessionID, jvmRoute);
+            handleJvmRoute( request, sessionID, jvmRoute);
             if (log.isDebugEnabled()) {
                 long t2 = System.currentTimeMillis();
                 long time = t2 - t1;
@@ -311,15 +307,13 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
      * SessionID change propagate to the other cluster nodes.
      * 
      * @param request current request
-     * @param response
-     *            Tomcat Response
      * @param sessionId
      *            request SessionID from Cookie
      * @param localJvmRoute
      *            local jvmRoute
      */
     protected void handleJvmRoute(
-            Request request, Response response,String sessionId, String localJvmRoute) {
+            Request request, String sessionId, String localJvmRoute) {
         // get requested jvmRoute.
         String requestJvmRoute = null;
         int index = sessionId.indexOf(".");
@@ -342,7 +336,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
             String newSessionID = id + "." + localJvmRoute;
             // OK - turnover the session and inform other cluster nodes
             if (catalinaSession != null) {
-                changeSessionID(request, response, sessionId, newSessionID,
+                changeSessionID(request, sessionId, newSessionID,
                         catalinaSession);
                 numberOfSessions++;
             } else {
@@ -353,7 +347,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
                 }
                 if (catalinaSession != null) {
                     // session is rewrite at other request, rewrite this also
-                    changeRequestSessionID(request, response, sessionId, newSessionID);
+                    changeRequestSessionID(request, sessionId, newSessionID);
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("jvmRoute.cannotFindSession",sessionId));
@@ -367,7 +361,6 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
      * change session id and send to all cluster nodes
      * 
      * @param request current request
-     * @param response current response
      * @param sessionId
      *            original session id
      * @param newSessionID
@@ -375,8 +368,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
      * @param catalinaSession
      *            current session with original session id
      */
-    protected void changeSessionID(Request request,
-            Response response, String sessionId, String newSessionID, Session catalinaSession) {
+    protected void changeSessionID(Request request, String sessionId,
+            String newSessionID, Session catalinaSession) {
         lifecycle.fireLifecycleEvent("Before session migration",
                 catalinaSession);
         // FIXME: setId trigger session Listener, but only chance to register manager with correct id!
@@ -385,7 +378,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
         // setId also trigger resetDeltaRequest!!
         if (catalinaSession instanceof DeltaSession)
             ((DeltaSession) catalinaSession).resetDeltaRequest();
-        changeRequestSessionID(request, response, sessionId, newSessionID);
+        changeRequestSessionID(request, sessionId, newSessionID);
 
         if (getCluster() != null) {
             // now sending the change to all other clusternodes!
@@ -403,13 +396,12 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
     /**
      * Change Request Session id
      * @param request current request
-     * @param response current response
      * @param sessionId
      *            original session id
      * @param newSessionID
      *            new session id for node migration
      */
-    protected void changeRequestSessionID(Request request, Response response, String sessionId, String newSessionID) {
+    protected void changeRequestSessionID(Request request, String sessionId, String newSessionID) {
         request.changeSessionId(newSessionID);
 
         // set original sessionid at request, to allow application detect the
@@ -445,42 +437,6 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
             cluster.sendClusterDomain(msg);
         else
             cluster.send(msg);
-    }
-
-    /**
-     * Sets a new cookie for the given session id and response
-     * 
-     * @param request current request
-     * @param response Tomcat Response
-     * @param sessionId The session id
-     * 
-     * @deprecated Use {@link Request#changeSessionId(String)}
-     */
-    protected void setNewSessionCookie(Request request,
-                                       Response response, String sessionId) {
-        if (response != null) {
-            Context context = request.getContext();
-            if (context.getServletContext().getEffectiveSessionTrackingModes()
-                    .contains(SessionTrackingMode.COOKIE)) {
-                // set a new session cookie
-                Cookie newCookie =
-                    ApplicationSessionCookieConfig.createSessionCookie(
-                            context.getServletContext().getSessionCookieConfig(),
-                            sessionId,
-                            request.isSecure(),
-                            context.getUseHttpOnly(),
-                            response.getConnector().getEmptySessionPath(),
-                            context.getEncodedPath()); 
-                    
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jvmRoute.newSessionCookie",
-                            sessionId, newCookie.getName(), newCookie.getPath(),
-                            Boolean.valueOf(newCookie.getSecure()),
-                            Boolean.valueOf(newCookie.isHttpOnly())));
-                }
-                response.addCookie(newCookie);
-            }
-        }
     }
 
     // ------------------------------------------------------ Lifecycle Methods
