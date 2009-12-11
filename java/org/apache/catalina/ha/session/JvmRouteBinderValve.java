@@ -410,9 +410,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
      *            new session id for node migration
      */
     protected void changeRequestSessionID(Request request, Response response, String sessionId, String newSessionID) {
-        request.setRequestedSessionId(newSessionID);
-        if(request.isRequestedSessionIdFromCookie())
-            setNewSessionCookie(request, response,newSessionID);
+        request.changeSessionId(newSessionID);
+
         // set original sessionid at request, to allow application detect the
         // change
         if (sessionIdAttribute != null && !"".equals(sessionIdAttribute)) {
@@ -454,6 +453,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
      * @param request current request
      * @param response Tomcat Response
      * @param sessionId The session id
+     * 
+     * @deprecated Use {@link Request#changeSessionId(String)}
      */
     protected void setNewSessionCookie(Request request,
                                        Response response, String sessionId) {

@@ -2252,6 +2252,40 @@ public class Request
 
 
     /**
+     * Change the ID of the session that this request is associated with. There
+     * are several things that may trigger an ID change. These include mmoving
+     * between nodes in a cluster and session fixation prevention during the
+     * authentication process.
+     * 
+     * @param session   The session to change the session ID for
+     */
+    public void changeSessionId(String newSessionId) {
+        // This should only ever be called if there was an old session ID but
+        // double check to be sure
+        if (requestedSessionId != null && requestedSessionId.length() > 0) {
+            requestedSessionId = newSessionId;
+        }
+        
+        if (context != null && !context.getServletContext()
+                .getEffectiveSessionTrackingModes().contains(
+                        SessionTrackingMode.COOKIE))
+            return;
+        
+        if (response != null) {
+            Cookie newCookie =
+                ApplicationSessionCookieConfig.createSessionCookie(
+                        context.getServletContext().getSessionCookieConfig(),
+                        newSessionId,
+                        secure,
+                        context.getUseHttpOnly(),
+                        response.getConnector().getEmptySessionPath(),
+                        context.getEncodedPath());
+            response.addCookie(newCookie);
+        }
+    }
+
+    
+    /**
      * Return the session associated with this Request, creating one
      * if necessary and requested.
      *
@@ -2370,7 +2404,7 @@ public class Request
                 throw new ServletException(
                         sm.getString("coyoteRequest.authFail", username));
             }
-            // Assume if we have a non-null LogonConfig then we must have an
+            // Assume if we have a non-null LoginConfig then we must have an
             // authenticator
             context.getAuthenticator().register(this, getResponse(), principal,
                     authMethod, username, password);
