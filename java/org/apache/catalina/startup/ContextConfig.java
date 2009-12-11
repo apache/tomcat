@@ -1866,7 +1866,11 @@ public class ContextConfig
                 jarFile = urlConn.getJarFile();
                 JarEntry fragmentEntry =
                     jarFile.getJarEntry(FRAGMENT_LOCATION);
-                if (fragmentEntry != null) {
+                if (fragmentEntry == null) {
+                    // If there is no web.xml, normal JAR no impact on
+                    // distributable
+                    fragment.setDistributable(true);
+                } else {
                     stream = jarFile.getInputStream(fragmentEntry);
                     InputSource source = new InputSource(
                             urlConn.getJarFileURL().toString() +
