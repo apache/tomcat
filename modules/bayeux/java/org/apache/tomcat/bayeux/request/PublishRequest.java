@@ -23,18 +23,16 @@ import javax.servlet.ServletException;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.tomcat.bayeux.HttpError;
 import org.apache.tomcat.bayeux.BayeuxException;
-import org.apache.tomcat.bayeux.BayeuxRequest;
 import org.apache.tomcat.bayeux.ChannelImpl;
 import org.apache.tomcat.bayeux.ClientImpl;
 import org.apache.tomcat.bayeux.MessageImpl;
+import org.apache.tomcat.bayeux.RequestBase;
 import org.apache.tomcat.bayeux.TomcatBayeux;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.cometd.bayeux.Bayeux;
-import java.util.List;
-import org.apache.cometd.bayeux.Message;
-import java.util.Iterator;
-import org.apache.tomcat.bayeux.*;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /******************************************************************************
  * Handshake request Bayeux message.
@@ -44,16 +42,18 @@ import org.apache.tomcat.bayeux.*;
  * @version 1.0
  *
  */
-public class PublishRequest extends RequestBase implements BayeuxRequest {
+public class PublishRequest extends RequestBase {
 
-    JSONObject msgData = null;
-
+    private static final Log log = LogFactory.getLog(RequestBase.class);
+    
     protected static HashMap<String,Object> responseTemplate = new HashMap<String,Object>();
 
     static {
         responseTemplate.put(Bayeux.SUCCESSFUL_FIELD,Boolean.TRUE);
         responseTemplate.put(Bayeux.ADVICE_FIELD, new HashMap<String, Object>());
     }
+
+    JSONObject msgData = null;
 
     public PublishRequest(TomcatBayeux tb, CometEvent event, JSONObject jsReq) throws JSONException {
         super(tb, event, jsReq);
@@ -69,6 +69,7 @@ public class PublishRequest extends RequestBase implements BayeuxRequest {
      *  
      * @return HttpError This method returns null if no errors were found
      */
+    @Override
     public HttpError validate() {
         if(channel==null|| (!this.getTomcatBayeux().hasChannel(channel)))
             return new HttpError(400,"Channel Id not valid.", null);
@@ -87,6 +88,7 @@ public class PublishRequest extends RequestBase implements BayeuxRequest {
     /**
      *  Send the event message to all registered subscribers.
      */
+    @Override
     public int process(int prevops) throws BayeuxException {
         super.process(prevops);
         response = (HashMap<String, Object>)responseTemplate.clone();
