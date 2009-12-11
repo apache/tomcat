@@ -38,6 +38,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
@@ -122,6 +123,12 @@ public abstract class AuthenticatorBase
     protected boolean cache = true;
 
 
+    /**
+     * Should the session ID, if any, be changed upon a successful
+     * authentication to prevent a session fixation attack?
+     */
+    protected boolean changeSessionIdOnAuthentication = true;
+    
     /**
      * The Context to which this Valve is attached.
      */
@@ -513,6 +520,7 @@ public abstract class AuthenticatorBase
                  */
                 return;
             } 
+            
         }
     
         if (log.isDebugEnabled()) {
@@ -726,6 +734,13 @@ public abstract class AuthenticatorBase
         request.setUserPrincipal(principal);
 
         Session session = request.getSessionInternal(false);
+        
+        if (session != null && changeSessionIdOnAuthentication) {
+            Manager manager = request.getContext().getManager();
+            manager.changeSessionId(session);
+            request.changeSessionId(session.getId());
+        }
+
         // Cache the authentication information in our session, if any
         if (cache) {
             if (session != null) {
