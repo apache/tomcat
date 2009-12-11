@@ -583,47 +583,6 @@
 </section>
 
 
-<section name="Add Default Character Set Valve">
-
-  <subsection name="Introduction">
-
-    <p>The HTTP specification is clear that if no character set is specified for
-    media sub-types of the "text" media type, the ISO-8859-1 character set must
-    be used. However, browsers may attempt to auto-detect the character set.
-    This may be exploited by an attacker to perform an XSS attack. Internet
-    Explorer has this behaviour by default. Other browsers have an option to
-    enable it.</p>
-    
-    <p>This valve prevents the attack by explicitly setting a character set.
-    Unless the provided character set is explicitly overridden by the user the
-    browser will adhere to the explicitly set character set, thus preventing the
-    XSS attack.</p>
-    
-    <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
-    <code>Context</code> level as required. Normally, this Valve would be used
-    at the <code>Engine</code> level.</p>
-
-  </subsection>
-
-  <subsection name="Attributes">
-
-    <p>The <strong>Add Default Character Set Valve</strong> supports the
-    following configuration attributes:</p>
-
-    <attributes>
-
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.valves.AddDefaultCharsetValve</strong>.</p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-</section>
-
-
 <section name="Remote IP Valve">
 
   <subsection name="Introduction">
