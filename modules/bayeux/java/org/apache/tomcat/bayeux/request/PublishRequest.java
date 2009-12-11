@@ -44,7 +44,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class PublishRequest extends RequestBase {
 
-    private static final Log log = LogFactory.getLog(RequestBase.class);
+    private static final Log log = LogFactory.getLog(PublishRequest.class);
     
     protected static HashMap<String,Object> responseTemplate = new HashMap<String,Object>();
 
