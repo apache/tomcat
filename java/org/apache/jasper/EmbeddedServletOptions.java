@@ -516,7 +516,7 @@ public final class EmbeddedServletOptions implements Options {
             }
         }
         
-        String genCharArray = config.getInitParameter("genStrAsCharArray");
+        String genCharArray = config.getInitParameter("genStringAsCharArray");
         if (genCharArray != null) {
             if (genCharArray.equalsIgnoreCase("true")) {
                 genStringAsCharArray = true;
