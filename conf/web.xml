@@ -160,7 +160,8 @@
   <!--                       a separate JVM is used for JSP page compiles   -->
   <!--                       from the one Tomcat is running in. [true]      -->
   <!--                                                                      -->
-  <!--   genStrAsCharArray   Should text strings be generated as char       -->
+  <!--   genStringAsCharArray                                               -->
+  <!--                       Should text strings be generated as char       -->
   <!--                       arrays, to improve performance in some cases?  -->
   <!--                       [false]                                        -->
   <!--                                                                      -->
