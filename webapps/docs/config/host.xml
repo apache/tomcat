@@ -146,11 +146,12 @@
 
       <attribute name="name" required="true">
         <p>Network name of this virtual host, as registered in your
-        <em>Domain Name Service</em> server.  One of the Hosts nested within
-        an <a href="engine.html">Engine</a> MUST have a name that matches the
-        <code>defaultHost</code> setting for that Engine.  See
-        <a href="#Host Name Aliases">Host Name Aliases</a> for information
-        on how to assign more than one network name to the same
+        <em>Domain Name Service</em> server. Regardless of the case used to
+        specify the hostname, Tomcat will convert it to lower case internally.
+        One of the Hosts nested within an <a href="engine.html">Engine</a> MUST
+        have a name that matches the <code>defaultHost</code> setting for that
+        Engine.  See <a href="#Host Name Aliases">Host Name Aliases</a> for
+        information on how to assign more than one network name to the same
         virtual host.</p>
       </attribute>
 
