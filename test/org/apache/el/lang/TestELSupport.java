@@ -62,6 +62,11 @@ public class TestELSupport extends TestCase {
         assertEquals(input, output);
     }
 
+    public void testCoerceNullToNumber() {
+        Object output = ELSupport.coerceToType(null, Number.class);
+        assertEquals(Long.valueOf(0), output);
+    }
+
     private static void testIsSame(Object value) {
         assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
     }

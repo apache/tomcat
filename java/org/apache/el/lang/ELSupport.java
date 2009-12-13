@@ -284,6 +284,9 @@ public class ELSupport {
         if (Float.TYPE == type || Float.class.equals(type)) {
             return new Float(number.floatValue());
         }
+        if (Number.class.equals(type)) {
+            return number;
+        }
 
         throw new IllegalArgumentException(MessageFactory.get("error.convert",
                 number, number.getClass(), type));
