@@ -29,6 +29,8 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.res.StringManager;
@@ -52,8 +54,7 @@ public class DefaultJarScanner implements JarScanner {
     private static final String JAR_EXT = ".jar";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
+    private static final Log log = LogFactory.getLog(DefaultJarScanner.class);
 
     /**
      * The string resources for this package.
