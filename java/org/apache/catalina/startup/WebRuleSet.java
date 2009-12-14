@@ -396,9 +396,7 @@ public class WebRuleSet extends RuleSetBase {
                          sessionConfig);
         
         digester.addCallMethod(fullPrefix + "/session-config/session-timeout",
-                               "setSessionTimeout", 1,
-                               new Class[] { Integer.TYPE });
-        digester.addCallParam(fullPrefix + "/session-config/session-timeout", 0);
+                               "setSessionTimeout", 0);
 
         // Taglibs pre Servlet 2.4
         digester.addRule(fullPrefix + "/taglib", new TaglibLocationRule(false));
