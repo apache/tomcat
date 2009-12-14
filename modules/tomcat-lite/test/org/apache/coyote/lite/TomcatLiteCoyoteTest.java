@@ -10,8 +10,6 @@ import junit.framework.TestCase;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.coyote.lite.LiteProtocolHandler;
 import org.apache.tomcat.lite.http.DefaultHttpConnector;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
@@ -26,8 +24,9 @@ public class TomcatLiteCoyoteTest extends TestCase {
         if (tomcat == null) {
             try {
                 tomcat = new Tomcat();
+                
                 tomcat.setPort(8885);
-                tomcat.setBaseDir("output/build");
+                tomcat.setBaseDir("../../output/build/webapps");
                 
                 tomcat.addWebapp("/examples", "examples");
                 tomcat.addWebapp("/", "ROOT");
@@ -36,7 +35,7 @@ public class TomcatLiteCoyoteTest extends TestCase {
                 //tomcat.addServlet(ctx, "name", "class");
                 // ctx.addServletMapping("/foo/*", "name");
                 
-                litePH = setUp(tomcat);
+                litePH = setUp(tomcat, 8885);
                 
                 tomcat.start();
             } catch (LifecycleException e) {
@@ -49,14 +48,19 @@ public class TomcatLiteCoyoteTest extends TestCase {
         }
     }
     
-    public static LiteProtocolHandler setUp(Tomcat tomcat) {
-        Connector connector = new Connector(LiteProtocolHandler.class.getName());
-        tomcat.getService().addConnector(connector);
-        connector.setPort(8885);
-        tomcat.setConnector(connector);
-        LiteProtocolHandler ph = 
-            (LiteProtocolHandler) connector.getProtocolHandler();
-        return ph;
+    public static LiteProtocolHandler setUp(Tomcat tomcat, int port) {
+        Connector connector;
+        try {
+            connector = new Connector(LiteProtocolHandler.class.getName());
+            tomcat.getService().addConnector(connector);
+            connector.setPort(port);
+            tomcat.setConnector(connector);
+            LiteProtocolHandler ph = 
+                (LiteProtocolHandler) connector.getProtocolHandler();
+            return ph;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     
