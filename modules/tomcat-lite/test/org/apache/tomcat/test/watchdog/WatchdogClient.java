@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class WatchdogClient {
+public class WatchdogClient implements Test {
         
   protected String goldenDir; 
   protected String testMatch;
@@ -45,8 +45,9 @@ public class WatchdogClient {
   };  
 
   protected String targetMatch;
-    
-
+  
+  protected int port;
+  
   Properties props = new Properties();
   
   protected void beforeSuite() {
@@ -56,7 +57,7 @@ public class WatchdogClient {
   }
   
   public Test getSuite() {
-      return getSuite(8080);
+      return getSuite(port);
   }
   
   /** 
@@ -95,6 +96,9 @@ public class WatchdogClient {
         for (int j = 0; j < watchDogL.getLength(); j++) {
           Element watchE = (Element) watchDogL.item(j);
           String testName = watchE.getAttribute("testName");
+          if (single != null && !testName.equals(single)) {
+              continue;
+          }
           if (testMatch != null) {
               if (!testName.startsWith(testMatch)) {
                   continue;
@@ -112,9 +116,13 @@ public class WatchdogClient {
                   continue;
               }
           }
-          testName = testName + ";" + this.getClass().getName();
+          testName = testName + "(" + this.getClass().getName() + ")";
           WatchdogTestCase test = new WatchdogTestCase(watchE, props, testName);
           tests.addTest(test);
+          if (single != null) {
+              singleTest = test;
+              break;
+          }
         }
       }
       
@@ -151,6 +159,26 @@ public class WatchdogClient {
           beforeSuite();
           super.run(res);
           afterSuite(res);
+      }
+  }
+
+  // Support for running a single test in the suite
+  
+  protected String single;
+  WatchdogTestCase singleTest;
+  
+  @Override
+  public int countTestCases() {
+      return 1;
+  }
+
+  @Override
+  public void run(TestResult result) {
+      getSuite();
+      if (singleTest != null) {
+          beforeSuite();
+          singleTest.run(result);
+          afterSuite(result);
       }
   }
 

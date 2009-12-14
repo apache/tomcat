@@ -16,6 +16,9 @@ import org.apache.tomcat.lite.io.FastHttpDateFormat;
 import org.apache.tomcat.lite.io.Hex;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
+import org.apache.tomcat.lite.io.IOConnector;
+import org.apache.tomcat.lite.io.NioThread;
+import org.apache.tomcat.lite.io.SocketIOChannel;
 
 public class Http11Connection extends HttpConnection {
     public static final String CHUNKED = "chunked";
@@ -61,6 +64,10 @@ public class Http11Connection extends HttpConnection {
     protected boolean http09 = false;
 
     HttpConnection switchedProtocol = null;
+
+    private int requestCount = 0;
+
+    private Object readLock = new Object();
     
     public Http11Connection(HttpConnector httpConnector) {
         this.httpConnector = httpConnector;
@@ -91,7 +98,7 @@ public class Http11Connection extends HttpConnection {
     private boolean readHead() throws IOException {
         while (true) {
             int read;
-            if (headRecvBuf.remaining() < 4) {
+            if (requestCount == 0 && headRecvBuf.remaining() < 4) {
                 // requests have at least 4 bytes - detect protocol
                 read = net.getIn().read(headRecvBuf, 4);
                 if (read < 0) {
@@ -168,63 +175,70 @@ public class Http11Connection extends HttpConnection {
             switchedProtocol.handleReceived(netx);
             return;
         }
-
+        //trace("handleReceived " + headersReceived);
         if (!checkKeepAliveClient()) {
             return; // we were in client keep alive mode
         }
-
-        if (!headersReceived) {
-            if (!readHead()) {
-                return;
+        // endSendReceived uses same lock - it will call this 
+        // to check outstanding bytes
+        synchronized (readLock) {
+            if (bodyReceived) {
+                return; // leave data in net buffer, for next req
             }
-        }
-        
-        // We have a header
-        if (activeHttp == null) {
-            if (checkHttpChannel() == null) {
-                return;
-            }
-        }
-
-        IOBuffer receiveBody = activeHttp.receiveBody;
-
-        if (!headersReceived) {
-            headRecvBuf.wrapTo(headW);
-            parseMessage(activeHttp, headW);
-            if (serverMode && activeHttp.httpReq.decodedUri.remaining() == 0) {
-                abort(activeHttp, "Invalid url");
+            
+            if (!headersReceived) {
+                if (!readHead()) {
+                    return;
+                }
             }
 
-            headersReceived = true;
-            // Send header callbacks - we process any incoming data 
-            // first, so callbacks have more info
-            activeHttp.handleHeadersReceived(activeHttp.inMessage);
-        }
-        
-        // any remaining data will be processed as part of the 
-        // body - or left in the channel until endSendReceive()
-        
-        if (!bodyReceived) {
-            // Will close receiveBody when it consummed enough
-            rawDataReceived(activeHttp, receiveBody, net.getIn());
-            // Did we process anything ?
-            if (receiveBody.getBufferCount() > 0) {
-                activeHttp.sendHandleReceivedCallback(); // callback
+            // We have a header
+            if (activeHttp == null) {
+                if (checkHttpChannel() == null) {
+                    return;
+                }
             }
 
+            IOBuffer receiveBody = activeHttp.receiveBody;
+
+            if (!headersReceived) {
+                headRecvBuf.wrapTo(headW);
+                parseMessage(activeHttp, headW);
+                if (serverMode && activeHttp.httpReq.decodedUri.remaining() == 0) {
+                    abort(activeHttp, "Invalid url");
+                }
+
+                headersReceived = true;
+                // Send header callbacks - we process any incoming data 
+                // first, so callbacks have more info
+                trace("Send headers received callback " + activeHttp.httpService);
+                activeHttp.handleHeadersReceived(activeHttp.inMessage);
+            }
+
+            // any remaining data will be processed as part of the 
+            // body - or left in the channel until endSendReceive()
+
+            if (!bodyReceived) {
+                // Will close receiveBody when it consummed enough
+                rawDataReceived(activeHttp, receiveBody, net.getIn());
+                // Did we process anything ?
+                if (receiveBody.getBufferCount() > 0) {
+                    activeHttp.sendHandleReceivedCallback(); // callback
+                }
+            }
             // Receive has marked the body as closed
             if (receiveBody.isAppendClosed()) {
-                activeHttp.handleEndReceive();
                 bodyReceived = true;
+                activeHttp.handleEndReceive();
             }
-        }
 
 
-        if (net.getIn().isClosedAndEmpty()) {
-            // If not already closed.
-            closeStreamOnEnd("closed after body");
-        }
+            if (net.getIn().isClosedAndEmpty()) {
+                // If not already closed.
+                closeStreamOnEnd("closed after body");
+            }
         
+        }
     }
 
     /**
@@ -300,7 +314,6 @@ public class Http11Connection extends HttpConnection {
             switchedProtocol.endSendReceive(http);
             return;
         }
-
         activeHttp = null; 
         if (!keepAlive()) {
             if (debug) {
@@ -308,31 +321,30 @@ public class Http11Connection extends HttpConnection {
             }
             if (net != null) {
                 net.close();
-//                net.getOut().close(); // shutdown output if not done
-//                net.getIn().close(); // this should close the socket
                 net.startSending();
-                
+
             }
             beforeRequest(); 
             return;
         }
-        
-        beforeRequest(); // will clear head buffer
-        
-        if (serverMode) {
-            handleReceived(net); // will attempt to read next req
-            if (debug) {
-                log.info(">>> server socket KEEP_ALIVE " + net.getTarget() + 
-                        " " + net);
+        synchronized (readLock) {
+            beforeRequest(); // will clear head buffer
+            requestCount++;
+            if (serverMode) {
+                if (debug) {
+                    log.info(">>> server socket KEEP_ALIVE " + net.getTarget() + 
+                            " " + net + " " + net.getIn().available());
+                }
+                handleReceived(net); // will attempt to read next req
+            } else {
+                if (debug) {
+                    log.info(">>> client socket KEEP_ALIVE " + net.getTarget() + 
+                            " " + net);
+                }
+                httpConnector.cpool.returnChannel(this);
             }
-            
-        } else {
-            if (debug) {
-                log.info(">>> client socket KEEP_ALIVE " + net.getTarget() + 
-                        " " + net);
-            }
-            httpConnector.cpool.returnChannel(this);
         }
+
     }
     
     private void trace(String s) {
@@ -1384,8 +1396,11 @@ public class Http11Connection extends HttpConnection {
             return switchedProtocol.toString();
         }
 
-        return (serverMode ? "S11 " : "C11 ") +
-        (keepAlive() ? " KA " : "");  
+        return (serverMode ? "SR " : "CL ") +
+        (keepAlive() ? " KA " : "") +
+        (headersReceived ? " HEAD " : "") +
+        (bodyReceived ? " BODY " : "")
+        ;  
     }
     
 }

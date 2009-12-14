@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -46,12 +45,22 @@ public class HttpConnector {
     HttpConnectionManager conManager = new HttpConnectionManager();
     
     private static Logger log = Logger.getLogger("HttpConnector");
-    private int maxHttpPoolSize = 20;
     
-    private int maxSocketPoolSize = 100;
-    private int keepAliveTimeMs = 30000;
+    /** 
+     * Cache HttpChannel/request/buffers
+     */
+    private int maxHttpPoolSize = 50;
     
-    private Queue<HttpChannel> httpChannelPool = new ConcurrentLinkedQueue<HttpChannel>();
+    /** 
+     * Max number of connections to keep alive. 
+     * Each connection holds a header buffer and the socket.
+     * ( we could skip the header buffer )
+     */
+    private int maxSocketPoolSize = 500; // 10000;
+    
+    private int keepAliveTimeMs = 300000;
+    
+    private List<HttpChannel> httpChannelPool = new ArrayList<HttpChannel>();
 
     protected IOConnector ioConnector;
     
@@ -76,12 +85,21 @@ public class HttpConnector {
     Dispatcher dispatcher;
     protected HttpService defaultService;
     int port = 8080;
-    
+
+    private Timer timer;
+
+    private static Timer defaultTimer = new Timer(true);
     
     public HttpConnector(IOConnector ioConnector) {
         this.ioConnector = ioConnector;
         dispatcher = new Dispatcher();
         defaultService = dispatcher;
+        if (ioConnector != null) {
+            timer = ioConnector.getTimer();
+        } else {
+            // tests
+            timer = defaultTimer;
+        }
     }
 
     protected HttpConnector() {
@@ -214,19 +232,22 @@ public class HttpConnector {
     protected HttpChannel get(boolean server) throws IOException {
         HttpChannel processor = null;
         synchronized (httpChannelPool) {
-            processor = httpChannelPool.poll();
+            int cnt = httpChannelPool.size();
+            if (cnt > 0) {
+                processor = httpChannelPool.remove(cnt - 1);
+            }
         }
         boolean reuse = false;
         totalHttpChannel.incrementAndGet();
+        if (!server) {
+            totalClientHttpChannel.incrementAndGet();
+        }
         if (processor == null) {
             processor = create();
         } else {
             reuse = true;
             reusedChannels.incrementAndGet();
             processor.release = false;
-        }
-        if (!server) {
-            totalClientHttpChannel.incrementAndGet();
         }
         processor.serverMode(server);
         if (debug) {
@@ -242,49 +263,34 @@ public class HttpConnector {
         return processor;
     }
 
-
-    /**
-     * Called by HttpChannel when the HTTP request is done, i.e. all 
-     * sending/receiving is complete. The service may still use the 
-     * HttpChannel object.
-     * 
-     * If keepOpen: clients will wait in the pool, detecting server close.
-     * For server: will wait for new requests.
-     * 
-     * TODO: timeouts, better pool management
-     */
-    protected void returnSocket(IOChannel ch, boolean serverMode, 
-                                boolean keepOpen) 
-            throws IOException {
-        // Now handle net - note that we could have reused the async object
-        
-
-    }
-    
     protected void returnToPool(HttpChannel http) throws IOException {
         inUse.decrementAndGet();
         recycledChannels.incrementAndGet();
-        if (debug) {
-            log.info("Return " + http.getTarget() + " obj=" +
-                http + " size=" + httpChannelPool.size());
-        }
+        int size = 0;
+        boolean pool = false;
         
         http.recycle();
+        http.setConnection(null);
+        http.setConnector(null);
         
         // No more data - release the object
         synchronized (httpChannelPool) {
-            http.setConnection(null);
-            http.setConnector(null);
+            size = httpChannelPool.size();
             if (httpChannelPool.contains(http)) {
-                System.err.println("dup ? ");                
-            }
-            if (httpChannelPool.size() >= maxHttpPoolSize) {
-                if (httpEvents != null) {
-                    httpEvents.onDestroy(http, this);
-                }
-            } else {
+                log.severe("Duplicate element in pool !");
+            } else if (size < maxHttpPoolSize) {
                 httpChannelPool.add(http);
+                pool = true;
             }
+        }
+        
+        if (!pool && httpEvents != null) {
+            httpEvents.onDestroy(http, this);
+        }
+        if (debug) {
+            log.info((pool ? "Return " : "Destroy ")
+                    + http.getTarget() + " obj=" +
+                    http + " size=" + size);
         }
     }
     
@@ -438,7 +444,7 @@ public class HttpConnector {
         implements DataReceivedCallback
     {
         protected HttpConnector httpConnector;
-        protected boolean serverMode;
+        protected boolean serverMode = false;
 
         protected BBuffer headRecvBuf = BBuffer.allocate(8192);
         
@@ -543,7 +549,6 @@ public class HttpConnector {
          */
         public Map<CharSequence, RemoteServer> hosts = new HashMap<CharSequence, 
             RemoteServer>();
-        boolean keepOpen = true;
 
         // Statistics
         public AtomicInteger waitingSockets = new AtomicInteger();
@@ -552,8 +557,6 @@ public class HttpConnector {
         public AtomicInteger hits = new AtomicInteger();
         public AtomicInteger misses = new AtomicInteger();
 
-        Timer timer;
-        
         public int getTargetCount() {
             return hosts.size();
         }
@@ -633,12 +636,6 @@ public class HttpConnector {
                 return;
             }
             
-            if (!keepOpen) {
-                ch.close();
-                return;
-            }
-            
-//            SocketIOChannel sdata = (SocketIOChannel) ch;
             if (!ch.isOpen()) {
                 ch.close(); // make sure all closed
                 if (debug) {
