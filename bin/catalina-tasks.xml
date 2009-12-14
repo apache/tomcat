@@ -28,6 +28,7 @@
   <taskdef resource="org/apache/catalina/ant/catalina.tasks">
     <classpath>
       <fileset file="${catalina.home}/bin/tomcat-juli.jar"/>
+      <fileset file="${catalina.home}/lib/tomcat-api.jar"/>
       <fileset file="${catalina.home}/lib/jasper.jar"/>
       <fileset file="${catalina.home}/lib/jasper-el.jar"/>
       <fileset file="${catalina.home}/lib/el-api.jar"/>
