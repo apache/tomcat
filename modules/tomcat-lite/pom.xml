@@ -99,7 +99,6 @@
           </excludes>
           <testExcludes>
             <exclude>org/apache/coyote/servlet/**</exclude>
-            <exclude>org/apache/coyote/lite/**</exclude>
             <exclude>**/ServletApi30.java</exclude>
           </testExcludes>
         </configuration>
