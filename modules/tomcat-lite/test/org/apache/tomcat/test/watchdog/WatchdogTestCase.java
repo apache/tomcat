@@ -7,7 +7,6 @@ import java.util.Properties;
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestResult;
-import junit.framework.TestSuite;
 
 import org.apache.tomcat.integration.DynamicObject;
 import org.apache.tomcat.integration.simple.AntProperties;
@@ -22,30 +21,12 @@ public class WatchdogTestCase implements Test {
 
     private Properties props;
 
-    private WatchdogTestCase delegate;
     private WatchdogClient wc;
     
-    public WatchdogTestCase(String s) throws Throwable {
-        String[] comp = s.split(";");
-        if (comp.length < 2) {
-            return;
-        }
-        Class c = Class.forName(comp[1]);
-        wc = (WatchdogClient) c.newInstance();
-        TestSuite suite = (TestSuite) wc.getSuite();
-        // need to encode the base, file, etc in the test name
-
-        System.err.println(s);
-
-        for (int i = 0; i < suite.testCount(); i++) {
-            WatchdogTestCase t = (WatchdogTestCase) suite.testAt(i);
-            if (s.equals(t.getName())) {
-                delegate = t;
-                return;
-            }
-        }
+    public WatchdogTestCase() {
+        
     }
-
+    
     public WatchdogTestCase(Element watchE, Properties props, String testName) {
         this.testName = testName;
         this.watchE = watchE;
@@ -57,20 +38,17 @@ public class WatchdogTestCase implements Test {
     }
 
     public String getName() {
-        return testName;
+        return testName == null ? "WatchdogTest" : testName;
     }
 
+    public String toString() {
+        return getName();
+    }
+    
     public void testDummy() {
     }
     
     public void run(TestResult res) {
-        if (delegate != null) {
-            // Single method run
-            wc.beforeSuite();
-            delegate.run(res);
-            wc.afterSuite(res);
-            return;
-        }
         if (watchE == null) {
             res.endTest(this);
             return;

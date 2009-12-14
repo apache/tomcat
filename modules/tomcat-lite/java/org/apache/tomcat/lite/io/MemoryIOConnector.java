@@ -3,6 +3,7 @@
 package org.apache.tomcat.lite.io;
 
 import java.io.IOException;
+import java.util.Timer;
 
 public class MemoryIOConnector extends IOConnector {
 
@@ -56,6 +57,10 @@ public class MemoryIOConnector extends IOConnector {
     // TODO: in-process communication without sockets for testing
     ConnectedCallback acceptor;
     MemoryIOConnector server;
+    
+    public MemoryIOConnector() {
+        timer = new Timer(true);
+    }
     
     public MemoryIOConnector withServer(MemoryIOConnector server) {
         this.server = server;

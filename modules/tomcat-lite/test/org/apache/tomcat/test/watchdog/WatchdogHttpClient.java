@@ -52,7 +52,7 @@ public class WatchdogHttpClient {
             System.out.println( " Socket Exception: " + ex );
             return;
         }
-        //socket.setSoTimeout(2000);
+        socket.setSoTimeout(10000);
         
         //socket obtained, rebuild the request.
         rebuildRequest(client, client.request, socket);

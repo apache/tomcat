@@ -20,10 +20,6 @@ public class IOStatus implements HttpService {
 
     private ConnectionPool pool;
 
-    public IOStatus() {
-        
-    }
-    
     public IOStatus(ConnectionPool pool) {
         this.pool = pool;
     }
@@ -31,9 +27,7 @@ public class IOStatus implements HttpService {
     @Override
     public void service(HttpRequest httpReq, HttpResponse httpRes)
             throws IOException {
-        ConnectionPool sc = pool == null ? 
-                httpReq.getHttpChannel().getConnector().cpool :
-                    pool;
+        ConnectionPool sc = pool;
         HttpWriter out = httpRes.getBodyWriter();
         
         httpRes.setContentType("text/plain");

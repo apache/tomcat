@@ -229,10 +229,13 @@ public class NioThread implements Runnable {
               // handle events for existing req first.
               if (selected != 0) {
                   sloops = 0;
+                  int callbackCnt = 0;
                   Set<SelectionKey> sel = selector.selectedKeys();
                   Iterator<SelectionKey> i = sel.iterator();
 
                   while (i.hasNext()) {
+                      callbackCnt++;
+                      long beforeCallback = System.currentTimeMillis();
                       SelectionKey sk = i.next();
                       i.remove();
                       
@@ -295,11 +298,12 @@ public class NioThread implements Runnable {
                           }
                           
                           long callbackTime = 
-                              System.currentTimeMillis() - lastWakeup;
+                              System.currentTimeMillis() - beforeCallback;
                           
                           if (callbackTime > 250) { 
                               log.warning("Callback too long ! ops=" + ready + 
-                                      " time=" + callbackTime + " ch=" + ch);
+                                      " time=" + callbackTime + " ch=" + ch + 
+                                      " " + callbackCnt);
                           }
                           if (callbackTime > maxCallbackTime) {
                               maxCallbackTime = callbackTime;
@@ -349,6 +353,9 @@ public class NioThread implements Runnable {
       selector = Selector.open();
       for (int i = 0; i < oldCh.size(); i++) {
           NioChannel selectorData = oldCh.get(i);
+          if (selectorData == null) {
+              continue;
+          }
           int interest = interests.get(i);
           if (selectorData.channel instanceof ServerSocketChannel) {
               ServerSocketChannel socketChannel = 
@@ -1146,6 +1153,11 @@ public class NioThread implements Runnable {
   
   protected boolean isSelectorThread() {
       return Thread.currentThread() == selectorThread;
+  }
+  
+  public static boolean isSelectorThread(IOChannel ch) {
+      SocketIOChannel sc = (SocketIOChannel) ch.getFirst();
+      return Thread.currentThread() == sc.ch.sel.selectorThread;
   }
   
 }
