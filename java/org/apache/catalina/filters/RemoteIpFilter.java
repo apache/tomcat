@@ -143,9 +143,10 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * <p>
  * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks (e.g.
- * <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code> ; as the JVM doesnt have a
+ * <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code> ; as the JVM doesn't have a
  * library similar to <a
- * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>.
+ * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on 
+ * regular expressions.
  * </p>
  * <hr/>
  * <p>
@@ -585,7 +586,7 @@ public class RemoteIpFilter implements Filter {
     
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
     
-    protected static final String PROTOCOL_HEADER_SSL_VALUE_PARAMETER = "protocolHeaderSslValue";
+    protected static final String PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER = "protocolHeaderHttpsValue";
     
     protected static final String PROXIES_HEADER_PARAMETER = "proxiesHeader";
     
@@ -671,7 +672,7 @@ public class RemoteIpFilter implements Filter {
      */
     private String protocolHeader = null;
     
-    private String protocolHeaderSslValue = "https";
+    private String protocolHeaderHttpsValue = "https";
     
     /**
      * @see #setProxiesHeader(String)
@@ -743,7 +744,7 @@ public class RemoteIpFilter implements Filter {
             
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
-                if (protocolHeaderValue != null && protocolHeaderSslValue.equalsIgnoreCase(protocolHeaderValue)) {
+                if (protocolHeaderValue != null && protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
                     xRequest.setSecure(true);
                     xRequest.setScheme("https");
                     xRequest.setServerPort(httpsServerPort);
@@ -790,8 +791,8 @@ public class RemoteIpFilter implements Filter {
         return protocolHeader;
     }
     
-    public String getProtocolHeaderSslValue() {
-        return protocolHeaderSslValue;
+    public String getProtocolHeaderHttpsValue() {
+        return protocolHeaderHttpsValue;
     }
     
     public String getProxiesHeader() {
@@ -815,8 +816,8 @@ public class RemoteIpFilter implements Filter {
             setProtocolHeader(filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER));
         }
         
-        if (filterConfig.getInitParameter(PROTOCOL_HEADER_SSL_VALUE_PARAMETER) != null) {
-            setProtocolHeaderSslValue(filterConfig.getInitParameter(PROTOCOL_HEADER_SSL_VALUE_PARAMETER));
+        if (filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER) != null) {
+            setProtocolHeaderHttpsValue(filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER));
         }
         
         if (filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER) != null) {
@@ -879,14 +880,14 @@ public class RemoteIpFilter implements Filter {
     
     /**
      * <p>
-     * Case insensitive value of the protocol header to indicate that the incoming http request uses SSL.
+     * Case insensitive value of the protocol header to indicate that the incoming http request uses HTTPS.
      * </p>
      * <p>
-     * Default value : <code>HTTPS</code>
+     * Default value : <code>https</code>
      * </p>
      */
-    public void setProtocolHeaderSslValue(String protocolHeaderSslValue) {
-        this.protocolHeaderSslValue = protocolHeaderSslValue;
+    public void setProtocolHeaderHttpsValue(String protocolHeaderHttpsValue) {
+        this.protocolHeaderHttpsValue = protocolHeaderHttpsValue;
     }
     
     /**
