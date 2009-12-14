@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.catalina.startup;
+package org.apache.jasper.compiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * The default {@link JarScanner} implementation scans the WEB-INF/lib directory
@@ -49,21 +48,14 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  * All of the extensions may be controlled via configuration.
  * 
- * Keep in sync with org.apache.jasper.compiler.InternalJarScanner
+ * Keep in sync with org.apache.catalina.startup.DefaultJarScanner
  */
-public class DefaultJarScanner implements JarScanner {
+public class InternalJarScanner implements JarScanner {
 
     private static final String JAR_EXT = ".jar";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
-    private static final Log log = LogFactory.getLog(DefaultJarScanner.class);
-
-    /**
-     * The string resources for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
+    private static final Log log = LogFactory.getLog(InternalJarScanner.class);
 
     /**
      * Controls the classpath scanning extension.
@@ -107,7 +99,7 @@ public class DefaultJarScanner implements JarScanner {
             JarScannerCallback callback, Set<String> jarsToSkip) {
 
         if (log.isTraceEnabled()) {
-            log.trace(sm.getString("jarScan.webinflibStart"));
+            log.trace(Localizer.getMessage("jsp.jarScan.webinflibStart"));
         }
 
         // Scan WEB-INF/lib
@@ -125,7 +117,15 @@ public class DefaultJarScanner implements JarScanner {
                         url = context.getResource(path);
                         process(callback, url);
                     } catch (IOException e) {
-                        log.warn(sm.getString("jarScan.webinflibFail", url), e);
+                        if (url == null) {
+                            log.warn(Localizer.getMessage(
+                                    "jsp.jarScan.webinflibFail",
+                                    path), e);
+                        } else {
+                            log.warn(Localizer.getMessage(
+                                    "jsp.jarScan.webinflibFail",
+                                    url.toString()), e);
+                        }
                     }
                 }
             }
@@ -134,7 +134,7 @@ public class DefaultJarScanner implements JarScanner {
         // Scan the classpath
         if (scanClassPath) {
             if (log.isTraceEnabled()) {
-                log.trace(sm.getString("jarScan.classloaderStart"));
+                log.trace(Localizer.getMessage("jsp.jarScan.classloaderStart"));
             }
 
             ClassLoader loader = 
@@ -155,8 +155,9 @@ public class DefaultJarScanner implements JarScanner {
                             try {
                                 process(callback, urls[i]);
                             } catch (IOException ioe) {
-                                log.warn(sm.getString(
-                                        "jarScan.classloaderFail",urls[i]), ioe);
+                                log.warn(Localizer.getMessage(
+                                        "jsp.jarScan.classloaderFail",
+                                        urls[i].toString()), ioe);
                             }
                         }
                     }
@@ -175,7 +176,8 @@ public class DefaultJarScanner implements JarScanner {
             throws IOException {
 
         if (log.isTraceEnabled()) {
-            log.trace(sm.getString("jarScan.jarUrlStart", url));
+            log.trace(Localizer.getMessage("jsp.jarScan.jarUrlStart",
+                    url.toString()));
         }
 
         URLConnection conn = url.openConnection();
