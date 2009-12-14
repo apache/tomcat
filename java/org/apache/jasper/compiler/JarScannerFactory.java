@@ -30,10 +30,8 @@ import org.apache.tomcat.JarScanner;
  */
 public class JarScannerFactory {
 
-    /*
-     * Don't want any instances so hide the default constructor.
-     */
     private JarScannerFactory() {
+        // Don't want any instances so hide the default constructor.
     }
 
     /**
@@ -45,6 +43,7 @@ public class JarScannerFactory {
         	(JarScanner) ctxt.getAttribute(JarScanner.class.getName());
         if (jarScanner == null) {
             ctxt.log(Localizer.getMessage("jsp.warning.noJarScanner"));
+            jarScanner = new InternalJarScanner();
         }
         return jarScanner;
     }
