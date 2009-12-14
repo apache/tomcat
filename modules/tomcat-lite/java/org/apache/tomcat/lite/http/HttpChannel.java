@@ -166,29 +166,32 @@ public class HttpChannel extends IOChannel {
      * 
      * @throws IOException
      */
-    public void abort(Throwable t) throws IOException {
+    public void abort(Throwable t) {
         abort(t.toString());
     }
     
-    public void abort(String t) throws IOException {
+    public void abort(String t)  {
         synchronized (this) {
             if (abortDone) {
                 return;
             }
             abortDone = true;
         }
-
-        checkRelease();
-        trace("abort " + t);
-        log.info("Abort connection " + t);
-        if (conn != null) {
-            conn.abort(this, t);
+        try {
+            checkRelease();
+            trace("abort " + t);
+            log.info("Abort connection " + t);
+            if (conn != null) {
+                conn.abort(this, t);
+            }
+            inMessage.state = HttpMessage.State.DONE;
+            outMessage.state = HttpMessage.State.DONE;
+            sendReceiveDone = true;
+            error = true;
+            handleEndSendReceive();
+        } catch (Throwable ex) {
+            log.severe("Exception in abort " + ex);
         }
-        inMessage.state = HttpMessage.State.DONE;
-        outMessage.state = HttpMessage.State.DONE;
-        sendReceiveDone = true;
-        error = true;
-        handleEndSendReceive();
     }
     
     /**

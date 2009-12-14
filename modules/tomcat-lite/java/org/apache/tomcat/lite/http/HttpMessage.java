@@ -79,8 +79,11 @@ public abstract class HttpMessage {
         }
         
         public int addHeader() {
-            headerNames.add(BBuffer.wrapper());
-            headerValues.add(BBuffer.wrapper());
+            if (headerCount >= headerNames.size()) {
+                // make space for the new header.
+                headerNames.add(BBuffer.wrapper());
+                headerValues.add(BBuffer.wrapper());                
+            }
             return headerCount++;
         }
         

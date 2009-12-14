@@ -4,6 +4,7 @@ package org.apache.tomcat.lite.io;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Timer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -36,6 +37,7 @@ public class SocketConnector extends IOConnector {
     Executor threadPool = Executors.newCachedThreadPool();
     
     public SocketConnector() {
+        timer = new Timer(true);
     }
 
     /**

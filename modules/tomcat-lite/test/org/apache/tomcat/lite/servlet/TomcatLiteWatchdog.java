@@ -30,6 +30,7 @@ import org.apache.tomcat.test.watchdog.WatchdogClient;
 public abstract class TomcatLiteWatchdog extends WatchdogClient {
   
   public TomcatLiteWatchdog() {
+      super();
       goldenDir = getWatchdogdir() + "/src/clients/org/apache/jcheck/servlet/client/";
       testMatch = 
           //"HttpServletResponseWrapperSetStatusMsgTest";
@@ -38,6 +39,11 @@ public abstract class TomcatLiteWatchdog extends WatchdogClient {
           // ex: "ServletToJSP";
       file = getWatchdogdir() + "/src/conf/servlet-gtest.xml";
       targetMatch = "gtestservlet-test";
+  }
+  
+  public TomcatLiteWatchdog(String s) {
+      this();
+      super.single = s;
   }
   
   protected void beforeSuite() {
@@ -58,10 +64,10 @@ public abstract class TomcatLiteWatchdog extends WatchdogClient {
   
   protected abstract void addConnector(TomcatLite liteServer);
   
-  TomcatLite tomcatForWatchdog;
-  
   public void initServerWithWatchdog(String wdDir) throws ServletException, 
           IOException {
+      TomcatLite tomcatForWatchdog;
+      
       File f = new File(wdDir + "/build/webapps");
       
       tomcatForWatchdog = new TomcatLite();
