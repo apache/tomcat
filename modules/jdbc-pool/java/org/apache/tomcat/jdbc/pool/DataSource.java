@@ -26,7 +26,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.sql.XADataSource;
 
-import org.apache.jasper.compiler.AntCompiler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
