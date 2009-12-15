@@ -424,7 +424,7 @@ int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, const char *file,
     X509 *x509;
     unsigned long err;
     int n;
-    STACK *extra_certs;
+    STACK_OF(X509) *extra_certs;
 
     if ((bio = BIO_new(BIO_s_file_internal())) == NULL)
         return -1;

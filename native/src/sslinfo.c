@@ -318,7 +318,7 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
         break;
         case SSL_INFO_CIPHER_DESCRIPTION:
             {
-                SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
+                const SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
                 if (cipher) {
                     char buf[256];
                     char *desc = SSL_CIPHER_description(cipher, buf, 256);
@@ -513,7 +513,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
         {
             int usekeysize = 0;
             int algkeysize = 0;
-            SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
+            const SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
             if (cipher) {
                 usekeysize = SSL_CIPHER_get_bits(cipher, &algkeysize);
                 if (what == SSL_INFO_CIPHER_USEKEYSIZE)

@@ -367,10 +367,10 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificate)(TCN_STDARGS,
         if (ca_certs == NULL) {
             SSL_load_client_CA_file(J2S(file));
             if (ca_certs != NULL)
-                SSL_CTX_set_client_CA_list(c->ctx, (STACK *)ca_certs);
+                SSL_CTX_set_client_CA_list(c->ctx, ca_certs);
         }
         else {
-            if (!SSL_add_file_cert_subjects_to_stack((STACK *)ca_certs, J2S(file)))
+            if (!SSL_add_file_cert_subjects_to_stack(ca_certs, J2S(file)))
                 ca_certs = NULL;
         }
         if (ca_certs == NULL && c->verify_mode == SSL_CVERIFY_REQUIRE) {
