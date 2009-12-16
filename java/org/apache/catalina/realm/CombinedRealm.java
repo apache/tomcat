@@ -20,6 +20,7 @@ package org.apache.catalina.realm;
 import java.security.Principal;
 
 import java.security.cert.X509Certificate;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -227,9 +228,19 @@ public class CombinedRealm extends RealmBase {
     @Override
     public void start() throws LifecycleException {
         // Start 'sub-realms' then this one
-        for (Realm realm : realms) {
+    	Iterator<Realm> iter = realms.iterator();
+    	
+        while (iter.hasNext()) {
+        	Realm realm = iter.next();
             if (realm instanceof Lifecycle) {
-                ((Lifecycle) realm).start();
+            	try {
+            		((Lifecycle) realm).start();
+            	} catch (LifecycleException e) {
+            		// If realm doesn't start can't authenticate against it
+            		iter.remove();
+            		log.error(sm.getString("combinedRealm.realmStartFail",
+            				realm.getInfo()), e);
+            	}
             }
         }
         super.start();
