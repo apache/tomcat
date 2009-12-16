@@ -336,6 +336,12 @@
         property.</p>
       </attribute>
 
+      <attribute name="connectionTimeout" required="false">
+        <p>The timeout in milliseconds to use when establishing the connection
+        to the LDAP directory. If not specified, a value of 5000 (5 seconds) is
+        used.</p>
+      </attribute>
+
       <attribute name="connectionURL" required="true">
         <p>The connection URL to be passed to the JNDI driver when
         establishing a connection to the directory.</p>
