@@ -23,6 +23,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.KeyManagerFactory;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -453,7 +455,7 @@ public abstract class AbstractEndpoint {
     
     // --------------------  SSL related properties --------------------
 
-    private String algorithm = "SunX509";
+    private String algorithm = KeyManagerFactory.getDefaultAlgorithm();
     public String getAlgorithm() { return algorithm;}
     public void setAlgorithm(String s ) { this.algorithm = s;}
 

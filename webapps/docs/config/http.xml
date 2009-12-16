@@ -688,10 +688,11 @@
   <attributes>
 
     <attribute name="algorithm" required="false">
-      <p>The certificate encoding algorithm to be used. This defaults to the Sun
-      implementation (<code>SunX509</code>). For IBM JVMs you should use the
-      value <code>IbmX509</code>. For other vendors, consult the JVM
-      documentation for the correct value.</p>
+      <p>The certificate encoding algorithm to be used. This defaults to
+      <code>KeyManagerFactory.getDefaultAlgorithm()</code> which returns
+      <code>SunX509</code> for Sun JVMs. IBM JVMs return
+      <code>IbmX509</code>. For other vendors, consult the JVM
+      documentation for the default value.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
