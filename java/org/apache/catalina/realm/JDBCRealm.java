@@ -311,6 +311,17 @@ public class JDBCRealm
       this.userTable = userTable;
     }
 
+    /**
+     * Return descriptive information about this Realm implementation and
+     * the corresponding version number, in the format
+     * <code>&lt;description&gt;/&lt;version&gt;</code>.
+     */
+    @Override
+	public String getInfo() {
+
+        return info;
+
+    }
 
     // --------------------------------------------------------- Public Methods
 
