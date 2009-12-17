@@ -79,7 +79,7 @@
 
   <!-- Files that need to have their line endings changed for src distros -->
   <patternset id="src.files" >
-    <include name="**/INSTALLLICENSE,**/KEYS,**/LICENSE,**/NOTICE">
+    <include name="**/INSTALLLICENSE,**/KEYS,**/LICENSE,**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/*.MF,**/*.TXT"/>
     <include name="**/*.am,**/*.amd64,**/*.autoconf,**/*.awk,**/*.bat"/>
