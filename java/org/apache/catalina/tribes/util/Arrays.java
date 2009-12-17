@@ -58,12 +58,12 @@ public class Arrays {
     public static String toString(byte[] data, int offset, int length) {
         return toString(data,offset,length,false);
     }
-    
-    public static String toString(byte[] data, int offset, int length, boolean asInt) {
+
+    public static String toString(byte[] data, int offset, int length, boolean unsigned) {
         StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
             int i = offset;
-            if (asInt) {
+            if (unsigned) {
                 buf.append(data[i++] & 0xff);
                 for (; i < length; i++) {
                     buf.append(", ").append(data[i] & 0xff);
