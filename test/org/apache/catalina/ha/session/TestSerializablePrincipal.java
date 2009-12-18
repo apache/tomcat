@@ -36,6 +36,7 @@ public class TestSerializablePrincipal extends TestCase {
     /**
      * Simple serialization / de-serialization test for bug 43840.
      */
+    @SuppressWarnings("null")
     public void testWriteReadPrincipal() {
         // Get a temporary file to use for the serialization test
         File file = null;
