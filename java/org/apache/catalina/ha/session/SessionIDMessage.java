@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.ha.session;
 
-import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterMessageBase;
 
 /**
@@ -26,7 +25,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  * 
  * @version $Revision$ $Date$
  */
-public class SessionIDMessage extends ClusterMessageBase implements ClusterMessage {
+public class SessionIDMessage extends ClusterMessageBase {
 
 	private int messageNumber;
 

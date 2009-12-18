@@ -19,8 +19,6 @@
 package org.apache.tomcat.util.modeler;
 
 
-import java.io.Serializable;
-
 import javax.management.MBeanNotificationInfo;
 
 
@@ -32,7 +30,7 @@ import javax.management.MBeanNotificationInfo;
  * @version $Revision$ $Date$
  */
 
-public class NotificationInfo extends FeatureInfo implements Serializable {
+public class NotificationInfo extends FeatureInfo {
     static final long serialVersionUID = -6319885418912650856L;
 
     // ----------------------------------------------------- Instance Variables

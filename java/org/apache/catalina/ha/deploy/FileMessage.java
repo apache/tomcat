@@ -17,9 +17,6 @@
 
 package org.apache.catalina.ha.deploy;
 
-import java.io.Serializable;
-
-import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.ha.ClusterMessageBase;
 
@@ -30,7 +27,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  * @version 1.0
  */
 
-public class FileMessage extends ClusterMessageBase implements ClusterMessage, Serializable {
+public class FileMessage extends ClusterMessageBase {
     private int messageNumber;
     private byte[] data;
     private int dataLength;

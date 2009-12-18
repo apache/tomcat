@@ -20,10 +20,7 @@ import java.io.Serializable;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
-import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.UniqueId;
 
@@ -67,8 +64,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  * @version 1.0
  */
-public class LazyReplicatedMap extends AbstractReplicatedMap 
-    implements RpcCallback, ChannelListener, MembershipListener {
+public class LazyReplicatedMap extends AbstractReplicatedMap {
     private static final Log log = LogFactory.getLog(LazyReplicatedMap.class);
     
 
