@@ -232,14 +232,14 @@ public class TestWebXml extends TestCase {
         a.addBeforeOrder("b");
         b.addBeforeOrder("a");
 
-        Exception e = null;
+        Exception exception = null;
         
         try {
             WebXml.orderWebFragments(app, fragments);
         } catch (Exception e1) {
-            e = e1;
+            exception = e1;
         }
         
-        assertTrue(e instanceof IllegalArgumentException);
+        assertTrue(exception instanceof IllegalArgumentException);
     }
 }
