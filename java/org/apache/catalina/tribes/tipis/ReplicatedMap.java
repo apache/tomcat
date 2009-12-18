@@ -20,12 +20,7 @@ import java.io.Serializable;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
-import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.group.RpcCallback;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /**
  * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical 
@@ -51,9 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * @todo memberDisappeared, should do nothing except change map membership
  *       by default it relocates the primary objects
  */
-public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback, ChannelListener, MembershipListener {
-
-    private static final Log log = LogFactory.getLog(ReplicatedMap.class);
+public class ReplicatedMap extends AbstractReplicatedMap {
 
 //------------------------------------------------------------------------------
 //              CONSTRUCTORS / DESTRUCTORS

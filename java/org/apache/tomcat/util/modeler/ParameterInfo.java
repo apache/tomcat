@@ -19,8 +19,6 @@
 package org.apache.tomcat.util.modeler;
 
 
-import java.io.Serializable;
-
 import javax.management.MBeanParameterInfo;
 
 
@@ -32,7 +30,7 @@ import javax.management.MBeanParameterInfo;
  * @version $Revision$ $Date$
  */
 
-public class ParameterInfo extends FeatureInfo implements Serializable {
+public class ParameterInfo extends FeatureInfo {
     static final long serialVersionUID = 2222796006787664020L;
     // ----------------------------------------------------------- Constructors
 

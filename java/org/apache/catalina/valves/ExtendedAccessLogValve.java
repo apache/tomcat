@@ -33,7 +33,6 @@ import java.util.TimeZone;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ServerInfo;
@@ -129,9 +128,7 @@ import org.apache.juli.logging.LogFactory;
  * @version $Revision$ $Date$
  */
 
-public class ExtendedAccessLogValve
-    extends AccessLogValve
-    implements Lifecycle {
+public class ExtendedAccessLogValve extends AccessLogValve {
 
     private static final Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
 
