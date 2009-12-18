@@ -41,7 +41,7 @@ import org.apache.catalina.tribes.util.StringManager;
  * @version $Revision$ $Date$
  * @since 5.5.16
  */
-public class BioSender extends AbstractSender implements DataSender {
+public class BioSender extends AbstractSender {
 
     private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(BioSender.class);
 
