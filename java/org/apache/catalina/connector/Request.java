@@ -2182,6 +2182,8 @@ public class Request
             // Can't find the session 
         }
 
+        if (session == null) return false;
+
         // The call to session.isValid() can trigger session listeners so make
         // sure we are using the webapp's class loader in case the listeners are
         // triggered
@@ -2195,7 +2197,7 @@ public class Request
 
         boolean result = false;
         try {
-            if ((session != null) && session.isValid()) {
+            if (session.isValid()) {
                 result = true;
             }
         } finally {
