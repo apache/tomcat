@@ -44,7 +44,7 @@ public class TestRequest extends TomcatBaseTest {
      * any of the {@link HttpServletRequest} getParameterXXX() methods if the
      * request is chunked.
      */
-    public void testBug37794() throws Exception {
+    public void testBug37794() {
         Bug37794Client client = new Bug37794Client();
         client.setPort(getPort());
 
