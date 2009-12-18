@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.apache.catalina.tribes.ChannelReceiver;
-import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
@@ -35,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  * @version $Revision$ $Date$
  */
-public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
+public class BioReceiver extends ReceiverBase implements Runnable {
 
     private static final Log log = LogFactory.getLog(BioReceiver.class);
 

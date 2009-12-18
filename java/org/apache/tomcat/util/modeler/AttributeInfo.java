@@ -15,11 +15,7 @@
  * limitations under the License.
  */
 
-
 package org.apache.tomcat.util.modeler;
-
-
-import java.io.Serializable;
 
 import javax.management.MBeanAttributeInfo;
 
@@ -30,7 +26,7 @@ import javax.management.MBeanAttributeInfo;
  *
  * @author Craig R. McClanahan
  */
-public class AttributeInfo extends FeatureInfo implements Serializable {
+public class AttributeInfo extends FeatureInfo {
     static final long serialVersionUID = -2511626862303972143L;
 
     // ----------------------------------------------------- Instance Variables
