@@ -46,7 +46,7 @@ public class TestKeepAliveCount extends TomcatBaseTest{
 
         private boolean init;
         
-        private synchronized void init() throws Exception {
+        private synchronized void init() {
             if (init) return;
             
             Tomcat tomcat = getTomcatInstance();
