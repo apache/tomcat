@@ -27,8 +27,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
-import org.apache.catalina.tribes.ChannelReceiver;
-import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
@@ -47,7 +45,7 @@ import java.nio.channels.ClosedSelectorException;
  * @author Filip Hanik
  * @version $Revision$ $Date$
  */
-public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
+public class NioReceiver extends ReceiverBase implements Runnable {
 
     private static final Log log = LogFactory.getLog(NioReceiver.class);
 

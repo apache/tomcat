@@ -19,8 +19,6 @@
 package org.apache.tomcat.util.modeler;
 
 
-import java.io.Serializable;
-
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 
@@ -31,7 +29,7 @@ import javax.management.MBeanParameterInfo;
  *
  * @author Craig R. McClanahan
  */
-public class OperationInfo extends FeatureInfo implements Serializable {
+public class OperationInfo extends FeatureInfo {
     static final long serialVersionUID = 4418342922072614875L;
     // ----------------------------------------------------------- Constructors
 

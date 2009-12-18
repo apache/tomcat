@@ -23,7 +23,6 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.DataSender;
-import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.PooledSender;
 
 /**
@@ -36,7 +35,7 @@ import org.apache.catalina.tribes.transport.PooledSender;
  * @author not attributable
  * @version 1.0
  */
-public class PooledParallelSender extends PooledSender implements MultiPointSender {
+public class PooledParallelSender extends PooledSender {
     protected boolean connected = true;
     public PooledParallelSender() {
         super();

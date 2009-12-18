@@ -27,7 +27,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  * 
  * @version $Revision$ $Date$
  */
-public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage, java.io.Serializable {
+public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage {
     
     public SessionMessageImpl() {
     }

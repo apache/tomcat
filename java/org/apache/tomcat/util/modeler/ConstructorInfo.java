@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-
 package org.apache.tomcat.util.modeler;
 
-
-import java.io.Serializable;
 
 import javax.management.MBeanConstructorInfo;
 
@@ -30,7 +27,7 @@ import javax.management.MBeanConstructorInfo;
  *
  * @author Craig R. McClanahan
  */
-public class ConstructorInfo extends OperationInfo implements Serializable {
+public class ConstructorInfo extends OperationInfo {
     static final long serialVersionUID = -5735336213417238238L;
     // ------------------------------------------------------------- Properties
 
