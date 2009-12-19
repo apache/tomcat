@@ -50,8 +50,8 @@ import org.xml.sax.InputSource;
  *     "catalina.base" system property.   [conf/server.xml]
  * <li><b>-help</b>      - Display usage information.
  * <li><b>-nonaming</b>  - Disable naming support.
- * <li><b>-start</b>     - Start an instance of Catalina.
- * <li><b>-stop</b>      - Stop the currently running instance of Catalina.
+ * <li><b>start</b>      - Start an instance of Catalina.
+ * <li><b>stop</b>       - Stop the currently running instance of Catalina.
  * </u>
  *
  * Should do the same thing as Embedded, but using a server.xml file.
