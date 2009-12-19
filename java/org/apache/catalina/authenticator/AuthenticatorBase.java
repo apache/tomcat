@@ -386,6 +386,31 @@ public abstract class AuthenticatorBase
         this.securePagesWithPragma = securePagesWithPragma;
     }    
 
+    /**
+     * Return the flag that states if we should change the session ID of an
+     * existing session upon successful authentication.
+     * 
+     * @return <code>true</code> to change session ID upon successful
+     *         authentication, <code>false</code> to do not perform the change.
+     */
+    public boolean getChangeSessionIdOnAuthentication() {
+        return changeSessionIdOnAuthentication;
+    }
+
+    /**
+     * Set the value of the flag that states if we should change the session ID
+     * of an existing session upon successful authentication.
+     * 
+     * @param changeSessionIdOnAuthentication
+     *            <code>true</code> to change session ID upon successful
+     *            authentication, <code>false</code> to do not perform the
+     *            change.
+     */
+    public void setChangeSessionIdOnAuthentication(
+            boolean changeSessionIdOnAuthentication) {
+        this.changeSessionIdOnAuthentication = changeSessionIdOnAuthentication;
+    }
+
     // --------------------------------------------------------- Public Methods
 
 

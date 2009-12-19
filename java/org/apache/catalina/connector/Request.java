@@ -2273,7 +2273,7 @@ public class Request
 
     /**
      * Change the ID of the session that this request is associated with. There
-     * are several things that may trigger an ID change. These include mmoving
+     * are several things that may trigger an ID change. These include moving
      * between nodes in a cluster and session fixation prevention during the
      * authentication process.
      * 
