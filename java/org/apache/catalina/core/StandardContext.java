@@ -2126,9 +2126,9 @@ public class StandardContext
 
 
     /**
-     * Set the clearReferencesStatic feature for this Context.
+     * Set the clearReferencesStopThreads feature for this Context.
      *
-     * @param clearReferencesStatic The new flag value
+     * @param clearReferencesStopThreads The new flag value
      */
     public void setClearReferencesStopThreads(
             boolean clearReferencesStopThreads) {
