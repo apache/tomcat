@@ -32,7 +32,7 @@ public class HttpMessages {
     // XXX move message resources in this package
     protected static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http.res");
-	
+        
     static String st_200=null;
     static String st_302=null;
     static String st_400=null;
@@ -47,25 +47,25 @@ public class HttpMessages {
      *
      */
     public static String getMessage( int status ) {
-	// method from Response.
-	
-	// Does HTTP requires/allow international messages or
-	// are pre-defined? The user doesn't see them most of the time
-	switch( status ) {
-	case 200:
-	    if( st_200==null ) st_200=sm.getString( "sc.200");
-	    return st_200;
-	case 302:
-	    if( st_302==null ) st_302=sm.getString( "sc.302");
-	    return st_302;
-	case 400:
-	    if( st_400==null ) st_400=sm.getString( "sc.400");
-	    return st_400;
-	case 404:
-	    if( st_404==null ) st_404=sm.getString( "sc.404");
-	    return st_404;
-	}
-	return sm.getString("sc."+ status);
+        // method from Response.
+        
+        // Does HTTP requires/allow international messages or
+        // are pre-defined? The user doesn't see them most of the time
+        switch( status ) {
+        case 200:
+            if( st_200==null ) st_200=sm.getString( "sc.200");
+            return st_200;
+        case 302:
+            if( st_302==null ) st_302=sm.getString( "sc.302");
+            return st_302;
+        case 400:
+            if( st_400==null ) st_400=sm.getString( "sc.400");
+            return st_400;
+        case 404:
+            if( st_404==null ) st_404=sm.getString( "sc.404");
+            return st_404;
+        }
+        return sm.getString("sc."+ status);
     }
 
     /**
@@ -77,31 +77,31 @@ public class HttpMessages {
      */
     public static String filter(String message) {
 
-	if (message == null)
-	    return (null);
+        if (message == null)
+            return (null);
 
-	char content[] = new char[message.length()];
-	message.getChars(0, message.length(), content, 0);
-	StringBuilder result = new StringBuilder(content.length + 50);
-	for (int i = 0; i < content.length; i++) {
-	    switch (content[i]) {
-	    case '<':
-		result.append("&lt;");
-		break;
-	    case '>':
-		result.append("&gt;");
-		break;
-	    case '&':
-		result.append("&amp;");
-		break;
-	    case '"':
-		result.append("&quot;");
-		break;
-	    default:
-		result.append(content[i]);
-	    }
-	}
-	return (result.toString());
+        char content[] = new char[message.length()];
+        message.getChars(0, message.length(), content, 0);
+        StringBuilder result = new StringBuilder(content.length + 50);
+        for (int i = 0; i < content.length; i++) {
+            switch (content[i]) {
+            case '<':
+                result.append("&lt;");
+                break;
+            case '>':
+                result.append("&gt;");
+                break;
+            case '&':
+                result.append("&amp;");
+                break;
+            case '"':
+                result.append("&quot;");
+                break;
+            default:
+                result.append(content[i]);
+            }
+        }
+        return (result.toString());
     }
 
 }
