@@ -65,7 +65,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
      * per-thread-locks for the waiting phase we have 
      * a phase one lock during the contention period.
      */
-    final ReentrantLock[] locks = new ReentrantLock[LOCK_COUNT];
+    private final ReentrantLock[] locks = new ReentrantLock[LOCK_COUNT];
 
     /**
      * All the objects in the pool are stored in a simple linked list
