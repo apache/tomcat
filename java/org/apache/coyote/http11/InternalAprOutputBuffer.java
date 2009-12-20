@@ -414,13 +414,14 @@ public class InternalAprOutputBuffer
 
         // Write message
         String message = null;
-        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER) {
+        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
+                HttpMessages.isSafeInHttpHeader(response.getMessage())) {
             message = response.getMessage();
         }
         if (message == null) {
             write(HttpMessages.getMessage(status));
         } else {
-            write(message.replace('\n', ' ').replace('\r', ' '));
+            write(message);
         }
 
         // End the response status line
