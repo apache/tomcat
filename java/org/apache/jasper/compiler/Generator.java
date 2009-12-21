@@ -889,6 +889,54 @@ class Generator {
                 }
                 output.append(quote(tx.substring(mark, i)));
             }
+            if (expectedType != type && !expectedType.isAssignableFrom(type)) {
+                // Composite expression was evaluated to String
+                // We must coerce it to the expected type.
+                String className = JspUtil.getCanonicalName(expectedType);
+                String methodName = null;
+                if (expectedType.isPrimitive()) {
+                    if (expectedType == Boolean.TYPE) {
+                        className = "Boolean";
+                        methodName = ".booleanValue()";
+                    }
+                    else if (expectedType == Character.TYPE) {
+                        className = "Character";
+                        methodName = ".charValue()";
+                    }
+                    else if (expectedType == Byte.TYPE) {
+                        className = "Byte";
+                        methodName = ".byteValue()";
+                    }
+                    else if (expectedType == Short.TYPE) {
+                        className = "Short";
+                        methodName = ".shortValue()";
+                    }
+                    else if (expectedType == Integer.TYPE) {
+                        className = "Integer";
+                        methodName = ".intValue()";
+                    }
+                    else if (expectedType == Long.TYPE) {
+                        className = "Long";
+                        methodName = ".longValue()";
+                    }
+                    else if (expectedType == Float.TYPE) {
+                        className = "Float";
+                        methodName = ".floatValue()";
+                    }
+                    else if (expectedType == Double.TYPE) {
+                        className = "Double";
+                        methodName = ".doubleValue()";
+                    }
+                }
+                output.insert(0, "(("
+                        + className
+                        + ")org.apache.el.lang.ELSupport.coerceToType(");
+                output.append(",").append(className).append(".class))");
+                if (methodName != null) {
+                    output.insert(0, '(');
+                    output.append(methodName).append(')');
+                }
+            }
             return output.toString();
         }
 
