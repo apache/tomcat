@@ -415,7 +415,7 @@ public class WebappClassLoader
     /**
      * Should Tomcat attempt to null out any static or final fields from loaded
      * classes when a web application is stopped as a work around for apparent
-     * garbage collection bugs and application coding errors. There have been
+     * garbage collection bugs and application coding errors? There have been
      * some issues reported with log4j when this option is true. Applications
      * without memory leaks using recent JVMs should operate correctly with this
      * option set to <code>false</code>. If not specified, the default value of
@@ -424,9 +424,9 @@ public class WebappClassLoader
     private boolean clearReferencesStatic = false;
 
     /**
-     * Should Tomcat attempt to termiate threads that have been started by the
+     * Should Tomcat attempt to terminate threads that have been started by the
      * web application? Stopping threads is performed via the deprecated (for
-     * goo reason) <code>Thread.stop()</code> method and is likely to result in
+     * good reason) <code>Thread.stop()</code> method and is likely to result in
      * instability. As such, enabling this should be viewed as an option of last
      * resort in a development environment and is not recommended in a
      * production environment. If not specified, the default value of
@@ -2007,9 +2007,9 @@ public class WebappClassLoader
                     }
 
                     // This method is deprecated and for good reason. This is
-                    // very risky code but is only only option at this point
+                    // very risky code but is the only option at this point.
                     // A *very* good reason for apps to do this clean-up
-                    // themselves
+                    // themselves.
                     thread.stop();
                 }
             }
