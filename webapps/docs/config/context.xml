@@ -340,12 +340,12 @@
       </attribute>
 
       <attribute name="clearReferencesStopThreads" required = "false">
-        <p>If <code>true</code>, Tomcat attempts to termiate threads that have
-        been started by the web application? Stopping threads is performed via
+        <p>If <code>true</code>, Tomcat attempts to terminate threads that have
+        been started by the web application. Stopping threads is performed via
         the deprecated (for good reason) <code>Thread.stop()</code> method and
         is likely to result in instability. As such, enabling this should be
         viewed as an option of last resort in a development environment and is
-        not recommended in a production environment.If not specified, the
+        not recommended in a production environment. If not specified, the
         default value of <code>false</code> will be used.</p>
       </attribute>
 
