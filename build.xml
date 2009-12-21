@@ -657,6 +657,12 @@
     </txt2html>
 
     <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/el">
+      <fileset dir="webapps/examples/WEB-INF/classes/examples">
+        <include name="ValuesTag.java"/>
+      </fileset>
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples">
+        <include name="ValuesBean.java"/>
+      </fileset>
       <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples/el">
         <include name="Functions.java"/>
       </fileset>
