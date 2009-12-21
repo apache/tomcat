@@ -790,7 +790,7 @@ public abstract class PersistentManagerBase
             return null;
 
         Object swapInLock = null;
-        
+
         /*
          * The purpose of this sync and these locks is to make sure that a
          * session is only loaded once. It doesn't matter if the lock is removed
@@ -800,78 +800,78 @@ public abstract class PersistentManagerBase
          * carry on.
          */
         synchronized (this) {
-			if (sessionSwapInLocks.containsKey(id)) {
-				swapInLock = sessionSwapInLocks.get(id);
-			} else {
-				swapInLock = new Object();
-				sessionSwapInLocks.put(id, swapInLock);
-			}
-		}
+            if (sessionSwapInLocks.containsKey(id)) {
+                swapInLock = sessionSwapInLocks.get(id);
+            } else {
+                swapInLock = new Object();
+                sessionSwapInLocks.put(id, swapInLock);
+            }
+        }
 
         Session session = null;
 
         synchronized (swapInLock) {
-        	// First check to see if another thread has loaded the session into
-        	// the manager
-        	session = sessions.get(id);
-        	
-        	if (session == null) {
-		        try {
-		            if (SecurityUtil.isPackageProtectionEnabled()){
-		                try {
-		                    session = AccessController.doPrivileged(
-		                            new PrivilegedStoreLoad(id));
-		                } catch (PrivilegedActionException ex) {
-		                    Exception e = ex.getException();
-		                    log.error(sm.getString(
-		                    		"persistentManager.swapInException", id),
-		                    		e);
-		                    if (e instanceof IOException){
-		                        throw (IOException)e;
-		                    } else if (e instanceof ClassNotFoundException) {
-		                        throw (ClassNotFoundException)e;
-		                    }
-		                }
-		            } else {
-		                 session = store.load(id);
-		            }   
-		        } catch (ClassNotFoundException e) {
-		        	String msg = sm.getString(
-		        			"persistentManager.deserializeError", id);
-		            log.error(msg, e);
-		            throw new IllegalStateException(msg, e);
-		        }
-	
-		        if (session != null && !session.isValid()) {
-		            log.error(sm.getString(
-		            		"persistentManager.swapInInvalid", id));
-		            session.expire();
-		            removeSession(id);
-		            session = null;
-		        }
-	
-		        if (session != null) {
-			        if(log.isDebugEnabled())
-			            log.debug(sm.getString("persistentManager.swapIn", id));
-			
-			        session.setManager(this);
-			        // make sure the listeners know about it.
-			        ((StandardSession)session).tellNew();
-			        add(session);
-			        ((StandardSession)session).activate();
-			        // endAccess() to ensure timeouts happen correctly.
-			        // access() to keep access count correct or it will end up
-			        // negative
-			        session.access();
-			        session.endAccess();
-		        }
-        	}
+            // First check to see if another thread has loaded the session into
+            // the manager
+            session = sessions.get(id);
+
+            if (session == null) {
+                try {
+                    if (SecurityUtil.isPackageProtectionEnabled()){
+                        try {
+                            session = AccessController.doPrivileged(
+                                    new PrivilegedStoreLoad(id));
+                        } catch (PrivilegedActionException ex) {
+                            Exception e = ex.getException();
+                            log.error(sm.getString(
+                                    "persistentManager.swapInException", id),
+                                    e);
+                            if (e instanceof IOException){
+                                throw (IOException)e;
+                            } else if (e instanceof ClassNotFoundException) {
+                                throw (ClassNotFoundException)e;
+                            }
+                        }
+                    } else {
+                         session = store.load(id);
+                    }
+                } catch (ClassNotFoundException e) {
+                    String msg = sm.getString(
+                            "persistentManager.deserializeError", id);
+                    log.error(msg, e);
+                    throw new IllegalStateException(msg, e);
+                }
+
+                if (session != null && !session.isValid()) {
+                    log.error(sm.getString(
+                            "persistentManager.swapInInvalid", id));
+                    session.expire();
+                    removeSession(id);
+                    session = null;
+                }
+
+                if (session != null) {
+                    if(log.isDebugEnabled())
+                        log.debug(sm.getString("persistentManager.swapIn", id));
+
+                    session.setManager(this);
+                    // make sure the listeners know about it.
+                    ((StandardSession)session).tellNew();
+                    add(session);
+                    ((StandardSession)session).activate();
+                    // endAccess() to ensure timeouts happen correctly.
+                    // access() to keep access count correct or it will end up
+                    // negative
+                    session.access();
+                    session.endAccess();
+                }
+            }
         }
 
         // Make sure the lock is removed
         synchronized (this) {
-			sessionSwapInLocks.remove(id);
-		}
+            sessionSwapInLocks.remove(id);
+        }
 
         return (session);
 
