@@ -213,7 +213,7 @@ public abstract class PersistentManagerBase
     /**
      * Sessions currently being swapped in and the associated locks
      */
-    private Map<String,Object> sessionSwapInLocks =
+    private final Map<String,Object> sessionSwapInLocks =
     	new HashMap<String,Object>();
 
 
@@ -794,15 +794,14 @@ public abstract class PersistentManagerBase
         /*
          * The purpose of this sync and these locks is to make sure that a
          * session is only loaded once. It doesn't matter if the lock is removed
-         * and then another thread enters this method and trues to load the same
-         * session. That thread will re-creates a swapIn lock for that session,
+         * and then another thread enters this method and tries to load the same
+         * session. That thread will re-create a swapIn lock for that session,
          * quickly find that the session is already in sessions, use it and
          * carry on.
          */
         synchronized (this) {
-            if (sessionSwapInLocks.containsKey(id)) {
-                swapInLock = sessionSwapInLocks.get(id);
-            } else {
+            swapInLock = sessionSwapInLocks.get(id);
+            if (swapInLock == null) {
                 swapInLock = new Object();
                 sessionSwapInLocks.put(id, swapInLock);
             }
