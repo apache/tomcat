@@ -748,7 +748,7 @@ public class StandardContext
     private boolean clearReferencesStatic = false;
     
     /**
-     * Should Tomcat attempt to termiate threads that have been started by the
+     * Should Tomcat attempt to terminate threads that have been started by the
      * web application? Stopping threads is performed via the deprecated (for
      * good reason) <code>Thread.stop()</code> method and is likely to result in
      * instability. As such, enabling this should be viewed as an option of last
