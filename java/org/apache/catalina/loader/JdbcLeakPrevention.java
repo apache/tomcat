@@ -38,23 +38,16 @@ import java.util.List;
  */
 public class JdbcLeakPrevention {
 
-    /* 
-     * This driver is visible to all classloaders but is loaded by the system
-     * class loader so there is no need to unload it.
-     */
-    private static final String JDBC_ODBC_BRIDGE_DRIVER =
-        "sun.jdbc.odbc.JdbcOdbcDriver";
-    
     public List<String> clearJdbcDriverRegistrations() throws SQLException {
         List<String> driverNames = new ArrayList<String>();
-        
-        // Unregister any JDBC drivers loaded by the class loader that loaded
-        // this class - ie the webapp class loader
+
+        // This will list all drivers visible to this class loader
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
-            if (JDBC_ODBC_BRIDGE_DRIVER.equals(
-                    driver.getClass().getCanonicalName())) {
+            // Only unload the drivers this web app loaded
+            if (driver.getClass().getClassLoader() !=
+                this.getClass().getClassLoader()) {
                 continue;
             }
             driverNames.add(driver.getClass().getCanonicalName());
