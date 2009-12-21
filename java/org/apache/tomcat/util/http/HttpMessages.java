@@ -118,16 +118,21 @@ public class HttpMessages {
         if (msg == null) {
             return true;
         }
-        
-        // TEXT is defined as OCTET excpet CTLs
+
+        // Reason-Phrase is defined as *<TEXT, excluding CR, LF>
+        // TEXT is defined as any OCTET except CTLs, but including LWS
         // OCTET is defined as an 8-bit sequence of data
         // CTL is defined as octets 0-31 and 127
-        for (char c : msg.toCharArray()) {
-            if (c > 255 || c < 32 || c == 127) {
-                return false;
+        // LWS, if we exclude CR LF pairs, is defined as SP or HT (32, 9)
+        final int len = msg.length();
+        for (int i = 0; i < len; i++) {
+            char c = msg.charAt(i);
+            if (32 <= c && c <= 126 || 128 <= c && c <= 255 || c == 9) {
+                continue;
             }
+            return false;
         }
-        
+
         return true;
     }
 }
