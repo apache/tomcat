@@ -777,7 +777,7 @@ public class HostConfig
             canonicalDocBase =
                 (new File(docBase.toString())).getCanonicalPath();
     
-            // If the canoncialDocBase ends with File.separator, add one to
+            // If the canonicalDocBase ends with File.separator, add one to
             // docBase before they are compared
             if (canonicalDocBase.endsWith(File.separator)) {
                 docBase.append(File.separator);
