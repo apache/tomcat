@@ -79,5 +79,40 @@
 	<required>false</required>
     </attribute>
   </tag>
-  
+
+  <!-- Another simple Tag -->
+  <!-- values tag -->
+  <tag>
+    <name>values</name>
+    <tag-class>examples.ValuesTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+        Accept and return values of different types. This tag is used
+        to illustrate type coercions.
+    </description>
+    <attribute>
+      <name>object</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.Object</type>
+    </attribute>
+    <attribute>
+      <name>string</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+    <attribute>
+      <name>long</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>long</type>
+    </attribute>
+    <attribute>
+      <name>double</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>double</type>
+    </attribute>
+  </tag>
 </taglib>
