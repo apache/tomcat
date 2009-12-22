@@ -1134,6 +1134,14 @@ class Validator {
                                     } else {
                                         expectedType = "java.lang.Object";
                                     }
+                                    if ("void".equals(expectedType)) {
+                                        // Can't specify a literal for a
+                                        // deferred method with an expected type
+                                        // of void - JSP.2.3.4
+                                        err.jspError(n,
+                                                "jsp.error.literal_with_void",
+                                                tldAttrs[j].getName());
+                                    }
                                 }
                                 if (tldAttrs[j].isDeferredValue()) {
                                     // The String literal must be castable to what is declared as type
