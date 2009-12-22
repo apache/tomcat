@@ -402,8 +402,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </zip>
     <checksum file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
               forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}.-windows-x86.zip${line.separator}" append="true" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-windows-x86.zip${line.separator}" append="true" />
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip">
@@ -433,8 +433,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </zip>
     <checksum file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
               forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}.-windows-x64.zip${line.separator}" append="true" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-windows-x64.zip${line.separator}" append="true" />
 
     <!-- Windows i64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip">
@@ -465,8 +465,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <checksum file="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip"
               forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}.-windows-i64.zip${line.separator}" append="true" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-windows-i64.zip${line.separator}" append="true" />
 
   </target>
 
