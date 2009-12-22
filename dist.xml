@@ -81,24 +81,12 @@
   <patternset id="src.files" >
     <include name="**/INSTALLLICENSE,**/KEYS,**/LICENSE,**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
-    <include name="**/*.MF,**/*.TXT"/>
-    <include name="**/*.am,**/*.amd64,**/*.autoconf,**/*.awk,**/*.bat"/>
-    <include name="**/*.c,**/*.classpath,**/*.conf,**/*.css"/>
-    <include name="**/*.def,**/*.default,**/*.dsp,**/*.dsw,**/*.dtd"/>
-    <include name="**/*.exp,**/*.h,**/*.html,**/*.hw"/>
-    <include name="**/*.ia64,**/*.in,**/*.ini,**/*.ism"/>
-    <include name="**/*.java,**/*.jsp,**/*.jspf,**/*.jspx"/>
-    <include name="**/*.launch,**/*.layout,**/*.lib,**/*.libdir,**/*.linux"/>
-    <include name="**/*.m4,**/*.mak,**/*.manifest,**/*.mc"/>
-    <include name="**/*.mdl,**/*.minimal,**/*.mk,**/*.module"/>
-    <include name="**/*.netware,**/*.nsi"/>
-    <include name="**/*.patch,**/*.pl,**/*.policy,**/*.pro,**/*.project"/>
-    <include name="**/*.properties,**/*.qclsrc,**/*.rc,**/*.reg"/>
-    <include name="**/*.sample,**/*.sh,**/*.shtml,**/*.sln"/>
-    <include name="**/*.solaris,**/*.spec"/>
-    <include name="**/*.tag,**/*.tasks,**/*.tld,**/*.tmpl,**/*.txt"/>
-    <include name="**/*.vbs,**/*.vc,**/*.vcproj"/>
-    <include name="**/*.x86,**/*.xml,**/*.xsd,**/*.xsl"/>
+    <include name="**/*.bat,**/*.default,**/*.dtd,**/*.html,**/*.ini"/>
+    <include name="**/*.java,**/*.jjt,**/*.jsp,**/*.jspf,**/*.jspx"/>
+    <include name="**/*.license,**/*.manifest,**/*.mdl"/>
+    <include name="**/*.nsi,**/*.policy,**/*.pom,**/*.properties,**/*.rtf"/>
+    <include name="**/*.sh,**/*.svg,**/*.tag,**/*.tasks,**/*.tld,**/*.txt"/>
+    <include name="**/*.xml,**/*.xsd,**/*.xsl"/>
   </patternset>
 
   <!-- ====================== COMBO: Clean All Directories ================ -->
