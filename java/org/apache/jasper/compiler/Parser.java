@@ -1217,10 +1217,14 @@ class Parser implements TagConstants {
         // Check if this is a user-defined tag.
         String uri = pageInfo.getURI(prefix);
         if (uri == null) {
-            reader.reset(start);
-            // Remember the prefix for later error checking
-            pageInfo.putNonCustomTagPrefix(prefix, reader.mark());
-            return false;
+            if (pageInfo.isErrorOnUndeclaredNamespace()) {
+                err.jspError(start, "jsp.error.undeclared_namespace", prefix);
+            } else {
+                reader.reset(start);
+                // Remember the prefix for later error checking
+                pageInfo.putNonCustomTagPrefix(prefix, reader.mark());
+                return false;
+            }
         }
 
         TagLibraryInfo tagLibInfo = pageInfo.getTaglib(uri);

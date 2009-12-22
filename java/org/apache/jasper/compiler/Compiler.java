@@ -140,6 +140,18 @@ public abstract class Compiler {
             pageInfo.setTrimDirectiveWhitespaces(JspUtil.booleanValue(jspProperty
                     .isTrimDirectiveWhitespaces()));
         }
+        if (jspProperty.getDefaultContentType() != null) {
+            pageInfo.setContentType(jspProperty.getDefaultContentType());
+        }
+        if (jspProperty.getBuffer() != null) {
+            pageInfo.setBufferValue(jspProperty.getBuffer(), null,
+                    errDispatcher);
+        }
+        if (jspProperty.isErrorOnUndeclaredNamespace() != null) {
+            pageInfo.setErrorOnUndeclaredNamespace(
+                    JspUtil.booleanValue(
+                            jspProperty.isErrorOnUndeclaredNamespace()));
+        }
 
         ctxt.checkOutputDir();
         String javaFileName = ctxt.getServletJavaFileName();
