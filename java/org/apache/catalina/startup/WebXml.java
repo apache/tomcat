@@ -41,7 +41,6 @@ import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
-import org.apache.catalina.deploy.JspPropertyGroup;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.MessageDestination;
 import org.apache.catalina.deploy.MessageDestinationRef;
@@ -276,13 +275,15 @@ public class WebXml {
     public Map<String,String> getTaglibs() { return taglibs; }
     
     // jsp-config/jsp-property-group
-    private Set<JspPropertyGroup> jspPropertyGroups =
-        new HashSet<JspPropertyGroup>();
-    public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
-        jspPropertyGroups.add(propertyGroup);
+    // URL pattern is the only attribute Catalina needs to know. Jasper handles
+    // all the others
+    private Set<String> jspUrlPatterns =
+        new HashSet<String>();
+    public void addJspUrlPattern(String urlPattern) {
+        jspUrlPatterns.add(urlPattern);
     }
-    public Set<JspPropertyGroup> getJspPropertyGroups() {
-        return jspPropertyGroups;
+    public Set<String> getJspUrlPatterns() {
+        return jspUrlPatterns;
     }
 
     // security-constraint
@@ -600,8 +601,8 @@ public class WebXml {
         }
 
         // Do this last as it depends on servlets
-        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
-            context.addJspMapping(jspPropertyGroup.getUrlPattern());
+        for (String urlPattern : jspUrlPatterns) {
+            context.addJspMapping(urlPattern);
         }
     }
     
@@ -726,9 +727,9 @@ public class WebXml {
         filters.putAll(temp.getFilters());
 
         for (WebXml fragment : fragments) {
-            for (JspPropertyGroup jspPropertyGroup : fragment.getJspPropertyGroups()) {
+            for (String urlPattern : fragment.getJspUrlPatterns()) {
                 // Always additive
-                addJspPropertyGroup(jspPropertyGroup);
+                addJspUrlPattern(urlPattern);
             }
         }
 
