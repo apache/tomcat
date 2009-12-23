@@ -81,11 +81,16 @@
   <patternset id="src.files" >
     <include name="**/INSTALLLICENSE,**/KEYS,**/LICENSE,**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
-    <include name="**/*.bat,**/*.default,**/*.dtd,**/*.html,**/*.ini"/>
-    <include name="**/*.java,**/*.jjt,**/*.jsp,**/*.jspf,**/*.jspx"/>
+    <include name="**/*.properties.default"/>
+    <include name="**/*.bat,**/*.dtd"/>
+    <include name="**/*.htm,**/*.html"/>
+    <include name="**/*.ini,**/*.java,**/*.jjt"/>
+    <include name="**/*.jsp,**/*.jspf,**/*.jspx"/>
     <include name="**/*.license,**/*.manifest,**/*.mdl"/>
     <include name="**/*.nsi,**/*.policy,**/*.pom,**/*.properties,**/*.rtf"/>
-    <include name="**/*.sh,**/*.svg,**/*.tag,**/*.tasks,**/*.tld,**/*.txt"/>
+    <include name="**/*.sh,**/*.svg"/>
+    <include name="**/*.tag,**/*.tagx"/>
+    <include name="**/*.tasks,**/*.tld,**/*.txt"/>
     <include name="**/*.xml,**/*.xsd,**/*.xsl"/>
   </patternset>
 
