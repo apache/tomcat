@@ -65,6 +65,9 @@
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
+  <!-- constant to declare a file binary for md5sum -->
+  <property name="md5sum.binary-prefix" value=" *" />
+
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
 
@@ -158,8 +161,9 @@
       <zipfileset file="res/META-INF/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-    <checksum file="${tomcat-juli.jar}"
-              forceOverwrite="yes" fileext=".md5" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat-juli.jar}" />
+    </antcall>
 
     <jar jarfile="${tomcat-juli-adapters.jar}"
     	 manifest="${tomcat.tmp}/default.manifest" >
@@ -176,9 +180,9 @@
       <zipfileset file="res/META-INF/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-    <checksum file="${tomcat-juli-adapters.jar}"
-              forceOverwrite="yes" fileext=".md5" />
-
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat-juli-adapters.jar}" />
+    </antcall>
   </target>
 
   <target name="webservices" depends="prepare"
@@ -232,9 +236,9 @@
 	      <zipfileset file="res/META-INF/default.license"
 	        fullpath="META-INF/LICENSE" />
 	    </jar>
-        <checksum file="${catalina-ws.jar}"
-              forceOverwrite="yes" fileext=".md5" />
-	
+    <antcall target="md5sum">
+      <param name="file" value="${catalina-ws.jar}" />
+    </antcall>
   </target>
 
   <target name="jmx-remote" depends="prepare"
@@ -250,10 +254,9 @@
       <zipfileset file="res/META-INF/default.license"
         fullpath="META-INF/LICENSE" />
    </jar>
-
-   <checksum file="${catalina-jmx-remote.jar}"
-             forceOverwrite="yes" fileext=".md5" />
-	  
+    <antcall target="md5sum">
+      <param name="file" value="${catalina-jmx-remote.jar}" />
+    </antcall>
   </target>
   
   <target name="extras" depends="prepare,commons-logging,webservices,jmx-remote"
@@ -283,9 +286,9 @@
       <zipfileset file="res/META-INF/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-    <checksum file="${tomcat-embed-log4j.jar}"
-              forceOverwrite="yes" fileext=".md5" />
-
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat-embed-log4j.jar}" />
+    </antcall>
   </target>
 
   <!-- Download and dependency building -->
@@ -324,5 +327,14 @@
     <delete file="${base.path}/file.tar.gz"/>
   </target>
 
-
+  <!-- Helper target, used to create a md5 checksum file  -->
+  <!-- Requires 'file' as a parameter. -->
+  <target name="md5sum">
+    <fail unless="file" />
+    <fail if="filename" />
+    <fail if="value" />
+    <basename file="${file}" property="filename" />
+    <checksum file="${file}" property="value" />
+    <echo file="${file}.md5" message="${value}${md5sum.binary-prefix}${filename}" />
+  </target>
 </project>
