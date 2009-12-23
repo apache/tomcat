@@ -1343,12 +1343,13 @@ class Generator {
                 }
             }
 
+            // JSP.5.1, Sematics, para 1 - lock not required for request or
+            // page scope
             String scopename = "PageContext.PAGE_SCOPE"; // Default to page
-            String lock = "_jspx_page_context";
+            String lock = null;
 
             if ("request".equals(scope)) {
                 scopename = "PageContext.REQUEST_SCOPE";
-                lock = "request";
             } else if ("session".equals(scope)) {
                 scopename = "PageContext.SESSION_SCOPE";
                 lock = "session";
@@ -1365,11 +1366,13 @@ class Generator {
             out.print(name);
             out.println(" = null;");
 
-            // Lock while getting or creating bean
-            out.printin("synchronized (");
-            out.print(lock);
-            out.println(") {");
-            out.pushIndent();
+            // Lock (if required) while getting or creating bean
+            if (lock != null) {
+                out.printin("synchronized (");
+                out.print(lock);
+                out.println(") {");
+                out.pushIndent();
+            }
 
             // Locate bean from context
             out.printin(name);
@@ -1472,8 +1475,10 @@ class Generator {
             out.printil("}");
 
             // End of lock block
-            out.popIndent();
-            out.printil("}");
+            if (lock != null) {
+                out.popIndent();
+                out.printil("}");
+            }
 
             n.setEndJavaLine(out.getJavaLine());
         }
