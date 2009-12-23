@@ -385,8 +385,12 @@ public class DataSourceFactory implements ObjectFactory {
             poolProperties.setDbProperties(new Properties());
         }
 
-        poolProperties.getDbProperties().setProperty("user",poolProperties.getUsername());
-        poolProperties.getDbProperties().setProperty("password",poolProperties.getPassword());
+        if (poolProperties.getUsername()!=null) {
+            poolProperties.getDbProperties().setProperty("user",poolProperties.getUsername());
+        }
+        if (poolProperties.getPassword()!=null) {
+            poolProperties.getDbProperties().setProperty("password",poolProperties.getPassword());
+        }
 
         value = properties.getProperty(PROP_INITSQL);
         if (value != null) {
