@@ -482,7 +482,8 @@ class Validator {
 
         private static final JspUtil.ValidAttribute[] attributeAttrs = {
                 new JspUtil.ValidAttribute("name", true),
-                new JspUtil.ValidAttribute("trim") };
+                new JspUtil.ValidAttribute("trim"),
+                new JspUtil.ValidAttribute("omit")};
 
         private static final JspUtil.ValidAttribute[] invokeAttrs = {
                 new JspUtil.ValidAttribute("fragment", true),

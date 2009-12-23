@@ -1950,6 +1950,10 @@ class Generator {
             for (int i = 0; attrs != null && i < attrs.length; i++) {
                 String attrStr = null;
                 if (attrs[i].isNamedAttribute()) {
+                    if (attrs[i].getNamedAttributeNode().isOmit()) {
+                        // Skip this attribute - JSP.5-7
+                        continue;
+                    }
                     attrStr = generateNamedAttributeValue(attrs[i]
                             .getNamedAttributeNode());
                 } else {
