@@ -313,10 +313,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}.exe"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" 
-                      message="${md5sum.binary-prefix}${final.name}.exe${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    </antcall>
   </target>
 
 
@@ -376,10 +375,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </zipfileset>
     </zip>
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}.zip${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.zip" />
+    </antcall>
   </target>
 
   <!-- Packages the core windows zip distros -->
@@ -405,10 +403,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </zipfileset>
       
     </zip>
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}-windows-x86.zip${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
+    </antcall>
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip">
@@ -436,10 +433,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="*.exe"/>
       </zipfileset>
     </zip>
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}-windows-x64.zip${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip" />
+    </antcall>
 
     <!-- Windows i64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip">
@@ -468,10 +464,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </zipfileset>
     </zip>
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}-windows-i64.zip${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip" />
+    </antcall>
 
   </target>
 
@@ -485,10 +480,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="RELEASE-NOTES" />
     </zip>
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}-deployer.zip${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip" />
+    </antcall>
   </target>
 
   <!-- Packages the core tar.gz distro -->
@@ -549,10 +543,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </tarfileset>
     </tar>
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}.tar.gz"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.tar.gz.md5"
-                      message="${md5sum.binary-prefix}${final.name}.tar.gz${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.tar.gz" />
+    </antcall>
   </target>
 
   <!-- Packages the deployer Tomcat distro in tar.gz format -->
@@ -574,10 +567,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </tarfileset>
     </tar>
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz.md5"
-                      message="${md5sum.binary-prefix}${final.name}-deployer.tar.gz${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz" />
+    </antcall>
   </target>
 
   <!-- Packages the documentation distro in tar.gz format -->
@@ -599,10 +591,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </tarfileset>
     </tar>
 
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz.md5"
-                      message="${md5sum.binary-prefix}${final.name}-fulldocs.tar.gz${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz" />
+    </antcall>
   </target>
 
   <!-- Packages the source code distribution in zip format -->
@@ -615,10 +606,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </zip>
 
-    <checksum file="${tomcat.release}/v${version}/src/${final-src.name}.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/src/${final-src.name}.zip.md5"
-                      message="${md5sum.binary-prefix}${final-src.name}.zip${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/src/${final-src.name}.zip" />
+    </antcall>
   </target>
 
   <!-- Packages the source code distribution in tar.gz format -->
@@ -631,10 +621,19 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </tar>
-    <checksum file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz.md5"
-                      message="${md5sum.binary-prefix}${final-src.name}.tar.gz${line.separator}" append="true" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz" />
+    </antcall>
   </target>
 
+  <!-- Helper target, used to create a md5 checksum file  -->
+  <!-- Requires 'file' as a parameter. -->
+  <target name="md5sum">
+    <fail unless="file" />
+    <fail if="filename" />
+    <fail if="value" />
+    <basename file="${file}" property="filename" />
+    <checksum file="${file}" property="value" />
+    <echo file="${file}.md5" message="${value}${md5sum.binary-prefix}${filename}" />
+  </target>
 </project>
