@@ -98,7 +98,7 @@ public class TldLocationsCache {
     private static final String TLD_EXT = ".tld";
 
     // Names of JARs that are known not to contain any TLDs
-    private static HashSet<String> noTldJars;
+    private static Set<String> noTldJars = null;
 
     /**
      * The mapping of the 'global' tag library URI to the location (resource
@@ -112,76 +112,6 @@ public class TldLocationsCache {
     private boolean initialized;
     private ServletContext ctxt;
 
-    //*********************************************************************
-    // Constructor and Initializations
-
-    /*
-     * Initializes the set of JARs that are known not to contain any TLDs
-     */
-    static {
-        // TODO - set this list via configuration (also web-fragments) 
-        noTldJars = new HashSet<String>();
-        // Bootstrap JARs
-        noTldJars.add("bootstrap.jar");
-        noTldJars.add("commons-daemon.jar");
-        noTldJars.add("tomcat-juli.jar");
-        // Main JARs
-        noTldJars.add("annotations-api.jar");
-        noTldJars.add("catalina.jar");
-        noTldJars.add("catalina-ant.jar");
-        noTldJars.add("catalina-ha.jar");
-        noTldJars.add("catalina-tribes.jar");
-        noTldJars.add("el-api.jar");
-        noTldJars.add("jasper.jar");
-        noTldJars.add("jasper-el.jar");
-        noTldJars.add("jasper-jdt.jar");
-        noTldJars.add("jsp-api.jar");
-        noTldJars.add("servlet-api.jar");
-        noTldJars.add("tomcat-api.jar");
-        noTldJars.add("tomcat-coyote.jar");
-        noTldJars.add("tomcat-dbcp.jar");
-        // i18n JARs
-        noTldJars.add("tomcat-i18n-en.jar");
-        noTldJars.add("tomcat-i18n-es.jar");
-        noTldJars.add("tomcat-i18n-fr.jar");
-        noTldJars.add("tomcat-i18n-ja.jar");
-        // Misc JARs not included with Tomcat
-        noTldJars.add("ant.jar");
-        noTldJars.add("commons-dbcp.jar");
-        noTldJars.add("commons-beanutils.jar");
-        noTldJars.add("commons-fileupload-1.0.jar");
-        noTldJars.add("commons-pool.jar");
-        noTldJars.add("commons-digester.jar");
-        noTldJars.add("commons-logging.jar");
-        noTldJars.add("commons-collections.jar");
-        noTldJars.add("jmx.jar");
-        noTldJars.add("jmx-tools.jar");
-        noTldJars.add("xercesImpl.jar");
-        noTldJars.add("xmlParserAPIs.jar");
-        noTldJars.add("xml-apis.jar");
-        // JARs from J2SE runtime
-        noTldJars.add("sunjce_provider.jar");
-        noTldJars.add("ldapsec.jar");
-        noTldJars.add("localedata.jar");
-        noTldJars.add("dnsns.jar");
-        noTldJars.add("tools.jar");
-        noTldJars.add("sunpkcs11.jar");
-        noTldJars.add("sunec.jar");
-        // Apple J2SE runtime
-        noTldJars.add("apple_provider.jar");
-        noTldJars.add("AppleScriptEngine.jar");
-        noTldJars.add("CoreAudio.jar");
-        noTldJars.add("dns_sd.jar");
-        noTldJars.add("j3daudio.jar");
-        noTldJars.add("j3dcore.jar");
-        noTldJars.add("j3dutils.jar");
-        noTldJars.add("jai_core.jar");
-        noTldJars.add("jai_codec.jar");
-        noTldJars.add("mlibwrapper_jai.jar");
-        noTldJars.add("MRJToolkit.jar");
-        noTldJars.add("vecmath.jar");
-    }
-    
     /** Constructor. 
      *
      * @param ctxt the servlet context of the web application in which Jasper 
@@ -200,8 +130,14 @@ public class TldLocationsCache {
      * known not to contain any TLDs 
      */
     public static void setNoTldJars(String jarNames) {
-        if (jarNames != null) {
-            noTldJars.clear();
+        if (jarNames == null) {
+            noTldJars = null;
+        } else {
+            if (noTldJars == null) {
+                noTldJars = new HashSet<String>();
+            } else {
+                noTldJars.clear();
+            }
             StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
             while (tokenizer.hasMoreElements()) {
                 noTldJars.add(tokenizer.nextToken());

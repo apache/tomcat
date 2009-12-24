@@ -64,7 +64,7 @@ public final class TldConfig  implements LifecycleListener {
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
     
     // Names of JARs that are known not to contain any TLDs
-    private static HashSet<String> noTldJars;
+    private static Set<String> noTldJars = null;
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
@@ -79,58 +79,6 @@ public final class TldConfig  implements LifecycleListener {
      * The <code>Digester</code>s available to process tld files.
      */
     private static Digester[] tldDigesters = new Digester[4];
-
-    /*
-     * Initializes the set of JARs that are known not to contain any TLDs
-     */
-    static {
-        noTldJars = new HashSet<String>();
-        // Bootstrap JARs
-        noTldJars.add("bootstrap.jar");
-        noTldJars.add("commons-daemon.jar");
-        noTldJars.add("tomcat-juli.jar");
-        // Main JARs
-        noTldJars.add("annotations-api.jar");
-        noTldJars.add("catalina.jar");
-        noTldJars.add("catalina-ant.jar");
-        noTldJars.add("catalina-ha.jar");
-        noTldJars.add("catalina-tribes.jar");
-        noTldJars.add("el-api.jar");
-        noTldJars.add("jasper.jar");
-        noTldJars.add("jasper-el.jar");
-        noTldJars.add("jasper-jdt.jar");
-        noTldJars.add("jsp-api.jar");
-        noTldJars.add("servlet-api.jar");
-        noTldJars.add("tomcat-api.jar");
-        noTldJars.add("tomcat-coyote.jar");
-        noTldJars.add("tomcat-dbcp.jar");
-        // i18n JARs
-        noTldJars.add("tomcat-i18n-en.jar");
-        noTldJars.add("tomcat-i18n-es.jar");
-        noTldJars.add("tomcat-i18n-fr.jar");
-        noTldJars.add("tomcat-i18n-ja.jar");
-        // Misc JARs not included with Tomcat
-        noTldJars.add("ant.jar");
-        noTldJars.add("commons-dbcp.jar");
-        noTldJars.add("commons-beanutils.jar");
-        noTldJars.add("commons-fileupload-1.0.jar");
-        noTldJars.add("commons-pool.jar");
-        noTldJars.add("commons-digester.jar");
-        noTldJars.add("commons-logging.jar");
-        noTldJars.add("commons-collections.jar");
-        noTldJars.add("jmx.jar");
-        noTldJars.add("jmx-tools.jar");
-        noTldJars.add("xercesImpl.jar");
-        noTldJars.add("xmlParserAPIs.jar");
-        noTldJars.add("xml-apis.jar");
-        // JARs from J2SE runtime
-        noTldJars.add("sunjce_provider.jar");
-        noTldJars.add("ldapsec.jar");
-        noTldJars.add("localedata.jar");
-        noTldJars.add("dnsns.jar");
-        noTldJars.add("tools.jar");
-        noTldJars.add("sunpkcs11.jar");
-    }
 
     /**
      * Create (if necessary) and return a Digester configured to process the
@@ -226,11 +174,17 @@ public final class TldConfig  implements LifecycleListener {
      * Sets the list of JARs that are known not to contain any TLDs.
      *
      * @param jarNames List of comma-separated names of JAR files that are 
-     * known not to contain any TLDs 
+     * known not to contain any TLDs.
      */
     public static void setNoTldJars(String jarNames) {
-        if (jarNames != null) {
-            noTldJars.clear();
+        if (jarNames == null) {
+            noTldJars = null;
+        } else {
+            if (noTldJars == null) {
+                noTldJars = new HashSet<String>();
+            } else {
+                noTldJars.clear();
+            }
             StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
             while (tokenizer.hasMoreElements()) {
                 noTldJars.add(tokenizer.nextToken());
