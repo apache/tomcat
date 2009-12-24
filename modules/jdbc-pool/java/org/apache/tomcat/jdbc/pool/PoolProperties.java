@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.sql.CommonDataSource;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -75,7 +77,7 @@ public class PoolProperties implements PoolConfiguration {
     protected boolean useLock = false;
     protected InterceptorDefinition[] interceptors = null;
     protected int suspectTimeout = 0;
-    protected javax.sql.DataSource dataSource = null;
+    protected javax.sql.CommonDataSource dataSource = null;
     protected String dataSourceJNDI = null;
     
     
@@ -876,14 +878,14 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    public void setDataSource(javax.sql.DataSource ds) {
+    public void setDataSource(javax.sql.CommonDataSource ds) {
         this.dataSource = ds;
     }
     
     /** 
      * {@inheritDoc}
      */
-    public javax.sql.DataSource getDataSource() {
+    public CommonDataSource getDataSource() {
         return dataSource;
     }
     

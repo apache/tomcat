@@ -464,10 +464,10 @@ public class DataSourceFactory implements ObjectFactory {
     public static DataSource createDataSource(Properties properties,Context context) throws Exception {
         PoolConfiguration poolProperties = DataSourceFactory.parsePoolProperties(properties);
         if (poolProperties.getDataSourceJNDI()!=null && poolProperties.getDataSource()==null) {
-            javax.sql.DataSource jndiDS = null;
+            javax.sql.CommonDataSource jndiDS = null;
             try {
                 if (context!=null) {
-                    jndiDS = (javax.sql.DataSource)context.lookup(poolProperties.getDataSourceJNDI());
+                    jndiDS = (javax.sql.CommonDataSource)context.lookup(poolProperties.getDataSourceJNDI());
                 } else {
                     log.warn("dataSourceJNDI property is configued, but local JNDI context is null.");
                 }
@@ -477,7 +477,7 @@ public class DataSourceFactory implements ObjectFactory {
             if (jndiDS==null) {
                 try {
                     context = (Context) (new InitialContext());
-                    jndiDS = (javax.sql.DataSource)context.lookup(poolProperties.getDataSourceJNDI());
+                    jndiDS = (javax.sql.CommonDataSource)context.lookup(poolProperties.getDataSourceJNDI());
                 } catch (NamingException e) {
                     log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the InitialContext.");
                 }
