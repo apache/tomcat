@@ -31,7 +31,6 @@ import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
-import org.apache.catalina.startup.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
@@ -54,12 +53,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class DefaultJarScanner implements JarScanner {
 
-    public static final String SKIP_JARS_PROPERTY =
-        "tomcat.util.scan.DefaultJarScanner.jarsToSkip";
-
-    private static final String JAR_EXT = ".jar";
-    private static final String WEB_INF_LIB = "/WEB-INF/lib/";
-
     private static final Log log = LogFactory.getLog(DefaultJarScanner.class);
 
     private static final Set<String> defaultJarsToSkip = new HashSet<String>();
@@ -71,7 +64,7 @@ public class DefaultJarScanner implements JarScanner {
         StringManager.getManager(Constants.Package);
 
     static {
-        String jarList = System.getProperty(SKIP_JARS_PROPERTY);
+        String jarList = System.getProperty(Constants.SKIP_JARS_PROPERTY);
         if (jarList != null) {
             StringTokenizer tokenizer = new StringTokenizer(jarList, ",");
             while (tokenizer.hasMoreElements()) {
@@ -143,12 +136,12 @@ public class DefaultJarScanner implements JarScanner {
         }
 
         // Scan WEB-INF/lib
-        Set<String> dirList = context.getResourcePaths(WEB_INF_LIB);
+        Set<String> dirList = context.getResourcePaths(Constants.WEB_INF_LIB);
         if (dirList != null) {
             Iterator<String> it = dirList.iterator();
             while (it.hasNext()) {
                 String path = it.next();
-                if (path.endsWith(JAR_EXT) &&
+                if (path.endsWith(Constants.JAR_EXT) &&
                         !ignoredJars.contains(
                                 path.substring(path.lastIndexOf('/')+1))) {
                     // Need to scan this JAR
@@ -183,7 +176,7 @@ public class DefaultJarScanner implements JarScanner {
                         // in WEB-INF/lib we have already scanned
                         if (!(ignoredJars.contains(jarName) ||
                                 urls[i].toString().contains(
-                                        WEB_INF_LIB + jarName))) {
+                                        Constants.WEB_INF_LIB + jarName))) {
                             try {
                                 process(callback, urls[i]);
                             } catch (IOException ioe) {
@@ -216,7 +209,7 @@ public class DefaultJarScanner implements JarScanner {
         } else {
             String urlStr = url.toString();
             if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:")) {
-                if (urlStr.endsWith(JAR_EXT)) {
+                if (urlStr.endsWith(Constants.JAR_EXT)) {
                     URL jarURL = new URL("jar:" + urlStr + "!/");
                     callback.scan((JarURLConnection) jarURL.openConnection());
                 } else {
@@ -254,7 +247,7 @@ public class DefaultJarScanner implements JarScanner {
         String name = null;
         
         String path = url.getPath();
-        int end = path.indexOf(JAR_EXT);
+        int end = path.indexOf(Constants.JAR_EXT);
         if (end != -1) {
             int start = path.lastIndexOf('/', end);
             name = path.substring(start + 1, end + 4);
