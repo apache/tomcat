@@ -25,6 +25,7 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationListener;
+import javax.sql.CommonDataSource;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -574,14 +575,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
    /** 
     * {@inheritDoc}
     */
-   public void setDataSource(javax.sql.DataSource ds) {
+   public void setDataSource(javax.sql.CommonDataSource ds) {
        getPoolProperties().setDataSource(ds);
    }
    
    /** 
     * {@inheritDoc}
     */
-   public javax.sql.DataSource getDataSource() {
+   public CommonDataSource getDataSource() {
        return getPoolProperties().getDataSource();
    }
    

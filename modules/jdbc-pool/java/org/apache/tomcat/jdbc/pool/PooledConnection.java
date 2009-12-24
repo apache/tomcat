@@ -178,13 +178,22 @@ public class PooledConnection {
                 xaConnection = xds.getXAConnection();
                 connection = xaConnection.getConnection();
             }
-        } else {
-            javax.sql.DataSource ds = poolProperties.getDataSource();
+        } else if (poolProperties.getDataSource() instanceof javax.sql.DataSource){
+            javax.sql.DataSource ds = (javax.sql.DataSource)poolProperties.getDataSource();
             if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
                 connection = ds.getConnection(poolProperties.getUsername(), poolProperties.getPassword());
             } else {
                 connection = ds.getConnection();
             }
+        } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource){
+            javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource)poolProperties.getDataSource();
+            if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
+                connection = ds.getPooledConnection(poolProperties.getUsername(), poolProperties.getPassword()).getConnection();
+            } else {
+                connection = ds.getPooledConnection().getConnection();
+            }
+        } else {
+            throw new SQLException("DataSource is of unknown class:"+(poolProperties.getDataSource()!=null?poolProperties.getDataSource().getClass():"null"));
         }
     }
     protected void connectUsingDriver() throws SQLException {
