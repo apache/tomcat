@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
+import javax.sql.CommonDataSource;
 import javax.sql.XAConnection;
 
 import org.apache.juli.logging.Log;
@@ -1014,14 +1015,14 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    public void setDataSource(javax.sql.DataSource ds) {
+    public void setDataSource(javax.sql.CommonDataSource ds) {
         getPoolProperties().setDataSource(ds);
     }
     
     /** 
      * {@inheritDoc}
      */
-    public javax.sql.DataSource getDataSource() {
+    public CommonDataSource getDataSource() {
         return getPoolProperties().getDataSource();
     }
     
