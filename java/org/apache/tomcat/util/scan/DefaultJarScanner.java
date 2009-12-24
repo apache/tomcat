@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.jasper.compiler;
+package org.apache.tomcat.util.scan;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +29,12 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 
+import org.apache.catalina.startup.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * The default {@link JarScanner} implementation scans the WEB-INF/lib directory
@@ -47,15 +49,20 @@ import org.apache.tomcat.JarScannerCallback;
  *       (disabled by default)</li>
  * </ul>
  * All of the extensions may be controlled via configuration.
- * 
- * Keep in sync with org.apache.catalina.startup.DefaultJarScanner
  */
-public class InternalJarScanner implements JarScanner {
+public class DefaultJarScanner implements JarScanner {
 
     private static final String JAR_EXT = ".jar";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
-    private static final Log log = LogFactory.getLog(InternalJarScanner.class);
+    private static final Log log = LogFactory.getLog(DefaultJarScanner.class);
+
+    /**
+     * The string resources for this package.
+     */
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
+
 
     /**
      * Controls the classpath scanning extension.
@@ -99,7 +106,7 @@ public class InternalJarScanner implements JarScanner {
             JarScannerCallback callback, Set<String> jarsToSkip) {
 
         if (log.isTraceEnabled()) {
-            log.trace(Localizer.getMessage("jsp.jarScan.webinflibStart"));
+            log.trace(sm.getString("jarScan.webinflibStart"));
         }
 
         // Scan WEB-INF/lib
@@ -117,15 +124,7 @@ public class InternalJarScanner implements JarScanner {
                         url = context.getResource(path);
                         process(callback, url);
                     } catch (IOException e) {
-                        if (url == null) {
-                            log.warn(Localizer.getMessage(
-                                    "jsp.jarScan.webinflibFail",
-                                    path), e);
-                        } else {
-                            log.warn(Localizer.getMessage(
-                                    "jsp.jarScan.webinflibFail",
-                                    url.toString()), e);
-                        }
+                        log.warn(sm.getString("jarScan.webinflibFail", url), e);
                     }
                 }
             }
@@ -134,7 +133,7 @@ public class InternalJarScanner implements JarScanner {
         // Scan the classpath
         if (scanClassPath) {
             if (log.isTraceEnabled()) {
-                log.trace(Localizer.getMessage("jsp.jarScan.classloaderStart"));
+                log.trace(sm.getString("jarScan.classloaderStart"));
             }
 
             ClassLoader loader = 
@@ -155,9 +154,8 @@ public class InternalJarScanner implements JarScanner {
                             try {
                                 process(callback, urls[i]);
                             } catch (IOException ioe) {
-                                log.warn(Localizer.getMessage(
-                                        "jsp.jarScan.classloaderFail",
-                                        urls[i].toString()), ioe);
+                                log.warn(sm.getString(
+                                        "jarScan.classloaderFail",urls[i]), ioe);
                             }
                         }
                     }
@@ -176,8 +174,7 @@ public class InternalJarScanner implements JarScanner {
             throws IOException {
 
         if (log.isTraceEnabled()) {
-            log.trace(Localizer.getMessage("jsp.jarScan.jarUrlStart",
-                    url.toString()));
+            log.trace(sm.getString("jarScan.jarUrlStart", url));
         }
 
         URLConnection conn = url.openConnection();
