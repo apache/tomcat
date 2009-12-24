@@ -24,8 +24,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
@@ -52,17 +54,31 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class DefaultJarScanner implements JarScanner {
 
+    public static final String SKIP_JARS_PROPERTY =
+        "tomcat.util.scan.DefaultJarScanner.jarsToSkip";
+
     private static final String JAR_EXT = ".jar";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
     private static final Log log = LogFactory.getLog(DefaultJarScanner.class);
 
+    private static final Set<String> defaultJarsToSkip = new HashSet<String>();
+    
     /**
      * The string resources for this package.
      */
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    static {
+        String jarList = System.getProperty(SKIP_JARS_PROPERTY);
+        if (jarList != null) {
+            StringTokenizer tokenizer = new StringTokenizer(jarList, ",");
+            while (tokenizer.hasMoreElements()) {
+                defaultJarsToSkip.add(tokenizer.nextToken());
+            }
+        }
+    }
 
     /**
      * Controls the classpath scanning extension.
@@ -99,7 +115,17 @@ public class DefaultJarScanner implements JarScanner {
     }
 
     /**
-     * {@inheritDoc}
+     * Scan the provided ServletContext and classloader for JAR files. Each JAR
+     * file found will be passed to the callback handler to be processed.
+     *  
+     * @param context       The ServletContext - used to locate and access
+     *                      WEB-INF/lib
+     * @param classloader   The classloader - used to access JARs not in
+     *                      WEB-INF/lib
+     * @param callback      The handler to process any JARs found
+     * @param jarsToSkip    List of JARs to ignore. If this list is null, a
+     *                      default list will be read from the system property
+     *                      defined by {@link #SKIP_JARS_PROPERTY} 
      */
     @Override
     public void scan(ServletContext context, ClassLoader classloader,
@@ -109,6 +135,13 @@ public class DefaultJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.webinflibStart"));
         }
 
+        Set<String> ignoredJars;
+        if (jarsToSkip == null) {
+            ignoredJars = defaultJarsToSkip;
+        } else {
+            ignoredJars = jarsToSkip;
+        }
+
         // Scan WEB-INF/lib
         Set<String> dirList = context.getResourcePaths(WEB_INF_LIB);
         if (dirList != null) {
@@ -116,8 +149,8 @@ public class DefaultJarScanner implements JarScanner {
             while (it.hasNext()) {
                 String path = it.next();
                 if (path.endsWith(JAR_EXT) &&
-                        !jarsToSkip.contains(
-                                path.substring(path.lastIndexOf('/')))) {
+                        !ignoredJars.contains(
+                                path.substring(path.lastIndexOf('/')+1))) {
                     // Need to scan this JAR
                     URL url = null;
                     try {
@@ -148,7 +181,7 @@ public class DefaultJarScanner implements JarScanner {
                         
                         // Skip JARs with known not to be interesting and JARs
                         // in WEB-INF/lib we have already scanned
-                        if (!(jarsToSkip.contains(jarName) ||
+                        if (!(ignoredJars.contains(jarName) ||
                                 urls[i].toString().contains(
                                         WEB_INF_LIB + jarName))) {
                             try {

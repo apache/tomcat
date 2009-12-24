@@ -200,76 +200,6 @@ public class ContextConfig
                                 new LoginConfig("NONE", null, null, null);
 
 
-    // Names of JARs that are known not to contain web-fragment.xml
-    private static HashSet<String> noFragmentJars;
-    
-    /*
-     * Initializes the set of JARs that are known not to contain any web-fragments
-     */
-    static {
-        // TODO - set this list via configuration (also TLDs in Jasper) 
-        noFragmentJars = new HashSet<String>();
-        // Bootstrap JARs
-        noFragmentJars.add("bootstrap.jar");
-        noFragmentJars.add("commons-daemon.jar");
-        noFragmentJars.add("tomcat-juli.jar");
-        // Main JARs
-        noFragmentJars.add("annotations-api.jar");
-        noFragmentJars.add("catalina.jar");
-        noFragmentJars.add("catalina-ant.jar");
-        noFragmentJars.add("catalina-ha.jar");
-        noFragmentJars.add("catalina-tribes.jar");
-        noFragmentJars.add("el-api.jar");
-        noFragmentJars.add("jasper.jar");
-        noFragmentJars.add("jasper-el.jar");
-        noFragmentJars.add("jasper-jdt.jar");
-        noFragmentJars.add("jsp-api.jar");
-        noFragmentJars.add("servlet-api.jar");
-        noFragmentJars.add("tomcat-api.jar");
-        noFragmentJars.add("tomcat-coyote.jar");
-        noFragmentJars.add("tomcat-dbcp.jar");
-        // i18n JARs
-        noFragmentJars.add("tomcat-i18n-en.jar");
-        noFragmentJars.add("tomcat-i18n-es.jar");
-        noFragmentJars.add("tomcat-i18n-fr.jar");
-        noFragmentJars.add("tomcat-i18n-ja.jar");
-        // Misc JARs not included with Tomcat
-        noFragmentJars.add("ant.jar");
-        noFragmentJars.add("commons-dbcp.jar");
-        noFragmentJars.add("commons-beanutils.jar");
-        noFragmentJars.add("commons-fileupload-1.0.jar");
-        noFragmentJars.add("commons-pool.jar");
-        noFragmentJars.add("commons-digester.jar");
-        noFragmentJars.add("commons-logging.jar");
-        noFragmentJars.add("commons-collections.jar");
-        noFragmentJars.add("jmx.jar");
-        noFragmentJars.add("jmx-tools.jar");
-        noFragmentJars.add("xercesImpl.jar");
-        noFragmentJars.add("xmlParserAPIs.jar");
-        noFragmentJars.add("xml-apis.jar");
-        // JARs from J2SE runtime
-        noFragmentJars.add("sunjce_provider.jar");
-        noFragmentJars.add("ldapsec.jar");
-        noFragmentJars.add("localedata.jar");
-        noFragmentJars.add("dnsns.jar");
-        noFragmentJars.add("tools.jar");
-        noFragmentJars.add("sunpkcs11.jar");
-        noFragmentJars.add("sunec.jar");
-        // Apple J2SE runtime
-        noFragmentJars.add("apple_provider.jar");
-        noFragmentJars.add("AppleScriptEngine.jar");
-        noFragmentJars.add("CoreAudio.jar");
-        noFragmentJars.add("dns_sd.jar");
-        noFragmentJars.add("j3daudio.jar");
-        noFragmentJars.add("j3dcore.jar");
-        noFragmentJars.add("j3dutils.jar");
-        noFragmentJars.add("jai_core.jar");
-        noFragmentJars.add("jai_codec.jar");
-        noFragmentJars.add("mlibwrapper_jai.jar");
-        noFragmentJars.add("MRJToolkit.jar");
-        noFragmentJars.add("vecmath.jar");
-    }
-
     // ------------------------------------------------------------- Properties
 
 
@@ -1500,7 +1430,7 @@ public class ContextConfig
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
         
         jarScanner.scan(context.getServletContext(),
-                context.getLoader().getClassLoader(), callback, noFragmentJars);
+                context.getLoader().getClassLoader(), callback, null);
         
         return callback.getFragments();
     }
