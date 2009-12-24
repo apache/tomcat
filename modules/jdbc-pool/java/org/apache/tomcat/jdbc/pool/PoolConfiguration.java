@@ -18,6 +18,8 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.Properties;
 
+import javax.sql.CommonDataSource;
+
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 /**
@@ -728,17 +730,17 @@ public interface PoolConfiguration {
      * will be invoked.  
      * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
      */
-    public void setDataSource(javax.sql.DataSource ds);
+    public void setDataSource(CommonDataSource ds);
     
     /**
      * Returns a datasource, if one exists that is being used to create connections.
      * This method will return null if the pool is using a {@link java.sql.Driver}
      * @return the {@link javax.sql.DataSource} to be used for creating connections to be pooled or null if a Driver is used.
      */
-    public javax.sql.DataSource getDataSource();
+    public CommonDataSource getDataSource();
     
     /**
-     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(javax.sql.DataSource)}
+     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(CommonDataSource)}
      * But instead of injecting the object, specify the JNDI location.
      * After a successful JNDI look, the {@link PoolConfiguration#getDataSource()} will not return null. 
      * @param jndiDS -the JNDI string @TODO specify the rules here.
