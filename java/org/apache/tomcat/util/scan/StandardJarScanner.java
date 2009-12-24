@@ -51,9 +51,9 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  * All of the extensions may be controlled via configuration.
  */
-public class DefaultJarScanner implements JarScanner {
+public class StandardJarScanner implements JarScanner {
 
-    private static final Log log = LogFactory.getLog(DefaultJarScanner.class);
+    private static final Log log = LogFactory.getLog(StandardJarScanner.class);
 
     private static final Set<String> defaultJarsToSkip = new HashSet<String>();
     
