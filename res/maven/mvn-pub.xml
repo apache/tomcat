@@ -142,6 +142,7 @@
     <doMavenDeploy artifactId="tomcat-jsp-api" jarFileName="jsp-api.jar"/>
     <doMavenDeploy artifactId="tomcat-servlet-api" jarFileName="servlet-api.jar"/>
     <doMavenDeploy artifactId="tomcat-api"/>
+    <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
     <doMavenDeploy artifactId="tomcat-i18n-es"/>
