@@ -23,7 +23,7 @@ package org.apache.jasper.compiler;
 import javax.servlet.ServletContext;
 
 import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.util.scan.DefaultJarScanner;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 
 /**
  * Provide a mechanism for Jasper to obtain a reference to the JarScanner
@@ -44,7 +44,7 @@ public class JarScannerFactory {
         	(JarScanner) ctxt.getAttribute(JarScanner.class.getName());
         if (jarScanner == null) {
             ctxt.log(Localizer.getMessage("jsp.warning.noJarScanner"));
-            jarScanner = new DefaultJarScanner();
+            jarScanner = new StandardJarScanner();
         }
         return jarScanner;
     }

@@ -104,7 +104,7 @@ import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.scan.DefaultJarScanner;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 
 /**
  * Standard implementation of the <b>Context</b> interface.  Each
@@ -781,7 +781,7 @@ public class StandardContext
     
     public JarScanner getJarScanner() {
         if (jarScanner == null) {
-            jarScanner = new DefaultJarScanner();
+            jarScanner = new StandardJarScanner();
         }
         return jarScanner;
     }
