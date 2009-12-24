@@ -84,6 +84,7 @@
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
   <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
+  <property name="tomcat-util.jar" value="${tomcat.build}/lib/tomcat-util.jar"/>
 
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
@@ -228,7 +229,11 @@
   <patternset id="files.tomcat-api">
     <include name="org/apache/tomcat/*.class" />
   </patternset>
-  	
+
+  <patternset id="files.tomcat-util">
+    <include name="org/apache/tomcat/util/scan/*.class" />
+  </patternset>
+
   <patternset id="files.catalina">
     <include name="org/apache/catalina/**" />
     <include name="org/apache/naming/**" />
@@ -261,6 +266,8 @@
     <include name="org/apache/tomcat/jni/**" />
     <include name="org/apache/jk/**" />
     <include name="org/apache/tomcat/util/**" />
+    <!-- Exclude the files shared between Catalina & Jasper -->
+    <exclude name="org/apache/tomcat/util/scan/**" />
   </patternset>
 
   <patternset id="files.jasper">
@@ -398,6 +405,11 @@
     <jarIt jarfile="${tomcat-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-api" />
+
+    <!-- Tomcat API JAR File -->
+    <jarIt jarfile="${tomcat-util.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-util" />
 
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote.jar}"

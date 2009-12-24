@@ -88,7 +88,6 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
-import org.apache.catalina.startup.DefaultJarScanner;
 import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ExtensionValidator;
@@ -105,6 +104,7 @@ import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.scan.DefaultJarScanner;
 
 /**
  * Standard implementation of the <b>Context</b> interface.  Each
