@@ -41,6 +41,7 @@ import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
+import org.apache.catalina.deploy.JspPropertyGroup;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.MessageDestination;
 import org.apache.catalina.deploy.MessageDestinationRef;
@@ -275,15 +276,13 @@ public class WebXml {
     public Map<String,String> getTaglibs() { return taglibs; }
     
     // jsp-config/jsp-property-group
-    // URL pattern is the only attribute Catalina needs to know. Jasper handles
-    // all the others
-    private Set<String> jspUrlPatterns =
-        new HashSet<String>();
-    public void addJspUrlPattern(String urlPattern) {
-        jspUrlPatterns.add(urlPattern);
+    private Set<JspPropertyGroup> jspPropertyGroups =
+        new HashSet<JspPropertyGroup>();
+    public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
+        jspPropertyGroups.add(propertyGroup);
     }
-    public Set<String> getJspUrlPatterns() {
-        return jspUrlPatterns;
+    public Set<JspPropertyGroup> getJspPropertyGroups() {
+        return jspPropertyGroups;
     }
 
     // security-constraint
@@ -601,8 +600,8 @@ public class WebXml {
         }
 
         // Do this last as it depends on servlets
-        for (String urlPattern : jspUrlPatterns) {
-            context.addJspMapping(urlPattern);
+        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
+            context.addJspMapping(jspPropertyGroup.getUrlPattern());
         }
     }
     
@@ -727,9 +726,9 @@ public class WebXml {
         filters.putAll(temp.getFilters());
 
         for (WebXml fragment : fragments) {
-            for (String urlPattern : fragment.getJspUrlPatterns()) {
+            for (JspPropertyGroup jspPropertyGroup : fragment.getJspPropertyGroups()) {
                 // Always additive
-                addJspUrlPattern(urlPattern);
+                addJspPropertyGroup(jspPropertyGroup);
             }
         }
 
