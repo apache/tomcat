@@ -284,6 +284,12 @@ public class WebRuleSet extends RuleSetBase {
                                "setTrimWhitespace", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/url-pattern",
                                "setUrlPattern", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/default-content-type",
+                               "setDefaultContentType", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/buffer",
+                               "setBuffer", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/error-on-undeclared-namespace",
+                               "setErrorOnUndeclaredNamespace", 0);
 
         digester.addRule(fullPrefix + "/login-config",
                          loginConfig);

@@ -81,4 +81,26 @@ public class JspPropertyGroup {
     }
     public String getUrlPattern() { return this.urlPattern; }
     
+    private String defaultContentType = null;
+    public void setDefaultContentType(String defaultContentType) {
+        this.defaultContentType = defaultContentType;
+    }
+    public String getDefaultContentType() { return this.defaultContentType; }
+    
+    private Integer buffer = null;
+    public void setBuffer(String buffer) {
+        this.buffer = Integer.valueOf(buffer);
+    }
+    public Integer getBuffer() { return this.buffer; }
+    
+    private Boolean errorOnUndeclaredNamespace = null;
+    public void setErrorOnUndeclaredNamespace(
+            String errorOnUndeclaredNamespace) {
+        this.errorOnUndeclaredNamespace =
+            Boolean.valueOf(errorOnUndeclaredNamespace);
+    }
+    public Boolean getErrorOnUndeclaredNamespace() {
+        return this.errorOnUndeclaredNamespace;
+    }
+    
 }
