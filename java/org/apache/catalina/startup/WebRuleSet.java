@@ -261,8 +261,29 @@ public class WebRuleSet extends RuleSetBase {
         digester.addRule(fullPrefix + "/jsp-config",
                          jspConfig);
 
+        digester.addObjectCreate(fullPrefix + "/jsp-config/jsp-property-group",
+                                 "org.apache.catalina.deploy.JspPropertyGroup");
+        digester.addSetNext(fullPrefix + "/jsp-config/jsp-property-group",
+                            "addJspPropertyGroup",
+                            "org.apache.catalina.deploy.JspPropertyGroup");
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/deferred-syntax-allowed-as-literal",
+                               "setDeferredSyntax", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/el-ignored",
+                               "setElIgnored", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/include-coda",
+                               "addIncludeCoda", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/include-prelude",
+                               "addIncludePrelude", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/is-xml",
+                               "setIsXml", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/page-encoding",
+                               "setPageEncoding", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/scripting-invalid",
+                               "setScriptingInvalid", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/trim-directive-whitespaces",
+                               "setTrimWhitespace", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/url-pattern",
-                               "addJspUrlPattern", 0);
+                               "setUrlPattern", 0);
 
         digester.addRule(fullPrefix + "/login-config",
                          loginConfig);
