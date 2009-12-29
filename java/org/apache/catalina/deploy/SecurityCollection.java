@@ -93,10 +93,15 @@ public class SecurityCollection implements Serializable {
 
 
     /**
-     * The HTTP methods covered by this web resource collection.
+     * The HTTP methods explicitly covered by this web resource collection.
      */
     private String methods[] = new String[0];
 
+
+    /**
+     * The HTTP methods explicitly excluded from this web resource collection.
+     */
+    private String omittedMethods[] = new String[0];
 
     /**
      * The name of this web resource collection.
@@ -161,7 +166,8 @@ public class SecurityCollection implements Serializable {
 
 
     /**
-     * Add an HTTP request method to be part of this web resource collection.
+     * Add an HTTP request method to be explicitly part of this web resource
+     * collection.
      */
     public void addMethod(String method) {
 
@@ -177,6 +183,20 @@ public class SecurityCollection implements Serializable {
 
 
     /**
+     * Add an HTTP request method to the methods explicitly excluded from this
+     * web resource collection.
+     */
+    public void addOmittedMethod(String method) {
+        if (method == null)
+            return;
+        String results[] = new String[omittedMethods.length + 1];
+        for (int i = 0; i < omittedMethods.length; i++)
+            results[i] = omittedMethods[i];
+        results[omittedMethods.length] = method;
+        omittedMethods = results;
+    }
+
+    /**
      * Add a URL pattern to be part of this web resource collection.
      */
     public void addPattern(String pattern) {
@@ -184,12 +204,12 @@ public class SecurityCollection implements Serializable {
         if (pattern == null)
             return;
 
-        pattern = RequestUtil.URLDecode(pattern);
+        String decodedPattern = RequestUtil.URLDecode(pattern);
         String results[] = new String[patterns.length + 1];
         for (int i = 0; i < patterns.length; i++) {
             results[i] = patterns[i];
         }
-        results[patterns.length] = pattern;
+        results[patterns.length] = decodedPattern;
         patterns = results;
 
     }
@@ -203,25 +223,45 @@ public class SecurityCollection implements Serializable {
      */
     public boolean findMethod(String method) {
 
-        if (methods.length == 0)
+        if (methods.length == 0 && omittedMethods.length == 0)
             return (true);
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].equals(method))
-                return (true);
+        if (methods.length > 0) {
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].equals(method))
+                    return true;
+            }
+            return false;
         }
-        return (false);
-
+        if (omittedMethods.length > 0) {
+            for (int i = 0; i < omittedMethods.length; i++) {
+                if (omittedMethods[i].equals(method))
+                    return false;
+            }
+        }
+        return true;
     }
 
 
     /**
      * Return the set of HTTP request methods that are part of this web
-     * resource collection, or a zero-length array if all request methods
-     * are included.
+     * resource collection, or a zero-length array if no methods have been
+     * explicitly included.
      */
     public String[] findMethods() {
 
         return (methods);
+
+    }
+
+
+    /**
+     * Return the set of HTTP request methods that are explicitly excluded from
+     * this web resource collection, or a zero-length array if no request
+     * methods are excluded.
+     */
+    public String[] findOmittedMethods() {
+
+        return (omittedMethods);
 
     }
 
@@ -279,6 +319,36 @@ public class SecurityCollection implements Serializable {
                     results[j++] = methods[i];
             }
             methods = results;
+        }
+
+    }
+
+
+    /**
+     * Remove the specified HTTP request method from those that are explicitly
+     * excluded from this web resource collection.
+     *
+     * @param method Request method to be removed
+     */
+    public void removeOmittedMethod(String method) {
+
+        if (method == null)
+            return;
+        int n = -1;
+        for (int i = 0; i < omittedMethods.length; i++) {
+            if (omittedMethods[i].equals(method)) {
+                n = i;
+                break;
+            }
+        }
+        if (n >= 0) {
+            int j = 0;
+            String results[] = new String[omittedMethods.length - 1];
+            for (int i = 0; i < omittedMethods.length; i++) {
+                if (i != n)
+                    results[j++] = omittedMethods[i];
+            }
+            omittedMethods = results;
         }
 
     }
