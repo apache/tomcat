@@ -177,6 +177,15 @@
         inferred by the automatic deployment process.</p>
       </attribute>
 
+      <attribute name="logEffectiveWebXml" required="false">
+        <p>Set to <code>true</code> if you want the effective web.xml used for a
+        web application to be logged (at INFO level) when the application
+        starts. The effective web.xml is the result of combining the
+        application's web.xml with any defaults configured by Tomcat and any
+        web-fragment.xml files and annotations discovered. If not specified, the
+        default value of <code>false</code> is used.</p>
+      </attribute>
+
       <attribute name="override" required="false">
         <p>Set to <code>true</code> to have explicit settings in this
         Context element override any corresponding settings in either the global

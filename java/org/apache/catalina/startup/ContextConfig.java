@@ -32,7 +32,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -1223,6 +1222,15 @@ public class ContextConfig
         } else {
             // Apply merged web.xml to Context
             webXml.configureContext(context);
+        }
+        // Make the merged web.xml available to other components, specifically
+        // Jasper, to save those components from having to re-generate it.
+        String mergedWebXml = webXml.toXml();
+        context.getServletContext().setAttribute(
+               org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
+                mergedWebXml);
+        if (context.getLogEffectiveWebXml()) {
+            log.info("web.xml:\n" + mergedWebXml);
         }
     }
 

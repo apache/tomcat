@@ -758,8 +758,20 @@ public class StandardContext
      */
     private boolean clearReferencesStopThreads = false;
 
+    /**
+     * Should the effective web.xml be logged when the context starts?
+     */
+    private boolean logEffectiveWebXml = false;
+
     // ----------------------------------------------------- Context Properties
 
+    public void setLogEffectiveWebXml(boolean logEffectiveWebXml) {
+        this.logEffectiveWebXml = logEffectiveWebXml;
+    }
+    
+    public boolean getLogEffectiveWebXml() {
+        return logEffectiveWebXml;
+    }
 
     public Authenticator getAuthenticator() {
         if (this instanceof Authenticator)

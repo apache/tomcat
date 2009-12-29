@@ -1101,5 +1101,16 @@ public interface Context extends Container {
      * <code>null</code> if none is used.
      */
     public Authenticator getAuthenticator();
+    
+    /**
+     * Set whether or not the effective web.xml for this context should be
+     * logged on context start.
+     */
+    public void setLogEffectiveWebXml(boolean logEffectiveWebXml);
+    
+    /**
+     * Should the effective web.xml for this context be logged on context start?
+     */
+    public boolean getLogEffectiveWebXml();
 }
 
