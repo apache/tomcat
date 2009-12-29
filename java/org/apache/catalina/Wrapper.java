@@ -360,4 +360,15 @@ public interface Wrapper extends Container {
      * Set the async support for the associated servlet.
      */
     public void setAsyncSupported(boolean asyncSupport);
+    
+    /**
+     * Is the associated Servlet enabled? Defaults to <code>true</code>.
+     */
+    public boolean isEnabled();
+    
+    /**
+     * Sets the enabled attribute for the associated servlet.
+     */
+    public void setEnabled(boolean enabled);
+
 }
