@@ -2287,6 +2287,11 @@ public class StandardContext
                          ("standardContext.securityConstraint.pattern",
                           patterns[j]));
             }
+            if (collections[i].findMethods().length > 0 &&
+                    collections[i].findOmittedMethods().length > 0) {
+                throw new IllegalArgumentException(sm.getString(
+                        "standardContext.securityConstraint.mixHttpMethod"));
+            }
         }
 
         // Add this constraint to the set for our web application

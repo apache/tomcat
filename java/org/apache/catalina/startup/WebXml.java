@@ -734,6 +734,9 @@ public class WebXml {
                 for (String method : collection.findMethods()) {
                     appendElement(sb, INDENT6, "http-method", method);
                 }
+                for (String method : collection.findOmittedMethods()) {
+                    appendElement(sb, INDENT6, "http-method-omission", method);
+                }
                 sb.append("    </web-resource-collection>\n");
             }
             if (constraint.findAuthRoles().length > 0) {
