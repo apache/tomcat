@@ -19,6 +19,7 @@
 package org.apache.catalina.startup;
 
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -54,6 +57,7 @@ import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.SecurityRoleRef;
 import org.apache.catalina.deploy.ServletDef;
+import org.apache.catalina.deploy.SessionConfig;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -232,13 +236,13 @@ public class WebXml {
     }
     public Map<String,String> getServletMappings() { return servletMappings; }
     
-    // session-config/session-timeout
+    // session-config
     // Digester will check there is only one of these
-    private Integer sessionTimeout = null;
-    public void setSessionTimeout(String timeout) {
-        sessionTimeout = Integer.valueOf(timeout);
+    private SessionConfig sessionConfig = new SessionConfig();
+    public void setSessionConfig(SessionConfig sessionConfig) {
+        this.sessionConfig = sessionConfig;
     }
-    public Integer getSessionTimeout() { return sessionTimeout; }
+    public SessionConfig getSessionConfig() { return sessionConfig; }
     
     // mime-mapping
     private Map<String,String> mimeMappings = new HashMap<String,String>();
@@ -620,12 +624,28 @@ public class WebXml {
         }
         sb.append('\n');
         
-        if (sessionTimeout != null) {
+        if (sessionConfig != null) {
             sb.append("  <session-config>\n");
             appendElement(sb, INDENT4, "session-timeout",
-                    sessionTimeout.toString());
-            // TODO cookie-config
-            // TODO tracking-mode
+                    sessionConfig.getSessionTimeout());
+            sb.append("    <cookie-config>\n");
+            appendElement(sb, INDENT6, "name", sessionConfig.getCookieName());
+            appendElement(sb, INDENT6, "domain",
+                    sessionConfig.getCookieDomain());
+            appendElement(sb, INDENT6, "path", sessionConfig.getCookiePath());
+            appendElement(sb, INDENT6, "comment",
+                    sessionConfig.getCookieComment());
+            appendElement(sb, INDENT6, "http-only",
+                    sessionConfig.getCookieHttpOnly());
+            appendElement(sb, INDENT6, "secure",
+                    sessionConfig.getCookieSecure());
+            appendElement(sb, INDENT6, "max-age",
+                    sessionConfig.getCookieMaxAge());
+            sb.append("    </cookie-config>\n");
+            for (SessionTrackingMode stm :
+                    sessionConfig.getSessionTrackingModes()) {
+                appendElement(sb, INDENT4, "tracking-mode", stm.name());
+            }
             sb.append("  </session-config>\n\n");
         }
         
@@ -1148,8 +1168,30 @@ public class WebXml {
         for (String pattern : servletMappings.keySet()) {
             context.addServletMapping(pattern, servletMappings.get(pattern));
         }
-        if (sessionTimeout != null) {
-            context.setSessionTimeout(sessionTimeout.intValue());
+        if (sessionConfig != null) {
+            if (sessionConfig.getSessionTimeout() != null) {
+                context.setSessionTimeout(
+                        sessionConfig.getSessionTimeout().intValue());
+            }
+            SessionCookieConfig scc =
+                context.getServletContext().getSessionCookieConfig();
+            scc.setName(sessionConfig.getCookieName());
+            scc.setDomain(sessionConfig.getCookieDomain());
+            scc.setPath(sessionConfig.getCookiePath());
+            scc.setComment(sessionConfig.getCookieComment());
+            if (sessionConfig.getCookieHttpOnly() != null) {
+                scc.setHttpOnly(sessionConfig.getCookieHttpOnly().booleanValue());
+            }
+            if (sessionConfig.getCookieSecure() != null) {
+                scc.setSecure(sessionConfig.getCookieSecure().booleanValue());
+            }
+            if (sessionConfig.getCookieMaxAge() != null) {
+                scc.setMaxAge(sessionConfig.getCookieMaxAge().intValue());
+            }
+            if (sessionConfig.getSessionTrackingModes().size() > 0) {
+                context.getServletContext().setSessionTrackingModes(
+                        sessionConfig.getSessionTrackingModes());
+            }
         }
         for (String uri : taglibs.keySet()) {
             context.addTaglib(uri, taglibs.get(uri));
@@ -1327,8 +1369,8 @@ public class WebXml {
                     }
                 }
             }
+            loginConfig = tempLoginConfig;
         }
-
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getMessageDestinationRefs(), messageDestinationRefs,
@@ -1431,12 +1473,15 @@ public class WebXml {
         }
         servlets.putAll(temp.getServlets());
         
-        if (sessionTimeout == null) {
+        if (sessionConfig.getSessionTimeout() == null) {
             for (WebXml fragment : fragments) {
-                Integer value = fragment.getSessionTimeout(); 
+                Integer value = fragment.getSessionConfig().getSessionTimeout();
                 if (value != null) {
-                    if (temp.getSessionTimeout() == null) {
-                        temp.setSessionTimeout(value.toString());
+                    if (temp.getSessionConfig().getSessionTimeout() == null) {
+                        temp.getSessionConfig().setSessionTimeout(value.toString());
+                    } else if (value.equals(
+                            temp.getSessionConfig().getSessionTimeout())) {
+                        // Fragments use same value - no conflict
                     } else {
                         log.error(sm.getString(
                                 "webXml.mergeConflictSessionTimeout",
@@ -1446,9 +1491,181 @@ public class WebXml {
                     }
                 }
             }
-            sessionTimeout = temp.getSessionTimeout();
+            sessionConfig.setSessionTimeout(
+                    temp.getSessionConfig().getSessionTimeout().toString());
+        }
+        
+        if (sessionConfig.getCookieName() == null) {
+            for (WebXml fragment : fragments) {
+                String value = fragment.getSessionConfig().getCookieName();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookieName() == null) {
+                        temp.getSessionConfig().setCookieName(value);
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookieName())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookieName",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookieName(
+                    temp.getSessionConfig().getCookieName());
+        }
+        if (sessionConfig.getCookieDomain() == null) {
+            for (WebXml fragment : fragments) {
+                String value = fragment.getSessionConfig().getCookieDomain();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookieDomain() == null) {
+                        temp.getSessionConfig().setCookieDomain(value);
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookieDomain())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookieDomain",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookieDomain(
+                    temp.getSessionConfig().getCookieDomain());
+        }
+        if (sessionConfig.getCookiePath() == null) {
+            for (WebXml fragment : fragments) {
+                String value = fragment.getSessionConfig().getCookiePath();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookiePath() == null) {
+                        temp.getSessionConfig().setCookiePath(value);
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookiePath())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookiePath",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookiePath(
+                    temp.getSessionConfig().getCookiePath());
+        }
+        if (sessionConfig.getCookieComment() == null) {
+            for (WebXml fragment : fragments) {
+                String value = fragment.getSessionConfig().getCookieComment();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookieComment() == null) {
+                        temp.getSessionConfig().setCookieComment(value);
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookieComment())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookieComment",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookieComment(
+                    temp.getSessionConfig().getCookieComment());
+        }
+        if (sessionConfig.getCookieHttpOnly() == null) {
+            for (WebXml fragment : fragments) {
+                Boolean value = fragment.getSessionConfig().getCookieHttpOnly();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookieHttpOnly() == null) {
+                        temp.getSessionConfig().setCookieHttpOnly(value.toString());
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookieHttpOnly())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookieHttpOnly",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookieHttpOnly(
+                    temp.getSessionConfig().getCookieHttpOnly().toString());
+        }
+        if (sessionConfig.getCookieSecure() == null) {
+            for (WebXml fragment : fragments) {
+                Boolean value = fragment.getSessionConfig().getCookieSecure();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookieSecure() == null) {
+                        temp.getSessionConfig().setCookieSecure(value.toString());
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookieSecure())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookieSecure",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookieSecure(
+                    temp.getSessionConfig().getCookieSecure().toString());
+        }
+        if (sessionConfig.getCookieMaxAge() == null) {
+            for (WebXml fragment : fragments) {
+                Integer value = fragment.getSessionConfig().getCookieMaxAge();
+                if (value != null) {
+                    if (temp.getSessionConfig().getCookieMaxAge() == null) {
+                        temp.getSessionConfig().setCookieMaxAge(value.toString());
+                    } else if (value.equals(
+                            temp.getSessionConfig().getCookieMaxAge())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionCookieMaxAge",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setCookieMaxAge(
+                    temp.getSessionConfig().getCookieMaxAge().toString());
         }
 
+        if (sessionConfig.getSessionTrackingModes().size() == 0) {
+            for (WebXml fragment : fragments) {
+                EnumSet<SessionTrackingMode> value =
+                    fragment.getSessionConfig().getSessionTrackingModes();
+                if (value.size() > 0) {
+                    if (temp.getSessionConfig().getSessionTrackingModes().size() == 0) {
+                        temp.getSessionConfig().getSessionTrackingModes().addAll(value);
+                    } else if (value.equals(
+                            temp.getSessionConfig().getSessionTrackingModes())) {
+                        // Fragments use same value - no conflict
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictSessionTrackingMode",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            sessionConfig.setSessionTimeout(
+                    temp.getSessionConfig().getSessionTimeout().toString());
+        }
+        
         for (WebXml fragment : fragments) {
             if (!mergeMap(fragment.getTaglibs(), taglibs,
                     temp.getTaglibs(), fragment, "Taglibs")) {
