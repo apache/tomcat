@@ -583,7 +583,7 @@ public class WebXml {
             }
             appendElement(sb, INDENT4, "load-on-startup",
                     servletDef.getLoadOnStartup());
-            // TODO enabled
+            appendElement(sb, INDENT4, "enabled", servletDef.getEnabled());
             appendElement(sb, INDENT4, "async-supported",
                     servletDef.getAsyncSupported());
             sb.append("    <run-as>\n");
@@ -1108,6 +1108,9 @@ public class WebXml {
             if (servlet.getLoadOnStartup() != null) {
                 wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());
             }
+            if (servlet.getEnabled() != null) {
+                wrapper.setEnabled(servlet.getEnabled().booleanValue());
+            }
             wrapper.setName(servlet.getServletName());
             Map<String,String> params = servlet.getParameterMap(); 
             for (String param : params.keySet()) {
@@ -1600,6 +1603,15 @@ public class WebXml {
         } else if (src.getLoadOnStartup() != null) {
             if (failOnConflict &&
                     !src.getLoadOnStartup().equals(dest.getLoadOnStartup())) {
+                return false;
+            }
+        }
+        
+        if (dest.getEnabled() == null) {
+            dest.setEnabled(src.getEnabled().toString());
+        } else if (src.getEnabled() != null) {
+            if (failOnConflict &&
+                    !src.getEnabled().equals(dest.getEnabled())) {
                 return false;
             }
         }
