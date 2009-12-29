@@ -568,6 +568,8 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(fullPrefix + "/service-ref/service-ref-name",
                                "setName", 0);
         digester.addCallMethod(fullPrefix + "/service-ref/service-interface",
+                               "setInterface", 0);
+        digester.addCallMethod(fullPrefix + "/service-ref/service-ref-type",
                                "setType", 0);
         digester.addCallMethod(fullPrefix + "/service-ref/wsdl-file",
                                "setWsdlfile", 0);
