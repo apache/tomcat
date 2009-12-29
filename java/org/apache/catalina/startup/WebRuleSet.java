@@ -337,6 +337,8 @@ public class WebRuleSet extends RuleSetBase {
                             "org.apache.catalina.deploy.SecurityCollection");
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/http-method",
                                "addMethod", 0);
+        digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/http-method-omission",
+                               "addOmittedMethod", 0);
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/url-pattern",
                                "addPattern", 0);
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/web-resource-name",
