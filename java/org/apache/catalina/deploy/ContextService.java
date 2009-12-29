@@ -77,6 +77,20 @@ public class ContextService extends ResourceBase {
     }
 
     /**
+     * The fully qualified class name of the JAX-WS Service interface that the
+     * client depends on.
+     */
+    private String serviceInterface = null;
+    
+    public String getInterface() {
+        return serviceInterface;
+    }
+    
+    public void setInterface(String serviceInterface) {
+        this.serviceInterface = serviceInterface;
+    }
+
+    /**
      * Contains the location (relative to the root of
      * the module) of the web service WSDL description.
      */
