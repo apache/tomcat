@@ -590,9 +590,11 @@ public class WebXml {
             appendElement(sb, INDENT4, "enabled", servletDef.getEnabled());
             appendElement(sb, INDENT4, "async-supported",
                     servletDef.getAsyncSupported());
-            sb.append("    <run-as>\n");
-            appendElement(sb, INDENT6, "role-name", servletDef.getRunAs());
-            sb.append("    </run-as>\n");
+            if (servletDef.getRunAs() != null) {
+                sb.append("    <run-as>\n");
+                appendElement(sb, INDENT6, "role-name", servletDef.getRunAs());
+                sb.append("    </run-as>\n");
+            }
             for (SecurityRoleRef roleRef : servletDef.getSecurityRoleRefs()) {
                 sb.append("    <security-role-ref>\n");
                 appendElement(sb, INDENT6, "role-name", roleRef.getName());
@@ -1491,8 +1493,10 @@ public class WebXml {
                     }
                 }
             }
-            sessionConfig.setSessionTimeout(
-                    temp.getSessionConfig().getSessionTimeout().toString());
+            if (temp.getSessionConfig().getSessionTimeout() != null) {
+                sessionConfig.setSessionTimeout(
+                        temp.getSessionConfig().getSessionTimeout().toString());
+            }
         }
         
         if (sessionConfig.getCookieName() == null) {
@@ -1597,8 +1601,10 @@ public class WebXml {
                     }
                 }
             }
-            sessionConfig.setCookieHttpOnly(
-                    temp.getSessionConfig().getCookieHttpOnly().toString());
+            if (temp.getSessionConfig().getCookieHttpOnly() != null) {
+                sessionConfig.setCookieHttpOnly(
+                        temp.getSessionConfig().getCookieHttpOnly().toString());
+            }
         }
         if (sessionConfig.getCookieSecure() == null) {
             for (WebXml fragment : fragments) {
@@ -1618,8 +1624,10 @@ public class WebXml {
                     }
                 }
             }
-            sessionConfig.setCookieSecure(
-                    temp.getSessionConfig().getCookieSecure().toString());
+            if (temp.getSessionConfig().getCookieSecure() != null) {
+                sessionConfig.setCookieSecure(
+                        temp.getSessionConfig().getCookieSecure().toString());
+            }
         }
         if (sessionConfig.getCookieMaxAge() == null) {
             for (WebXml fragment : fragments) {
@@ -1639,8 +1647,10 @@ public class WebXml {
                     }
                 }
             }
-            sessionConfig.setCookieMaxAge(
-                    temp.getSessionConfig().getCookieMaxAge().toString());
+            if (temp.getSessionConfig().getCookieMaxAge() != null) {
+                sessionConfig.setCookieMaxAge(
+                        temp.getSessionConfig().getCookieMaxAge().toString());
+            }
         }
 
         if (sessionConfig.getSessionTrackingModes().size() == 0) {
@@ -1662,8 +1672,8 @@ public class WebXml {
                     }
                 }
             }
-            sessionConfig.setSessionTimeout(
-                    temp.getSessionConfig().getSessionTimeout().toString());
+            sessionConfig.getSessionTrackingModes().addAll(
+                    temp.getSessionConfig().getSessionTrackingModes());
         }
         
         for (WebXml fragment : fragments) {
