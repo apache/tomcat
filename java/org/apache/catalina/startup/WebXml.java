@@ -1596,7 +1596,7 @@ public class WebXml {
         }
         
         if (dest.getLoadOnStartup() == null) {
-            dest.setLoadOnStartup(src.getServletClass());
+            dest.setLoadOnStartup(src.getLoadOnStartup().toString());
         } else if (src.getLoadOnStartup() != null) {
             if (failOnConflict &&
                     !src.getLoadOnStartup().equals(dest.getLoadOnStartup())) {
