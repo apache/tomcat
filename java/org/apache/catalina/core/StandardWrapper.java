@@ -267,6 +267,11 @@ public class StandardWrapper
     protected boolean asyncSupported = true;
 
     /**
+     * Enabled
+     */
+    protected boolean enabled = true;
+
+    /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.init</code> is invoked.
      */
@@ -586,13 +591,15 @@ public class StandardWrapper
      */
     public boolean isUnavailable() {
 
-        if (available == 0L)
-            return (false);
+        if (!isEnabled())
+            return true;
+        else if (available == 0L)
+            return false;
         else if (available <= System.currentTimeMillis()) {
             available = 0L;
-            return (false);
+            return false;
         } else
-            return (true);
+            return true;
 
     }
 
@@ -1514,6 +1521,14 @@ public class StandardWrapper
     
     public void setAsyncSupported(boolean asyncSupported) {
         this.asyncSupported = asyncSupported;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+    
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     // -------------------------------------------------------- Package Methods
