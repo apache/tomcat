@@ -21,6 +21,7 @@ package org.apache.catalina.deploy;
 
 import org.apache.catalina.util.RequestUtil;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.servlet.DispatcherType;
 
@@ -166,6 +167,25 @@ public class FilterMap implements Serializable {
         return dispatcherMapping; 
     }
 
+    public String[] getDispatcherNames() {
+    	ArrayList<String> result = new ArrayList<String>();
+    	if ((dispatcherMapping & FORWARD) > 0) {
+    		result.add(DispatcherType.FORWARD.name());
+    	}
+    	if ((dispatcherMapping & INCLUDE) > 0) {
+    		result.add(DispatcherType.INCLUDE.name());
+    	}
+    	if ((dispatcherMapping & REQUEST) > 0) {
+    		result.add(DispatcherType.REQUEST.name());
+    	}
+    	if ((dispatcherMapping & ERROR) > 0) {
+    		result.add(DispatcherType.ERROR.name());
+    	}
+    	if ((dispatcherMapping & ASYNC) > 0) {
+    		result.add(DispatcherType.ASYNC.name());
+    	}
+    	return result.toArray(new String[result.size()]);
+    }
 
     // --------------------------------------------------------- Public Methods
 
