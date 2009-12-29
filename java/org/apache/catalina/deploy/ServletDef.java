@@ -234,4 +234,18 @@ public class ServletDef implements Serializable {
     public void setAsyncSupported(String asyncSupported) {
         this.asyncSupported = Boolean.valueOf(asyncSupported);
     }
+
+    
+    /**
+     * Is this servlet enabled.
+     */
+    private Boolean enabled = null;
+    
+    public Boolean getEnabled() {
+        return this.enabled;
+    }
+    
+    public void setEnabled(String enabled) {
+        this.enabled = Boolean.valueOf(enabled);
+    }
 }

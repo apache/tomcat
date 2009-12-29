@@ -390,7 +390,9 @@ public class WebRuleSet extends RuleSetBase {
                                "setFileSizeThreshold", 0);
 
         digester.addCallMethod(fullPrefix + "/servlet/async-supported",
-                "setAsyncSupported", 0);
+                               "setAsyncSupported", 0);
+        digester.addCallMethod(fullPrefix + "/servlet/enabled",
+                               "setEnabled", 0);
 
         
         digester.addRule(fullPrefix + "/servlet-mapping",
