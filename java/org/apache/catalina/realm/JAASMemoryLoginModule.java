@@ -22,7 +22,6 @@ package org.apache.catalina.realm;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -36,11 +35,7 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.Constants;
-import org.apache.catalina.connector.Request;
-import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -208,56 +203,6 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
     }
 
-    
-    /**
-     * Return the SecurityConstraints configured to guard the request URI for
-     * this request, or <code>null</code> if there is no such constraint.
-     *
-     * @param request Request we are processing
-     * @param context Context the Request is mapped to
-     */
-    @Override
-    public SecurityConstraint [] findSecurityConstraints(Request request,
-                                                     Context context) {
-        ArrayList<SecurityConstraint> results = null;
-        // Are there any defined security constraints?
-        SecurityConstraint constraints[] = context.findConstraints();
-        if ((constraints == null) || (constraints.length == 0)) {
-            if (context.getLogger().isDebugEnabled())
-                context.getLogger().debug("  No applicable constraints defined");
-            return (null);
-        }
-
-        // Check each defined security constraint
-        String uri = request.getDecodedRequestURI();
-        String contextPath = request.getContextPath();
-        if (contextPath.length() > 0)
-            uri = uri.substring(contextPath.length());
-        uri = RequestUtil.URLDecode(uri); // Before checking constraints
-        String method = request.getMethod();
-        for (int i = 0; i < constraints.length; i++) {
-            if (context.getLogger().isDebugEnabled())
-                context.getLogger().debug("  Checking constraint '" + constraints[i] +
-                    "' against " + method + " " + uri + " --> " +
-                    constraints[i].included(uri, method));
-            if (constraints[i].included(uri, method)) {
-                if(results == null) {
-                    results = new ArrayList<SecurityConstraint>();
-                }
-                results.add(constraints[i]);
-            }
-        }
-
-        // No applicable security constraint was found
-        if (context.getLogger().isDebugEnabled())
-            context.getLogger().debug("  No applicable constraint located");
-        if(results == null)
-            return null;
-        SecurityConstraint [] array = new SecurityConstraint[results.size()];
-        System.arraycopy(results.toArray(), 0, array, 0, array.length);
-        return array;
-    }
-    
     
     /**
      * Initialize this <code>LoginModule</code> with the specified
