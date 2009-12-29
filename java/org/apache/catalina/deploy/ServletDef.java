@@ -225,13 +225,13 @@ public class ServletDef implements Serializable {
     /**
      * Does this servlet support async.
      */
-    private String asyncSupported = null;
+    private Boolean asyncSupported = null;
     
-    public String getAsyncSupported() {
+    public Boolean getAsyncSupported() {
         return this.asyncSupported;
     }
     
     public void setAsyncSupported(String asyncSupported) {
-        this.asyncSupported = asyncSupported;
+        this.asyncSupported = Boolean.valueOf(asyncSupported);
     }
 }

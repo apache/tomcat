@@ -1138,7 +1138,7 @@ public class WebXml {
             }
             if (servlet.getAsyncSupported() != null) {
                 wrapper.setAsyncSupported(
-                        Boolean.parseBoolean(servlet.getAsyncSupported()));
+                        servlet.getAsyncSupported().booleanValue());
             }
             context.addChild(wrapper);
         }
@@ -1624,7 +1624,7 @@ public class WebXml {
         }
         
         if (dest.getAsyncSupported() == null) {
-            dest.setAsyncSupported(src.getAsyncSupported());
+            dest.setAsyncSupported(src.getAsyncSupported().toString());
         } else if (src.getAsyncSupported() != null) {
             if (failOnConflict &&
                     !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
