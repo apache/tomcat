@@ -400,11 +400,29 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallParam(fullPrefix + "/servlet-mapping/servlet-name", 1);
         digester.addRule(fullPrefix + "/servlet-mapping/url-pattern", new CallParamMultiRule(0));
 
-        digester.addRule(fullPrefix + "/session-config",
-                         sessionConfig);
-        
+        digester.addRule(fullPrefix + "/session-config", sessionConfig);
+        digester.addObjectCreate(fullPrefix + "/session-config",
+                                 "org.apache.catalina.deploy.SessionConfig");
+        digester.addSetNext(fullPrefix + "/session-config", "setSessionConfig",
+                            "org.apache.catalina.deploy.SessionConfig");
         digester.addCallMethod(fullPrefix + "/session-config/session-timeout",
                                "setSessionTimeout", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/name",
+                               "setCookieName", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/domain",
+                               "setCookieDomain", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/path",
+                               "setCookiePath", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/comment",
+                               "setCookieComment", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/http-only",
+                               "setCookieHttpOnly", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/secure",
+                               "setCookieSecure", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/max-age",
+                               "setCookieMaxAge", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/tracking-mode",
+                               "addSessionTrackingMode", 0);
 
         // Taglibs pre Servlet 2.4
         digester.addRule(fullPrefix + "/taglib", new TaglibLocationRule(false));
