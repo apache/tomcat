@@ -24,11 +24,15 @@ public final class Constants {
 
     public static final String Package = "org.apache.tomcat.util.scan";
 
+    /* System properties */
     public static final String SKIP_JARS_PROPERTY =
         "tomcat.util.scan.DefaultJarScanner.jarsToSkip";
 
+    /* Commons strings */
     public static final String JAR_EXT = ".jar";
     public static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
-
+    /* Context attributes - used to pass short-cuts to Jasper */
+    public static final String MERGED_WEB_XML =
+        "org.apache.tomcat.util.scan.MergedWebXml";
 }
