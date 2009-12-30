@@ -81,9 +81,6 @@ import org.apache.tomcat.JarScannerCallback;
 
 public class TldLocationsCache {
 
-    // Logger
-    private final Log log = LogFactory.getLog(TldLocationsCache.class);
-
     /**
      * The types of URI one may specify for a tag library
      */
@@ -93,8 +90,6 @@ public class TldLocationsCache {
 
     private static final String WEB_INF = "/WEB-INF/";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
-    private static final String WEB_XML = "/WEB-INF/web.xml";
-    private static final String FILE_PROTOCOL = "file:";
     private static final String JAR_EXT = ".jar";
     private static final String TLD_EXT = ".tld";
 
@@ -238,67 +233,17 @@ public class TldLocationsCache {
      * This is not kept in sync with o.a.c.startup.TldConfig as the Jasper only
      * needs the URI to TLD mappings from scan web.xml whereas TldConfig needs
      * to scan the actual TLD files.
-     * 
-     * Search order is:
-     * - web.xml scanned by Tomcat and placed in context attribute
-     * - location specified by ALT_DD_ATTR
-     * - /WEB-INF/web.xml
      */    
     private void tldScanWebXml() throws Exception {
 
-        InputStream is = null;
-        String systemId = null;
-
+        WebXml webXml = null;
         try {
-            // Is a web.xml provided as context attribute?
-            String webXml = (String) ctxt.getAttribute(
-                    org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML);
-            if (webXml != null) {
-                is = new ByteArrayInputStream(webXml.getBytes());
-                systemId = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML;
-            }
+            webXml = new WebXml(ctxt);
             
-            // If not available as context attribute, look for an alternative
-            // location
-            if (is == null) {
-                // Acquire input stream to web application deployment descriptor
-                String altDDName = (String)ctxt.getAttribute(
-                                                        Constants.ALT_DD_ATTR);
-                if (altDDName != null) {
-                    try {
-                        URL uri =
-                            new URL(FILE_PROTOCOL+altDDName.replace('\\', '/'));
-                        is = uri.openStream();
-                        systemId = uri.toExternalForm();
-                    } catch (MalformedURLException e) {
-                        log.warn(Localizer.getMessage(
-                                "jsp.error.internal.filenotfound",
-                                altDDName));
-                    }
-                }
-            }
-            
-            // Finally, try the default /WEB-INF/web.xml
-            if (is == null) {
-                URL uri = ctxt.getResource(WEB_XML);
-                if (uri == null) {
-                    log.warn(Localizer.getMessage(
-                            "jsp.error.internal.filenotfound", WEB_XML));
-                } else {
-                    is = uri.openStream();
-                    systemId = uri.toExternalForm();
-                }
-            }
-
-            if (is == null) {
-                return;
-            }
-            InputSource ip = new InputSource(is);
-            ip.setSystemId(systemId); 
-
             // Parse the web application deployment descriptor
             TreeNode webtld = null;
-            webtld = new ParserUtils().parseXMLDocument(systemId, ip);
+            webtld = new ParserUtils().parseXMLDocument(webXml.getSystemId(),
+                    webXml.getInputSource());
 
             // Allow taglib to be an element of the root or jsp-config (JSP2.0)
             TreeNode jspConfig = webtld.findChild("jsp-config");
@@ -332,10 +277,8 @@ public class TldLocationsCache {
                 mappings.put(tagUri, new String[] { tagLoc, tagLoc2 });
             }
         } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Throwable t) {}
+            if (webXml != null) {
+                webXml.close();
             }
         }
     }
