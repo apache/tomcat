@@ -350,4 +350,12 @@ public class BeanELResolver extends ELResolver {
 		}
 
 	}
+	
+	@Override
+    public Object invoke(ELContext context, Object base, Object method,
+            Class<?>[] paramTypes, Object[] params) {
+        // TODO 
+        return null;
+    }
+
 }

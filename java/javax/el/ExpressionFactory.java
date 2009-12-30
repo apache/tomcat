@@ -17,6 +17,8 @@
 
 package javax.el;
 
+import java.util.Properties;
+
 /**
  * 
  * @since 2.1
@@ -37,4 +39,13 @@ public abstract class ExpressionFactory {
             String expression, Class<?> expectedReturnType,
             Class<?>[] expectedParamTypes) throws ELException,
             NullPointerException;
+    
+    public static ExpressionFactory newInstance() {
+        return newInstance(null);
+    }
+
+    public static ExpressionFactory newInstance(Properties properties) {
+        // TODO
+        return null;
+    }
 }

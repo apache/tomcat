@@ -124,6 +124,13 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
+    @Override
+    public Object invoke(ELContext context, Object base, Object method,
+            Class<?>[] paramTypes, Object[] params) {
+        // TODO 
+        return null;
+    }
+
     private final static class FeatureIterator implements Iterator<FeatureDescriptor> {
 
         private final ELContext context;
