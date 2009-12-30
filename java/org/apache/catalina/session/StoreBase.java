@@ -175,7 +175,7 @@ public abstract class StoreBase
     public void processExpires() {
         String[] keys = null;
 
-         if(!started) {
+        if(!started) {
             return;
         }
 
