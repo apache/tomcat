@@ -73,13 +73,13 @@ public class ParserUtils {
      * Parse the specified XML document, and return a <code>TreeNode</code>
      * that corresponds to the root node of the document tree.
      *
-     * @param uri URI of the XML document being parsed
+     * @param location Location (eg URI) of the XML document being parsed
      * @param is Input source containing the deployment descriptor
      *
      * @exception JasperException if an input/output error occurs
      * @exception JasperException if a parsing error occurs
      */
-    public TreeNode parseXMLDocument(String uri, InputSource is)
+    public TreeNode parseXMLDocument(String location, InputSource is)
         throws JasperException {
 
         Document document = null;
@@ -96,20 +96,20 @@ public class ParserUtils {
             document = builder.parse(is);
 	} catch (ParserConfigurationException ex) {
             throw new JasperException
-                (Localizer.getMessage("jsp.error.parse.xml", uri), ex);
+                (Localizer.getMessage("jsp.error.parse.xml", location), ex);
 	} catch (SAXParseException ex) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml.line",
-				      uri,
+				      location,
 				      Integer.toString(ex.getLineNumber()),
 				      Integer.toString(ex.getColumnNumber())),
 		 ex);
 	} catch (SAXException sx) {
             throw new JasperException
-                (Localizer.getMessage("jsp.error.parse.xml", uri), sx);
+                (Localizer.getMessage("jsp.error.parse.xml", location), sx);
         } catch (IOException io) {
             throw new JasperException
-                (Localizer.getMessage("jsp.error.parse.xml", uri), io);
+                (Localizer.getMessage("jsp.error.parse.xml", location), io);
 	}
 
         // Convert the resulting document to a graph of TreeNodes
