@@ -194,7 +194,8 @@ public class WebXml {
         if (filters.containsKey(filter.getFilterName())) {
             // Filter names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateFilter"));
+                    sm.getString("webXml.duplicateFilter",
+                            filter.getFilterName()));
         }
         filters.put(filter.getFilterName(), filter);
     }
@@ -279,6 +280,11 @@ public class WebXml {
     // jsp-config/taglib or taglib (2.3 and earlier)
     private Map<String,String> taglibs = new HashMap<String,String>();
     public void addTaglib(String uri, String location) {
+        if (taglibs.containsKey(uri)) {
+            // Taglib URIs must be unique within a web(-fragment).xml
+            throw new IllegalArgumentException(
+                    sm.getString("webXml.duplicateTaglibUri", uri));
+        }
         taglibs.put(uri, location);
     }
     public Map<String,String> getTaglibs() { return taglibs; }
@@ -329,7 +335,8 @@ public class WebXml {
         if (envEntries.containsKey(envEntry.getName())) {
             // env-entry names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateEnvEntry"));
+                    sm.getString("webXml.duplicateEnvEntry",
+                            envEntry.getName()));
         }
         envEntries.put(envEntry.getName(),envEntry);
     }
@@ -373,7 +380,8 @@ public class WebXml {
         if (resourceRefs.containsKey(resourceRef.getName())) {
             // resource-ref names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateResourceRef"));
+                    sm.getString("webXml.duplicateResourceRef",
+                            resourceRef.getName()));
         }
         resourceRefs.put(resourceRef.getName(), resourceRef);
     }
@@ -389,7 +397,8 @@ public class WebXml {
         if (resourceEnvRefs.containsKey(resourceEnvRef.getName())) {
             // resource-env-ref names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateResourceEnvRef"));
+                    sm.getString("webXml.duplicateResourceEnvRef",
+                            resourceEnvRef.getName()));
         }
         resourceEnvRefs.put(resourceEnvRef.getName(), resourceEnvRef);
     }
@@ -408,7 +417,8 @@ public class WebXml {
             // message-destination-ref names must be unique within a
             // web(-fragment).xml
             throw new IllegalArgumentException(sm.getString(
-                    "webXml.duplicateMessageDestinationRef"));
+                    "webXml.duplicateMessageDestinationRef",
+                    messageDestinationRef.getName()));
         }
         messageDestinationRefs.put(messageDestinationRef.getName(),
                 messageDestinationRef);
@@ -430,7 +440,8 @@ public class WebXml {
             // message-destination names must be unique within a
             // web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateMessageDestination"));
+                    sm.getString("webXml.duplicateMessageDestination",
+                            messageDestination.getName()));
         }
         messageDestinations.put(messageDestination.getName(),
                 messageDestination);
