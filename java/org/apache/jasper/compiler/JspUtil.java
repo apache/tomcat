@@ -49,9 +49,6 @@ public class JspUtil {
     private static final String OPEN_EXPR = "<%=";
     private static final String CLOSE_EXPR = "%>";
 
-    // private static ExpressionEvaluatorImpl expressionEvaluator
-    // = new ExpressionEvaluatorImpl();
-
     private static final String javaKeywords[] = { "abstract", "assert",
             "boolean", "break", "byte", "case", "catch", "char", "class",
             "const", "continue", "default", "do", "double", "else", "enum",
