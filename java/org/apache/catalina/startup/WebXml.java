@@ -505,7 +505,14 @@ public class WebXml {
         sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
         sb.append("         xsi:schemaLocation=");
         sb.append("\"http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\"\n");
-        sb.append("         version=\"3.0\"\n");
+        sb.append("         version=\"");
+        if (version != null) {
+            sb.append(version);
+        } else {
+            // Should be non-null but in case it isn't assume 3.0
+            sb.append("3.0");
+        }
+        sb.append("\"\n");
         sb.append("         metadata-complete=\"true\">\n\n");
 
         appendElement(sb, INDENT2, "display-name", displayName);
