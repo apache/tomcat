@@ -17,10 +17,8 @@
 
 package org.apache.jasper.compiler;
 
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Vector;
-import java.net.URL;
 
 import javax.servlet.ServletContext;
 
@@ -29,7 +27,6 @@ import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.xml.sax.InputSource;
 
 /**
  * Handles the jsp-config element in WEB_INF/web.xml.  This is used
@@ -40,8 +37,6 @@ import org.xml.sax.InputSource;
  */
 
 public class JspConfig {
-
-    private static final String WEB_XML = "/WEB-INF/web.xml";
 
     // Logger
     private final Log log = LogFactory.getLog(JspConfig.class);
@@ -75,23 +70,16 @@ public class JspConfig {
         return 2.3;
     }
 
-    private void processWebDotXml(ServletContext ctxt) throws JasperException {
+    private void processWebDotXml() throws JasperException {
 
-        InputStream is = null;
+        WebXml webXml = null;
 
         try {
-            URL uri = ctxt.getResource(WEB_XML);
-            if (uri == null) {
-                // no web.xml
-                return;
-            }
-
-            is = uri.openStream();
-            InputSource ip = new InputSource(is);
-            ip.setSystemId(uri.toExternalForm()); 
-
+            webXml = new WebXml(ctxt);
+            
             ParserUtils pu = new ParserUtils();
-            TreeNode webApp = pu.parseXMLDocument(WEB_XML, ip);
+            TreeNode webApp = pu.parseXMLDocument(webXml.getSystemId(),
+                    webXml.getInputSource());
 
             if (webApp == null
                     || getVersion(webApp) < 2.4) {
@@ -222,10 +210,8 @@ public class JspConfig {
         } catch (Exception ex) {
             throw new JasperException(ex);
         } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Throwable t) {}
+            if (webXml != null) {
+                webXml.close();
             }
         }
     }
@@ -235,7 +221,7 @@ public class JspConfig {
         if (!initialized) {
             synchronized (this) {
                 if (!initialized) {
-                    processWebDotXml(ctxt);
+                    processWebDotXml();
                     defaultJspProperty = new JspProperty(defaultIsXml,
                             defaultIsELIgnored,
                             defaultIsScriptingInvalid,
