@@ -35,7 +35,6 @@ import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.servlet.jsp.tagext.ValidationMessage;
 
-import org.apache.el.lang.ELSupport;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.el.ELContextImpl;
 import org.xml.sax.Attributes;
@@ -501,6 +500,9 @@ class Validator {
                 new JspUtil.ValidAttribute("doctype-root-element"),
                 new JspUtil.ValidAttribute("doctype-public"),
                 new JspUtil.ValidAttribute("doctype-system") };
+
+        private static final ExpressionFactory EXPRESSION_FACTORY =
+            ExpressionFactory.newInstance();
 
         /*
          * Constructor
@@ -1160,7 +1162,7 @@ class Validator {
                                     }
                                     // Check casting
                                     try {
-                                        ELSupport.checkType(attrs.getValue(i), expectedClass);
+                                        EXPRESSION_FACTORY.coerceToType(attrs.getValue(i), expectedClass);
                                     } catch (Exception e) {
                                         err.jspError
                                             (n, "jsp.error.coerce_to_type",
