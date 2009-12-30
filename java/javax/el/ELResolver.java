@@ -66,4 +66,12 @@ public abstract class ELResolver {
     public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
     
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
+    
+    public Object invoke(@SuppressWarnings("unused") ELContext context,
+            @SuppressWarnings("unused") Object base,
+            @SuppressWarnings("unused") Object method,
+            @SuppressWarnings("unused") Class<?>[] paramTypes,
+            @SuppressWarnings("unused") Object[] params) {
+        return null;
+    }
 }
