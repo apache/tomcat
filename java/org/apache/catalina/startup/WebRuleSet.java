@@ -160,6 +160,8 @@ public class WebRuleSet extends RuleSetBase {
                          new SetPublicIdRule("setPublicId"));
         digester.addRule(fullPrefix,
                          new IgnoreAnnotationsRule());
+        digester.addRule(fullPrefix,
+                new VersionRule());
 
         if (fragment) {
             // web-fragment.xml
@@ -1005,6 +1007,33 @@ final class IgnoreAnnotationsRule extends Rule {
     }
 
 }
+
+/**
+ * A Rule that records the spec version of the web.xml being parsed
+ * 
+ */
+
+final class VersionRule extends Rule {
+
+    public VersionRule() {
+        // NO-OP
+    }
+
+    @Override
+    public void begin(String namespace, String name, Attributes attributes)
+        throws Exception {
+        WebXml webxml = (WebXml) digester.peek(digester.getCount() - 1);
+        webxml.setVersion(attributes.getValue("version"));
+        
+        if (digester.getLogger().isDebugEnabled()) {
+            digester.getLogger().debug
+                (webxml.getClass().getName() + ".setVersion( " +
+                        webxml.getVersion() + ")");
+        }
+    }
+
+}
+
 
 /**
  * A rule that logs a warning if absolute ordering is configured.

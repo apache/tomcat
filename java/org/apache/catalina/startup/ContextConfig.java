@@ -1190,7 +1190,13 @@ public class ContextConfig
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
         
-        if (!webXml.isMetadataComplete()) {
+        // Assuming 0 is safe for what is required in this case
+        double webXmlVersion = 0;
+        if (webXml.getVersion() != null) {
+            webXmlVersion = Double.parseDouble(webXml.getVersion());
+        }
+        
+        if (webXmlVersion >= 3 && !webXml.isMetadataComplete()) {
             // Process /WEB-INF/classes for annotations
             URL webinfClasses;
             try {
@@ -1219,19 +1225,21 @@ public class ContextConfig
 
             // Apply merged web.xml to Context
             webXml.configureContext(context);
+            
+            // Make the merged web.xml available to other components,
+            // specifically Jasper, to save those components from having to
+            // re-generate it.
+            String mergedWebXml = webXml.toXml();
+            context.getServletContext().setAttribute(
+                   org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
+                    mergedWebXml);
+            if (context.getLogEffectiveWebXml()) {
+                log.info("web.xml:\n" + mergedWebXml);
+            }
         } else {
-            // Apply merged web.xml to Context
+            // Apply unmerged web.xml to Context
             webXml.configureContext(context);
-        }
-        // Make the merged web.xml available to other components, specifically
-        // Jasper, to save those components from having to re-generate it.
-        String mergedWebXml = webXml.toXml();
-        context.getServletContext().setAttribute(
-               org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
-                mergedWebXml);
-        if (context.getLogEffectiveWebXml()) {
-            log.info("web.xml:\n" + mergedWebXml);
-        }
+        }        
     }
 
     
