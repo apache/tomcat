@@ -261,8 +261,14 @@ public final class CGIServlet extends HttpServlet {
     private String cgiExecutable = "perl";
     
     /** the encoding to use for parameters */
-    private String parameterEncoding = System.getProperty("file.encoding",
-                                                          "UTF-8");
+    private String parameterEncoding =
+        System.getProperty("file.encoding", "UTF-8");
+
+    /**
+     * The time (in milliseconds) to wait for the reading of stdErr to complete
+     * before terminating the CGI process.
+     */
+    private long stderrTimeout = 2000;
 
     /** object used to ensure multiple threads don't try to expand same file */
     static Object expandFileLock = new Object();
@@ -307,6 +313,11 @@ public final class CGIServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("parameterEncoding") != null) {
             parameterEncoding = getServletConfig().getInitParameter("parameterEncoding");
+        }
+
+        if (getServletConfig().getInitParameter("stderrTimeout") != null) {
+            stderrTimeout = Long.parseLong(getServletConfig().getInitParameter(
+                    "stderrTimeout"));
         }
 
     }
@@ -1588,6 +1599,7 @@ public final class CGIServlet extends HttpServlet {
             BufferedReader cgiHeaderReader = null;
             InputStream cgiOutput = null;
             BufferedReader commandsStdErr = null;
+            Thread errReaderThread = null;
             BufferedOutputStream commandsStdIn = null;
             Process proc = null;
             int bufRead = -1;
@@ -1645,12 +1657,13 @@ public final class CGIServlet extends HttpServlet {
                     (new InputStreamReader(proc.getErrorStream()));
                 final BufferedReader stdErrRdr = commandsStdErr ;
 
-                new Thread() {
+                errReaderThread = new Thread() {
                     @Override
                     public void run () {
                         sendToLog(stdErrRdr) ;
                     }
-                }.start() ;
+                };
+                errReaderThread.start();
 
                 InputStream cgiHeaderStream =
                     new HTTPHeaderInputStream(proc.getInputStream());
@@ -1741,6 +1754,14 @@ public final class CGIServlet extends HttpServlet {
                         cgiOutput.close();
                     } catch (IOException ioe) {
                         log ("Exception closing output stream " + ioe);
+                    }
+                }
+                // Make sure the error stream reader has finished
+                if (errReaderThread != null) {
+                    try {
+                        errReaderThread.join(stderrTimeout);
+                    } catch (InterruptedException e) {
+                        log ("Interupted waiting for stderr reader thread");
                     }
                 }
                 if (debug > 4) {
