@@ -244,6 +244,8 @@ public final class CGIServlet extends HttpServlet {
 
     /* some vars below copied from Craig R. McClanahan's InvokerServlet */
 
+    private static final long serialVersionUID = 1L;
+
     /** the debugging detail level for this servlet. */
     private int debug = 0;
 
@@ -327,7 +329,9 @@ public final class CGIServlet extends HttpServlet {
      *
      */
     protected void printServletEnvironment(ServletOutputStream out,
-        HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpServletRequest req,
+        @SuppressWarnings("unused") HttpServletResponse res)
+    throws IOException {
 
         // Document the properties from ServletRequest
         out.println("<h1>ServletRequest Properties</h1>");
@@ -867,21 +871,21 @@ public final class CGIServlet extends HttpServlet {
             }
             if (!currentLocation.isFile()) {
                 return new String[] { null, null, null, null };
-            } else {
-                if (debug >= 2) {
-                    log("findCGI: FOUND cgi at " + currentLocation);
-                }
-                path = currentLocation.getAbsolutePath();
-                name = currentLocation.getName();
+            }
 
-                if (".".equals(contextPath)) {
-                    scriptname = servletPath;
-                } else {
-                    scriptname = contextPath + servletPath;
-                }
-                if (!servletPath.equals(cginame)) {
-                    scriptname = scriptname + cginame;
-                }
+            if (debug >= 2) {
+                log("findCGI: FOUND cgi at " + currentLocation);
+            }
+            path = currentLocation.getAbsolutePath();
+            name = currentLocation.getName();
+
+            if (".".equals(contextPath)) {
+                scriptname = servletPath;
+            } else {
+                scriptname = contextPath + servletPath;
+            }
+            if (!servletPath.equals(cginame)) {
+                scriptname = scriptname + cginame;
             }
 
             if (debug >= 1) {
