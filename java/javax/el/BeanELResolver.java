@@ -22,6 +22,7 @@ import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -354,8 +355,90 @@ public class BeanELResolver extends ELResolver {
 	@Override
     public Object invoke(ELContext context, Object base, Object method,
             Class<?>[] paramTypes, Object[] params) {
-        // TODO 
-        return null;
+        if (context == null) {
+            throw new NullPointerException();
+        }
+	    if (base == null || method == null) {
+	        return null;
+	    }
+
+	    ExpressionFactory factory = ExpressionFactory.newInstance();
+        
+	    String methodName = (String) factory.coerceToType(method, String.class);
+	    
+	    // Find the matching method
+	    Method matchingMethod = null;
+	    Class<?> clazz = base.getClass();
+	    if (paramTypes != null) {
+	        try {
+	            matchingMethod = clazz.getMethod(methodName, paramTypes);
+	        } catch (NoSuchMethodException e) {
+	            throw new MethodNotFoundException(e);
+	        }
+	    } else {
+	        int paramCount = 0;
+	        if (params != null) {
+	            paramCount = params.length;
+	        }
+	        Method[] methods = clazz.getMethods();
+	        for (Method m : methods) {
+	            if (m.getParameterTypes().length == paramCount) {
+	                // Same number of parameters - use the first match
+	                matchingMethod = m;
+	                break;
+	            }
+	            if (m.isVarArgs()) {
+                    matchingMethod = m;
+	            }
+	        }
+	        if (matchingMethod == null) {
+	            throw new MethodNotFoundException(
+	                    "Unable to find method [" + methodName + "] with ["
+	                    + paramCount + "] parameters");
+	        }
+	    }
+
+	    Class<?>[] parameterTypes = matchingMethod.getParameterTypes();
+	    Object[] parameters = null;
+	    if (parameterTypes.length >0) {
+	        parameters = new Object[parameterTypes.length];
+	        if (matchingMethod.isVarArgs()) {
+	            int varArgIndex = parameterTypes.length - 1;
+	            int paramCount = params.length;
+	            // First argCount-1 parameters are standard
+                for (int i = 0; (i < varArgIndex - 1); i++) {
+                    parameters[i] = factory.coerceToType(params[i],
+                            parameterTypes[i]);
+                }
+                // Last parameter is the varags
+                Class<?> varArgClass =
+                    parameterTypes[varArgIndex].getComponentType();
+                for (int i = (varArgIndex); i < paramCount; i++) {
+                    Object varargs = Array.newInstance(
+                            parameterTypes[paramCount],
+                            (paramCount - varArgIndex));
+                    Array.set(varargs, i,
+                            factory.coerceToType(params[i], varArgClass));
+                    parameters[varArgIndex] = varargs;
+                }
+	        } else {
+    	        parameters = new Object[parameterTypes.length];
+    	        for (int i = 0; i < parameterTypes.length; i++) {
+    	            parameters[i] = factory.coerceToType(params[i],
+    	                    parameterTypes[i]);
+    	        }
+	        }
+	    }
+	    try {
+            return matchingMethod.invoke(base, parameters);
+        } catch (IllegalArgumentException e) {
+            throw new ELException(e);
+        } catch (IllegalAccessException e) {
+            throw new ELException(e);
+        } catch (InvocationTargetException e) {
+            throw new ELException(e.getCause());
+        }
+	    
     }
 
 }
