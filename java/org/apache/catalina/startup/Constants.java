@@ -49,6 +49,11 @@ public final class Constants {
     public static final String JavaeeSchemaResourcePath_5 =
         "/javax/servlet/resources/javaee_5.xsd";
 
+    public static final String JavaeeSchemaPublicId_6 =
+        "javaee_6.xsd";
+    public static final String JavaeeSchemaResourcePath_6 =
+        "/javax/servlet/resources/javaee_6.xsd";
+
     
     // W3C
     public static final String W3cSchemaPublicId_10 =
@@ -77,7 +82,12 @@ public final class Constants {
         "jsp_2_1.xsd";
     public static final String JspSchemaResourcePath_21 =
         "/javax/servlet/jsp/resources/jsp_2_1.xsd";
-    
+
+    public static final String JspSchemaPublicId_22 =
+        "jsp_2_2.xsd";
+    public static final String JspSchemaResourcePath_22 =
+        "/javax/servlet/jsp/resources/jsp_2_2.xsd";
+
 
     // TLD
     public static final String TldDtdPublicId_11 =
@@ -122,6 +132,20 @@ public final class Constants {
     public static final String WebSchemaResourcePath_25 =
         "/javax/servlet/resources/web-app_2_5.xsd";
 
+    public static final String WebSchemaPublicId_30 =
+        "web-app_3_0.xsd";
+    public static final String WebSchemaResourcePath_30 =
+        "/javax/servlet/resources/web-app_3_0.xsd";
+
+    public static final String WebCommonSchemaPublicId_30 =
+        "web-common_3_0.xsd";
+    public static final String WebCommonSchemaResourcePath_30 =
+        "/javax/servlet/resources/web-common_3_0.xsd";
+
+    public static final String WebFragmentSchemaPublicId_30 =
+        "web-fragment_3_0.xsd";
+    public static final String WebFragmentSchemaResourcePath_30 =
+        "/javax/servlet/resources/web-fragment_3_0.xsd";
     
     // Web service
     public static final String J2eeWebServiceSchemaPublicId_11 =
@@ -143,5 +167,15 @@ public final class Constants {
         "javaee_web_services_client_1_2.xsd";
     public static final String JavaeeWebServiceClientSchemaResourcePath_12 =
         "/javax/servlet/resources/javaee_web_services_client_1_2.xsd";
+
+    public static final String JavaeeWebServiceSchemaPublicId_13 =
+        "javaee_web_services_1_3.xsd";
+    public static final String JavaeeWebServiceSchemaResourcePath_13 =
+        "/javax/servlet/resources/javaee_web_services_1_3.xsd";
+
+    public static final String JavaeeWebServiceClientSchemaPublicId_13 =
+        "javaee_web_services_client_1_3.xsd";
+    public static final String JavaeeWebServiceClientSchemaResourcePath_13 =
+        "/javax/servlet/resources/javaee_web_services_client_1_3.xsd";
 
 }

@@ -95,6 +95,10 @@ public class DigesterFactory {
                 Constants.JavaeeSchemaPublicId_5,
                 schemaResolver);
 
+        register(Constants.JavaeeSchemaResourcePath_6,
+                Constants.JavaeeSchemaPublicId_6,
+                schemaResolver);
+
         // W3C
         register(Constants.W3cSchemaResourcePath_10,
                  Constants.W3cSchemaPublicId_10,
@@ -115,6 +119,10 @@ public class DigesterFactory {
 
         register(Constants.JspSchemaResourcePath_21,
                 Constants.JspSchemaPublicId_21,
+                schemaResolver);
+
+        register(Constants.JspSchemaResourcePath_22,
+                Constants.JspSchemaPublicId_22,
                 schemaResolver);
 
         // TLD
@@ -151,6 +159,18 @@ public class DigesterFactory {
                 Constants.WebSchemaPublicId_25,
                 schemaResolver);
 
+        register(Constants.WebSchemaResourcePath_30,
+                Constants.WebSchemaPublicId_30,
+                schemaResolver);
+
+        register(Constants.WebCommonSchemaResourcePath_30,
+                Constants.WebCommonSchemaPublicId_30,
+                schemaResolver);
+        
+        register(Constants.WebFragmentSchemaResourcePath_30,
+                Constants.WebFragmentSchemaPublicId_30,
+                schemaResolver);
+
         // Web Service
         register(Constants.J2eeWebServiceSchemaResourcePath_11,
                  Constants.J2eeWebServiceSchemaPublicId_11,
@@ -168,6 +188,13 @@ public class DigesterFactory {
                 Constants.JavaeeWebServiceClientSchemaPublicId_12,
                 schemaResolver);
 
+        register(Constants.JavaeeWebServiceSchemaResourcePath_13,
+                Constants.JavaeeWebServiceSchemaPublicId_13,
+                schemaResolver);
+
+        register(Constants.JavaeeWebServiceClientSchemaResourcePath_13,
+                Constants.JavaeeWebServiceClientSchemaPublicId_13,
+                schemaResolver);
     }
 
 
