@@ -79,19 +79,40 @@
 
   <!-- Files that need to have their line endings changed for src distros -->
   <patternset id="src.files" >
-    <include name="**/INSTALLLICENSE,**/KEYS,**/LICENSE,**/NOTICE"/>
+    <include name="**/INSTALLLICENSE"/>
+    <include name="**/KEYS"/>
+    <include name="**/LICENSE"/>
+    <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
-    <include name="**/*.bat,**/*.dtd"/>
-    <include name="**/*.htm,**/*.html"/>
-    <include name="**/*.ini,**/*.java,**/*.jjt"/>
-    <include name="**/*.jsp,**/*.jspf,**/*.jspx"/>
-    <include name="**/*.license,**/*.manifest,**/*.mdl,**/*.nsi"/>
-    <include name="**/*.policy,**/*.pom,**/*.properties"/>
+    <include name="**/*.bat"/>
+    <include name="**/*.dtd"/>
+    <include name="**/*.htm"/>
+    <include name="**/*.html"/>
+    <include name="**/*.ini"/>
+    <include name="**/*.java"/>
+    <include name="**/*.jjt"/>
+    <include name="**/*.jsp"/>
+    <include name="**/*.jspf"/>
+    <include name="**/*.jspx"/>
+    <include name="**/*.license"/>
+    <include name="**/*.manifest"/>
+    <include name="**/*.mdl"/>
+    <include name="**/*.nsi"/>
+    <include name="**/*.policy"/>
+    <include name="**/*.pom"/>
+    <include name="**/*.properties"/>
     <include name="**/*.properties.default"/>
-    <include name="**/*.rtf,**/*.sh,**/*.svg"/>
-    <include name="**/*.tag,**/*.tagx"/>
-    <include name="**/*.tasks,**/*.tld,**/*.txt"/>
-    <include name="**/*.xml,**/*.xsd,**/*.xsl"/>
+    <include name="**/*.rtf"/>
+    <include name="**/*.sh"/>
+    <include name="**/*.svg"/>
+    <include name="**/*.tag"/>
+    <include name="**/*.tagx"/>
+    <include name="**/*.tasks"/>
+    <include name="**/*.tld"/>
+    <include name="**/*.txt"/>
+    <include name="**/*.xml"/>
+    <include name="**/*.xsd"/>
+    <include name="**/*.xsl"/>
   </patternset>
 
   <!-- ====================== COMBO: Clean All Directories ================ -->
@@ -600,7 +621,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="package-src-zip">
     <fixcrlf srcdir="${tomcat.dist}/src" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
-      <patternset id="src.files"/>
+      <patternset refid="src.files"/>
     </fixcrlf>
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip">
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
@@ -615,7 +636,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="package-src-tgz">
     <fixcrlf srcdir="${tomcat.dist}/src" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
-      <patternset id="src.files"/>
+      <patternset refid="src.files"/>
     </fixcrlf>
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
