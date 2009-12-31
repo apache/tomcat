@@ -38,6 +38,48 @@ public final class Constants {
     public static final String HostContextXml = "context.xml.default";
     public static final String HostWebXml = "web.xml.default";
 
+    // J2EE
+    public static final String J2eeSchemaPublicId_14 =
+        "j2ee_1_4.xsd";
+    public static final String J2eeSchemaResourcePath_14 =
+        "/javax/servlet/resources/j2ee_1_4.xsd";
+
+    public static final String JavaeeSchemaPublicId_5 =
+        "javaee_5.xsd";
+    public static final String JavaeeSchemaResourcePath_5 =
+        "/javax/servlet/resources/javaee_5.xsd";
+
+    
+    // W3C
+    public static final String W3cSchemaPublicId_10 =
+        "xml.xsd";
+    public static final String W3cSchemaResourcePath_10 =
+        "/javax/servlet/resources/xml.xsd";
+
+    public static final String W3cSchemaDTDPublicId_10 =
+        "XMLSchema.dtd";
+    public static final String W3cSchemaDTDResourcePath_10 =
+        "/javax/servlet/resources/XMLSchema.dtd";
+
+    public static final String W3cDatatypesDTDPublicId_10 =
+        "datatypes.dtd";
+    public static final String W3cDatatypesDTDResourcePath_10 =
+        "/javax/servlet/resources/datatypes.dtd";
+
+    
+    // JSP
+    public static final String JspSchemaPublicId_20 =
+        "jsp_2_0.xsd";
+    public static final String JspSchemaResourcePath_20 =
+        "/javax/servlet/jsp/resources/jsp_2_0.xsd";
+    
+    public static final String JspSchemaPublicId_21 =
+        "jsp_2_1.xsd";
+    public static final String JspSchemaResourcePath_21 =
+        "/javax/servlet/jsp/resources/jsp_2_1.xsd";
+    
+
+    // TLD
     public static final String TldDtdPublicId_11 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
     public static final String TldDtdResourcePath_11 =
@@ -58,6 +100,8 @@ public final class Constants {
     public static final String TldSchemaResourcePath_21 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_2_1.xsd";
 
+    
+    // web.xml
     public static final String WebDtdPublicId_22 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
     public static final String WebDtdResourcePath_22 =
@@ -78,41 +122,8 @@ public final class Constants {
     public static final String WebSchemaResourcePath_25 =
         "/javax/servlet/resources/web-app_2_5.xsd";
 
-    public static final String J2eeSchemaPublicId_14 =
-        "j2ee_1_4.xsd";
-    public static final String J2eeSchemaResourcePath_14 =
-        "/javax/servlet/resources/j2ee_1_4.xsd";
-
-    public static final String JavaeeSchemaPublicId_5 =
-        "javaee_5.xsd";
-    public static final String JavaeeSchemaResourcePath_5 =
-        "/javax/servlet/resources/javaee_5.xsd";
-
-    public static final String W3cSchemaPublicId_10 =
-        "xml.xsd";
-    public static final String W3cSchemaResourcePath_10 =
-        "/javax/servlet/resources/xml.xsd";
-
-    public static final String W3cSchemaDTDPublicId_10 =
-        "XMLSchema.dtd";
-    public static final String W3cSchemaDTDResourcePath_10 =
-        "/javax/servlet/resources/XMLSchema.dtd";
-
-    public static final String W3cDatatypesDTDPublicId_10 =
-        "datatypes.dtd";
-    public static final String W3cDatatypesDTDResourcePath_10 =
-        "/javax/servlet/resources/datatypes.dtd";
-
-    public static final String JspSchemaPublicId_20 =
-        "jsp_2_0.xsd";
-    public static final String JspSchemaResourcePath_20 =
-        "/javax/servlet/jsp/resources/jsp_2_0.xsd";
     
-    public static final String JspSchemaPublicId_21 =
-        "jsp_2_1.xsd";
-    public static final String JspSchemaResourcePath_21 =
-        "/javax/servlet/jsp/resources/jsp_2_1.xsd";
-    
+    // Web service
     public static final String J2eeWebServiceSchemaPublicId_11 =
             "j2ee_web_services_1_1.xsd";
     public static final String J2eeWebServiceSchemaResourcePath_11 =
