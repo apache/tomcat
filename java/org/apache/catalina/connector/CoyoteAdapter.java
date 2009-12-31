@@ -30,6 +30,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.core.AsyncContextImpl;
+import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
@@ -54,9 +55,13 @@ import org.apache.tomcat.util.net.SocketStatus;
  * @version $Revision$ $Date$
  */
 
-public class CoyoteAdapter
-    implements Adapter 
- {
+public class CoyoteAdapter implements Adapter {
+    
+    private static final String POWERED_BY = "Servlet/3.0 JSP/2.2 " +
+            "(" + ServerInfo.getServerInfo() + " Java/" +
+            System.getProperty("java.vm.vendor") + "/" +
+            System.getProperty("java.runtime.version") + ")";
+
     private static final Log log = LogFactory.getLog(CoyoteAdapter.class);
 
     // -------------------------------------------------------------- Constants
@@ -367,7 +372,7 @@ public class CoyoteAdapter
         }
 
         if (connector.getXpoweredBy()) {
-            response.addHeader("X-Powered-By", "Servlet/2.5");
+            response.addHeader("X-Powered-By", POWERED_BY);
         }
 
         boolean comet = false;
