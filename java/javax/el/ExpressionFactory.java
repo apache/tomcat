@@ -40,8 +40,7 @@ public abstract class ExpressionFactory {
 
     private static final String SEP = System.getProperty("file.separator");
     private static final String PROPERTY_FILE =
-        System.getProperty("java.home") + "jre" + SEP + "lib" + SEP +
-        "el.properties";
+        System.getProperty("java.home") + "lib" + SEP + "el.properties";
     private static final String PROPERTY_NAME = "javax.el.ExpressionFactory";
 
     public abstract Object coerceToType(Object obj, Class<?> expectedType)
