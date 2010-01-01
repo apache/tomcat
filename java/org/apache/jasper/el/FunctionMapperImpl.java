@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import javax.servlet.jsp.el.FunctionMapper;
 
+@Deprecated
 public final class FunctionMapperImpl extends javax.el.FunctionMapper {
 	
 	private final FunctionMapper fnMapper;
