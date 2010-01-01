@@ -25,7 +25,7 @@ import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.FunctionMapper;
 import javax.servlet.jsp.el.VariableResolver;
 
-
+@Deprecated
 public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
 
 	private final ExpressionFactory factory;
