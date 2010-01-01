@@ -217,6 +217,8 @@ public abstract class JspContext {
     abstract public JspWriter getOut();
     
     /**
+     * @deprecated As of JSP 2.1, replaced by
+     *             JspApplicationContext.getExpressionFactory()
      * Provides programmatic access to the ExpressionEvaluator.
      * The JSP Container must return a valid instance of an 
      * ExpressionEvaluator that can parse EL expressions.
@@ -224,12 +226,17 @@ public abstract class JspContext {
      * @return A valid instance of an ExpressionEvaluator.
      * @since 2.0
      */
+    @Deprecated
     public abstract ExpressionEvaluator getExpressionEvaluator();
     
     
     public abstract ELContext getELContext();
     
     /**
+     * @deprecated As of JSP 2.1,
+     *             replaced by javax.el.ELContext.getELResolver()
+     *             which can be obtained by
+     *             jspContext.getELContext().getELResolver()
      * Returns an instance of a VariableResolver that provides access to the
      * implicit objects specified in the JSP specification using this JspContext
      * as the context object.
@@ -237,6 +244,7 @@ public abstract class JspContext {
      * @return A valid instance of a VariableResolver.
      * @since 2.0
      */
+    @Deprecated
     public abstract VariableResolver getVariableResolver();
     
     /**
