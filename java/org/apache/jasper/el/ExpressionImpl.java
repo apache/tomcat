@@ -22,6 +22,7 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.Expression;
 import javax.servlet.jsp.el.VariableResolver;
 
+@Deprecated
 public final class ExpressionImpl extends Expression {
 
 	private final ValueExpression ve;
