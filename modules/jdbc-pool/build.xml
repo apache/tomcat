@@ -29,7 +29,7 @@
 
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat JDBC Pool" />
-  <property name="year"                  value="2009" />
+  <property name="year"                  value="2010" />
 
   <property name="project"               value="apache-tomcat-jdbc-pool" />
   <property name="final.name"            value="${project}-${version}" />
