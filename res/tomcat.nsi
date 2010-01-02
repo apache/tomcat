@@ -25,7 +25,7 @@
   ;Product information
   VIAddVersionKey ProductName "Apache Tomcat"
   VIAddVersionKey CompanyName "Apache Software Foundation"
-  VIAddVersionKey LegalCopyright "Copyright (c) 1999-2009 The Apache Software Foundation"
+  VIAddVersionKey LegalCopyright "Copyright (c) 1999-2010 The Apache Software Foundation"
   VIAddVersionKey FileDescription "Apache Tomcat Installer"
   VIAddVersionKey FileVersion "2.0"
   VIAddVersionKey ProductVersion "@VERSION@"
