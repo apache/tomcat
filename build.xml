@@ -120,6 +120,7 @@
     <format property="TSTAMP" pattern="hh:mm:ss"/>
   </tstamp>
   <filterset id="version.filters">
+    <filter token="YEAR" value="${year}"/>
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_NUMBER" value="${version.number}"/>
     <filter token="VERSION_MAJOR" value="${version.major}"/>
