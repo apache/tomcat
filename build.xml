@@ -21,15 +21,26 @@
 
   <!-- ===================== Initialize Property Values =================== -->
 
-  <!-- property values you must customize for successful building!!!        -->
+  <!-- We read customizable properties from the file "build.properties.default" -->
+  <!-- and also from "build.properties" if it exists.                           -->
+  <!-- The values in "build.properties" have stronger preference.               -->
+  <!-- If you want to customize your build, you can either change the values    -->
+  <!-- directly in the default file, or create a new build.properties and set   -->
+  <!-- the values there. This way you don't have to change a file which is part -->
+  <!-- of the original project source code.                                     -->
+  <!-- See "build.properties.default" for some property values you may          -->
+  <!-- customize.                                                               -->
   <property file="${user.home}/build.properties"/>
   <property file="${basedir}/build.properties"/>
   <property file="${basedir}/build.properties.default"/>
-  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat JDBC Pool" />
-  <property name="year"                  value="2010" />
+  <tstamp>
+    <format property="year" pattern="yyyy" locale="en"/>
+  </tstamp>
 
   <property name="project"               value="apache-tomcat-jdbc-pool" />
   <property name="final.name"            value="${project}-${version}" />
@@ -65,11 +76,24 @@
     <pathelement location="${h2.jar}"/>
   </path>
   
+  <!-- Version info filter set -->
+  <tstamp>
+    <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
+    <format property="TSTAMP" pattern="hh:mm:ss"/>
+  </tstamp>
+  <filterset id="version.filters">
+    <filter token="YEAR" value="${year}"/>
+    <filter token="VERSION" value="${version}"/>
+    <filter token="VERSION_MAJOR" value="${version.major}"/>
+    <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
+    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
+    <filter token="TOMCAT_PROJECT_DEST" value="${tomcat.project.dest}"/>
+  </filterset>
+
   <target name="prepare">
     <mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.classes}"/>
     <mkdir dir="${tomcat.testclasses}"/>
-    <property name="project.xml" location="${tomcat.project.dest}"/>
     <copy todir="${tomcat.pool}">
       <fileset dir="${basedir}">
         <include name="LICENSE"/>
@@ -78,10 +102,7 @@
         <include name="doc/*.xml"/>
         <include name="resources/MANIFEST.MF"/>
       </fileset>
-      <filterset>
-        <filter token="tomcat.project.dest" value="${project.xml}"/>
-        <filter token="version" value="${version}"/>
-      </filterset>  
+      <filterset refid="version.filters"/>
     </copy>
   </target>
 
