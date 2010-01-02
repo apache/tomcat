@@ -144,4 +144,4 @@ set PR_STDERROR=auto
 echo The service '%SERVICE_NAME%' has been installed.
 
 :end
-cd %CURRENT_DIR%
+cd "%CURRENT_DIR%"
