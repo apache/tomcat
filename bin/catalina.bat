@@ -80,7 +80,7 @@ set CATALINA_HOME=%CURRENT_DIR%
 if exist "%CATALINA_HOME%\bin\catalina.bat" goto okHome
 cd ..
 set CATALINA_HOME=%cd%
-cd %CURRENT_DIR%
+cd "%CURRENT_DIR%"
 :gotHome
 if exist "%CATALINA_HOME%\bin\catalina.bat" goto okHome
 echo The CATALINA_HOME environment variable is not defined correctly
