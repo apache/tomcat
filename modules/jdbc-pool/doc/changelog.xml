@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <!DOCTYPE document [
-  <!ENTITY project SYSTEM "@tomcat.project.dest@">
+  <!ENTITY project SYSTEM "@TOMCAT_PROJECT_DEST@">
 ]>
 <document url="changelog.html">
 
