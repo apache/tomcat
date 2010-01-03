@@ -1525,11 +1525,8 @@ class Validator {
                             err.jspError(n, "jsp.error.noFunctionPrefix",
                                     function);
                         } else {
-                            err
-                                    .jspError(
-                                            n,
-                                            "jsp.error.attribute.invalidPrefix",
-                                            prefix);
+                            err.jspError(n, "jsp.error.attribute.invalidPrefix",
+                                    prefix);
                         }
                     }
                     TagLibraryInfo taglib = pageInfo.getTaglib(uri);
