@@ -128,8 +128,7 @@ public class PageContextImpl extends PageContext {
 
 	private void _initialize(Servlet servlet, ServletRequest request,
 			ServletResponse response, String errorPageURL,
-			boolean needsSession, int bufferSize, boolean autoFlush)
-			throws IOException {
+			boolean needsSession, int bufferSize, boolean autoFlush) {
 
 		// initialize state
 		this.servlet = servlet;

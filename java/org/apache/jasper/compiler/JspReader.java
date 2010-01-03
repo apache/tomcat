@@ -128,7 +128,7 @@ class JspReader {
                      String encoding,
                      InputStreamReader reader,
                      ErrorDispatcher err)
-            throws JasperException, FileNotFoundException {
+            throws JasperException {
 
         this.context = ctxt;
         this.err = err;
@@ -532,8 +532,7 @@ class JspReader {
      * current position in the current file is remembered.
      */
     private void pushFile(String file, String encoding, 
-                           InputStreamReader reader) 
-                throws JasperException, FileNotFoundException {
+                           InputStreamReader reader) throws JasperException {
 
         // Register the file
         String longName = file;
