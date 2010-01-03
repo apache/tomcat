@@ -246,13 +246,19 @@ abstract class ELNode {
             n.getExpression().visit(this);
         }
 
+        @SuppressWarnings("unused")
         public void visit(Function n) throws JasperException {
+            // NOOP by default
         }
 
+        @SuppressWarnings("unused")
         public void visit(Text n) throws JasperException {
+            // NOOP by default
         }
 
+        @SuppressWarnings("unused")
         public void visit(ELText n) throws JasperException {
+            // NOOP by default
         }
     }
 }
