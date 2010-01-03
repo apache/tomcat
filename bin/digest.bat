@@ -33,11 +33,11 @@ echo This environment variable is needed to run this program
 goto end
 :okHome
 
-set EXECUTABLE=%CATALINA_HOME%\bin\tool-wrapper.bat
+set "EXECUTABLE=%CATALINA_HOME%\bin\tool-wrapper.bat"
 
 rem Check that target executable exists
 if exist "%EXECUTABLE%" goto okExec
-echo Cannot find %EXECUTABLE%
+echo Cannot find "%EXECUTABLE%"
 echo This file is needed to run this program
 goto end
 :okExec
