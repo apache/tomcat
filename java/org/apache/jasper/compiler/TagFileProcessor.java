@@ -352,28 +352,6 @@ class TagFileProcessor {
                     nameFromAttribute, className, declare, scope));
         }
 
-        /*
-         * Returns the vector of attributes corresponding to attribute
-         * directives.
-         */
-        public Vector<TagAttributeInfo> getAttributesVector() {
-            return attributeVector;
-        }
-
-        /*
-         * Returns the vector of variables corresponding to variable directives.
-         */
-        public Vector<TagVariableInfo> getVariablesVector() {
-            return variableVector;
-        }
-
-        /*
-         * Returns the value of the dynamic-attributes tag directive attribute.
-         */
-        public String getDynamicAttributesMapName() {
-            return dynamicAttrsMapName;
-        }
-
         public TagInfo getTagInfo() throws JasperException {
 
             if (name == null) {
