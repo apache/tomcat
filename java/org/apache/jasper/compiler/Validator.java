@@ -84,7 +84,7 @@ class Validator {
         /*
          * Constructor
          */
-        DirectiveVisitor(Compiler compiler) throws JasperException {
+        DirectiveVisitor(Compiler compiler) {
             this.pageInfo = compiler.getPageInfo();
             this.err = compiler.getErrorDispatcher();
         }
