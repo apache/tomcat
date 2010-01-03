@@ -40,7 +40,7 @@ if not exist "%JAVA_HOME%\bin\javaw.exe" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\jdb.exe" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
 if not "%JRE_HOME%" == "" goto okJavaHome
-set JRE_HOME=%JAVA_HOME%
+set "JRE_HOME=%JAVA_HOME%"
 goto okJavaHome
 
 :noJavaHome
@@ -64,7 +64,7 @@ goto exit
 rem Don't override the endorsed dir if the user has set it previously
 if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
 rem Set the default -Djava.endorsed.dirs argument
-set JAVA_ENDORSED_DIRS=%BASEDIR%\endorsed
+set "JAVA_ENDORSED_DIRS=%BASEDIR%\endorsed"
 :gotEndorseddir
 
 rem Set standard command for invoking Java.
