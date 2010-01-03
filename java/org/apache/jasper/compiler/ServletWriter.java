@@ -16,7 +16,6 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
@@ -44,7 +43,7 @@ public class ServletWriter {
 	this.writer = writer;
     }
 
-    public void close() throws IOException {
+    public void close() {
 	writer.close();
     }
 
