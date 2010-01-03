@@ -677,6 +677,7 @@ public class PageContextImpl extends PageContext {
 	}
 
 	@Override
+	@Deprecated
     public VariableResolver getVariableResolver() {
 		return new VariableResolverImpl(this.getELContext());
 	}
@@ -787,6 +788,7 @@ public class PageContextImpl extends PageContext {
 	 * parse EL expressions.
 	 */
 	@Override
+	@Deprecated
     public ExpressionEvaluator getExpressionEvaluator() {
 		return new ExpressionEvaluatorImpl(this.applicationContext.getExpressionFactory());
 	}
