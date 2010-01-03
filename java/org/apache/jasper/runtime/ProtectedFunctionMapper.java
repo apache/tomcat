@@ -186,6 +186,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
      * @return the result of the method mapping. Null means no entry found.
      */
     @Override
+    @Deprecated
     public Method resolveFunction(String prefix, String localName) {
         if (this.fnmap != null) {
             return this.fnmap.get(prefix + ":" + localName);
