@@ -54,21 +54,21 @@ if exist "%CATALINA_HOME%\bin\setenv.bat" call "%CATALINA_HOME%\bin\setenv.bat"
 
 rem Get standard Java environment variables
 if exist "%CATALINA_HOME%\bin\setclasspath.bat" goto okSetclasspath
-echo Cannot find %CATALINA_HOME%\bin\setclasspath.bat
+echo Cannot find "%CATALINA_HOME%\bin\setclasspath.bat"
 echo This file is needed to run this program
 goto end
 :okSetclasspath
-set BASEDIR=%CATALINA_HOME%
+set "BASEDIR=%CATALINA_HOME%"
 call "%CATALINA_HOME%\bin\setclasspath.bat"
 
 rem Add on extra jar files to CLASSPATH
 rem Note that there are no quotes as we do not want to introduce random
 rem quotes into the CLASSPATH
 if "%CLASSPATH%" == "" goto noclasspath
-set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar;%BASEDIR%\lib\servlet-api.jar
+set "CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar;%BASEDIR%\lib\servlet-api.jar"
 goto okclasspath
 :noclasspath
-set CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%BASEDIR%\lib\servlet-api.jar
+set "CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%BASEDIR%\lib\servlet-api.jar"
 :okclasspath
 
 rem Get remaining unshifted command line arguments and save them in the
