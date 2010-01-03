@@ -205,7 +205,7 @@ public class JspCompilationContext {
      * is not done yet. Right now we're just hardcoding the actual
      * compilers that are created. 
      */
-    public Compiler createCompiler() throws JasperException {
+    public Compiler createCompiler() {
         if (jspCompiler != null ) {
             return jspCompiler;
         }
@@ -606,9 +606,7 @@ public class JspCompilationContext {
 
     // ==================== Manipulating the class ====================
 
-    public Class<?> load() 
-        throws JasperException, FileNotFoundException
-    {
+    public Class<?> load() throws JasperException {
         try {
             getJspLoader();
             

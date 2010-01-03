@@ -86,8 +86,7 @@ public class JspServletWrapper {
      * JspServletWrapper for JSP pages.
      */
     public JspServletWrapper(ServletConfig config, Options options, String jspUri,
-                      boolean isErrorPage, JspRuntimeContext rctxt)
-            throws JasperException {
+                      boolean isErrorPage, JspRuntimeContext rctxt) {
 
         this.isTagFile = false;
         this.config = config;
@@ -106,8 +105,7 @@ public class JspServletWrapper {
                              String tagFilePath,
                              TagInfo tagInfo,
                              JspRuntimeContext rctxt,
-                             URL tagFileJarUrl)
-            throws JasperException {
+                             URL tagFileJarUrl) {
 
         this.isTagFile = true;
         this.config = null;        // not used
@@ -127,9 +125,7 @@ public class JspServletWrapper {
         this.reload = reload;
     }
 
-    public Servlet getServlet()
-        throws ServletException, IOException, FileNotFoundException
-    {
+    public Servlet getServlet() throws ServletException {
         if (reload) {
             synchronized (this) {
                 // Synchronizing on jsw enables simultaneous loading
