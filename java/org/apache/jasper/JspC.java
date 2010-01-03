@@ -1412,9 +1412,9 @@ public class JspC implements Options {
      protected File resolveFile(final String s) {
          if(getProject() == null) {
              // Note FileUtils.getFileUtils replaces FileUtils.newFileUtils in Ant 1.6.3
-             return FileUtils.newFileUtils().resolveFile(null, s);
+             return FileUtils.getFileUtils().resolveFile(null, s);
          } else {
-             return FileUtils.newFileUtils().resolveFile(getProject().getBaseDir(), s);
+             return FileUtils.getFileUtils().resolveFile(getProject().getBaseDir(), s);
          }
      }
 }
