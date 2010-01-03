@@ -303,6 +303,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	}
 
 	@Override
+	@Deprecated
     public VariableResolver getVariableResolver() {
 		return this;
 	}
@@ -323,6 +324,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	}
 
 	@Override
+	@Deprecated
     public ExpressionEvaluator getExpressionEvaluator() {
 		return invokingJspCtxt.getExpressionEvaluator();
 	}
@@ -344,6 +346,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	/**
 	 * VariableResolver interface
 	 */
+	@Deprecated
 	public Object resolveVariable(String pName) throws ELException {
 		ELContext ctx = this.getELContext();
 		return ctx.getELResolver().getValue(ctx, null, pName);
