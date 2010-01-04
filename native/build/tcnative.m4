@@ -117,16 +117,21 @@ AC_DEFUN(
       # JAVA_PLATFORM
       AC_MSG_CHECKING([Try to guess JDK location])
 
-      for JAVA_PREFIX in /usr/local /usr/local/lib /usr /usr/lib /opt /usr/java ; do
+      for JAVA_PREFIX in /usr/local /usr/local/lib /usr /usr/lib /opt /usr/java /System/Library/Frameworks/JavaVM.framework/Versions/ ; do
 
         for JAVA_PLATFORM in 6 5 4 3 2 ; do
 
-          for subversion in .9 .8 .7 .6 .5 .4 .3 .2 .1 "" ; do
+          for subversion in .9 .8 .7 .6 .5 .4 .3 .2 .1 .0 "" ; do
 
-            for VARIANT in IBMJava2- java java- jdk jdk-; do
+            for VARIANT in IBMJava2- java java- jdk jdk- ""; do
               GUESS="${JAVA_PREFIX}/${VARIANT}1.${JAVA_PLATFORM}${subversion}"
 dnl           AC_MSG_CHECKING([${GUESS}])
               if test -d "${GUESS}/bin" & test -d "${GUESS}/include" ; then
+                JAVA_HOME="${GUESS}"
+                AC_MSG_RESULT([${GUESS}])
+                break
+              fi
+              if test -d "${GUESS}/Commands" & test -d "${GUESS}/Headers" ; then
                 JAVA_HOME="${GUESS}"
                 AC_MSG_RESULT([${GUESS}])
                 break
