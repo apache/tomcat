@@ -170,8 +170,8 @@ of Tomcat Native 1.1.13 Stable.
 <section name="Install and tests">
 <subsection name="UNIX">
   <p>
-   Edit the $CATALINA_HOME/bin/setenv.sh and add the path to the tc-native libraries to LD_LIBRARY_PATH.
-   Something like:
+   Edit $CATALINA_HOME/bin/setenv.sh (creating the file if necessary) and add
+   the path to the tc-native libraries to LD_LIBRARY_PATH. Something like:
    <pre>
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/lib
     export LD_LIBRARY_PATH
@@ -193,8 +193,8 @@ of Tomcat Native 1.1.13 Stable.
 
 <subsection name="Windows">
   <p>
-    Edit the $CATALINA_BASE\bin\setenv.bat and add the path to the tc-native libraries, apr and OpenSSL to PATH.
-    For example:
+    Edit $CATALINA_BASE\bin\setenv.bat (creating the file if necessary) and add
+    the path to the tc-native libraries, apr and OpenSSL to PATH. For example:
   <pre>
     set PATH=%PATH;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\native\Debug;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\apr\Debug;C:\OpenSSL\lib\VC
   </pre>
