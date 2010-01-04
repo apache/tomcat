@@ -443,7 +443,7 @@ int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, const char *file,
     /* free a perhaps already configured extra chain */
     extra_certs = SSL_CTX_get_extra_certs(ctx);
     if (extra_certs != NULL) {
-        sk_X509_pop_free((STACK_OF(X509) *)extra_certs, X509_free);
+        sk_X509_pop_free(extra_certs, X509_free);
         SSL_CTX_set_extra_certs(ctx,NULL);
     }
     /* create new extra chain by loading the certs */
