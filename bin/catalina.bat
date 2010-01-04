@@ -68,6 +68,11 @@ rem   LOGGING_MANAGER (Optional) Override Tomcat's logging manager
 rem                   Example (all one line)
 rem                   set LOGGING_CONFIG="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 rem
+rem   TITLE           (Optional) Specify the title of Tomcat window. The default
+rem                   TITLE is Tomcat if it's not specified.
+rem                   Example (all one line)
+rem                   set TITLE=Tomcat.Cluster#1.Server#1 [%DATE% %TIME%]
+rem
 rem
 rem
 rem $Id$
@@ -224,7 +229,8 @@ goto execCmd
 :doStart
 shift
 if not "%OS%" == "Windows_NT" goto noTitle
-set _EXECJAVA=start "Tomcat" %_RUNJAVA%
+if "%TITLE%" == "" set TITLE=Tomcat
+set _EXECJAVA=start "%TITLE%" %_RUNJAVA%
 goto gotTitle
 :noTitle
 set _EXECJAVA=start %_RUNJAVA%
