@@ -16,6 +16,7 @@
 #
 
 %define tcnver 1
+%define aprver 1
 
 Summary: Tomcat Native Java library
 Name: tcnative
@@ -48,7 +49,7 @@ contains additional utility interfaces for Java.
 
 %build
 %configure --with-apr=%{_prefix} \
-        --includedir=%{_includedir}/apr-%{tcnver}
+        --includedir=%{_includedir}/apr-%{aprver}
 make %{?_smp_mflags} && make dox
 
 %check
@@ -85,10 +86,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libtcnative-%{tcnver}.*a
 %{_libdir}/libtcnative-%{tcnver}.so
 %{_libdir}/pkgconfig/tcnative-%{tcnver}.pc
-%{_includedir}/apr-%{tcnver}/*.h
+%{_includedir}/apr-%{aprver}/*.h
 %doc --parents html
 
 %changelog
+* Mon Jan 04 2010 Rainer Jung <rjung@apache.org> 1.0.0-2
+- Decouple apr major lib version form tcnative lib version
 * Tue Jun 22 2004 Mladen Turk <mturk@jboss.com> 1.0.0-1
 - update to support v1.0.2 of APR
                                                                                 
