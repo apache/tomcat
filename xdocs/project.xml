@@ -29,7 +29,7 @@
         <item name="Docs Home"                  href="index.html"/>
     </menu>
 
-   <menu name="Miscellaneous Documentation">
+    <menu name="Miscellaneous Documentation">
         <item name="Changelog"                  href="miscellaneous/changelog.html"/>
     </menu>
 
