@@ -932,14 +932,21 @@ public class Connector
 
     protected ObjectName createObjectName(String domain, String type)
             throws MalformedObjectNameException {
-        String encodedAddr = null;
-        if (getProperty("address") != null) {
-            encodedAddr = URLEncoder.encode(getProperty("address").toString());
+        Object addressObj = getProperty("address");
+
+        StringBuilder sb = new StringBuilder(domain);
+        sb.append(":type=");
+        sb.append(type);
+        sb.append(",port=");
+        sb.append(getPort());
+        if (addressObj != null) {
+            String address = addressObj.toString();
+            if (address.length() > 0) {
+                sb.append(",address=");
+                sb.append(ObjectName.quote(address));
+            }
         }
-        String addSuffix = (getProperty("address") == null) ? "" : ",address="
-                + encodedAddr;
-        ObjectName _oname = new ObjectName(domain + ":type=" + type + ",port="
-                + getPort() + addSuffix);
+        ObjectName _oname = new ObjectName(sb.toString());
         return _oname;
     }
 
