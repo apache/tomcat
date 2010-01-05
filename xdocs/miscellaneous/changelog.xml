@@ -40,7 +40,7 @@
   <changelog>
     <fix>
       <bug>48129</bug>: Fix build with OpenSSL 1.0.0-beta3.
-      Patch provided by Ville Skytt. (mturk, rjung)
+      Patch provided by Tomas Mraz. (mturk, rjung)
     </fix>
     <update>
       Add detection of the Mac OS X JVM. (rjung)
