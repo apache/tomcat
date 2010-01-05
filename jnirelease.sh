@@ -90,7 +90,7 @@ if [ ! -x "$EXPTOOL" ]; then
     echo ""
     exit 1
 fi
-UNIX2DOS="`which unix2dos 2>/dev/null || unix2dos $i 2>&1`"
+UNIX2DOS="`which unix2dos 2>/dev/null || type unix2dos 2>&1`"
 echo $JKJNIEXT | egrep -e 'x$' > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     USE_BRANCH=1
