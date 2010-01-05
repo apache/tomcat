@@ -92,6 +92,7 @@
 
   <target name="clean" description="Delete the default output folders">
   	<delete dir="${tomcat.extras}"/>
+    <delete dir="${tomcat.embed}"/>
   </target>
 
   <target name="commons-logging" depends="prepare"
