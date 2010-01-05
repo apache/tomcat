@@ -90,7 +90,7 @@ if [ ! -x "$EXPTOOL" ]; then
     echo ""
     exit 1
 fi
-
+UNIX2DOS="`which unix2dos 2>/dev/null || unix2dos $i 2>&1`"
 echo $JKJNIEXT | egrep -e 'x$' > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     USE_BRANCH=1
@@ -134,11 +134,10 @@ cd "$top"
 rm -rf ${JKJNIDIST}/jni/xdocs
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
-svn cat ${JKJNISVN}/KEYS > ${JKJNIDIST}/KEYS
-svn cat ${JKJNISVN}/LICENSE > ${JKJNIDIST}/LICENSE
-svn cat ${JKJNISVN}/NOTICE > ${JKJNIDIST}/NOTICE
-svn cat ${JKJNISVN}/README.txt > ${JKJNIDIST}/README.txt
-
+for i in KEYS LICENSE NOTICE README.txt
+do
+    svn cat ${JKJNISVN}/${i} > ${JKJNIDIST}/${i}
+done
 #
 # Prebuild
 cd ${JKJNIDIST}/jni/native
@@ -151,10 +150,32 @@ tar -cf - ${JKJNIDIST} | gzip -c9 > ${JKJNIDIST}.tar.gz
 JKWINDIST=tomcat-native-${JKJNIVER}-win32-src
 rm -rf ${JKWINDIST}
 mkdir -p ${JKWINDIST}/jni
-svn export --native-eol CRLF ${JKJNISVN}/native ${JKWINDIST}/jni/native
-svn cat ${JKJNISVN}/KEYS > ${JKWINDIST}/KEYS
-svn cat ${JKJNISVN}/LICENSE > ${JKWINDIST}/LICENSE
-svn cat ${JKJNISVN}/NOTICE > ${JKWINDIST}/NOTICE
-svn cat ${JKJNISVN}/README.txt > ${JKWINDIST}/README.txt
-cp ${JKJNIDIST}/CHANGELOG.txt ${JKWINDIST}/
+for i in native java xdocs examples test build.xml build.properties.default
+do
+    svn export --native-eol CRLF ${JKJNISVN}/${i} ${JKWINDIST}/jni/${i}
+    if [ $? -ne 0 ]; then
+        echo "svn export ${i} failed"
+        exit 1
+    fi
+done
+top="`pwd`"
+cd ${JKWINDIST}/jni/xdocs
+ant
+$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html > ../../CHANGELOG.txt 2>/dev/null
+cd "$top"
+
+rm -rf ${JKWINDIST}/jni/xdocs
+mv ${JKWINDIST}/jni/build/docs ${JKWINDIST}/jni/docs
+rm -rf ${JKWINDIST}/jni/build
+for i in KEYS LICENSE NOTICE README.txt
+do
+    svn cat ${JKJNISVN}/${i} > ${JKWINDIST}/${i}
+    if [ -x "$UNIX2DOS" ]; then
+        $UNIX2DOS ${JKWINDIST}/${i}
+    fi
+done
+if [ -x "$UNIX2DOS" ]; then
+    $UNIX2DOS ${JKWINDIST}/CHANGELOG.txt 2>/dev/null
+fi
 zip -9rqyo ${JKWINDIST}.zip ${JKWINDIST}
+
