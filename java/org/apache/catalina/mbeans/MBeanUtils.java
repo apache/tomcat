@@ -461,15 +461,20 @@ public class MBeanUtils {
 
         ObjectName name = null;
         try {
-            String address = (String)
-                IntrospectionUtils.getProperty(connector, "address");
+            Object addressObj = IntrospectionUtils.getProperty(connector, "address");            
             Integer port = (Integer)
                 IntrospectionUtils.getProperty(connector, "port");
+
             StringBuilder sb = new StringBuilder(domain);
             sb.append(":type=Connector");
-            sb.append(",port=" + port);
-            if ((address != null) && (address.length()>0)) {
-                sb.append(",address=" + address);
+            sb.append(",port=");
+            sb.append(port);
+            if (addressObj != null) {
+                String address = addressObj.toString();
+                if (address.length() > 0) {
+                    sb.append(",address=");
+                    sb.append(ObjectName.quote(address));
+                }
             }
             name = new ObjectName(sb.toString());
             return (name);
