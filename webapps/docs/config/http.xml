@@ -249,7 +249,7 @@
       <p>The maximum queue length for incoming connection requests when
       all possible request processing threads are in use.  Any requests
       received when the queue is full will be refused.  The default
-      value is 10.</p>
+      value is 100.</p>
     </attribute>
 
     <attribute name="address" required="false">
