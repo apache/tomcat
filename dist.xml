@@ -122,6 +122,7 @@
 
     <delete dir="${tomcat.deployer}"/>
     <delete dir="${tomcat.dist}" failonerror="false"/>
+    <delete dir="${tomcat.release}" />
 
     <!-- This is why releasing must be done on a Windows box: 
          otherwise this check fails and the .exe distro is not generated -->
@@ -197,17 +198,28 @@
 
   </target>
 
+  <!-- Classpath -->
+  <path id="tomcat.classpath">
+    <pathelement location="${jdt.jar}"/>
+  </path>
+
   <target name="dist-javadoc" depends="dist-source"
     description="Create the Tomcat javadoc" >
     <javadoc packagenames="org.apache.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/api"
-      author="true" version="true"
-      windowtitle="Tomcat API Documentation"
-      doctitle="Tomcat API"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.  All Rights Reserved."
+      version="true"
+      windowtitle="Apache Tomcat ${version} API Documentation"
+      doctitle="Apache Tomcat ${version} API"
+      header="&lt;b&gt;Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       additionalparam="-breakiterator"
       maxmemory="256m" >
+      <classpath>
+        <path refid="tomcat.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+      <link href="http://java.sun.com/j2se/1.6.0/docs/api/"/>
     </javadoc>
   </target>
 
