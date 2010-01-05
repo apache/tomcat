@@ -90,7 +90,7 @@ if [ ! -x "$EXPTOOL" ]; then
     echo ""
     exit 1
 fi
-UNIX2DOS="`which unix2dos 2>/dev/null || type unix2dos 2>&1`"
+PERL="`which perl 2>/dev/null || type perl 2>&1`"
 echo $JKJNIEXT | egrep -e 'x$' > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     USE_BRANCH=1
@@ -170,12 +170,12 @@ rm -rf ${JKWINDIST}/jni/build
 for i in KEYS LICENSE NOTICE README.txt
 do
     svn cat ${JKJNISVN}/${i} > ${JKWINDIST}/${i}
-    if [ -x "$UNIX2DOS" ]; then
-        $UNIX2DOS ${JKWINDIST}/${i}
+    if [ -x "$PERL" ]; then
+        $PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/${i}
     fi
 done
-if [ -x "$UNIX2DOS" ]; then
-    $UNIX2DOS ${JKWINDIST}/CHANGELOG.txt 2>/dev/null
+if [ -x "$PERL" ]; then
+    $PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/CHANGELOG.txt
 fi
 zip -9rqyo ${JKWINDIST}.zip ${JKWINDIST}
 
