@@ -124,7 +124,7 @@
     <delete dir="${tomcat.dist}" failonerror="false"/>
     <delete dir="${tomcat.release}" />
 
-    <!-- This is why releasing must be done on a Windows box: 
+    <!-- This is why releasing must be done on a Windows box:
          otherwise this check fails and the .exe distro is not generated -->
     <condition property="execute.installer">
       <and>
@@ -435,7 +435,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="bin/x64/"/>
         <exclude name="bin/i64/"/>
       </zipfileset>
-      
+
     </zip>
     <antcall target="md5sum">
       <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
@@ -459,7 +459,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="BENCHMARKS.txt"/>
         <exclude name="bin/x64/"/>
         <exclude name="bin/i64/"/>
-        <exclude name="bin/*.dll"/>        
+        <exclude name="bin/*.dll"/>
         <exclude name="bin/tomcat${version.major}.exe"/>
       </zipfileset>
       <zipfileset dir="${tomcat.dist}/bin/x64" prefix="${final.name}/bin">
