@@ -167,7 +167,7 @@
     </antcall>
 
     <jar jarfile="${tomcat-juli-adapters.jar}"
-       manifest="${tomcat.tmp}/default.manifest" >
+      manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
         <include name="org/apache/juli/logging/impl/**.class" />
         <exclude name="org/apache/juli/logging/impl/WeakHashtable*.class" />
@@ -254,7 +254,7 @@
         fullpath="META-INF/NOTICE" />
       <zipfileset file="res/META-INF/default.license"
         fullpath="META-INF/LICENSE" />
-   </jar>
+    </jar>
     <antcall target="md5sum">
       <param name="file" value="${catalina-jmx-remote.jar}" />
     </antcall>
