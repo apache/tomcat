@@ -37,7 +37,7 @@ public class LiveHttp1Test extends TestCase {
     public void setUp() throws IOException {
         // DefaultHttpConnector.get().setDebug(true);
         // DefaultHttpConnector.get().setDebugHttp(true);
-        TestMain.initTestEnv();
+        TestMain.getTestServer();
 
         httpClient = DefaultHttpConnector.get().request("localhost", clientPort);
 
@@ -53,6 +53,15 @@ public class LiveHttp1Test extends TestCase {
 
     public void testSimpleRequest() throws Exception {
         httpClient.requestURI().set("/hello");
+
+        httpClient.send();
+        httpClient.readAll(bodyRecvBuffer, to);
+        assertEquals("Hello world", bodyRecvBuffer.toString());
+    }
+
+    public void testSimpleRequestClose() throws Exception {
+        httpClient.requestURI().set("/hello");
+        httpClient.setHeader("Connection", "close");
 
         httpClient.send();
         httpClient.readAll(bodyRecvBuffer, to);

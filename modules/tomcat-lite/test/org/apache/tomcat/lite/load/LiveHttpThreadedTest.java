@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,9 +38,9 @@ import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
+import org.apache.tomcat.lite.http.SpdyConnection;
 import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
-import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.IOBuffer;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 /*
   Notes on memory use ( from heap dumps ): 
@@ -69,7 +68,7 @@ import org.apache.tomcat.lite.io.IOBuffer;
  * it seems there is a bug as well.
  */
 public class LiveHttpThreadedTest extends TestCase {
-  HttpConnector clientCon = TestMain.getClientAndInit();
+  HttpConnector clientCon = TestMain.shared().getClient();
   ThreadRunner tr;
   static MBeanServer server;
   
@@ -79,25 +78,46 @@ public class LiveHttpThreadedTest extends TestCase {
 
   Map<HttpRequest, HttpRequest> active = new HashMap();
   
-  public void xtest1000Async() throws Exception {
+  public void test1000Async() throws Exception {
       try {
-          asyncRequest(10, 100);
+          asyncRequest(10, 100, false);
       } finally {
           dumpHeap("heapAsync.bin");
       }
       
   }
 
-  public void xtest10000Async() throws Exception {
+  public void test10000Async() throws Exception {
       try {
-          asyncRequest(20, 500);
+          asyncRequest(20, 500, false);
       } finally {
           dumpHeap("heapAsync.bin");
       }
   }
   
-  public void asyncRequest(int thr, int perthr) throws Exception {
+  public void xtest1000AsyncSpdy() throws Exception {
+      try {
+          asyncRequest(10, 20, true);
+      } finally {
+          dumpHeap("heapAsync.bin");
+      }
+      
+  }
+
+  public void xtest10000AsyncSpdy() throws Exception {
+      try {
+          asyncRequest(20, 500, true);
+      } finally {
+          dumpHeap("heapAsync.bin");
+      }
+  }
+  
+  public void asyncRequest(int thr, int perthr, boolean spdy) throws Exception {
       reqCnt = thr * perthr;
+      if (spdy) {
+          // TODO: simpler API ( 'allowSpdy', etc ) - after negotiation is impl
+          clientCon.withConnectionManager(new SpdyConnection.SpdyConnectionManager());
+      }
       long t0 = System.currentTimeMillis();
       tr = new ThreadRunner(thr, perthr) {
           public void makeRequest(int i) throws Exception {
@@ -123,32 +143,34 @@ public class LiveHttpThreadedTest extends TestCase {
       System.err.println(reqCnt + " Async requests: " + (System.currentTimeMillis() - t0));
   }
   
-  public void xtestURLRequest() throws Exception {
-      urlRequest(10, 200);
+  public void testURLRequest() throws Exception {
+      urlRequest(10, 100);
   }
 
   public void testURLRequest2() throws Exception {
-      urlRequest(40, 500);
+      urlRequest(20, 500);
+
   }
   
+  /** 
+   * HttpURLConnection client against lite.http server.
+   */
   public void urlRequest(int thr, int cnt) throws Exception {
+      long t0 = System.currentTimeMillis();
           
       
       try {
-          HttpConnector testServer = TestMain.testServer;
+          HttpConnector testServer = TestMain.getTestServer();
           
           tr = new ThreadRunner(thr, cnt) {
 
               public void makeRequest(int i) throws Exception {
                   try {
-                      URL url = new URL("http://localhost:8802/hello");
-                      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                      con.setReadTimeout(4000000);
-                      con.connect();
+                      ByteChunk out = new ByteChunk();
+                      HttpURLConnection con = TestMain.getUrl("http://localhost:8802/hello", out);
                       if (con.getResponseCode() != 200) {
                           errors.incrementAndGet();
                       }
-                      BBuffer out = new IOBuffer().append(con.getInputStream()).copyAll(null);
                       if (!"Hello world".equals(out.toString())) {
                           errors.incrementAndGet();
                           System.err.println("bad result " + out);
@@ -161,7 +183,10 @@ public class LiveHttpThreadedTest extends TestCase {
           };
           tr.run();
           assertEquals(0, tr.errors.get());
-          
+       
+          System.err.println(thr + " threads, " + (thr * cnt) + " total blocking URL requests: " + 
+                  (System.currentTimeMillis() - t0));
+
           //assertEquals(testServer., actual)
       } finally {
           dumpHeap("heapURLReq.bin");

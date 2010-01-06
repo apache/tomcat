@@ -150,26 +150,26 @@ public class HttpProxyService implements HttpService {
         
         
         CBuffer origURIx = serverHttpReq.requestURI();
-        String origURI = origURIx.toString();
-        if (origURI.startsWith("http://")) {
-            // Real proxy - extract client address, modify the uri.
-            // TODO: optimize the strings.
-            int start = origURI.indexOf('/', 7);
-            String hostPortS = (start == -1) ?
-                    origURI.subSequence(7, origURI.length()).toString() :
-                    origURI.subSequence(7, start).toString();
-            String[] hostPort = hostPortS.split(":");
-
-            dstHost = hostPort[0];
-            dstPort = (hostPort.length > 1) ? Integer.parseInt(hostPort[1]) : 
-                80;
-
-            if (start >= 0) {
-                serverHttpReq.requestURI().set(origURI.substring(start));
-            } else {
-                serverHttpReq.requestURI().set("/");
-            }
-        } else {
+//        String origURI = origURIx.toString();
+//        if (origURI.startsWith("http://")) {
+//            // Real proxy - extract client address, modify the uri.
+//            // TODO: optimize the strings.
+//            int start = origURI.indexOf('/', 7);
+//            String hostPortS = (start == -1) ?
+//                    origURI.subSequence(7, origURI.length()).toString() :
+//                    origURI.subSequence(7, start).toString();
+//            String[] hostPort = hostPortS.split(":");
+//
+//            dstHost = hostPort[0];
+//            dstPort = (hostPort.length > 1) ? Integer.parseInt(hostPort[1]) : 
+//                80;
+//
+//            if (start >= 0) {
+//                serverHttpReq.requestURI().set(origURI.substring(start));
+//            } else {
+//                serverHttpReq.requestURI().set("/");
+//            }
+//        } else {
             // Adjust the host header.
             CBuffer hostHdr = 
                 serverHttpReq.getMimeHeaders().getHeader("host");
@@ -182,7 +182,7 @@ public class HttpProxyService implements HttpService {
                     cb.appendInt(dstPort);
                 }
             }
-        }
+//        }
         if (debug) {
             HttpChannel server = serverHttpReq.getHttpChannel();
             log.info("START: " + server.getId() + " " + dstHost + " "  + 

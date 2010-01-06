@@ -152,7 +152,7 @@ public class NioChannel implements ByteChannel {
     @Override
     public void close() throws IOException {
         shutdownOutput();
-        sel.close(this, null);
+        inputClosed();
     }
 
     /**

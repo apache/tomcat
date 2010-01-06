@@ -28,7 +28,7 @@ public class ClientTest extends TestCase {
      * Start a http server, runs on 8802 - shared by all tests.
      * Will use /echo handler. 
      */
-    static HttpConnector testServer = TestMain.initTestEnv();
+    static HttpConnector testServer = TestMain.getTestServer();
 
     
     public void testSimpleBlocking() throws IOException {

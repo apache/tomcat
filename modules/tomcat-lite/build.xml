@@ -40,6 +40,7 @@
                source="${compile.source}"
                optimize="${compile.optimize}"
                encoding="ISO-8859-1">
+            <classpath refid="lite-classpath" />
             <src path="${tomcat.lite.src}/java" />
             <classpath refid="head-classpath" />
             <exclude name="**/ServletApi25.java"/>
@@ -83,6 +84,7 @@
                optimize="${compile.optimize}"
                encoding="ISO-8859-1"
         >
+            <classpath refid="lite-classpath" />
             <classpath refid="head-classpath" />
             <classpath path="${classes}" />
             <src path="${tomcat.lite.src}/test" />
@@ -95,6 +97,7 @@
         <!-- Need to run it in tomcat to find output/build/webapps --> 
         <junit printsummary="yes" fork="yes" dir="${tomcat.base}"
             >
+            <classpath refid="lite-classpath" />
             <classpath refid="head-classpath" />
             <classpath path="${test-classes}" />
             <classpath path="${classes}" />

@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.lite.http;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tomcat.lite.TestMain;
-import org.apache.tomcat.lite.http.HttpChannel.HttpService;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.SslConnector;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -33,70 +31,26 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class HttpsTest extends TestCase {
     
     static int port = 8443;
-    HttpConnector con;
-    HttpConnector httpClient;
+    final HttpConnector httpClient = TestMain.shared().getClient();
     
     public void setUp() {
         Logger.getLogger("SSL").setLevel(Level.FINEST);
     }
 
-    public void tearDown() {
-        if (con != null) {
-            con.stop();
-        }
-        if (httpClient != null) {
-            httpClient.stop();
-        }
-    }
-    
-    static HttpConnector initServer(int port) throws IOException {
-        SslConnector sslCon = new SslConnector()
-            .setKeysResource("org/apache/tomcat/lite/http/test.keystore", "changeit");
-        
-        HttpConnector con = new HttpConnector(sslCon);
-        con.setPort(port);
-
-        addService(con);
-        return con;
-    }
-    
-    private static void addService(HttpConnector con) throws IOException {
-        con.setMaxHttpPoolSize(0);
-//        con.setDebug(true);
-//        con.setDebugHttp(true);
-        
-        con.getDispatcher().setDefaultService(new HttpService() {
-            @Override
-            public void service(HttpRequest httpReq, HttpResponse httpRes)
-                    throws IOException {
-                httpRes.setHeader("Connection", "close");
-                httpRes.getBodyWriter().write("Hello");
-            }
-        });
-        con.start();
-    }
-
     public void testSimpleClient() throws Exception {
-        SslConnector sslCon = new SslConnector();
-        httpClient = new HttpConnector(sslCon);
-//        httpClient.setDebug(true);
-//        httpClient.setDebugHttp(true);
-        httpClient.setMaxHttpPoolSize(0);
-        con = initServer(++port);
         checkResponse(httpClient);
     }
     
     
     public void testSimpleServer() throws Exception {
-        con = initServer(++port);
-        ByteChunk res = TestMain.getUrl("https://localhost:" + port +
-            "/examples/servlets/servlet/HelloWorldExample");
+        ByteChunk res = TestMain.getUrl("https://localhost:8443/hello");
         assertTrue(res.toString().indexOf("Hello") >= 0);
     }       
 
     
     private void checkResponse(HttpConnector httpCon) throws Exception {
-        HttpRequest ch = httpCon.request("localhost", port);
+        HttpRequest ch = httpCon.request("localhost", port).setSecure(true);
+        
         ch.setRequestURI("/hello");
         ch.setProtocol("HTTP/1.0");
         ch.send();
@@ -106,21 +60,14 @@ public class HttpsTest extends TestCase {
     }    
     
     public void testSimpleClient20() throws Exception {
-        SslConnector sslCon = new SslConnector();
-        httpClient = new HttpConnector(sslCon);
-//        httpClient.setDebug(true);
-//        httpClient.setDebugHttp(true);
-
-        con = initServer(++port);
         for (int i = 0; i < 20; i++) {
             checkResponse(httpClient);
         }
     }
     
     public void testSimpleRequestGoogle() throws Exception {
-        SslConnector sslCon = new SslConnector();
-        httpClient = new HttpConnector(sslCon);
-        HttpRequest client = httpClient.request("www.google.com", 443);
+        HttpRequest client = httpClient.request("www.google.com", 443).
+            setSecure(true);
         client.getHttpChannel().setIOTimeout(2000);
         client.setRequestURI("/accounts/ServiceLogin");
         client.send();
@@ -140,19 +87,19 @@ public class HttpsTest extends TestCase {
      */
     public void testSeverWithKeys() throws Exception {
         Base64 b64 = new Base64();
-
-        
         byte[] keyBytes = b64.decode(PRIVATE_KEY);
 
         SslConnector sslCon = new SslConnector()
             .setKeys(CERTIFICATE, keyBytes);
             
         HttpConnector con = new HttpConnector(sslCon);
-        con.setPort(++port);
-        addService(con);
+        con.setPort(8444);
         
-        ByteChunk res = TestMain.getUrl("https://localhost:" + port +
-            "/examples/servlets/servlet/HelloWorldExample");
+        TestMain.shared().initTestCallback(con.getDispatcher());
+        con.start();
+        
+        ByteChunk res = TestMain.getUrl("https://localhost:8444" + 
+            "/hello");
         assertTrue(res.toString().indexOf("Hello") >= 0);
         
     }
