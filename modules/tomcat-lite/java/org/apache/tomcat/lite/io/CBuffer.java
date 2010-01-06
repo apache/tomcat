@@ -173,6 +173,9 @@ public class CBuffer extends CBucket implements Cloneable,
      */
     public CBuffer append(char src[], int srcStart, int srcEnd)  {
         int len = srcEnd - srcStart;
+        if (len == 0) {
+            return this;
+        }
         // will grow, up to limit
         makeSpace(len);
 
@@ -187,6 +190,9 @@ public class CBuffer extends CBucket implements Cloneable,
      */
     public CBuffer append(StringBuffer sb) {
         int len = sb.length();
+        if (len == 0) {
+            return this;
+        }
         makeSpace(len);
         sb.getChars(0, len, value, end);
         end += len;
@@ -197,7 +203,7 @@ public class CBuffer extends CBucket implements Cloneable,
      * Append a string to the buffer
      */
     public CBuffer append(String s) {
-        if (s == null) {
+        if (s == null || s.length() == 0) {
             return this;
         }
         append(s, 0, s.length());

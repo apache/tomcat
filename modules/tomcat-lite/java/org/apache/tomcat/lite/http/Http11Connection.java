@@ -16,9 +16,6 @@ import org.apache.tomcat.lite.io.FastHttpDateFormat;
 import org.apache.tomcat.lite.io.Hex;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
-import org.apache.tomcat.lite.io.IOConnector;
-import org.apache.tomcat.lite.io.NioThread;
-import org.apache.tomcat.lite.io.SocketIOChannel;
 
 public class Http11Connection extends HttpConnection {
     public static final String CHUNKED = "chunked";
@@ -35,7 +32,7 @@ public class Http11Connection extends HttpConnection {
     protected static Logger log = Logger.getLogger("Http11Connection");
     static final byte COLON = (byte) ':';
 
-    // net is the 'socket' connector
+    // super.net is the socket 
 
     HttpChannel activeHttp;
     boolean debug;
@@ -673,7 +670,7 @@ public class Http11Connection extends HttpConnection {
                     if (first == null) {
                         break; // will go back to check if done.
                     } else {
-                        body.queue(first);
+                        received(body, first);
                     }
                 }
             } else {
@@ -714,13 +711,13 @@ public class Http11Connection extends HttpConnection {
                     // To buffer has more data than we need.
                     int lenToConsume = (int) bodys.remaining;
                     BBucket sb = rawReceiveBuffers.popLen(lenToConsume);
-                    body.queue(sb);
+                    received(body, sb);
                     //log.info("Queue received buffer " + this + " " + lenToConsume);
                     bodys.remaining = 0;
                 } else {
                     BBucket first = rawReceiveBuffers.popFirst();
                     bodys.remaining -= first.remaining();
-                    body.queue(first);
+                    received(body, first);
                     //log.info("Queue full received buffer " + this + " RAW: " + rawReceiveBuffers);
                 }
                 if (bodys.contentLength >= 0 && bodys.remaining == 0) {
@@ -731,7 +728,10 @@ public class Http11Connection extends HttpConnection {
             }
         }
     }
-    
+
+    private void received(IOBuffer body, BBucket bb) throws IOException {
+        body.queue(bb);
+    }
 
     
     protected void sendRequest(HttpChannel http) 

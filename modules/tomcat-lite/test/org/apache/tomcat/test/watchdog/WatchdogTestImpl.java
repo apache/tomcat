@@ -522,7 +522,7 @@ public class WatchdogTestImpl {
     private boolean checkResponse(boolean testCondition) throws Exception {
         boolean match = false;
 
-        if (responseLine != null) {
+        if (responseLine != null && !"".equals(responseLine)) {
             // If returnCode doesn't match
             if (responseLine.indexOf("HTTP/1.") > -1) {
 
@@ -554,7 +554,7 @@ public class WatchdogTestImpl {
                     }
                 }
             } else {
-                resultOut.append("\n<failure>Wrong Http version: "
+                resultOut.append("\n<failure>No response or invalid response: "
                         + responseLine + "</failure>");
                 return false;
             }

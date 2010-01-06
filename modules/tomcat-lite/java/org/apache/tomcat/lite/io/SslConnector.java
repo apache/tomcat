@@ -78,6 +78,7 @@ public class SslConnector extends IOConnector {
     private TrustManager[] trustManagers;
     
     Executor handshakeExecutor;
+    static int id = 0;
     
     public SslConnector() {
     }
@@ -86,8 +87,8 @@ public class SslConnector extends IOConnector {
         
     }
     
-    public IOConnector getNet() {
-        if (net == null) {
+    public SSLContext getSSLContext() {
+        if (sslCtx == null) {
             try {
                 sslCtx = SSLContext.getInstance("TLS");
                 if (trustManagers == null) {
@@ -102,13 +103,18 @@ public class SslConnector extends IOConnector {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+        }
+        return sslCtx;
+    }
+    
+    public IOConnector getNet() {
+        if (net == null) {
+            getSSLContext();
             net = new SocketConnector();
         }
         return net;
     }
     
-    static int id = 0;
     
     @Override
     public void acceptor(final ConnectedCallback sc, CharSequence port, Object extra) 

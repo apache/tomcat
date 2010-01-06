@@ -1655,17 +1655,6 @@ public abstract class ServletRequestImpl implements HttpServletRequest {
 
     }
 
-
-    /**
-     * Set the value to be returned by <code>isSecure()</code>
-     * for this Request.
-     *
-     * @param secure The new isSecure value
-     */
-    public void setSecure(boolean secure) {
-        this.secure = secure;
-    }
-
     /**
      * Set the servlet path for this Request.  This will normally be called
      * when the associated Context is mapping the Request to a particular

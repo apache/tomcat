@@ -22,9 +22,9 @@ import java.util.logging.Logger;
 import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.CBuffer;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
+import org.apache.tomcat.lite.io.IOConnector;
 
 /**
  * HTTP async client and server, based on tomcat NIO/APR connectors
@@ -205,6 +205,14 @@ public class HttpChannel extends IOChannel {
         }        
     }
     
+    public IOChannel getSink() {
+        if (conn == null) {
+            return null;
+        }
+        return conn.getSink();
+    }
+
+    
     /**
      * Called when the request is done. Need to send remaining byte.
      * 
@@ -340,6 +348,9 @@ public class HttpChannel extends IOChannel {
      * 
      */
     protected void handleEndSendReceive() throws IOException {
+        // make sure the callback was called ( needed for abort )
+        handleHeadersReceived(inMessage);
+        
         this.doneLock.signal(this);
         synchronized (this) {
             if (doneCallbackCalled) {
@@ -803,5 +814,11 @@ public class HttpChannel extends IOChannel {
     };
     
 
+    IOConnector.ConnectedCallback connectedCallback = new IOConnector.ConnectedCallback() {
+        @Override
+        public void handleConnected(IOChannel ch) throws IOException {
+            httpConnector.handleConnected(ch, HttpChannel.this);
+        }
+    };
     
 }

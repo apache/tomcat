@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 public class OneTest extends TestCase {
  
     public void setUp() throws Exception {
-        TestMain.initTestEnv();
+        TestMain.getTestServer();
     }
     
     public void tearDown() throws IOException {
