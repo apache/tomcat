@@ -18,9 +18,11 @@
 package org.apache.el;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import javax.el.ValueExpression;
+import javax.el.FunctionMapper;
 
 import org.apache.el.ExpressionFactoryImpl;
 import org.apache.el.lang.ELSupport;
@@ -90,6 +92,11 @@ public class TestELEvaluation extends TestCase {
         assertEquals("\"\\", evaluateExpression("${\"\\\"\\\\\"}"));
     }
 
+    public void testParserFunction() {
+        // bug 48112
+        assertEquals("{world}", evaluateExpression("${fn:trim('{world}')}"));
+    }
+
     private void compareBoth(String msg, int expected, Object o1, Object o2){
         int i1 = ELSupport.compare(o1, o2);
         int i2 = ELSupport.compare(o2, o1);
@@ -116,9 +123,33 @@ public class TestELEvaluation extends TestCase {
 
     private String evaluateExpression(String expression) {
         ELContextImpl ctx = new ELContextImpl();
+        ctx.setFunctionMapper(new FMapper());
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
         ValueExpression ve = exprFactory.createValueExpression(ctx, expression,
                 String.class);
         return (String) ve.getValue(ctx);
+    }
+    
+    public static class FMapper extends FunctionMapper {
+
+        @Override
+        public Method resolveFunction(String prefix, String localName) {
+            if ("trim".equals(localName)) {
+                Method m;
+                try {
+                    m = this.getClass().getMethod("trim", String.class);
+                    return m;
+                } catch (SecurityException e) {
+                    // Ignore
+                } catch (NoSuchMethodException e) {
+                    // Ignore
+                } 
+            }
+            return null;
+        }
+        
+        public static String trim(String input) {
+            return input.trim();
+        }
     }
 }
