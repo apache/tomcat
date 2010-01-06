@@ -19,6 +19,8 @@ import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
+import org.apache.tomcat.lite.io.SslChannel;
+import org.apache.tomcat.lite.io.SslConnector;
 import org.apache.tomcat.lite.io.IOConnector.DataReceivedCallback;
 
 /**
@@ -63,6 +65,9 @@ public class HttpConnector {
     private List<HttpChannel> httpChannelPool = new ArrayList<HttpChannel>();
 
     protected IOConnector ioConnector;
+    
+    // for https connections
+    protected SslConnector sslConnector = new SslConnector();
     
     boolean debugHttp = false;
     boolean debug = false;
@@ -323,55 +328,10 @@ public class HttpConnector {
     }
     
     protected void connectAndSend(HttpChannel httpCh) throws IOException {
-        String target = httpCh.getTarget();
-        // TODO: SSL 
-        HttpConnection ch = cpool.getChannel(target);
+        cpool.send(httpCh);
 
-        if (ch == null) {
-            if (debug) {
-                httpCh.trace("HTTP_CONNECT: New connection " + target);
-            }
-            IOConnector.ConnectedCallback connected =
-                new HttpConnectedCallback(this, httpCh);
-            
-            // will call sendRequestHeaders
-            String[] hostPort = target.split(":");
-            int targetPort = hostPort.length > 1 ? 
-                    Integer.parseInt(hostPort[1]) : 80;
-            getIOConnector().connect(hostPort[0], targetPort,
-                    connected);
-        } else {
-            if (debug) {
-                httpCh.trace("HTTP_CONNECT: Reuse connection " + target + " " + this);
-            }
-            // TODO retry if closed
-            ch.beforeRequest();
-            httpCh.setConnection(ch);
-            ch.sendRequest(httpCh);
-        }
     }
     
-    static class HttpConnectedCallback implements IOConnector.ConnectedCallback {
-        HttpConnector httpCon;
-        HttpChannel httpCh;
-        
-        public HttpConnectedCallback(HttpConnector httpConnector,
-                HttpChannel httpCh2) {
-            this.httpCh = httpCh2;
-            this.httpCon = httpConnector;
-        }
-
-        @Override
-        public void handleConnected(IOChannel ch) throws IOException {
-            if (httpCon.debugHttp) {
-                IOChannel ch1 = new DumpChannel("");
-                ch.addFilterAfter(ch1);
-                ch = ch1;                        
-            }
-            httpCon.handleConnected(ch, httpCh);
-        }
-    }
-
     HttpConnection newConnection() {
         return conManager.newConnection(this);
     }
@@ -413,6 +373,20 @@ public class HttpConnector {
     
     public void handleConnected(IOChannel net, HttpChannel httpCh) 
             throws IOException {
+        boolean ssl = httpCh.getRequest().isSecure();
+        if (ssl) {
+            SslChannel ch1 = new SslChannel();
+            ch1.setSslContext(sslConnector.getSSLContext());
+            ch1.setSink(net);
+            net.addFilterAfter(ch1);
+            net = ch1;
+        }
+        if (debugHttp) {
+            IOChannel ch1 = new DumpChannel("");
+            net.addFilterAfter(ch1);
+            net = ch1;                        
+        }
+        
         if (!net.isOpen()) {
             httpCh.abort("Can't connect");
             return;
@@ -447,7 +421,7 @@ public class HttpConnector {
         protected boolean serverMode = false;
 
         protected BBuffer headRecvBuf = BBuffer.allocate(8192);
-        
+        protected CompressFilter compress = new CompressFilter();
 
         @Override
         public void handleReceived(IOChannel ch) throws IOException {
@@ -535,7 +509,6 @@ public class HttpConnector {
      * for example if a server has multiple IPs or LB replicas - any would work.   
      */
     public static class RemoteServer {
-        public ConnectionPool pool;
         public ArrayList<HttpConnection> connections = new ArrayList<HttpConnection>();
     }
 
@@ -569,15 +542,6 @@ public class HttpConnector {
             return closedSockets.get();
         }
 
-        public String dumpSockets() {
-            StringBuffer sb = new StringBuffer();
-            for (CharSequence k: hosts.keySet()) {
-                RemoteServer t = hosts.get(k);
-                sb.append(k).append("=").append(t.connections.size()).append("\n");
-            }
-            return sb.toString();
-        }
-
         public Set<CharSequence> getKeepAliveTargets() {
             return hosts.keySet();
         }
@@ -585,41 +549,68 @@ public class HttpConnector {
         /** 
          * @param key host:port, or some other key if multiple hosts:ips
          * are connected to equivalent servers ( LB ) 
+         * @param httpCh 
          * @throws IOException 
          */
-        public HttpConnection getChannel(CharSequence key) throws IOException {
+        public HttpConnection send(HttpChannel httpCh) 
+                throws IOException {
+            String target = httpCh.getTarget();
+            HttpConnection con = null;
+            // TODO: check ssl on connection - now if a second request 
+            // is received on a ssl connection - we just send it
+            boolean ssl = httpCh.getRequest().isSecure();
+            
             RemoteServer t = null;
             synchronized (hosts) {
-                t = hosts.get(key);
+                t = hosts.get(target);
                 if (t == null) {
                     misses.incrementAndGet();
-                    return null;
                 }
             }
-            HttpConnection res = null;
-            synchronized (t) {
-                if (t.connections.size() == 0) {
-                    misses.incrementAndGet();
-                    return null;
-                } // one may be added - no harm.
-                
-                res = conManager.getFromPool(t);
-                
-                if (!res.isOpen()) {
-                    res.setDataReceivedCallback(null);
-                    res.close();
-                    log.fine("Already closed " + res);
-                    res = null;
-                    misses.incrementAndGet();
-                    return null;
+            if (t != null) {
+                synchronized (t) {
+                    if (t.connections.size() == 0) {
+                        misses.incrementAndGet();
+                    } else {
+                        con = conManager.getFromPool(t);
+
+                        if (!con.isOpen()) {
+                            con.setDataReceivedCallback(null);
+                            con.close();
+                            log.fine("Already closed " + con);
+                            con = null;
+                            misses.incrementAndGet();
+                        } else {
+                            hits.incrementAndGet();
+                            if (debug) {
+                                httpCh.trace("HTTP_CONNECT: Reuse connection " + target + " " + this);
+                            }
+                        }
+                    }
                 }
-                waitingSockets.decrementAndGet();
             }
-            hits.incrementAndGet();
-            if (debug) {
-                log.info("REUSE channel ..." + key + " " + res);
+            
+            if (con == null) {
+                if (debug) {
+                    httpCh.trace("HTTP_CONNECT: New connection " + target);
+                }
+                String[] hostPort = target.split(":");
+                
+                int targetPort = ssl ? 443 : 80;
+                if (hostPort.length > 1) {
+                    targetPort = Integer.parseInt(hostPort[1]);
+                }
+                
+                getIOConnector().connect(hostPort[0], targetPort,
+                        httpCh.connectedCallback);
+            } else {
+                con.beforeRequest();
+                httpCh.setConnection(con);
+                con.sendRequest(httpCh);
             }
-            return res;      
+            
+            
+            return con;      
         }
 
         /**
@@ -649,7 +640,6 @@ public class HttpConnector {
                 t = hosts.get(key);
                 if (t == null) {
                     t = new RemoteServer();
-                    t.pool = this;
                     hosts.put(key, t);
                 }
             }

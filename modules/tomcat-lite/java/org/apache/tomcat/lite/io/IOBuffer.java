@@ -111,6 +111,7 @@ public class IOBuffer {
                 first.position(first.limit());
             } else {
                 first.position(first.position() + len);                
+                len = 0;
             }
         }
     }
@@ -631,7 +632,7 @@ public class IOBuffer {
                 throw new IOException("Not appending");
             }
             if (writeBuffer != null) {
-                if (read > 0) {
+                if (appendable.limit() != writeBuffer.position()) {
                     appendable.limit(writeBuffer.position());
                     // We have some more data.
                     if (buffers.size() == 0 || 

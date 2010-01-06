@@ -20,6 +20,11 @@ import org.apache.tomcat.lite.io.IOBuffer;
  * TODO: expectations ? 
  * Fix docs - order matters
  * Crashes in chrome
+ * 
+ * Test with unit tests or:
+ *  google-chrome --use-flip=no-ssl 
+ *    --user-data-dir=/home/$USER/.config/google-chrome/Test 
+ *    http://localhost:8802/hello
  */
 
 public class SpdyConnection extends HttpConnector.HttpConnection  {
@@ -40,6 +45,33 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         
     }
     
+    /** Use compression for headers. Will magically turn to false
+     * if the first request doesn't have x8xx ( i.e. compress header )
+     */
+    boolean headerCompression = true;
+    boolean firstFrame = true;
+    
+    public static long DICT_ID = 3751956914L;
+    private static String SPDY_DICT_S = 
+        "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-" +
+        "languageauthorizationexpectfromhostif-modified-sinceif-matchif-none-matchi" +
+        "f-rangeif-unmodifiedsincemax-forwardsproxy-authorizationrangerefererteuser" + 
+        "-agent10010120020120220320420520630030130230330430530630740040140240340440" + 
+        "5406407408409410411412413414415416417500501502503504505accept-rangesageeta" + 
+        "glocationproxy-authenticatepublicretry-afterservervarywarningwww-authentic" + 
+        "ateallowcontent-basecontent-encodingcache-controlconnectiondatetrailertran" + 
+        "sfer-encodingupgradeviawarningcontent-languagecontent-lengthcontent-locati" + 
+        "oncontent-md5content-rangecontent-typeetagexpireslast-modifiedset-cookieMo" + 
+        "ndayTuesdayWednesdayThursdayFridaySaturdaySundayJanFebMarAprMayJunJulAugSe" + 
+        "pOctNovDecchunkedtext/htmlimage/pngimage/jpgimage/gifapplication/xmlapplic" + 
+        "ation/xhtmltext/plainpublicmax-agecharset=iso-8859-1utf-8gzipdeflateHTTP/1" + 
+        ".1statusversionurl ";
+    public static byte[] SPDY_DICT = SPDY_DICT_S.getBytes();
+    // C code uses this - not in the spec
+    static {
+        SPDY_DICT[SPDY_DICT.length - 1] = (byte) 0;
+    }
+
 
     protected static Logger log = Logger.getLogger("SpdyConnection");
     
@@ -65,6 +97,12 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
 
     BBuffer headW = BBuffer.wrapper();
     
+    CompressFilter headCompressIn = new CompressFilter()
+        .setDictionary(SPDY_DICT, DICT_ID);
+    CompressFilter headCompressOut = new CompressFilter()
+        .setDictionary(SPDY_DICT, DICT_ID);
+    IOBuffer headerCompressBuffer = new IOBuffer();
+
     // TODO: detect if it's spdy or http based on bit 8
 
     @Override
@@ -194,15 +232,33 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                 ch.handleEndReceive();
             }
         }
+        firstFrame = false;
     }
 
     private BBuffer processHeaders(IOBuffer iob, HttpChannel ch,
             HttpMessageBytes reqBytes) throws IOException {
-        int nvCount = SpdyConnection.readShort(iob);
-        int read = 8;
-
-        iob.read(headRecvBuf, currentInFrame.length - 8);
-
+        int res = iob.peek() & 0xFF;
+        int nvCount = 0;
+        if (firstFrame && (res & 0x0F) !=  8) {
+            headerCompression = false;
+        }
+        headRecvBuf.recycle();
+        if (headerCompression) {
+            // 0x800 headers seems a bit too much - assume compressed.
+            // I wish this was a flag...
+            headerCompressBuffer.recycle();
+            // stream id ( 4 ) + unused ( 2 ) 
+            // nvCount is compressed in impl - spec is different
+            headCompressIn.decompress(iob, headerCompressBuffer, 
+                    currentInFrame.length - 6);
+            headerCompressBuffer.copyAll(headRecvBuf);
+            headerCompressBuffer.recycle();
+            nvCount = readShort(headRecvBuf);
+        } else {
+            nvCount = readShort(iob);
+            // 8 = stream Id (4) + pri/unused (2) + nvCount (2)
+            iob.read(headRecvBuf, currentInFrame.length - 8);
+        }
         // Wrapper - so we don't change position in head
         headRecvBuf.wrapTo(headW);
         
@@ -213,14 +269,12 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
 
             int nameLen = SpdyConnection.readShort(headW);
 
-            nameBuf
-                    .setBytes(headW.array(), headW.position(),
+            nameBuf.setBytes(headW.array(), headW.position(),
                             nameLen);
             headW.advance(nameLen);
 
             int valueLen = SpdyConnection.readShort(headW);
-            valBuf
-                    .setBytes(headW.array(), headW.position(),
+            valBuf.setBytes(headW.array(), headW.position(),
                             valueLen);
             headW.advance(valueLen);
 
@@ -241,8 +295,6 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
             }
 
             // TODO: repeated values are separated by a 0
-            // pretty weird...
-            read += nameLen + valueLen + 4;
         }
         return headW;
     }
@@ -272,7 +324,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         // TODO: url
         SpdyConnection.appendAsciiHead(headBuf, http.getRequest().requestURL());
         
-        
+        // Frame head - 8
         BBuffer out = BBuffer.allocate();
         // Syn-reply 
         out.putByte(0x80); 
@@ -285,7 +337,10 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         } else {
             out.putByte(0x00); 
         }
-        SpdyConnection.append24(out, headBuf.remaining() + http.getOut().available() + 4);
+        
+        // Length, channel id (4) + unused (2) - headBuf has header count 
+        // and headers
+        SpdyConnection.append24(out, headBuf.remaining() + 6);
         
         if (serverMode) {
             http.channelId = 2 * lastOutStream.incrementAndGet();
@@ -302,11 +357,11 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         sendFrame(out, headBuf); 
 
         // Any existing data
-        sendData(http);
+        //sendData(http);
     }
     
     @Override
-    protected void sendResponseHeaders(HttpChannel http) throws IOException {
+    protected synchronized void sendResponseHeaders(HttpChannel http) throws IOException {
         if (!serverMode) {
             throw new IOException("Only in server mode");
         }
@@ -320,39 +375,54 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
 
         BBuffer headBuf = BBuffer.allocate();
 
-        SpdyConnection.appendInt(headBuf, http.channelId);
-        headBuf.putByte(0);
-        headBuf.putByte(0);
 
         //mimeHeaders.remove("content-length");
-        
-        SpdyConnection.appendShort(headBuf, mimeHeaders.size() + 2);
+        BBuffer headers = headBuf;
+        if (headerCompression) {
+            headers = BBuffer.allocate();
+        }
+
+        //SpdyConnection.appendInt(headers, http.channelId);
+        //headers.putByte(0);
+        //headers.putByte(0);
+        SpdyConnection.appendShort(headers, mimeHeaders.size() + 2);        
         
         // chrome will crash if we don't send the header
-        serializeMime(mimeHeaders, headBuf);
+        serializeMime(mimeHeaders, headers);
 
         // Must be at the end
-        SpdyConnection.appendAsciiHead(headBuf, "status");
-        SpdyConnection.appendAsciiHead(headBuf, 
+        SpdyConnection.appendAsciiHead(headers, "status");
+        SpdyConnection.appendAsciiHead(headers, 
                 Integer.toString(http.getResponse().getStatus()));
 
-        SpdyConnection.appendAsciiHead(headBuf, "version");
-        SpdyConnection.appendAsciiHead(headBuf, "HTTP/1.1");
+        SpdyConnection.appendAsciiHead(headers, "version");
+        SpdyConnection.appendAsciiHead(headers, "HTTP/1.1");
 
+        if (headerCompression) {
+            headerCompressBuffer.recycle();
+            headCompressOut.compress(headers, headerCompressBuffer, false);
+            headerCompressBuffer.copyAll(headBuf);
+            headerCompressBuffer.recycle();
+        }
         
-        BBuffer out = BBuffer.allocate();
+        BBuffer frameHead = BBuffer.allocate();
         // Syn-reply 
-        out.putByte(0x80); // Control
-        out.putByte(0x01); // version
-        out.putByte(0x00); // 00 02 - SYN_REPLY
-        out.putByte(0x02);
+        frameHead.putByte(0x80); // Control
+        frameHead.putByte(0x01); // version
+        frameHead.putByte(0x00); // 00 02 - SYN_REPLY
+        frameHead.putByte(0x02);
         
         // It seems piggibacking data is not allowed
-        out.putByte(0x00); 
+        frameHead.putByte(0x00); 
 
-        SpdyConnection.append24(out, headBuf.remaining());
-        
-        sendFrame(out, headBuf);
+        SpdyConnection.append24(frameHead, headBuf.remaining() + 6);
+
+//        // Stream-Id, unused
+        SpdyConnection.appendInt(frameHead, http.channelId);
+        frameHead.putByte(0);
+        frameHead.putByte(0);
+
+        sendFrame(frameHead, headBuf);
     }
     
     
@@ -542,6 +612,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
      */
     public void abort(HttpChannel http, String t) throws IOException {
         // TODO: send interrupt signal
+        
     }
 
 

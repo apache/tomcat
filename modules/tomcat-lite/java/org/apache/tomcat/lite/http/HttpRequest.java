@@ -842,6 +842,26 @@ public class HttpRequest extends HttpMessage {
      * Server mode, request just received.
      */
     protected void processReceivedHeaders() throws IOException {
+        BBuffer url = getMsgBytes().url();
+        if (url.get(0) == 'h') {
+            int firstSlash = url.indexOf('/', 0);
+            schemeMB.appendAscii(url.array(), 
+                    url.getStart(), firstSlash + 2);
+            if (!schemeMB.equals("http://") && 
+                    !schemeMB.equals("https://")) {
+                httpCh.getResponse().setStatus(400);
+                httpCh.abort("Error normalizing url " + 
+                        getMsgBytes().url());
+                return;                                
+            }
+            
+            int urlStart = url.indexOf('/', firstSlash + 2);
+            serverNameMB.recycle();
+            serverNameMB.appendAscii(url.array(), 
+                    url.getStart() + firstSlash + 2, urlStart - firstSlash - 2);
+            
+            url.position(url.getStart() + urlStart);
+        }
         if (!httpCh.normalize(getMsgBytes().url())) {
             httpCh.getResponse().setStatus(400);
             httpCh.abort("Error normalizing url " + 
@@ -982,5 +1002,14 @@ public class HttpRequest extends HttpMessage {
         } catch (IOException e) {
             return "Invalid request";
         }
+    }
+    
+    public boolean isSecure() {
+        return ssl;
+    }
+    
+    public HttpRequest setSecure(boolean ssl) {
+        this.ssl = ssl;
+        return this;
     }
 }
