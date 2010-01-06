@@ -91,23 +91,23 @@
   </target>
 
   <target name="clean" description="Delete the default output folders">
-  	<delete dir="${tomcat.extras}"/>
+    <delete dir="${tomcat.extras}"/>
     <delete dir="${tomcat.embed}"/>
   </target>
 
   <target name="commons-logging" depends="prepare"
-  	      description="Build JULI for log4j extras package">
-    
+          description="Build JULI for log4j extras package">
+
     <antcall target="downloadfile">
       <param name="sourcefile" value="${commons-logging-src.loc}"/>
       <param name="destfile" value="${tomcat.extras}/logging/commons-logging-src.tar.gz"/>
       <param name="destdir" value="${tomcat.extras}/logging/"/>
     </antcall>
-    <gunzip src="${tomcat.extras}/logging/commons-logging-src.tar.gz" 
-    	dest="${tomcat.extras}/logging/commons-logging-src.tar"/>
-    <untar src="${tomcat.extras}/logging/commons-logging-src.tar" 
-    	dest="${tomcat.extras}/logging/"/>
-  	
+    <gunzip src="${tomcat.extras}/logging/commons-logging-src.tar.gz"
+      dest="${tomcat.extras}/logging/commons-logging-src.tar"/>
+    <untar src="${tomcat.extras}/logging/commons-logging-src.tar"
+      dest="${tomcat.extras}/logging/"/>
+
     <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/commons"
         encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
@@ -119,34 +119,34 @@
     </move>
 
     <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
-        encoding="ISO-8859-1">
+      encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
-            value="org.apache.juli" />
-        <replacefilter token="org/apache/commons/"
-              value="org/apache/juli/" />
+        value="org.apache.juli" />
+      <replacefilter token="org/apache/commons/"
+        value="org/apache/juli/" />
     </replace>
-    <copy tofile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml" 
-    	file="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build.xml" />
+    <copy tofile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
+      file="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build.xml" />
 
-  	<ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
-  	     dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src" 
-  	     target="getlibs" />
+    <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
+         dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
+         target="getlibs" />
     <copy todir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src">
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/lib" />
     </copy>
-  	<ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
-  	     dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
-  	     target="compile" />
-  
+    <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
+         dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
+         target="compile" />
+
     <jar jarfile="${tomcat-juli.jar}"
          manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
-        <include name="org/apache/juli/logging/*.class" /> 
-        <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" /> 
-        <include name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
-        <include name="org/apache/juli/logging/impl/SimpleLog*.class" /> 
-        <include name="org/apache/juli/logging/impl/NoOpLog*.class" /> 
-        <include name="org/apache/juli/logging/impl/Jdk14Logger.class" /> 
+        <include name="org/apache/juli/logging/*.class" />
+        <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" />
+        <include name="org/apache/juli/logging/impl/WeakHashtable*.class" />
+        <include name="org/apache/juli/logging/impl/SimpleLog*.class" />
+        <include name="org/apache/juli/logging/impl/NoOpLog*.class" />
+        <include name="org/apache/juli/logging/impl/Jdk14Logger.class" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -167,11 +167,11 @@
     </antcall>
 
     <jar jarfile="${tomcat-juli-adapters.jar}"
-    	 manifest="${tomcat.tmp}/default.manifest" >
+       manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
-        <include name="org/apache/juli/logging/impl/**.class" /> 
-        <exclude name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
-        <exclude name="org/apache/juli/logging/impl/LogFactoryImpl.class" /> 
+        <include name="org/apache/juli/logging/impl/**.class" />
+        <exclude name="org/apache/juli/logging/impl/WeakHashtable*.class" />
+        <exclude name="org/apache/juli/logging/impl/LogFactoryImpl.class" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -187,66 +187,66 @@
   </target>
 
   <target name="webservices" depends="prepare"
-  	      description="Build web services extras package">
-	
-	    <mkdir dir="${tomcat.extras}/webservices"/>
-	
-	    <antcall target="downloadfile">
-	      <param name="sourcefile" value="${jaxrpc-src.loc}"/>
-	      <param name="destfile" value="${tomcat.extras}/webservices/jaxrpc.jar"/>
-	      <param name="destdir" value="${tomcat.extras}/webservices/"/>
-	    </antcall>
-	
-	    <antcall target="downloadfile">
-	      <param name="sourcefile" value="${wsdl4j-src.loc}"/>
-	      <param name="destfile" value="${tomcat.extras}/webservices/wsdl4j.jar"/>
-	      <param name="destdir" value="${tomcat.extras}/webservices/"/>
-	    </antcall>
-	
-	    <!-- Classpath -->
-	    <path id="tomcat.webservices.classpath">
-	      <pathelement path="${tomcat.classpath}"/>
-	      <fileset dir="${tomcat.extras}/webservices">
-	        <include name="jaxrpc.jar"/>
-	        <include name="wsdl4j.jar"/>
-	      </fileset>
-	    </path>
-	
-	    <!-- Compile internal server components -->
-	    <javac srcdir="java" destdir="${tomcat.classes}"
-	           debug="${compile.debug}"
-	           deprecation="${compile.deprecation}"
-	           source="${compile.source}"
-	           optimize="${compile.optimize}"
-	           encoding="ISO-8859-1">
-	      <classpath refid="tomcat.webservices.classpath" />
-	      <include name="org/apache/naming/factory/webservices/**" />
-	    </javac>
-	
-	    <!-- Catalina Main JAR File -->
-	    <jar jarfile="${catalina-ws.jar}"
-	    	 manifest="${tomcat.tmp}/default.manifest">
-	      <fileset dir="${tomcat.classes}">
-            <include name="org/apache/naming/factory/webservices/**" />
-	        <!-- Javadoc and i18n exclusions -->
-	        <exclude name="**/package.html" />
-	        <exclude name="**/LocalStrings_*" />
-	      </fileset>
-          <zipfileset file="res/META-INF/default.notice"
-            fullpath="META-INF/NOTICE" />
-	      <zipfileset file="res/META-INF/default.license"
-	        fullpath="META-INF/LICENSE" />
-	    </jar>
+          description="Build web services extras package">
+
+    <mkdir dir="${tomcat.extras}/webservices"/>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${jaxrpc-src.loc}"/>
+      <param name="destfile" value="${tomcat.extras}/webservices/jaxrpc.jar"/>
+      <param name="destdir" value="${tomcat.extras}/webservices/"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${wsdl4j-src.loc}"/>
+      <param name="destfile" value="${tomcat.extras}/webservices/wsdl4j.jar"/>
+      <param name="destdir" value="${tomcat.extras}/webservices/"/>
+    </antcall>
+
+    <!-- Classpath -->
+    <path id="tomcat.webservices.classpath">
+      <pathelement path="${tomcat.classpath}"/>
+      <fileset dir="${tomcat.extras}/webservices">
+        <include name="jaxrpc.jar"/>
+        <include name="wsdl4j.jar"/>
+      </fileset>
+    </path>
+
+    <!-- Compile internal server components -->
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1">
+      <classpath refid="tomcat.webservices.classpath" />
+      <include name="org/apache/naming/factory/webservices/**" />
+    </javac>
+
+    <!-- Catalina Main JAR File -->
+    <jar jarfile="${catalina-ws.jar}"
+         manifest="${tomcat.tmp}/default.manifest">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/naming/factory/webservices/**" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
+    </jar>
     <antcall target="md5sum">
       <param name="file" value="${catalina-ws.jar}" />
     </antcall>
   </target>
 
   <target name="jmx-remote" depends="prepare"
-	      description="Build JMX remote extras package">
+          description="Build JMX remote extras package">
     <!-- Create the JAR file -->
     <jar jarfile="${catalina-jmx-remote.jar}"
-    	manifest="${tomcat.tmp}/default.manifest" >
+      manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/mbeans/JmxRemote*" />
       </fileset>
@@ -259,19 +259,19 @@
       <param name="file" value="${catalina-jmx-remote.jar}" />
     </antcall>
   </target>
-  
+
   <target name="extras" depends="prepare,commons-logging,webservices,jmx-remote"
-  	      description="Build all extras packages">
+          description="Build all extras packages">
   </target>
 
   <target name="embed" depends="extras"
-  	      description="Embedded packaging for those extras that can use it">
+          description="Embedded packaging for those extras that can use it">
 
     <jar jarfile="${tomcat-embed-log4j.jar}"
          manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
-        <include name="org/apache/juli/logging/*.class" /> 
-        <include name="org/apache/juli/logging/impl/*.class" /> 
+        <include name="org/apache/juli/logging/*.class" />
+        <include name="org/apache/juli/logging/impl/*.class" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -318,7 +318,7 @@
     <mkdir dir="${destdir}" />
     <get src="${sourcefile}" dest="${destfile}" />
   </target>
-	
+
   <target name="downloadgz" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
