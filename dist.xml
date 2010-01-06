@@ -296,35 +296,35 @@
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-  	<!-- 32 bit -->
+    <!-- 32 bit -->
     <copy file="res/procrun/tomcat${version.major}.exe"
         tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
     <copy file="res/procrun/tomcat${version.major}w.exe"
         tofile="${tomcat.dist}/bin/tomcat${version.major}w.exe" />
-  	<!-- 64 bit amd -->
+    <!-- 64 bit amd -->
     <copy file="res/procrun/amd64/tomcat${version.major}.exe"
         tofile="${tomcat.dist}/bin/x64/tomcat${version.major}.exe" />
-  	<!-- 64 bit ia -->
+    <!-- 64 bit ia -->
     <copy file="res/procrun/ia64/tomcat${version.major}.exe"
         tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
-  	<!-- tc native -->
+    <!-- tc native -->
     <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
         tofile="${tomcat.dist}/bin/tcnative-1.dll" />
-  	<!-- tc native 64 bit for amd/emt -->
+    <!-- tc native 64 bit for amd/emt -->
     <copy file="${tomcat-native.home}/tcnative-1.dll.x64"
         tofile="${tomcat.dist}/bin/x64/tcnative-1.dll" />
-  	<!-- tc native 64 bit for ia -->
+    <!-- tc native 64 bit for ia -->
     <copy file="${tomcat-native.home}/tcnative-1.dll.i64"
         tofile="${tomcat.dist}/bin/i64/tcnative-1.dll" />
-	<!-- platform README files -->
-	<echo append="false" file="${tomcat.dist}/bin/i64/README">
+    <!-- platform README files -->
+    <echo append="false" file="${tomcat.dist}/bin/i64/README">
 Apache Tomcat ${version} native binaries for Win64 IA64 platform.
-	</echo>
-	<echo append="false" file="${tomcat.dist}/bin/x64/README">
+    </echo>
+    <echo append="false" file="${tomcat.dist}/bin/x64/README">
 Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
-	</echo>
+    </echo>
 
-  	<!-- Make sure the RELEASE-NOTES has Windows line endings as they may be
+    <!-- Make sure the RELEASE-NOTES has Windows line endings as they may be
          displayed post-install -->
     <fixcrlf srcdir="${tomcat.dist}/webapps/ROOT"
         includes="RELEASE-NOTES.txt" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
@@ -341,7 +341,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <arg value="tomcat.nsi" />
     </exec>
 
-  	<!-- Restore original line ending-->
+    <!-- Restore original line ending-->
     <fixcrlf srcdir="${tomcat.dist}/webapps/ROOT"
         includes="RELEASE-NOTES.txt" encoding="ISO-8859-1" fixlast="false" />
 
