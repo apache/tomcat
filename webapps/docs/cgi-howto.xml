@@ -84,7 +84,7 @@ to be used with the GCI servlet. Default is
 variables (if any) be passed to the CGI script? Default is
 <code>false</code>.</li>
 <li><strong>stderrTimeout</strong> - The time (in milliseconds) to wait for
-the reading of stderr to complete before terminating the CGI process? Default
+the reading of stderr to complete before terminating the CGI process. Default
 is 2000.</li>
 </ul>
 </p>

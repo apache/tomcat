@@ -265,7 +265,7 @@ public final class CGIServlet extends HttpServlet {
         System.getProperty("file.encoding", "UTF-8");
 
     /**
-     * The time (in milliseconds) to wait for the reading of stdErr to complete
+     * The time (in milliseconds) to wait for the reading of stderr to complete
      * before terminating the CGI process.
      */
     private long stderrTimeout = 2000;
