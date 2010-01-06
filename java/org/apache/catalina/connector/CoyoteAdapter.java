@@ -57,14 +57,14 @@ import org.apache.tomcat.util.net.SocketStatus;
 
 public class CoyoteAdapter implements Adapter {
     
+    private static final Log log = LogFactory.getLog(CoyoteAdapter.class);
+
+    // -------------------------------------------------------------- Constants
+
     private static final String POWERED_BY = "Servlet/3.0 JSP/2.2 " +
             "(" + ServerInfo.getServerInfo() + " Java/" +
             System.getProperty("java.vm.vendor") + "/" +
             System.getProperty("java.runtime.version") + ")";
-
-    private static final Log log = LogFactory.getLog(CoyoteAdapter.class);
-
-    // -------------------------------------------------------------- Constants
 
     private static final EnumSet<SessionTrackingMode> SSL_ONLY =
         EnumSet.of(SessionTrackingMode.SSL);
