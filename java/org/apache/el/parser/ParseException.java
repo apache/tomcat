@@ -60,7 +60,7 @@ public class ParseException extends Exception {
   /**
    * This is the last token that has been consumed successfully.  If
    * this object has been created due to a parse error, the token
-   * following this token will (therefore) be the first error token.
+   * followng this token will (therefore) be the first error token.
    */
   public Token currentToken;
 
@@ -139,7 +139,7 @@ public class ParseException extends Exception {
    * string literal.
    */
   static String add_escapes(String str) {
-      StringBuilder retval = new StringBuilder();
+      StringBuffer retval = new StringBuffer();
       char ch;
       for (int i = 0; i < str.length(); i++) {
         switch (str.charAt(i))

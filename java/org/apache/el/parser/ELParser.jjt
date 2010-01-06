@@ -353,11 +353,15 @@ void Null() #Null : {}
 /* ==================================================================================== */
 <DEFAULT> TOKEN :
 {
+  /*
+   * The following definition uses + rather than * in two places to prevent
+   * LITERAL_EXPRESSION matching the empty string that could result in the
+   * Parser entering an infinite loop.
+   */
   < LITERAL_EXPRESSION:
-    ((~["\\", "$", "#"])
-      | ("\\" ("\\" | "$" | "#"))
-      | ("$" ~["{", "$"])
-      | ("#" ~["{", "#"])
+    (   (~["$", "#", "\\"])* "\\" (["$", "#"])?
+      | (~["$", "#"])* (["$", "#"] ~["{"])
+      | (~["$", "#"])+
     )+
     | "$"
     | "#"
@@ -367,8 +371,6 @@ void Null() #Null : {}
 |
   < START_DEFERRED_EXPRESSION: "#{" > : IN_EXPRESSION
 }
-
-<DEFAULT> SKIP : { "\\" }
 
 <IN_EXPRESSION> SKIP : { " " | "\t" | "\n" | "\r" }
 
