@@ -77,9 +77,12 @@ public class JspConfig {
         try {
             webXml = new WebXml(ctxt);
             
-            ParserUtils pu = new ParserUtils();
-            TreeNode webApp = pu.parseXMLDocument(webXml.getSystemId(),
-                    webXml.getInputSource());
+            TreeNode webApp = null;
+            if (webXml.getInputSource() != null) {
+                ParserUtils pu = new ParserUtils();
+                webApp = pu.parseXMLDocument(webXml.getSystemId(),
+                        webXml.getInputSource());
+            }
 
             if (webApp == null
                     || getVersion(webApp) < 2.4) {
