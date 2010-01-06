@@ -132,7 +132,7 @@
   <target name="build-prepare">
 
     <available classname="junit.framework.TestCase" property="junit.present" />
-  	
+
     <mkdir dir="${tomcat.classes}"/>
 
     <delete dir="${tomcat.build}/temp" />
@@ -159,8 +159,8 @@
            optimize="${compile.optimize}"
            excludes="**/CVS/**,**/.svn/**"
            encoding="ISO-8859-1"
-    	   includeAntRuntime="true" >
-<!-- Comment this in to show unchecked warnings:     
+           includeAntRuntime="true" >
+<!-- Comment this in to show unchecked warnings:
       <compilerarg value="-Xlint:unchecked"/>
  -->
       <classpath refid="tomcat.classpath" />
@@ -201,7 +201,7 @@
     <include name="javax/servlet/http/*" />
     <include name="javax/servlet/resources/*" />
   </patternset>
-  
+
   <patternset id="files.jsp-api">
     <include name="javax/servlet/jsp/**" />
   </patternset>
@@ -276,14 +276,14 @@
   <patternset id="files.jasper">
     <include name="org/apache/jasper/**" />
   </patternset>
-  
+
   <patternset id="files.jasper-el">
     <include name="org/apache/el/**" />
   </patternset>
 
   <!-- Pattern sets for embedded JARs -->
   <patternset id="files.tomcat-embed-core" >
-  	<patternset refid="files.annotations-api" />
+    <patternset refid="files.annotations-api" />
     <patternset refid="files.servlet-api" />
     <patternset refid="files.el-api" />
     <patternset refid="files.bootstrap" />
@@ -297,7 +297,7 @@
     <patternset refid="files.jasper" />
     <patternset refid="files.jasper-el" />
   </patternset>
-  
+
   <!-- Pattern sets used directly -->
     <!--<patternset refid="files.tomcat-juli" />-->
 
@@ -305,7 +305,7 @@
     <!--<patternset refid="files.catalina-tribes" />-->
     <!--<patternset refid="files.catalina-ha" />-->
     <!--<patternset refid="files.catalina-ant" />-->
-	
+
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">
     <attribute name="jarfile" description="the name of the JAR file to create"/>
     <attribute name="filesDir" description="the directory to obtain the files from"/>
@@ -324,12 +324,12 @@
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
         </fileset>
-      	<zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
+        <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
         <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
       </jar>
     </sequential>
   </macrodef>
-  
+
   <target name="build-manifests" >
     <!-- Filtering tokens for JAR manifests-->
     <filter token="source.jdk" value="${compile.source}"/>
@@ -343,7 +343,7 @@
       <filterset refid="version.filters"/>
       <fileset dir="${tomcat.home}/res/META-INF" includes="*.manifest" />
     </copy>
-    
+
   </target>
 
   <target name="package" depends="build-manifests" >
@@ -436,9 +436,9 @@
         <include name="**/LocalStrings_es.properties" />
       </fileset>
       <zipfileset file="res/META-INF/default.notice"
-      	fullpath="META-INF/NOTICE" />
+        fullpath="META-INF/NOTICE" />
       <zipfileset file="res/META-INF/default.license"
-      	fullpath="META-INF/LICENSE" />
+        fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
       manifest="${tomcat.tmp}/default.manifest" >
@@ -545,7 +545,7 @@
           <param name="relative-path" expression=".."/>
     </xslt>
   </target>
- 
+
   <target name="deploy" depends="build-only,build-docs"
           description="Default. Builds a working Tomcat instance">
 
@@ -570,7 +570,7 @@
          <include name="**/*.bat"/>
       </fileset>
     </copy>
-  	<!-- Copy doesn't retain permissions -->
+    <!-- Copy doesn't retain permissions -->
     <chmod dir="${tomcat.build}/bin" includes="*.sh" perm="+x"/>
 
     <!-- Copy static resource files -->
@@ -587,7 +587,7 @@
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="ROOT/**"/>
-      	<exclude name="ROOT/index.html"/>
+        <exclude name="ROOT/index.html"/>
         <include name="examples/**"/>
         <include name="manager/**"/>
         <include name="host-manager/**"/>
@@ -711,7 +711,7 @@
       </fileset>
     </txt2html>
 
-    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" 
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib"
       failonerror="false"/>
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
 
@@ -721,10 +721,10 @@
     depends="build-prepare,build-manifests,compile" >
 
     <mkdir dir="${tomcat.embed}" />
-  	
-  	<copy file="${basedir}/LICENSE" todir="${tomcat.embed}" />
+
+    <copy file="${basedir}/LICENSE" todir="${tomcat.embed}" />
     <copy file="${basedir}/NOTICE" todir="${tomcat.embed}" />
-    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.embed}" 
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.embed}"
       failonerror="false"/>
     <copy file="${jasper-jdt.jar}" todir="${tomcat.embed}" />
 
@@ -748,9 +748,9 @@
     <mkdir dir="${tomcat.embed.sources}" />
 
     <!--No sources for jasper-jdt-->
-  	
+
     <jarIt jarfile="${tomcat-embed-core-sources.jar}"
-    	   filesDir="java"
+           filesDir="java"
            filesId="files.tomcat-embed-core"/>
     <jarIt jarfile="${tomcat-embed-jasper-sources.jar}"
            filesDir="java"
@@ -777,16 +777,16 @@
 
   <target name="test" description="Runs the JUnit test cases"
     depends="compile,test-compile" >
-  	
-  	<junit printsummary="yes" fork="yes">
-  	  <classpath refid="tomcat.test.classpath" />
+
+    <junit printsummary="yes" fork="yes">
+      <classpath refid="tomcat.test.classpath" />
 
       <formatter type="plain" usefile="false" />
 
       <batchtest>
         <fileset dir="test" >
           <!-- Include all by default -->
-      	  <include name="**/Test*.java" />
+          <include name="**/Test*.java" />
           <!-- Exclude TestAll ortherwise there will be duplicated -->
           <exclude name="**/TestAll.java" />
           <!-- Exclude helper classes -->
@@ -794,8 +794,8 @@
           <!-- Exclude the tests known to fail -->
           <exclude name="org/apache/catalina/tribes/**" />
         </fileset>
-  	  </batchtest>
-  	</junit>
+      </batchtest>
+    </junit>
   </target>
 
   <target name="clean-depend"
@@ -805,7 +805,7 @@
   </target>
 
   <target name="clean"
-  	      description="Delete the default output folders">
+          description="Delete the default output folders">
     <delete dir="${tomcat.classes}" />
     <delete dir="${tomcat.build}" />
     <delete dir="${tomcat.tmp}" />
@@ -915,7 +915,7 @@
     <antcall target="downloadzip">
       <param name="sourcefile" value="${nsis.loc}"/>
       <param name="destfile" value="${nsis.exe}"/>
-  	  <param name="destdir" value="${nsis.home}/.."/>
+      <param name="destdir" value="${nsis.home}/.."/>
     </antcall>
 
        <!-- Download json libraries -->
@@ -974,7 +974,7 @@
     </javac>
     <jar jarfile="${tomcat-dbcp.jar}"
          index="true"
-    	 manifest="${tomcat.tmp}/default.manifest">
+         manifest="${tomcat.tmp}/default.manifest">
       <fileset dir="${tomcat-dbcp.home}/classes">
         <include name="**/*.class" />
         <include name="**/*.properties" />
@@ -989,7 +989,7 @@
   <target name="build-jasper-jdt" depends="build-manifests" >
     <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
     <jar destfile="${jasper-jdt.jar}" index="true"
-    	 manifest="${tomcat.tmp}/default.manifest">
+         manifest="${tomcat.tmp}/default.manifest">
       <fileset dir="${jasper-jdt.home}">
         <include name="org/eclipse/jdt/core/compiler/**"/>
         <include name="org/eclipse/jdt/internal/compiler/**"/>
