@@ -46,9 +46,32 @@ public class TestELEvaluation extends TestCase {
         assertEquals("false", evaluateExpression("${false?true:false}"));
     }
 
-    public void testMisc() {
-        // From bug 45451 - not a parser bug
-        assertEquals("\\", evaluateExpression("\\\\"));
+    public void testParserLiteralExpression() {
+        // Inspired by work on bug 45451, comments from kkolinko on the dev
+        // list and looking at the spec to find some edge cases
+
+        // '\' is only an escape character inside a StringLiteral
+        assertEquals("\\\\", evaluateExpression("\\\\"));
+    }
+
+    public void testParserStringLiteral() {
+        // Inspired by work on bug 45451, comments from kkolinko on the dev
+        // list and looking at the spec to find some edge cases
+        
+        // '\' is only an escape character inside a StringLiteral
+        assertEquals("\\", evaluateExpression("${'\\\\'}"));
+        assertEquals("\\", evaluateExpression("${\"\\\\\"}"));
+
+        // Can use ''' inside '"' when quoting with '"' and vice versa without
+        // escaping
+        assertEquals("\\\"", evaluateExpression("${'\\\\\"'}"));
+        assertEquals("\"\\", evaluateExpression("${'\"\\\\'}"));
+        assertEquals("\\'", evaluateExpression("${'\\\\\\''}"));
+        assertEquals("'\\", evaluateExpression("${'\\'\\\\'}"));
+        assertEquals("\\'", evaluateExpression("${\"\\\\'\"}"));
+        assertEquals("'\\", evaluateExpression("${\"'\\\\\"}"));
+        assertEquals("\\\"", evaluateExpression("${\"\\\\\\\"\"}"));
+        assertEquals("\"\\", evaluateExpression("${\"\\\"\\\\\"}"));
     }
 
     private void compareBoth(String msg, int expected, Object o1, Object o2){
