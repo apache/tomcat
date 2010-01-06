@@ -52,6 +52,22 @@ public class TestELEvaluation extends TestCase {
 
         // '\' is only an escape character inside a StringLiteral
         assertEquals("\\\\", evaluateExpression("\\\\"));
+        
+        /*
+         * LiteralExpresions can only contain ${ or #{ if escaped with \
+         * \ is not an escape character in any other circumstances including \\
+         */
+        assertEquals("\\", evaluateExpression("\\"));
+        assertEquals("$", evaluateExpression("$"));
+        assertEquals("#", evaluateExpression("#"));
+        assertEquals("\\$", evaluateExpression("\\$"));
+        assertEquals("\\#", evaluateExpression("\\#"));
+        assertEquals("\\\\$", evaluateExpression("\\\\$"));
+        assertEquals("\\\\#", evaluateExpression("\\\\#"));
+        assertEquals("${", evaluateExpression("\\${"));
+        assertEquals("#{", evaluateExpression("\\#{"));
+        assertEquals("\\${", evaluateExpression("\\\\${"));
+        assertEquals("\\#{", evaluateExpression("\\\\#{"));
     }
 
     public void testParserStringLiteral() {
