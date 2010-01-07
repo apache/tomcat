@@ -137,7 +137,7 @@ public class TestELEvaluation extends TestCase {
             if ("trim".equals(localName)) {
                 Method m;
                 try {
-                    m = this.getClass().getMethod("trim", String.class);
+                    m = TesterFunctions.class.getMethod("trim", String.class);
                     return m;
                 } catch (SecurityException e) {
                     // Ignore
@@ -146,10 +146,6 @@ public class TestELEvaluation extends TestCase {
                 } 
             }
             return null;
-        }
-        
-        public static String trim(String input) {
-            return input.trim();
         }
     }
 }
