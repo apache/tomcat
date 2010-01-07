@@ -1,0 +1,19 @@
+<jsp:root
+  xmlns:bug45451="urn:jsptagdir:/WEB-INF/tags/bug45451"
+  xmlns:jsp="http://java.sun.com/JSP/Page" version="2.2"
+  xmlns:tags="urn:jsptagdir:/WEB-INF/tags" >
+  <jsp:directive.page isELIgnored="false" />
+<html>
+  <body>
+    <p>00-${1+1}</p>
+    <p>01-\${1+1}</p>
+    <p>02-\\${1+1}</p>
+    <p>03-\\\${1+1}</p>
+    <tags:echo echo="04-${1+1}" />
+    <tags:echo echo="05-\${1+1}" />
+    <tags:echo echo="06-\\${1+1}" />
+    <tags:echo echo="07-\\\${1+1}" />
+    <tags:echo echo="08-\\\\${1+1}" />
+  </body>
+</html>
+</jsp:root>
