@@ -277,6 +277,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("08-a2z") > 0);
         assertTrue(result.indexOf("09-az2") > 0);
         assertTrue(result.indexOf("10-${'foo'}bar") > 0);
+        assertTrue(result.indexOf("11-\"}") > 0);
     }
 
 
