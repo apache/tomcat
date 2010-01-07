@@ -133,42 +133,48 @@ public class TestELInJsp extends TomcatBaseTest {
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451b.jsp");
         result = res.toString();
+        System.out.println(result);
         // Warning: JSP attribute escaping != Java String escaping
+        // Warning: Attributes are always unescaped before passing to the EL
+        //          processor
         assertTrue(result.indexOf("00-2") > 0);
         assertTrue(result.indexOf("01-${1+1}") > 0);
         assertTrue(result.indexOf("02-\\${1+1}") > 0);
         assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
         assertTrue(result.indexOf("04-2") > 0);
         assertTrue(result.indexOf("05-${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\2") > 0);
+        assertTrue(result.indexOf("06-\\2") > 0);      // TODO Fails (bug)
         assertTrue(result.indexOf("07-\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\2") > 0);
+        assertTrue(result.indexOf("08-\\\\2") > 0);    // TODO Fails (bug) 
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451c.jsp");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
+        // TODO - Currently we allow a single unescaped \ in attribute values
+        //        Review if this should cause a warning/error
         assertTrue(result.indexOf("00-${1+1}") > 0);
         assertTrue(result.indexOf("01-\\${1+1}") > 0);
         assertTrue(result.indexOf("02-\\\\${1+1}") > 0);
         assertTrue(result.indexOf("03-\\\\\\${1+1}") > 0);
         assertTrue(result.indexOf("04-${1+1}") > 0);
         assertTrue(result.indexOf("05-\\${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("07-\\\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\\\\\${1+1}") > 0);
+        assertTrue(result.indexOf("06-\\${1+1}") > 0);
+        assertTrue(result.indexOf("07-\\\\${1+1}") > 0);
+        assertTrue(result.indexOf("08-\\\\${1+1}") > 0);
 
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451d.jspx");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
+        // \\ Is *not* an escape sequence in XML attributes
         assertTrue(result.indexOf("00-2") > 0);
         assertTrue(result.indexOf("01-${1+1}") > 0);
         assertTrue(result.indexOf("02-\\${1+1}") > 0);
         assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
         assertTrue(result.indexOf("04-2") > 0);
         assertTrue(result.indexOf("05-${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\2") > 0);
-        assertTrue(result.indexOf("07-\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\2") > 0);
+        assertTrue(result.indexOf("06-\\${1+1}") > 0);
+        assertTrue(result.indexOf("07-\\\\${1+1}") > 0);
+        assertTrue(result.indexOf("08-\\\\\\${1+1}") > 0);
     }
 
     public void testBug45511() throws Exception {
@@ -262,8 +268,8 @@ public class TestELInJsp extends TomcatBaseTest {
         String result = res.toString();
         assertTrue(result.indexOf("00-\\\\\\\"${'hello world'}") > 0);
         assertTrue(result.indexOf("01-\\\\\\\"\\${'hello world'}") > 0);
-        assertTrue(result.indexOf("02-\\\"\\${'hello world'}") > 0);
-        assertTrue(result.indexOf("03-\\\"\\${'hello world'}") > 0);
+        assertTrue(result.indexOf("02-\\\"\\${'hello world'}") > 0); // TODO - bug
+        assertTrue(result.indexOf("03-\\\"\\hello world") > 0);      // TODO - bug
         assertTrue(result.indexOf("2az-04") > 0);
         assertTrue(result.indexOf("05-a2z") > 0);
         assertTrue(result.indexOf("06-az2") > 0);
