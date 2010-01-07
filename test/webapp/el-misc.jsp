@@ -28,5 +28,6 @@
     <tags:echo echo="${\"2\"}az-07" />
     <tags:echo echo="08-a${\"2\"}z" />
     <tags:echo echo="09-az${\"2\"}" />
+    <tags:echo echo="10-\${'foo'}${'bar'}" />
   </body>
 </html>
