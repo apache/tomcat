@@ -121,7 +121,7 @@ public class TestELInJsp extends TomcatBaseTest {
         
         tomcat.start();
 
-        ByteChunk res = /* getUrl("http://localhost:" + getPort() +
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug45451a.jsp");
         
         String result = res.toString();
@@ -131,8 +131,8 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("02-\\'hello world\\'") > 0);
         assertTrue(result.indexOf("03-\\'hello world\\'") > 0);
         
-        res = */ getUrl("http://localhost:" + getPort() + "/test/bug45451b.jsp");
-        String result = res.toString();
+        res = getUrl("http://localhost:" + getPort() + "/test/bug45451b.jsp");
+        result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         assertTrue(result.indexOf("00-2") > 0);
         assertTrue(result.indexOf("01-${1+1}") > 0);
