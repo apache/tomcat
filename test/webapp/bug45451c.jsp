@@ -15,4 +15,5 @@
   limitations under the License.
 --%>
 <%@page isELIgnored="true" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ include file="bug45451.jspf" %>
