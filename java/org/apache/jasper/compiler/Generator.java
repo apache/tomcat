@@ -804,8 +804,8 @@ class Generator {
                 }
                 return v;
             } else if (attr.isELInterpreterInput()) {
-                v = attributeValueWithEL(this.isTagFile, v, expectedType,
-                        attr.getEL().getMapName());
+                v = JspUtil.interpreterCall(this.isTagFile, v, expectedType,
+                        attr.getEL().getMapName(), false);
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
                             + v + ", request.getCharacterEncoding())";
@@ -820,124 +820,6 @@ class Generator {
                 }
                 return quote(v);
             }
-        }
-
-
-        /*
-         * When interpreting the EL attribute value, literals outside the EL
-         * must not be unescaped but the EL processor will unescape them.
-         * Therefore, make sure only the EL expressions are processed by the EL
-         * processor.
-         */
-        private String attributeValueWithEL(boolean isTag, String tx,
-                Class<?> expectedType, String mapName) {
-            if (tx==null) return null;
-            Class<?> type = expectedType;
-            int size = tx.length();
-            StringBuilder output = new StringBuilder(size);
-            boolean el = false;
-            int i = 0;
-            int mark = 0;
-            char ch;
-            
-            while(i < size){
-                ch = tx.charAt(i);
-                
-                // Start of an EL expression
-                if (!el && i+1 < size && ch == '$' && tx.charAt(i+1)=='{') {
-                    if (mark < i) {
-                        if (output.length() > 0) {
-                            output.append(" + ");
-                            // Composite expression - must coerce to String
-                            type = String.class;
-                        }
-                        output.append(quote(tx.substring(mark, i)));
-                    }
-                    mark = i;
-                    el = true;
-                    i += 2;
-                } else if (ch=='\\' && i+1 < size &&
-                        (tx.charAt(i+1)=='$' || tx.charAt(i+1)=='}')) { 
-                    // Skip an escaped $ or }
-                    i += 2;
-                } else if (el && ch=='}') {
-                    // End of an EL expression
-                    if (output.length() > 0) {
-                        output.append(" + ");
-                        // Composite expression - must coerce to String
-                        type = String.class;
-                    }
-                    if (i+1 < size) {
-                        // Composite expression - must coerce to String
-                        type = String.class;
-                    }
-                    output.append(
-                            JspUtil.interpreterCall(isTag,
-                                    tx.substring(mark, i+1), type,
-                                    mapName, false));
-                    mark = i + 1;
-                    el = false;
-                    ++i;
-                } else {
-                    // Nothing to see here - move to next character
-                    ++i;
-                }
-            }
-            if (!el && mark < i) {
-                if (output.length() > 0) {
-                    output.append(" + ");
-                }
-                output.append(quote(tx.substring(mark, i)));
-            }
-            if (expectedType != type && !expectedType.isAssignableFrom(type)) {
-                // Composite expression was evaluated to String
-                // We must coerce it to the expected type.
-                String className = JspUtil.getCanonicalName(expectedType);
-                String methodName = null;
-                if (expectedType.isPrimitive()) {
-                    if (expectedType == Boolean.TYPE) {
-                        className = "Boolean";
-                        methodName = ".booleanValue()";
-                    }
-                    else if (expectedType == Character.TYPE) {
-                        className = "Character";
-                        methodName = ".charValue()";
-                    }
-                    else if (expectedType == Byte.TYPE) {
-                        className = "Byte";
-                        methodName = ".byteValue()";
-                    }
-                    else if (expectedType == Short.TYPE) {
-                        className = "Short";
-                        methodName = ".shortValue()";
-                    }
-                    else if (expectedType == Integer.TYPE) {
-                        className = "Integer";
-                        methodName = ".intValue()";
-                    }
-                    else if (expectedType == Long.TYPE) {
-                        className = "Long";
-                        methodName = ".longValue()";
-                    }
-                    else if (expectedType == Float.TYPE) {
-                        className = "Float";
-                        methodName = ".floatValue()";
-                    }
-                    else if (expectedType == Double.TYPE) {
-                        className = "Double";
-                        methodName = ".doubleValue()";
-                    }
-                }
-                output.insert(0, "(("
-                        + className
-                        + ")org.apache.el.lang.ELSupport.coerceToType(");
-                output.append(",").append(className).append(".class))");
-                if (methodName != null) {
-                    output.insert(0, '(');
-                    output.append(methodName).append(')');
-                }
-            }
-            return output.toString();
         }
 
 
@@ -3000,8 +2882,8 @@ class Generator {
                     // run attrValue through the expression interpreter
                     String mapName = (attr.getEL() != null) ? attr.getEL()
                             .getMapName() : null;
-                    attrValue = attributeValueWithEL(this.isTagFile,
-                            attrValue, c[0], mapName);
+                    attrValue = JspUtil.interpreterCall(this.isTagFile, attrValue,
+                            c[0], mapName, false);
                 }
             } else {
                 attrValue = convertString(c[0], attrValue, localName,
