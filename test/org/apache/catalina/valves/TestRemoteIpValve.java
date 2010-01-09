@@ -33,7 +33,7 @@ import org.apache.catalina.valves.ValveBase;
 /**
  * {@link RemoteIpValve} Tests
  */
-public class RemoteIpValveTest extends TestCase {
+public class TestRemoteIpValve extends TestCase {
     
     static class RemoteAddrAndHostTrackerValve extends ValveBase {
         private String remoteAddr;
