@@ -129,9 +129,10 @@
       <li>The root logger can define its set of handlers using a
       <code>.handlers</code> property.</li>
       <li>Logging is buffered using a default buffer size of 8192 bytes.
-      To change buffersize, use the <code>bufferSize</code> property.</li>
-      <li>System property replacement for property values which start with
-      ${systemPropertyName}.</li>
+      To change buffersize, use the <code>bufferSize</code> property of a handler.
+      The value of <code>0</code> disables buffering.</li>
+      <li>System property replacement is performed for property values which
+      contain ${systemPropertyName}.</li>
     </ul>
   </p>
   <p>
