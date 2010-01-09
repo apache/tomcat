@@ -145,7 +145,16 @@ public class FileHandler
         try {
             PrintWriter writer = this.writer;
             if (writer!=null) {
-                writer.write(result);
+                if (bufferSize > 0) {
+                    writer.write(result);
+                } else {
+                    synchronized (this) {
+                        // OutputStreamWriter performs buffering inside its StreamEncoder,
+                        // and so to run without a buffer we have to flush explicitly
+                        writer.write(result);
+                        writer.flush();
+                    }
+                }
             } else {
                 reportError("FileHandler is closed or not yet initialized, unable to log ["+result+"]", null, ErrorManager.WRITE_FAILURE);
             }
