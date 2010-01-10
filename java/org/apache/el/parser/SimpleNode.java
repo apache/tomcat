@@ -45,9 +45,11 @@ public abstract class SimpleNode extends ELSupport implements Node {
     }
 
     public void jjtOpen() {
+        // NOOP by default
     }
 
     public void jjtClose() {
+        // NOOP by default
     }
 
     public void jjtSetParent(Node n) {
@@ -151,11 +153,13 @@ public abstract class SimpleNode extends ELSupport implements Node {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Object invoke(EvaluationContext ctx, Class[] paramTypes,
             Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("unchecked")
     public MethodInfo getMethodInfo(EvaluationContext ctx,
             Class[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
