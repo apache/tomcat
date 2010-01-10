@@ -91,6 +91,7 @@ public final class AstIdentifier extends SimpleNode {
         ctx.getELResolver().setValue(ctx, null, this.image, value);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object invoke(EvaluationContext ctx, Class[] paramTypes,
             Object[] paramValues) throws ELException {
@@ -98,6 +99,7 @@ public final class AstIdentifier extends SimpleNode {
     }
     
 
+    @SuppressWarnings("unchecked")
     @Override
     public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes)
             throws ELException {
