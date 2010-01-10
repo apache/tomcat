@@ -22,10 +22,17 @@ import junit.framework.TestSuite;
 
 import org.apache.catalina.connector.TestKeepAliveCount;
 import org.apache.catalina.connector.TestRequest;
+import org.apache.catalina.core.TestStandardContext;
 import org.apache.catalina.ha.session.TestSerializablePrincipal;
 import org.apache.catalina.startup.TestTomcat;
+import org.apache.catalina.startup.TestTomcatSSL;
+import org.apache.catalina.startup.TestWebXml;
 import org.apache.el.TestELEvaluation;
+import org.apache.el.TestELInJsp;
 import org.apache.el.lang.TestELSupport;
+import org.apache.jasper.compiler.TestAttributeParser;
+import org.apache.jasper.compiler.TestGenerator;
+import org.apache.jasper.compiler.TestValidator;
 import org.apache.tomcat.util.http.TestCookies;
 import org.apache.tomcat.util.res.TestStringManager;
 
@@ -35,18 +42,28 @@ public class TestAll {
         TestSuite suite = new TestSuite("Test for org.apache");
         // o.a.catalina
         // connector
-        suite.addTestSuite(TestRequest.class);
         suite.addTestSuite(TestKeepAliveCount.class);
+        suite.addTestSuite(TestRequest.class);
+        // core
+        suite.addTestSuite(TestStandardContext.class);
         // ha.session
         suite.addTestSuite(TestSerializablePrincipal.class);
         // startup
         suite.addTestSuite(TestTomcat.class);
+        suite.addTestSuite(TestTomcatSSL.class);
+        suite.addTestSuite(TestWebXml.class);
         // tribes
         // suite.addTest(TribesTestSuite.suite());
         
         // o.a.el
         suite.addTestSuite(TestELSupport.class);
         suite.addTestSuite(TestELEvaluation.class);
+        suite.addTestSuite(TestELInJsp.class);
+        
+        // o.a.jasper
+        suite.addTestSuite(TestAttributeParser.class);
+        suite.addTestSuite(TestGenerator.class);
+        suite.addTestSuite(TestValidator.class);
         
         // o.a.tomcat.util
         // http
