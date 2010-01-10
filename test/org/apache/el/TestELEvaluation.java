@@ -21,6 +21,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Date;
 
+import javax.el.ELException;
 import javax.el.ValueExpression;
 import javax.el.FunctionMapper;
 
@@ -115,10 +116,27 @@ public class TestELEvaluation extends TestCase {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
         
-        // '\' is only an escape character inside a StringLiteral
+        // The only characters that can be escaped inside a String literal
+        // are \ " and '. # and $ are not escaped inside a String literal.
         assertEquals("\\", evaluateExpression("${'\\\\'}"));
         assertEquals("\\", evaluateExpression("${\"\\\\\"}"));
+        assertEquals("\\\"'$#", evaluateExpression("${'\\\\\\\"\\'$#'}"));
+        assertEquals("\\\"'$#", evaluateExpression("${\"\\\\\\\"\\'$#\"}"));
 
+        // Trying to quote # or $ should throw an error
+        Exception e = null;
+        try {
+            evaluateExpression("${'\\$'}");
+        } catch (ELException el) {
+            e = el;
+        }
+        assertNotNull(e);
+
+        assertEquals("\\$", evaluateExpression("${'\\\\$'}"));
+        assertEquals("\\\\$", evaluateExpression("${'\\\\\\\\$'}"));
+        
+        
+        
         // Can use ''' inside '"' when quoting with '"' and vice versa without
         // escaping
         assertEquals("\\\"", evaluateExpression("${'\\\\\"'}"));
