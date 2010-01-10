@@ -21,15 +21,19 @@ import java.io.File;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.jasper.compiler.TestAttributeParser;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+/**
+ * Tests EL with an without JSP attributes using a test web application. Similar
+ * tests may be found in {@link TestELEvaluation} and {@link TestAttributeParser}.
+ */
 public class TestELInJsp extends TomcatBaseTest {
     
     public void testBug42565() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
-            new File("test/webapp");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -133,7 +137,6 @@ public class TestELInJsp extends TomcatBaseTest {
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451b.jsp");
         result = res.toString();
-        System.out.println(result);
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
         //          processor
@@ -143,9 +146,9 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
         assertTrue(result.indexOf("04-2") > 0);
         assertTrue(result.indexOf("05-${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\2") > 0);      // TODO Fails (bug)
+        assertTrue(result.indexOf("06-\\2") > 0);      
         assertTrue(result.indexOf("07-\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\2") > 0);    // TODO Fails (bug) 
+        assertTrue(result.indexOf("08-\\\\2") > 0); 
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451c.jsp");
         result = res.toString();
@@ -268,8 +271,8 @@ public class TestELInJsp extends TomcatBaseTest {
         String result = res.toString();
         assertTrue(result.indexOf("00-\\\\\\\"${'hello world'}") > 0);
         assertTrue(result.indexOf("01-\\\\\\\"\\${'hello world'}") > 0);
-        assertTrue(result.indexOf("02-\\\"\\${'hello world'}") > 0); // TODO - bug
-        assertTrue(result.indexOf("03-\\\"\\hello world") > 0);      // TODO - bug
+        assertTrue(result.indexOf("02-\\\"${'hello world'}") > 0);
+        assertTrue(result.indexOf("03-\\\"\\hello world") > 0);
         assertTrue(result.indexOf("2az-04") > 0);
         assertTrue(result.indexOf("05-a2z") > 0);
         assertTrue(result.indexOf("06-az2") > 0);
@@ -280,5 +283,32 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("11-\"}") > 0);
     }
 
+    public void testScriptingExpression() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/script-expr.jsp");
+        String result = res.toString();
+        System.out.println(result);
+        assertTrue(result.indexOf("00-hello world") > 0);
+        assertTrue(result.indexOf("01-hello \"world") > 0);
+        assertTrue(result.indexOf("02-hello \\\"world") > 0);
+        assertTrue(result.indexOf("03-hello ${world") > 0);
+        assertTrue(result.indexOf("04-hello \\${world") > 0);
+        assertTrue(result.indexOf("05-hello world") > 0);
+        assertTrue(result.indexOf("06-hello \"world") > 0);
+        assertTrue(result.indexOf("07-hello \\\"world") > 0);
+        assertTrue(result.indexOf("08-hello ${world") > 0);
+        assertTrue(result.indexOf("09-hello \\${world") > 0);
+        assertTrue(result.indexOf("10-hello <% world") > 0);
+        assertTrue(result.indexOf("11-hello %> world") > 0);
+    }
 
 }
