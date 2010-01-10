@@ -142,9 +142,11 @@ public final class AstValue extends SimpleNode {
         Class<?> targetClass = resolver.getType(ctx, t.base, t.property);
         if (COERCE_TO_ZERO == true
                 || !isAssignable(value, targetClass)) {
-            value = ELSupport.coerceToType(value, targetClass);
+            resolver.setValue(ctx, t.base, t.property,
+                    ELSupport.coerceToType(value, targetClass));
+        } else {
+            resolver.setValue(ctx, t.base, t.property, value);
         }
-        resolver.setValue(ctx, t.base, t.property, value);
     }
 
     private boolean isAssignable(Object value, Class<?> targetClass) {
@@ -159,6 +161,7 @@ public final class AstValue extends SimpleNode {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes)
             throws ELException {
@@ -168,6 +171,7 @@ public final class AstValue extends SimpleNode {
                 .getParameterTypes());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object invoke(EvaluationContext ctx, Class[] paramTypes,
             Object[] paramValues) throws ELException {
