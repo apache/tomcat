@@ -30,6 +30,22 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public class TestELInJsp extends TomcatBaseTest {
     
+    public void testBug36923() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug36923.jsp");
+        
+        String result = res.toString();
+        assertTrue(result.indexOf("00-${hello world}") > 0);
+    }
+
     public void testBug42565() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
