@@ -82,6 +82,11 @@ public class TestELEvaluation extends TestCase {
         assertEquals("false", evaluateExpression("${(true)and(false)}"));
     }
 
+    public void testBug48112() {
+        // bug 48112
+        assertEquals("{world}", evaluateExpression("${fn:trim('{world}')}"));
+    }
+
     public void testParserLiteralExpression() {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
@@ -124,11 +129,6 @@ public class TestELEvaluation extends TestCase {
         assertEquals("'\\", evaluateExpression("${\"'\\\\\"}"));
         assertEquals("\\\"", evaluateExpression("${\"\\\\\\\"\"}"));
         assertEquals("\"\\", evaluateExpression("${\"\\\"\\\\\"}"));
-    }
-
-    public void testParserFunction() {
-        // bug 48112
-        assertEquals("{world}", evaluateExpression("${fn:trim('{world}')}"));
     }
 
     private void compareBoth(String msg, int expected, Object o1, Object o2){
