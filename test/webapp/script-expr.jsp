@@ -16,19 +16,19 @@
   limitations under the License.
 --%>
 <html>
-  <head><title>Misc EL test cases</title></head>
+  <head><title>Scripting expression test cases</title></head>
   <body>
-    <p>00-\\\"\${'hello world'}</p>
-    <p>01-\\\"\\${'hello world'}</p>
-    <tags:echo echo="02-\\\"\${'hello world'}" />
-    <tags:echo echo="03-\\\"\\${'hello world'}" />
-    <tags:echo echo="${'2'}az-04" />
-    <tags:echo echo="05-a${'2'}z" />
-    <tags:echo echo="06-az${'2'}" />
-    <tags:echo echo="${\"2\"}az-07" />
-    <tags:echo echo="08-a${\"2\"}z" />
-    <tags:echo echo="09-az${\"2\"}" />
-    <tags:echo echo="10-\${'foo'}${'bar'}" />
-    <tags:echo echo="11-${\"\\\"}\"}" />
+    <p><%= "00-hello world" %></p>
+    <p><%= "01-hello \"world" %></p>
+    <p><%= "02-hello \\\"world" %></p>
+    <p><%= "03-hello ${world" %></p>
+    <p><%= "04-hello \\${world" %></p>
+    <tags:echo echo="<%= "05-hello world" %>" />
+    <tags:echo echo="<%= "06-hello \\\"world" %>" />
+    <tags:echo echo="<%= "07-hello \\\\\\\"world" %>" />
+    <tags:echo echo="<%= "08-hello ${world" %>" />
+    <tags:echo echo="<%= "09-hello \\\\${world" %>" />
+    <tags:echo echo="10-hello <\% world" />
+    <tags:echo echo="11-hello %\> world" />
   </body>
 </html>
