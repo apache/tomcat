@@ -26,26 +26,60 @@ import javax.el.FunctionMapper;
 
 import org.apache.el.ExpressionFactoryImpl;
 import org.apache.el.lang.ELSupport;
+import org.apache.jasper.compiler.TestAttributeParser;
 import org.apache.jasper.el.ELContextImpl;
 
 import junit.framework.TestCase;
 
 /**
- * Tests for EL parsing and evaluation.
+ * Tests the EL engine directly. Similar tests may be found in
+ * {@link TestAttributeParser} and {@link TestELInJsp}.
  */
 public class TestELEvaluation extends TestCase {
 
+    /**
+     * Test use of spaces in ternary expressions. This was primarily an EL
+     * parser bug.
+     */
+    public void testBug42565() {
+        assertEquals("false", evaluateExpression("${false?true:false}"));
+        assertEquals("false", evaluateExpression("${false?true: false}"));
+        assertEquals("false", evaluateExpression("${false?true :false}"));
+        assertEquals("false", evaluateExpression("${false?true : false}"));
+        assertEquals("false", evaluateExpression("${false? true:false}"));
+        assertEquals("false", evaluateExpression("${false? true: false}"));
+        assertEquals("false", evaluateExpression("${false? true :false}"));
+        assertEquals("false", evaluateExpression("${false? true : false}"));
+        assertEquals("false", evaluateExpression("${false ?true:false}"));
+        assertEquals("false", evaluateExpression("${false ?true: false}"));
+        assertEquals("false", evaluateExpression("${false ?true :false}"));
+        assertEquals("false", evaluateExpression("${false ?true : false}"));
+        assertEquals("false", evaluateExpression("${false ? true:false}"));
+        assertEquals("false", evaluateExpression("${false ? true: false}"));
+        assertEquals("false", evaluateExpression("${false ? true :false}"));
+        assertEquals("false", evaluateExpression("${false ? true : false}"));
+    }
+
+
+    /**
+     * Test use nested ternary expressions. This was primarily an EL parser bug. 
+     */
+    public void testBug44994() {
+        assertEquals("none", evaluateExpression(
+                "${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}"));
+        assertEquals("one", evaluateExpression(
+                "${0 lt 1 ? 1 lt 1 ? 'many': 'one': 'none'}"));
+        assertEquals("many", evaluateExpression(
+                "${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}"));
+    }
+    
+    
     public void testParserBug45511() {
         // Test cases provided by OP
         assertEquals("true", evaluateExpression("${empty ('')}"));
         assertEquals("true", evaluateExpression("${empty('')}"));
         assertEquals("false", evaluateExpression("${(true) and (false)}"));
         assertEquals("false", evaluateExpression("${(true)and(false)}"));
-    }
-
-    public void testParserBug42565() {
-        // Test cases provided by OP
-        assertEquals("false", evaluateExpression("${false?true:false}"));
     }
 
     public void testParserLiteralExpression() {
