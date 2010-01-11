@@ -59,7 +59,7 @@ public class AprLifecycleListener
     protected static final int TCN_REQUIRED_MAJOR = 1;
     protected static final int TCN_REQUIRED_MINOR = 1;
     protected static final int TCN_REQUIRED_PATCH = 17;
-    protected static final int TCN_RECOMMENDED_MIN = 1;
+    protected static final int TCN_RECOMMENDED_MINOR = 1;
     protected static final int TCN_RECOMMENDED_PV = 19;
 
 
@@ -161,12 +161,12 @@ public class AprLifecycleListener
             }
             return;
         }
-        if (minor < TCN_RECOMMENDED_MIN ||
-                (minor == TCN_RECOMMENDED_MIN && patch <  TCN_RECOMMENDED_PV)) {
+        if (minor < TCN_RECOMMENDED_MINOR ||
+                (minor == TCN_RECOMMENDED_MINOR && patch < TCN_RECOMMENDED_PV)) {
             log.info(sm.getString("aprListener.tcnVersion", major + "."
                     + minor + "." + patch,
                     TCN_REQUIRED_MAJOR + "." +
-                    TCN_RECOMMENDED_MIN + "." +
+                    TCN_RECOMMENDED_MINOR + "." +
                     TCN_RECOMMENDED_PV));
         }
 
