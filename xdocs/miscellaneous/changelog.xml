@@ -39,6 +39,9 @@
 <section name="Changes between 1.1.18 and 1.1.19">
   <changelog>
     <fix>
+      Update windows resource files to correct version. (mturk)
+    </fix>
+    <fix>
       <bug>48129</bug>: Fix build with OpenSSL 1.0.0-beta3.
       Patch provided by Tomas Mraz. (mturk, rjung)
     </fix>
