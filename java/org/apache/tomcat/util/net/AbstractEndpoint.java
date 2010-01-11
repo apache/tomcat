@@ -400,8 +400,7 @@ public abstract class AbstractEndpoint {
         try {
             // Need to create a connection to unlock the accept();
             if (address == null) {
-                //TODO fix IPv6
-                saddr = new InetSocketAddress("127.0.0.1", getPort());
+                saddr = new InetSocketAddress("localhost", getPort());
             } else {
                 saddr = new InetSocketAddress(address,getPort());
             }
