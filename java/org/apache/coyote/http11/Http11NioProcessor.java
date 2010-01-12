@@ -1187,8 +1187,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
         // Add server header
         if (server != null) {
+            // Always overrides anything the app might set
             headers.setValue("Server").setString(server);
-        } else {
+        } else if (headers.getValue("Server") == null) {
+            // If app didn't set the header, use the default
             outputBuffer.write(Constants.SERVER_BYTES);
         }
 

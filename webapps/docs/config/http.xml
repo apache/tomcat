@@ -364,8 +364,12 @@
     </attribute>
 
     <attribute name="server" required="false">
-      <p>The Server header for the http response.
-         Unless you are paranoid, you won't need this feature.
+      <p>Overrides the Server header for the http response. If set, the value
+      for this attribute overrides the Tomcat default and any Server header set
+      by a web application. If not set, any value specified by the application
+      is used. If the application does not specify a value then
+      <code>Apache-Coyote/1.1</code> is used. Unless you are paranoid, you won't
+      need this feature.
       </p>
     </attribute>
 
