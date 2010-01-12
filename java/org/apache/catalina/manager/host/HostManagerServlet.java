@@ -346,7 +346,7 @@ public class HostManagerServlet
          boolean xmlNamespaceAware,
          boolean xmlValidation) {
         if (debug >= 1) {
-            log("add: Adding host '" + name + "'");
+            log(sm.getString("hostManagerServlet.add", name));
         }
 
         // Validate the requested host name
@@ -470,7 +470,7 @@ public class HostManagerServlet
     protected synchronized void remove(PrintWriter writer, String name) {
 
         if (debug >= 1) {
-            log("remove: Removing host '" + name + "'");
+            log(sm.getString("hostManagerServlet.remove", name));
         }
 
         // Validate the requested host name
@@ -523,9 +523,9 @@ public class HostManagerServlet
      */
     protected void list(PrintWriter writer) {
 
-        if (debug >= 1)
-            log("list: Listing hosts for engine '" 
-                + engine.getName() + "'");
+        if (debug >= 1) {
+            log(sm.getString("hostManagerServlet.list", engine.getName()));
+        }
 
         writer.println(sm.getString("hostManagerServlet.listed",
                                     engine.getName()));
@@ -555,8 +555,9 @@ public class HostManagerServlet
      */
     protected void start(PrintWriter writer, String name) {
 
-        if (debug >= 1)
-            log("start: Starting host with name '" + name + "'");
+        if (debug >= 1) {
+            log(sm.getString("hostManagerServlet.start", name));
+        }
 
         // Validate the requested host name
         if ((name == null) || name.length() == 0) {
@@ -604,8 +605,9 @@ public class HostManagerServlet
      */
     protected void stop(PrintWriter writer, String name) {
 
-        if (debug >= 1)
-            log("stop: Stopping host with name '" + name + "'");
+        if (debug >= 1) {
+            log(sm.getString("hostManagerServlet.stop", name));
+        }
 
         // Validate the requested host name
         if ((name == null) || name.length() == 0) {
