@@ -1541,7 +1541,7 @@ public class ContextConfig
             DirContextURLConnection dcUrlConn;
             if (!(urlConn instanceof DirContextURLConnection)) {
                 // This should never happen
-                sm.getString("contextConfig.jndiUrl", url);
+                sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
                 return;
             }
             
