@@ -78,11 +78,12 @@ public class ELParser {
     }
 
     /**
-     * Parse an EL expression string '${...}'
+     * Parse an EL expression string '${...}'. Currently only separates the EL
+     * into functions and everything else.
      * 
-     * @return An ELNode.Nodes representing the EL expression TODO: Currently
-     *         only parsed into functions and text strings. This should be
-     *         rewritten for a full parser.
+     * @return An ELNode.Nodes representing the EL expression
+     * 
+     * TODO: Can this be refactored to use the standard EL implementation?
      */
     private ELNode.Nodes parseEL() {
 
