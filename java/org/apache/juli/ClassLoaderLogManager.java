@@ -46,6 +46,46 @@ import java.util.logging.Logger;
  */
 public class ClassLoaderLogManager extends LogManager {
 
+    private final class Cleaner extends Thread {
+        
+        @Override
+        public void run() {
+            // The JVM us being shutdown. Make sure all loggers for all class
+            // loaders are shutdown
+            for (ClassLoaderLogInfo clLogInfo : classLoaderLoggers.values()) {
+                for (Logger logger : clLogInfo.loggers.values()) {
+                    resetLogger(logger);
+                }
+            }
+        }
+            
+        private void resetLogger(Logger logger) {
+            
+            Handler[] handlers = logger.getHandlers();
+            for (Handler handler : handlers) {
+                logger.removeHandler(handler);
+                try {
+                    handler.close();
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+        }
+
+    }
+
+    
+    // ------------------------------------------------------------Constructors
+
+    public ClassLoaderLogManager() {
+        super();
+        try { 
+            Runtime.getRuntime().addShutdownHook(new Cleaner());
+        } catch (IllegalStateException ise) {
+            // We are probably already being shutdown. Ignore this error.
+        }
+    }
+
 
     // -------------------------------------------------------------- Variables
 
@@ -484,33 +524,6 @@ public class ClassLoaderLogManager extends LogManager {
         return result;
     }
     
-
-    /**
-     * Need to override reset so the loggers loaded by the web applications can
-     * be shutdown.
-     */
-    @Override
-    public void reset() {
-        super.reset();
-        for (ClassLoaderLogInfo classLoaderLogInfo : classLoaderLoggers.values()) {
-            for (Logger logger : classLoaderLogInfo.loggers.values()) {
-                resetLogger(logger);
-            }
-        }
-    }
-    
-    private void resetLogger(Logger logger) {
-        
-        Handler[] handlers = logger.getHandlers();
-        for (Handler handler : handlers) {
-            logger.removeHandler(handler);
-            try {
-                handler.close();
-            } catch (Exception e) {
-                // Ignore
-            }
-        }
-    }
 
     // ---------------------------------------------------- LogNode Inner Class
 
