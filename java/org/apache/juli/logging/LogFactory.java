@@ -19,6 +19,7 @@ package org.apache.juli.logging;
 
 
 import java.util.Properties;
+import java.util.logging.LogManager;
 
 
 
@@ -325,8 +326,10 @@ public /* abstract */ class LogFactory {
      *
      * @param classLoader ClassLoader for which to release the LogFactory
      */
-    public static void release(ClassLoader classLoader) {
-        // nothing - we don't use any class loaders
+    public static void release(
+            @SuppressWarnings("unused") ClassLoader classLoader) {
+        // JULI's log manager looks at the current classLoader
+        LogManager.getLogManager().reset();
     }
 
 
