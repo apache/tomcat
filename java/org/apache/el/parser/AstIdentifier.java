@@ -91,17 +91,19 @@ public final class AstIdentifier extends SimpleNode {
         ctx.getELResolver().setValue(ctx, null, this.image, value);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object invoke(EvaluationContext ctx, Class[] paramTypes,
+    // Interface el.parser.Node uses raw types (and is auto-generated)
+    public Object invoke(EvaluationContext ctx,
+            @SuppressWarnings("unchecked") Class[] paramTypes,
             Object[] paramValues) throws ELException {
         return this.getMethodExpression(ctx).invoke(ctx.getELContext(), paramValues);
     }
     
 
-    @SuppressWarnings("unchecked")
     @Override
-    public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes)
+    // Interface el.parser.Node uses raw types (and is auto-generated)
+    public MethodInfo getMethodInfo(EvaluationContext ctx, 
+            @SuppressWarnings("unchecked") Class[] paramTypes)
             throws ELException {
         return this.getMethodExpression(ctx).getMethodInfo(ctx.getELContext());
     }

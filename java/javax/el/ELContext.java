@@ -39,16 +39,17 @@ public abstract class ELContext {
         this.resolved = false;
     }
     
-    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
-    public Object getContext(Class key) {
+    // Can't use Class<?> because API needs to match specification
+    public Object getContext(@SuppressWarnings("unchecked") Class key) {
         if (this.map == null) {
             return null;
         }
         return this.map.get(key);
     }
     
-    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
-    public void putContext(Class key, Object contextObject) throws NullPointerException {
+    // Can't use Class<?> because API needs to match specification
+    public void putContext(@SuppressWarnings("unchecked") Class key,
+            Object contextObject) throws NullPointerException {
         if (key == null || contextObject == null) {
             throw new NullPointerException();
         }

@@ -100,8 +100,9 @@ public class ResourceBundleELResolver extends ELResolver {
 	}
 
 	@Override
-    @SuppressWarnings("unchecked") // Can't use Iterator<FeatureDescriptor> because API needs to match specification
-    public Iterator getFeatureDescriptors(ELContext context, Object base) {
+    // Can't use Iterator<FeatureDescriptor> because API needs to match specification
+    public @SuppressWarnings("unchecked") Iterator getFeatureDescriptors(
+            ELContext context, Object base) {
 		if (base instanceof ResourceBundle) {
 			List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>();
 			Enumeration<String> e = ((ResourceBundle) base).getKeys();
