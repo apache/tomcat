@@ -37,8 +37,8 @@ public class BeanELResolver extends ELResolver {
 
 	private final boolean readOnly;
 
-	private final ConcurrentCache<String, BeanProperties> cache = new ConcurrentCache<String, BeanProperties>(
-			1000);
+	private final ConcurrentCache<String, BeanProperties> cache =
+	    new ConcurrentCache<String, BeanProperties>(1000);
 
 	public BeanELResolver() {
 		this.readOnly = false;
@@ -230,8 +230,8 @@ public class BeanELResolver extends ELResolver {
 			this.type = descriptor.getPropertyType();
 		}
 
-		@SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
-        public Class getPropertyType() {
+		// Can't use Class<?> because API needs to match specification
+        public @SuppressWarnings("unchecked") Class getPropertyType() {
 			return this.type;
 		}
 

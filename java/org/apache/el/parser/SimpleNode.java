@@ -153,15 +153,17 @@ public abstract class SimpleNode extends ELSupport implements Node {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public Object invoke(EvaluationContext ctx, Class[] paramTypes,
+    // Interface el.parser.Node uses raw types (and is auto-generated)
+    public Object invoke(EvaluationContext ctx, 
+            @SuppressWarnings("unchecked") Class[] paramTypes,
             Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("unchecked")
+    // Interface el.parser.Node uses a raw type (and is auto-generated)
     public MethodInfo getMethodInfo(EvaluationContext ctx,
-            Class[] paramTypes) throws ELException {
+            @SuppressWarnings("unchecked") Class[] paramTypes)
+            throws ELException {
         throw new UnsupportedOperationException();
     }
 }

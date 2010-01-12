@@ -147,9 +147,8 @@ public class VirtualDirContext extends FileDirContext {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected ArrayList list(File file) {
-        ArrayList entries = super.list(file);
+    protected ArrayList<NamingEntry> list(File file) {
+        ArrayList<NamingEntry> entries = super.list(file);
 
         // adds virtual tlds for WEB-INF listing
         if ("WEB-INF".equals(file.getName())) {
