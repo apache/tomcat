@@ -432,7 +432,7 @@ class JspDocumentParser
                     scriptlessBodyNode = node;
                 } else if (TagInfo.BODY_CONTENT_TAG_DEPENDENT.equalsIgnoreCase(bodyType)) {
                     tagDependentPending = true;
-                } else if (TagInfo.BODY_CONTENT_EMPTY.equals(bodyType)) {
+                } else if (TagInfo.BODY_CONTENT_EMPTY.equalsIgnoreCase(bodyType)) {
                     tagEmptyBody = node;
                 }
             }
