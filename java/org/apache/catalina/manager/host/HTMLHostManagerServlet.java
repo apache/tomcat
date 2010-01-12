@@ -396,7 +396,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                      URLEncoder.encode(hostName, "UTF-8"));
                 args[5] = hostsRemove;
                 args[6] = newNonce;
-                if (host == this.host) {
+                if (host == this.installedHost) {
                     writer.print(MessageFormat.format(
                         MANAGER_HOST_ROW_BUTTON_SECTION, args));
                 } else {

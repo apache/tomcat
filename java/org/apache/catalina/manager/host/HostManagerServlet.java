@@ -100,12 +100,6 @@ public class HostManagerServlet
 
 
     /**
-     * Path where context descriptors should be deployed.
-     */
-    protected File configBase = null;
-
-
-    /**
      * The Context container associated with our web application.
      */
     protected Context context = null;
@@ -120,7 +114,7 @@ public class HostManagerServlet
     /**
      * The associated host.
      */
-    protected Host host = null;
+    protected Host installedHost = null;
 
     
     /**
@@ -171,12 +165,12 @@ public class HostManagerServlet
         this.wrapper = wrapper;
         if (wrapper == null) {
             context = null;
-            host = null;
+            installedHost = null;
             engine = null;
         } else {
             context = (Context) wrapper.getParent();
-            host = (Host) context.getParent();
-            engine = (Engine) host.getParent();
+            installedHost = (Host) context.getParent();
+            engine = (Engine) installedHost.getParent();
         }
 
         // Retrieve the MBean server
@@ -493,7 +487,7 @@ public class HostManagerServlet
         }
 
         // Prevent removing our own host
-        if (engine.findChild(name) == host) {
+        if (engine.findChild(name) == installedHost) {
             writer.println
                 (sm.getString("hostManagerServlet.cannotRemoveOwnHost", name));
             return;
@@ -578,7 +572,7 @@ public class HostManagerServlet
         }
 
         // Prevent starting our own host
-        if (engine.findChild(name) == host) {
+        if (engine.findChild(name) == installedHost) {
             writer.println
                 (sm.getString("hostManagerServlet.cannotStartOwnHost", name));
             return;
@@ -627,7 +621,7 @@ public class HostManagerServlet
         }
 
         // Prevent starting our own host
-        if (engine.findChild(name) == host) {
+        if (engine.findChild(name) == installedHost) {
             writer.println
                 (sm.getString("hostManagerServlet.cannotStopOwnHost", name));
             return;
@@ -666,7 +660,7 @@ public class HostManagerServlet
         if (engine != null) {
             configBase = new File(configBase, engine.getName());
         }
-        if (host != null) {
+        if (installedHost != null) {
             configBase = new File(configBase, hostName);
         }
         configBase.mkdirs();
