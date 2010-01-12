@@ -282,6 +282,10 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                      HttpServletResponse response,
                      String message) throws IOException {
 
+        if (debug >= 1) {
+            log(sm.getString("hostManagerServlet.list", engine.getName()));
+        }
+
         String newNonce = generateNonce();
         request.getSession().setAttribute(NONCE_SESSION, newNonce);
         
