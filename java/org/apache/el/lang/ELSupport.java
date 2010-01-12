@@ -107,12 +107,12 @@ public class ELSupport {
             return coerceToString(obj0).compareTo(coerceToString(obj1));
         }
         if (obj0 instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // checked above
             final Comparable<Object> comparable = (Comparable<Object>) obj0;
             return (obj1 != null) ? comparable.compareTo(obj1) : 1;
         }
         if (obj1 instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // checked above
             final Comparable<Object> comparable = (Comparable<Object>) obj1;
             return (obj0 != null) ? -comparable.compareTo(obj0) : -1;
         }

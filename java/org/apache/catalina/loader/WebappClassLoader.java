@@ -1788,7 +1788,7 @@ public class WebappClassLoader
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
                     classBytes, 0, offset);
             Object obj = lpClass.newInstance();
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // clearJdbcDriverRegistrations() returns List<String> 
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
@@ -1812,7 +1812,7 @@ public class WebappClassLoader
 
     private final void clearReferencesStaticFinal() {
         
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") // resourceEntries is HashMap<String, ResourceEntry>
         Collection<ResourceEntry> values =
             ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
         Iterator<ResourceEntry> loadedClasses = values.iterator();
@@ -1934,7 +1934,7 @@ public class WebappClassLoader
     }
 
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
         
