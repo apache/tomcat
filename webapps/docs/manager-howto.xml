@@ -891,6 +891,52 @@ error message.  Possible causes for problems include:</p>
 
 </subsection>
 
+<subsection name="Server Status">
+
+<p>From this link , you can view information about the server.</p>
+
+<p>First, you have the server and JVM version number, JVM provider, OS name 
+and number followed by the architecture type.</p>
+
+<p>Second, there is several information about the memory usage of the JVM 
+(available, total and max memory).</p>
+
+<p>Then, there is information about the Tomcat AJP and HTTP connectors. 
+The same information is available for both of them :
+</p>
+<ul>
+    <li><p>Threads information : Max threads, min and max spare threads, 
+    current thread count and current thread busy.</p></li>
+    <li><p>Request information : Max processing time and processing time, 
+    request and error count, bytes received and sent.</p></li>
+    <li><p>A table showing Stage, Time, Bytes Sent, Bytes Receive, Client, 
+    VHost and Request. All existing threads are listed in the table. 
+    Here is the list of the possible thread stages :</p>
+    <ul>
+        <li><p><em>"Parse and Prepare Request"</em> : The request headers are
+        being parsed or the necessary preparation to read the request body (if
+        a transfer encoding has been specified) is taking place.</p></li>
+        <li><p><em>"Service"</em> : The thread is processing a request and
+        generating the response. This stage follows the "Parse and Prepare
+        Request" stage and precedes the "Finishing" stage. There is always at
+        least one thread in this stage (the server-status page).</p></li>
+        <li><p><em>"Finishing"</em> : The end of the request processing. Any
+        remainder of the response still in the output buffers is sent to the
+        client. This stage is followed by "Keep-Alive" if it is appropriate to
+        keep the connection alive or "Ready" if "Keep-Alive" is not
+        appropriate.</p></li>
+        <li><p><em>"Keep-Alive"</em> : The thread keeps the connection open to
+        the client in case the client sends another request. If another request
+        is recieved, the next stage will br "Parse and Prepare Requst". If no
+        request is received before the keep alive times out, the connection will
+        be closed and the next stage will be "Ready".</p></li>
+        <li><p><em>"Ready"</em> : The thread is at rest and ready to be
+        used.</p></li>
+    </ul>
+    </li>
+</ul>
+</subsection>
+
 </section>
 
 <section name="Executing Manager Commands With Ant">
