@@ -2181,31 +2181,11 @@ public class Request
         } catch (IOException e) {
             // Can't find the session 
         }
+        if ((session != null) && session.isValid())
+            return (true);
+        else
+            return (false);
 
-        if (session == null) return false;
-
-        // The call to session.isValid() can trigger session listeners so make
-        // sure we are using the webapp's class loader in case the listeners are
-        // triggered
-        ClassLoader oldTccl = null;
-        if (context.getLoader() != null &&
-                context.getLoader().getClassLoader() != null) {
-            oldTccl = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(
-                    context.getLoader().getClassLoader());
-        }
-
-        boolean result = false;
-        try {
-            if (session.isValid()) {
-                result = true;
-            }
-        } finally {
-            if (oldTccl != null) {
-                Thread.currentThread().setContextClassLoader(oldTccl);
-            }
-        }
-        return result;
     }
 
 
