@@ -406,6 +406,7 @@ public abstract class AbstractEndpoint {
             }
             s = new java.net.Socket();
             s.setSoTimeout(getSocketProperties().getSoTimeout());
+            // TODO Consider hard-coding to s.setSoLinger(true,0)
             s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
             if (log.isDebugEnabled()) {
                 log.debug("About to unlock socket for:"+saddr);
