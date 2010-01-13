@@ -31,6 +31,7 @@ import javax.el.FunctionMapper;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
 import javax.el.ValueExpression;
+import javax.el.ValueReference;
 import javax.el.VariableMapper;
 
 import org.apache.el.lang.ELSupport;
@@ -103,7 +104,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     private transient Node node;
 
     public ValueExpressionImpl() {
-
+        super();
     }
 
     /**
@@ -270,4 +271,15 @@ public final class ValueExpressionImpl extends ValueExpression implements
     public String toString() {
         return "ValueExpression["+this.expr+"]";
     }
+
+    /**
+     * @since EL 2.2
+     */
+    @Override
+    public ValueReference getValueReference(ELContext context) {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
+                this.varMapper);
+        return this.getNode().getValueReference(ctx);
+    }
+    
 }
