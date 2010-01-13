@@ -22,6 +22,8 @@ package javax.el;
  */
 public class PropertyNotWritableException extends ELException {
 
+    private static final long serialVersionUID = 827987155471214717L;
+
     /**
      * 
      */
