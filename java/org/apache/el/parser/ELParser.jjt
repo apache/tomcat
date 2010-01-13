@@ -227,7 +227,7 @@ void ValuePrefix() : {}
  */
 void ValueSuffix() : {}
 {
-    DotSuffix() | BracketSuffix()
+    ( DotSuffix() | BracketSuffix() ) ( MethodParameters())?
 }
 
 /*
@@ -246,6 +246,14 @@ void DotSuffix() #DotSuffix : { Token t = null; }
 void BracketSuffix() #BracketSuffix : {}
 {
     <LBRACK> Expression() <RBRACK>
+}
+
+/*
+ * MethodParameters
+ */
+void MethodParameters() : {}
+{
+    <LPAREN> ( Expression() ( <COMMA> Expression())* )? <RPAREN>
 }
 
 /*
