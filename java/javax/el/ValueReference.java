@@ -17,22 +17,28 @@
 
 package javax.el;
 
+import java.io.Serializable;
+
 /**
- *
+ * @since EL 2.2
  */
-public abstract class MethodExpression extends Expression {
+public class ValueReference implements Serializable {
 
-    private static final long serialVersionUID = 8163925562047324656L;
+    private static final long serialVersionUID = 1L;
+    
+    private Object base;
+    private Object property;
+    
+    public ValueReference(Object base, Object property) {
+        this.base = base;
+        this.property = property;
+    }
 
-    public abstract MethodInfo getMethodInfo(ELContext context) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
+    public Object getBase() {
+        return base;
+    }
     
-    public abstract Object invoke(ELContext context, Object[] params) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
-    
-    /**
-     * @since EL 2.2
-     */
-    public boolean isParametersProvided() {
-        // Expected to be over-ridden by implementation
-        return false;
+    public Object getProperty() {
+        return property;
     }
 }
