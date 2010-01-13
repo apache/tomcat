@@ -22,6 +22,8 @@ package javax.el;
  */
 public abstract class ValueExpression extends Expression {
 
+    private static final long serialVersionUID = 8577809572381654673L;
+
     public abstract Class<?> getExpectedType();
     
     public abstract Class<?> getType(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
@@ -32,4 +34,11 @@ public abstract class ValueExpression extends Expression {
     
     public abstract Object getValue(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
 
+    /**
+     * @since EL 2.2
+     */
+    public ValueReference getValueReference(@SuppressWarnings("unused") ELContext context) {
+     // Expected to be over-ridden by implementation
+        return null;
+    }
 }
