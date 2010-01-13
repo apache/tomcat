@@ -20,6 +20,7 @@ package org.apache.el.parser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import javax.el.ELException;
 import javax.el.ELResolver;
@@ -109,17 +110,34 @@ public final class AstValue extends SimpleNode {
         Object base = this.children[0].getValue(ctx);
         int propCount = this.jjtGetNumChildren();
         int i = 1;
-        Object property = null;
+        Object suffix = null;
         ELResolver resolver = ctx.getELResolver();
         while (base != null && i < propCount) {
-            property = this.children[i].getValue(ctx);
-            if (property == null) {
-                return null;
+            suffix = this.children[i].getValue(ctx);
+            if (i + 1 < propCount && !(this.children[i+1] instanceof Suffix)) {
+                // Looking for a method
+                ArrayList<Object> params = new ArrayList<Object>();
+                ArrayList<Class<?>> paramTypes = new ArrayList<Class<?>>();
+                while (i + 1 < propCount &&
+                        !(this.children[i+1] instanceof Suffix)) {
+                    params.add(this.children[i+1].getValue(ctx));
+                    paramTypes.add(this.children[i+1].getType(ctx));
+                    i++;
+                }
+                base = resolver.invoke(ctx, base, suffix,
+                        paramTypes.toArray(new Class<?>[paramTypes.size()]),
+                        params.toArray(new Object[params.size()]));
+                i++;
             } else {
-                ctx.setPropertyResolved(false);
-                base = resolver.getValue(ctx, base, property);
+                // Looking for a property
+                if (suffix == null) {
+                    return null;
+                } else {
+                    ctx.setPropertyResolved(false);
+                    base = resolver.getValue(ctx, base, suffix);
+                }
+                i++;
             }
-            i++;
         }
         return base;
     }
