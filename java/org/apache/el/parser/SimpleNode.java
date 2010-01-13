@@ -21,6 +21,7 @@ package org.apache.el.parser;
 import javax.el.ELException;
 import javax.el.MethodInfo;
 import javax.el.PropertyNotWritableException;
+import javax.el.ValueReference;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
@@ -153,17 +154,27 @@ public abstract class SimpleNode extends ELSupport implements Node {
         }
     }
 
-    // Interface el.parser.Node uses raw types (and is auto-generated)
-    public Object invoke(EvaluationContext ctx, 
-            @SuppressWarnings("unchecked") Class[] paramTypes,
+    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
             Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
-    // Interface el.parser.Node uses a raw type (and is auto-generated)
     public MethodInfo getMethodInfo(EvaluationContext ctx,
-            @SuppressWarnings("unchecked") Class[] paramTypes)
-            throws ELException {
+            Class<?>[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * @since EL 2.2
+     */
+    public ValueReference getValueReference(EvaluationContext ctx) {
+        return null;
+    }
+    
+    /**
+     * @since EL 2.2
+     */
+    public boolean isParametersProvided() {
+        return false;
     }
 }
