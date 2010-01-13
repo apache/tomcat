@@ -26,6 +26,7 @@ import javax.el.ELException;
 import javax.el.ELResolver;
 import javax.el.MethodInfo;
 import javax.el.PropertyNotFoundException;
+import javax.el.ValueReference;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
@@ -207,4 +208,20 @@ public final class AstValue extends SimpleNode {
         }
         return result;
     }
+
+    /**
+     * @since EL 2.2
+     */
+    @Override
+    public ValueReference getValueReference(EvaluationContext ctx) {
+        // Check this is a reference to a base and a property
+        if (this.children.length > 2 && this.jjtGetChild(2) instanceof Suffix) {
+            // This is a method call
+            return null;
+        }
+        Target t = getTarget(ctx);
+        return new ValueReference(t.base, this.jjtGetChild(1).getValue(ctx));
+    }
+    
+    
 }

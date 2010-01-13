@@ -21,6 +21,7 @@ package org.apache.el.parser;
 
 import javax.el.ELException;
 import javax.el.MethodInfo;
+import javax.el.ValueReference;
 
 import org.apache.el.lang.EvaluationContext;
 
@@ -31,7 +32,7 @@ import org.apache.el.lang.EvaluationContext;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Change: 181177 $$Date$$Author$
+ * $Id$
  */
 public interface Node {
 
@@ -63,9 +64,21 @@ public interface Node {
   
   public Object getValue(EvaluationContext ctx) throws ELException;
   public void setValue(EvaluationContext ctx, Object value) throws ELException;
-  public Class getType(EvaluationContext ctx) throws ELException;
+  public Class<?> getType(EvaluationContext ctx) throws ELException;
   public boolean isReadOnly(EvaluationContext ctx) throws ELException;
   public void accept(NodeVisitor visitor) throws Exception;
-  public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes) throws ELException;
-  public Object invoke(EvaluationContext ctx, Class[] paramTypes, Object[] paramValues) throws ELException;
+  public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes)
+          throws ELException;
+  public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
+          Object[] paramValues) throws ELException;
+  
+  /**
+   * @since EL 2.2
+   */
+  public ValueReference getValueReference(EvaluationContext ctx);
+  
+  /**
+   * @since EL 2.2
+   */
+  public boolean isParametersProvided();
 }
