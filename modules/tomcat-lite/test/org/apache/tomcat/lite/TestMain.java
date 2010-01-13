@@ -233,7 +233,7 @@ public class TestMain {
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();
-       // connection.setReadTimeout(100000);
+        connection.setReadTimeout(10000);
         connection.connect();
         int rc = connection.getResponseCode();
         InputStream is = connection.getInputStream();

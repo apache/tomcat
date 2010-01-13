@@ -3,18 +3,26 @@
 package org.apache.tomcat.lite.http;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
-import org.apache.tomcat.lite.http.HttpConnector.RemoteServer;
+import org.apache.tomcat.lite.http.HttpConnectionPool.RemoteServer;
 import org.apache.tomcat.lite.http.HttpMessage.HttpMessageBytes;
 import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBuffer;
+import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.IOBuffer;
+import org.apache.tomcat.lite.io.IOChannel;
+import org.apache.tomcat.lite.io.IOConnector;
+import org.apache.tomcat.lite.io.SslChannel;
 
 /*
  * TODO: expectations ? 
@@ -27,23 +35,9 @@ import org.apache.tomcat.lite.io.IOBuffer;
  *    http://localhost:8802/hello
  */
 
-public class SpdyConnection extends HttpConnector.HttpConnection  {
+public class SpdyConnection extends HttpConnector.HttpConnection 
+        implements IOConnector.ConnectedCallback {
     
-    public static class SpdyConnectionManager 
-        extends HttpConnector.HttpConnectionManager {
-        @Override
-        public HttpConnection newConnection(HttpConnector con) {
-            return new SpdyConnection(con);
-        }
-
-        @Override
-        public HttpConnection getFromPool(RemoteServer t) {
-            // TODO: we may initiate multiple SPDY connections with each server
-            // Sending frames is synchronized, receiving is muxed
-            return t.connections.get(0);
-        }
-        
-    }
     
     /** Use compression for headers. Will magically turn to false
      * if the first request doesn't have x8xx ( i.e. compress header )
@@ -77,11 +71,16 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
     
     /**
      * @param spdyConnector
+     * @param remoteServer 
      */
-    SpdyConnection(HttpConnector spdyConnector) {
+    SpdyConnection(HttpConnector spdyConnector, RemoteServer remoteServer) {
         this.httpConnector = spdyConnector;
+        this.remoteHost = remoteServer;
+        this.target = remoteServer.target;
     }
 
+    AtomicInteger streamErrors = new AtomicInteger();
+    
     AtomicInteger lastInStream = new AtomicInteger();
     AtomicInteger lastOutStream = new AtomicInteger();
 
@@ -111,9 +110,12 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
     }
     
     @Override
-    public void dataReceived(IOBuffer iob) throws IOException {
-        int avail = iob.available();
-        while (avail > 0) {
+    public synchronized void dataReceived(IOBuffer iob) throws IOException {
+        while (true) {
+            int avail = iob.available();
+            if (avail == 0) {
+                return;
+            }
             if (currentInFrame == null) {
                 if (inFrameBuffer.remaining() + avail < 8) {
                     return;
@@ -121,12 +123,11 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                 if (inFrameBuffer.remaining() < 8) {
                     int headRest = 8 - inFrameBuffer.remaining();
                     int rd = iob.read(inFrameBuffer, headRest);
-                    avail -= rd;
                 }
                 currentInFrame = new SpdyConnection.Frame(); // TODO: reuse
-                currentInFrame.parse(inFrameBuffer);
+                currentInFrame.parse(this, inFrameBuffer);
             }
-            if (avail < currentInFrame.length) {
+            if (iob.available() < currentInFrame.length) {
                 return;
             }
             // We have a full frame. Process it.
@@ -134,11 +135,21 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
 
             // TODO: extra checks, make sure the frame is correct and
             // it consumed all data.
-            avail -= currentInFrame.length;
             currentInFrame = null;
         }
     }
 
+    AtomicInteger inFrames = new AtomicInteger();
+    AtomicInteger inDataFrames = new AtomicInteger();
+    AtomicInteger inSyncStreamFrames = new AtomicInteger();
+    AtomicInteger inBytes = new AtomicInteger();
+
+    AtomicInteger outFrames = new AtomicInteger();
+    AtomicInteger outDataFrames = new AtomicInteger();
+    AtomicInteger outBytes = new AtomicInteger();
+    
+    
+    
     /**
      * Frame received. Must consume all data for the frame.
      * 
@@ -148,11 +159,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
     protected void onFrame(IOBuffer iob) throws IOException {
         // TODO: make sure we have enough data.
         lastFrame = currentInFrame;
+        inFrames.incrementAndGet();
+        inBytes.addAndGet(currentInFrame.length + 8);
         
         if (currentInFrame.c) {
             if (currentInFrame.type == SpdyConnection.Frame.TYPE_HELO) {
                 // receivedHello = currentInFrame;
             } else if (currentInFrame.type == SpdyConnection.Frame.TYPE_SYN_STREAM) {
+                inSyncStreamFrames.incrementAndGet();
                 HttpChannel ch = new HttpChannel(); // TODO: reuse
                 ch.channelId = SpdyConnection.readInt(iob);
                 ch.setConnection(this);
@@ -164,15 +178,22 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                     ch.setHttpService(this.httpConnector.defaultService);
                 }
 
-                channels.put(ch.channelId, ch);
+                synchronized (this) {
+                        channels.put(ch.channelId, ch);                    
+                }
 
-                // pri and unused
-                SpdyConnection.readShort(iob);
+                try {
+                    // pri and unused
+                    SpdyConnection.readShort(iob);
 
-                HttpMessageBytes reqBytes = ch.getRequest().getMsgBytes();
-                
-                BBuffer head = processHeaders(iob, ch, reqBytes);
+                    HttpMessageBytes reqBytes = ch.getRequest().getMsgBytes();
 
+                    processHeaders(iob, ch, reqBytes);
+                } catch (Throwable t) {
+                    log.log(Level.SEVERE, "Error parsing head", t);
+                    abort("Error reading headers " + t);
+                    return;
+                }
                 ch.getRequest().processReceivedHeaders();
 
                 ch.handleHeadersReceived(ch.getRequest());
@@ -183,14 +204,24 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                 }
             } else if (currentInFrame.type == SpdyConnection.Frame.TYPE_SYN_REPLY) {
                 int chId = SpdyConnection.readInt(iob);
-                HttpChannel ch = channels.get(chId);
-                
-                SpdyConnection.readShort(iob);
+                HttpChannel ch;
+                synchronized (this) {
+                    ch = channels.get(chId);
+                    if (ch == null) {
+                        abort("Channel not found");
+                    }
+                }
+                try {
+                    SpdyConnection.readShort(iob);
         
-                HttpMessageBytes resBytes = ch.getResponse().getMsgBytes();
+                    HttpMessageBytes resBytes = ch.getResponse().getMsgBytes();
                 
-                BBuffer head = processHeaders(iob, ch, resBytes);
-
+                    BBuffer head = processHeaders(iob, ch, resBytes);
+                } catch (Throwable t) {
+                    log.log(Level.SEVERE, "Error parsing head", t);
+                    abort("Error reading headers " + t);
+                    return;
+                }
                 ch.getResponse().processReceivedHeaders();
 
                 ch.handleHeadersReceived(ch.getResponse());
@@ -204,8 +235,12 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                 iob.advance(currentInFrame.length);
             }
         } else {
+            inDataFrames.incrementAndGet();
             // data frame - part of an existing stream
-            HttpChannel ch = channels.get(currentInFrame.streamId);
+            HttpChannel ch;
+            synchronized (this) {
+                ch = channels.get(currentInFrame.streamId);
+            }
             if (ch == null) {
                 log.warning("Unknown stream ");
                 net.close();
@@ -215,9 +250,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
             int len = currentInFrame.length;
             while (len > 0) {
                 BBucket bb = iob.peekFirst();
+                if (bb == null) {
+                    // we should have all data
+                    abort("Unexpected short read");
+                    return;
+                }
                 if (len > bb.remaining()) {
                     ch.getIn().append(bb);
-                    len += bb.remaining();
+                    len -= bb.remaining();
                     bb.position(bb.limit());
                 } else {
                     ch.getIn().append(bb, len);
@@ -228,19 +268,31 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
             ch.sendHandleReceivedCallback();
             
             if ((currentInFrame.flags & SpdyConnection.Frame.FLAG_HALF_CLOSE) != 0) {
-                ch.getIn().close();
                 ch.handleEndReceive();
             }
         }
         firstFrame = false;
     }
+    
+    /**
+     * On frame error.
+     */
+    private void abort(String msg) throws IOException {
+        streamErrors.incrementAndGet();
+        for (HttpChannel ch : channels.values()) {
+            ch.abort(msg);
+        }
+        close();
+    }
 
     private BBuffer processHeaders(IOBuffer iob, HttpChannel ch,
             HttpMessageBytes reqBytes) throws IOException {
-        int res = iob.peek() & 0xFF;
         int nvCount = 0;
-        if (firstFrame && (res & 0x0F) !=  8) {
-            headerCompression = false;
+        if (firstFrame) {
+            int res = iob.peek() & 0xFF;
+            if ((res & 0x0F) !=  8) {
+                headerCompression = false;
+            }
         }
         headRecvBuf.recycle();
         if (headerCompression) {
@@ -257,7 +309,11 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         } else {
             nvCount = readShort(iob);
             // 8 = stream Id (4) + pri/unused (2) + nvCount (2)
-            iob.read(headRecvBuf, currentInFrame.length - 8);
+            // we know we have enough data
+            int rd = iob.read(headRecvBuf, currentInFrame.length - 8);
+            if (rd != currentInFrame.length - 8) {
+                abort("Unexpected incomplete read");
+            }
         }
         // Wrapper - so we don't change position in head
         headRecvBuf.wrapTo(headW);
@@ -268,6 +324,9 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         for (int i = 0; i < nvCount; i++) {
 
             int nameLen = SpdyConnection.readShort(headW);
+            if (nameLen > headW.remaining()) {
+                abort("Name too long");
+            }
 
             nameBuf.setBytes(headW.array(), headW.position(),
                             nameLen);
@@ -300,18 +359,23 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
     }
 
     @Override
-    protected void sendRequest(HttpChannel http) throws IOException {
+    protected synchronized void sendRequest(HttpChannel http) throws IOException {
         if (serverMode) {
             throw new IOException("Only in client mode");
         }
-
+        if (!checkConnection(http)) {
+            return;
+        }
         MultiMap mimeHeaders = http.getRequest().getMimeHeaders();
         BBuffer headBuf = BBuffer.allocate();
         
         SpdyConnection.appendShort(headBuf, mimeHeaders.size() + 3);
         
         serializeMime(mimeHeaders, headBuf);
-
+        
+        if (headerCompression) {
+        }
+        
         // TODO: url - with host prefix , method
         // optimize...
         SpdyConnection.appendAsciiHead(headBuf, "version");
@@ -332,6 +396,11 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         out.putByte(0x00); 
         out.putByte(0x01);
         
+        CBuffer method = http.getRequest().method();
+        if (method.equals("GET") || method.equals("HEAD")) {
+            http.getOut().close();
+        }
+        
         if (http.getOut().isAppendClosed()) {
             out.putByte(0x01); // closed
         } else {
@@ -348,16 +417,31 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
             http.channelId = 2 * lastOutStream.incrementAndGet() + 1;            
         }
         SpdyConnection.appendInt(out, http.channelId);
-        
-        channels.put(http.channelId, http);
+        http.setConnection(this);
+
+        synchronized (this) {
+            channels.put(http.channelId, http);            
+        }
         
         out.putByte(0x00); // no priority 
         out.putByte(0x00); 
         
         sendFrame(out, headBuf); 
 
+        if (http.outMessage.state == HttpMessage.State.HEAD) {
+            http.outMessage.state = HttpMessage.State.BODY_DATA;
+        }
+        if (http.getOut().isAppendClosed()) {
+            http.handleEndSent();
+        }
+
         // Any existing data
         //sendData(http);
+    }
+
+    
+    public synchronized Collection<HttpChannel> getActives() {
+        return channels.values();
     }
     
     @Override
@@ -415,7 +499,8 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         // It seems piggibacking data is not allowed
         frameHead.putByte(0x00); 
 
-        SpdyConnection.append24(frameHead, headBuf.remaining() + 6);
+        int len = headBuf.remaining() + 6;
+        SpdyConnection.append24(frameHead, len);
 
 //        // Stream-Id, unused
         SpdyConnection.appendInt(frameHead, http.channelId);
@@ -474,11 +559,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         if (net == null) {
             return; // unit test
         }
+        outBytes.addAndGet(out.remaining());
         net.getOut().append(out);
         if (headBuf != null) {
             net.getOut().append(headBuf);
+            outBytes.addAndGet(headBuf.remaining());
         }
         net.startSending();
+        outFrames.incrementAndGet();
     }
 
     public synchronized void sendDataFrame(IOBuffer out2, int avail,
@@ -497,11 +585,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         // TODO: chunk if too much data ( at least at 24 bits)
         SpdyConnection.append24(outFrameBuffer, avail);
 
+        outBytes.addAndGet(outFrameBuffer.remaining() + avail);
         net.getOut().append(outFrameBuffer);
+
         if (avail > 0) {
             net.getOut().append(out2, avail);
         }
         net.startSending();
+        outDataFrames.incrementAndGet();        
     }
 
     static void appendInt(BBuffer headBuf, int length) throws IOException {
@@ -579,9 +670,11 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
     
         static int FLAG_HALF_CLOSE = 1;
     
-        public void parse(BBuffer iob) throws IOException {
+        public void parse(SpdyConnection spdyConnection,
+                BBuffer iob) throws IOException {
             int b0 = iob.read();
             if (b0 < 128) {
+                // data frame 
                 c = false;
                 streamId = b0;
                 for (int i = 0; i < 3; i++) {
@@ -592,6 +685,10 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                 c = true;
                 b0 -= 128;
                 version = ((b0 << 8) | iob.read());
+                if (version != 1) {
+                    spdyConnection.abort("Wrong version");
+                    return;
+                }
                 b0 = iob.read();
                 type = ((b0 << 8) | iob.read());
             }
@@ -601,10 +698,21 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
                 b0 = iob.read();
                 length = length << 8 | b0;
             }
-
+            
             iob.recycle();
         }
     
+    }
+    
+    @Override
+    protected void endSendReceive(HttpChannel http) throws IOException {
+        synchronized (this) {
+            HttpChannel doneHttp = channels.remove(http.channelId);
+            if (doneHttp != http) {
+                log.severe("Error removing " + doneHttp + " " + http);
+            }
+        }
+        httpConnector.cpool.afterRequest(http, this, true);
     }
     
     /** 
@@ -615,5 +723,86 @@ public class SpdyConnection extends HttpConnector.HttpConnection  {
         
     }
 
+    
+    volatile boolean connecting = false;
+    volatile boolean connected = false;
+    
+    
+    private boolean checkConnection(HttpChannel http) throws IOException {
+        synchronized(this) {
+            if (net == null || !isOpen()) {
+                connected = false;
+            }
+        
+            if (!connected) {
+                if (!connecting) {
+                    // TODO: secure set at start ? 
+                    connecting = true;
+                    httpConnector.cpool.httpConnect(http, 
+                            target.toString(), 
+                            http.getRequest().isSecure(), this);
+                }
+                
+                synchronized (remoteHost) {
+                    remoteHost.pending.add(http);
+                    httpConnector.cpool.queued.incrementAndGet();
+                }
+                return false;
+            }
+        }
 
+        return true;
+    }
+
+    @Override
+    public void handleConnected(IOChannel net) throws IOException {
+        HttpChannel httpCh = null;
+        if (!net.isOpen()) {
+            while (true) {
+                synchronized (remoteHost) {
+                    if (remoteHost.pending.size() == 0) {
+                        return;
+                    }
+                    httpCh = remoteHost.pending.remove();
+                }
+                httpCh.abort("Can't connect");
+            }            
+        }
+
+        synchronized (remoteHost) {
+            httpCh = remoteHost.pending.peek();
+        }
+        secure = httpCh.getRequest().isSecure();
+        if (secure) {
+            SslChannel ch1 = new SslChannel();
+            ch1.setSslContext(httpConnector.sslConnector.getSSLContext());
+            ch1.setSink(net);
+            net.addFilterAfter(ch1);
+            net = ch1;
+        }
+        
+        if (httpConnector.debugHttp) {
+            IOChannel ch1 = new DumpChannel("");
+            net.addFilterAfter(ch1);
+            net = ch1;                        
+        }
+        
+        setSink(net);
+        
+        synchronized(this) {
+            connecting = false;
+            connected = true;
+        }
+ 
+        while (true) {
+            synchronized (remoteHost) {
+                if (remoteHost.pending.size() == 0) {
+                    return;
+                }
+                httpCh = remoteHost.pending.remove();
+            }
+            sendRequest(httpCh);
+        }
+
+    }
 }

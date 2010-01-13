@@ -12,12 +12,16 @@ import org.apache.tomcat.lite.http.HttpMessage.HttpMessageBytes;
 import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBuffer;
+import org.apache.tomcat.lite.io.IOConnector;
+import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.FastHttpDateFormat;
 import org.apache.tomcat.lite.io.Hex;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
+import org.apache.tomcat.lite.io.SslChannel;
 
-public class Http11Connection extends HttpConnection {
+public class Http11Connection extends HttpConnection 
+        implements IOConnector.ConnectedCallback {
     public static final String CHUNKED = "chunked";
     
     public static final String CLOSE = "close"; 
@@ -33,8 +37,7 @@ public class Http11Connection extends HttpConnection {
     static final byte COLON = (byte) ':';
 
     // super.net is the socket 
-
-    HttpChannel activeHttp;
+    
     boolean debug;
     BBuffer line = BBuffer.wrapper(); 
     boolean endSent = false;
@@ -74,7 +77,11 @@ public class Http11Connection extends HttpConnection {
     }
 
     public void beforeRequest() {
-        activeHttp = null;
+        nextRequest();
+        headRecvBuf.recycle();
+    }
+
+    public void nextRequest() {
         endSent = false;
         keepAlive = true;
         receiveBodyState.recycle();
@@ -84,7 +91,6 @@ public class Http11Connection extends HttpConnection {
         http10 = false;
         headersReceived = false;
         bodyReceived = false;
-        headRecvBuf.recycle();
     }
     
     public Http11Connection serverMode() {
@@ -108,7 +114,8 @@ public class Http11Connection extends HttpConnection {
                 if (headRecvBuf.get(0) == 0x80 && 
                         headRecvBuf.get(1) == 0x01) {
                     // SPDY signature ( experimental )
-                    switchedProtocol = new SpdyConnection(httpConnector);
+                    switchedProtocol = new SpdyConnection(httpConnector, 
+                            remoteHost);
                     if (serverMode) {
                         switchedProtocol.serverMode = true;
                     }
@@ -167,9 +174,9 @@ public class Http11Connection extends HttpConnection {
     }
 
     @Override
-    public void handleReceived(IOChannel netx) throws IOException {
+    public void dataReceived(IOBuffer netx) throws IOException {
         if (switchedProtocol != null) {
-            switchedProtocol.handleReceived(netx);
+            switchedProtocol.dataReceived(netx);
             return;
         }
         //trace("handleReceived " + headersReceived);
@@ -299,7 +306,7 @@ public class Http11Connection extends HttpConnection {
         if (http09) {
             keepAlive = false;
         }
-        if (!net.isOpen()) {
+        if (net != null && !net.isOpen()) {
             keepAlive = false;
         }
         return keepAlive;
@@ -311,8 +318,8 @@ public class Http11Connection extends HttpConnection {
             switchedProtocol.endSendReceive(http);
             return;
         }
-        activeHttp = null; 
-        if (!keepAlive()) {
+        boolean keepAlive = keepAlive();
+        if (!keepAlive) {
             if (debug) {
                 log.info("--- Close socket, no keepalive " + net);
             }
@@ -321,27 +328,16 @@ public class Http11Connection extends HttpConnection {
                 net.startSending();
 
             }
-            beforeRequest(); 
-            return;
         }
         synchronized (readLock) {
-            beforeRequest(); // will clear head buffer
             requestCount++;
-            if (serverMode) {
-                if (debug) {
-                    log.info(">>> server socket KEEP_ALIVE " + net.getTarget() + 
-                            " " + net + " " + net.getIn().available());
-                }
+            beforeRequest();
+            httpConnector.cpool.afterRequest(http, this, true);
+
+            if (serverMode && keepAlive) {
                 handleReceived(net); // will attempt to read next req
-            } else {
-                if (debug) {
-                    log.info(">>> client socket KEEP_ALIVE " + net.getTarget() + 
-                            " " + net);
-                }
-                httpConnector.cpool.returnChannel(this);
             }
         }
-
     }
     
     private void trace(String s) {
@@ -741,8 +737,6 @@ public class Http11Connection extends HttpConnection {
             return;
         }
 
-        this.activeHttp = http;
-        
         // Update transfer fields based on headers.
         processProtocol(http.getRequest().protocol());
         updateKeepAlive(http.getRequest().getMimeHeaders(), true);
@@ -1402,5 +1396,33 @@ public class Http11Connection extends HttpConnection {
         (bodyReceived ? " BODY " : "")
         ;  
     }
-    
+
+    @Override
+    public void handleConnected(IOChannel net) throws IOException {
+
+        HttpChannel httpCh = activeHttp; 
+        boolean ssl = httpCh.getRequest().isSecure();
+        if (ssl) {
+            SslChannel ch1 = new SslChannel();
+            ch1.setSslContext(httpConnector.sslConnector.getSSLContext());
+            ch1.setSink(net);
+            net.addFilterAfter(ch1);
+            net = ch1;
+        }
+        if (httpConnector.debugHttp) {
+            IOChannel ch1 = new DumpChannel("");
+            net.addFilterAfter(ch1);
+            net = ch1;                        
+        }
+
+        if (!net.isOpen()) {
+            httpCh.abort("Can't connect");
+            return;
+        }
+        
+        setSink(net);
+        
+        sendRequest(httpCh);
+    }
+
 }

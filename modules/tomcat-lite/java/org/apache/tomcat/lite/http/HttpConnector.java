@@ -44,8 +44,6 @@ public class HttpConnector {
         public void onDestroy(HttpChannel ch, HttpConnector con) throws IOException;
     }
     
-    HttpConnectionManager conManager = new HttpConnectionManager();
-    
     private static Logger log = Logger.getLogger("HttpConnector");
     
     /** 
@@ -84,7 +82,7 @@ public class HttpConnector {
     public AtomicInteger recycledChannels = new AtomicInteger();
     public AtomicInteger reusedChannels = new AtomicInteger();
 
-    public ConnectionPool cpool = new ConnectionPool();
+    public HttpConnectionPool cpool = new HttpConnectionPool(this);
         
     // Host + context mapper.
     Dispatcher dispatcher;
@@ -332,11 +330,6 @@ public class HttpConnector {
 
     }
     
-    HttpConnection newConnection() {
-        return conManager.newConnection(this);
-    }
-
-
     private class AcceptorCallback implements IOConnector.ConnectedCallback {
         @Override
         public void handleConnected(IOChannel accepted) throws IOException {
@@ -346,7 +339,7 @@ public class HttpConnector {
 
     public HttpConnection handleAccepted(IOChannel accepted) throws IOException {
         // TODO: reuse
-        HttpConnection shttp = newConnection();
+        HttpConnection shttp = cpool.accepted(accepted);
         shttp.serverMode = true;
 
         if (debugHttp) {
@@ -371,50 +364,11 @@ public class HttpConnector {
         return this;
     }
     
-    public void handleConnected(IOChannel net, HttpChannel httpCh) 
-            throws IOException {
-        boolean ssl = httpCh.getRequest().isSecure();
-        if (ssl) {
-            SslChannel ch1 = new SslChannel();
-            ch1.setSslContext(sslConnector.getSSLContext());
-            ch1.setSink(net);
-            net.addFilterAfter(ch1);
-            net = ch1;
-        }
-        if (debugHttp) {
-            IOChannel ch1 = new DumpChannel("");
-            net.addFilterAfter(ch1);
-            net = ch1;                        
-        }
-        
-        if (!net.isOpen()) {
-            httpCh.abort("Can't connect");
-            return;
-        }
-        HttpConnection httpStream = newConnection();
-        httpStream.setSink(net);
-
-        // TODO: add it to the cpool
-        httpCh.setConnection(httpStream);
-        
-        httpStream.sendRequest(httpCh);
-    }
-
-    public static class HttpConnectionManager {
-        public HttpConnection newConnection(HttpConnector con) {
-            return new Http11Connection(con);
-        }
-        
-        public HttpConnection getFromPool(RemoteServer t) {
-            return t.connections.remove(t.connections.size() - 1);            
-        }
-    }
-    
     /**
      * Actual HTTP/1.1 wire protocol. 
      *  
      */
-    public static class HttpConnection extends IOChannel
+    public static abstract class HttpConnection extends IOChannel
         implements DataReceivedCallback
     {
         protected HttpConnector httpConnector;
@@ -422,9 +376,18 @@ public class HttpConnector {
 
         protected BBuffer headRecvBuf = BBuffer.allocate(8192);
         protected CompressFilter compress = new CompressFilter();
+        
+        protected boolean secure = false;
+        
+        protected HttpConnectionPool.RemoteServer remoteHost;
+        // If set, the connection is in use ( active )
+        // null == keep alive. Changes synchronized on remoteHost
+        // before/after request
+        protected HttpChannel activeHttp;
 
         @Override
-        public void handleReceived(IOChannel ch) throws IOException {
+        public final void handleReceived(IOChannel ch) throws IOException {
+            int before = ch.getIn().available();
             dataReceived(ch.getIn());
         }
 
@@ -451,9 +414,7 @@ public class HttpConnector {
         /** 
          * Incoming data.
          */
-        public void dataReceived(IOBuffer iob) throws IOException {
-            
-        }
+        public abstract void dataReceived(IOBuffer iob) throws IOException;
         
         /** 
          * Framing error, client interrupt, etc.
@@ -474,12 +435,12 @@ public class HttpConnector {
 
         @Override
         public IOBuffer getIn() {
-            return net.getIn();
+            return net == null ? null : net.getIn();
         }
 
         @Override
         public IOBuffer getOut() {
-            return net.getOut();
+            return net == null ? null : net.getOut();
         }
 
         @Override
@@ -493,188 +454,22 @@ public class HttpConnector {
         protected void outClosed(HttpChannel http) throws IOException {
         }
 
-        protected void endSendReceive(HttpChannel httpChannel) throws IOException {
-            return;
-        }
+        /**
+         * Called by HttpChannel when both input and output are fully 
+         * sent/received. When this happens the request is no longer associated
+         * with the Connection, and the connection can be re-used. 
+         * 
+         * The channel can still be used to access the retrieved data that may
+         * still be buffered until HttpChannel.release() is called.
+         * 
+         * This method will be called only once, for both succesful and aborted
+         * requests. 
+         */
+        protected abstract void endSendReceive(HttpChannel httpChannel) throws IOException;
 
         public void withExtraBuffer(BBuffer received) {
             return;
         }
         
-    }
-
-    /** 
-     * Connections for one remote host.
-     * This should't be restricted by IP:port or even hostname,
-     * for example if a server has multiple IPs or LB replicas - any would work.   
-     */
-    public static class RemoteServer {
-        public ArrayList<HttpConnection> connections = new ArrayList<HttpConnection>();
-    }
-
-    // TODO: add timeouts, limits per host/total, expire old entries 
-    // TODO: discover apr and use it
-    
-    public class ConnectionPool {
-        // visible for debugging - will be made private, with accessor 
-        /**
-         * Map from client names to socket pools.
-         */
-        public Map<CharSequence, RemoteServer> hosts = new HashMap<CharSequence, 
-            RemoteServer>();
-
-        // Statistics
-        public AtomicInteger waitingSockets = new AtomicInteger();
-        public AtomicInteger closedSockets = new AtomicInteger();
-
-        public AtomicInteger hits = new AtomicInteger();
-        public AtomicInteger misses = new AtomicInteger();
-
-        public int getTargetCount() {
-            return hosts.size();
-        }
-
-        public int getSocketCount() {
-            return waitingSockets.get();
-        }
-
-        public int getClosedSockets() {
-            return closedSockets.get();
-        }
-
-        public Set<CharSequence> getKeepAliveTargets() {
-            return hosts.keySet();
-        }
-
-        /** 
-         * @param key host:port, or some other key if multiple hosts:ips
-         * are connected to equivalent servers ( LB ) 
-         * @param httpCh 
-         * @throws IOException 
-         */
-        public HttpConnection send(HttpChannel httpCh) 
-                throws IOException {
-            String target = httpCh.getTarget();
-            HttpConnection con = null;
-            // TODO: check ssl on connection - now if a second request 
-            // is received on a ssl connection - we just send it
-            boolean ssl = httpCh.getRequest().isSecure();
-            
-            RemoteServer t = null;
-            synchronized (hosts) {
-                t = hosts.get(target);
-                if (t == null) {
-                    misses.incrementAndGet();
-                }
-            }
-            if (t != null) {
-                synchronized (t) {
-                    if (t.connections.size() == 0) {
-                        misses.incrementAndGet();
-                    } else {
-                        con = conManager.getFromPool(t);
-
-                        if (!con.isOpen()) {
-                            con.setDataReceivedCallback(null);
-                            con.close();
-                            log.fine("Already closed " + con);
-                            con = null;
-                            misses.incrementAndGet();
-                        } else {
-                            hits.incrementAndGet();
-                            if (debug) {
-                                httpCh.trace("HTTP_CONNECT: Reuse connection " + target + " " + this);
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if (con == null) {
-                if (debug) {
-                    httpCh.trace("HTTP_CONNECT: New connection " + target);
-                }
-                String[] hostPort = target.split(":");
-                
-                int targetPort = ssl ? 443 : 80;
-                if (hostPort.length > 1) {
-                    targetPort = Integer.parseInt(hostPort[1]);
-                }
-                
-                getIOConnector().connect(hostPort[0], targetPort,
-                        httpCh.connectedCallback);
-            } else {
-                con.beforeRequest();
-                httpCh.setConnection(con);
-                con.sendRequest(httpCh);
-            }
-            
-            
-            return con;      
-        }
-
-        /**
-         * Must be called in IOThread for the channel
-         */
-        public void returnChannel(HttpConnection ch) 
-                throws IOException {
-            CharSequence key = ch.getTarget(); 
-            if (key == null) {
-                ch.close();
-                if (debug) {
-                    log.info("Return channel, no target ..." + key + " " + ch);
-                }
-                return;
-            }
-            
-            if (!ch.isOpen()) {
-                ch.close(); // make sure all closed
-                if (debug) {
-                    log.info("Return closed channel ..." + key + " " + ch);
-                }
-                return;
-            }
-            
-            RemoteServer t = null;
-            synchronized (hosts) {
-                t = hosts.get(key);
-                if (t == null) {
-                    t = new RemoteServer();
-                    hosts.put(key, t);
-                }
-            }
-            waitingSockets.incrementAndGet();
-            
-            ch.ts = System.currentTimeMillis();
-            synchronized (t) {
-                t.connections.add(ch);      
-            }
-        }
-        
-        // Called by handleClosed
-        void stopKeepAlive(IOChannel schannel) {
-            CharSequence target = schannel.getTarget();
-            RemoteServer t = null;
-            synchronized (hosts) {
-                t = hosts.get(target);
-                if (t == null) {
-                    return;
-                }
-            }
-            synchronized (t) {
-                if (t.connections.remove(schannel)) {      
-                    waitingSockets.decrementAndGet();
-                    if (t.connections.size() == 0) {
-                        hosts.remove(target);
-                    }
-                }
-            }
-        }
-    }
-
-    public HttpConnector withConnectionManager(
-            HttpConnectionManager connectionManager) {
-        this.conManager = connectionManager;
-        return this;
     }
 }
