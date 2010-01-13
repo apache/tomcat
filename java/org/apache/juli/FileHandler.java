@@ -71,7 +71,7 @@ public class FileHandler
      * The as-of date for the currently open log file, or a zero-length
      * string if there is no open log file.
      */
-    private String date = "";
+    private volatile String date = "";
 
 
     /**
@@ -100,7 +100,7 @@ public class FileHandler
     /**
      * Log buffer size
      */
-    private int bufferSize = 8192;
+    private int bufferSize = 0;
 
 
     // --------------------------------------------------------- Public Methods
@@ -145,15 +145,9 @@ public class FileHandler
         try {
             PrintWriter writer = this.writer;
             if (writer!=null) {
-                if (bufferSize > 0) {
-                    writer.write(result);
-                } else {
-                    synchronized (this) {
-                        // OutputStreamWriter performs buffering inside its StreamEncoder,
-                        // and so to run without a buffer we have to flush explicitly
-                        writer.write(result);
-                        writer.flush();
-                    }
+                writer.write(result);
+                if (bufferSize < 0) {
+                    writer.flush();
                 }
             } else {
                 reportError("FileHandler is closed or not yet initialized, unable to log ["+result+"]", null, ErrorManager.WRITE_FAILURE);
@@ -314,7 +308,7 @@ public class FileHandler
             OutputStream os = bufferSize>0?new BufferedOutputStream(fos,bufferSize):fos;
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding)
-                                       : new OutputStreamWriter(os), true);
+                                       : new OutputStreamWriter(os), false);
             writer.write(getFormatter().getHead(this));
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
