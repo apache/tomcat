@@ -128,9 +128,11 @@
       boolean value.</li>
       <li>The root logger can define its set of handlers using a
       <code>.handlers</code> property.</li>
-      <li>Logging is buffered using a default buffer size of 8192 bytes.
-      To change buffersize, use the <code>bufferSize</code> property of a handler.
-      The value of <code>0</code> disables buffering.</li>
+      <li>Logging is buffered using a default buffer size of 0 bytes.
+      To change bufferSize, use the <code>bufferSize</code> property of a handler.
+      The value of <code>0</code> uses system default buffering.
+      The value of <code>&lt;0</code> forces a writer flush upon each log write.
+      A value <code>&gt;0</code> uses a BufferedOutputStream with the defined value.</li>
       <li>System property replacement is performed for property values which
       contain ${systemPropertyName}.</li>
     </ul>
