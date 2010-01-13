@@ -312,7 +312,6 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/script-expr.jsp");
         String result = res.toString();
-        System.out.println(result);
         assertTrue(result.indexOf("00-hello world") > 0);
         assertTrue(result.indexOf("01-hello \"world") > 0);
         assertTrue(result.indexOf("02-hello \\\"world") > 0);
@@ -327,4 +326,21 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("11-hello %> world") > 0);
     }
 
+    public void testELMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/el-method.jsp");
+        String result = res.toString();
+        assertTrue(result.indexOf("00-Hello JUnit from Tomcat") > 0);
+        assertTrue(result.indexOf("01-Hello JUnit from Tomcat") > 0);
+        assertTrue(result.indexOf("02-Hello JUnit from Tomcat") > 0);
+    }
 }
