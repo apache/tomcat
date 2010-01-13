@@ -25,7 +25,6 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationListener;
-import javax.sql.CommonDataSource;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -77,7 +76,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     
     
     
-    @Override 
+     
     public MBeanNotificationInfo[] getNotificationInfo() { 
         MBeanNotificationInfo[] pres = super.getNotificationInfo();
         MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
@@ -401,7 +400,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public void setDriverClassName(String driverClassName) {
         getPoolProperties().setDriverClassName(driverClassName);
     }
-
+    
+    @Override
     public void setFairQueue(boolean fairQueue) {
         getPoolProperties().setFairQueue(fairQueue);
     }
@@ -442,7 +442,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         
     }
 
-    @Override
+    @Override 
     public void setMaxIdle(int maxIdle) {
         // TODO Auto-generated method stub
         
@@ -575,14 +575,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
    /** 
     * {@inheritDoc}
     */
-   public void setDataSource(javax.sql.CommonDataSource ds) {
+   public void setDataSource(Object ds) {
        getPoolProperties().setDataSource(ds);
    }
    
    /** 
     * {@inheritDoc}
     */
-   public CommonDataSource getDataSource() {
+   public Object getDataSource() {
        return getPoolProperties().getDataSource();
    }
    
