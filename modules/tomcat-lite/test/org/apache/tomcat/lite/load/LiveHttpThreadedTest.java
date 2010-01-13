@@ -68,175 +68,184 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * it seems there is a bug as well.
  */
 public class LiveHttpThreadedTest extends TestCase {
-  HttpConnector clientCon = TestMain.shared().getClient();
-  ThreadRunner tr;
-  static MBeanServer server;
-  
-  AtomicInteger ok = new AtomicInteger();
-  Object lock = new Object();
-  int reqCnt;
+    HttpConnector clientCon = TestMain.shared().getClient();
+    HttpConnector serverCon = TestMain.shared().getTestServer();
+    ThreadRunner tr;
+    static MBeanServer server;
 
-  Map<HttpRequest, HttpRequest> active = new HashMap();
-  
-  public void test1000Async() throws Exception {
-      try {
-          asyncRequest(10, 100, false);
-      } finally {
-          dumpHeap("heapAsync.bin");
-      }
-      
-  }
+    AtomicInteger ok = new AtomicInteger();
+    Object lock = new Object();
+    int reqCnt;
 
-  public void test10000Async() throws Exception {
-      try {
-          asyncRequest(20, 500, false);
-      } finally {
-          dumpHeap("heapAsync.bin");
-      }
-  }
-  
-  public void xtest1000AsyncSpdy() throws Exception {
-      try {
-          asyncRequest(10, 20, true);
-      } finally {
-          dumpHeap("heapAsync.bin");
-      }
-      
-  }
+    Map<HttpRequest, HttpRequest> active = new HashMap();
 
-  public void xtest10000AsyncSpdy() throws Exception {
-      try {
-          asyncRequest(20, 500, true);
-      } finally {
-          dumpHeap("heapAsync.bin");
-      }
-  }
-  
-  public void asyncRequest(int thr, int perthr, boolean spdy) throws Exception {
-      reqCnt = thr * perthr;
-      if (spdy) {
-          // TODO: simpler API ( 'allowSpdy', etc ) - after negotiation is impl
-          clientCon.withConnectionManager(new SpdyConnection.SpdyConnectionManager());
-      }
-      long t0 = System.currentTimeMillis();
-      tr = new ThreadRunner(thr, perthr) {
-          public void makeRequest(int i) throws Exception {
-              HttpRequest cstate = clientCon.request("localhost", 8802);
-              synchronized (active) {
-                  active.put(cstate, cstate);
-              }
-              
-              cstate.requestURI().set("/hello");
-              cstate.setCompletedCallback(reqCallback);
-              
-              // Send the request, wait response
-              Thread.currentThread().sleep(20);
-              cstate.send();
-            }
-      };
-      tr.run();
-      assertEquals(0, tr.errors.get());
-      synchronized (lock) {
-          lock.wait(reqCnt * 100);
-      }
-      assertEquals(reqCnt, ok.get());
-      System.err.println(reqCnt + " Async requests: " + (System.currentTimeMillis() - t0));
-  }
-  
-  public void testURLRequest() throws Exception {
-      urlRequest(10, 100);
-  }
-
-  public void testURLRequest2() throws Exception {
-      urlRequest(20, 500);
-
-  }
-  
-  /** 
-   * HttpURLConnection client against lite.http server.
-   */
-  public void urlRequest(int thr, int cnt) throws Exception {
-      long t0 = System.currentTimeMillis();
-          
-      
-      try {
-          HttpConnector testServer = TestMain.getTestServer();
-          
-          tr = new ThreadRunner(thr, cnt) {
-
-              public void makeRequest(int i) throws Exception {
-                  try {
-                      ByteChunk out = new ByteChunk();
-                      HttpURLConnection con = TestMain.getUrl("http://localhost:8802/hello", out);
-                      if (con.getResponseCode() != 200) {
-                          errors.incrementAndGet();
-                      }
-                      if (!"Hello world".equals(out.toString())) {
-                          errors.incrementAndGet();
-                          System.err.println("bad result " + out);
-                      }
-                  } catch(Throwable t) {
-                      t.printStackTrace();
-                      errors.incrementAndGet();
-                  }
-              }
-          };
-          tr.run();
-          assertEquals(0, tr.errors.get());
-       
-          System.err.println(thr + " threads, " + (thr * cnt) + " total blocking URL requests: " + 
-                  (System.currentTimeMillis() - t0));
-
-          //assertEquals(testServer., actual)
-      } finally {
-          dumpHeap("heapURLReq.bin");
-      }
-  }
-  
-  // TODO: move to a servlet
-  private void dumpHeap(String file) throws InstanceNotFoundException,
-      MBeanException, ReflectionException, MalformedObjectNameException {
-
-      if (server == null) {
-          server = ManagementFactory.getPlatformMBeanServer();
-          
-      }
-      File f1 = new java.io.File(file);
-      if (f1.exists()) {
-          f1.delete();
-      }
-      server.invoke(new ObjectName("com.sun.management:type=HotSpotDiagnostic"),
-              "dumpHeap",
-              new Object[] {file, Boolean.FALSE /* live */}, 
-              new String[] {String.class.getName(), "boolean"});
-  }
-
-
-  RequestCompleted reqCallback = new RequestCompleted() {
-    @Override
-    public void handle(HttpChannel data, Object extraData) 
-        throws IOException {
-        String out = data.getIn().copyAll(null).toString();
-        if (200 != data.getResponse().getStatus()) {
-            System.err.println("Wrong status");
-            tr.errors.incrementAndGet();            
+    public void tearDown() throws IOException {
+        clientCon.cpool.clear();
+    }
+    
+    public void test1000Async() throws Exception {
+        try {
+            asyncRequest(10, 100, false);
+        } finally {
+            dumpHeap("heapAsync.bin");
         }
-        if (!"Hello world".equals(out)) {
-            tr.errors.incrementAndGet();
-            System.err.println("bad result " + out);
-        }        
-        synchronized (active) {
-            active.remove(data.getRequest());
-        }
-        data.release();
-        int okres = ok.incrementAndGet();
-        if (okres >= reqCnt) {
-            synchronized (lock) {
-                lock.notify();
-            }
+
+    }
+
+    public void test10000Async() throws Exception {
+        try {
+            asyncRequest(20, 500, false);
+        } finally {
+            dumpHeap("heapAsyncBig.bin");
         }
     }
-  };
-  
-  
+
+    public void test1000AsyncSpdy() throws Exception {
+        try {
+            asyncRequest(10, 100, true);
+        } finally {
+            dumpHeap("heapSpdy1000.bin");
+        }
+
+    }
+
+    public void test10000AsyncSpdy() throws Exception {
+        try {
+            asyncRequest(20, 500, true);
+        } finally {
+            dumpHeap("heapSpdy10000.bin");
+        }
+    }
+
+    public void asyncRequest(int thr, int perthr, 
+            final boolean spdy) throws Exception {
+        reqCnt = thr * perthr;
+        long t0 = System.currentTimeMillis();
+        tr = new ThreadRunner(thr, perthr) {
+            public void makeRequest(int i) throws Exception {
+                HttpRequest cstate = clientCon.request("localhost", 8802);
+                synchronized (active) {
+                    active.put(cstate, cstate);
+                }
+                if (spdy) {
+                    // Magic way to force spdy - will be replaced with
+                    // a negotiation.
+                    cstate.setProtocol("SPDY/1.0");
+                }
+                cstate.requestURI().set("/hello");
+                cstate.setCompletedCallback(reqCallback);
+                // no body
+                cstate.getBody().close();
+                // Send the request, wait response
+                Thread.currentThread().sleep(20);
+                cstate.send();
+            }
+        };
+        tr.run();
+        assertEquals(0, tr.errors.get());
+        synchronized (lock) {
+            if (ok.get() < reqCnt) {
+                lock.wait(reqCnt * 100);
+            }
+        }
+        assertEquals(reqCnt, ok.get());
+        System.err.println(reqCnt + " Async requests: " + (System.currentTimeMillis() - t0));
+    }
+
+    public void testURLRequest1000() throws Exception {
+        urlRequest(10, 100);
+    }
+
+    public void testURLRequest10000() throws Exception {
+        urlRequest(20, 500);
+
+    }
+
+    /** 
+     * HttpURLConnection client against lite.http server.
+     */
+    public void urlRequest(int thr, int cnt) throws Exception {
+        long t0 = System.currentTimeMillis();
+
+
+        try {
+            HttpConnector testServer = TestMain.getTestServer();
+
+            tr = new ThreadRunner(thr, cnt) {
+
+                public void makeRequest(int i) throws Exception {
+                    try {
+                        ByteChunk out = new ByteChunk();
+                        HttpURLConnection con = TestMain.getUrl("http://localhost:8802/hello", out);
+                        if (con.getResponseCode() != 200) {
+                            errors.incrementAndGet();
+                        }
+                        if (!"Hello world".equals(out.toString())) {
+                            errors.incrementAndGet();
+                            System.err.println("bad result " + out);
+                        }
+                    } catch(Throwable t) {
+                        t.printStackTrace();
+                        errors.incrementAndGet();
+                    }
+                }
+            };
+            tr.run();
+            assertEquals(0, tr.errors.get());
+
+            System.err.println(thr + " threads, " + (thr * cnt) + " total blocking URL requests: " + 
+                    (System.currentTimeMillis() - t0));
+
+            //assertEquals(testServer., actual)
+        } finally {
+            dumpHeap("heapURLReq.bin");
+        }
+    }
+
+    // TODO: move to a servlet
+    private void dumpHeap(String file) throws InstanceNotFoundException,
+    MBeanException, ReflectionException, MalformedObjectNameException {
+
+        if (server == null) {
+            server = ManagementFactory.getPlatformMBeanServer();
+
+        }
+        File f1 = new java.io.File(file);
+        if (f1.exists()) {
+            f1.delete();
+        }
+        server.invoke(new ObjectName("com.sun.management:type=HotSpotDiagnostic"),
+                "dumpHeap",
+                new Object[] {file, Boolean.FALSE /* live */}, 
+                new String[] {String.class.getName(), "boolean"});
+    }
+
+
+    RequestCompleted reqCallback = new RequestCompleted() {
+        @Override
+        public void handle(HttpChannel data, Object extraData) 
+        throws IOException {
+            String out = data.getIn().copyAll(null).toString();
+            if (200 != data.getResponse().getStatus()) {
+                System.err.println("Wrong status");
+                tr.errors.incrementAndGet();            
+            }
+            if (!"Hello world".equals(out)) {
+                tr.errors.incrementAndGet();
+                System.err.println("bad result " + out);
+            }        
+            synchronized (active) {
+                active.remove(data.getRequest());
+            }
+            data.release();
+            int okres = ok.incrementAndGet();
+            if (okres >= reqCnt) {
+                synchronized (lock) {
+                    lock.notify();
+                }
+            }
+        }
+    };
+
+
 }

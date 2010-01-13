@@ -348,18 +348,25 @@ public class IOBuffer {
     }
     
     public int read(byte[] buf, int off, int len) throws IOException {
-        BBucket bucket = peekFirst();
         if (isClosedAndEmpty()) {
             return -1;
         }
-        if (bucket == null) {
-            return 0;
+        int rd = 0;
+        while (true) {
+            BBucket bucket = peekFirst();
+            if (bucket == null) {
+                return rd;
+            }
+            int toCopy = Math.min(len, bucket.remaining());
+            System.arraycopy(bucket.array(), bucket.position(), 
+                    buf, off + rd, toCopy);
+            bucket.position(bucket.position() + toCopy);
+            rd += toCopy;
+            len -= toCopy;
+            if (len == 0) {
+                return rd;
+            }
         }
-        int toCopy = Math.min(len, bucket.remaining());
-        System.arraycopy(bucket.array(), bucket.position(), buf, 
-                off, toCopy);
-        bucket.position(bucket.position() + toCopy);
-        return toCopy;
         
     }
 
