@@ -429,8 +429,9 @@ public class BeanELResolver extends ELResolver {
     	        }
 	        }
 	    }
+	    Object result = null;
 	    try {
-            return matchingMethod.invoke(base, parameters);
+	        result = matchingMethod.invoke(base, parameters);
         } catch (IllegalArgumentException e) {
             throw new ELException(e);
         } catch (IllegalAccessException e) {
@@ -439,6 +440,8 @@ public class BeanELResolver extends ELResolver {
             throw new ELException(e.getCause());
         }
 	    
+        context.setPropertyResolved(true);
+        return result;
     }
 
 }
