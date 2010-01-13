@@ -118,7 +118,7 @@ public abstract class TomcatBaseTest extends TestCase {
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(100000);
+        connection.setReadTimeout(1000000);
         connection.connect();
         int rc = connection.getResponseCode();
         if (resHead != null) {
