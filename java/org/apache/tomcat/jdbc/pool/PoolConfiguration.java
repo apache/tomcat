@@ -738,7 +738,7 @@ public interface PoolConfiguration {
     public Object getDataSource();
     
     /**
-     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(CommonDataSource)}
+     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(Object)}
      * But instead of injecting the object, specify the JNDI location.
      * After a successful JNDI look, the {@link PoolConfiguration#getDataSource()} will not return null. 
      * @param jndiDS -the JNDI string @TODO specify the rules here.
@@ -747,7 +747,7 @@ public interface PoolConfiguration {
     
     /**
      * Returns the JNDI string configured for data source usage.
-     * @return
+     * @return the JNDI string or null if not set
      */
     public String getDataSourceJNDI();
     
