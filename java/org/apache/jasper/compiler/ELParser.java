@@ -30,7 +30,8 @@ package org.apache.jasper.compiler;
 
 public class ELParser {
 
-    private Token curToken; // current token
+    private Token curToken;  // current token
+    private Token prevToken; // previous token
 
     private ELNode.Nodes expr;
 
@@ -119,27 +120,28 @@ public class ELParser {
      * arguments
      */
     private boolean parseFunction() {
-        if (!(curToken instanceof Id) || isELReserved(curToken.toString())) {
+        if (!(curToken instanceof Id) || isELReserved(curToken.toString()) ||
+                prevToken instanceof Char && prevToken.toChar() == '.') {
             return false;
         }
         String s1 = null; // Function prefix
         String s2 = curToken.toString(); // Function name
         int mark = getIndex();
         if (hasNext()) {
-            Token t = nextToken();
-            if (t.toChar() == ':') {
+            curToken = nextToken();
+            if (curToken.toChar() == ':') {
                 if (hasNext()) {
                     Token t2 = nextToken();
                     if (t2 instanceof Id) {
                         s1 = s2;
                         s2 = t2.toString();
                         if (hasNext()) {
-                            t = nextToken();
+                            curToken = nextToken();
                         }
                     }
                 }
             }
-            if (t.toChar() == '(') {
+            if (curToken.toChar() == '(') {
                 ELexpr.add(new ELNode.Function(s1, s2));
                 return true;
             }
@@ -224,6 +226,7 @@ public class ELParser {
      * @return The next token in the EL expression buffer.
      */
     private Token nextToken() {
+        prevToken = curToken;
         skipSpaces();
         if (hasNextChar()) {
             char ch = nextChar();
