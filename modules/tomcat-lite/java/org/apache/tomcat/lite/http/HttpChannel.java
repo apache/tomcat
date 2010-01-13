@@ -316,7 +316,7 @@ public class HttpChannel extends IOChannel {
         if (target == null) {
             return ":0"; // server mode ? 
         }
-        return target;
+        return target.toString();
     }
 
 
@@ -797,11 +797,25 @@ public class HttpChannel extends IOChannel {
     }
     
     
-    
+    /**
+     * This method will be called when the http headers have been received - 
+     * the body may or may not be available. 
+     * 
+     * In server mode this is equivalent with a servlet request. 
+     * This is also called for http client, when the response headers
+     * are received. 
+     *  
+     * TODO: rename it to HttMessageReceived or something similar.
+     */
     public static interface HttpService {
         void service(HttpRequest httpReq, HttpResponse httpRes) throws IOException;
     }
     
+    /** 
+     * Called when both request and response bodies have been sent/
+     * received. After this call the HttpChannel will be disconnected
+     * from the http connection, which can be used for other requests. 
+     */
     public static interface RequestCompleted {
         void handle(HttpChannel data, Object extraData) throws IOException;
     }
@@ -814,11 +828,4 @@ public class HttpChannel extends IOChannel {
     };
     
 
-    IOConnector.ConnectedCallback connectedCallback = new IOConnector.ConnectedCallback() {
-        @Override
-        public void handleConnected(IOChannel ch) throws IOException {
-            httpConnector.handleConnected(ch, HttpChannel.this);
-        }
-    };
-    
 }

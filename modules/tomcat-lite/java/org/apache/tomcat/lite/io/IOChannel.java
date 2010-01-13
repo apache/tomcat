@@ -27,7 +27,7 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     protected IOChannel app;
     
     protected String id;
-    protected String target;    
+    protected CharSequence target;    
 
     protected IOConnector connector;
 
@@ -136,7 +136,7 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
         shutdownOutput();
         // Should it read the buffers ? 
         
-        if (getIn().isAppendClosed()) {
+        if (getIn() == null || getIn().isAppendClosed()) {
             return;
         } else {
             getIn().close();
@@ -146,11 +146,13 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     }
 
     public boolean isOpen() {
-        return !getIn().isAppendClosed() && !getOut().isAppendClosed();
+        return getIn() != null && 
+        getOut() != null && 
+        !getIn().isAppendClosed() && !getOut().isAppendClosed();
     }
     
     public void shutdownOutput() throws IOException {
-        if (getOut().isAppendClosed()) {
+        if (getOut() == null || getOut().isAppendClosed()) {
             return;
         } else {
             getOut().close();
@@ -290,5 +292,8 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
         return target;
     }
     
+    public void setTarget(CharSequence target) {
+        this.target = target;
+    }
     
 }

@@ -9,17 +9,15 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.apache.tomcat.lite.TestMain;
+import org.apache.tomcat.lite.http.HttpConnectionPool.RemoteServer;
 import org.apache.tomcat.lite.io.IOBuffer;
-import org.apache.tomcat.lite.http.SpdyConnection.SpdyConnectionManager;
 
 public class SpdyTest extends TestCase {
     HttpConnector http11Con = TestMain.shared().getClient();
     
-    static HttpConnector spdyCon = DefaultHttpConnector.get()
-        .withConnectionManager(new SpdyConnectionManager());
+    static HttpConnector spdyCon = DefaultHttpConnector.get();
     
-    HttpConnector memSpdyCon = 
-        new HttpConnector(null).withConnectionManager(new SpdyConnectionManager());
+    HttpConnector memSpdyCon = new HttpConnector(null);
     
     public void testClient() throws IOException {
         HttpRequest req = 
@@ -43,7 +41,7 @@ public class SpdyTest extends TestCase {
         IOBuffer iob = new IOBuffer();
         iob.append(is);
         
-        SpdyConnection con = (SpdyConnection) memSpdyCon.newConnection();
+        SpdyConnection con = new SpdyConnection(memSpdyCon, new RemoteServer());
         
         // By default it has a dispatcher buit-in 
         con.serverMode = true;
@@ -72,7 +70,7 @@ public class SpdyTest extends TestCase {
         IOBuffer iob = new IOBuffer();
         iob.append(is);
         
-        SpdyConnection con = (SpdyConnection) memSpdyCon.newConnection();
+        SpdyConnection con = new SpdyConnection(memSpdyCon, new RemoteServer());
         
         // By default it has a dispatcher buit-in 
         con.serverMode = true;
@@ -95,22 +93,44 @@ public class SpdyTest extends TestCase {
     public void testLargeInt() throws Exception {
         
         IOBuffer iob = new IOBuffer();
+        iob.append(0x80);
+        iob.append(0x01);
+        iob.append(0xFF);
+        iob.append(0xFF);
+
         iob.append(0xFF);
         iob.append(0xFF);
         iob.append(0xFF);
         iob.append(0xFF);
 
-        iob.append(0xFF);
-        iob.append(0xFF);
-        iob.append(0xFF);
-        iob.append(0xFF);
-
-        SpdyConnection con = (SpdyConnection) memSpdyCon.newConnection();
+        SpdyConnection con = new SpdyConnection(memSpdyCon, new RemoteServer());
         con.dataReceived(iob);
-        assertEquals(0x7FFF, con.currentInFrame.version);
+        assertEquals(1, con.currentInFrame.version);
         assertEquals(0xFFFF, con.currentInFrame.type);
         assertEquals(0xFF, con.currentInFrame.flags);
         assertEquals(0xFFFFFF, con.currentInFrame.length);
         
     }
+
+    // Does int parsing works ?
+    public void testBad() throws Exception {
+        
+            IOBuffer iob = new IOBuffer();
+            iob.append(0xFF);
+            iob.append(0xFF);
+            iob.append(0xFF);
+            iob.append(0xFF);
+
+            iob.append(0xFF);
+            iob.append(0xFF);
+            iob.append(0xFF);
+            iob.append(0xFF);
+
+            SpdyConnection con = new SpdyConnection(memSpdyCon, new RemoteServer());
+            con.dataReceived(iob);
+            
+            assertEquals(1, con.streamErrors.get());
+        
+    }
+
 }
