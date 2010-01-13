@@ -18,8 +18,6 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.Properties;
 
-import javax.sql.CommonDataSource;
-
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 /**
@@ -730,14 +728,14 @@ public interface PoolConfiguration {
      * will be invoked.  
      * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
      */
-    public void setDataSource(CommonDataSource ds);
+    public void setDataSource(Object ds);
     
     /**
      * Returns a datasource, if one exists that is being used to create connections.
      * This method will return null if the pool is using a {@link java.sql.Driver}
      * @return the {@link javax.sql.DataSource} to be used for creating connections to be pooled or null if a Driver is used.
      */
-    public CommonDataSource getDataSource();
+    public Object getDataSource();
     
     /**
      * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(CommonDataSource)}
