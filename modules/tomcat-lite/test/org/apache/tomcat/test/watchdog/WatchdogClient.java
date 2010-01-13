@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class WatchdogClient implements Test {
+public class WatchdogClient {
         
   protected String goldenDir; 
   protected String testMatch;
@@ -167,12 +167,10 @@ public class WatchdogClient implements Test {
   protected String single;
   WatchdogTestCase singleTest;
   
-  @Override
   public int countTestCases() {
       return 1;
   }
 
-  @Override
   public void run(TestResult result) {
       getSuite();
       if (singleTest != null) {

@@ -38,22 +38,34 @@ public class CompressFilter {
     long dictId;
     
     public CompressFilter() {
-        cStream = new ZStream();
-        cStream.deflateInit(JZlib.Z_BEST_COMPRESSION);
-        
-        dStream = new ZStream();
-        dStream.inflateInit();
     }
     
     public void recycle() {
+        if (cStream == null) {
+            return;
+        }
+        cStream.free();
+        cStream = null;
+        dStream.free();
+        dStream = null;
+    }
+    
+    public void init() {
+        if (cStream != null) {
+            return;
+        }
         // can't call: cStream.free(); - will kill the adler, NPE
-
-        cStream.deflateInit(JZlib.Z_BEST_COMPRESSION);
+        cStream = new ZStream();
+        // BEST_COMRESSION results in 256Kb per Deflate
+        cStream.deflateInit(JZlib.Z_BEST_SPEED);
+        
+        dStream = new ZStream();
         dStream.inflateInit();
 
     }
     
     CompressFilter setDictionary(byte[] dict, long id) {
+        init();
         this.dict = dict;
         this.dictId = id;
         cStream.deflateSetDictionary(dict, dict.length);
@@ -61,6 +73,7 @@ public class CompressFilter {
     }
 
     void compress(IOBuffer in, IOBuffer out) throws IOException {
+        init();
         BBucket bb = in.popFirst();
         
         while (bb != null) {
@@ -80,6 +93,7 @@ public class CompressFilter {
         // TODO: only the last one needs flush
 
         // TODO: size missmatches ?
+        init();
         int flush = JZlib.Z_PARTIAL_FLUSH;
 
         cStream.next_in = bb.array();
@@ -129,6 +143,7 @@ public class CompressFilter {
     }
     
     void decompress(IOBuffer in, IOBuffer out, int len) throws IOException {
+        init();
         BBucket bb = in.peekFirst();
         
         while (bb != null && len > 0) {

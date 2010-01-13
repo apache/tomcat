@@ -86,7 +86,7 @@ public class LiveHttp1Test extends TestCase {
         httpClient.requestURI().set("/chunked/foo");
         httpClient.send();
         httpClient.readAll(bodyRecvBuffer, to);
-        assertTrue(bodyRecvBuffer.toString().indexOf("AAA") >= 0);
+        assertTrue(bodyRecvBuffer.toString(), bodyRecvBuffer.toString().indexOf("AAA") >= 0);
     }
 
     // Check waitResponseHead()

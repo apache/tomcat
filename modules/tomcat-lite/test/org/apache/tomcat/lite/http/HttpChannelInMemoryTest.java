@@ -27,7 +27,7 @@ public class HttpChannelInMemoryTest extends TestCase {
     /** 
      * Last http channel created by the connection
      */
-    HttpChannel http;
+    volatile HttpChannel http;
     
     // Input/output for the connection
     MemoryIOConnector.MemoryIOChannel net = new MemoryIOChannel();
