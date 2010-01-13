@@ -76,7 +76,12 @@ public class ReplicationTransmitter implements ChannelSender {
      */
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException {
         MultiPointSender sender = getTransport();
-        sender.sendMessage(destination,message);
+        try {
+            sender.sendMessage(destination,message);
+        }catch (ChannelException x) {
+            sender.disconnect();
+            throw x;
+        }
     }
     
     
