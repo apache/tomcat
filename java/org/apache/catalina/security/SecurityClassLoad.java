@@ -99,6 +99,8 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage + "session.StandardSession");
         loader.loadClass
+            (basePackage + "session.StandardSession$PrivilegedSetTccl");
+        loader.loadClass
             (basePackage +
              "session.StandardSession$1");
         loader.loadClass
