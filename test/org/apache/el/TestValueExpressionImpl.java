@@ -34,11 +34,12 @@ public class TestValueExpressionImpl extends TestCase {
         
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
-        ValueExpression var = factory.createValueExpression(beanB, TesterBeanB.class);
+        ValueExpression var =
+            factory.createValueExpression(beanB, TesterBeanB.class);
         context.getVariableMapper().setVariable("beanB", var);
 
-        ValueExpression ve =
-            factory.createValueExpression(context, "${beanB.name}", String.class); 
+        ValueExpression ve = factory.createValueExpression(
+                context, "${beanB.name}", String.class);
 
         // First check the basics work
         String result = (String) ve.getValue(context);
