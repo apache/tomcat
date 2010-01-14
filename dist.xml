@@ -288,15 +288,7 @@
   </target>
 
   <!-- ================= DIST: Create Windows Installer =================== -->
-  <target name="installer"
-   description="Create Windows installer" unless="skip.installer">
-    <echo message="Builds a Windows installer based on Nullsoft Installer"/>
-    <copy todir="${tomcat.dist}">
-      <fileset dir="res" />
-    </copy>
-    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
+  <target name="win-prepare" >
     <!-- 32 bit -->
     <copy file="res/procrun/tomcat${version.major}.exe"
         tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
@@ -324,6 +316,18 @@ Apache Tomcat ${version} native binaries for Win64 IA64 platform.
     <echo append="false" file="${tomcat.dist}/bin/x64/README">
 Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </echo>
+  </target>
+
+  <!-- ================= DIST: Create Windows Installer =================== -->
+  <target name="installer" description="Create Windows installer"
+  	  unless="skip.installer" depends="win-prepare" >
+    <echo message="Builds a Windows installer based on Nullsoft Installer"/>
+    <copy todir="${tomcat.dist}">
+      <fileset dir="res" />
+    </copy>
+    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
 
     <!-- Make sure the RELEASE-NOTES has Windows line endings as they may be
          displayed post-install -->
@@ -418,7 +422,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <!-- Packages the core windows zip distros -->
-  <target name="package-winzip">
+  <target name="package-winzip" depends="win-prepare">
     <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
     <fixcrlf srcdir="${tomcat.dist}/conf" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
 
