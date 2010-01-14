@@ -251,7 +251,7 @@ void BracketSuffix() #BracketSuffix : {}
 /*
  * MethodParameters
  */
-void MethodParameters() : {}
+void MethodParameters() #MethodParameters : {}
 {
     <LPAREN> ( Expression() ( <COMMA> Expression())* )? <RPAREN>
 }

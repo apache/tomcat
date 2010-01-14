@@ -27,7 +27,7 @@ import org.apache.el.lang.EvaluationContext;
  * @author Jacob Hookom [jacob@hookom.net]
  * @version $Change: 181177 $$Date$$Author$
  */
-public final class AstDotSuffix extends SimpleNode implements Suffix {
+public final class AstDotSuffix extends SimpleNode {
     public AstDotSuffix(int id) {
         super(id);
     }
