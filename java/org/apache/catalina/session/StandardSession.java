@@ -710,8 +710,14 @@ public class StandardSession
             if (context.getLoader() != null &&
                     context.getLoader().getClassLoader() != null) {
                 oldTccl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(
-                        context.getLoader().getClassLoader());
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                            context.getLoader().getClassLoader());
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(
+                            context.getLoader().getClassLoader());
+                }
             }
             try {
                 Object listeners[] = context.getApplicationLifecycleListeners();
@@ -747,7 +753,13 @@ public class StandardSession
                 }
             } finally {
                 if (oldTccl != null) {
-                    Thread.currentThread().setContextClassLoader(oldTccl);
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa =
+                            new PrivilegedSetTccl(oldTccl);
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(oldTccl);
+                    }
                 }
             }
 
@@ -1731,6 +1743,21 @@ public class StandardSession
 
     }
 
+
+    private static class PrivilegedSetTccl
+    implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
 
 }
 
