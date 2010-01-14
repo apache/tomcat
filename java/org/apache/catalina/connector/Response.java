@@ -70,9 +70,21 @@ public class Response
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Compliance with SRV.15.2.22.1. A call to Response.getWriter() if no
+     * character encoding has been specified will result in subsequent calls to
+     * Response.getCharacterEncoding() returning ISO-8859-1 and the Content-Type
+     * response header will include a charset=ISO-8859-1 component.
+     */
+    private static final boolean ENFORCE_ENCODING_IN_GET_WRITER;
+
     static {
         // Ensure that URL is loaded for SM
         URL.isSchemeChar('c');
+
+        ENFORCE_ENCODING_IN_GET_WRITER = Boolean.valueOf(
+                System.getProperty("org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER",
+                        "true")).booleanValue();
     }
 
     public Response() {
@@ -603,7 +615,7 @@ public class Response
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.getWriter.ise"));
 
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (ENFORCE_ENCODING_IN_GET_WRITER) {
             /*
              * If the response's character encoding has not been specified as
              * described in <code>getCharacterEncoding</code> (i.e., the method
