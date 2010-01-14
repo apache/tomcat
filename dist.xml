@@ -98,6 +98,7 @@
     <include name="**/*.license"/>
     <include name="**/*.manifest"/>
     <include name="**/*.mdl"/>
+    <include name="**/*.notice"/>
     <include name="**/*.nsi"/>
     <include name="**/*.policy"/>
     <include name="**/*.pom"/>
