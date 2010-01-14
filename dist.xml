@@ -387,6 +387,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the core zip distro -->
   <target name="package-zip">
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}/conf" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -417,6 +419,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the core windows zip distros -->
   <target name="package-winzip">
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}/conf" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+
     <!-- Windows x86 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip">
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
