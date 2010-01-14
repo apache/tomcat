@@ -20,7 +20,6 @@ package org.apache.el.parser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import javax.el.ELException;
 import javax.el.ELResolver;
@@ -73,7 +72,15 @@ public final class AstValue extends SimpleNode {
 
         // set up our start/end
         Object property = null;
-        int propCount = this.jjtGetNumChildren() - 1;
+        int propCount = this.jjtGetNumChildren();
+        
+        if (propCount > 2 &&
+                this.jjtGetChild(propCount - 1) instanceof AstMethodParameters) {
+            // Method call with paramaters. 
+            propCount-=2;
+        } else {
+            propCount--;
+        }
         int i = 1;
 
         // evaluate any properties before our target
@@ -115,22 +122,16 @@ public final class AstValue extends SimpleNode {
         ELResolver resolver = ctx.getELResolver();
         while (base != null && i < propCount) {
             suffix = this.children[i].getValue(ctx);
-            if (i + 1 < propCount && !(this.children[i+1] instanceof Suffix)) {
-                // Looking for a method
-                ArrayList<Object> params = new ArrayList<Object>();
-                ArrayList<Class<?>> paramTypes = new ArrayList<Class<?>>();
-                while (i + 1 < propCount &&
-                        !(this.children[i+1] instanceof Suffix)) {
-                    params.add(this.children[i+1].getValue(ctx));
-                    paramTypes.add(this.children[i+1].getType(ctx));
-                    i++;
-                }
+            if (i + 1 < propCount &&
+                    (this.children[i+1] instanceof AstMethodParameters)) {
+                AstMethodParameters mps =
+                    (AstMethodParameters) this.children[i+1];
+                // This is a method
                 base = resolver.invoke(ctx, base, suffix,
-                        paramTypes.toArray(new Class<?>[paramTypes.size()]),
-                        params.toArray(new Object[params.size()]));
-                i++;
+                        mps.getParameterTypes(ctx), mps.getParameters(ctx));
+                i+=2;
             } else {
-                // Looking for a property
+                // This is a property
                 if (suffix == null) {
                     return null;
                 } else {
@@ -215,13 +216,25 @@ public final class AstValue extends SimpleNode {
     @Override
     public ValueReference getValueReference(EvaluationContext ctx) {
         // Check this is a reference to a base and a property
-        if (this.children.length > 2 && this.jjtGetChild(2) instanceof Suffix) {
+        if (this.children.length > 2 &&
+                this.jjtGetChild(2) instanceof AstMethodParameters) {
             // This is a method call
             return null;
         }
         Target t = getTarget(ctx);
         return new ValueReference(t.base, this.jjtGetChild(1).getValue(ctx));
     }
+
     
-    
+    /**
+     * @ since EL 2.2
+     */
+    @Override
+    public boolean isParametersProvided() {
+        if (this.children.length > 2
+                && this.jjtGetChild(2) instanceof AstMethodParameters) {
+            return true;
+        }
+        return false;
+    }
 }
