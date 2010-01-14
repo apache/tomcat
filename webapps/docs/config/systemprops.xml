@@ -225,12 +225,6 @@
       dispatcher will be checked to ensure that it has wrapped the original
       request or response. (SRV.8.2 / SRV.14.2.5.1)
       </li>
-      <li>a call to <code>Response.getWriter()</code> if no character encoding
-      has been specified will result in subsequent calls to
-      <code>Response.getCharacterEncoding()</code> returning
-      <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
-      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)
-      </li>
       <li>every request that is associated with a session will cause the
       session's last accessed time to be updated regardless of whether or not
       the request explicitly accesses the session. (SRV.7.6)  
@@ -254,6 +248,18 @@
       changed by setting
       <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> can always be
       overridden by explicitly setting the appropriate system property.</p>
+    </property>
+
+    <property name="org.apache.catalina.connector. Response.ENFORCE_ENCODING_IN_GET_WRITER">
+      <p>If this is <code>true</code> then
+      a call to <code>Response.getWriter()</code> if no character encoding
+      has been specified will result in subsequent calls to
+      <code>Response.getCharacterEncoding()</code> returning
+      <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
+      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)
+      <br />
+      If not specified, the default specification compliant value of
+      <code>true</code> will be used.</p>
     </property>
 
     <property
