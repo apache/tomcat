@@ -31,6 +31,6 @@ public interface ServletContainerInitializer {
      * @param ctx
      * @throws ServletException
      */
-    public void onStartup(Set<java.lang.Class<?>> c, ServletContext ctx)
+    public void onStartup(Set<Class<?>> c, ServletContext ctx)
     throws ServletException;
 }
