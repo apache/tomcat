@@ -53,7 +53,7 @@ package javax.servlet.jsp.el;
  * @since 2.0
  * @deprecated
  */
-@Deprecated
+@SuppressWarnings("dep-ann") // TCK signature test fails with annotation
 public abstract class ExpressionEvaluator {
 
     /**
@@ -77,9 +77,10 @@ public abstract class ExpressionEvaluator {
      *
      * @exception ELException Thrown if parsing errors were found.
      */ 
-    public abstract Expression parseExpression( String expression, 
-				       Class<?> expectedType, 
-				       FunctionMapper fMapper ) 
+    public abstract Expression parseExpression( String expression,
+            @SuppressWarnings("unchecked") // TCK signature fails with generics
+            Class expectedType,
+	        FunctionMapper fMapper) 
       throws ELException; 
 
 
@@ -99,11 +100,12 @@ public abstract class ExpressionEvaluator {
      * @return The result of the expression evaluation.
      *
      * @exception ELException Thrown if the expression evaluation failed.
-     */ 
-    public abstract Object evaluate( String expression, 
-			    Class<?> expectedType, 
-			    VariableResolver vResolver,
-			    FunctionMapper fMapper ) 
+     */
+    public abstract Object evaluate( String expression,
+            @SuppressWarnings("unchecked") // TCK signature fails with generics
+		    Class expectedType,
+		    VariableResolver vResolver,
+		    FunctionMapper fMapper)
       throws ELException; 
 }
 

@@ -122,8 +122,7 @@ public interface BodyTag extends IterationTag {
      * @deprecated	As of Java JSP API 1.2, use BodyTag.EVAL_BODY_BUFFERED
      * or IterationTag.EVAL_BODY_AGAIN.
      */
- 
-    @Deprecated
+    @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
     public final static int EVAL_BODY_TAG = 2;
 
     /**
