@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.catalina.startup;
+package org.apache.catalina.deploy;
 
 import java.net.URL;
 import java.util.EnumSet;
@@ -36,28 +36,6 @@ import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.deploy.ContextEjb;
-import org.apache.catalina.deploy.ContextEnvironment;
-import org.apache.catalina.deploy.ContextHandler;
-import org.apache.catalina.deploy.ContextLocalEjb;
-import org.apache.catalina.deploy.ContextResource;
-import org.apache.catalina.deploy.ContextResourceEnvRef;
-import org.apache.catalina.deploy.ContextService;
-import org.apache.catalina.deploy.ErrorPage;
-import org.apache.catalina.deploy.FilterDef;
-import org.apache.catalina.deploy.FilterMap;
-import org.apache.catalina.deploy.InjectionTarget;
-import org.apache.catalina.deploy.JspPropertyGroup;
-import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.deploy.MessageDestination;
-import org.apache.catalina.deploy.MessageDestinationRef;
-import org.apache.catalina.deploy.MultipartDef;
-import org.apache.catalina.deploy.ResourceBase;
-import org.apache.catalina.deploy.SecurityCollection;
-import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.deploy.SecurityRoleRef;
-import org.apache.catalina.deploy.ServletDef;
-import org.apache.catalina.deploy.SessionConfig;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -1949,7 +1927,7 @@ public class WebXml {
      * @param fragments     The map of fragment names to web fragments
      * @return Ordered list of web-fragment.xml files to process
      */
-    protected static Set<WebXml> orderWebFragments(WebXml application,
+    public static Set<WebXml> orderWebFragments(WebXml application,
             Map<String,WebXml> fragments) {
 
         Set<WebXml> orderedFragments = new LinkedHashSet<WebXml>();
