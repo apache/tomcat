@@ -45,9 +45,9 @@ public class TestMethodExpressionImpl extends TestCase {
                 new Class<?>[] { String.class });
 
         String result1 = (String) me1.invoke(context, null);
-        assertFalse(me1.isParametersProvided());
+        assertFalse(me1.isParmetersProvided());
         String result2 = (String) me2.invoke(context, new Object[] { "JUnit2" });
-        assertTrue(me2.isParametersProvided());
+        assertTrue(me2.isParmetersProvided());
         
         assertNotNull(result1);
         assertNotNull(result2);

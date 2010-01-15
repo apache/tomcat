@@ -30,8 +30,12 @@ public abstract class MethodExpression extends Expression {
     
     /**
      * @since EL 2.2
+     * 
+     * Note: The spelling mistake is deliberate.
+     * isParmetersProvided()  - Specification definition
+     * isParametersProvided() - Corrected spelling
      */
-    public boolean isParametersProvided() {
+    public boolean isParmetersProvided() {
         // Expected to be over-ridden by implementation
         return false;
     }
