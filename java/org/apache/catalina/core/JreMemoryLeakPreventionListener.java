@@ -82,7 +82,9 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     /**
      * XML parsing can pin a web application class loader in memory. This is
      * particularly nasty as profilers (at least YourKit and Eclipse MAT) don't
-     * identify any GC roots related to this. 
+     * identify any GC roots related to this.
+     * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6916498">
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6916498</a>
      */
     private boolean xmlParsingProtection = true;
     public boolean isXmlParsingProtection() { return xmlParsingProtection; }
