@@ -434,7 +434,7 @@ public class ServletRequestWrapper implements ServletRequest {
      */
     public AsyncContext startAsync(ServletRequest servletRequest,
             ServletResponse servletResponse)
-            throws java.lang.IllegalStateException {
+            throws IllegalStateException {
         return request.startAsync(servletRequest, servletResponse);
     }
     
