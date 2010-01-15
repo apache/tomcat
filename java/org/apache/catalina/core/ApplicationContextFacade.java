@@ -509,7 +509,7 @@ public final class ApplicationContextFacade
     
     
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
-    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
+    public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (EnumSet<SessionTrackingMode>)
                 doPrivileged("getDefaultSessionTrackingModes", null);
@@ -519,7 +519,7 @@ public final class ApplicationContextFacade
     }
 
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
-    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (EnumSet<SessionTrackingMode>)
                 doPrivileged("getEffectiveSessionTrackingModes", null);
@@ -540,7 +540,7 @@ public final class ApplicationContextFacade
 
 
     public void setSessionTrackingModes(
-            EnumSet<SessionTrackingMode> sessionTrackingModes) {
+            Set<SessionTrackingMode> sessionTrackingModes) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setSessionTrackingModes",
                     new Object[]{sessionTrackingModes});

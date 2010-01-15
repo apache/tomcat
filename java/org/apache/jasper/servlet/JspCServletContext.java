@@ -463,12 +463,12 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
+    public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return EnumSet.noneOf(SessionTrackingMode.class);
     }
 
 
-    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         return EnumSet.noneOf(SessionTrackingMode.class);
     }
 
@@ -479,7 +479,7 @@ public class JspCServletContext implements ServletContext {
 
 
     public void setSessionTrackingModes(
-            EnumSet<SessionTrackingMode> sessionTrackingModes) {
+            Set<SessionTrackingMode> sessionTrackingModes) {
         // Do nothing
     }
 
