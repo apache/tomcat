@@ -26,6 +26,7 @@ import org.apache.catalina.deploy.ContextHandler;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.ServletDef;
+import org.apache.catalina.deploy.WebXml;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.CallMethodRule;
 import org.apache.tomcat.util.digester.CallParamRule;

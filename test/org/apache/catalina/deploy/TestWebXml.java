@@ -15,13 +15,16 @@
  *  limitations under the License.
  */
 
-package org.apache.catalina.startup;
+package org.apache.catalina.deploy;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.catalina.deploy.WebXml;
+import org.apache.catalina.startup.ContextConfig;
 
 import junit.framework.TestCase;
 
