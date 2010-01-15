@@ -184,10 +184,14 @@ public class DataSourceFactory implements ObjectFactory {
             return null;
         }
         Reference ref = (Reference) obj;
-        
+        boolean XA = false;
         boolean ok = false;
         if ("javax.sql.DataSource".equals(ref.getClassName())) {
             ok = true;
+        }
+        if ("javax.sql.XADataSource".equals(ref.getClassName())) {
+            ok = true;
+            XA = true;
         }
         if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
             ok = true;
@@ -209,7 +213,7 @@ public class DataSourceFactory implements ObjectFactory {
             }
         }
 
-        return createDataSource(properties,nameCtx);
+        return createDataSource(properties,nameCtx,XA);
     }
     
     public static PoolConfiguration parsePoolProperties(Properties properties) throws IOException{
@@ -458,39 +462,45 @@ public class DataSourceFactory implements ObjectFactory {
      * @param properties the datasource configuration properties
      * @throws Exception if an error occurs creating the data source
      */
-    public static DataSource createDataSource(Properties properties) throws Exception {
-        return createDataSource(properties,null);
+    public DataSource createDataSource(Properties properties) throws Exception {
+        return createDataSource(properties,null,false);
     }
-    public static DataSource createDataSource(Properties properties,Context context) throws Exception {
+    public DataSource createDataSource(Properties properties,Context context, boolean XA) throws Exception {
         PoolConfiguration poolProperties = DataSourceFactory.parsePoolProperties(properties);
         if (poolProperties.getDataSourceJNDI()!=null && poolProperties.getDataSource()==null) {
-            Object jndiDS = null;
-            try {
-                if (context!=null) {
-                    jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
-                } else {
-                    log.warn("dataSourceJNDI property is configued, but local JNDI context is null.");
-                }
-            } catch (NamingException e) {
-                log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the local context.");
-            }
-            if (jndiDS==null) {
-                try {
-                    context = (Context) (new InitialContext());
-                    jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
-                } catch (NamingException e) {
-                    log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the InitialContext.");
-                }
-            }
-            if (jndiDS!=null) {
-                poolProperties.setDataSource(jndiDS);
-            }
+            performJNDILookup(context, poolProperties);
         }
-        org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
+        org.apache.tomcat.jdbc.pool.DataSource dataSource = XA?
+                new org.apache.tomcat.jdbc.pool.XADataSource(poolProperties) :
+                new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
         //initialise the pool itself
         dataSource.createPool();
         // Return the configured DataSource instance
         return dataSource;
+    }
+
+    public void performJNDILookup(Context context, PoolConfiguration poolProperties) {
+        Object jndiDS = null;
+        try {
+            if (context!=null) {
+                jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
+            } else {
+                log.warn("dataSourceJNDI property is configued, but local JNDI context is null.");
+            }
+        } catch (NamingException e) {
+            log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the local context.");
+        }
+        if (jndiDS==null) {
+            try {
+                context = (Context) (new InitialContext());
+                jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
+            } catch (NamingException e) {
+                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the InitialContext.");
+            }
+        }
+        if (jndiDS!=null) {
+            poolProperties.setDataSource(jndiDS);
+        }
     }
     
     /**
