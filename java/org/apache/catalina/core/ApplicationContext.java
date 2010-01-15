@@ -171,9 +171,9 @@ public class ApplicationContext
     /**
      * Session tracking modes
      */
-    private EnumSet<SessionTrackingMode> sessionTrackingModes = null;
-    private EnumSet<SessionTrackingMode> defaultSessionTrackingModes = null;
-    private EnumSet<SessionTrackingMode> supportedSessionTrackingModes = null;
+    private Set<SessionTrackingMode> sessionTrackingModes = null;
+    private Set<SessionTrackingMode> defaultSessionTrackingModes = null;
+    private Set<SessionTrackingMode> supportedSessionTrackingModes = null;
 
     // --------------------------------------------------------- Public Methods
 
@@ -963,7 +963,7 @@ public class ApplicationContext
      * used by this context has the attribute <code>secure</code> set to
      * <code>true</code>.
      */
-    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
+    public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return defaultSessionTrackingModes;
     }
 
@@ -994,7 +994,7 @@ public class ApplicationContext
      * Return the supplied value if one was previously set, else return the
      * defaults.
      */
-    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         if (sessionTrackingModes != null) {
             return sessionTrackingModes;
         }
@@ -1014,7 +1014,7 @@ public class ApplicationContext
      *                                  tracking mode is requested
      */
     public void setSessionTrackingModes(
-            EnumSet<SessionTrackingMode> sessionTrackingModes) {
+            Set<SessionTrackingMode> sessionTrackingModes) {
 
         if (context.getAvailable()) {
             throw new IllegalStateException(
