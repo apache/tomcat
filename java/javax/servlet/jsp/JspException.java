@@ -21,7 +21,6 @@ package javax.servlet.jsp;
  * JspExceptions will result in an invocation of the errorpage
  * machinery.
  */
-
 public class JspException extends Exception {
 
     /**
@@ -85,15 +84,14 @@ public class JspException extends Exception {
 
     
     /**
-     * @deprecated As of JSP 2.1, replaced by
-     * <code>java.lang.Throwable.getCause()</code>
-     *  
      * Returns the exception that caused this JSP exception.
      *
      * @return  the <code>Throwable</code> that caused this JSP exception
+     * 
+     * @deprecated As of JSP 2.1, replaced by
+     * <code>java.lang.Throwable.getCause()</code>
      */
-    
-    @Deprecated
+    @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
     public Throwable getRootCause() {
         return getCause();
     }
