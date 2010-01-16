@@ -185,7 +185,14 @@ public class ELSupport {
         if (obj.getClass().isEnum()) {
             return (Enum<?>) obj;
         }
-        return Enum.valueOf(type, obj.toString());
+        Enum<?> result;
+        try {
+             result = Enum.valueOf(type, obj.toString());
+        } catch (IllegalArgumentException iae) {
+            throw new ELException(MessageFactory.get("error.convert",
+                    obj, obj.getClass(), type));
+        }
+        return result;
     }
 
     /**
