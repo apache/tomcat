@@ -22,10 +22,12 @@ import javax.el.ELException;
 import javax.el.MethodExpression;
 import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
+import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
+import org.apache.el.util.MessageFactory;
 
 
 /**
@@ -47,7 +49,12 @@ public final class AstIdentifier extends SimpleNode {
             }
         }
         ctx.setPropertyResolved(false);
-        return ctx.getELResolver().getType(ctx, null, this.image);
+        Class<?> result = ctx.getELResolver().getType(ctx, null, this.image);
+        if (!ctx.isPropertyResolved()) {
+            throw new PropertyNotFoundException(MessageFactory.get(
+                    "error.resolver.unhandled.null", this.image));
+        }
+        return result;
     }
 
     @Override
@@ -60,7 +67,12 @@ public final class AstIdentifier extends SimpleNode {
             }
         }
         ctx.setPropertyResolved(false);
-        return ctx.getELResolver().getValue(ctx, null, this.image);
+        Object result = ctx.getELResolver().getValue(ctx, null, this.image);
+        if (!ctx.isPropertyResolved()) {
+            throw new PropertyNotFoundException(MessageFactory.get(
+                    "error.resolver.unhandled.null", this.image));
+        }
+        return result;
     }
 
     @Override
@@ -73,7 +85,12 @@ public final class AstIdentifier extends SimpleNode {
             }
         }
         ctx.setPropertyResolved(false);
-        return ctx.getELResolver().isReadOnly(ctx, null, this.image);
+        boolean result = ctx.getELResolver().isReadOnly(ctx, null, this.image);
+        if (!ctx.isPropertyResolved()) {
+            throw new PropertyNotFoundException(MessageFactory.get(
+                    "error.resolver.unhandled.null", this.image));
+        }
+        return result;
     }
 
     @Override
@@ -89,6 +106,10 @@ public final class AstIdentifier extends SimpleNode {
         }
         ctx.setPropertyResolved(false);
         ctx.getELResolver().setValue(ctx, null, this.image, value);
+        if (!ctx.isPropertyResolved()) {
+            throw new PropertyNotFoundException(MessageFactory.get(
+                    "error.resolver.unhandled.null", this.image));
+        }
     }
 
     @Override
