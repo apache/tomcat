@@ -203,7 +203,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      */
     @Override
     public int hashCode() {
-        return this.expr.hashCode();
+        return this.getNode().hashCode();
     }
 
     /*
