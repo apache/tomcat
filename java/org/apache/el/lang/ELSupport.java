@@ -178,11 +178,11 @@ public class ELSupport {
      * @param type
      * @return
      */
-    public final static Enum coerceToEnum(final Object obj, Class type) {
+    public final static Enum<?> coerceToEnum(final Object obj, Class type) {
         if (obj == null || "".equals(obj)) {
             return null;
         }
-        if (obj.getClass().isEnum()) {
+        if (type.isAssignableFrom(obj.getClass())) {
             return (Enum<?>) obj;
         }
         Enum<?> result;
