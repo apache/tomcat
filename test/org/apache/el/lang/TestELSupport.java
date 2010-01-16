@@ -19,6 +19,8 @@ package org.apache.el.lang;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import javax.el.ELException;
+
 import junit.framework.TestCase;
 
 public class TestELSupport extends TestCase {
@@ -66,8 +68,51 @@ public class TestELSupport extends TestCase {
         Object output = ELSupport.coerceToType(null, Number.class);
         assertEquals(Long.valueOf(0), output);
     }
+    
+    public void testCoerceEnumAToEnumA() {
+        Object output = null;
+        try {
+            output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumA.class);
+        } finally {
+            assertEquals(TestEnumA.VALA1, output);
+        }
+    }
+    
+    public void testCoerceEnumAToEnumB() {
+        Object output = null;
+        try {
+            output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumB.class);
+        } catch (ELException ele) {
+            // Ignore
+        }
+        assertNull(output);
+    }
+
+    public void testCoerceEnumAToEnumC() {
+        Object output = null;
+        try {
+            output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumC.class);
+        } finally {
+            assertEquals(TestEnumC.VALA1, output);
+        }
+    }
 
     private static void testIsSame(Object value) {
         assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
+    }
+    
+    private static enum TestEnumA {
+        VALA1,
+        VALA2
+    }
+    private static enum TestEnumB {
+        VALB1,
+        VALB2
+    }
+    private static enum TestEnumC {
+        VALA1,
+        VALA2,
+        VALB1,
+        VALB2
     }
 }
