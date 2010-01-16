@@ -18,6 +18,8 @@
 
 package org.apache.el.parser;
 
+import java.util.Arrays;
+
 import javax.el.ELException;
 import javax.el.MethodInfo;
 import javax.el.PropertyNotWritableException;
@@ -164,6 +166,45 @@ public abstract class SimpleNode extends ELSupport implements Node {
         throw new UnsupportedOperationException();
     }
     
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(children);
+        result = prime * result + id;
+        result = prime * result + ((image == null) ? 0 : image.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof SimpleNode)) {
+            return false;
+        }
+        SimpleNode other = (SimpleNode) obj;
+        if (!Arrays.equals(children, other.children)) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (image == null) {
+            if (other.image != null) {
+                return false;
+            }
+        } else if (!image.equals(other.image)) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @since EL 2.2
      */
