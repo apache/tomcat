@@ -500,6 +500,17 @@ public interface Context extends Container {
      */
     public void addFilterMap(FilterMap filterMap);
 
+    /**
+     * Add a filter mapping to this Context before the mappings defined in the
+     * deployment descriptor but after any other mappings added via this method.
+     *
+     * @param filterMap The filter mapping to be added
+     *
+     * @exception IllegalArgumentException if the specified filter name
+     *  does not match an existing filter definition, or the filter mapping
+     *  is malformed
+     */
+    public void addFilterMapBefore(FilterMap filterMap);
 
     /**
      * Add the classname of an InstanceListener to be added to each

@@ -54,6 +54,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ApplicationParameter;
+import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResourceSet;
@@ -816,7 +817,7 @@ public class ApplicationContext
 
 
     public FilterRegistration.Dynamic addFilter(String filterName,
-            String className) throws IllegalStateException {
+            String filterClass) throws IllegalStateException {
         
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
@@ -825,12 +826,23 @@ public class ApplicationContext
                             getContextPath()));
         }
         
-        if (context.findFilterDef(filterName) != null) {
-            return null;
+        FilterDef filterDef = context.findFilterDef(filterName);
+        
+        // Assume a 'complete' FilterRegistration is one that has a class and
+        // a name
+        if (filterDef == null) {
+            filterDef = new FilterDef();
+        } else {
+            if (filterDef.getFilterName() != null &&
+                    filterDef.getFilterClass() != null) {
+                return null;
+            }
         }
 
-        // TODO SERVLET3
-        return null;
+        // Name must already be set
+        filterDef.setFilterClass(filterClass);
+        
+        return new ApplicationFilterRegistration(filterDef, context);
     }
 
     
