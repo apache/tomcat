@@ -18,46 +18,24 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="2008.html">
+<document url="2009.html">
 
   &project;
 
   <properties>
     <author email="general.AT.tomcat.DOT.apache.DOT.org">Apache Tomcat Native Project</author>
-    <title>2008 News and Status</title>
+    <title>2009 News and Status</title>
   </properties>
 
 <body>
 
-<section name="2008 News &amp; Status">
+<section name="2009 News &amp; Status">
 <br />
-<a name="20081118.1">
-<h3>18 November - TC-Native-1.1.16 released</h3>
+<a name="20091123.1">
+<h3>23 November - TC-Native-1.1.18 released</h3>
 </a>
 <p>The Apache Tomcat team is proud to announce the immediate availability
-of Tomcat Native 1.1.16. This is a stable release adding some bug fixes.
-</p>
-
-<a name="20080911.1">
-<h3>11 September - TC-Native-1.1.15 released</h3>
-</a>
-<p>The Apache Tomcat team is proud to announce the immediate availability
-of Tomcat Native 1.1.15. This is a stable release adding some bug fixes.
-</p>
-
-<a name="20080704.1">
-<h3>4 July - TC-Native-1.1.14 released</h3>
-</a>
-<p>The Apache Tomcat team is proud to announce the immediate availability
-of Tomcat Native 1.1.14. This is a stable release adding some bug fixes.
-</p>
-
-<a name="20080115.1">
-<h3>15 February - TC-Native-1.1.13 released</h3>
-</a>
-<p>The Apache Tomcat team is proud to announce the immediate availability
-of Tomcat Native 1.1.13. This is a stable release adding few new features
-and some bug fixes.
+of Tomcat Native 1.1.18. This is a stable release adding some bug fixes.
 </p><p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
