@@ -2,6 +2,7 @@
  */
 package org.apache.tomcat.integration;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,9 +30,9 @@ import java.util.logging.Logger;
 public class DynamicObject {
     // Based on MbeansDescriptorsIntrospectionSource
 
-    static Logger log = Logger.getLogger(DynamicObject.class.getName());
+    private static Logger log = Logger.getLogger(DynamicObject.class.getName());
 
-    static Class<?> NO_PARAMS[] = new Class[0];
+    private static Class<?> NO_PARAMS[] = new Class[0];
 
 
     private static String strArray[] = new String[0];
@@ -47,21 +48,18 @@ public class DynamicObject {
     
     private Class realClass;
 
-    private Map<String, Method> getAttMap;
+    // Method or Field
+    private Map<String, AccessibleObject> getAttMap;
 
     public DynamicObject(Class beanClass) {
         this.realClass = beanClass;
         initCache();
     }
 
-    public DynamicObject(Class beanClass, boolean noCache) {
-        this.realClass = beanClass;
-    }
-
     private void initCache() {
         Method methods[] = null;
 
-        getAttMap = new HashMap<String, Method>();
+        getAttMap = new HashMap<String, AccessibleObject>();
 
         methods = realClass.getMethods();
         for (int j = 0; j < methods.length; ++j) {
@@ -94,52 +92,18 @@ public class DynamicObject {
                 getAttMap.put(name, methods[j]);
             }
         }
+        // non-private AtomicInteger and AtomicLong - stats
+        Field fields[] = realClass.getFields();
+        for (int j = 0; j < fields.length; ++j) {
+            if (fields[j].getType() == AtomicInteger.class) {
+                getAttMap.put(fields[j].getName(), fields[j]);
+            }
+        }
+        
     }
 
-    private boolean ignorable(Method method) {
-        if (Modifier.isStatic(method.getModifiers()))
-            return true;
-        if (!Modifier.isPublic(method.getModifiers())) {
-            return true;
-        }
-        if (method.getDeclaringClass() == Object.class)
-            return true;
-        return false;
-    }
-    
     public List<String> attributeNames() {
-        List<String> attributes = new ArrayList<String>();
-        Method methods[] = realClass.getMethods();
-        for (int j = 0; j < methods.length; ++j) {
-            String name = methods[j].getName();
-            if (ignorable(methods[j])) {
-                continue;
-            }
-            Class<?> params[] = methods[j].getParameterTypes();
-            if (name.startsWith("get") && params.length == 0) {
-                Class<?> ret = methods[j].getReturnType();
-                if (!supportedType(ret)) {
-                    continue;
-                }
-                name = unCapitalize(name.substring(3));
-                attributes.add(name);
-            } else if (name.startsWith("is") && params.length == 0) {
-                Class<?> ret = methods[j].getReturnType();
-                if (Boolean.TYPE != ret) {
-                    continue;
-                }
-                name = unCapitalize(name.substring(2));
-                attributes.add(name);
-            } else if (name.startsWith("set") && params.length == 1) {
-                if (!supportedType(params[0])) {
-                    continue;
-                }
-                name = unCapitalize(name.substring(3));
-                attributes.add(name);
-            }
-        }
-
-        return attributes;
+        return new ArrayList<String>(getAttMap.keySet());
     }
 
 
@@ -154,28 +118,44 @@ public class DynamicObject {
     }
 
     // TODO
-    public Object invoke(String method, Object[] params) {
-        return null;
-    }
-
-    public boolean hasHook(String method) {
-        return false;
-    }
+//    public Object invoke(String method, Object[] params) {
+//        return null;
+//    }
 
     public Object getAttribute(Object o, String att) {
-        Method m = getAttMap.get(att);
-        if (m == null)
-            return null;
-        try {
-            return m.invoke(o);
-        } catch (Throwable e) {
-            log.log(Level.INFO, "Error getting attribute " + realClass + " "
-                    + att, e);
+        AccessibleObject m = getAttMap.get(att);
+        if (m instanceof Method) {
+            try {
+                return ((Method) m).invoke(o);
+            } catch (Throwable e) {
+                log.log(Level.INFO, "Error getting attribute " + realClass + " "
+                        + att, e);
+                return null;
+            }
+        } if (m instanceof Field) {
+            if (((Field) m).getType() == AtomicInteger.class) {
+                try {
+                    Object value = ((Field) m).get(o);
+                    return ((AtomicInteger) value).get();
+                } catch (Throwable e) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
             return null;
         }
     }
 
+    /** 
+     * Set an object-type attribute.
+     * 
+     * Use setProperty to use a string value and convert it to the 
+     * specific (primitive) type. 
+     */
     public boolean setAttribute(Object proxy, String name, Object value) {
+        // TODO: use the cache...
         String methodName = "set" + capitalize(name);
         Method[] methods = proxy.getClass().getMethods();
         for (Method m : methods) {
@@ -203,6 +183,7 @@ public class DynamicObject {
     }
 
     public boolean setProperty(Object proxy, String name, String value) {
+        // TODO: use the cache...
         String setter = "set" + capitalize(name);
 
         try {
@@ -389,5 +370,16 @@ public class DynamicObject {
         return new String(chars);
     }
 
+    private boolean ignorable(Method method) {
+        if (Modifier.isStatic(method.getModifiers()))
+            return true;
+        if (!Modifier.isPublic(method.getModifiers())) {
+            return true;
+        }
+        if (method.getDeclaringClass() == Object.class)
+            return true;
+        return false;
+    }
+    
     
 }

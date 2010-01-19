@@ -5,10 +5,7 @@ package org.apache.tomcat.lite.http;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,6 +99,19 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         .setDictionary(SPDY_DICT, DICT_ID);
     IOBuffer headerCompressBuffer = new IOBuffer();
 
+    AtomicInteger inFrames = new AtomicInteger();
+    AtomicInteger inDataFrames = new AtomicInteger();
+    AtomicInteger inSyncStreamFrames = new AtomicInteger();
+    AtomicInteger inBytes = new AtomicInteger();
+
+    AtomicInteger outFrames = new AtomicInteger();
+    AtomicInteger outDataFrames = new AtomicInteger();
+    AtomicInteger outBytes = new AtomicInteger();
+    
+        
+    volatile boolean connecting = false;
+    volatile boolean connected = false;
+
     // TODO: detect if it's spdy or http based on bit 8
 
     @Override
@@ -139,16 +149,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         }
     }
 
-    AtomicInteger inFrames = new AtomicInteger();
-    AtomicInteger inDataFrames = new AtomicInteger();
-    AtomicInteger inSyncStreamFrames = new AtomicInteger();
-    AtomicInteger inBytes = new AtomicInteger();
 
-    AtomicInteger outFrames = new AtomicInteger();
-    AtomicInteger outDataFrames = new AtomicInteger();
-    AtomicInteger outBytes = new AtomicInteger();
-    
-    
     
     /**
      * Frame received. Must consume all data for the frame.
@@ -367,14 +368,10 @@ public class SpdyConnection extends HttpConnector.HttpConnection
             return;
         }
         MultiMap mimeHeaders = http.getRequest().getMimeHeaders();
+
         BBuffer headBuf = BBuffer.allocate();
-        
         SpdyConnection.appendShort(headBuf, mimeHeaders.size() + 3);
-        
         serializeMime(mimeHeaders, headBuf);
-        
-        if (headerCompression) {
-        }
         
         // TODO: url - with host prefix , method
         // optimize...
@@ -387,7 +384,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         SpdyConnection.appendAsciiHead(headBuf, "url");
         // TODO: url
         SpdyConnection.appendAsciiHead(headBuf, http.getRequest().requestURL());
-        
+
+        if (headerCompression && httpConnector.compression) {
+            headerCompressBuffer.recycle();
+            headCompressOut.compress(headBuf, headerCompressBuffer, false);
+            headBuf.recycle();
+            headerCompressBuffer.copyAll(headBuf);
+        }
+
         // Frame head - 8
         BBuffer out = BBuffer.allocate();
         // Syn-reply 
@@ -417,6 +421,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
             http.channelId = 2 * lastOutStream.incrementAndGet() + 1;            
         }
         SpdyConnection.appendInt(out, http.channelId);
+        
         http.setConnection(this);
 
         synchronized (this) {
@@ -722,10 +727,6 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         // TODO: send interrupt signal
         
     }
-
-    
-    volatile boolean connecting = false;
-    volatile boolean connected = false;
     
     
     private boolean checkConnection(HttpChannel http) throws IOException {

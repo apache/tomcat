@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="target/lib/asm.jar"/>
 	<classpathentry kind="lib" path="target/lib/catalina.jar"/>
 	<classpathentry kind="lib" path="target/lib/commons-codec.jar"/>
-	<classpathentry kind="lib" path="target/lib/coyote.jar"/>
+	<classpathentry kind="lib" path="target/lib/coyote.jar" sourcepath="/home/costin/.m2/repository/org/apache/tomcat/coyote/6.0.20/coyote-6.0.20-sources.jar"/>
 	<classpathentry kind="lib" path="target/lib/el-api.jar"/>
 	<classpathentry kind="lib" path="target/lib/jasper-el.jar"/>
 	<classpathentry kind="lib" path="target/lib/jasper-jdt.jar"/>
@@ -19,7 +19,7 @@
 	<classpathentry kind="lib" path="target/lib/jsp-api.jar"/>
 	<classpathentry kind="lib" path="target/lib/juli.jar"/>
 	<classpathentry kind="lib" path="target/lib/junit.jar"/>
-	<classpathentry kind="lib" path="target/lib/jzlib.jar"/>
-	<classpathentry kind="lib" path="target/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="target/lib/jzlib.jar" sourcepath="/home/costin/.m2/repository/com/jcraft/jzlib/1.0.7/jzlib-1.0.7-sources.jar"/>
+	<classpathentry kind="lib" path="target/lib/servlet-api.jar" sourcepath="/tomcat-trunk"/>
 	<classpathentry kind="output" path="output/classes"/>
 </classpath>

@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.integration.jmx;
 
+import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
 
 import org.apache.tomcat.integration.ObjectManager;
@@ -33,6 +34,7 @@ public class JmxObjectManagerSpi extends ObjectManager {
     
     public JmxObjectManagerSpi() {
         registry = Registry.getRegistry(null, null);
+        registry.setServer(ManagementFactory.getPlatformMBeanServer());
     }
     
     public void bind(String name, Object o) {

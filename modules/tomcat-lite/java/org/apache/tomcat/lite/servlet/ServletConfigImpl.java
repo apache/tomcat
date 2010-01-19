@@ -40,10 +40,12 @@ import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.integration.jmx.JMXProxyServlet;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
 import org.apache.tomcat.lite.http.MappingData;
+import org.apache.tomcat.lite.io.WrappedException;
 import org.apache.tomcat.servlets.jsp.BaseJspLoader;
 import org.apache.tomcat.servlets.util.Enumerator;
 
@@ -134,6 +136,15 @@ public class ServletConfigImpl implements ServletConfig, HttpChannel.HttpService
         this.servletClassName = classname;
         this.ctx = ctx;
         ctx.lite.notifyAdd(this);
+    }
+
+    public ServletConfigImpl(Servlet realServlet) throws IOException {
+        instance = realServlet;
+        try {
+            realServlet.init(this);
+        } catch (ServletException e) {
+            throw new WrappedException(e);
+        }
     }
 
     /**
@@ -768,6 +779,11 @@ public class ServletConfigImpl implements ServletConfig, HttpChannel.HttpService
         ServletResponseImpl res = req.getResponse();
         
         // TODO
+        try {
+            instance.service(req, res);
+        } catch (ServletException e) {
+            throw new WrappedException(e);
+        }
     }
     
     /** Coyote / mapper adapter. Result of the mapper.
