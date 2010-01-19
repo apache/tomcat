@@ -57,7 +57,8 @@ public class CompressFilter {
         // can't call: cStream.free(); - will kill the adler, NPE
         cStream = new ZStream();
         // BEST_COMRESSION results in 256Kb per Deflate
-        cStream.deflateInit(JZlib.Z_BEST_SPEED);
+        // 15 == default = 32k window
+        cStream.deflateInit(JZlib.Z_BEST_SPEED, 10);
         
         dStream = new ZStream();
         dStream.inflateInit();

@@ -67,6 +67,7 @@ public class Http11Connection extends HttpConnection
 
     private int requestCount = 0;
 
+    // dataReceived and endSendReceive
     private Object readLock = new Object();
     
     public Http11Connection(HttpConnector httpConnector) {
@@ -318,6 +319,8 @@ public class Http11Connection extends HttpConnection
             switchedProtocol.endSendReceive(http);
             return;
         }
+        chunk.recycle();
+        rchunk.recycle();
         boolean keepAlive = keepAlive();
         if (!keepAlive) {
             if (debug) {
@@ -329,14 +332,13 @@ public class Http11Connection extends HttpConnection
 
             }
         }
-        synchronized (readLock) {
-            requestCount++;
-            beforeRequest();
-            httpConnector.cpool.afterRequest(http, this, true);
 
-            if (serverMode && keepAlive) {
-                handleReceived(net); // will attempt to read next req
-            }
+        requestCount++;
+        beforeRequest();
+        httpConnector.cpool.afterRequest(http, this, true);
+
+        if (serverMode && keepAlive) {
+            handleReceived(net); // will attempt to read next req
         }
     }
     
@@ -680,7 +682,7 @@ public class Http11Connection extends HttpConnection
                     int rc = NEED_MORE;
                     // TODO: simplify, use readLine()
                     while (rc == NEED_MORE) {
-                        rc = chunk.parseChunkHeader(rawReceiveBuffers);
+                        rc = rchunk.parseChunkHeader(rawReceiveBuffers);
                         if (rc == ERROR) {
                             http.abort("Chunk error");
                             receiveDone(http, body, true);
@@ -1218,6 +1220,7 @@ public class Http11Connection extends HttpConnection
 
     // used for chunk parsing/end
     ChunkState chunk = new ChunkState();
+    ChunkState rchunk = new ChunkState();
     static final int NEED_MORE = -1;
     static final int ERROR = -4;
     static final int DONE = -5;

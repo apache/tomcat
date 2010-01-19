@@ -8,17 +8,24 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.tomcat.integration.jmx.JMXProxyServlet;
+import org.apache.tomcat.integration.jmx.JmxObjectManagerSpi;
+import org.apache.tomcat.integration.jmx.UJmxHandler;
+import org.apache.tomcat.integration.jmx.UJmxObjectManagerSpi;
 import org.apache.tomcat.integration.simple.Main;
 import org.apache.tomcat.integration.simple.SimpleObjectManager;
 import org.apache.tomcat.lite.http.BaseMapper;
 import org.apache.tomcat.lite.http.DefaultHttpConnector;
 import org.apache.tomcat.lite.http.Dispatcher;
 import org.apache.tomcat.lite.http.HttpChannel;
+import org.apache.tomcat.lite.http.HttpConnectionPool;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
+import org.apache.tomcat.lite.http.HttpConnectionPool.RemoteServer;
 import org.apache.tomcat.lite.http.HttpConnector.HttpChannelEvents;
+import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.http.services.EchoCallback;
 import org.apache.tomcat.lite.http.services.SleepCallback;
 import org.apache.tomcat.lite.io.BBuffer;
@@ -27,6 +34,7 @@ import org.apache.tomcat.lite.io.SslConnector;
 import org.apache.tomcat.lite.proxy.HttpProxyService;
 import org.apache.tomcat.lite.proxy.StaticContentService;
 import org.apache.tomcat.lite.service.IOStatus;
+import org.apache.tomcat.lite.servlet.ServletConfigImpl;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -53,7 +61,9 @@ public class TestMain {
     private HttpConnector testProxy = new HttpConnector(serverCon);
 
     private HttpProxyService proxy;
-   
+
+    UJmxObjectManagerSpi jmx = new UJmxObjectManagerSpi();
+        
     public static TestMain shared() {
         if (defaultServer == null) {
             defaultServer = new TestMain();
@@ -70,7 +80,7 @@ public class TestMain {
         return shared().testClient;
     }
 
-    public void initTestCallback(Dispatcher d) {
+    public void initTestCallback(Dispatcher d) throws IOException {
         BaseMapper.ContextMapping mCtx = d.addContext(null, "", null, null, null, null);
         
         d.addWrapper(mCtx, "/", new StaticContentService()
@@ -79,6 +89,9 @@ public class TestMain {
                     "<a href='/proc/cpool/server'>Server pool</a><br/>" +
                     "<a href='/proc/cpool/proxy'>Proxy pool</a><br/>" +
                     ""));
+
+        d.addWrapper(mCtx, "/favicon.ico", 
+                new StaticContentService().setStatus(404).setData("Not found"));
 
         d.addWrapper(mCtx, "/hello", new StaticContentService().setData("Hello world"));
         d.addWrapper(mCtx, "/2nd", new StaticContentService().setData("Hello world2"));
@@ -104,6 +117,9 @@ public class TestMain {
             }
         });
 
+        d.addWrapper(mCtx, "/ujmx", new UJmxHandler(jmx));
+        d.addWrapper(mCtx, "/jmx", 
+                new ServletConfigImpl(new JMXProxyServlet()));
     }
 
     public void run() {
@@ -114,9 +130,22 @@ public class TestMain {
         }
     } 
     
+    public int getServerPort() {
+        return 8802;
+    }
+
+    public int getProxyPort() {
+        return 8903;
+    }
+
+    public int getSslServerPort() {
+        return 8443;
+    }
+    
     protected void startAll(int basePort) throws IOException {
         int port = basePort + 903;
         if (proxy == null) {
+
             proxy = new HttpProxyService()
                 .withHttpClient(testClient);
             testProxy.setPort(port);
@@ -156,7 +185,10 @@ public class TestMain {
 //            testServer.setDebug(true);
 //            sslServer.setDebug(true);
 //            sslServer.setDebugHttp(true);
-            
+
+            // Bind the objects, make them visible in JMX
+            // additional settings from config
+            initObjectManager("org/apache/tomcat/lite/test.properties");
         }   
         
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -168,12 +200,63 @@ public class TestMain {
             }
         });
     }
+    
+    public void bindConnector(HttpConnector con, final String base) {
+        om.bind("HttpConnector-" + base, con);
+        om.bind("HttpConnectionPool-" + base, con.cpool);
+        SocketConnector sc = (SocketConnector) con.getIOConnector();
+        om.bind("NioThread-" + base, sc.getSelector());
 
+        con.cpool.setEvents(new HttpConnectionPool.HttpConnectionPoolEvents() {
+
+            @Override
+            public void closedConnection(RemoteServer host, HttpConnection con) {
+                om.unbind("HttpConnection-" + base + "-" + con.getId());
+            }
+
+            @Override
+            public void newConnection(RemoteServer host, HttpConnection con) {
+                om.bind("HttpConnection-" + base + "-" + con.getId(), con);
+            }
+
+            @Override
+            public void newTarget(RemoteServer host) {
+                om.bind("AsyncHttp-" + base + "-" + host.target, host);
+            }
+
+            @Override
+            public void targetRemoved(RemoteServer host) {
+                om.unbind("AsyncHttp-" + base + "-" + host.target);
+            }
+            
+        });
+        
+        con.setOnCreate(new HttpChannelEvents() {
+            @Override
+            public void onCreate(HttpChannel data, HttpConnector extraData)
+                    throws IOException {
+                om.bind("AsyncHttp-" + base + "-" + data.getId(), data);
+            }
+            @Override
+            public void onDestroy(HttpChannel data, HttpConnector extraData)
+                    throws IOException {
+                om.unbind("AsyncHttp-" + base + "-" + data.getId());
+            }
+        });
+    
+        
+    }
+    
     private void initObjectManager(String cfgFile) {
         if (om == null) {
             om = new SimpleObjectManager();
         }
-
+        // All objects visible in JMX via util.registry
+        // ( optional dependency )
+        om.register(new JmxObjectManagerSpi());
+        om.register(jmx);
+        
+        
         om.loadResource(cfgFile);
         String run = (String) om.getProperty("RUN");
         String[] runNames = run == null ? new String[] {} : run.split(",");
@@ -185,24 +268,10 @@ public class TestMain {
             }
         }
 
-        om.bind("HttpConnector-TestServer", testServer);
-        om.bind("HttpConnector", testClient);
-        om.bind("HttpConnector-Proxy", testProxy);
+        bindConnector(testServer, "TestServer");
+        bindConnector(testClient, "Client");
+        bindConnector(testProxy, "Proxy");
         
-        testServer.setOnCreate(new HttpChannelEvents() {
-            @Override
-            public void onCreate(HttpChannel data, HttpConnector extraData)
-                    throws IOException {
-                //data.trace("BIND");
-                om.bind("AsyncHttp-" + data.getId(), data);
-            }
-            @Override
-            public void onDestroy(HttpChannel data, HttpConnector extraData)
-                    throws IOException {
-                //data.trace("UNBIND");
-                om.unbind("AsyncHttp-" + data.getId());
-            }
-        });
     }
     
 
@@ -251,7 +320,6 @@ public class TestMain {
         TestMain testMain = new TestMain();
         TestMain.defaultServer = testMain;
         testMain.om = new SimpleObjectManager(args);
-        testMain.initObjectManager("org/apache/tomcat/lite/test.properties");
         testMain.run();
         Main.waitStop();
     }
