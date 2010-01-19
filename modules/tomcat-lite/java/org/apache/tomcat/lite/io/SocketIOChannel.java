@@ -142,6 +142,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
         // we place the Buckets in the queue, as 'readable' buffers.
         boolean newData = false;
         try {
+            int read = 0;
             synchronized(in) {
                 // data between 0 and position
                 int total = 0;
@@ -149,39 +150,36 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
                     if (in.isAppendClosed()) { // someone closed me ?
                         ch.inputClosed(); // remove read interest.
                         // if outClosed - close completely
-                        super.sendHandleReceivedCallback();
-                        return;
+                        newData = true;
+                        break;
                     }
                     
                     ByteBuffer bb = in.getWriteBuffer();
-                    int read = ch.read(bb);
+                    read = ch.read(bb);
                     in.releaseWriteBuffer(read);
     
-                    if (in == null) {
-                        // Detached.
-                        if (newData) {
-                            sendHandleReceivedCallback();
-                        }
-                        return;
+                    if (in == null) { // Detached.
+                        break;
                     }
                     
                     if (read < 0) {
                         // mark the in buffer as closed
                         in.close();
                         ch.inputClosed();
-                        sendHandleReceivedCallback();
-                        return;
+                        newData = true;
+                        break;
                     }
                     if (read == 0) {
-                        if (newData) {
-                            super.sendHandleReceivedCallback();
-                        }
-                        return;
+                        break;
                     }
                     total += read;
                     newData = true;
                 }
+            } // sync
+            if (newData) {
+                super.sendHandleReceivedCallback();
             }
+            
         } catch (Throwable t) {
             close();
             if (t instanceof IOException) {

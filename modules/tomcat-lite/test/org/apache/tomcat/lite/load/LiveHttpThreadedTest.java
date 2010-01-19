@@ -38,8 +38,8 @@ import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
-import org.apache.tomcat.lite.http.SpdyConnection;
 import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
+import org.apache.tomcat.lite.io.SocketConnector;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /*
@@ -70,9 +70,20 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class LiveHttpThreadedTest extends TestCase {
     HttpConnector clientCon = TestMain.shared().getClient();
     HttpConnector serverCon = TestMain.shared().getTestServer();
+    
+    HttpConnector spdyClient = 
+        new HttpConnector(new SocketConnector()).setCompression(false);
+    
+    HttpConnector spdyClientCompress = 
+        new HttpConnector(new SocketConnector());
+    
+    HttpConnector spdyClientCompressSsl = 
+        new HttpConnector(new SocketConnector());
+    
     ThreadRunner tr;
     static MBeanServer server;
-
+    static boolean dumpHeap = false;
+    
     AtomicInteger ok = new AtomicInteger();
     Object lock = new Object();
     int reqCnt;
@@ -85,7 +96,7 @@ public class LiveHttpThreadedTest extends TestCase {
     
     public void test1000Async() throws Exception {
         try {
-            asyncRequest(10, 100, false);
+            asyncRequest(10, 100, false, clientCon);
         } finally {
             dumpHeap("heapAsync.bin");
         }
@@ -94,7 +105,7 @@ public class LiveHttpThreadedTest extends TestCase {
 
     public void test10000Async() throws Exception {
         try {
-            asyncRequest(20, 500, false);
+            asyncRequest(20, 500, false, clientCon);
         } finally {
             dumpHeap("heapAsyncBig.bin");
         }
@@ -102,7 +113,7 @@ public class LiveHttpThreadedTest extends TestCase {
 
     public void test1000AsyncSpdy() throws Exception {
         try {
-            asyncRequest(10, 100, true);
+            asyncRequest(10, 100, true, spdyClient);
         } finally {
             dumpHeap("heapSpdy1000.bin");
         }
@@ -111,14 +122,31 @@ public class LiveHttpThreadedTest extends TestCase {
 
     public void test10000AsyncSpdy() throws Exception {
         try {
-            asyncRequest(20, 500, true);
+            asyncRequest(20, 500, true, spdyClient);
+        } finally {
+            dumpHeap("heapSpdy10000.bin");
+        }
+    }
+
+    public void test1000AsyncSpdyComp() throws Exception {
+        try {
+            asyncRequest(10, 100, true, spdyClientCompress);
+        } finally {
+            dumpHeap("heapSpdy1000Comp.bin");
+        }
+
+    }
+
+    public void test10000AsyncSpdyComp() throws Exception {
+        try {
+            asyncRequest(20, 500, true, spdyClientCompress);
         } finally {
             dumpHeap("heapSpdy10000.bin");
         }
     }
 
     public void asyncRequest(int thr, int perthr, 
-            final boolean spdy) throws Exception {
+            final boolean spdy, final HttpConnector clientCon) throws Exception {
         reqCnt = thr * perthr;
         long t0 = System.currentTimeMillis();
         tr = new ThreadRunner(thr, perthr) {
@@ -156,7 +184,7 @@ public class LiveHttpThreadedTest extends TestCase {
         urlRequest(10, 100);
     }
 
-    public void testURLRequest10000() throws Exception {
+    public void xtestURLRequest10000() throws Exception {
         urlRequest(20, 500);
 
     }
@@ -205,7 +233,9 @@ public class LiveHttpThreadedTest extends TestCase {
     // TODO: move to a servlet
     private void dumpHeap(String file) throws InstanceNotFoundException,
     MBeanException, ReflectionException, MalformedObjectNameException {
-
+        if (!dumpHeap) {
+            return;
+        }
         if (server == null) {
             server = ManagementFactory.getPlatformMBeanServer();
 

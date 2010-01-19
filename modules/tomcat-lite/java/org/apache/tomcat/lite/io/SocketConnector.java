@@ -40,6 +40,10 @@ public class SocketConnector extends IOConnector {
         timer = new Timer(true);
     }
 
+    public SocketConnector(int port) {
+        timer = new Timer(true);
+    }
+
     /**
      * This may be blocking - involves host resolution, connect.
      * If the IP address is provided - it shouldn't block.
@@ -109,7 +113,7 @@ public class SocketConnector extends IOConnector {
 
     static int id = 0;
 
-    synchronized NioThread getSelector() {
+    public synchronized NioThread getSelector() {
         if (selector == null) {
             String name = "SelectorThread-" + id++;
             selector = new NioThread(name, true);

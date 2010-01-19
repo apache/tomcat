@@ -91,6 +91,8 @@ public class HttpConnector {
 
     private Timer timer;
 
+    boolean compression = true;
+
     private static Timer defaultTimer = new Timer(true);
     
     public HttpConnector(IOConnector ioConnector) {
@@ -124,6 +126,15 @@ public class HttpConnector {
 
     public void setDebugHttp(boolean b) {
         this.debugHttp  = b;
+    }
+    
+    /** 
+     * Allow or disable compression for this connector.
+     * Compression is enabled by default.
+     */
+    public HttpConnector setCompression(boolean b) {
+        this.compression = b;
+        return this;
     }
 
     public void setClientKeepAlive(boolean b) {
@@ -472,4 +483,5 @@ public class HttpConnector {
         }
         
     }
+
 }
