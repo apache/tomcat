@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBucket;
 import org.apache.tomcat.lite.io.CBuffer;
-import org.apache.tomcat.util.buf.CharChunk;
 
 /**
  * Map used to represent headers and parameters ( could be used 

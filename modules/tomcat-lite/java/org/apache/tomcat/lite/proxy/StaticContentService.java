@@ -36,6 +36,7 @@ public class StaticContentService implements HttpService  {
     protected BBucket mb;
     
     protected boolean chunked = false;
+    int code = 200;
     
     protected String contentType = "text/plain";
 
@@ -43,6 +44,10 @@ public class StaticContentService implements HttpService  {
     public StaticContentService() {
     }
     
+    /**
+     * Used for testing chunked encoding.
+     * @return
+     */
     public StaticContentService chunked() {
       chunked = true;
       return this;
@@ -52,6 +57,11 @@ public class StaticContentService implements HttpService  {
         mb = BBuffer.wrapper(data, 0, data.length);
         return this;
     }    
+    
+    public StaticContentService setStatus(int status) {
+        this.code = status;
+        return this;
+    }
 
     public StaticContentService withLen(int len) {
         byte[] data = new byte[len];
@@ -97,19 +107,23 @@ public class StaticContentService implements HttpService  {
     @Override
     public void service(HttpRequest httpReq, HttpResponse res) throws IOException {
        
-        res.setStatus(200);
+        res.setStatus(code);
       
           if (!chunked) {
             res.setContentLength(mb.remaining());
           }
           res.setContentType(contentType);
       
+          int len = mb.remaining();
+          int first = 0;
+          
           if (chunked) {
+              first = len / 2;
               res.getBody()
-                  .queue(BBuffer.wrapper(mb, 0, mb.remaining()));
+                  .queue(BBuffer.wrapper(mb, 0, first));
               res.flush();
           }
 
-          res.getBody().queue(BBuffer.wrapper(mb, 0, mb.remaining()));
+          res.getBody().queue(BBuffer.wrapper(mb, 0, len - first));
     }
 }

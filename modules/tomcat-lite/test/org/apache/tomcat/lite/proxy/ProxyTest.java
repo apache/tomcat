@@ -106,7 +106,7 @@ public class ProxyTest extends TestCase {
       String resStr = 
           TestMain.get("http://localhost:8903/chunked/test")
           .toString();
-      assertEquals(8, resStr.length());
+      assertEquals(4, resStr.length());
       assertTrue(resStr.indexOf("AAA") >= 0);
   }
   
