@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.tomcat.servlets.jmx;
+package org.apache.tomcat.integration.jmx;
 
 
 import java.io.IOException;

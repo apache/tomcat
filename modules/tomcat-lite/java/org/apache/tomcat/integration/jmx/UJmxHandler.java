@@ -16,9 +16,10 @@
  */
 
 
-package org.apache.tomcat.lite.service;
+package org.apache.tomcat.integration.jmx;
 
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,6 +29,10 @@ import java.util.logging.Logger;
 
 import org.apache.tomcat.integration.DynamicObject;
 import org.apache.tomcat.integration.ObjectManager;
+import org.apache.tomcat.lite.http.HttpRequest;
+import org.apache.tomcat.lite.http.HttpResponse;
+import org.apache.tomcat.lite.http.HttpWriter;
+import org.apache.tomcat.lite.http.HttpChannel.HttpService;
 
 /**
  * Send all registered JMX objects and properties as JSON.
@@ -40,49 +45,21 @@ import org.apache.tomcat.integration.ObjectManager;
  *
  * @author Costin Manolache
  */
-public class JMXProxy extends ObjectManager implements Runnable  {
+public class UJmxHandler implements HttpService {
 
-    static Logger log = Logger.getLogger(JMXProxy.class.getName());
+    private static Logger log = Logger.getLogger(UJmxHandler.class.getName());
+    private UJmxObjectManagerSpi jmx;
     
-    protected ObjectManager om;
-    
-    Map<Class, DynamicObject> types = new HashMap<Class, DynamicObject>();
-    
-    Map<String, Object> objects = new HashMap();
-    
-    
-    public void bind(String name, Object o) {
-        objects.put(name, o);
-    }
-
-    public void unbind(String name) {
-        objects.remove(name);
-    }
-
-    
-    public void setObjectManager(ObjectManager om) {
-        this.om = om;
+    public UJmxHandler(UJmxObjectManagerSpi jmx) {
+        this.jmx = jmx;
     }
     
-    
-    private DynamicObject getClassInfo(Class beanClass) {
-        if (types.get(beanClass) != null) {
-            return types.get(beanClass);
-        }
-        DynamicObject res = new DynamicObject(beanClass);
-        types.put(beanClass, res);
-        return res;
-    }
-
-    
-    // --------------------------------------------------------- Public Methods
-
     public void getAttribute(PrintWriter writer, String onameStr, String att) {
         try {
             
-            Object bean = objects.get(onameStr);
+            Object bean = jmx.objects.get(onameStr);
             Class beanClass = bean.getClass();
-            DynamicObject ci = getClassInfo(beanClass);
+            DynamicObject ci = jmx.getClassInfo(beanClass);
             
             Object value = ci.getAttribute(bean, att);
             writer.println("OK - Attribute get '" + onameStr + "' - " + att
@@ -97,9 +74,9 @@ public class JMXProxy extends ObjectManager implements Runnable  {
                               String onameStr, String att, String val )
     {
         try {
-            Object bean = objects.get(onameStr);
+            Object bean = jmx.objects.get(onameStr);
             Class beanClass = bean.getClass();
-            DynamicObject ci = getClassInfo(beanClass);
+            DynamicObject ci = jmx.getClassInfo(beanClass);
 
             ci.setProperty(bean, att, val);
             writer.println("OK - Attribute set");
@@ -114,19 +91,24 @@ public class JMXProxy extends ObjectManager implements Runnable  {
             listBeansJson(writer, qry);
             return;
         }
-        Set<String> names = objects.keySet();
+        Set<String> names = jmx.objects.keySet();
         writer.println("OK - Number of results: " + names.size());
         writer.println();
         
         Iterator<String> it=names.iterator();
         while( it.hasNext()) {
             String oname=it.next();
+            if (qry != null && oname.indexOf(qry) < 0) {
+                continue;
+            }
             writer.println( "Name: " + oname);
 
             try {
-                Object bean = objects.get(oname);
+                Object bean = jmx.objects.get(oname);
+                
                 Class beanClass = bean.getClass();
-                DynamicObject ci = getClassInfo(beanClass);
+                DynamicObject ci = jmx.getClassInfo(beanClass);
+                
                 writer.println("modelerType: " + beanClass.getName());
 
                 Object value=null;
@@ -155,7 +137,7 @@ public class JMXProxy extends ObjectManager implements Runnable  {
     }
     
    private void listBeansJson(PrintWriter writer, String qry) {
-       Set<String> names = objects.keySet();
+       Set<String> names = jmx.objects.keySet();
        writer.println("[");
        
        Iterator<String> it=names.iterator();
@@ -165,9 +147,9 @@ public class JMXProxy extends ObjectManager implements Runnable  {
            json(writer, "name", oname);
 
            try {
-               Object bean = objects.get(oname);
+               Object bean = jmx.objects.get(oname);
                Class beanClass = bean.getClass();
-               DynamicObject ci = getClassInfo(beanClass);
+               DynamicObject ci = jmx.getClassInfo(beanClass);
                json(writer, "modelerType", beanClass.getName());
 
                Object value=null;
@@ -234,7 +216,30 @@ public class JMXProxy extends ObjectManager implements Runnable  {
     }
 
     @Override
-    public void run() {
+    public void service(HttpRequest request, HttpResponse httpRes)
+            throws IOException {
         
+        httpRes.setContentType("text/plain");
+        HttpWriter out = httpRes.getBodyWriter();
+        PrintWriter writer = new PrintWriter(out);
+        
+        String qry = request.getParameter("set");
+        if( qry!= null ) {
+            String name=request.getParameter("att");
+            String val=request.getParameter("val");
+
+            setAttribute( writer, qry, name, val );
+            return;
+        }
+        qry=request.getParameter("get");
+        if( qry!= null ) {
+            String name=request.getParameter("att");
+            getAttribute( writer, qry, name );
+            return;
+        }        
+        qry=request.getParameter("qry");
+
+        listBeans( writer, qry, request.getParameter("json") != null);
+
     }
 }

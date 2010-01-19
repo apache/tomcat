@@ -156,14 +156,14 @@ public class BBuffer implements Cloneable, Serializable,
     
     public static BBuffer allocate(String msg) {
         BBuffer bc = allocate();
-        byte[] data = msg.getBytes(UTF8);
+        byte[] data = msg.getBytes();
         bc.append(data, 0, data.length);
         return bc;
     }
 
     public static BBuffer wrapper(String msg) {
         BBuffer bc = new IOBucketWrap();
-        byte[] data = msg.getBytes(UTF8);
+        byte[] data = msg.getBytes();
         bc.setBytes(data, 0, data.length);
         return bc;
     }
@@ -500,6 +500,9 @@ public class BBuffer implements Cloneable, Serializable,
     }
     
     public int indexOf(String src, int srcOff, int srcLen, int myOff) {
+        if ("".equals(src)) {
+            return myOff;
+        }
         char first = src.charAt(srcOff);
 
         // Look for first char
