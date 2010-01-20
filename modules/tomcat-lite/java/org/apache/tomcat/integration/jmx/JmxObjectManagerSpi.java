@@ -34,7 +34,7 @@ public class JmxObjectManagerSpi extends ObjectManager {
     
     public JmxObjectManagerSpi() {
         registry = Registry.getRegistry(null, null);
-        registry.setServer(ManagementFactory.getPlatformMBeanServer());
+        registry.setMBeanServer(ManagementFactory.getPlatformMBeanServer());
     }
     
     public void bind(String name, Object o) {
