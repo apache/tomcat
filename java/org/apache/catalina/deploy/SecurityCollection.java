@@ -115,6 +115,12 @@ public class SecurityCollection implements Serializable {
     private String patterns[] = new String[0];
 
 
+    /**
+     * This security collection was established by a deployment descriptor.
+     * Defaults to <code>true</code>.
+     */
+    private boolean isFromDescriptor = true;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -159,6 +165,22 @@ public class SecurityCollection implements Serializable {
 
         this.name = name;
 
+    }
+
+
+    /**
+     * Return if this constraint was defined in a deployment descriptor.
+     */
+    public boolean isFromDescriptor() {
+        return isFromDescriptor;
+    }
+
+
+    /**
+     * Set if this constraint was defined in a deployment descriptor.
+     */
+    public void setFromDescriptor(boolean isFromDescriptor) {
+        this.isFromDescriptor = isFromDescriptor;
     }
 
 
