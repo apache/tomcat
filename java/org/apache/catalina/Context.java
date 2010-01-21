@@ -451,6 +451,108 @@ public interface Context extends Container {
     public void setWrapperClass(String wrapperClass);
 
 
+    /**
+     * Get the server.xml <context> attribute's xmlNamespaceAware.
+     * @return true if namespace awareness is enabled.
+     *
+     */
+    public boolean getXmlNamespaceAware();
+
+
+    /**
+     * Get the server.xml <context> attribute's xmlValidation.
+     * @return true if validation is enabled.
+     *
+     */
+    public boolean getXmlValidation();
+
+
+    /**
+     * Set the validation feature of the XML parser used when
+     * parsing xml instances.
+     * @param xmlValidation true to enable xml instance validation
+     */
+    public void setXmlValidation(boolean xmlValidation);
+
+
+   /**
+     * Set the namespace aware feature of the XML parser used when
+     * parsing xml instances.
+     * @param xmlNamespaceAware true to enable namespace awareness
+     */
+    public void setXmlNamespaceAware(boolean xmlNamespaceAware);
+    /**
+     * Get the server.xml <context> attribute's xmlValidation.
+     * @return true if validation is enabled.
+     */
+     
+
+    /**
+     * Set the validation feature of the XML parser used when
+     * parsing tlds files. 
+     * @param tldValidation true to enable xml instance validation
+     */
+    public void setTldValidation(boolean tldValidation);
+
+
+    /**
+     * Get the server.xml <context> attribute's webXmlValidation.
+     * @return true if validation is enabled.
+     *
+     */
+    public boolean getTldValidation();
+
+
+    /**
+     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
+     * @return true if namespace awareness is enabled.
+     */
+    public boolean getTldNamespaceAware();
+
+
+    /**
+     * Set the namespace aware feature of the XML parser used when
+     * parsing xml instances.
+     * @param tldNamespaceAware true to enable namespace awareness
+     */
+    public void setTldNamespaceAware(boolean tldNamespaceAware);
+
+    /**
+     * Get the Jar Scanner to be used to scan for JAR resources for this
+     * context.
+     * @return  The Jar Scanner configured for this context.
+     */
+    public JarScanner getJarScanner();
+
+    /**
+     * Set the Jar Scanner to be used to scan for JAR resources for this
+     * context.
+     * @param jarScanner    The Jar Scanner to be used for this context.
+     */
+    public void setJarScanner(JarScanner jarScanner);
+
+    /**
+     * Obtain the {@link Authenticator} that is used by this context or
+     * <code>null</code> if none is used.
+     */
+    public Authenticator getAuthenticator();
+    
+    /**
+     * Set whether or not the effective web.xml for this context should be
+     * logged on context start.
+     */
+    public void setLogEffectiveWebXml(boolean logEffectiveWebXml);
+    
+    /**
+     * Should the effective web.xml for this context be logged on context start?
+     */
+    public boolean getLogEffectiveWebXml();
+    
+    /**
+     * Has this context been initialized?
+     */
+    public boolean isInitialized();
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -1020,108 +1122,11 @@ public interface Context extends Container {
 
 
     /**
-     * Get the server.xml <context> attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
-     *
-     */
-    public boolean getXmlNamespaceAware();
-
-
-    /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    public boolean getXmlValidation();
-
-
-    /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlValidation true to enable xml instance validation
-     */
-    public void setXmlValidation(boolean xmlValidation);
-
-
-   /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlNamespaceAware true to enable namespace awareness
-     */
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware);
-    /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
-     */
-     
-
-    /**
-     * Set the validation feature of the XML parser used when
-     * parsing tlds files. 
-     * @param tldValidation true to enable xml instance validation
-     */
-    public void setTldValidation(boolean tldValidation);
-
-
-    /**
-     * Get the server.xml <context> attribute's webXmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    public boolean getTldValidation();
-
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
-     */
-    public boolean getTldNamespaceAware();
-
-
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param tldNamespaceAware true to enable namespace awareness
-     */
-    public void setTldNamespaceAware(boolean tldNamespaceAware);
-
-    /**
      * Return the real path for a given virtual path, if possible; otherwise
      * return <code>null</code>.
      *
      * @param path The path to the desired resource
      */
     public String getRealPath(String path);
-
-    /**
-     * Get the Jar Scanner to be used to scan for JAR resources for this
-     * context.
-     * @return  The Jar Scanner configured for this context.
-     */
-    public JarScanner getJarScanner();
-
-    /**
-     * Set the Jar Scanner to be used to scan for JAR resources for this
-     * context.
-     * @param jarScanner    The Jar Scanner to be used for this context.
-     */
-    public void setJarScanner(JarScanner jarScanner);
-
-    /**
-     * Obtain the {@link Authenticator} that is used by this context or
-     * <code>null</code> if none is used.
-     */
-    public Authenticator getAuthenticator();
-    
-    /**
-     * Set whether or not the effective web.xml for this context should be
-     * logged on context start.
-     */
-    public void setLogEffectiveWebXml(boolean logEffectiveWebXml);
-    
-    /**
-     * Should the effective web.xml for this context be logged on context start?
-     */
-    public boolean getLogEffectiveWebXml();
 }
 

@@ -57,6 +57,7 @@ import org.apache.tomcat.util.modeler.Registry;
 
 public final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
@@ -95,7 +96,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
         this.context = context;
         setFilterDef(filterDef);
-
+        if (filterDef.getFilter() != null) {
+            this.filter = filterDef.getFilter();
+            getInstanceManager().newInstance(filter);
+            initFilter();
+        }
     }
 
 
@@ -156,10 +161,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     public String getInitParameter(String name) {
 
         Map<String,String> map = filterDef.getParameterMap();
-        if (map == null)
+        if (map == null) {
             return (null);
-        else
-            return map.get(name);
+        }
+
+        return map.get(name);
 
     }
 
@@ -171,10 +177,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     public Enumeration<String> getInitParameterNames() {
         Map<String,String> map = filterDef.getParameterMap();
         
-        if (map == null)
+        if (map == null) {
             return (new Enumerator<String>(new ArrayList<String>()));
-        else
-            return (new Enumerator<String>(map.keySet()));
+        }
+
+        return new Enumerator<String>(map.keySet());
 
     }
 
@@ -184,7 +191,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      */
     public ServletContext getServletContext() {
 
-        return (this.context.getServletContext());
+        return this.context.getServletContext();
 
     }
 
@@ -239,16 +246,23 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         // Identify the class loader we will be using
         String filterClass = filterDef.getFilterClass();
         this.filter = (Filter) getInstanceManager().newInstance(filterClass);
+        
+        initFilter();
+        
+        return (this.filter);
 
+    }
+
+    private void initFilter() throws ServletException {
         if (context instanceof StandardContext &&
                 context.getSwallowOutput()) {
             try {
                 SystemLogHandler.startCapture();
                 filter.init(this);
             } finally {
-                String log = SystemLogHandler.stopCapture();
-                if (log != null && log.length() > 0) {
-                    getServletContext().log(log);
+                String capturedlog = SystemLogHandler.stopCapture();
+                if (capturedlog != null && capturedlog.length() > 0) {
+                    getServletContext().log(capturedlog);
                 }
             }
         } else {
@@ -257,11 +271,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         
         // Expose filter via JMX
         registerJMX();
-        
-        return (this.filter);
-
     }
-
 
     /**
      * Return the filter definition we are configured for.
