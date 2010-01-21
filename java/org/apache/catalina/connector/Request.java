@@ -67,7 +67,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
-import org.apache.catalina.core.StandardPart;
+import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
@@ -2461,7 +2461,7 @@ public class Request
         try {
            List<FileItem> items = upload.parseRequest(this);
            for (FileItem item : items) {
-                result.add(new StandardPart(item, mce));
+                result.add(new ApplicationPart(item, mce));
             }
             
         } catch (InvalidContentTypeException e) {
