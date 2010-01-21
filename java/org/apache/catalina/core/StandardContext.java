@@ -2154,6 +2154,13 @@ public class StandardContext
     }
 
 
+    /**
+     * Has this context been initialized?
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     // -------------------------------------------------------- Context Methods
 
 
@@ -5840,20 +5847,6 @@ public class StandardContext
     public void startRecursive() throws LifecycleException {
         // nothing to start recursive, the servlets will be started by load-on-startup
         start();
-    }
-    
-    public int getState() {
-        if( started ) {
-            return 1; // RUNNING
-        }
-        if( initialized ) {
-            return 0; // starting ? 
-        }
-        if( ! available ) { 
-            return 4; //FAILED
-        }
-        // 2 - STOPPING
-        return 3; // STOPPED
     }
     
     /**

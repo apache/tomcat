@@ -648,6 +648,21 @@ public class StandardWrapper
     }
 
 
+    /**
+     * Return the associated servlet instance.
+     */
+    public Servlet getServlet() {
+        return instance;
+    }
+    
+    
+    /**
+     * Set the associated servlet instance.
+     */
+    public void setServlet(Servlet servlet) {
+        instance = servlet;
+    }
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -764,14 +779,6 @@ public class StandardWrapper
     }
 
 
-    /**
-     * Return the associated servlet instance.
-     */
-    public Servlet getServlet() {
-        return instance;
-    }
-    
-    
     /**
      * Allocate an initialized instance of this Servlet that is ready to have
      * its <code>service()</code> method called.  If the servlet class does
