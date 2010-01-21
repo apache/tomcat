@@ -36,12 +36,12 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
  * commons-upload to be used by the Servlet 3.0 upload API that expects
  * {@link Part}s.
  */
-public class StandardPart implements Part {
+public class ApplicationPart implements Part {
 
     private FileItem fileItem;
     private MultipartConfigElement mce;
 
-    public StandardPart(FileItem fileItem, MultipartConfigElement mce) {
+    public ApplicationPart(FileItem fileItem, MultipartConfigElement mce) {
         this.fileItem = fileItem;
         this.mce = mce;
     }
