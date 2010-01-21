@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.Serializable;
 
+import javax.servlet.Filter;
+
 
 /**
  * Representation of a filter definition for a web application, as represented
@@ -66,7 +68,21 @@ public class FilterDef implements Serializable {
         this.displayName = displayName;
     }
 
+    
+    /**
+     * The filter instance associated with this definition
+     */
+    private Filter filter = null;
+    
+    public Filter getFilter() {
+        return filter;
+    }
 
+    public void setFilter(Filter filter) {
+        this.filter = filter;
+    }
+    
+    
     /**
      * The fully qualified name of the Java class that implements this filter.
      */
