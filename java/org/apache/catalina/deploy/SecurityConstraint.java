@@ -19,6 +19,16 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.servlet.HttpConstraintElement;
+import javax.servlet.HttpMethodConstraintElement;
+import javax.servlet.ServletSecurityElement;
+import javax.servlet.annotation.ServletSecurity;
+import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 
 
 /**
@@ -459,4 +469,81 @@ public class SecurityConstraint implements Serializable {
     }
 
 
+    /**
+     * Convert a {@link ServletSecurityElement} to an array of
+     * {@link SecurityConstraint}(s).
+     * 
+     * @param element       The element to be converted
+     * @param urlPattern    The url pattern that the element should be applied
+     *                      to
+     * @return              The (possibly zero length) array of constraints that
+     *                      are the equivalent to the input
+     */
+    public static SecurityConstraint[] createConstraints(
+            ServletSecurityElement element, String urlPattern) {
+        Set<SecurityConstraint> result = new HashSet<SecurityConstraint>();
+        
+        // Add the per method constraints
+        Collection<HttpMethodConstraintElement> methods =
+            element.getHttpMethodConstraints();
+        Iterator<HttpMethodConstraintElement> methodIter = methods.iterator();
+        while (methodIter.hasNext()) {
+            HttpMethodConstraintElement methodElement = methodIter.next();
+            SecurityConstraint constraint =
+                createConstraint(methodElement, urlPattern, true);
+            // There will always be a single collection
+            SecurityCollection collection = constraint.findCollections()[0];
+            collection.addMethod(methodElement.getMethodName());
+            result.add(constraint);
+        }
+        
+        // Add the constraint for all the other methods
+        SecurityConstraint constraint = createConstraint(element, urlPattern, false);
+        if (constraint != null) {
+            // There will always be a single collection
+            SecurityCollection collection = constraint.findCollections()[0];
+            Iterator<String> ommittedMethod = element.getMethodNames().iterator();
+            while (ommittedMethod.hasNext()) {
+                collection.addOmittedMethod(ommittedMethod.next());
+            }
+            
+            result.add(constraint);
+            
+        }
+        
+        return result.toArray(new SecurityConstraint[result.size()]);
+    }
+    
+    private static SecurityConstraint createConstraint(
+            HttpConstraintElement element, String urlPattern, boolean alwaysCreate) {
+
+        SecurityConstraint constraint = new SecurityConstraint();
+        SecurityCollection collection = new SecurityCollection();
+        boolean create = alwaysCreate;
+        
+        if (element.getTransportGuarantee() !=
+                ServletSecurity.TransportGuarantee.NONE) {
+            constraint.setUserConstraint(element.getTransportGuarantee().name());
+            create = true;
+        }
+        if (element.getRolesAllowed().length > 0) {
+            String[] roles = element.getRolesAllowed();
+            for (String role : roles) {
+                constraint.addAuthRole(role);
+            }
+            create = true;
+        }
+        if (element.getEmptyRoleSemantic() != EmptyRoleSemantic.PERMIT) {
+            constraint.setAuthConstraint(true);
+            create = true;
+        }
+        
+        if (create) {
+            collection.addPattern(urlPattern);
+            constraint.addCollection(collection);
+            return constraint;
+        }
+        
+        return null;
+    }
 }

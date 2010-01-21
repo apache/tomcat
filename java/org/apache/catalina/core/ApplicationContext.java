@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -816,8 +817,58 @@ public class ApplicationContext
     }
 
 
+    /**
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filterClass Name of filter class
+     * @returns <code>null</code> if the filter has already been fully defined,
+     *          else a {@link FilterRegistration.Dynamic} object that can be
+     *          used to further configure the filter
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws UnsupportedOperationException - TODO SERVLET3
+     */
     public FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass) throws IllegalStateException {
+        
+        return addFilter(filterName, filterClass, null);
+    }
+
+    
+    /**
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filter      Filter to add
+     * @returns <code>null</code> if the filter has already been fully defined,
+     *          else a {@link FilterRegistration.Dynamic} object that can be
+     *          used to further configure the filter
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws UnsupportedOperationException - TODO SERVLET3
+     */
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            Filter filter) throws IllegalStateException {
+        
+        return addFilter(filterName, null, filter);
+    }
+
+    
+    /**
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filterClass Class of filter to add
+     * @returns <code>null</code> if the filter has already been fully defined,
+     *          else a {@link FilterRegistration.Dynamic} object that can be
+     *          used to further configure the filter
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws UnsupportedOperationException - TODO SERVLET3
+     */
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            Class<? extends Filter> filterClass) throws IllegalStateException {
+        
+        return addFilter(filterName, filterClass.getName(), null);
+    }
+
+    private FilterRegistration.Dynamic addFilter(String filterName,
+            String filterClass, Filter filter) throws IllegalStateException {
         
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
@@ -840,103 +891,78 @@ public class ApplicationContext
         }
 
         // Name must already be set
-        filterDef.setFilterClass(filterClass);
+        if (filter == null) {
+            filterDef.setFilterClass(filterClass);
+        } else {
+            filterDef.setFilterClass(filter.getClass().getName());
+            filterDef.setFilter(filter);
+        }
         
         return new ApplicationFilterRegistration(filterDef, context);
-    }
-
-    
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            Filter filter) throws IllegalStateException {
-        
-        if (context.initialized) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addFilter.ise",
-                            getContextPath()));
-        }
-        
-        if (context.findFilterDef(filterName) != null) {
-            return null;
-        }
-
-        // TODO SERVLET3
-        return null;
-    }
-
-    
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            Class<? extends Filter> filterClass) throws IllegalStateException {
-        
-        if (context.initialized) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addFilter.ise",
-                            getContextPath()));
-        }
-        
-        if (context.findFilterDef(filterName) != null) {
-            return null;
-        }
-
-        // TODO SERVLET3
-        return null;
-    }
-
+    } 
     
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
-        // TODO SERVLET3
-        return null;
+        try {
+            @SuppressWarnings("unchecked")
+            T filter = (T) context.getInstanceManager().newInstance(c.getName());
+            return filter;
+        } catch (IllegalAccessException e) {
+            throw new ServletException(e);
+        } catch (InvocationTargetException e) {
+            throw new ServletException(e);
+        } catch (NamingException e) {
+            throw new ServletException(e);
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (ClassNotFoundException e) {
+            throw new ServletException(e);
+        }
     }
 
 
     public FilterRegistration getFilterRegistration(String filterName) {
-        // TODO SERVLET3
-        return null;
-    }
-    
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            String className) throws IllegalStateException {
-        
-        if (context.initialized) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addServlet.ise",
-                            getContextPath()));
-        }
-
-        if (context.findChild(servletName) != null) {
+        FilterDef filterDef = context.findFilterDef(filterName);
+        if (filterDef == null) {
             return null;
         }
-
-        // TODO SERVLET3
-        return null;
+        
+        return new ApplicationFilterRegistration(filterDef, context);
+    }
+    
+    /**
+     * Add servlet to context.
+     * @param   servletName  Name of filter to add
+     * @param   servletClass Name of filter class
+     * @returns <code>null</code> if the servlet has already been fully defined,
+     *          else a {@link ServletRegistration.Dynamic} object that can be
+     *          used to further configure the servlet
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws UnsupportedOperationException - TODO SERVLET3
+     */
+    public ServletRegistration.Dynamic addServlet(String servletName,
+            String servletClass) throws IllegalStateException {
+        
+        return addServlet(servletName, servletClass, null);
     }
 
 
     public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) throws IllegalStateException {
-        
-        if (context.initialized) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addServlet.ise",
-                            getContextPath()));
-        }
 
-        if (context.findChild(servletName) != null) {
-            return null;
-        }
-
-        // TODO SERVLET3
-        return null;
+        return addServlet(servletName, null, servlet);
     }
 
     
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass)
     throws IllegalStateException {
+
+        return addServlet(servletName, servletClass.getName(), null);
+    }
+
+    private ServletRegistration.Dynamic addServlet(String servletName,
+            String servletClass, Servlet servlet) throws IllegalStateException {
         
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
@@ -944,26 +970,59 @@ public class ApplicationContext
                     sm.getString("applicationContext.addServlet.ise",
                             getContextPath()));
         }
-
-        if (context.findChild(servletName) != null) {
-            return null;
+        
+        Wrapper wrapper = (Wrapper) context.findChild(servletName);
+        
+        // Assume a 'complete' FilterRegistration is one that has a class and
+        // a name
+        if (wrapper == null) {
+            wrapper = context.createWrapper();
+        } else {
+            if (wrapper.getName() != null &&
+                    wrapper.getServletClass() != null) {
+                return null;
+            }
         }
 
-        // TODO SERVLET3
-        return null;
-    }
+        // Name must already be set
+        if (servlet == null) {
+            wrapper.setServletClass(servletClass);
+        } else {
+            wrapper.setServletClass(servlet.getClass().getName());
+            wrapper.setServlet(servlet);
+       }
+        
+        return new ApplicationServletRegistration(wrapper, context);
+    } 
 
 
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException {
-        // TODO SERVLET3
-        return null;
+        try {
+            @SuppressWarnings("unchecked")
+            T servlet = (T) context.getInstanceManager().newInstance(c.getName());
+            return servlet;
+        } catch (IllegalAccessException e) {
+            throw new ServletException(e);
+        } catch (InvocationTargetException e) {
+            throw new ServletException(e);
+        } catch (NamingException e) {
+            throw new ServletException(e);
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (ClassNotFoundException e) {
+            throw new ServletException(e);
+        }
     }
 
 
     public ServletRegistration getServletRegistration(String servletName) {
-        // TODO SERVLET3
-        return null;
+        Wrapper wrapper = (Wrapper) context.findChild(servletName);
+        if (wrapper == null) {
+            return null;
+        }
+        
+        return new ApplicationServletRegistration(wrapper, context);
     }
     
 
@@ -1058,8 +1117,12 @@ public class ApplicationContext
 
     @Override
     public boolean setInitParameter(String name, String value) {
-        // TODO SERVLET3
-        return false;
+        if (parameters.containsKey(name)) {
+            return false;
+        }
+        
+        parameters.put(name, value);
+        return true;
     }
     
     
@@ -1091,14 +1154,50 @@ public class ApplicationContext
 
     @Override
     public void declareRoles(String... roleNames) {
-        // TODO SERVLET3
+        
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addRole.ise",
+                            getContextPath()));
+        }
+        
+        if (roleNames == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("applicationContext.roles.iae",
+                            getContextPath()));
+        }
+        
+        for (String role : roleNames) {
+            if (role == null || "".equals(role)) {
+                throw new IllegalArgumentException(
+                        sm.getString("applicationContext.role.iae",
+                                getContextPath()));
+            }
+            context.addSecurityRole(role);
+        }
     }
 
 
     @Override
     public ClassLoader getClassLoader() {
-        // TODO SERVLET3
-        return null;
+        ClassLoader result = context.getLoader().getClassLoader();
+        if (Globals.IS_SECURITY_ENABLED) {
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            ClassLoader parent = result;
+            while (parent != null) {
+                if (parent == tccl) {
+                    break;
+                }
+                parent = parent.getParent();
+            }
+            if (parent == null) {
+                System.getSecurityManager().checkPermission(
+                        new RuntimePermission("getClassLoader"));
+            }
+        }
+        
+        return result;
     }
 
 
@@ -1250,10 +1349,15 @@ public class ApplicationContext
      * Get full path, based on the host name and the context path.
      */
     private static String getJNDIUri(String hostName, String path) {
-        if (!path.startsWith("/"))
-            return "/" + hostName + "/" + path;
-        else
-            return "/" + hostName + path;
+        String result;
+        
+        if (path.startsWith("/")) {
+            result = "/" + hostName + path;
+        } else {
+            result = "/" + hostName + "/" + path;
+        }
+        
+        return result;
     }
 
 

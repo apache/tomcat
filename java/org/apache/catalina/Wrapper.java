@@ -151,6 +151,17 @@ public interface Wrapper extends Container {
      */
     public boolean isUnavailable();
 
+    
+    /**
+     * Return the associated servlet instance.
+     */
+    public Servlet getServlet();
+    
+
+    /**
+     * Set the associated servlet instance
+     */
+    public void setServlet(Servlet servlet);
 
     // --------------------------------------------------------- Public Methods
 
@@ -218,12 +229,6 @@ public interface Wrapper extends Container {
     public void deallocate(Servlet servlet) throws ServletException;
 
 
-    /**
-     * Return the associated servlet instance.
-     */
-    public Servlet getServlet();
-    
-    
     /**
      * Return the value for the specified initialization parameter name,
      * if any; otherwise return <code>null</code>.
