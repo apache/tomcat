@@ -18,6 +18,7 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
+<?xml-stylesheet type="text/xsl" href="tomcat-docs.xsl"?>
 <document url="changelog.html">
 
   &project;
