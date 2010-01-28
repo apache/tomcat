@@ -45,7 +45,7 @@ public class AprLifecycleListener
     implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(AprLifecycleListener.class);
-
+    private static boolean instanceCreated = false;
     /**
      * The string manager for this package.
      */
@@ -72,8 +72,13 @@ public class AprLifecycleListener
     protected static boolean aprAvailable = false;
 
     public static boolean isAprAvailable() {
-        init();
+        //https://issues.apache.org/bugzilla/show_bug.cgi?id=48613
+        if (instanceCreated) init();
         return aprAvailable;
+    }
+    
+    public AprLifecycleListener() {
+        instanceCreated = true;
     }
 
     // ---------------------------------------------- LifecycleListener Methods
