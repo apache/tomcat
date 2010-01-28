@@ -72,6 +72,7 @@ public class AprLifecycleListener
     protected static boolean aprAvailable = false;
 
     public static boolean isAprAvailable() {
+        init();
         return aprAvailable;
     }
 
