@@ -100,7 +100,7 @@ public class FileHandler
     /**
      * Log buffer size
      */
-    private int bufferSize = 0;
+    private int bufferSize = -1;
 
 
     // --------------------------------------------------------- Public Methods
@@ -228,7 +228,7 @@ public class FileHandler
             prefix = getProperty(className + ".prefix", "juli.");
         if (suffix == null)
             suffix = getProperty(className + ".suffix", ".log");
-        String sBufferSize = getProperty(className + ".bufferSize", "8192");
+        String sBufferSize = getProperty(className + ".bufferSize", String.valueOf(bufferSize));
         try {
             bufferSize = Integer.parseInt(sBufferSize);
         } catch (NumberFormatException ignore) {
