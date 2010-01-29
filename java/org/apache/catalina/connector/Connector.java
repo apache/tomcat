@@ -69,8 +69,7 @@ public class Connector
     // ------------------------------------------------------------ Constructor
 
 
-    public Connector()
-        throws Exception {
+    public Connector() {
         this(null);
     }
 
