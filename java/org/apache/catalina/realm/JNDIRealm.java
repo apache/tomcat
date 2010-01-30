@@ -1686,7 +1686,7 @@ public class JNDIRealm extends RealmBase {
                 Set<String> newThisRound = new HashSet<String>(); // Stores the groups we find in this iteration
 
                 for (String groupDN : newGroupDNs) {
-                    filter = roleFormat.format(new String[] { groupDN });
+                    filter = roleFormat.format(new String[] { groupDN, groupDN });
 
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Perform a nested group search with base "+ roleBase + " and filter " + filter);
