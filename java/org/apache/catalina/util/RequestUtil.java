@@ -281,7 +281,7 @@ public final class RequestUtil {
      * by a valid 2-digit hexadecimal number
      */
     public static String URLDecode(byte[] bytes, String enc) {
-        return URLDecode(bytes, null, false);
+        return URLDecode(bytes, enc, false);
     }
 
     /**
