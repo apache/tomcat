@@ -23,6 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 
 /**
  * General purpose request parsing and encoding utility methods.
@@ -35,6 +39,14 @@ import java.util.TimeZone;
 public final class RequestUtil {
 
 
+    private static final Log log = LogFactory.getLog(RequestUtil.class);
+
+    /**
+     * The string resources for this package.
+     */
+    private static final StringManager sm =
+        StringManager.getManager("org.apache.catalina.util");
+    
     /**
      * The DateFormat to use for generating readable dates in cookies.
      */
@@ -220,7 +232,8 @@ public final class RequestUtil {
      * string is not a query string.
      *
      * @param str The url-encoded string
-     * @param enc The encoding to use; if null, the default encoding is used
+     * @param enc The encoding to use; if null, the default encoding is used. If
+     * an unsupported encoding is specified null will be returned
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
      */
@@ -232,7 +245,8 @@ public final class RequestUtil {
      * Decode and return the specified URL-encoded String.
      *
      * @param str The url-encoded string
-     * @param enc The encoding to use; if null, the default encoding is used
+     * @param enc The encoding to use; if null, the default encoding is used. If
+     * an unsupported encoding is specified null will be returned
      * @param isQuery Is this a query string being processed
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
@@ -251,7 +265,9 @@ public final class RequestUtil {
             } else {
                 bytes = str.getBytes(enc);
             }
-        } catch (UnsupportedEncodingException uee) {}
+        } catch (UnsupportedEncodingException uee) {
+            log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
+        }
 
         return URLDecode(bytes, enc, isQuery);
 
