@@ -249,7 +249,8 @@ class Parser implements TagConstants {
                 quote = watch.charAt(0);
             }
             ret = AttributeParser.getUnquoted(reader.getText(start, stop),
-                    quote, pageInfo.isELIgnored());
+                    quote, pageInfo.isELIgnored(),
+                    pageInfo.isDeferredSyntaxAllowedAsLiteral());
         } catch (IllegalArgumentException iae) {
             err.jspError(start, iae.getMessage());
         }
