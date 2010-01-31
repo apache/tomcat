@@ -14,22 +14,4 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<p>00-${1+1}</p>
-<p>01-\${1+1}</p>
-<p>02-\\${1+1}</p>
-<p>03-\\\${1+1}</p>
-<tags:echo echo="04-${1+1}" />
-<tags:echo echo="05-\${1+1}" />
-<tags:echo echo="06-\\${1+1}" />
-<tags:echo echo="07-\\\${1+1}" />
-<tags:echo echo="08-\\\\${1+1}" />
-<tags:echo echo="04-${1+1}" />
-<tags:echo echo="05-\${1+1}" />
-<tags:echo echo="06-\\${1+1}" />
-<tags:echo echo="07-\\\${1+1}" />
-<tags:echo echo="08-\\\\${1+1}" />
-<tags:echo-deferred echo="09-#{1+1}" />
-<tags:echo-deferred echo="10-\#{1+1}" />
-<tags:echo-deferred echo="11-\\#{1+1}" />
-<tags:echo-deferred echo="12-\\\#{1+1}" />
-<tags:echo-deferred echo="13-\\\\#{1+1}" />
+<%@ tag %><%@ attribute name="echo" deferredValue="true" %><p>${echo}</p>

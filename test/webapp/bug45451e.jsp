@@ -14,6 +14,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page isELIgnored="true" deferredSyntaxAllowedAsLiteral="true" %>
+<%@page deferredSyntaxAllowedAsLiteral="true" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ include file="bug45451.jspf" %>
