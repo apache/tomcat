@@ -150,13 +150,15 @@ public class TestAttributeParser extends TestCase {
         ctx.setFunctionMapper(new FMapper());
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
         ValueExpression ve = exprFactory.createValueExpression(ctx,
-                AttributeParser.getUnquoted(expression, quote, false, false),
+                AttributeParser.getUnquoted(expression, quote, false, false,
+                        false),
                 String.class);
         return (String) ve.getValue(ctx);
     }
     
     private String parseScriptExpression(String expression, char quote) {
-        return AttributeParser.getUnquoted(expression, quote, false, false);
+        return AttributeParser.getUnquoted(expression, quote, false, false,
+                false);
     }
 
     public static class FMapper extends FunctionMapper {
