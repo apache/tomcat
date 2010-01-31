@@ -307,7 +307,8 @@ public final class RequestUtil {
      * Decode and return the specified URL-encoded byte array.
      *
      * @param bytes The url-encoded byte array
-     * @param enc The encoding to use; if null, the default encoding is used
+     * @param enc The encoding to use; if null, the default encoding is used. If
+     * an unsupported encoding is specified null will be returned
      * @param isQuery Is this a query string being processed
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
@@ -315,7 +316,7 @@ public final class RequestUtil {
     public static String URLDecode(byte[] bytes, String enc, boolean isQuery) {
     
         if (bytes == null)
-            return (null);
+            return null;
 
         int len = bytes.length;
         int ix = 0;
@@ -333,8 +334,9 @@ public final class RequestUtil {
         if (enc != null) {
             try {
                 return new String(bytes, 0, ox, enc);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (UnsupportedEncodingException uee) {
+                log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
+                return null;
             }
         }
         return new String(bytes, 0, ox);
