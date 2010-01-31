@@ -326,6 +326,10 @@ public final class RequestUtil {
             if (b == '+' && isQuery) {
                 b = (byte)' ';
             } else if (b == '%') {
+                if (ix + 2 >= len) {
+                    throw new IllegalArgumentException(
+                            sm.getString("requestUtil.urlDecode.missingDigit"));
+                }
                 b = (byte) ((convertHexDigit(bytes[ix++]) << 4)
                             + convertHexDigit(bytes[ix++]));
             }
@@ -353,7 +357,9 @@ public final class RequestUtil {
         if ((b >= '0') && (b <= '9')) return (byte)(b - '0');
         if ((b >= 'a') && (b <= 'f')) return (byte)(b - 'a' + 10);
         if ((b >= 'A') && (b <= 'F')) return (byte)(b - 'A' + 10);
-        return 0;
+        throw new IllegalArgumentException(
+                sm.getString("requestUtil.convertHexDigit.notHex",
+                        Character.valueOf((char)b)));
     }
 
 
