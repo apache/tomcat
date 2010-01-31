@@ -882,12 +882,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         String encoding = getCharacterEncoding();
         if (encoding == null)
             encoding = "ISO-8859-1";
-        try {
-            RequestUtil.parseParameters
-                (queryParameters, queryParamString, encoding);
-        } catch (Exception e) {
-            // Ignore
-        }
+        RequestUtil.parseParameters(queryParameters, queryParamString,
+                encoding);
         Iterator<String> keys = parameters.keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
