@@ -171,6 +171,22 @@ public class TestELEvaluation extends TestCase {
         assertTrue(null == null);
     }
 
+    /**
+     * Test mixing ${...} and #{...} in the same expression.
+     */
+    public void testMixedTypes() {
+        // Mixing types should throw an error
+        Exception e = null;
+        try {
+            evaluateExpression("${1+1}#{1+1}");
+        } catch (ELException el) {
+            e = el;
+        }
+        assertNotNull(e);
+    }
+
+
+
     // ************************************************************************
 
     private String evaluateExpression(String expression) {
