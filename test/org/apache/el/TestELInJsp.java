@@ -165,6 +165,11 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("06-\\2") > 0);      
         assertTrue(result.indexOf("07-\\${1+1}") > 0);
         assertTrue(result.indexOf("08-\\\\2") > 0); 
+        assertTrue(result.indexOf("09-2") > 0);
+        assertTrue(result.indexOf("10-#{1+1}") > 0);
+        assertTrue(result.indexOf("11-\\2") > 0);      
+        assertTrue(result.indexOf("12-\\#{1+1}") > 0);
+        assertTrue(result.indexOf("13-\\\\2") > 0); 
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451c.jsp");
         result = res.toString();
@@ -180,6 +185,11 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("06-\\${1+1}") > 0);
         assertTrue(result.indexOf("07-\\\\${1+1}") > 0);
         assertTrue(result.indexOf("08-\\\\${1+1}") > 0);
+        assertTrue(result.indexOf("09-#{1+1}") > 0);
+        assertTrue(result.indexOf("10-\\#{1+1}") > 0);
+        assertTrue(result.indexOf("11-\\#{1+1}") > 0);
+        assertTrue(result.indexOf("12-\\\\#{1+1}") > 0);
+        assertTrue(result.indexOf("13-\\\\#{1+1}") > 0);
 
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451d.jspx");
         result = res.toString();
@@ -194,6 +204,32 @@ public class TestELInJsp extends TomcatBaseTest {
         assertTrue(result.indexOf("06-\\${1+1}") > 0);
         assertTrue(result.indexOf("07-\\\\${1+1}") > 0);
         assertTrue(result.indexOf("08-\\\\\\${1+1}") > 0);
+        assertTrue(result.indexOf("09-2") > 0);
+        assertTrue(result.indexOf("10-#{1+1}") > 0);
+        assertTrue(result.indexOf("11-\\#{1+1}") > 0);
+        assertTrue(result.indexOf("12-\\\\#{1+1}") > 0);
+        assertTrue(result.indexOf("13-\\\\\\#{1+1}") > 0);
+        
+        res = getUrl("http://localhost:" + getPort() + "/test/bug45451e.jsp");
+        result = res.toString();
+        System.out.println(result);
+        // Warning: JSP attribute escaping != Java String escaping
+        // Warning: Attributes are always unescaped before passing to the EL
+        //          processor
+        assertTrue(result.indexOf("00-2") > 0);
+        assertTrue(result.indexOf("01-${1+1}") > 0);
+        assertTrue(result.indexOf("02-\\${1+1}") > 0);
+        assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
+        assertTrue(result.indexOf("04-2") > 0);
+        assertTrue(result.indexOf("05-${1+1}") > 0);
+        assertTrue(result.indexOf("06-\\2") > 0);      
+        assertTrue(result.indexOf("07-\\${1+1}") > 0);
+        assertTrue(result.indexOf("08-\\\\2") > 0); 
+        assertTrue(result.indexOf("09-#{1+1}") > 0);
+        assertTrue(result.indexOf("10-\\#{1+1}") > 0);
+        assertTrue(result.indexOf("11-\\#{1+1}") > 0);
+        assertTrue(result.indexOf("12-\\\\#{1+1}") > 0);
+        assertTrue(result.indexOf("13-\\\\#{1+1}") > 0);
     }
 
     public void testBug45511() throws Exception {
