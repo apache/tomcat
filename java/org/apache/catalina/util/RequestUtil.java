@@ -184,11 +184,12 @@ public final class RequestUtil {
      *
      * @param map Map that accumulates the resulting parameters
      * @param data Input string containing request parameters
-     *
-     * @exception IllegalArgumentException if the data is malformed
+     * @param encoding The encoding to use; if null, the default encoding is
+     * used. If an unsupported encoding is specified the parameters will not be
+     * parsed and the map will not be modified
      */
     public static void parseParameters(Map<String,String[]> map, String data,
-            String encoding) throws UnsupportedEncodingException {
+            String encoding) {
 
         if ((data != null) && (data.length() > 0)) {
 
@@ -202,10 +203,12 @@ public final class RequestUtil {
                 } else {
                     bytes = data.getBytes(encoding);
                 }
+                parseParameters(map, bytes, encoding);
             } catch (UnsupportedEncodingException uee) {
+                log.debug(sm.getString("requestUtil.parseParameters.uee",
+                        encoding), uee);
             }
 
-            parseParameters(map, bytes, encoding);
         }
 
     }
@@ -391,9 +394,11 @@ public final class RequestUtil {
      *
      * @param map Map that accumulates the resulting parameters
      * @param data Input string containing request parameters
-     * @param encoding Encoding to use for converting hex
+     * @param encoding The encoding to use; if null, the default encoding is
+     * used
      *
-     * @exception UnsupportedEncodingException if the data is malformed
+     * @exception UnsupportedEncodingException if the requested encoding is not
+     * supported.
      */
     public static void parseParameters(Map<String,String[]> map, byte[] data,
             String encoding) throws UnsupportedEncodingException {
