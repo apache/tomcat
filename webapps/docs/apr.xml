@@ -145,179 +145,26 @@
   </section>
 
   <section name="APR Connectors Configuration">
+  
+    <subsection name="HTTP/HTTPS">
+  
+      <p>For HTTP configuration, see the <a href="config/http.html">HTTP</a>
+      connector configuration documentation.</p>
 
-    <subsection name="HTTP">
-    
-    <p>
-      When APR is enabled, the HTTP connector will use sendfile for handling large static files (all such
-      files will be sent asynchronously using high performance kernel level calls), and will use 
-      a socket poller for keepalive, increasing scalability of the server.
-    </p>
+      <p>For HTTPS configuration, see the
+      <a href="config/http.html#SSL%20Support">HTTPS</a> connector configuration
+      documentation.</p>
 
-    <p>
-      The following attributes are supported in the HTTP APR connector in addition to the ones supported
-      in the regular HTTP connector:
-    </p>
-
-    <attributes>
- 
-    <attribute name="keepAliveTimeout" required="false">
-      <p>The number of milliseconds this <strong>Connector</strong> will wait for
-       another HTTP request before closing the connection.
-       The default value is to use the value that has been set for the
-       connectionTimeout attribute. This value also controls the timeout interval which
-       is used for Comet connections.</p>
-    </attribute>
-
-    <attribute name="pollTime" required="false">
-      <p>Duration of a poll call. Lowering this value will slightly decrease latency of connections 
-      being kept alive in some cases, but will use more CPU as more poll calls are being made. The
-      default value is 2000 (5ms).</p>
-    </attribute>
-
-    <attribute name="pollerSize" required="false">
-      <p>Amount of sockets that the poller responsible for polling kept alive connections can hold at a
-      given time. Extra connections will be closed right away. The default value is 8192, corresponding to
-      8192 keepalive connections.</p>
-    </attribute>
-
-    <attribute name="pollerThreadCount" required="false">
-      <p>Number of threads used to poll kept alive connections. On Windows the
-      default is chosen so that the sockets managed by each thread is
-      less than 1024. For Linux the default is 1. Changing the default on
-      Windows is likely to have a negative performance impact.</p>
-    </attribute>
-
-    <attribute name="useSendfile" required="false">
-      <p>Use kernel level sendfile for certain static files. The default value is true.</p>
-    </attribute>
-
-    <attribute name="sendfileSize" required="false">
-      <p>Amount of sockets that the poller responsible for sending static files asynchronously can hold 
-      at a given time. Extra connections will be closed right away without any data being sent 
-      (resulting in a zero length file on the client side). Note that in most cases, sendfile is a call
-      that will return right away (being taken care of "synchronously" by the kernel), and the sendfile
-      poller will not be used, so the amount of static files which can be sent concurrently is much larger
-      than the specified amount. The default value is 1024.</p>
-    </attribute>
-
-    <attribute name="sendFileThreadCount" required="false">
-      <p>Number of threads used service sendfile sockets. On Windows the
-      default is chosen so that the sockets managed by each thread is
-      less than 1024. For Linux the default is 1. Changing the default on
-      Windows is likely to have a negative performance impact.</p>
-    </attribute>
-
-    </attributes>
-    
-    </subsection>
-	
-    <subsection name="HTTPS">
-    
-    <p>
-      When APR is enabled, the HTTPS connector will use a socket poller for keepalive, increasing 
-      scalability of the server. It also uses OpenSSL, which may be more optimized than JSSE depending
-      on the processor being used, and can be complemented with many commercial accelerator components.
-      Unlike the HTTP connector, the HTTPS connector cannot use sendfile to optimize static file
-      processing.
-    </p>
-
-    <p>
-      The HTTPS APR connector has the same basic attributes than the HTTP APR connector, but adds 
-      OpenSSL specific ones. For the full details on using OpenSSL, please refer to OpenSSL documentations
-      and the many books available for it (see the <a href="http://www.openssl.org">Official OpenSSL 
-      website</a>). The SSL specific attributes for the connector are:
-    </p>
-    
-    <attributes>
-
-    <attribute name="SSLEnabled" required="false">
-    <p>
-      Enable SSL on the socket, default value is false. Set this value to true
-      to enable SSL handshake/encryption/decryption in the APR connector.
-    </p>
-    </attribute>
-    <attribute name="SSLProtocol" required="false">
-    <p>
-      Protocol which may be used for communicating with clients. The default is "all", with
-      other acceptable values being "SSLv2", "SSLv3", "TLSv1", and "SSLv2+SSLv3".
-    </p>
-    </attribute>
-    <attribute name="SSLCipherSuite" required="false">
-    <p>
-      Ciphers which may be used for communicating with clients. The default is "ALL", with
-      other acceptable values being a list of ciphers, with ":" used as the delimiter
-      (see OpenSSL documentation for the list of ciphers supported).
-    </p>
-    </attribute>
-    <attribute name="SSLCertificateFile" required="true">
-    <p>
-      Name of the file that contains the server certificate. The format is PEM-encoded.
-    </p>
-    </attribute>
-    <attribute name="SSLCertificateKeyFile" required="false">
-    <p>
-      Name of the file that contains the server private key. The format is PEM-encoded.
-      The default value is the value of "SSLCertificateFile" and in this case both certificate
-      and private key have to be in this file (NOT RECOMMENDED).
-    </p>
-    </attribute>
-    <attribute name="SSLPassword" required="false">
-    <p>
-      Pass phrase for the encrypted private key. If "SSLPassword" is not provided, the callback function
-      should prompt for the pass phrase.
-    </p>
-    </attribute>
-    <attribute name="SSLVerifyClient" required="false">
-    <p>
-      Ask client for certificate. The default is "none", meaning the client will not have the opportunity
-      to submit a certificate. Other acceptable values include "optional", "require" and "optionalNoCA".
-    </p>
-    </attribute>
-    <attribute name="SSLVerifyDepth" required="false">
-    <p>
-      Maximum verification depth for client certificates. The default is "10".
-    </p>
-    </attribute>
-    <attribute name="SSLCACertificateFile" required="false">
-    <p>
-      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatefile">the mod_ssl documentation</a>.
-    </p>
-    </attribute>
-    <attribute name="SSLCACertificatePath" required="false">
-    <p>
-      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatepath">the mod_ssl documentation</a>.
-    </p>
-    </attribute>
-    <attribute name="SSLCertificateChainFile" required="false">
-    <p>
-      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcertificatechainfile">the mod_ssl documentation</a>.
-    </p>
-    </attribute>
-    <attribute name="SSLCARevocationFile" required="false">
-    <p>
-      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcarevocationfile">the mod_ssl documentation</a>.
-    </p>
-    </attribute>
-    <attribute name="SSLCARevocationPath" required="false">
-    <p>
-      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcarevocationpath">the mod_ssl documentation</a>.
-    </p>
-    </attribute>
-
-    </attributes>
-    
-    <p>
-    An example SSL Connector declaration can be:
-    <source>
-    &lt;Connector port="443" maxHttpHeaderSize="8192"
-               maxThreads="150"
-               enableLookups="false" disableUploadTimeout="true"
-               acceptCount="100" scheme="https" secure="true"
-               SSLEnabled="true" 
-               SSLCertificateFile="${catalina.base}/conf/localhost.crt"
-               SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" /&gt;</source>
-    </p>
+      <p>An example SSL Connector declaration is:
+      <source>
+      &lt;Connector port="443" maxHttpHeaderSize="8192"
+                 maxThreads="150"
+                 enableLookups="false" disableUploadTimeout="true"
+                 acceptCount="100" scheme="https" secure="true"
+                 SSLEnabled="true" 
+                 SSLCertificateFile="${catalina.base}/conf/localhost.crt"
+                 SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" /&gt;</source>
+      </p>
     
     </subsection>
 	
