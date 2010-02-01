@@ -208,13 +208,6 @@ public class AjpProcessor implements ActionHook {
 
 
     /**
-     * The socket timeout used when reading the first block of the request
-     * header.
-     */
-    protected long readTimeout;
-
-
-    /**
      * Temp message bytes used for processing.
      */
     protected MessageBytes tmpMB = MessageBytes.newInstance();
