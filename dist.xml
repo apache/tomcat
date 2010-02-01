@@ -31,12 +31,10 @@
   <!-- property values you may customize.                                       -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
-
   <property file="build.properties.default"/>
 
   <!-- Project Properties -->
   <property name="project"               value="apache-tomcat" />
-  <property name="name"                  value="Apache Tomcat" />
   <tstamp>
     <format property="year" pattern="yyyy" locale="en"/>
   </tstamp>
@@ -60,14 +58,9 @@
   <property name="tomcat.deployer"   value="${basedir}/output/deployer"/>
   <property name="tomcat.extras"     value="${basedir}/output/extras"/>
   <property name="tomcat.release"    value="${basedir}/output/release"/>
-  <property name="test.failonerror"  value="true"/>
-  <property name="test.runner"       value="junit.textui.TestRunner"/>
 
   <!-- constant to declare a file binary for md5sum -->
   <property name="md5sum.binary-prefix" value=" *" />
-
-  <!-- Servlet 3.0 spec requires 1.6+ -->
-  <property name="compile.source" value="1.6"/>
 
   <!-- Version info filter set -->
   <filterset id="version.filters">
@@ -85,7 +78,6 @@
     <include name="**/LICENSE"/>
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
-    <include name="**/*.bat"/>
     <include name="**/*.dtd"/>
     <include name="**/*.htm"/>
     <include name="**/*.html"/>
@@ -105,7 +97,6 @@
     <include name="**/*.properties"/>
     <include name="**/*.properties.default"/>
     <include name="**/*.rtf"/>
-    <include name="**/*.sh"/>
     <include name="**/*.svg"/>
     <include name="**/*.tag"/>
     <include name="**/*.tagx"/>
@@ -321,6 +312,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ================= DIST: Create Windows Installer =================== -->
   <target name="installer" description="Create Windows installer"
   	  unless="skip.installer" depends="win-prepare" >
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
       <fileset dir="res" />
@@ -329,12 +325,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
 
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.dist}/conf" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
-    <!-- Make sure the RELEASE-NOTES has Windows line endings as they may be
-         displayed post-install -->
-    <fixcrlf srcdir="${tomcat.dist}/webapps/ROOT"
-        includes="RELEASE-NOTES.txt" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
@@ -347,10 +337,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="tomcat.nsi" />
     </exec>
-
-    <!-- Restore original line ending-->
-    <fixcrlf srcdir="${tomcat.dist}/webapps/ROOT"
-        includes="RELEASE-NOTES.txt" encoding="ISO-8859-1" fixlast="false" />
 
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
 
@@ -393,8 +379,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the core zip distro -->
   <target name="package-zip">
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.dist}/conf" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -425,8 +414,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the core windows zip distros -->
   <target name="package-winzip" depends="win-prepare">
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.dist}/conf" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
 
     <!-- Windows x86 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip">
@@ -518,6 +509,15 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the deployer distribution in zip format -->
   <target name="package-deployer-zip">
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <fixcrlf srcdir="${tomcat.deployer}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip">
       <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="LICENSE" />
@@ -533,9 +533,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the core tar.gz distro -->
   <target name="package-tgz">
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.dist}/conf" eol="lf" encoding="ISO-8859-1" fixlast="false" />
-    <tar longfile="gnu" compression="gzip"
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+  	<tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
         <include name="bin/catalina.sh" />
@@ -596,9 +599,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the deployer Tomcat distro in tar.gz format -->
   <target name="package-deployer-tgz">
-    <fixcrlf srcdir="${tomcat.dist}"
-     includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.deployer}" includes="*.xml" eol="lf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <fixcrlf srcdir="${tomcat.deployer}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz">
@@ -620,9 +628,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the documentation distro in tar.gz format -->
   <target name="package-docs-tgz">
-
-    <!-- Package gocs -->
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz">
@@ -647,7 +656,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <fixcrlf srcdir="${tomcat.dist}/src" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files"/>
+      <include name="bin/*.bat" />
+      <include name="bin/*.sh" />
     </fixcrlf>
+
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip">
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </zip>
@@ -662,7 +674,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <fixcrlf srcdir="${tomcat.dist}/src" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files"/>
+      <include name="bin/*.bat" />
+      <include name="bin/*.sh" />
     </fixcrlf>
+
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
