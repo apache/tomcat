@@ -236,13 +236,13 @@
       value is 100.</p>
     </attribute>
 
-      <attribute name="acceptorThreadCount" required="false">
-        <p>The number of threads to be used to accept connections. Increase this
-        value on a multi CPU machine, although you would never really need more
-        than <code>2</code>. Also, with a lot of non keep alive connections, you
-        might want to increase this value as well. Default value is
-        <code>1</code>.</p>
-      </attribute>
+    <attribute name="acceptorThreadCount" required="false">
+      <p>The number of threads to be used to accept connections. Increase this
+      value on a multi CPU machine, although you would never really need more
+      than <code>2</code>. Also, with a lot of non keep alive connections, you
+      might want to increase this value as well. Default value is
+      <code>1</code>.</p>
+    </attribute>
 
     <attribute name="address" required="false">
       <p>For servers with more than one IP address, this attribute
@@ -652,9 +652,9 @@
     </attributes>
   </subsection>
 
-  <subsection name="APR specific configuration">
+  <subsection name="APR/native specific configuration">
     
-    <p>The following attributes are specific to the APR connector.</p>
+    <p>The following attributes are specific to the APR/native connector.</p>
 
     <attributes>
 
