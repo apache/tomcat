@@ -169,35 +169,9 @@
     </subsection>
 	
     <subsection name="AJP">
-    
-    <p>
-      When APR is enabled, the AJP connector will use a socket poller for keepalive, increasing 
-      scalability of the server. As AJP is designed around a pool of persistent (or almost
-      persistent) connections, this will reduce significantly the amount of processing threads 
-      needed by Tomcat. Unlike the HTTP connector, the AJP connector cannot use sendfile to optimize
-      static file processing.
-    </p>
 
-    <p>
-      The following attributes are supported in the AJP APR connector in addition to the ones supported
-      in the regular AJP connector:
-    </p>
-
-    <attributes>
- 
-    <attribute name="pollTime" required="false">
-      <p>Duration of a poll call. Lowering this value will slightly decrease latency of connections 
-      being kept alive in some cases, but will use more CPU as more poll calls are being made. The
-      default value is 2000 (5ms).</p>
-    </attribute>
-
-    <attribute name="pollerSize" required="false">
-      <p>Amount of sockets that the poller responsible for polling kept alive connections can hold at a
-      given time. Extra connections will be closed right away. The default value is 8192, corresponding to
-      8192 keepalive connections.</p>
-    </attribute>
-
-    </attributes>
+      <p>For AJP configuration, see the <a href="config/ajp.html">AJP</a>
+      connector configuration documentation.</p>
     
     </subsection>
 	
