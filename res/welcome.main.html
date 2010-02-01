@@ -41,9 +41,11 @@ RELEASE-NOTES and the RUNNING.txt file in the distribution for more details.
 
 <p>Packaging Details (or "What Should I Download?")
   <ul>
-    <li>apache-tomcat-[version].zip or .tar.gz: base distribution.</li>
+    <li>apache-tomcat-[version].zip or .tar.gz: base distribution.  These distributions do not include the Windows service wrapper nor the compiled APR/native library for Windows.</li>
     <li>apache-tomcat-[version].exe: Windows installer for Tomcat.  Please note that while this distribution includes the vast majority of the base distribution, some of the command-line scripts for launching Tomcat are not included.  This distribution is intended for those users planning to launch Tomcat through the Windows shortcuts or services.</li>
-    <!--<li>apache-tomcat-[version]-admin.zip or .tar.gz: the Tomcat Administration webapp only.</li>-->
+    <li>apache-tomcat-[version]-windows-x86.zip: 32-bit Windows specific distribution that includes the Windows service wrapper and the compiled APR/native library for use with 32-bit JVMs on both 32 and 64 bit Windows platforms.</li>
+    <li>apache-tomcat-[version]-windows-x64.zip: 64-bit Windows specific distribution that includes the Windows service wrapper and the compiled APR/native library for use with 64-bit JVMs on x64 Windows platforms.</li>
+    <li>apache-tomcat-[version]-windows-i64.zip: 64-bit Windows specific distribution that includes the Windows service wrapper and the compiled APR/native library for use with 64-bit JVMs on i64 Windows platforms.</li>
     <li>apache-tomcat-[version]-deployer.zip or .tar.gz: the standalone Tomcat Web Application Deployer.</li>
     <li>apache-tomcat-[version]-fulldocs.tar.gz: the Tomcat documentation bundle, including complete javadocs.</li>
   </ul>
