@@ -78,14 +78,9 @@
 
     <attribute name="emptySessionPath" required="false">
       <p>If set to <code>true</code>, all paths for session cookies will be set
-      to <code>/</code>. This can be useful for portlet specification implementations.
-      If not specified, this attribute is set to <code>false</code>.<br/>
-      A side effect to setting this to true, is that if Tomcat creates a new session it will attempt to use the 
-      cookie session id if supplied by the client.<br/>
-      <a href="http://svn.apache.org/viewvc/tomcat/container/tc5.5.x/catalina/src/share/org/apache/catalina/connector/Request.java?diff_format=h&amp;view=log#rev303682">SVN check in</a><br/>
-      <a href="http://tomcat.markmail.org/search/?q=emptysessionpath%20reuse#query:emptysessionpath%20reuse%20date%3A200502%20+page:1+mid:2bocwjhn3cczsoii+state:results">Dev discussion</a><br/>
-      <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=47298">Work around</a>
-      </p>
+      to <code>/</code>. This can be useful for portlet specification
+      implementations. If not specified, this attribute is set to
+      <code>false</code>.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">
@@ -119,17 +114,23 @@
       to 4096 (4 kilobytes).</p>
     </attribute>
 
+    <attribute name="port" required="true">
+      <p>The TCP port number on which this <strong>Connector</strong>
+      will create a server socket and await incoming connections.  Your
+      operating system will allow only one server application to listen
+      to a particular port number on a particular IP address.</p>
+    </attribute>
+
     <attribute name="protocol" required="false">
-      <p>
-        Sets the protocol to handle incoming traffic.
-        The default value is <code>HTTP/1.1</code> which uses an auto-switching
-        mechanism to select either a blocking Java based connector or an
-        APR/native based connector. If the <code>PATH</code> (Windows) or
-        <code>LD_LIBRARY_PATH</code> (on most unix systems) environment variables
-        contain the Tomcat native library, the native/APR connector will be used.
-        If the native library cannot be found, the blocking Java based connector
-        will be used. Please be advised that the native/APR connector has
-        different settings for HTTPS than the Java connectors.<br/>
+      <p>Sets the protocol to handle incoming traffic. The default value is
+        <code>HTTP/1.1</code> which uses an auto-switching mechanism to select
+        either a blocking Java based connector or an APR/native based connector.
+        If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
+        most unix systems) environment variables contain the Tomcat native
+        library, the native/APR connector will be used. If the native library
+        cannot be found, the blocking Java based connector will be used. Note
+        that the native/APR connector has different settings for HTTPS than the
+        Java connectors.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
         <code>org.apache.coyote.http11.Http11Protocol</code> -
@@ -169,20 +170,6 @@
       <code>&lt;security-constraint&gt;</code> requires SSL transport,
       Catalina will automatically redirect the request to the port
       number specified here.</p>
-    </attribute>
-
-    <attribute name="SSLEnabled" required="false">
-      <p>
-      Use this attribute to enable SSL traffic on a connector.
-      To turn on SSL handshake/encryption/decryption on a connector
-      set this value to <code>true</code>.
-      The default value is <code>false</code>.
-      When turning this value <code>true</code> you will want to set the 
-      <code>scheme</code> and the <code>secure</code> attributes as well
-      to pass the correct <code>request.getScheme()</code> and 
-      <code>request.isSecure()</code> values to the servlets
-      See <a href="#SSL Support">SSL Support</a> for more information.
-      </p>
     </attribute>
 
     <attribute name="scheme" required="false">
@@ -229,9 +216,6 @@
       support for the Servlet specification using the header recommended in the
       specification.  The default value is <code>false</code>.</p>
     </attribute>
-    
-   
-
 
   </attributes>
 
@@ -239,9 +223,9 @@
 
   <subsection name="Standard Implementation">
 
-  <p>
-  HTTP supports the following additional attributes (in addition to the
-  common attributes listed above):</p>
+  <p>The standard HTTP connectors (BIO, NIO and APR/native) all support the
+  following attributes in addition to the common Connector attributes listed
+  above.</p>
 
   <attributes>
 
@@ -252,17 +236,19 @@
       value is 100.</p>
     </attribute>
 
+      <attribute name="acceptorThreadCount" required="false">
+        <p>The number of threads to be used to accept connections. Increase this
+        value on a multi CPU machine, although you would never really need more
+        than <code>2</code>. Also, with a lot of non keep alive connections, you
+        might want to increase this value as well. Default value is
+        <code>1</code>.</p>
+      </attribute>
+
     <attribute name="address" required="false">
       <p>For servers with more than one IP address, this attribute
       specifies which address will be used for listening on the specified
       port.  By default, this port will be used on all IP addresses
       associated with the server.</p>
-    </attribute>
-
-    <attribute name="bufferSize" required="false">
-      <p>The size (in bytes) of the buffer to be provided for input
-      streams created by this connector.  By default, buffers of
-      2048 bytes will be provided.</p>
     </attribute>
 
     <attribute name="compressableMimeType" required="false">
@@ -283,10 +269,16 @@
       attribute is set to "off".</p>
     </attribute>
 
+    <attribute name="compressionMinSize" required="false">
+      <p>If <strong>compression</strong> is set to "on" then this attribute
+      may be used to specify the minimum amount of data before the output is
+      compressed. If not specified, this attribute is defaults to "2048".</p>
+    </attribute>
+
     <attribute name="connectionLinger" required="false">
       <p>The number of milliseconds during which the sockets used by this
       <strong>Connector</strong> will linger when they are closed.
-      The default value is -1 (socket linger is disabled).</p>
+      The default value <code>-1</code> which disables this option.</p>
     </attribute>
 
     <attribute name="connectionTimeout" required="false">
@@ -295,19 +287,6 @@
       presented.  The default value is 60000 (i.e. 60 seconds).</p>
     </attribute>
     
-    <attribute name="executor" required="false">
-      <p>A reference to the name in an <a href="executor.html">Executor</a> element.
-         If this attribute is enabled, and the named executor exists, the connector will
-         use the executor, and all the other thread attributes will be ignored.</p>
-    </attribute>
-
-    <attribute name="keepAliveTimeout" required="false">
-      <p>The number of milliseconds this <strong>Connector</strong> will wait for
-       another HTTP request before closing the connection.
-       The default value is to use the value that has been set for the
-       connectionTimeout attribute.</p>
-    </attribute>
-
     <attribute name="disableUploadTimeout" required="false">
       <p>This flag allows the servlet container to use a different, longer
       connection timeout while a servlet is being executed, which in the end
@@ -316,10 +295,25 @@
       this attribute is set to "true".</p>
     </attribute>
 
+    <attribute name="executor" required="false">
+      <p>A reference to the name in an <a href="executor.html">Executor</a>
+      element. If this attribute is set, and the named executor exists, the
+      connector will use the executor, and all the other thread attributes will
+      be ignored. Note that if a shared executor is not specified for a
+      connector then the connector will use a private, internal executor to
+      provide the thread pool.</p>
+    </attribute>
+
+    <attribute name="keepAliveTimeout" required="false">
+      <p>The number of milliseconds this <strong>Connector</strong> will wait
+      for another HTTP request before closing the connection. The default value
+      is to use the value that has been set for the
+      <strong>connectionTimeout</strong> attribute.</p>
+    </attribute>
+
     <attribute name="maxHttpHeaderSize" required="false">
       <p>The maximum size of the request and response HTTP header, specified
-      in bytes.
-      If not specified, this attribute is set to 8192 (8 KB).</p>
+      in bytes. If not specified, this attribute is set to 8192 (8 KB).</p>
     </attribute>
 
     <attribute name="maxKeepAliveRequests" required="false">
@@ -340,6 +334,11 @@
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
+    <attribute name="minSpareThreads" required="false">
+      <p>The minimum number of threads always kept running. If not specified,
+      the default of <code>10</code> is used.</p>
+    </attribute>
+
     <attribute name="noCompressionUserAgents" required="false">
       <p>The value is a comma separated list of regular expressions matching
       user-agents of HTTP clients for which compression should not be used,
@@ -348,13 +347,13 @@
       The default value is an empty String (regexp matching disabled).</p>
     </attribute>
 
-    <attribute name="port" required="true">
-      <p>The TCP port number on which this <strong>Connector</strong>
-      will create a server socket and await incoming connections.  Your
-      operating system will allow only one server application to listen
-      to a particular port number on a particular IP address.</p>
+    <attribute name="processorCache" required="false">
+      <p>The protocol handler caches Processor objects to speed up performance.
+      This setting dictates how many of these objects get cached.
+      <code>-1</code> means unlimited, default is <code>200</code>. Set this
+      value somewhere close to your maxThreads value.</p>
     </attribute>
-
+      
     <attribute name="restrictedUserAgents" required="false">
       <p>The value is a comma separated list of regular expressions matching
       user-agents of HTTP clients for which HTTP/1.1 or HTTP/1.0 keep alive
@@ -379,6 +378,19 @@
       By default, a buffers of 9000 bytes will be used.</p>
     </attribute>
 
+    <attribute name="SSLEnabled" required="false">
+      <p>Use this attribute to enable SSL traffic on a connector.
+      To turn on SSL handshake/encryption/decryption on a connector
+      set this value to <code>true</code>.
+      The default value is <code>false</code>.
+      When turning this value <code>true</code> you will want to set the 
+      <code>scheme</code> and the <code>secure</code> attributes as well
+      to pass the correct <code>request.getScheme()</code> and 
+      <code>request.isSecure()</code> values to the servlets
+      See <a href="#SSL Support">SSL Support</a> for more information.
+      </p>
+    </attribute>
+
     <attribute name="tcpNoDelay" required="false">
       <p>If set to <code>true</code>, the TCP_NO_DELAY option will be
       set on the server socket, which improves performance under most
@@ -394,8 +406,15 @@
     </attribute>
 
   </attributes>
+  
   </subsection>
+  
   <subsection name="Java TCP socket attributes">
+  
+    <p>The BIO and NIO implementation support the following Java TCP socket
+    attributes in addition to the common Connector and HTTP attributes listed
+    above.</p>
+  
     <attributes>
       <attribute name="socket.rxBufSize" required="false">
         <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. JVM default
@@ -406,8 +425,8 @@
         used if not set.</p>
       </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
-        <p>(bool)same as the standard setting <code>tcpNoDelay</code>. JVM
-        default used if not set.</p>
+        <p>(bool)This is equivalent to standard attribute
+        <strong>tcpNoDelay</strong>.</p>
       </attribute>
       <attribute name="socket.soKeepAlive" required="false">
         <p>(bool)Boolean value for the socket's keep alive setting
@@ -423,21 +442,31 @@
       </attribute>
       <attribute name="socket.soLingerOn" required="false">
         <p>(bool)Boolean value for the sockets so linger option (SO_LINGER).
+        A value for the standard attribute <strong>connectionLinger</strong>
+        that is &gt;=0 is equivalent to setting this to <code>true</code>.
+        A value for the standard attribute <strong>connectionLinger</strong>
+        that is &lt;0 is equivalent to setting this to <code>false</code>.
         Both this attribute and <code>soLingerTime</code> must be set else the
         JVM defaults will be used for both.</p>
       </attribute>
       <attribute name="socket.soLingerTime" required="false">
-        <p>(bool)Value in seconds for the sockets so linger option (SO_LINGER).
+        <p>(int)Value in seconds for the sockets so linger option (SO_LINGER).
+        This is equivalent to standard attribute
+        <strong>connectionLinger</strong>.
         Both this attribute and <code>soLingerOn</code> must be set else the
         JVM defaults will be used for both.</p>
       </attribute>
       <attribute name="socket.soTimeout" required="false">
-        <p>(int)Value in milliseconds for the sockets read timeout (SO_TIMEOUT).
-        JVM default used if not set.</p>
+        <p>This is equivalent to standard attribute
+        <strong>connectionTimeout</strong>.</p>
       </attribute>      
       <attribute name="socket.soTrafficClass" required="false">
         <p>(byte)Value between <code>0</code> and <code>255</code> for the
         traffic class on the socket. JVM default used if not set.</p>
+        <p><strong>Note</strong>On some JDK versions, setting
+        <strong>soTrafficClass</strong> causes a problem. A work around for this
+        is to add the <code>-Djava.net.preferIPv4Stack=true</code> value to your
+        JVM options.</p>
       </attribute>      
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
@@ -464,165 +493,236 @@
     </attributes>
   </subsection>
   
-  <subsection name="Nio Implementation">
+  <subsection name="BIO specific configuration">
+    
+    <p>There are no BIO specific configuration settings.</p>
+    
+  </subsection>
+  
+  <subsection name="NIO specific configuration">
 
-    <p>The NIO connector exposes all the low level socket properties that can be used to tune the connector.
-    Most of these attributes are directly linked to the socket implementation in the JDK so you can find out 
-    about the actual meaning in the JDK API documentation.<br/>
-    <strong>Note</strong>On some JDK versions, setTrafficClass causes a problem, a work around for this is to add 
-    the <code>-Djava.net.preferIPv4Stack=true</code> value to your command line</p>
+    <p>The following attributes are specific to the NIO connector.</p>
 
     <attributes>
-      <attribute name="useSendfile" required="false">
-        <p>(bool)Use this attribute to enable or disable sendfile capability.
-           The default value is <code>true</code>
-        </p>
+
+      <attribute name="acceptorThreadPriority" required="false">
+        <p>(int)The priority of the acceptor threads. The threads used to accept
+        new connections. The default value is
+        <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc for the
+        java.lang.Thread class for more details on what this priority means.</p>
       </attribute>
-      <attribute name="useExecutor" required="false">
-        <p>(bool)Set to true to use the NIO thread pool executor. The default value is <code>true</code>.
-        If set to false, it uses a thread pool based on a stack for its execution.
-        Generally, using the executor yields a little bit slower performance, but yields a better
-        fairness for processing connections in a high load environment as the traffic gets queued through a 
-        FIFO queue. If set to true(default) then the max pool size is the <code>maxThreads</code> attribute
-        and the core pool size is the <code>minSpareThreads</code>.
-        This value is ignored if the <code>executor</code> attribute is present and points to a valid shared thread pool.
-        </p>
-      </attribute>
-      <attribute name="executor" required="false">
-        <p>A reference to the name in an <a href="executor.html">Executor</a> element.
-           If this attribute is enabled, and the named executor exists, the connector will
-           use the executor, and all the other thread attributes will be ignored.</p>
-      </attribute>
-      <attribute name="acceptorThreadCount" required="false">
-        <p>(int)The number of threads to be used to accept connections. Increase this value on a multi CPU machine,
-        although you would never really need more than <code>2</code>. Also, with a lot of non keep alive connections,
-        you might want to increase this value as well. Default value is <code>1</code>.</p>
-      </attribute>
+
       <attribute name="pollerThreadCount" required="false">
         <p>(int)The number of threads to be used to run for the polling events.
         Default value is <code>1</code> per processor. Can't see a reason to go
         above that. But experiment and find your own results.</p>
       </attribute>
-      <attribute name="pollerThreadPriority" required="false">
-        <p>(int)The priority of the poller threads.
-          The default value is <code>java.lang.Thread#NORM_PRIORITY</code>.
-          See the JavaDoc for the java.lang.Thread class for more details on
-          what this priority means.
-        </p>
-      </attribute>
-      <attribute name="acceptorThreadPriority" required="false">
-        <p>(int)The priority of the acceptor threads. The threads used to accept new connections.
-          The default value is <code>java.lang.Thread#NORM_PRIORITY</code>.
-          See the JavaDoc for the java.lang.Thread class for more details on
-          what this priority means.
-        </p>
-      </attribute>
       
+      <attribute name="pollerThreadPriority" required="false">
+        <p>(int)The priority of the poller threads. The default value is
+        <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc for the
+        java.lang.Thread class for more details on what this priority means.</p>
+      </attribute>
+
       <attribute name="selectorTimeout" required="false">
-        <p>(int)The time in milliseconds to timeout on a select() for the poller.
-           This value is important, since connection clean up is done on the same thread, so do not set this 
-           value to an extremely high one. The default value is <code>1000</code> milliseconds.</p>
+        <p>(int)The time in milliseconds to timeout on a select() for the
+        poller. This value is important, since connection clean up is done on
+        the same thread, so do not set this value to an extremely high one. The
+        default value is <code>1000</code> milliseconds.</p>
       </attribute>
+
       <attribute name="useComet" required="false">
-        <p>(bool)Whether to allow comet servlets or not, Default value is <code>true</code>.</p>
+        <p>(bool)Whether to allow comet servlets or not. Default value is
+        <code>true</code>.</p>
       </attribute>
-      <attribute name="processCache" required="false">
-        <p>(int)The protocol handler caches Http11NioProcessor objects to speed up performance.
-           This setting dictates how many of these objects get cached.
-           <code>-1</code> means unlimited, default is <code>200</code>. Set this value somewhere close to your maxThreads value.
-        </p>
-      </attribute>
-      <attribute name="maxKeepAliveRequests" required="false">
-        <p>The maximum number of HTTP requests which can be pipelined until
-        the connection is closed by the server. Setting this attribute to 1 will
-        disable HTTP/1.0 keep-alive, as well as HTTP/1.1 keep-alive and
-        pipelining. Setting this to -1 will allow an unlimited amount of
-        pipelined or keep-alive HTTP requests.
-        If not specified, this attribute is set to 100.</p>
+
+      <attribute name="useSendfile" required="false">
+        <p>(bool)Use this attribute to enable or disable sendfile capability.
+        The default value is <code>true</code>.</p>
       </attribute>
 
       <attribute name="socket.directBuffer" required="false">
-        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped ByteBuffers. Default is <code>false</code>
-           <br/>When you are using direct buffers, make sure you allocate the appropriate amount of memory for the 
-                direct memory space. On Sun's JDK that would be something like <code>-XX:MaxDirectMemorySize=256m</code></p>
-      </attribute>
-      <attribute name="socket.appReadBufSize" required="false">
-        <p>(int)Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
-           This attribute controls the size of these buffers. By default this read buffer is sized at <code>8192</code> bytes.
-           For lower concurrency, you can increase this to buffer more data.
-           For an extreme amount of keep alive connections, decrease this number or increase your heap size.</p>
-      </attribute>
-      <attribute name="socket.appWriteBufSize" required="false">
-        <p>(int)Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
-           This attribute controls the size of these buffers. By default this write buffer is sized at <code>8192</code> bytes.
-           For low concurrency you can increase this to buffer more response data.
-           For an extreme amount of keep alive connections, decrease this number or increase your heap size.
-           <br/>
-           The default value here is pretty low, you should up it if you are not dealing with tens of thousands
-           concurrent connections.</p>
-      </attribute>
-      <attribute name="socket.bufferPool" required="false">
-        <p>(int)The Nio connector uses a class called NioChannel that holds elements linked to a socket.
-           To reduce garbage collection, the Nio connector caches these channel objects.
-           This value specifies the size of this cache.
-           The default value is <code>500</code>, and represents that the cache will hold 500 NioChannel objects.
-           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
-      </attribute>
-      <attribute name="socket.bufferPoolSize" required="false">
-        <p>(int)The NioChannel pool can also be size based, not used object based. The size is calculated as follows:<br/>
-        NioChannel <code>buffer size = read buffer size + write buffer size</code><br/>
-        SecureNioChannel <code>buffer size = application read buffer size + application write buffer size + network read buffer size + network write buffer size</code><br/>
-        The value is in bytes, the default value is <code>1024*1024*100</code> (100MB)
+        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
+        ByteBuffers. Default is <code>false</code>.<br/>
+        When you are using direct buffers, make sure you allocate the
+        appropriate amount of memory for the direct memory space. On Sun's JDK
+        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
         </p>
       </attribute>
+      
+      <attribute name="socket.appReadBufSize" required="false">
+        <p>(int)Each connection that is opened up in Tomcat get associated with
+        a read ByteBuffer. This attribute controls the size of this buffer. By
+        default this read buffer is sized at <code>8192</code> bytes. For lower
+        concurrency, you can increase this to buffer more data. For an extreme
+        amount of keep alive connections, decrease this number or increase your
+        heap size.</p>
+      </attribute>
+
+      <attribute name="socket.appWriteBufSize" required="false">
+        <p>(int)Each connection that is opened up in Tomcat get associated with
+        a write ByteBuffer. This attribute controls the size of this buffer. By
+        default this write buffer is sized at <code>8192</code> bytes. For low
+        concurrency you can increase this to buffer more response data. For an
+        extreme amount of keep alive connections, decrease this number or
+        increase your heap size.<br/>
+        The default value here is pretty low, you should up it if you are not
+        dealing with tens of thousands concurrent connections.</p>
+      </attribute>
+
+      <attribute name="socket.bufferPool" required="false">
+        <p>(int)The NIO connector uses a class called NioChannel that holds
+        elements linked to a socket. To reduce garbage collection, the NIO
+        connector caches these channel objects. This value specifies the size of
+        this cache. The default value is <code>500</code>, and represents that
+        the cache will hold 500 NioChannel objects. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
+      </attribute>
+
+      <attribute name="socket.bufferPoolSize" required="false">
+        <p>(int)The NioChannel pool can also be size based, not used object
+        based. The size is calculated as follows:<br/>
+        NioChannel
+        <code>buffer size = read buffer size + write buffer size</code><br/>
+        SecureNioChannel <code>buffer size = application read buffer size +
+        application write buffer size + network read buffer size +
+        network write buffer size</code><br/>
+        The value is in bytes, the default value is <code>1024*1024*100</code>
+        (100MB).</p>
+      </attribute>
+
       <attribute name="socket.processorCache" required="false">
-        <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage collection.
-           The integer value specifies how many objects to keep in the cache at most.
-           The default is <code>500</code>.
-           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
+        <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
+        collection. The integer value specifies how many objects to keep in the
+        cache at most. The default is <code>500</code>. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code>for no cache.</p>
       </attribute>
+
       <attribute name="socket.keyCache" required="false">
-        <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage collection.
-           The integer value specifies how many objects to keep in the cache at most.
-           The default is <code>500</code>.
-           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
+        <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage
+        collection. The integer value specifies how many objects to keep in the
+        cache at most. The default is <code>500</code>. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code>for no cache.</p>
       </attribute>
+
       <attribute name="socket.eventCache" required="false">
-        <p>(int)Tomcat will cache PollerEvent objects to reduce garbage collection.
-           The integer value specifies how many objects to keep in the cache at most.
-           The default is <code>500</code>.
-           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
+        <p>(int)Tomcat will cache PollerEvent objects to reduce garbage
+        collection. The integer value specifies how many objects to keep in the
+        cache at most. The default is <code>500</code>. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code>for no cache.</p>
       </attribute>
+
       <attribute name="selectorPool.maxSelectors" required="false">
-        <p>(int)The max selectors to be used in the pool, to reduce selector contention.
-        Use this option when the command line <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set to false.
-        Default value is <code>200</code>.</p>
+        <p>(int)The max selectors to be used in the pool, to reduce selector
+        contention. Use this option when the command line
+        <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set
+        to false. Default value is <code>200</code>.</p>
       </attribute>
+
       <attribute name="selectorPool.maxSpareSelectors" required="false">
-        <p>(int)The max spare selectors to be used in the pool, to reduce selector contention.
-        When a selector is returned to the pool, the system can decide to keep it or let it be GC:ed.
-        Use this option when the command line <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set to false.
-        Default value is <code>-1</code> (unlimited)</p>
+        <p>(int)The max spare selectors to be used in the pool, to reduce
+        selector contention. When a selector is returned to the pool, the system
+        can decide to keep it or let it be GC'd. Use this option when the
+        command line <code>org.apache.tomcat.util.net.NioSelectorShared</code>
+        value is set to false. Default value is <code>-1</code> (unlimited).</p>
       </attribute>
+
       <attribute name="command-line-options" required="false">
-        <p>The following command line options are available for the NIO connector:<br/>
-        <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code> - default is <code>true</code>.
-        Set this value to false if you wish to use a selector for each thread.
-        the property. If you do set it to false, you can control the size of the pool of selectors by using the 
-        selectorPool.maxSelectors attribute</p>
+        <p>The following command line options are available for the NIO
+        connector:<br/>
+        <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code>
+        - default is <code>true</code>. Set this value to false if you wish to
+        use a selector for each thread. If you do set it to false, you can
+        control the size of the pool of selectors by using the 
+        <strong>selectorPool.maxSelectors attribute</strong>.</p>
       </attribute>
+
       <attribute name="oomParachute" required="false">
-        <p>(int)The NIO connector implements an OutOfMemoryError strategy called parachute.
-           It holds a chunk of data as a byte array. In case of an OOM,
-           this chunk of data is released and the error is reported. This will give the VM enough room
-           to clean up. The <code>oomParachute</code> represent the size in bytes of the parachute(the byte array).
-           The default value is <code>1024*1024</code>(1MB).
-           Please note, this only works for OOM errors regarding the Java Heap space, and there is absolutely no 
-           guarantee that you will be able to recover at all.
-           If you have an OOM outside of the Java Heap, then this parachute trick will not help.
+        <p>(int)The NIO connector implements an OutOfMemoryError strategy called
+        parachute. It holds a chunk of data as a byte array. In case of an OOM,
+        this chunk of data is released and the error is reported. This will give
+        the VM enough room to clean up. The <code>oomParachute</code> represents
+        the size in bytes of the parachute(the byte array). The default value is
+        <code>1024*1024</code>(1MB). Please note, this only works for OOM errors
+        regarding the Java Heap space, and there is absolutely no  guarantee
+        that you will be able to recover at all. If you have an OOM outside of
+        the Java Heap, then this parachute trick will not help.
         </p>
       </attribute>
     </attributes>
+  </subsection>
+
+  <subsection name="APR specific configuration">
+    
+    <p>The following attributes are specific to the APR connector.</p>
+
+    <attributes>
+
+      <attribute name="deferAccept" required="false">
+        <p>Sets the <code>TCP_DEFER_ACCEPT</code> flag on the listening socket
+        for this connector. The default value is <code>true</code> where
+        <code>TCP_DEFER_ACCEPT</code> is supported by the operating system,
+        otherwise it is <code>false</code>.</p>
+      </attribute>
+    
+      <attribute name="pollerSize" required="false">
+        <p>Amount of sockets that the poller responsible for polling kept alive
+        connections can hold at a given time. Extra connections will be closed
+        right away. The default value is 8192, corresponding to 8192 keep-alive
+        connections.</p>
+      </attribute>
+
+      <attribute name="pollerThreadCount" required="false">
+        <p>Number of threads used to poll kept alive connections. On Windows the
+        default is chosen so that the sockets managed by each thread is
+        less than 1024. For Linux the default is 1. Changing the default on
+        Windows is likely to have a negative performance impact.</p>
+      </attribute>
+
+      <attribute name="pollTime" required="false">
+        <p>Duration of a poll call. Lowering this value will slightly decrease
+        latency of connections being kept alive in some cases, but will use more
+        CPU as more poll calls are being made. The default value is 2000 (5ms).
+        </p>
+      </attribute>
+
+      <attribute name="sendfileSize" required="false">
+        <p>Amount of sockets that the poller responsible for sending static
+        files asynchronously can hold at a given time. Extra connections will be
+        closed right away without any data being sent (resulting in a zero
+        length file on the client side). Note that in most cases, sendfile is a
+        call that will return right away (being taken care of "synchronously" by
+        the kernel), and the sendfile poller will not be used, so the amount of
+        static files which can be sent concurrently is much larger than the
+        specified amount. The default value is 1024.</p>
+      </attribute>
+
+      <attribute name="sendfileThreadCount" required="false">
+        <p>Number of threads used service sendfile sockets. On Windows the
+        default is chosen so that the sockets managed by each thread is
+        less than 1024. For Linux the default is 1. Changing the default on
+        Windows is likely to have a negative performance impact.</p>
+      </attribute>
+      
+      <attribute name="threadPriority" required="false">
+        <p>(int)The priority of the acceptor and poller threads. The default
+        value is <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc
+        for the java.lang.Thread class for more details on what this priority
+        means.</p>
+      </attribute>
+
+      <attribute name="useComet" required="false">
+        <p>(bool)Whether to allow comet servlets or not. Default value is
+        <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="useSendfile" required="false">
+        <p>(bool)Use this attribute to enable or disable sendfile capability.
+        The default value is <code>true</code>.</p>
+      </attribute>
+
+    </attributes>
+    
   </subsection>
 
 </section>
@@ -682,12 +782,17 @@
   <strong>Connector</strong> by setting the <code>SSLEnabled</code> attribute to
   <code>true</code>.</p>
 
-  <p>You will also need to set the <code>scheme</code> and <code>secure</code> attributes
-  to the values <code>https</code> and <code>true</code> respectively,
-  to pass correct information to the servlets.</p>
+  <p>You will also need to set the <code>scheme</code> and <code>secure</code>
+  attributes to the values <code>https</code> and <code>true</code>
+  respectively, to pass correct information to the servlets.</p>
 
-  <p>In addition, you may need to configure the following
-  attributes:</p>
+  <p>The BIO and NIO connectors used the JSSE SSL whereas the APR/native
+  connector uses OpenSSL. Therefore, in addition to using different attributes
+  to configure SSL, the APR/native connector also requires keys and certificates
+  to be provided in a different format.</p>
+  
+  <p>The BIO and NIO connectors use the following attributes to configure SSL:
+  </p>
 
   <attributes>
 
@@ -699,6 +804,23 @@
       documentation for the default value.</p>
     </attribute>
 
+    <attribute name="allowUnsafeLegacyRenegotiation" required="false">
+      <p>Is unsafe legacy TLS renegotiation allowed which is likely to expose
+      users to CVE-2009-3555, a man-in-the-middle vulnerability in the TLS
+      protocol that allows an attacker to inject arbitrary data into the user's
+      request. If not specified, a default of <code>false</code> is used.</p>
+    </attribute>
+
+    <attribute name="ciphers" required="false">
+      <p>The comma separated list of encryption ciphers that this socket is 
+      allowed to use. By default, the default ciphers for the JVM will be used.
+      Note that this usually means that the weak export grade ciphers will be
+      included in the list of available ciphers. The ciphers are specified using
+      the JSSE cipher naming convention. The special value of <code>ALL</code>
+      will enable all supported ciphers. This will include many that are not
+      secure. <code>ALL</code> is intended for testing purposes only.</p>
+    </attribute>
+
     <attribute name="clientAuth" required="false">
       <p>Set to <code>true</code> if you want the SSL stack to require a
       valid certificate chain from the client before accepting a connection.
@@ -707,6 +829,23 @@
       value (which is the default) will not require a certificate chain
       unless the client requests a resource protected by a security
       constraint that uses <code>CLIENT-CERT</code> authentication.</p>
+    </attribute>
+
+    <attribute name="crlFile" required="false">
+      <p>The certificate revocation list to be used to verify client
+      certificates. If not defined, client certificates will not be checked
+      against a certificate revocation list.</p>
+    </attribute>
+
+    <attribute name="keyAlias" required="false">
+      <p>The alias used to for the server certificate in the keystore. If not
+      specified the first key read in the keystore will be used.</p>
+    </attribute>
+
+    <attribute name="keyPass" required="false">
+      <p>The password used to access the server certificate from the
+      specified keystore file.  The default value is "<code>changeit</code>".
+      </p>
     </attribute>
 
     <attribute name="keystoreFile" required="false">
@@ -724,11 +863,6 @@
       </p>
     </attribute>
 
-    <attribute name="keystoreType" required="false">
-      <p>The type of keystore file to be used for the server certificate.
-      If not specified, the default value is "<code>JKS</code>".</p>
-    </attribute>
-
     <attribute name="keystoreProvider" required="false">
       <p>The name of the keystore provider to be used for the server
       certificate. If not specified, the list of registered providers is
@@ -737,30 +871,44 @@
       </p>
     </attribute>
 
+    <attribute name="keystoreType" required="false">
+      <p>The type of keystore file to be used for the server certificate.
+      If not specified, the default value is "<code>JKS</code>".</p>
+    </attribute>
+
+    <attribute name="sessionCacheSize" required="false">
+      <p>The number of SSL sessions to maintain in the session cache. Use 0 to
+      specify an unlimited cache size. If not specified, a default of 0 is
+      used.</p>
+    </attribute>
+    
+    <attribute name="sessionTimeout" required="false">
+      <p>The time, in seconds, after the creation of an SSL session that it will
+      timeout. Use 0 to specify an unlimited timeout. If not specified, a
+      default of 86400 (24 hours) is used.</p>
+    </attribute>
+
+    <attribute name="sslEnabledProtocols" required="false">
+      <p><strong>NIO only</strong>. The version of the SSL protocols to use. If
+      not specified, the default is "<code>TLSv1,SSLv3,SSLv2Hello</code>".</p>
+    </attribute>
+
     <attribute name="sslProtocol" required="false">
       <p>The version of the SSL protocol to use.  If not specified,
       the default is "<code>TLS</code>".</p>
     </attribute>
 
-    <attribute name="ciphers" required="false">
-      <p>The comma separated list of encryption ciphers that this socket is 
-      allowed to use. By default, the default ciphers for the JVM will be used.
-      Note that this usually means that the weak export grade ciphers will be
-      included in the list of available ciphers. The ciphers are specified using
-      the JSSE cipher naming convention. The special value of <code>ALL</code>
-      will enable all supported ciphers. This will include many that are not
-      secure. <code>ALL</code> is intended for testing purposes only.</p>
+    <attribute name="trustMaxCertLength" required="false">
+      <p>The maximum number of intermediate certificates that will be allowed
+      when validating client certificates. If not specified, the default value
+      of 5 will be used.</p>
     </attribute>
 
-    <attribute name="keyAlias" required="false">
-      <p>The alias used to for the server certificate in the keystore. If not
-      specified the first key read in the keystore will be used.</p>
-    </attribute>
-
-    <attribute name="keyPass" required="false">
-      <p>The password used to access the server certificate from the
-      specified keystore file.  The default value is "<code>changeit</code>".
-      </p>
+    <attribute name="truststoreAlgorithm" required="false">
+      <p>The algorithm to use for truststore. If not specified, the default
+      value returned by
+      <code>javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()</code> is
+      used.</p>
     </attribute>
 
     <attribute name="truststoreFile" required="false">
@@ -778,13 +926,6 @@
       <code>keystorePass</code>is set, no trust store will be configured.</p>
     </attribute>
 
-    <attribute name="truststoreType" required="false">
-      <p>The type of key store used for the trust store. The default is the
-      value of the <code>javax.net.ssl.trustStoreType</code> system property. If
-      that property is null, the value of <code>keystoreType</code> is used as
-      the default.</p>
-     </attribute>
-
     <attribute name="truststoreProvider" required="false">
       <p>The name of the truststore provider to be used for the server
       certificate. The default is the value of the
@@ -797,46 +938,125 @@
       </p>
     </attribute>
 
-    <attribute name="truststoreAlgorithm" required="false">
-      <p>The algorithm to use for truststore. If not specified, the default
-      value returned by
-      <code>javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()</code> is
-      used.</p>
-    </attribute>
-
-    <attribute name="crlFile" required="false">
-      <p>The certificate revocation list to be used to verify client
-      certificates. If not defined, client certificates will not be checked
-      against a certificate revocation list.</p>
-    </attribute>
-
-    <attribute name="trustMaxCertLength" required="false">
-      <p>The maximum number of intermediate certificates that will be allowed
-      when validating client certificates. If not specified, the default value
-      of 5 will be used.</p>
-    </attribute>
-
-    <attribute name="sessionCacheSize" required="false">
-      <p>The number of SSL sessions to maintain in the session cache. Use 0 to
-      specify an unlimited cache size. If not specified, a default of 0 is
-      used.</p>
-    </attribute>
-    
-    <attribute name="sessionTimeout" required="false">
-      <p>The time, in seconds, after the creation of an SSL session that it will
-      timeout. Use 0 to specify an unlimited timeout. If not specified, a
-      default of 86400 (24 hours) is used.</p>
-    </attribute>
-
-    <attribute name="allowUnsafeLegacyRenegotiation" required="false">
-      <p>Is unsafe legacy TLS renegotiation allowed which is likely to expose
-      users to CVE-2009-3555, a man-in-the-middle vulnerability in the TLS
-      protocol that allows an attacker to inject arbitrary data into the user's
-      request. If not specified, a default of <code>false</code> is used.</p>
-    </attribute>
+    <attribute name="truststoreType" required="false">
+      <p>The type of key store used for the trust store. The default is the
+      value of the <code>javax.net.ssl.trustStoreType</code> system property. If
+      that property is null, the value of <code>keystoreType</code> is used as
+      the default.</p>
+     </attribute>
 
   </attributes>
 
+  <p>When APR/native is enabled, the HTTPS connector will use a socket poller
+  for keep-alive, increasing scalability of the server. It also uses OpenSSL,
+  which may be more optimized than JSSE depending on the processor being used,
+  and can be complemented with many commercial accelerator components. Unlike
+  the HTTP connector, the HTTPS connector cannot use sendfile to optimize static
+  file processing.</p>
+
+  <p>The HTTPS APR/native connector has the same attributes than the HTTP
+  APR/native connector, but adds OpenSSL specific ones. For the full details on
+  using OpenSSL, please refer to OpenSSL documentations and the many books
+  available for it (see the <a href="http://www.openssl.org">Official OpenSSL
+  website</a>). The SSL specific attributes for the APR/native connector are:
+  </p>
+
+  <attributes>
+  
+    <attribute name="SSLCACertificateFile" required="false">
+      <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatefile">
+      the mod_ssl documentation</a>.</p>
+    </attribute>
+    
+    <attribute name="SSLCACertificatePath" required="false">
+      <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatepath">
+      the mod_ssl documentation</a>.</p>
+    </attribute>
+
+    <attribute name="SSLCARevocationFile" required="false">
+      <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcarevocationfile">
+      the mod_ssl documentation</a>.</p>
+    </attribute>
+
+    <attribute name="SSLCARevocationPath" required="false">
+      <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcarevocationpath">
+      the mod_ssl documentation</a>.</p>
+    </attribute>
+
+    <attribute name="SSLCertificateChainFile" required="false">
+      <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcertificatechainfile">
+      the mod_ssl documentation</a>.</p>
+    </attribute>
+
+    <attribute name="SSLCACertificateFile" required="false">
+      <p>Name of the file that contains the concatenated certificates for the
+      trusted certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="SSLCACertificatePath" required="false">
+      <p>Name of the directory that contains the certificates for the trusted
+      certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="SSLCARevocationFile" required="false">
+      <p>Name of the file that contains the concatenated certificate revocation
+      lists for the certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="SSLCARevocationPath" required="false">
+      <p>Name of the directory that contains the certificate revocation lists
+      for the certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="SSLCertificateChainFile" required="false">
+      <p>Name of the file that contains concatenated certifcates for the
+      certificate authorities which form the certifcate chain for the server
+      certificate. The format is PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="SSLCertificateFile" required="true">
+      <p>Name of the file that contains the server certificate. The format is
+      PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="SSLCertificateKeyFile" required="false">
+      <p>Name of the file that contains the server private key. The format is
+      PEM-encoded. The default value is the value of "SSLCertificateFile" and in
+      this case both certificate and private key have to be in this file (NOT
+      RECOMMENDED).</p>
+    </attribute>
+
+    <attribute name="SSLCipherSuite" required="false">
+      <p>Ciphers which may be used for communicating with clients. The default
+      is "ALL", with other acceptable values being a list of ciphers, with ":"
+      used as the delimiter (see OpenSSL documentation for the list of ciphers
+      supported).</p>
+    </attribute>
+
+    <attribute name="SSLPassword" required="false">
+      <p>Pass phrase for the encrypted private key. If "SSLPassword" is not
+      provided, the callback function should prompt for the pass phrase.</p>
+    </attribute>
+
+    <attribute name="SSLProtocol" required="false">
+      <p>Protocol which may be used for communicating with clients. The default
+      is "all", with other acceptable values being "SSLv2", "SSLv3", "TLSv1"
+      and "SSLv2+SSLv3".</p>
+    </attribute>
+
+    <attribute name="SSLVerifyClient" required="false">
+      <p>Ask client for certificate. The default is "none", meaning the client
+      will not have the opportunity to submit a certificate. Other acceptable
+      values include "optional", "require" and "optionalNoCA".</p>
+    </attribute>
+
+    <attribute name="SSLVerifyDepth" required="false">
+      <p>Maximum verification depth for client certificates. The default is
+      "10".</p>
+    </attribute>
+  
+  </attributes>
+  
   <p>For more information, see the
   <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
 
