@@ -31,39 +31,13 @@
   <!-- property values you may customize.                                       -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
-
   <property file="build.properties.default"/>
 
-  <!-- Project Properties -->
-  <property name="project"               value="apache-tomcat" />
-  <property name="name"                  value="Apache Tomcat" />
-  <tstamp>
-    <format property="year" pattern="yyyy" locale="en"/>
-  </tstamp>
-  <property name="version.major"         value="7" />
-  <property name="version.minor"         value="0" />
-  <property name="version.build"         value="0" />
-  <property name="version.patch"         value="0" />
-  <property name="version.suffix"        value="-dev" />
-
-  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
-  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
-  <property name="version.major.minor"   value="${version.major}.${version.minor}" />
-
-  <property name="final.name"            value="${project}-${version}" />
-  <property name="final-src.name"        value="${project}-${version}-src" />
-
   <!-- Build Defaults -->
-  <property name="tomcat.build"      value="${basedir}/output/build"/>
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
-  <property name="tomcat.dist"       value="${basedir}/output/dist"/>
   <property name="tomcat.embed"      value="${basedir}/output/embed"/>
   <property name="tomcat.extras"     value="${basedir}/output/extras"/>
   <property name="tomcat.tmp"        value="${basedir}/output/tmp"/>
-  <property name="tomcat.deployer"   value="${basedir}/output/deployer"/>
-  <property name="tomcat.release"    value="${basedir}/output/release"/>
-  <property name="test.failonerror"  value="true"/>
-  <property name="test.runner"       value="junit.textui.TestRunner"/>
 
   <!-- constant to declare a file binary for md5sum -->
   <property name="md5sum.binary-prefix" value=" *" />
