@@ -24,7 +24,7 @@ package org.apache.jasper.compiler;
  * "\${1+1}". After unquoting, both appear as "${1+1}" but the first should
  * evaluate to "2" and the second to "${1+1}". Literal \, $ and # need special
  * treatment to ensure there is no ambiguity. The JSP attribute unquoting
- * covers \\, \", \', \$, \#, %\>, <\%, &apos; and &quot;
+ * covers \\, \", \', \$, \#, %\&gt;, &lt;\%, &amp;apos; and &amp;quot;
  */
 public class AttributeParser {
 
