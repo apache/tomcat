@@ -479,8 +479,11 @@ public class MBeanUtils {
             name = new ObjectName(sb.toString());
             return (name);
         } catch (Exception e) {
-            throw new MalformedObjectNameException
-                ("Cannot create object name for " + connector+e);
+            MalformedObjectNameException mone =
+                new MalformedObjectNameException
+                ("Cannot create object name for " + connector);
+            mone.initCause(e);
+            throw mone;
         }
     }
 
