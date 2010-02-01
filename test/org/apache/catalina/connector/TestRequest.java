@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
@@ -206,8 +208,11 @@ public class TestRequest extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         StandardContext ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
-        // You can customize the context by calling 
-        // its API
+
+        LoginConfig config = new LoginConfig();
+        config.setAuthMethod("BASIC");
+        ctx.setLoginConfig(config);
+        ctx.getPipeline().addValve(new BasicAuthenticator());
         
         Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
         ctx.addServletMapping("/", "servlet");
