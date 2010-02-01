@@ -167,6 +167,26 @@ class Generator {
         return b.toString();
     }
 
+    /**
+     * Finds the <jsp:body> subelement of the given parent node. If not
+     * found, null is returned.
+     */
+    protected static Node.JspBody findJspBody(Node parent) {
+        Node.JspBody result = null;
+
+        Node.Nodes subelements = parent.getBody();
+        for (int i = 0; (subelements != null) && (i < subelements.size()); i++) {
+            Node n = subelements.getNode(i);
+            if (n instanceof Node.JspBody) {
+                result = (Node.JspBody) n;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
     private String createJspId() {
         if (this.jspIdPrefix == null) {
             StringBuilder sb = new StringBuilder(32);
@@ -969,25 +989,6 @@ class Generator {
                     }
                 }
             }
-        }
-
-        /**
-         * Finds the <jsp:body> subelement of the given parent node. If not
-         * found, null is returned.
-         */
-        private Node.JspBody findJspBody(Node parent) {
-            Node.JspBody result = null;
-
-            Node.Nodes subelements = parent.getBody();
-            for (int i = 0; (subelements != null) && (i < subelements.size()); i++) {
-                Node n = subelements.getNode(i);
-                if (n instanceof Node.JspBody) {
-                    result = (Node.JspBody) n;
-                    break;
-                }
-            }
-
-            return result;
         }
 
         @Override
