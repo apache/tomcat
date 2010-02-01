@@ -46,17 +46,18 @@
   the <code>jvmRoute</code> attribute of the 
   <a href="engine.html">Engine</a>.</p>
 
-<p>The native connectors supported with this Tomcat release are:
-<ul>
-  <li>JK 1.2.x with any of the supported servers</li>
-  <li>mod_proxy on Apache httpd 2.x (included by default in Apache HTTP Server 2.2), 
-      with AJP enabled: see
-      <a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy_ajp.html">the httpd docs</a>
-      for details.</li>
-</ul>
-</p>
+  <p>The native connectors supported with this Tomcat release are:
+    <ul>
+      <li>JK 1.2.x with any of the supported servers</li>
+      <li>mod_proxy on Apache httpd 2.x (included by default in Apache HTTP
+      Server 2.2), with AJP enabled: see
+      <a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy_ajp.html">the
+      httpd docs</a> for details.</li>
+    </ul>
+  </p>
 
-<p><b>Other native connectors supporting AJP may work, but are no longer supported.</b></p>
+  <p><b>Other native connectors supporting AJP may work, but are no longer
+  supported.</b></p>
 
 </section>
 
@@ -77,8 +78,9 @@
 
     <attribute name="emptySessionPath" required="false">
       <p>If set to <code>true</code>, all paths for session cookies will be set
-      to <code>/</code>. This can be useful for portlet specification implementations.
-      If not specified, this attribute is set to <code>false</code>.</p>
+      to <code>/</code>. This can be useful for portlet specification
+      implementations. If not specified, this attribute is set to
+      <code>false</code>.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">
@@ -92,7 +94,7 @@
 
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
-      the container FORM URL parameter parsing. The feature can be disabled by
+      the container FORM URL parameter parsing. The limit can be disabled by
       setting this attribute to a value less than or equal to 0.
       If not specified, this attribute is set to 2097152 (2 megabytes).</p>
     </attribute>
@@ -110,6 +112,13 @@
       attribute to -1. Setting the attribute to zero will disable the saving of
       POST data during authentication. If not specified, this attribute is set
       to 4096 (4 kilobytes).</p>
+    </attribute>
+
+    <attribute name="port" required="true">
+      <p>The TCP port number on which this <strong>Connector</strong>
+      will create a server socket and await incoming connections.  Your
+      operating system will allow only one server application to listen
+      to a particular port number on a particular IP address.</p>
     </attribute>
 
     <attribute name="protocol" required="false">
@@ -157,25 +166,21 @@
       number specified here.</p>
     </attribute>
 
-    <attribute name="request.registerRequests" required="false">
-      <p>This attribute controls request registration for JMX monitoring
-      of the Connector.  It is enabled by default, but may be turned
-      it off to save a bit of memory.</p>
-    </attribute>
-
     <attribute name="scheme" required="false">
       <p>Set this attribute to the name of the protocol you wish to have
       returned by calls to <code>request.getScheme()</code>.  For
       example, you would set this attribute to "<code>https</code>"
       for an SSL Connector.  The default value is "<code>http</code>".
-      See <a href="#SSL Support">SSL Support</a> for more information.</p>
+      </p>
     </attribute>
 
     <attribute name="secure" required="false">
       <p>Set this attribute to <code>true</code> if you wish to have
       calls to <code>request.isSecure()</code> to return <code>true</code>
-      for requests received by this Connector (you would want this on an
-      SSL Connector).  The default value is <code>false</code>.</p>
+      for requests received by this Connector. You would want this on an
+      SSL Connector or a non SSL connector that is receiving data from a 
+      SSL accelerator, like a crypto card, a SSL appliance or even a webserver.
+      The default value is <code>false</code>.</p>
     </attribute>
 
     <attribute name="URIEncoding" required="false">
@@ -196,7 +201,7 @@
 
     <attribute name="useIPVHosts" required="false">
       <p>Set this attribute to <code>true</code> to cause Tomcat to use
-      the ServerName passed by the native web server to determine the Host
+      the IP address passed by the native web server to determine the Host
       to send the request to.  The default value is <code>false</code>.</p>
     </attribute>
 
@@ -205,8 +210,6 @@
       support for the Servlet specification using the header recommended in the
       specification.  The default value is <code>false</code>.</p>
     </attribute>
-    
-    
 
   </attributes>
 
@@ -214,8 +217,7 @@
 
   <subsection name="Standard Implementations">
 
-  <p>To use AJP, you
-  must specify the protocol attribute (see above).</p>
+  <p>To use AJP, you must specify the protocol attribute (see above).</p>
 
   <p><strong>These implementations support the AJP 1.3 protocol.</strong></p>
 
@@ -252,13 +254,6 @@
       presented.  The default value is infinite (i.e. no timeout).</p>
     </attribute>
     
-    <attribute name="deferAccept" required="false">
-      <p>Sets the <code>TCP_DEFER_ACCEPT</code> flag on the listening socket for
-      this connector. The default value is <code>true</code> where
-      <code>TCP_DEFER_ACCEPT</code> is supported by the operating system,
-      otherwise it is <code>false</code>.</p>
-    </attribute>
-    
     <attribute name="executor" required="false">
       <p>A reference to the name in an <a href="executor.html">Executor</a> element.
          If this attribute is enabled, and the named executor exists, the connector will
@@ -288,13 +283,6 @@
       the maximum packet size. Problems with the default value have been
       reported when sending certificates or certificate chains. The default
       value is 8192.</p>
-    </attribute>
-
-    <attribute name="port" required="true">
-      <p>The TCP port number on which this <strong>Connector</strong>
-      will create a server socket and await incoming connections.  Your
-      operating system will allow only one server application to listen
-      to a particular port number on a particular IP address.</p>
     </attribute>
 
     <attribute name="request.secret" required="false">
