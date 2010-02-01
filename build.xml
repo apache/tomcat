@@ -17,29 +17,25 @@
 -->
 <project name="Tomcat 7.0" default="deploy" basedir=".">
 
+  <!-- ===================== Initialize Property Values ==================== -->
 
-  <!-- ===================== Initialize Property Values =================== -->
-
-  <!-- We read customizable properties from the file "build.properties.default" -->
-  <!-- and also from "build.properties" if it exists.                           -->
-  <!-- The values in "build.properties" have stronger preference.               -->
-  <!-- If you want to customize your build, you can either change the values    -->
-  <!-- directly in the default file, or create a new build.properties and set   -->
-  <!-- the values there. This way you don't have to change a file which is part -->
-  <!-- of the original project source code.                                     -->
-  <!-- See "build.properties.default" in the top level directory for some       -->
-  <!-- property values you may customize.                                       -->
+  <!-- We read customizable properties from "build.properties.default"       -->
+  <!-- and also from "build.properties" if it exists.                        -->
+  <!-- The values in "build.properties" have stronger preference.            -->
+  <!-- If you want to customize your build, you can either change the values -->
+  <!-- directly in the default file, or create a new build.properties and    -->
+  <!-- set the values there. This way you don't have to change a file which  -->
+  <!-- is part of the original project source code.                          -->
+  <!-- See "build.properties.default" in the top level directory for some    -->
+  <!-- property values you may customize.                                    -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
-
   <property file="build.properties.default"/>
 
-  <!-- Project Properties -->
+  <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
-  <property name="name"                  value="Apache Tomcat" />
-  <tstamp>
-    <format property="year" pattern="yyyy" locale="en"/>
-  </tstamp>
+	
+  <!-- Version numbers -->
   <property name="version.major"         value="7" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
@@ -50,27 +46,32 @@
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
+  <!-- Exact spec versions (for the manifests) -->
+  <property name="servlet.revision" value="FR" />
+  <property name="jsp.revision" value="FR" />
+
+  <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
   <property name="final-src.name"        value="${project}-${version}-src" />
 
-  <!-- Build Defaults -->
+  <!-- Locations to create build artifacts -->
   <property name="tomcat.home"           value="${basedir}"/>
-  <property name="tomcat.build"          value="${basedir}/output/build"/>
-  <property name="tomcat.classes"        value="${basedir}/output/classes"/>
-  <property name="tomcat.dist"           value="${basedir}/output/dist"/>
-  <property name="tomcat.embed"          value="${basedir}/output/embed"/>
-  <property name="tomcat.embed.sources"  value="${basedir}/output/embed"/>
-  <property name="tomcat.tmp"            value="${basedir}/output/tmp"/>
-  <property name="test.classes"          value="${basedir}/output/testclasses"/>
+  <property name="tomcat.output"         value="${basedir}/output"/>
+  <property name="tomcat.build"          value="${tomcat.output}/build"/>
+  <property name="tomcat.classes"        value="${tomcat.output}/classes"/>
+  <property name="tomcat.deployer"       value="${tomcat.output}/deployer"/>
+  <property name="tomcat.dist"           value="${tomcat.output}/dist"/>
+  <property name="tomcat.embed"          value="${tomcat.output}/embed"/>
+  <property name="tomcat.embed.sources"  value="${tomcat.output}/embed"/>
+  <property name="tomcat.extras"         value="${tomcat.output}/extras"/>
+  <property name="tomcat.manifests"      value="${tomcat.output}/manifests"/>
+  <property name="tomcat.release"        value="${tomcat.output}/release"/>
+  <property name="test.classes"          value="${tomcat.output}/testclasses"/>
 
   <property name="compile.source" value="1.6"/>
   <property name="compile.target" value="1.6"/>
 
-  <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="PR" />
-  <property name="jsp.revision" value="FR" />
-
-  <!-- JAR artifacts -->
+  <!-- Locations to create the JAR artifacts -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
   <property name="tomcat-juli.jar" value="${tomcat.build}/bin/tomcat-juli.jar"/>
 
@@ -103,21 +104,24 @@
   <property name="tomcat-embed-juli-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-logging-juli-src.jar"/>
   <property name="tomcat-embed-dbcp-sources.jar" value="${tomcat.embed.sources}/tomcat-dbcp-src.jar"/>
 
-  <!-- Classpath -->
+  <!-- Classpaths -->
   <path id="tomcat.classpath">
     <pathelement location="${jdt.jar}"/>
   </path>
 
   <path id="tomcat.test.classpath">
+    <pathelement location="${tomcat.build}/webapps/examples/WEB-INF/classes"/>
     <pathelement location="${test.classes}"/>
     <pathelement location="${tomcat.classes}"/>
     <pathelement location="${junit.jar}"/>
+    <path refid="tomcat.classpath" />
   </path>
 
   <!-- Version info filter set -->
   <tstamp>
-    <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
-    <format property="TSTAMP" pattern="hh:mm:ss"/>
+  	<format property="year" pattern="yyyy" locale="en"/>
+    <format property="today" pattern="MMM d yyyy" locale="en"/>
+    <format property="tstamp" pattern="hh:mm:ss"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
@@ -125,67 +129,12 @@
     <filter token="VERSION_NUMBER" value="${version.number}"/>
     <filter token="VERSION_MAJOR" value="${version.major}"/>
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
-    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
+    <filter token="VERSION_BUILT" value="${today} ${tstamp}"/>
   </filterset>
 
-  <!-- Just build Tomcat -->
-  <target name="build-prepare">
 
-    <available classname="junit.framework.TestCase" property="junit.present" />
-
-    <mkdir dir="${tomcat.classes}"/>
-
-    <delete dir="${tomcat.build}/temp" />
-    <delete dir="${tomcat.build}/work" />
-
-    <mkdir dir="${tomcat.build}"/>
-    <mkdir dir="${tomcat.build}/bin"/>
-    <mkdir dir="${tomcat.build}/conf"/>
-    <mkdir dir="${tomcat.build}/lib"/>
-    <mkdir dir="${tomcat.build}/logs"/>
-    <mkdir dir="${tomcat.build}/temp"/>
-    <mkdir dir="${tomcat.build}/webapps"/>
-
-  </target>
-
-  <target name="compile">
-
-    <!-- Compile internal server components -->
-    <javac srcdir="java" destdir="${tomcat.classes}"
-           debug="${compile.debug}"
-           deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
-           optimize="${compile.optimize}"
-           excludes="**/CVS/**,**/.svn/**"
-           encoding="ISO-8859-1"
-           includeAntRuntime="true" >
-<!-- Comment this in to show unchecked warnings:
-      <compilerarg value="-Xlint:unchecked"/>
- -->
-      <classpath refid="tomcat.classpath" />
-      <exclude name="org/apache/naming/factory/webservices/**" />
-      <exclude name="org/apache/tomcat/bayeux/**" />
-      <exclude name="org/apache/cometd/**" />
-      <exclude name="org/apache/tomcat/jdbc/**" />
-    </javac>
-    <!-- Copy static resource files -->
-    <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
-      <filterset refid="version.filters"/>
-      <fileset dir="java">
-        <include name="**/*.properties"/>
-        <include name="**/*.dtd"/>
-        <include name="**/*.tasks"/>
-        <include name="**/*.xsd"/>
-        <include name="**/*.xml"/>
-      </fileset>
-    </copy>
-
-  </target>
-
-  <target name="build-only" depends="build-prepare,compile,package" />
-
-  <!-- Pattern sets for jar files -->
+  <!-- ========= Pattern sets used to control content of JAR files ========= -->
+  <!-- Pattern sets for jar files in standard distributions -->
   <patternset id="files.annotations-api">
     <include name="javax/annotation/*" />
     <include name="javax/annotation/security/*" />
@@ -282,6 +231,7 @@
   </patternset>
 
   <!-- Pattern sets for embedded JARs -->
+  <!-- Every standard pattern set above should be included in an embedded JAR -->
   <patternset id="files.tomcat-embed-core" >
     <patternset refid="files.annotations-api" />
     <patternset refid="files.servlet-api" />
@@ -302,33 +252,66 @@
     <!--<patternset refid="files.tomcat-juli" />-->
 
   <!-- Pattern sets not included in embedded -->
+    <!-- Cluster support not included in embedded -->
     <!--<patternset refid="files.catalina-tribes" />-->
     <!--<patternset refid="files.catalina-ha" />-->
+    <!-- Ant tasks not included in embedded -->
     <!--<patternset refid="files.catalina-ant" />-->
 
-  <macrodef name="jarIt" description="utility macro for standard JAR packaging">
-    <attribute name="jarfile" description="the name of the JAR file to create"/>
-    <attribute name="filesDir" description="the directory to obtain the files from"/>
-    <attribute name="filesId" description="the patternset id of the files to use"/>
-    <attribute name="manifest" description="the manifest file use"
-               default="${tomcat.tmp}/default.manifest" />
-    <attribute name="notice" description="the LICENSE file to use"
-               default="res/META-INF/default.notice" />
-    <attribute name="license" description="the NOTICE file to use"
-               default="res/META-INF/default.license" />
-    <sequential>
-      <jar  jarfile="@{jarfile}" manifest="@{manifest}">
-        <fileset dir="@{filesDir}">
-          <patternset refid="@{filesId}"/>
-          <!-- Javadoc and i18n exclusions -->
-          <exclude name="**/package.html" />
-          <exclude name="**/LocalStrings_*" />
-        </fileset>
-        <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
-        <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
-      </jar>
-    </sequential>
-  </macrodef>
+
+  <!-- =========================== Build targets =========================== -->
+
+  <target name="build-prepare">
+
+  	<!-- Required so we can compile -->
+    <mkdir dir="${tomcat.classes}"/>
+
+  	<!-- Minimum dirs needed for a working Tomcat instance -->
+    <mkdir dir="${tomcat.build}"/>
+    <mkdir dir="${tomcat.build}/bin"/>
+    <mkdir dir="${tomcat.build}/conf"/>
+    <mkdir dir="${tomcat.build}/lib"/>
+    <mkdir dir="${tomcat.build}/logs"/>
+    <mkdir dir="${tomcat.build}/temp"/>
+    <mkdir dir="${tomcat.build}/webapps"/>
+
+    <!-- Ensure these directories are removed every time we re-build -->
+    <delete dir="${tomcat.build}/temp" />
+    <delete dir="${tomcat.build}/work" />
+
+  </target>
+
+  <target name="compile" depends="build-prepare">
+
+    <!-- Compile internal server components -->
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           target="${compile.target}"
+           optimize="${compile.optimize}"
+           excludes="**/.svn/**"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true" >
+      <!-- Comment this in to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <classpath refid="tomcat.classpath" />
+      <exclude name="org/apache/naming/factory/webservices/**" />
+    </javac>
+    <!-- Copy static resource files -->
+    <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+      <fileset dir="java">
+        <include name="**/*.properties"/>
+        <include name="**/*.dtd"/>
+        <include name="**/*.tasks"/>
+        <include name="**/*.xsd"/>
+        <include name="**/*.xml"/>
+      </fileset>
+    </copy>
+
+  </target>
 
   <target name="build-manifests" >
     <!-- Filtering tokens for JAR manifests-->
@@ -337,8 +320,8 @@
     <filter token="servlet.revision" value="${servlet.revision}"/>
     <filter token="jsp.revision" value="${jsp.revision}"/>
 
-    <mkdir dir="${tomcat.tmp}" />
-    <copy todir="${tomcat.tmp}" overwrite="yes" filtering="yes"
+    <mkdir dir="${tomcat.manifests}" />
+    <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
       encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir="${tomcat.home}/res/META-INF" includes="*.manifest" />
@@ -346,7 +329,7 @@
 
   </target>
 
-  <target name="package" depends="build-manifests" >
+  <target name="package" depends="compile,build-manifests" >
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
@@ -356,7 +339,7 @@
     <jarIt jarfile="${servlet-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.servlet-api"
-      manifest="${tomcat.tmp}/servlet-api.jar.manifest"
+      manifest="${tomcat.manifests}/servlet-api.jar.manifest"
       notice="res/META-INF/servlet-api.jar.notice"
       license="res/META-INF/servlet-api.jar.license" />
 
@@ -364,7 +347,7 @@
     <jarIt jarfile="${jsp-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jsp-api"
-      manifest="${tomcat.tmp}/jsp-api.jar.manifest"
+      manifest="${tomcat.manifests}/jsp-api.jar.manifest"
       notice="res/META-INF/jsp-api.jar.notice"
       license="res/META-INF/jsp-api.jar.license" />
 
@@ -377,7 +360,7 @@
     <jarIt jarfile="${bootstrap.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.bootstrap"
-      manifest="${tomcat.tmp}/bootstrap.jar.manifest" />
+      manifest="${tomcat.manifests}/bootstrap.jar.manifest" />
 
     <!-- Tomcat-juli JAR File -->
     <jarIt jarfile="${tomcat-juli.jar}"
@@ -431,7 +414,7 @@
 
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
-      manifest="${tomcat.tmp}/default.manifest" >
+      manifest="${tomcat.manifests}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
@@ -441,7 +424,7 @@
         fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
-      manifest="${tomcat.tmp}/default.manifest" >
+      manifest="${tomcat.manifests}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
@@ -451,7 +434,7 @@
         fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
-      manifest="${tomcat.tmp}/default.manifest" >
+      manifest="${tomcat.manifests}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
@@ -546,7 +529,7 @@
     </xslt>
   </target>
 
-  <target name="deploy" depends="build-only,build-docs"
+  <target name="deploy" depends="package,build-docs"
           description="Default. Builds a working Tomcat instance">
 
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
@@ -628,9 +611,10 @@
     </javac>
 
     <!-- Add sources for examples -->
-    <taskdef    name="txt2html"
-           classname="org.apache.tomcat.buildutil.Txt2Html"
-           classpath="${tomcat.classes}" />
+    <taskdef name="txt2html"
+             classname="org.apache.tomcat.buildutil.Txt2Html"
+             classpath="${tomcat.classes}" />
+
     <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/simpletag">
       <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples">
         <include name="BookBean.java"/>
@@ -718,7 +702,7 @@
   </target>
 
   <target name="embed" description="Create experimental embedded jars"
-    depends="build-prepare,build-manifests,compile" >
+    depends="build-manifests,compile" >
 
     <mkdir dir="${tomcat.embed}" />
 
@@ -742,8 +726,9 @@
 
   </target>
 
-  <target name="embed-sources" description="Create source jars for embedded jars"
-    depends="build-prepare,compile" >
+  <target name="embed-sources"
+  	      description="Create source jars for embedded jars"
+          depends="build-manifests" >
 
     <mkdir dir="${tomcat.embed.sources}" />
 
@@ -776,18 +761,18 @@
   </target>
 
   <target name="test" description="Runs the JUnit test cases"
-    depends="compile,test-compile" >
+    depends="test-compile,deploy" >
 
-    <junit printsummary="yes" fork="yes">
+    <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
       <classpath refid="tomcat.test.classpath" />
 
       <formatter type="plain" usefile="false" />
 
-      <batchtest>
+      <batchtest haltonerror="true" haltonfailure="true">
         <fileset dir="test" >
           <!-- Include all by default -->
           <include name="**/Test*.java" />
-          <!-- Exclude TestAll ortherwise there will be duplicated -->
+          <!-- Exclude TestAll otherwise there will be duplicates -->
           <exclude name="**/TestAll.java" />
           <!-- Exclude helper classes -->
           <exclude name="**/Tester*.java" />
@@ -798,6 +783,21 @@
     </junit>
   </target>
 
+	  <target name="test-single" description="Runs the JUnit test cases"
+	    depends="test-compile" >
+
+	    <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
+	      <classpath refid="tomcat.test.classpath" />
+
+	      <formatter type="plain" usefile="false" />
+
+	      <test name="org.apache.el.TestELInJsp"></test>
+	    </junit>
+	  </target>
+
+
+  <!-- ========================= Cleaning Targets ========================== -->
+
   <target name="clean-depend"
           description="Deletes the dependencies that are built from source">
      <delete dir="${tomcat-dbcp.home}"/>
@@ -806,12 +806,162 @@
 
   <target name="clean"
           description="Delete the default output folders">
-    <delete dir="${tomcat.classes}" />
-    <delete dir="${tomcat.build}" />
-    <delete dir="${tomcat.tmp}" />
+    <delete dir="${tomcat.output}" />
   </target>
 
   <!-- Download and dependency building -->
+  <target name="download"
+          description="Download (and build as necessary) dependent components" >
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${tomcat-native.loc}"/>
+      <param name="destfile" value="${tomcat-native.tar.gz}"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${tomcat-native.dll}/win32/tcnative-1.dll"/>
+      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.x86"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${tomcat-native.dll}/win64/x64/tcnative-1.dll"/>
+      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.x64"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${tomcat-native.dll}/win64/ia64/tcnative-1.dll"/>
+      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.i64"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-daemon.loc}"/>
+      <param name="destfile" value="${commons-daemon.jar}"/>
+    </antcall>
+
+    <!-- Download src and build Tomcat DBCP bundle -->
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-pool-src.loc}"/>
+      <param name="destfile" value="${commons-pool.home}/build.xml" />
+    </antcall>
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-dbcp-src.loc}"/>
+      <param name="destfile" value="${commons-dbcp.home}/build.xml" />
+    </antcall>
+    <mkdir dir="${tomcat-dbcp.home}"/>
+    <antcall target="build-tomcat-dbcp">
+      <param name="basedir" value="${tomcat-dbcp.home}" />
+    </antcall>
+
+    <!-- Dpwnload src and build Jasper JDT bundle -->
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${jdt.loc}"/>
+      <param name="destfile" value="${jdt.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+    <mkdir dir="${jasper-jdt.home}"/>
+    <antcall target="build-jasper-jdt">
+      <param name="basedir" value="${jasper-jdt.home}" />
+    </antcall>
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${nsis.loc}"/>
+      <param name="destfile" value="${nsis.exe}"/>
+      <param name="destdir" value="${nsis.home}/.."/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${json-lib.lib}"/>
+      <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
+      <param name="destdir" value="${json-lib.home}"/>
+    </antcall>
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${junit.loc}"/>
+      <param name="destfile" value="${junit.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+
+  </target>
+
+  <!-- =============== Targets for dependencies that need to =============== -->
+  <!-- ================  be built rather than used directly ================ -->
+
+  <target name="build-tomcat-dbcp" depends="build-manifests" >
+    <copy todir="${tomcat-dbcp.home}">
+      <fileset dir="${commons-pool.home}">
+        <include name="**/*.java" />
+        <exclude name="**/test/**" />
+      </fileset>
+      <fileset dir="${commons-dbcp.home}">
+        <include name="**/*.java" />
+        <exclude name="**/test/**" />
+        <exclude name="**/managed/**" />
+      </fileset>
+    </copy>
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
+        encoding="ISO-8859-1">
+      <replacefilter token="org.apache.commons"
+            value="org.apache.tomcat.dbcp" />
+    </replace>
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl"
+        encoding="ISO-8859-1">
+      <replacefilter token="enum"
+            value="enumeration" />
+    </replace>
+
+    <mkdir dir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp" />
+    <move todir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp">
+      <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
+    </move>
+    <mkdir dir="${tomcat-dbcp.home}/classes"/>
+    <javac destdir="${tomcat-dbcp.home}/classes"
+           optimize="off"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           target="${compile.target}"
+           sourcepath="${tomcat-dbcp.home}/src/java"
+           srcdir="${tomcat-dbcp.home}/src/java"
+           encoding="ISO-8859-1">
+      <include name="**" />
+    </javac>
+    <jar jarfile="${tomcat-dbcp.jar}"
+         index="true"
+         manifest="${tomcat.manifests}/default.manifest">
+      <fileset dir="${tomcat-dbcp.home}/classes">
+        <include name="**/*.class" />
+        <include name="**/*.properties" />
+      </fileset>
+      <zipfileset file="${tomcat.home}/res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.home}/res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
+    </jar>
+  </target>
+
+  <target name="build-jasper-jdt" depends="build-manifests" >
+    <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
+    <jar destfile="${jasper-jdt.jar}" index="true"
+         manifest="${tomcat.manifests}/default.manifest">
+      <fileset dir="${jasper-jdt.home}">
+        <include name="org/eclipse/jdt/core/compiler/**"/>
+        <include name="org/eclipse/jdt/internal/compiler/**"/>
+        <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
+      </fileset>
+      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.license"
+        fullpath="META-INF/LICENSE" />
+    </jar>
+  </target>
+
+
+  <!-- =============== Utility Targets to support downloads ================ -->
+
   <target name="proxyflags">
     <!-- check proxy parameters. -->
     <condition property="useproxy">
@@ -855,151 +1005,31 @@
     <get src="${sourcefile}" dest="${destfile}" />
   </target>
 
-  <target name="download"
-          description="Download (and build as necessary) dependent components" >
 
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.loc}"/>
-      <param name="destfile" value="${tomcat-native.tar.gz}"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
+  <!-- ======================= Macros, Taskdefs etc ======================== -->
 
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.dll}/win32/tcnative-1.dll"/>
-      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.x86"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
-
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.dll}/win64/x64/tcnative-1.dll"/>
-      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.x64"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
-
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.dll}/win64/ia64/tcnative-1.dll"/>
-      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.i64"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
-
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-daemon.loc}"/>
-      <param name="destfile" value="${commons-daemon.jar}"/>
-    </antcall>
-
-    <!-- Build Tomcat DBCP bundle -->
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-pool-src.loc}"/>
-      <param name="destfile" value="${commons-pool.home}/build.xml" />
-    </antcall>
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-dbcp-src.loc}"/>
-      <param name="destfile" value="${commons-dbcp.home}/build.xml" />
-    </antcall>
-    <mkdir dir="${tomcat-dbcp.home}"/>
-    <antcall target="build-tomcat-dbcp">
-      <param name="basedir" value="${tomcat-dbcp.home}" />
-    </antcall>
-
-    <!-- Build Jasper JDT bundle -->
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${jdt.loc}"/>
-      <param name="destfile" value="${jdt.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-    <mkdir dir="${jasper-jdt.home}"/>
-    <antcall target="build-jasper-jdt">
-      <param name="basedir" value="${jasper-jdt.home}" />
-    </antcall>
-
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${nsis.loc}"/>
-      <param name="destfile" value="${nsis.exe}"/>
-      <param name="destdir" value="${nsis.home}/.."/>
-    </antcall>
-
-       <!-- Download json libraries -->
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${json-lib.lib}"/>
-      <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
-      <param name="destdir" value="${json-lib.home}"/>
-    </antcall>
-
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${junit.loc}"/>
-      <param name="destfile" value="${junit.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-
-  </target>
-
-  <target name="build-tomcat-dbcp" depends="build-manifests" >
-    <copy todir="${tomcat-dbcp.home}">
-      <fileset dir="${commons-pool.home}">
-        <include name="**/*.java" />
-        <exclude name="**/test/**" />
-      </fileset>
-      <fileset dir="${commons-dbcp.home}">
-        <include name="**/*.java" />
-        <exclude name="**/test/**" />
-        <exclude name="**/managed/**" />
-      </fileset>
-    </copy>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
-        encoding="ISO-8859-1">
-      <replacefilter token="org.apache.commons"
-            value="org.apache.tomcat.dbcp" />
-    </replace>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl"
-        encoding="ISO-8859-1">
-      <replacefilter token="enum"
-            value="enumeration" />
-    </replace>
-
-    <mkdir dir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp" />
-    <move todir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp">
-      <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
-    </move>
-    <mkdir dir="${tomcat-dbcp.home}/classes"/>
-    <javac destdir="${tomcat-dbcp.home}/classes"
-           optimize="off"
-           debug="${compile.debug}"
-           deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
-           sourcepath="${tomcat-dbcp.home}/src/java"
-           srcdir="${tomcat-dbcp.home}/src/java"
-           encoding="ISO-8859-1">
-      <include name="**" />
-    </javac>
-    <jar jarfile="${tomcat-dbcp.jar}"
-         index="true"
-         manifest="${tomcat.tmp}/default.manifest">
-      <fileset dir="${tomcat-dbcp.home}/classes">
-        <include name="**/*.class" />
-        <include name="**/*.properties" />
-      </fileset>
-      <zipfileset file="${tomcat.home}/res/META-INF/default.notice"
-        fullpath="META-INF/NOTICE" />
-      <zipfileset file="${tomcat.home}/res/META-INF/default.license"
-        fullpath="META-INF/LICENSE" />
-    </jar>
-  </target>
-
-  <target name="build-jasper-jdt" depends="build-manifests" >
-    <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
-    <jar destfile="${jasper-jdt.jar}" index="true"
-         manifest="${tomcat.tmp}/default.manifest">
-      <fileset dir="${jasper-jdt.home}">
-        <include name="org/eclipse/jdt/core/compiler/**"/>
-        <include name="org/eclipse/jdt/internal/compiler/**"/>
-        <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
-      </fileset>
-      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.notice"
-        fullpath="META-INF/NOTICE" />
-      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.license"
-        fullpath="META-INF/LICENSE" />
-    </jar>
-  </target>
+  <macrodef name="jarIt" description="utility macro for standard JAR packaging">
+    <attribute name="jarfile" description="the name of the JAR file to create"/>
+    <attribute name="filesDir" description="the directory to obtain the files from"/>
+    <attribute name="filesId" description="the patternset id of the files to use"/>
+    <attribute name="manifest" description="the manifest file use"
+               default="${tomcat.manifests}/default.manifest" />
+    <attribute name="notice" description="the LICENSE file to use"
+               default="res/META-INF/default.notice" />
+    <attribute name="license" description="the NOTICE file to use"
+               default="res/META-INF/default.license" />
+    <sequential>
+      <jar  jarfile="@{jarfile}" manifest="@{manifest}">
+        <fileset dir="@{filesDir}">
+          <patternset refid="@{filesId}"/>
+          <!-- Javadoc and i18n exclusions -->
+          <exclude name="**/package.html" />
+          <exclude name="**/LocalStrings_*" />
+        </fileset>
+        <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
+        <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
+      </jar>
+    </sequential>
+  </macrodef>
 
 </project>
