@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.SessionCookieConfig;
@@ -1054,8 +1055,8 @@ public class WebXml {
         context.setPublicId(publicId);
 
         // Everything else in order
-        for (String contextParam : contextParams.keySet()) {
-            context.addParameter(contextParam, contextParams.get(contextParam));
+        for (Entry<String, String> entry : contextParams.entrySet()) {
+            context.addParameter(entry.getKey(), entry.getValue());
         }
         context.setDisplayName(displayName);
         context.setDistributable(distributable);
@@ -1081,9 +1082,9 @@ public class WebXml {
         for (String listener : listeners) {
             context.addApplicationListener(listener);
         }
-        for (String locale : localeEncodingMappings.keySet()) {
-            context.addLocaleEncodingMappingParameter(locale,
-                    localeEncodingMappings.get(locale));
+        for (Entry<String, String> entry : localeEncodingMappings.entrySet()) {
+            context.addLocaleEncodingMappingParameter(entry.getKey(),
+                    entry.getValue());
         }
         // Prevents IAE
         if (loginConfig != null) {
@@ -1096,8 +1097,8 @@ public class WebXml {
         // messageDestinations were ignored in Tomcat 6, so ignore here
         
         context.setIgnoreAnnotations(metadataComplete);
-        for (String extension : mimeMappings.keySet()) {
-            context.addMimeMapping(extension, mimeMappings.get(extension));
+        for (Entry<String, String> entry : mimeMappings.entrySet()) {
+            context.addMimeMapping(entry.getKey(), entry.getValue());
         }
         // Name is just used for ordering
         for (ContextResourceEnvRef resource : resourceEnvRefs.values()) {
@@ -1134,8 +1135,8 @@ public class WebXml {
             }
             wrapper.setName(servlet.getServletName());
             Map<String,String> params = servlet.getParameterMap(); 
-            for (String param : params.keySet()) {
-                wrapper.addInitParameter(param, params.get(param));
+            for (Entry<String, String> entry : params.entrySet()) {
+                wrapper.addInitParameter(entry.getKey(), entry.getValue());
             }
             wrapper.setRunAs(servlet.getRunAs());
             Set<SecurityRoleRef> roleRefs = servlet.getSecurityRoleRefs();
@@ -1166,8 +1167,8 @@ public class WebXml {
             }
             context.addChild(wrapper);
         }
-        for (String pattern : servletMappings.keySet()) {
-            context.addServletMapping(pattern, servletMappings.get(pattern));
+        for (Entry<String, String> entry : servletMappings.entrySet()) {
+            context.addServletMapping(entry.getKey(), entry.getValue());
         }
         if (sessionConfig != null) {
             if (sessionConfig.getSessionTimeout() != null) {
@@ -1194,8 +1195,8 @@ public class WebXml {
                         sessionConfig.getSessionTrackingModes());
             }
         }
-        for (String uri : taglibs.keySet()) {
-            context.addTaglib(uri, taglibs.get(uri));
+        for (Entry<String, String> entry : taglibs.entrySet()) {
+            context.addTaglib(entry.getKey(), entry.getValue());
         }
         
         // Context doesn't use version directly
@@ -1735,10 +1736,11 @@ public class WebXml {
     private static <T> boolean mergeMap(Map<String,T> fragmentMap,
             Map<String,T> mainMap, Map<String,T> tempMap, WebXml fragment,
             String mapName) {
-        for (String key : fragmentMap.keySet()) {
+        for (Entry<String, T> entry : fragmentMap.entrySet()) {
+            final String key = entry.getKey();
             if (!mainMap.containsKey(key)) {
                 // Not defined in main web.xml
-                T value = fragmentMap.get(key);
+                T value = entry.getValue();
                 if (tempMap.containsKey(key)) {
                     if (value != null && !value.equals(
                             tempMap.get(key))) {
@@ -1942,9 +1944,9 @@ public class WebXml {
             for (String requestedName : requestedOrder) {
                 if (WebXml.ORDER_OTHERS.equals(requestedName)) {
                     // Add all fragments not named explicitly at this point
-                    for (String name : fragments.keySet()) {
-                        if (!requestedOrder.contains(name)) {
-                            WebXml fragment = fragments.get(name);
+                    for (Entry<String, WebXml> entry : fragments.entrySet()) {
+                        if (!requestedOrder.contains(entry.getKey())) {
+                            WebXml fragment = entry.getValue();
                             if (fragment != null) {
                                 orderedFragments.add(fragment);
                             }
