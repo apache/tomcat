@@ -293,6 +293,10 @@
   	<!-- Required so we can compile -->
     <mkdir dir="${tomcat.classes}"/>
 
+    <!-- Ensure these directories are removed every time we re-build -->
+    <delete dir="${tomcat.build}/temp" />
+    <delete dir="${tomcat.build}/work" />
+
   	<!-- Minimum dirs needed for a working Tomcat instance -->
     <mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.build}/bin"/>
@@ -301,10 +305,6 @@
     <mkdir dir="${tomcat.build}/logs"/>
     <mkdir dir="${tomcat.build}/temp"/>
     <mkdir dir="${tomcat.build}/webapps"/>
-
-    <!-- Ensure these directories are removed every time we re-build -->
-    <delete dir="${tomcat.build}/temp" />
-    <delete dir="${tomcat.build}/work" />
 
   </target>
 
