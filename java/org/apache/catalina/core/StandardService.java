@@ -497,7 +497,6 @@ public class StandardService
         // Validate and update our current component state
         if (log.isInfoEnabled() && started) {
             log.info(sm.getString("standardService.start.started"));
-            return;
         }
         
         if( ! initialized )
