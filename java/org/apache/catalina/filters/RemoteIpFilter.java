@@ -138,6 +138,19 @@ import org.apache.juli.logging.LogFactory;
  * <td><code>https</code></td>
  * </tr>
  * <tr>
+ * <td>httpServerPort</td>
+ * <td>Value returned by {@link ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>http</code> protocol</td>
+ * <td>N/A</td>
+ * <td>integer</td>
+ * <td>80</td>
+ * </tr>
+ * <tr>
+ * <td>httpsServerPort</td>
+ * <td>Value returned by {@link ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>https</code> protocol</td>
+ * <td>N/A</td>
+ * <td>integer</td>
+ * <td>443</td>
+ * </tr>
  * </table>
  * </p>
  * <p>
@@ -575,6 +588,8 @@ public class RemoteIpFilter implements Filter {
      */
     private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
     
+    protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
+
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
     
     protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
@@ -655,10 +670,15 @@ public class RemoteIpFilter implements Filter {
     }
     
     /**
+     * @see #setHttpServerPort(int)
+     */
+    private int httpServerPort = 80;
+
+    /**
      * @see #setHttpsServerPort(int)
      */
     private int httpsServerPort = 443;
-    
+
     /**
      * @see #setInternalProxies(String)
      */
@@ -744,10 +764,16 @@ public class RemoteIpFilter implements Filter {
             
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
-                if (protocolHeaderValue != null && protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
+                if (protocolHeaderValue == null) {
+                    // don't modify the secure,scheme and serverPort attributes of the request
+                } else if (protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
                     xRequest.setSecure(true);
                     xRequest.setScheme("https");
                     xRequest.setServerPort(httpsServerPort);
+                } else {
+                    xRequest.setSecure(false);
+                    xRequest.setScheme("http");
+                    xRequest.setServerPort(httpServerPort);
                 }
             }
             
@@ -832,13 +858,34 @@ public class RemoteIpFilter implements Filter {
             setTrustedProxies(filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER));
         }
         
+        if (filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null) {
+            try {
+                setHttpServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Illegal " + HTTP_SERVER_PORT_PARAMETER + " : " + e.getMessage());
+            }
+        }
+        
         if (filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER) != null) {
             try {
                 setHttpsServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Illegal serverPort : " + e.getMessage());
+                throw new NumberFormatException("Illegal " + HTTPS_SERVER_PORT_PARAMETER + " : " + e.getMessage());
             }
         }
+    }
+    
+    /**
+     * <p>
+     * Server Port value if the {@link #protocolHeader} indicates HTTP (i.e. {@link #protocolHeader} is not null and
+     * has a value different of {@link #protocolHeaderHttpsValue}). 
+     * </p>
+     * <p>
+     * Default value : 80
+     * </p>
+     */
+    public void setHttpServerPort(int httpServerPort) {
+        this.httpServerPort = httpServerPort;
     }
     
     /**

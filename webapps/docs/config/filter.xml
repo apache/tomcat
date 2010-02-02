@@ -205,8 +205,9 @@
     via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
 
     <p>Another feature of this filter is to replace the apparent scheme
-    (http/https) and server port with the scheme presented by a proxy or a load
-    balancer via a request header (e.g. &quot;X-Forwarded-Proto&quot;).</p>
+    (http/https), server port and <code>request.secure</code> with the scheme presented 
+    by a proxy or a load balancer via a request header 
+    (e.g. &quot;X-Forwarded-Proto&quot;).</p>
  
     <p>If used in conjunction with Remote Address/Host filters then this filter
     should be defined first to ensure that the correct client IP address is
@@ -269,6 +270,20 @@
       <attribute name="protocolHeaderHttpsValue" required="false">
         <p>Value of the <strong>protocolHeader</strong> to indicate that it is
         an HTTPS request. If not specified, the default of <code>https</code> is
+        used.</p>
+      </attribute>
+
+      <attribute name="httpServerPort" required="false">
+         <p>Value returned by <code>ServletRequest.getServerPort()</code> 
+         when the <strong>protocolHeader</strong> indicates <code>http</code> 
+         protocol. If not specified, the default of <code>80</code> is
+        used.</p>
+      </attribute>
+
+      <attribute name="httpsServerPort" required="false">
+         <p>Value returned by <code>ServletRequest.getServerPort()</code> 
+         when the <strong>protocolHeader</strong> indicates <code>https</code> 
+         protocol. If not specified, the default of <code>443</code> is
         used.</p>
       </attribute>
 
