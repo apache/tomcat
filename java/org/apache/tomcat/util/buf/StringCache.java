@@ -19,8 +19,8 @@ package org.apache.tomcat.util.buf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
@@ -233,11 +233,9 @@ public class StringCache {
                         // Sort the entries according to occurrence
                         TreeMap<Integer,ArrayList<ByteEntry>> tempMap =
                             new TreeMap<Integer,ArrayList<ByteEntry>>();
-                        Iterator<ByteEntry> entries =
-                            bcStats.keySet().iterator();
-                        while (entries.hasNext()) {
-                            ByteEntry entry = entries.next();
-                            int[] countA = bcStats.get(entry);
+                        for (Entry<ByteEntry, int[]> item : bcStats.entrySet()) {
+                            ByteEntry entry = item.getKey();
+                            int[] countA = item.getValue();
                             Integer count = new Integer(countA[0]);
                             // Add to the list for that count
                             ArrayList<ByteEntry> list = tempMap.get(count);
@@ -347,10 +345,9 @@ public class StringCache {
                         // Sort the entries according to occurrence
                         TreeMap<Integer,ArrayList<CharEntry>> tempMap =
                             new TreeMap<Integer,ArrayList<CharEntry>>();
-                        Iterator<CharEntry> entries = ccStats.keySet().iterator();
-                        while (entries.hasNext()) {
-                            CharEntry entry = entries.next();
-                            int[] countA = ccStats.get(entry);
+                        for (Entry<CharEntry, int[]> item : ccStats.entrySet()) {
+                            CharEntry entry = item.getKey();
+                            int[] countA = item.getValue();
                             Integer count = new Integer(countA[0]);
                             // Add to the list for that count
                             ArrayList<CharEntry> list = tempMap.get(count);
