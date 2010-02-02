@@ -134,6 +134,15 @@
     <path refid="tomcat.classpath" />
   </path>
 
+  <path id="tomcat.webservices.classpath">
+    <path refid="tomcat.classpath" />
+    <fileset dir="${tomcat.extras}/webservices">
+      <include name="jaxrpc.jar"/>
+      <include name="wsdl4j.jar"/>
+    </fileset>
+  </path>
+
+
   <!-- Version info filter set -->
   <tstamp>
   	<format property="year" pattern="yyyy" locale="en"/>
@@ -285,6 +294,14 @@
     <!-- Ant tasks not included in embedded -->
     <!--<patternset refid="files.catalina-ant" />-->
 
+  <!-- Pattern sets for extras JARs -->
+  <patternset id="files.tomcat-extras-ws">
+  	<include name="org/apache/naming/factory/webservices/**" />
+  </patternset>
+
+  <patternset id="files.tomcat-extras-jmxremote">
+    <include name="org/apache/catalina/mbeans/JmxRemote*" />
+  </patternset>
 
   <!-- =========================== Build targets =========================== -->
 
@@ -925,16 +942,7 @@
       <param name="destdir" value="${tomcat.extras}/webservices/"/>
     </antcall>
 
-    <!-- Classpath -->
-    <path id="tomcat.webservices.classpath">
-      <pathelement path="${tomcat.classpath}"/>
-      <fileset dir="${tomcat.extras}/webservices">
-        <include name="jaxrpc.jar"/>
-        <include name="wsdl4j.jar"/>
-      </fileset>
-    </path>
-
-    <!-- Compile internal server components -->
+    <!-- Compile web services classes components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
@@ -945,20 +953,10 @@
       <include name="org/apache/naming/factory/webservices/**" />
     </javac>
 
-    <!-- Catalina WS JAR File -->
-    <jar jarfile="${catalina-ws.jar}"
-         manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/naming/factory/webservices/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-      <zipfileset file="res/META-INF/default.notice"
-        fullpath="META-INF/NOTICE" />
-      <zipfileset file="res/META-INF/default.license"
-        fullpath="META-INF/LICENSE" />
-    </jar>
+  	<jarIt jarfile="${catalina-ws.jar}"
+  	  filesDir="${tomcat.classes}"
+  	  filesId="files.tomcat-extras-ws" />
+
     <antcall target="md5sum">
       <param name="file" value="${catalina-ws.jar}" />
     </antcall>
@@ -967,17 +965,11 @@
   <target name="extras-jmx-remote"
           depends="extras-prepare,compile,build-manifests"
           description="Build JMX remote extras package">
-    <!-- Create the JAR file -->
-    <jar jarfile="${catalina-jmx-remote.jar}"
-      manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/mbeans/JmxRemote*" />
-      </fileset>
-      <zipfileset file="res/META-INF/default.notice"
-        fullpath="META-INF/NOTICE" />
-      <zipfileset file="res/META-INF/default.license"
-        fullpath="META-INF/LICENSE" />
-    </jar>
+
+    <jarIt jarfile="${catalina-jmx-remote.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-extras-jmxremote" />
+
     <antcall target="md5sum">
       <param name="file" value="${catalina-jmx-remote.jar}" />
     </antcall>
