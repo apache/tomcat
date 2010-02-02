@@ -365,7 +365,17 @@
                description="Comma delimited list of internal proxies"
                type="java.lang.String"
                writeable="false" />
-               
+
+    <attribute name="httpServerPort"
+               description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates http protocol"
+               type="java.lang.String"
+               writeable="false" />
+    
+    <attribute name="httpsServerPort"
+               description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates https protocol"
+               type="java.lang.String"
+               writeable="false" />
+    
     <attribute name="protocolHeader"
                description="The protocol header (e.g. &quot;X-Forwarded-Proto&quot;)"
                type="java.lang.String"
@@ -381,7 +391,7 @@
                type="java.lang.String"
                writeable="false" />
                
-    <attribute name="remoteIpHedaer"
+    <attribute name="remoteIpHeader"
                description="The remote IP header name (e.g. &quot;X-Forwarded-For&quot;)"
                type="java.lang.String"
                writeable="false" />
