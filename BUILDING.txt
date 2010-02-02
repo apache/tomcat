@@ -132,7 +132,7 @@ The documentation can be easly built:
 
 (6) Building the extras (commons-logging, webservices etc.).
     cd ${tomcat.source}
-    ant -f extras.xml
+    ant extras
 
 (7) Building a release running tests:
 
