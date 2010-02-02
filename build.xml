@@ -867,6 +867,7 @@
   <target name="extras-prepare" >
     <mkdir dir="${tomcat.extras}"/>
     <mkdir dir="${tomcat.embed}"/>
+    <mkdir dir="${tomcat.extras}/webservices"/>
   </target>
 
   <target name="extras-commons-logging"
@@ -964,8 +965,6 @@
   <target name="extras-webservices"
           depends="extras-prepare,compile,build-manifests"
           description="Build web services extras package">
-
-    <mkdir dir="${tomcat.extras}/webservices"/>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${jaxrpc-src.loc}"/>
@@ -1142,7 +1141,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     
   </target>
 
-  <target name="javadoc" depends="dist-source"
+  <target name="javadoc" depends="dist-source,extras-prepare"
     description="Create the Tomcat javadoc" >
     <javadoc packagenames="org.apache.*"
       sourcepath="${tomcat.dist}/src/java"
