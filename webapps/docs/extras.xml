@@ -60,7 +60,7 @@
         Tomcat binary from the source bundle (note: it will be used by the build
         process of the additional components, but does not need to be actually
         used later on)</li>
-    <li>Execute the command <code>ant -f extras.xml</code> to run the build
+    <li>Execute the command <code>ant extras</code> to run the build
         script</li>
     <li>The additional components JARs will be placed in the
         <code>output/extras</code> folder</li>
