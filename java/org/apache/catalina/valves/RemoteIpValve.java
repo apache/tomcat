@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.connector.Request;
@@ -126,6 +127,19 @@ import org.apache.juli.logging.LogFactory;
  * <td><code>https</code></td>
  * </tr>
  * <tr>
+ * <td>httpServerPort</td>
+ * <td>Value returned by {@link ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>http</code> protocol</td>
+ * <td>N/A</td>
+ * <td>integer</td>
+ * <td>80</td>
+ * </tr>
+ * <tr>
+ * <td>httpsServerPort</td>
+ * <td>Value returned by {@link ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>https</code> protocol</td>
+ * <td>N/A</td>
+ * <td>integer</td>
+ * <td>443</td>
+ * </tr>
  * </table>
  * </p>
  * <p>
@@ -415,6 +429,11 @@ public class RemoteIpValve extends ValveBase {
     }
     
     /**
+     * @see #setHttpServerPort(int)
+     */
+    private int httpServerPort = 80;
+    
+    /**
      * @see #setHttpsServerPort(int)
      */
     private int httpsServerPort = 443;
@@ -454,6 +473,10 @@ public class RemoteIpValve extends ValveBase {
     
     public int getHttpsServerPort() {
         return httpsServerPort;
+    }
+    
+    public int getHttpServerPort() {
+        return httpServerPort;
     }
     
     /**
@@ -507,7 +530,7 @@ public class RemoteIpValve extends ValveBase {
     public String getRemoteIpHeader() {
         return remoteIpHeader;
     }
-    
+
     /**
      * @see #setTrustedProxies(String)
      * @return comma delimited list of trusted proxies
@@ -580,12 +603,21 @@ public class RemoteIpValve extends ValveBase {
             
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
-                if (protocolHeaderValue != null && protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
+                if (protocolHeaderValue == null) {
+                    // don't modify the secure,scheme and serverPort attributes
+                    // of the request
+                } else if (protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
                     request.setSecure(true);
                     // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
                     request.getCoyoteRequest().scheme().setString("https");
                     
                     request.setServerPort(httpsServerPort);
+                } else {
+                    request.setSecure(false);
+                    // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
+                    request.getCoyoteRequest().scheme().setString("http");
+                    
+                    request.setServerPort(httpServerPort);
                 }
             }
             
@@ -609,6 +641,18 @@ public class RemoteIpValve extends ValveBase {
             
             request.setServerPort(originalServerPort);
         }
+    }
+    
+    /**
+     * <p>
+     * Server Port value if the {@link #protocolHeader} is not <code>null</code> and does not indicate HTTP
+     * </p>
+     * <p>
+     * Default value : 80
+     * </p>
+     */
+    public void setHttpServerPort(int httpServerPort) {
+        this.httpServerPort = httpServerPort;
     }
     
     /**

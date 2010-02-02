@@ -38,6 +38,9 @@ public class TestRemoteIpValve extends TestCase {
     static class RemoteAddrAndHostTrackerValve extends ValveBase {
         private String remoteAddr;
         private String remoteHost;
+        private String scheme;
+        private boolean secure;
+        private int serverPort;
         
         public String getRemoteAddr() {
             return remoteAddr;
@@ -47,10 +50,25 @@ public class TestRemoteIpValve extends TestCase {
             return remoteHost;
         }
         
+        public String getScheme() {
+            return scheme;
+        }
+
+        public int getServerPort() {
+            return serverPort;
+        }
+
+        public boolean isSecure() {
+            return secure;
+        }
+        
         @Override
         public void invoke(Request request, Response response) throws IOException, ServletException {
             this.remoteHost = request.getRemoteHost();
             this.remoteAddr = request.getRemoteAddr();
+            this.scheme = request.getScheme();
+            this.secure = request.isSecure();
+            this.serverPort = request.getServerPort();
         }
     }
     
@@ -269,6 +287,262 @@ public class TestRemoteIpValve extends TestCase {
         
         String actualPostInvokeRemoteHost = request.getRemoteHost();
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+    }
+    
+    public void testInvokeXforwardedProtoSaysHttpsForIncomingHttpRequest() throws Exception {
+        
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+        
+        Request request = new Request();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        // protocol
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString("https");
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        
+        // TEST
+        remoteIpValve.invoke(request, null);
+        
+        // VERIFY
+        // client ip
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        
+        // protocol
+        String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
+        assertEquals("x-forwarded-proto says https", "https", actualScheme);
+        
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        assertEquals("x-forwarded-proto says https", 443, actualServerPort);
+        
+        boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
+        assertEquals("x-forwarded-proto says https", true, actualSecure);
+
+        boolean actualPostInvokeSecure = request.isSecure();
+        assertEquals("postInvoke secure", false, actualPostInvokeSecure);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+
+        String actualPostInvokeScheme = request.getScheme();
+        assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
+    }
+    
+    public void testInvokeXforwardedProtoIsNullForIncomingHttpRequest() throws Exception {
+        
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+        
+        Request request = new Request();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        // protocol
+        // null "x-forwarded-proto"
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        
+        // TEST
+        remoteIpValve.invoke(request, null);
+        
+        // VERIFY
+        // client ip
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        
+        // protocol
+        String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
+        assertEquals("x-forwarded-proto is null", "http", actualScheme);
+        
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        assertEquals("x-forwarded-proto is null", 8080, actualServerPort);
+        
+        boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
+        assertEquals("x-forwarded-proto is null", false, actualSecure);
+
+        boolean actualPostInvokeSecure = request.isSecure();
+        assertEquals("postInvoke secure", false, actualPostInvokeSecure);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+
+        String actualPostInvokeScheme = request.getScheme();
+        assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
+    }
+    
+    public void testInvokeXforwardedProtoSaysHttpForIncomingHttpsRequest() throws Exception {
+        
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+        
+        Request request = new Request();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        // protocol
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString("http");
+        request.setSecure(true);
+        request.setServerPort(8443);
+        request.getCoyoteRequest().scheme().setString("https");
+        
+        // TEST
+        remoteIpValve.invoke(request, null);
+        
+        // VERIFY
+        // client ip
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        
+        // protocol
+        String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
+        assertEquals("x-forwarded-proto says http", "http", actualScheme);
+        
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        assertEquals("x-forwarded-proto says http", 80, actualServerPort);
+        
+        boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
+        assertEquals("x-forwarded-proto says http", false, actualSecure);
+
+        boolean actualPostInvokeSecure = request.isSecure();
+        assertEquals("postInvoke secure", true, actualPostInvokeSecure);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
+
+        String actualPostInvokeScheme = request.getScheme();
+        assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
+    }
+    
+    public void testInvokeXforwardedProtoIsNullForIncomingHttpsRequest() throws Exception {
+        
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+        
+        Request request = new Request();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        // protocol
+        // Don't declare "x-forwarded-proto"
+        request.setSecure(true);
+        request.setServerPort(8443);
+        request.getCoyoteRequest().scheme().setString("https");
+        
+        // TEST
+        remoteIpValve.invoke(request, null);
+        
+        // VERIFY
+        // client ip
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        
+        // protocol
+        String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
+        assertEquals("x-forwarded-proto is null", "https", actualScheme);
+        
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        assertEquals("x-forwarded-proto is null", 8443, actualServerPort);
+        
+        boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
+        assertEquals("x-forwarded-proto is null", true, actualSecure);
+
+        boolean actualPostInvokeSecure = request.isSecure();
+        assertEquals("postInvoke secure", true, actualPostInvokeSecure);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
+
+        String actualPostInvokeScheme = request.getScheme();
+        assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
     }
     
     public void testInvokeNotAllowedRemoteAddr() throws Exception {
