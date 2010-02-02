@@ -111,7 +111,7 @@ class ScriptingVariabler {
                     // the scripting variables always need to be declared
                     if (currentRange == null ||
                             ownRange.compareTo(currentRange) > 0 ||
-                            parent != null && isImplemetedAsFragment(parent)) {
+                            parent != null && isImplementedAsFragment(parent)) {
                         scriptVars.put(varName, ownRange);
                         vec.add(varInfos[i]);
                     }
@@ -138,7 +138,7 @@ class ScriptingVariabler {
                     // the scripting variables always need to be declared
                     if (currentRange == null ||
                             ownRange.compareTo(currentRange) > 0 ||
-                            parent != null && isImplemetedAsFragment(parent)) {
+                            parent != null && isImplementedAsFragment(parent)) {
                         scriptVars.put(varName, ownRange);
                         vec.add(tagVarInfos[i]);
                     }
@@ -149,7 +149,7 @@ class ScriptingVariabler {
         }
     }
 
-    private static boolean isImplemetedAsFragment(Node.CustomTag n) {
+    private static boolean isImplementedAsFragment(Node.CustomTag n) {
         // Replicates logic from Generator to determine if a fragment
         // helper will be used
         if (n.implementsSimpleTag()) {
