@@ -79,7 +79,9 @@ import org.apache.naming.resources.ResourceAttributes;
 
 public class DefaultServlet
     extends HttpServlet {
-    
+
+    private static final long serialVersionUID = 1L;
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -671,10 +673,12 @@ public class DefaultServlet
                                  boolean content)
         throws IOException, ServletException {
 
+        boolean serveContent = content;
+        
         // Identify the requested resource path
         String path = getRelativePath(request);
         if (debug > 0) {
-            if (content)
+            if (serveContent)
                 log("DefaultServlet.serveResource:  Serving resource '" +
                     path + "' headers and data");
             else
@@ -779,7 +783,7 @@ public class DefaultServlet
             // Special case for zero length files, which would cause a
             // (silent) ISE when setting the output buffer size
             if (contentLength == 0L) {
-                content = false;
+                serveContent = false;
             }
 
         }
@@ -787,7 +791,7 @@ public class DefaultServlet
         ServletOutputStream ostream = null;
         PrintWriter writer = null;
 
-        if (content) {
+        if (serveContent) {
 
             // Trying to retrieve the servlet output stream
 
@@ -834,7 +838,7 @@ public class DefaultServlet
             InputStream renderResult = null;
             if (cacheEntry.context != null) {
 
-                if (content) {
+                if (serveContent) {
                     // Serve the directory browser
                     renderResult =
                         render(request.getContextPath(), cacheEntry);
@@ -843,7 +847,7 @@ public class DefaultServlet
             }
 
             // Copy the input stream to our output stream (if requested)
-            if (content) {
+            if (serveContent) {
                 try {
                     response.setBufferSize(output);
                 } catch (IllegalStateException e) {
@@ -888,7 +892,7 @@ public class DefaultServlet
                     response.setContentType(contentType);
                 }
 
-                if (content) {
+                if (serveContent) {
                     try {
                         response.setBufferSize(output);
                     } catch (IllegalStateException e) {
@@ -907,7 +911,7 @@ public class DefaultServlet
                 response.setContentType("multipart/byteranges; boundary="
                                         + mimeSeparation);
 
-                if (content) {
+                if (serveContent) {
                     try {
                         response.setBufferSize(output);
                     } catch (IllegalStateException e) {
