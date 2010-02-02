@@ -495,8 +495,11 @@ public class StandardService
     public void start() throws LifecycleException {
 
         // Validate and update our current component state
-        if (log.isInfoEnabled() && started) {
-            log.info(sm.getString("standardService.start.started"));
+        if (started) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("standardService.start.started"));
+            }
+            return;
         }
         
         if( ! initialized )
