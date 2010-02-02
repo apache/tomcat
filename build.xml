@@ -158,6 +158,43 @@
     <filter token="VERSION_BUILT" value="${today} ${tstamp}"/>
   </filterset>
 
+  <!-- Files to change line endings for depending on target platform -->
+  <patternset id="text.files" >
+    <include name="**/INSTALLLICENSE"/>
+    <include name="**/KEYS"/>
+    <include name="**/LICENSE"/>
+    <include name="**/NOTICE"/>
+    <include name="**/RELEASE-NOTES"/>
+    <include name="**/*.dtd"/>
+    <include name="**/*.htm"/>
+    <include name="**/*.html"/>
+    <include name="**/*.ini"/>
+    <include name="**/*.java"/>
+    <include name="**/*.jjt"/>
+    <include name="**/*.jsp"/>
+    <include name="**/*.jspf"/>
+    <include name="**/*.jspx"/>
+    <include name="**/*.license"/>
+    <include name="**/*.manifest"/>
+    <include name="**/*.mdl"/>
+    <include name="**/*.notice"/>
+    <include name="**/*.nsi"/>
+    <include name="**/*.policy"/>
+    <include name="**/*.pom"/>
+    <include name="**/*.properties"/>
+    <include name="**/*.properties.default"/>
+    <include name="**/*.rtf"/>
+    <include name="**/*.svg"/>
+    <include name="**/*.tag"/>
+    <include name="**/*.tagx"/>
+    <include name="**/*.tasks"/>
+    <include name="**/*.tld"/>
+    <include name="**/*.txt"/>
+    <include name="**/*.xml"/>
+    <include name="**/*.xsd"/>
+    <include name="**/*.xsl"/>
+  </patternset>
+
 
   <!-- ========= Pattern sets used to control content of JAR files ========= -->
   <!-- Pattern sets for jar files in standard distributions -->
@@ -1007,6 +1044,564 @@
       <param name="file" value="${tomcat-embed-log4j.jar}" />
     </antcall>
   </target>
+
+  <target name="dist-prepare">
+    <!-- This is why releasing must be done on Windows / with wine:
+         otherwise this check fails and the .exe distro is not generated -->
+    <condition property="execute.installer">
+      <and>
+        <os family="windows" />
+        <available file="${nsis.exe}" />
+        <available file="${nsis.installoptions.dll}" />
+        <available file="${nsis.nsexec.dll}" />
+        <available file="${nsis.nsisdl.dll}" />
+      </and>
+    </condition>
+    
+    <mkdir dir="${tomcat.dist}"/>
+    <mkdir dir="${tomcat.dist}/bin"/>
+    <mkdir dir="${tomcat.dist}/conf"/>
+    <mkdir dir="${tomcat.dist}/lib"/>
+    <mkdir dir="${tomcat.dist}/logs"/>
+    <mkdir dir="${tomcat.dist}/temp"/>
+    <mkdir dir="${tomcat.dist}/webapps"/>
+    <mkdir dir="${tomcat.dist}/work"/>
+    <mkdir dir="${tomcat.release}/v${version}/bin" />
+    <mkdir dir="${tomcat.release}/v${version}/src" />
+  </target>
+
+  <target name="dist-static" depends="dist-prepare, deploy, extras">
+
+    <!-- Copy the top-level documentation files -->
+    <copy todir="${tomcat.dist}" encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+      <fileset dir=".">
+        <include name="INSTALLING.txt"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="RELEASE-NOTES"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
+    </copy>
+
+    <!-- Copy the contents of each "build" directory -->
+    <copy todir="${tomcat.dist}/bin">
+      <fileset dir="${tomcat.build}/bin">
+      </fileset>
+    </copy>
+    <copy todir="${tomcat.dist}/lib">
+      <fileset dir="${tomcat.build}/lib" />
+    </copy>
+    <copy todir="${tomcat.dist}/conf">
+      <fileset dir="${tomcat.build}/conf">
+      </fileset>
+    </copy>
+
+    <copy todir="${tomcat.dist}/webapps">
+      <fileset dir="${tomcat.build}/webapps">
+        <exclude name="**/ROOT/WEB-INF/classes/**" />
+        <exclude name="**/WEB-INF/src/**" />
+      </fileset>
+    </copy>
+
+    <touch file="${tomcat.dist}/temp/safeToDelete.tmp" />
+
+    <!-- Correct permissions and line endings on "bin" scripts -->
+    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.sh"  eol="lf"   encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.bat" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <chmod      dir="${tomcat.dist}/bin" includes="*.sh"  perm="+x"/>
+
+    <!-- Windows binaries -->
+    <!-- 32 bit -->
+    <copy file="res/procrun/tomcat${version.major}.exe"
+        tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
+    <copy file="res/procrun/tomcat${version.major}w.exe"
+        tofile="${tomcat.dist}/bin/tomcat${version.major}w.exe" />
+    <!-- 64 bit amd -->
+    <copy file="res/procrun/amd64/tomcat${version.major}.exe"
+        tofile="${tomcat.dist}/bin/x64/tomcat${version.major}.exe" />
+    <!-- 64 bit ia -->
+    <copy file="res/procrun/ia64/tomcat${version.major}.exe"
+        tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
+    <!-- tc native -->
+    <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
+        tofile="${tomcat.dist}/bin/tcnative-1.dll" />
+    <!-- tc native 64 bit for amd/emt -->
+    <copy file="${tomcat-native.home}/tcnative-1.dll.x64"
+        tofile="${tomcat.dist}/bin/x64/tcnative-1.dll" />
+    <!-- tc native 64 bit for ia -->
+    <copy file="${tomcat-native.home}/tcnative-1.dll.i64"
+        tofile="${tomcat.dist}/bin/i64/tcnative-1.dll" />
+    <!-- platform README files -->
+    <echo append="false" file="${tomcat.dist}/bin/i64/README">
+Apache Tomcat ${version} native binaries for Win64 IA64 platform.
+    </echo>
+    <echo append="false" file="${tomcat.dist}/bin/x64/README">
+Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
+    </echo>
+    
+  </target>
+
+  <target name="javadoc" depends="dist-source"
+    description="Create the Tomcat javadoc" >
+    <javadoc packagenames="org.apache.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/api"
+      version="true"
+      windowtitle="Apache Tomcat ${version} API Documentation"
+      doctitle="Apache Tomcat ${version} API"
+      header="&lt;b&gt;Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      additionalparam="-breakiterator"
+      maxmemory="256m" >
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path refid="tomcat.webservices.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+      <link href="http://java.sun.com/j2se/1.6.0/docs/api/"/>
+    </javadoc>
+  </target>
+
+  <target name="dist-deployer" depends="dist-prepare,deploy"
+  	description="Create the Tomcat deployer binary">
+
+    <!-- Servlet and JSP -->
+    <copy todir="${tomcat.deployer}/lib">
+      <fileset dir="${tomcat.build}/lib">
+        <include name="catalina-ant.jar"/>
+        <include name="el-api.jar"/>
+        <include name="jsp-api.jar"/>
+        <include name="jasper.jar"/>
+        <include name="jasper-el.jar"/>
+        <include name="servlet-api.jar"/>
+      </fileset>
+      <fileset dir="${tomcat.build}/bin">
+        <include name="tomcat-juli.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- Digester and dependencies -->
+    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar">
+       <fileset dir="${tomcat.classes}">
+          <include name="org/apache/catalina/startup/DigesterFactory.class" />
+          <include name="org/apache/catalina/util/SchemaResolver.class" />
+          <include name="org/apache/catalina/util/StringManager.class" />
+          <include name="org/apache/tomcat/util/*" />
+          <include name="org/apache/tomcat/util/digester/*" />
+          <exclude name="**/package.html" />
+          <exclude name="**/LocalStrings_*" />
+       </fileset>
+    </jar>
+
+    <!-- Main build script -->
+    <copy todir="${tomcat.deployer}">
+      <fileset dir="${basedir}/res/deployer" />
+    </copy>
+
+    <!-- Copy deployer documentation -->
+    <copy todir="${tomcat.deployer}">
+      <fileset dir="${tomcat.build}/webapps/docs">
+        <include name="images/asf-logo.gif" />
+        <include name="images/tomcat.gif" />
+      </fileset>
+    </copy>
+    <copy tofile="${tomcat.deployer}/deployer-howto.html"
+      file="${tomcat.build}/webapps/docs/deployer-howto.html"/>
+
+  </target>
+
+  <target name="dist-source">
+
+    <mkdir dir="${tomcat.dist}/src"/>
+
+    <!-- Tomcat source -->
+    <copy todir="${tomcat.dist}/src">
+      <fileset dir="${basedir}">
+        <exclude name=".*/**"/>
+        <exclude name="output/**"/>
+        <exclude name="build.properties"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="installer" description="Create Windows installer"
+      unless="skip.installer" depends="dist-static">
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <echo message="Builds a Windows installer based on Nullsoft Installer"/>
+    <copy todir="${tomcat.dist}">
+      <fileset dir="res" />
+    </copy>
+    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
+
+    <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+    </copy>
+    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="tomcat.nsi" />
+    </exec>
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.exe}" />
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="tomcat.nsi" />
+    </exec>
+
+    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    </antcall>
+  </target>
+
+  <target name="release"
+  	depends="clean,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz"
+    description="Create a Tomcat 7 packaged distribution">
+
+    <copy file="KEYS"
+         todir="${tomcat.release}/v${version}"/>
+    <copy file="RELEASE-NOTES"
+         todir="${tomcat.release}/v${version}"
+         encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+    </copy>
+    <copy file="res/welcome.main.html"
+        tofile="${tomcat.release}/v${version}/README.html"
+        encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+    </copy>
+    <copy file="res/welcome.bin.html"
+        tofile="${tomcat.release}/v${version}/bin/README.html"
+        encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+    </copy>
+
+    <mkdir dir="${tomcat.release}/v${version}/bin/extras" />
+    <copy todir="${tomcat.release}/v${version}/bin/extras">
+      <fileset dir="${tomcat.extras}">
+        <include name="*.*"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <!-- Packages the core zip distro -->
+  <target name="package-zip" depends="dist-static">
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**"/>
+        <include name="conf/**"/>
+        <include name="logs/**"/>
+        <include name="lib/**"/>
+        <include name="webapps/**"/>
+        <include name="work/**"/>
+        <include name="temp/**"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+        <include name="RUNNING.txt"/>
+        <include name="BENCHMARKS.txt"/>
+        <exclude name="bin/service.bat"/>
+        <exclude name="bin/x64/"/>
+        <exclude name="bin/i64/"/>
+        <exclude name="bin/*.exe"/>
+        <exclude name="bin/*.dll"/>
+      </zipfileset>
+    </zip>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.zip" />
+    </antcall>
+  </target>
+
+  <!-- Packages the core windows zip distros -->
+  <target name="package-winzip" depends="dist-static">
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <!-- Windows x86 package -->
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**"/>
+        <include name="conf/**"/>
+        <include name="logs/**"/>
+        <include name="lib/**"/>
+        <include name="webapps/**"/>
+        <include name="work/**"/>
+        <include name="temp/**"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+        <include name="RUNNING.txt"/>
+        <include name="BENCHMARKS.txt"/>
+        <exclude name="bin/x64/"/>
+        <exclude name="bin/i64/"/>
+      </zipfileset>
+
+    </zip>
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
+    </antcall>
+
+    <!-- Windows x64 package -->
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**"/>
+        <include name="conf/**"/>
+        <include name="logs/**"/>
+        <include name="lib/**"/>
+        <include name="webapps/**"/>
+        <include name="work/**"/>
+        <include name="temp/**"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+        <include name="RUNNING.txt"/>
+        <include name="BENCHMARKS.txt"/>
+        <exclude name="bin/x64/"/>
+        <exclude name="bin/i64/"/>
+        <exclude name="bin/*.dll"/>
+        <exclude name="bin/tomcat${version.major}.exe"/>
+      </zipfileset>
+      <zipfileset dir="${tomcat.dist}/bin/x64" prefix="${final.name}/bin">
+        <include name="*.dll"/>
+        <include name="*.exe"/>
+      </zipfileset>
+    </zip>
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip" />
+    </antcall>
+
+    <!-- Windows i64 package -->
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**"/>
+        <include name="conf/**"/>
+        <include name="logs/**"/>
+        <include name="lib/**"/>
+        <include name="webapps/**"/>
+        <include name="work/**"/>
+        <include name="temp/**"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+        <include name="RUNNING.txt"/>
+        <include name="BENCHMARKS.txt"/>
+        <exclude name="bin/x64/"/>
+        <exclude name="bin/i64/"/>
+        <exclude name="bin/*.dll"/>
+        <exclude name="bin/tomcat${version.major}.exe"/>
+      </zipfileset>
+      <zipfileset dir="${tomcat.dist}/bin/i64" prefix="${final.name}/bin">
+        <include name="*.dll"/>
+        <include name="*.exe"/>
+      </zipfileset>
+    </zip>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip" />
+    </antcall>
+
+  </target>
+
+  <!-- Packages the deployer distribution in zip format -->
+  <target name="package-deployer-zip">
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <fixcrlf srcdir="${tomcat.deployer}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip">
+      <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="LICENSE" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="NOTICE" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="README.txt" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="RELEASE-NOTES" />
+    </zip>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip" />
+    </antcall>
+  </target>
+
+  <!-- Packages the core tar.gz distro -->
+  <target name="package-tgz" depends="dist-static">
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
+      <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
+        <include name="bin/catalina.sh" />
+        <include name="bin/digest.sh" />
+        <include name="bin/jasper.sh" />
+        <include name="bin/jspc.sh" />
+        <include name="bin/setclasspath.sh" />
+        <include name="bin/startup.sh" />
+        <include name="bin/shutdown.sh" />
+        <include name="bin/tool-wrapper.sh" />
+        <include name="bin/tool-wrapper-using-launcher.sh" />
+        <include name="bin/shutdown-using-launcher.sh" />
+        <include name="bin/startup-using-launcher.sh" />
+        <include name="bin/version.sh" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
+        <include name="conf/**" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**" />
+        <include name="lib/**" />
+        <include name="logs/**" />
+        <include name="temp/**" />
+        <include name="webapps/**" />
+        <include name="work/**" />
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RELEASE-NOTES" />
+        <include name="RUNNING.txt" />
+        <include name="BENCHMARKS.txt" />
+        <exclude name="bin/catalina.sh" />
+        <exclude name="bin/digest.sh" />
+        <exclude name="bin/jasper.sh" />
+        <exclude name="bin/jspc.sh" />
+        <exclude name="bin/service.bat"/>
+        <exclude name="bin/setclasspath.sh" />
+        <exclude name="bin/startup.sh" />
+        <exclude name="bin/shutdown.sh" />
+        <exclude name="bin/tool-wrapper.sh" />
+        <exclude name="bin/tool-wrapper-using-launcher.sh" />
+        <exclude name="bin/shutdown-using-launcher.sh" />
+        <exclude name="bin/startup-using-launcher.sh" />
+        <exclude name="bin/version.sh" />
+        <exclude name="conf/**" />
+        <exclude name="src/**" />
+        <exclude name="bin/x64/"/>
+        <exclude name="bin/i64/"/>
+        <exclude name="bin/*.exe"/>
+        <exclude name="bin/*.dll"/>
+      </tarfileset>
+    </tar>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.tar.gz" />
+    </antcall>
+  </target>
+
+  <!-- Packages the deployer Tomcat distro in tar.gz format -->
+  <target name="package-deployer-tgz">
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <fixcrlf srcdir="${tomcat.deployer}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz">
+      <tarfileset dir="${tomcat.dist}" prefix="${final.name}-deployer">
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RELEASE-NOTES" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer">
+        <include name="**" />
+      </tarfileset>
+    </tar>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz" />
+    </antcall>
+  </target>
+
+  <!-- Packages the documentation distro in tar.gz format -->
+  <target name="package-docs-tgz" depends="dist-static">
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz">
+      <tarfileset dir="${tomcat.dist}" prefix="tomcat-${version.major.minor}-doc">
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RUNNING.txt" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}/webapps/docs" prefix="tomcat-${version.major.minor}-doc">
+        <include name="**" />
+      </tarfileset>
+    </tar>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz" />
+    </antcall>
+  </target>
+
+  <!-- Packages the source code distribution in zip format -->
+  <target name="package-src-zip" depends="dist-source">
+    <fixcrlf srcdir="${tomcat.dist}/src" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files"/>
+      <include name="bin/*.bat" />
+      <include name="bin/*.sh" />
+    </fixcrlf>
+
+    <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip">
+      <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
+    </zip>
+
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/src/${final-src.name}.zip" />
+    </antcall>
+  </target>
+
+  <!-- Packages the source code distribution in tar.gz format -->
+  <target name="package-src-tgz" depends="dist-source">
+    <fixcrlf srcdir="${tomcat.dist}/src" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files"/>
+      <include name="bin/*.bat" />
+      <include name="bin/*.sh" />
+    </fixcrlf>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
+      <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
+    </tar>
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz" />
+    </antcall>
+  </target>
+
 
   <!-- ========================= Cleaning Targets ========================== -->
 
