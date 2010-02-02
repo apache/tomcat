@@ -1206,9 +1206,12 @@
   <!-- ======================= Macros, Taskdefs etc ======================== -->
 
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">
-    <attribute name="jarfile" description="the name of the JAR file to create"/>
-    <attribute name="filesDir" description="the directory to obtain the files from"/>
-    <attribute name="filesId" description="the patternset id of the files to use"/>
+    <attribute name="jarfile"
+    	       description="the name of the JAR file to create"/>
+    <attribute name="filesDir"
+    	       description="the directory from which to obtain the files "/>
+    <attribute name="filesId"
+    	       description="the patternset id of the files to use"/>
     <attribute name="manifest" description="the manifest file use"
                default="${tomcat.manifests}/default.manifest" />
     <attribute name="notice" description="the LICENSE file to use"
