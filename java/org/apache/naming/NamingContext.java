@@ -520,7 +520,7 @@ public class NamingContext implements Context {
         throws NamingException {
         checkWritable();
         
-        Context newContext = new NamingContext(env, this.name);
+        Context newContext = new NamingContext(env, name.get(name.size() - 1));
         bind(name, newContext);
         
         return newContext;
