@@ -128,7 +128,7 @@ For a quick rebuild of only modified code you can use:
 The documentation can be easly built:
 
     cd ${tomcat.source}
-    ant -f dist.xml dist-javadoc
+    ant javadoc
 
 (6) Building the extras (commons-logging, webservices etc.).
     cd ${tomcat.source}
@@ -137,6 +137,6 @@ The documentation can be easly built:
 (7) Building a release running tests:
 
     cd ${tomcat.source}
-    ant -f dist.xml release
+    ant release
 
 
