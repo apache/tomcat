@@ -119,9 +119,10 @@ import org.xml.sax.SAXException;
 public class WebdavServlet
     extends DefaultServlet {
 
+    private static final long serialVersionUID = 1L;
+
 
     // -------------------------------------------------------------- Constants
-
 
     private static final String METHOD_PROPFIND = "PROPFIND";
     private static final String METHOD_PROPPATCH = "PROPPATCH";
@@ -510,6 +511,8 @@ public class WebdavServlet
 
         if (type == FIND_BY_PROPERTY) {
             properties = new Vector<String>();
+            // propNode must be non-null if type == FIND_BY_PROPERTY 
+            @SuppressWarnings("null")
             NodeList childList = propNode.getChildNodes();
 
             for (int i=0; i < childList.getLength(); i++) {
@@ -679,9 +682,8 @@ public class WebdavServlet
     /**
      * PROPPATCH Method.
      */
-    protected void doProppatch(HttpServletRequest req,
-                               HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doProppatch(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
 
         if (readOnly) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
@@ -831,7 +833,7 @@ public class WebdavServlet
      * COPY Method.
      */
     protected void doCopy(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws IOException {
 
         if (readOnly) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
@@ -847,7 +849,7 @@ public class WebdavServlet
      * MOVE Method.
      */
     protected void doMove(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws IOException {
 
         if (readOnly) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
@@ -1288,19 +1290,15 @@ public class WebdavServlet
 
             LockInfo toRenew = resourceLocks.get(path);
             Enumeration<String> tokenList = null;
-            if (lock != null) {
 
-                // At least one of the tokens of the locks must have been given
-
-                tokenList = toRenew.tokens.elements();
-                while (tokenList.hasMoreElements()) {
-                    String token = tokenList.nextElement();
-                    if (ifHeader.indexOf(token) != -1) {
-                        toRenew.expiresAt = lock.expiresAt;
-                        lock = toRenew;
-                    }
+            // At least one of the tokens of the locks must have been given
+            tokenList = toRenew.tokens.elements();
+            while (tokenList.hasMoreElements()) {
+                String token = tokenList.nextElement();
+                if (ifHeader.indexOf(token) != -1) {
+                    toRenew.expiresAt = lock.expiresAt;
+                    lock = toRenew;
                 }
-
             }
 
             // Checking inheritable collection locks
@@ -1356,7 +1354,7 @@ public class WebdavServlet
      * UNLOCK Method.
      */
     protected void doUnlock(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws IOException {
 
         if (readOnly) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
@@ -1533,7 +1531,7 @@ public class WebdavServlet
      */
     private boolean copyResource(HttpServletRequest req,
                                  HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws IOException {
 
         // Parsing destination header
 
@@ -1699,13 +1697,13 @@ public class WebdavServlet
     /**
      * Copy a collection.
      *
-     * @param resources Resources implementation to be used
+     * @param dirContext Resources implementation to be used
      * @param errorList Hashtable containing the list of errors which occurred
      * during the copy operation
      * @param source Path of the resource to be copied
      * @param dest Destination path
      */
-    private boolean copyResource(DirContext resources,
+    private boolean copyResource(DirContext dirContext,
             Hashtable<String,Integer> errorList, String source, String dest) {
 
         if (debug > 1)
@@ -1713,7 +1711,7 @@ public class WebdavServlet
 
         Object object = null;
         try {
-            object = resources.lookup(source);
+            object = dirContext.lookup(source);
         } catch (NamingException e) {
             // Ignore
         }
@@ -1721,7 +1719,7 @@ public class WebdavServlet
         if (object instanceof DirContext) {
 
             try {
-                resources.createSubcontext(dest);
+                dirContext.createSubcontext(dest);
             } catch (NamingException e) {
                 errorList.put
                     (dest, new Integer(WebdavStatus.SC_CONFLICT));
@@ -1730,7 +1728,7 @@ public class WebdavServlet
 
             try {
                 NamingEnumeration<NameClassPair> enumeration =
-                    resources.list(source);
+                    dirContext.list(source);
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncPair = enumeration.nextElement();
                     String childDest = dest;
@@ -1741,7 +1739,7 @@ public class WebdavServlet
                     if (!childSrc.equals("/"))
                         childSrc += "/";
                     childSrc += ncPair.getName();
-                    copyResource(resources, errorList, childSrc, childDest);
+                    copyResource(dirContext, errorList, childSrc, childDest);
                 }
             } catch (NamingException e) {
                 errorList.put
@@ -1753,7 +1751,7 @@ public class WebdavServlet
 
             if (object instanceof Resource) {
                 try {
-                    resources.bind(dest, object);
+                    dirContext.bind(dest, object);
                 } catch (NamingException e) {
                     if (e.getCause() instanceof FileNotFoundException) {
                         // We know the source exists so it must be the
@@ -1789,7 +1787,7 @@ public class WebdavServlet
      */
     private boolean deleteResource(HttpServletRequest req,
                                    HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws IOException {
 
         String path = getRelativePath(req);
 
@@ -1809,7 +1807,7 @@ public class WebdavServlet
      */
     private boolean deleteResource(String path, HttpServletRequest req,
                                    HttpServletResponse resp, boolean setStatus)
-        throws ServletException, IOException {
+            throws IOException {
 
         if ((path.toUpperCase().startsWith("/WEB-INF")) ||
             (path.toUpperCase().startsWith("/META-INF"))) {
@@ -1884,12 +1882,12 @@ public class WebdavServlet
     /**
      * Deletes a collection.
      *
-     * @param resources Resources implementation associated with the context
+     * @param dirContext Resources implementation associated with the context
      * @param path Path to the collection to be deleted
      * @param errorList Contains the list of the errors which occurred
      */
     private void deleteCollection(HttpServletRequest req,
-                                  DirContext resources,
+                                  DirContext dirContext,
                                   String path,
                                   Hashtable<String,Integer> errorList) {
 
@@ -1912,7 +1910,7 @@ public class WebdavServlet
 
         Enumeration<NameClassPair> enumeration = null;
         try {
-            enumeration = resources.list(path);
+            enumeration = dirContext.list(path);
         } catch (NamingException e) {
             errorList.put(path, new Integer
                 (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
@@ -1933,13 +1931,13 @@ public class WebdavServlet
             } else {
 
                 try {
-                    Object object = resources.lookup(childName);
+                    Object object = dirContext.lookup(childName);
                     if (object instanceof DirContext) {
-                        deleteCollection(req, resources, childName, errorList);
+                        deleteCollection(req, dirContext, childName, errorList);
                     }
 
                     try {
-                        resources.unbind(childName);
+                        dirContext.unbind(childName);
                     } catch (NamingException e) {
                         if (!(object instanceof DirContext)) {
                             // If it's not a collection, then it's an unknown
@@ -1971,7 +1969,7 @@ public class WebdavServlet
      */
     private void sendReport(HttpServletRequest req, HttpServletResponse resp,
                             Hashtable<String,Integer> errorList)
-        throws ServletException, IOException {
+            throws IOException {
 
         resp.setStatus(WebdavStatus.SC_MULTI_STATUS);
 
@@ -2634,7 +2632,7 @@ public class WebdavServlet
      * Determines the methods normally allowed for the resource.
      *
      */
-    private StringBuilder determineMethodsAllowed(DirContext resources,
+    private StringBuilder determineMethodsAllowed(DirContext dirContext,
                                                  HttpServletRequest req) {
 
         StringBuilder methodsAllowed = new StringBuilder();
@@ -2643,7 +2641,7 @@ public class WebdavServlet
         try {
             String path = getRelativePath(req);
 
-            object = resources.lookup(path);
+            object = dirContext.lookup(path);
         } catch (NamingException e) {
             exists = false;
         }
