@@ -194,12 +194,12 @@
   </patternset>
 
   <patternset id="files.tomcat-api">
-    <include name="org/apache/tomcat/*.class" />
+    <include name="org/apache/tomcat/*" />
   </patternset>
 
   <patternset id="files.tomcat-util">
-    <include name="org/apache/tomcat/util/res/*.class" />
-    <include name="org/apache/tomcat/util/scan/*.class" />
+    <include name="org/apache/tomcat/util/res/**" />
+    <include name="org/apache/tomcat/util/scan/**" />
   </patternset>
 
   <patternset id="files.catalina">
@@ -245,6 +245,16 @@
 
   <patternset id="files.jasper-el">
     <include name="org/apache/el/**" />
+  </patternset>
+
+  <patternset id="files.jasper-jdt">
+    <include name="org/eclipse/jdt/core/compiler/**"/>
+    <include name="org/eclipse/jdt/internal/compiler/**"/>
+    <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
+  </patternset>
+
+  <patternset id="files.tomcat-dbcp">
+    <include name="org/apache/tomcat/dbcp/**"/>
   </patternset>
 
   <!-- Pattern sets for embedded JARs -->
@@ -1139,34 +1149,19 @@
            encoding="ISO-8859-1">
       <include name="**" />
     </javac>
-    <jar jarfile="${tomcat-dbcp.jar}"
-         index="true"
-         manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat-dbcp.home}/classes">
-        <include name="**/*.class" />
-        <include name="**/*.properties" />
-      </fileset>
-      <zipfileset file="${tomcat.home}/res/META-INF/default.notice"
-        fullpath="META-INF/NOTICE" />
-      <zipfileset file="${tomcat.home}/res/META-INF/default.license"
-        fullpath="META-INF/LICENSE" />
-    </jar>
+  	<jarIt jarfile="${tomcat-dbcp.jar}"
+  	  filesDir="${tomcat-dbcp.home}/classes"
+  	  filesId="files.tomcat-dbcp" />
   </target>
 
   <target name="build-jasper-jdt" depends="build-manifests" >
     <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
-    <jar destfile="${jasper-jdt.jar}" index="true"
-         manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${jasper-jdt.home}">
-        <include name="org/eclipse/jdt/core/compiler/**"/>
-        <include name="org/eclipse/jdt/internal/compiler/**"/>
-        <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
-      </fileset>
-      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.notice"
-        fullpath="META-INF/NOTICE" />
-      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.license"
-        fullpath="META-INF/LICENSE" />
-    </jar>
+  	<jarIt jarfile="${jasper-jdt.jar}"
+  	  filesDir="${jasper-jdt.home}"
+  	  filesId="files.jasper-jdt"
+  	  manifest="${tomcat.manifests}/default.manifest"
+  	  notice="${tomcat.home}/res/META-INF/jasper-jdt.jar.notice"
+  	  license="${tomcat.home}/res/META-INF/jasper-jdt.jar.license"/>
   </target>
 
 
@@ -1225,11 +1220,11 @@
     <attribute name="manifest" description="the manifest file use"
                default="${tomcat.manifests}/default.manifest" />
     <attribute name="notice" description="the LICENSE file to use"
-               default="res/META-INF/default.notice" />
+               default="${tomcat.home}/res/META-INF/default.notice" />
     <attribute name="license" description="the NOTICE file to use"
-               default="res/META-INF/default.license" />
+               default="${tomcat.home}/res/META-INF/default.license" />
     <sequential>
-      <jar  jarfile="@{jarfile}" manifest="@{manifest}">
+      <jar jarfile="@{jarfile}" manifest="@{manifest}" index="yes">
         <fileset dir="@{filesDir}">
           <patternset refid="@{filesId}"/>
           <!-- Javadoc and i18n exclusions -->
