@@ -1007,6 +1007,20 @@ public class StandardContext
 
 
     /**
+     * Add a listener to the end of the list of initialized application event
+     * listeners.
+     */
+    public void addApplicationEventListener(Object listener) {
+        int len = applicationEventListenersObjects.length;
+        Object[] newListeners = new Object[len + 1];
+        System.arraycopy(applicationEventListenersObjects, 0,
+                newListeners, 0, len);
+        newListeners[len + 1] = listener;
+        applicationEventListenersObjects = newListeners;
+    }
+    
+    
+    /**
      * Return the set of initialized application lifecycle listener objects,
      * in the order they were specified in the web application deployment
      * descriptor, for this application.
@@ -1031,6 +1045,20 @@ public class StandardContext
     }
 
 
+    /**
+     * Add a listener to the end of the list of initialized application
+     * lifecycle listeners.
+     */
+    public void addApplicationLifecycleListener(Object listener) {
+        int len = applicationLifecycleListenersObjects.length;
+        Object[] newListeners = new Object[len + 1];
+        System.arraycopy(applicationLifecycleListenersObjects, 0,
+                newListeners, 0, len);
+        newListeners[len + 1] = listener;
+        applicationLifecycleListenersObjects = newListeners;
+    }
+
+    
     /**
      * Return the antiJARLocking flag for this Context.
      */
