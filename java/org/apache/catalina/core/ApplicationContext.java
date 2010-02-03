@@ -24,10 +24,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,11 +45,17 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.ServletRequestListener;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.annotation.WebListener;
 import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -125,17 +134,13 @@ public class ApplicationContext
 
     /**
      * Empty String collection to serve as the basis for empty enumerations.
-     * <strong>DO NOT ADD ANY ELEMENTS TO THIS COLLECTION!</strong>
      */
-    private static final ArrayList<String> emptyString =
-        new ArrayList<String>();
+    private static final List<String> emptyString = Collections.emptyList();
 
     /**
      * Empty Servlet collection to serve as the basis for empty enumerations.
-     * <strong>DO NOT ADD ANY ELEMENTS TO THIS COLLECTION!</strong>
      */
-    private static final ArrayList<Servlet> emptyServlet =
-        new ArrayList<Servlet>();
+    private static final List<Servlet> emptyServlet = Collections.emptyList();
 
 
     /**
@@ -395,17 +400,18 @@ public class ApplicationContext
 
         // Get query string
         String queryString = null;
-        int pos = path.indexOf('?');
+        String normalizedPath = path;
+        int pos = normalizedPath.indexOf('?');
         if (pos >= 0) {
-            queryString = path.substring(pos + 1);
-            path = path.substring(0, pos);
+            queryString = normalizedPath.substring(pos + 1);
+            normalizedPath = normalizedPath.substring(0, pos);
         }
 
-        path = RequestUtil.normalize(path);
-        if (path == null)
+        normalizedPath = RequestUtil.normalize(normalizedPath);
+        if (normalizedPath == null)
             return (null);
 
-        pos = path.length(); 
+        pos = normalizedPath.length(); 
 
         // Use the thread local URI and mapping data
         DispatchData dd = dispatchData.get();
@@ -428,11 +434,11 @@ public class ApplicationContext
              * Ignore any trailing path params (separated by ';') for mapping
              * purposes
              */
-            int semicolon = path.indexOf(';');
+            int semicolon = normalizedPath.indexOf(';');
             if (pos >= 0 && semicolon > pos) {
                 semicolon = -1;
             }
-            uriCC.append(path, 0, semicolon > 0 ? semicolon : pos);
+            uriCC.append(normalizedPath, 0, semicolon > 0 ? semicolon : pos);
             context.getMapper().map(uriMB, mappingData);
             if (mappingData.wrapper == null) {
                 return (null);
@@ -443,7 +449,7 @@ public class ApplicationContext
              * RequestDispatcher's requestURI
              */
             if (semicolon > 0) {
-                uriCC.append(path, semicolon, pos - semicolon);
+                uriCC.append(normalizedPath, semicolon, pos - semicolon);
             }
         } catch (Exception e) {
             // Should never happen
@@ -525,17 +531,18 @@ public class ApplicationContext
         if (!path.startsWith("/") && Globals.STRICT_SERVLET_COMPLIANCE)
             return null;
 
-        path = RequestUtil.normalize(path);
-        if (path == null)
+        String normalizedPath = RequestUtil.normalize(path);
+        if (normalizedPath == null)
             return (null);
 
         DirContext resources = context.getResources();
         if (resources != null) {
             try {
-                Object resource = resources.lookup(path);
+                Object resource = resources.lookup(normalizedPath);
                 if (resource instanceof Resource)
                     return (((Resource) resource).streamContent());
             } catch (Exception e) {
+                // Ignore
             }
         }
         return (null);
@@ -561,13 +568,13 @@ public class ApplicationContext
                 (sm.getString("applicationContext.resourcePaths.iae", path));
         }
 
-        path = RequestUtil.normalize(path);
-        if (path == null)
+        String normalizedPath = RequestUtil.normalize(path);
+        if (normalizedPath == null)
             return (null);
 
         DirContext resources = context.getResources();
         if (resources != null) {
-            return (getResourcePathsInternal(resources, path));
+            return (getResourcePathsInternal(resources, normalizedPath));
         }
         return (null);
 
@@ -825,7 +832,10 @@ public class ApplicationContext
      *          else a {@link FilterRegistration.Dynamic} object that can be
      *          used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - TODO SERVLET3
+     * @throws UnsupportedOperationException - if this context was passed to the
+     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *         method of a {@link ServletContextListener} that was not declared
+     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
      */
     public FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass) throws IllegalStateException {
@@ -842,7 +852,10 @@ public class ApplicationContext
      *          else a {@link FilterRegistration.Dynamic} object that can be
      *          used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - TODO SERVLET3
+     * @throws UnsupportedOperationException - if this context was passed to the
+     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *         method of a {@link ServletContextListener} that was not declared
+     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
      */
     public FilterRegistration.Dynamic addFilter(String filterName,
             Filter filter) throws IllegalStateException {
@@ -859,7 +872,10 @@ public class ApplicationContext
      *          else a {@link FilterRegistration.Dynamic} object that can be
      *          used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - TODO SERVLET3
+     * @throws UnsupportedOperationException - if this context was passed to the
+     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *         method of a {@link ServletContextListener} that was not declared
+     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
      */
     public FilterRegistration.Dynamic addFilter(String filterName,
             Class<? extends Filter> filterClass) throws IllegalStateException {
@@ -876,7 +892,13 @@ public class ApplicationContext
                     sm.getString("applicationContext.addFilter.ise",
                             getContextPath()));
         }
-        
+
+        // TODO SERVLET3
+        // throw UnsupportedOperationException - if this context was passed to the
+        // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+        // method of a {@link ServletContextListener} that was not declared
+        // in web.xml, a web-fragment or annotated with {@link WebListener}.
+
         FilterDef filterDef = context.findFilterDef(filterName);
         
         // Assume a 'complete' FilterRegistration is one that has a class and
@@ -926,19 +948,22 @@ public class ApplicationContext
         if (filterDef == null) {
             return null;
         }
-        
         return new ApplicationFilterRegistration(filterDef, context);
     }
+
     
     /**
      * Add servlet to context.
-     * @param   servletName  Name of filter to add
-     * @param   servletClass Name of filter class
+     * @param   servletName  Name of servlet to add
+     * @param   servletClass Name of servlet class
      * @returns <code>null</code> if the servlet has already been fully defined,
      *          else a {@link ServletRegistration.Dynamic} object that can be
      *          used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - TODO SERVLET3
+     * @throws UnsupportedOperationException - if this context was passed to the
+     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *         method of a {@link ServletContextListener} that was not declared
+     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass) throws IllegalStateException {
@@ -947,6 +972,19 @@ public class ApplicationContext
     }
 
 
+    /**
+     * Add servlet to context.
+     * @param   servletName Name of servlet to add
+     * @param   servlet     Servlet instance to add
+     * @returns <code>null</code> if the servlet has already been fully defined,
+     *          else a {@link ServletRegistration.Dynamic} object that can be
+     *          used to further configure the servlet
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws UnsupportedOperationException - if this context was passed to the
+     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *         method of a {@link ServletContextListener} that was not declared
+     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     */
     public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) throws IllegalStateException {
 
@@ -954,6 +992,19 @@ public class ApplicationContext
     }
 
     
+    /**
+     * Add servlet to context.
+     * @param   servletName  Name of servlet to add
+     * @param   servletClass Class of servlet to add
+     * @returns <code>null</code> if the servlet has already been fully defined,
+     *          else a {@link ServletRegistration.Dynamic} object that can be
+     *          used to further configure the servlet
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws UnsupportedOperationException - if this context was passed to the
+     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *         method of a {@link ServletContextListener} that was not declared
+     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     */
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass)
     throws IllegalStateException {
@@ -971,6 +1022,12 @@ public class ApplicationContext
                             getContextPath()));
         }
         
+        // TODO SERVLET3
+        // throw UnsupportedOperationException - if this context was passed to the
+        // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+        // method of a {@link ServletContextListener} that was not declared
+        // in web.xml, a web-fragment or annotated with {@link WebListener}.
+
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
         
         // Assume a 'complete' FilterRegistration is one that has a class and
@@ -1128,28 +1185,115 @@ public class ApplicationContext
     
     @Override
     public void addListener(Class<? extends EventListener> listenerClass) {
-        // TODO SERVLET3
+        EventListener listener;
+        try {
+            listener = createListener(listenerClass);
+        } catch (ServletException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.init",
+                    listenerClass.getName()), e);
+        }
+        addListener(listener);
     }
 
 
     @Override
     public void addListener(String className) {
-        // TODO SERVLET3
+        
+        Class<?> clazz;
+        
+        try {
+             clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.cnfe", className), e);
+        }
+        
+        if (!EventListener.class.isAssignableFrom(clazz)) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.wrongType", className));
+        }
+
+        try {
+            @SuppressWarnings("unchecked") // tested above
+            EventListener listener = createListener((Class<EventListener>)clazz);
+            addListener(listener);
+        } catch (ServletException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.wrongType", className),
+                    e);
+        }
+        
     }
 
 
     @Override
     public <T extends EventListener> void addListener(T t) {
+        if (context.getAvailable()) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addListener.ise",
+                            getContextPath()));
+        }
+
         // TODO SERVLET3
+        // throw UnsupportedOperationException - if this context was passed to the
+        // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+        // method of a {@link ServletContextListener} that was not declared
+        // in web.xml, a web-fragment or annotated with {@link WebListener}.
+
+        if (t instanceof ServletContextAttributeListener ||
+                t instanceof ServletRequestListener ||
+                t instanceof ServletRequestAttributeListener ||
+                t instanceof HttpSessionAttributeListener) {
+            context.addApplicationEventListener(t);
+            return;
+        }
+        
+        if (t instanceof HttpSessionListener) {
+            context.addApplicationLifecycleListener(t);
+        }
+        
+        if (t instanceof ServletContextListener) {
+            // TODO SERVLET3 - also need to check caller? spec isn't clear
+            context.addApplicationLifecycleListener(t);
+        }
+        
+        throw new IllegalArgumentException(sm.getString(
+                "applicationContext.addListener.iae.wrongType",
+                t.getClass().getName()));
+
     }
 
 
     @Override
     public <T extends EventListener> T createListener(Class<T> c)
             throws ServletException {
-        // TODO SERVLET3
-        return null;
-    }
+        try {
+            @SuppressWarnings("unchecked")
+            T listener =
+                (T) context.getInstanceManager().newInstance(c.getName());
+            if (listener instanceof ServletContextListener ||
+                    listener instanceof ServletContextAttributeListener ||
+                    listener instanceof ServletRequestListener ||
+                    listener instanceof ServletRequestAttributeListener ||
+                    listener instanceof HttpSessionListener ||
+                    listener instanceof HttpSessionAttributeListener) {
+                return listener;
+            }
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.wrongType",
+                    listener.getClass().getName()));
+        } catch (IllegalAccessException e) {
+            throw new ServletException(e);
+        } catch (InvocationTargetException e) {
+            throw new ServletException(e);
+        } catch (NamingException e) {
+            throw new ServletException(e);
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (ClassNotFoundException e) {
+            throw new ServletException(e);
+        }    }
 
 
     @Override
@@ -1217,8 +1361,16 @@ public class ApplicationContext
 
     @Override
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-        // TODO SERVLET3
-        return null;
+        Map<String, ApplicationFilterRegistration> result =
+            new HashMap<String, ApplicationFilterRegistration>();
+        
+        FilterDef[] filterDefs = context.findFilterDefs();
+        for (FilterDef filterDef : filterDefs) {
+            result.put(filterDef.getFilterName(),
+                    new ApplicationFilterRegistration(filterDef, context));
+        }
+
+        return result;
     }
 
 
@@ -1231,6 +1383,10 @@ public class ApplicationContext
 
     @Override
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        Map<String, ApplicationServletRegistration > result =
+            new HashMap<String, ApplicationServletRegistration>();
+        
+        context.findChildren();
         // TODO SERVLET3
         return null;
     }
