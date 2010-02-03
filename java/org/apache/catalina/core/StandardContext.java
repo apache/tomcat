@@ -763,8 +763,28 @@ public class StandardContext
      */
     private boolean logEffectiveWebXml = false;
 
+    private int effectiveMajorVersion = 3;
+    
+    private int effectiveMinorVersion = 0;
+
     // ----------------------------------------------------- Context Properties
 
+    public int getEffectiveMajorVersion() {
+        return effectiveMajorVersion;
+    }
+
+    public void setEffectiveMajorVersion(int effectiveMajorVersion) {
+        this.effectiveMajorVersion = effectiveMajorVersion;
+    }
+
+    public int getEffectiveMinorVersion() {
+        return effectiveMinorVersion;
+    }
+
+    public void setEffectiveMinorVersion(int effectiveMinorVersion) {
+        this.effectiveMinorVersion = effectiveMinorVersion;
+    }
+    
     public void setLogEffectiveWebXml(boolean logEffectiveWebXml) {
         this.logEffectiveWebXml = logEffectiveWebXml;
     }
