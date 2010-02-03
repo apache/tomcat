@@ -57,6 +57,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -1386,9 +1387,12 @@ public class ApplicationContext
         Map<String, ApplicationServletRegistration > result =
             new HashMap<String, ApplicationServletRegistration>();
         
-        context.findChildren();
-        // TODO SERVLET3
-        return null;
+        Container[] wrappers = context.findChildren();
+        for (Container wrapper : wrappers) {
+            new ApplicationServletRegistration((Wrapper) wrapper, context);
+        }
+
+        return result;
     }
 
     
