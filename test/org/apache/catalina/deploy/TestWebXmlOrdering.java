@@ -24,14 +24,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.catalina.deploy.WebXml;
-import org.apache.catalina.startup.ContextConfig;
 
 import junit.framework.TestCase;
 
 /**
- * Test case for {@link ContextConfig}.
+ * Test case for {@link WebXml} fragment ordering.
  */
-public class TestWebXml extends TestCase {
+public class TestWebXmlOrdering extends TestCase {
     private WebXml app;
     private WebXml a;
     private WebXml b;
