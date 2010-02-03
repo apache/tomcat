@@ -23,7 +23,7 @@ import junit.framework.TestSuite;
 import org.apache.catalina.connector.TestKeepAliveCount;
 import org.apache.catalina.connector.TestRequest;
 import org.apache.catalina.core.TestStandardContext;
-import org.apache.catalina.deploy.TestWebXml;
+import org.apache.catalina.deploy.TestWebXmlOrdering;
 import org.apache.catalina.ha.session.TestSerializablePrincipal;
 import org.apache.catalina.startup.TestTomcat;
 import org.apache.catalina.startup.TestTomcatSSL;
@@ -51,7 +51,7 @@ public class TestAll {
         // startup
         suite.addTestSuite(TestTomcat.class);
         suite.addTestSuite(TestTomcatSSL.class);
-        suite.addTestSuite(TestWebXml.class);
+        suite.addTestSuite(TestWebXmlOrdering.class);
         // tribes
         // suite.addTest(TribesTestSuite.suite());
         

@@ -1348,15 +1348,13 @@ public class ApplicationContext
 
     @Override
     public int getEffectiveMajorVersion() {
-        // TODO SERVLET3
-        return 0;
+        return context.getEffectiveMajorVersion();
     }
 
 
     @Override
     public int getEffectiveMinorVersion() {
-        // TODO SERVLET3
-        return 0;
+        return context.getEffectiveMinorVersion();
     }
 
 

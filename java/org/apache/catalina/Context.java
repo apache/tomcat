@@ -1128,5 +1128,33 @@ public interface Context extends Container {
      * @param path The path to the desired resource
      */
     public String getRealPath(String path);
+    
+    
+    /**
+     * Return the effective major version of the Servlet spec used by this
+     * context.
+     */
+    public int getEffectiveMajorVersion();
+    
+    
+    /**
+     * Set the effective major version of the Servlet spec used by this
+     * context.
+     */
+    public void setEffectiveMajorVersion(int major);
+    
+    
+    /**
+     * Return the effective minor version of the Servlet spec used by this
+     * context.
+     */
+    public int getEffectiveMinorVersion();
+    
+    
+    /**
+     * Set the effective minor version of the Servlet spec used by this
+     * context.
+     */
+    public void setEffectiveMinorVersion(int minor);
 }
 
