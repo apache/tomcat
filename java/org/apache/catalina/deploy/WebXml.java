@@ -110,12 +110,85 @@ public class WebXml {
     // Required attribute of web-app element
     private String version = null;
     public String getVersion() { return version; }
-    public void setVersion(String version) { this.version = version; }
+    /**
+     * Set the version for this web.xml file
+     * @param version   Values of <code>null</code> will be ignored
+     */
+    public void setVersion(String version) {
+        if (version == null) return;
+        
+        this.version = version;
+        // Update major and minor version
+        // Expected format is n.n - allow for any number of digits just in case
+        String major = null;
+        String minor = null;
+        int split = version.indexOf('.');
+        if (split < 0) {
+            // Major only
+            major = version;
+        } else {
+            major = version.substring(0, split);
+            minor = version.substring(split + 1);
+        }
+        if (major == null || major.length() == 0) {
+            majorVersion = 0;
+        } else {
+            try {
+                majorVersion = Integer.parseInt(major);
+            } catch (NumberFormatException nfe) {
+                log.warn(sm.getString("webXml.version.nfe", major, version),
+                        nfe);
+                majorVersion = 0;
+            }
+        }
+        
+        if (minor == null || minor.length() == 0) {
+            minorVersion = 0;
+        } else {
+            try {
+                minorVersion = Integer.parseInt(minor);
+            } catch (NumberFormatException nfe) {
+                log.warn(sm.getString("webXml.version.nfe", minor, version),
+                        nfe);
+                minorVersion = 0;
+            }
+        }
+    }
+
 
     // Optional publicId attribute
     private String publicId = null;
     public String getPublicId() { return publicId; }
-    public void setPublicId(String publicId) { this.publicId = publicId; }
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+        // Update major and minor version
+        if (org.apache.catalina.startup.Constants.WebSchemaPublicId_30.
+                equalsIgnoreCase(publicId) ||
+                org.apache.catalina.startup.Constants.WebFragmentSchemaPublicId_30.
+                equalsIgnoreCase(publicId)) {
+            majorVersion = 3;
+            minorVersion = 0;
+        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_25.
+                equalsIgnoreCase(publicId)) {
+            majorVersion = 2;
+            minorVersion = 5;
+        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_24.
+                equalsIgnoreCase(publicId)) {
+            majorVersion = 2;
+            minorVersion = 4;
+        } else if (org.apache.catalina.startup.Constants.WebDtdPublicId_23.
+                equalsIgnoreCase(publicId)) {
+            majorVersion = 2;
+            minorVersion = 3;
+        } else if (org.apache.catalina.startup.Constants.WebDtdPublicId_22.
+                equalsIgnoreCase(publicId)) {
+            majorVersion = 2;
+            minorVersion = 2;
+        } else {
+            // Unrecognised publicId
+            log.warn(sm.getString("webxml.unrecognisedPublicId", publicId));
+        }
+    }
     
     // Optional metadata-complete attribute
     private boolean metadataComplete = false;
@@ -135,6 +208,13 @@ public class WebXml {
         }
     }
 
+    // Derived major and minor version attributes
+    // Default to 3.0 until we know otherwise
+    private int majorVersion = 3;
+    private int minorVersion = 0;
+    public int getMajorVersion() { return majorVersion; }
+    public int getMinorVersion() { return minorVersion; }
+    
     // web-app elements
     // TODO: Ignored elements:
     // - description
@@ -1055,6 +1135,9 @@ public class WebXml {
         context.setPublicId(publicId);
 
         // Everything else in order
+        context.setEffectiveMajorVersion(getMajorVersion());
+        context.setEffectiveMinorVersion(getMinorVersion());
+        
         for (Entry<String, String> entry : contextParams.entrySet()) {
             context.addParameter(entry.getKey(), entry.getValue());
         }
