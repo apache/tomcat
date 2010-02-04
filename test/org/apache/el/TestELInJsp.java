@@ -322,6 +322,7 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/el-misc.jsp");
         String result = res.toString();
+        System.out.println(result);
         assertEcho(result, "00-\\\\\\\"${'hello world'}");
         assertEcho(result, "01-\\\\\\\"\\${'hello world'}");
         assertEcho(result, "02-\\\"${'hello world'}");
@@ -334,6 +335,12 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "09-az2");
         assertEcho(result, "10-${'foo'}bar");
         assertEcho(result, "11-\"}");
+        assertEcho(result, "12-foo\\bar\\baz");
+        assertEcho(result, "13-foo\\bar\\baz");
+        assertEcho(result, "14-foo\\bar\\baz");
+        assertEcho(result, "15-foo\\bar\\baz");
+        assertEcho(result, "16-foo\\bar\\baz");
+        assertEcho(result, "17-foo\\bar\\baz");
     }
 
     public void testScriptingExpression() throws Exception {
