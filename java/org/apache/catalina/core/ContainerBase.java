@@ -122,7 +122,7 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 
 public abstract class ContainerBase
-    implements Container, Lifecycle, Pipeline, MBeanRegistration {
+    implements Container, Lifecycle, MBeanRegistration {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
@@ -1195,13 +1195,12 @@ public abstract class ContainerBase
 
 
     /**
-     * Add a new Valve to the end of the pipeline associated with this
-     * Container.  Prior to adding the Valve, the Valve's
-     * <code>setContainer</code> method must be called, with this Container
-     * as an argument.  The method may throw an
-     * <code>IllegalArgumentException</code> if this Valve chooses not to
-     * be associated with this Container, or <code>IllegalStateException</code>
-     * if it is already associated with a different Container.
+     * Convenience method, intended for use by the digester to simplify the
+     * process of adding Valves to containers. See
+     * {@link Pipeline#addValve(Valve)} for full details. Components other than
+     * the digester should use {@link #getPipeline()#addValve(Valve)} in case a
+     * future implementation provides an alternative method for the digester to
+     * use.
      *
      * @param valve Valve to be added
      *
@@ -1219,69 +1218,6 @@ public abstract class ContainerBase
 
     public ObjectName[] getValveObjectNames() {
         return ((StandardPipeline)pipeline).getValveObjectNames();
-    }
-    
-    /**
-     * <p>Return the Valve instance that has been distinguished as the basic
-     * Valve for this Pipeline (if any).
-     */
-    public Valve getBasic() {
-
-        return (pipeline.getBasic());
-
-    }
-
-
-    /**
-     * Return the first valve in the pipeline.
-     */
-    public Valve getFirst() {
-
-        return (pipeline.getFirst());
-
-    }
-
-
-    /**
-     * Return the set of Valves in the pipeline associated with this
-     * Container, including the basic Valve (if any).  If there are no
-     * such Valves, a zero-length array is returned.
-     */
-    public Valve[] getValves() {
-
-        return (pipeline.getValves());
-
-    }
-
-
-    /**
-     * Remove the specified Valve from the pipeline associated with this
-     * Container, if it is found; otherwise, do nothing.
-     *
-     * @param valve Valve to be removed
-     */
-    public synchronized void removeValve(Valve valve) {
-
-        pipeline.removeValve(valve);
-    }
-
-
-    /**
-     * <p>Set the Valve instance that has been distinguished as the basic
-     * Valve for this Pipeline (if any).  Prior to setting the basic Valve,
-     * the Valve's <code>setContainer()</code> will be called, if it
-     * implements <code>Contained</code>, with the owning Container as an
-     * argument.  The method may throw an <code>IllegalArgumentException</code>
-     * if this Valve chooses not to be associated with this Container, or
-     * <code>IllegalStateException</code> if it is already associated with
-     * a different Container.</p>
-     *
-     * @param valve Valve to be distinguished as the basic Valve
-     */
-    public void setBasic(Valve valve) {
-
-        pipeline.setBasic(valve);
-
     }
 
 
@@ -1611,14 +1547,5 @@ public abstract class ContainerBase
         }
 
     }
-
-
-    @Override
-    public boolean isAsyncSupported() {
-        return pipeline.isAsyncSupported();
-    }
-    
-    
-
 
 }

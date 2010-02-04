@@ -752,7 +752,7 @@ public class StandardHost
                     if(!found) {          	
                         Valve valve = (Valve) Class.forName(errorReportValveClass)
                         .newInstance();
-                        addValve(valve);
+                        getPipeline().addValve(valve);
                         errorReportValveObjectName = ((ValveBase)valve).getObjectName() ;
                     }
             } catch (Throwable t) {
