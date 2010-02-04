@@ -39,12 +39,14 @@ public class TestParser extends TomcatBaseTest {
                 "/test/bug48627.jsp");
         
         String result = res.toString();
-        
-        System.out.println(result);
-        
         // Beware of the differences between escaping in JSP attributes and
         // in Java Strings
-        assertTrue(result.indexOf("00-\\") > 0);
-        assertTrue(result.indexOf("01-\\") > 0);
+        assertEcho(result, "00-\\");
+        assertEcho(result, "01-\\");
+    }
+
+    /** Assertion for text printed by tags:echo */
+    private static void assertEcho(String result, String expected) {
+        assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }
