@@ -957,7 +957,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Acquire a reference to the component to be removed
         ObjectName oname = new ObjectName(name);
         ContainerBase container = getParentContainerFromChild(oname);
-        Valve[] valves = container.getValves();
+        Valve[] valves = container.getPipeline().getValves();
         for (int i = 0; i < valves.length; i++) {
             ObjectName voname = ((ValveBase) valves[i]).getObjectName();
             if (voname.equals(oname)) {
