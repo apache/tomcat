@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextEnvironment;
+import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -242,6 +243,41 @@ public class TestTomcat extends TomcatBaseTest {
         environment.setName(HelloWorldJndi.JNDI_ENV_NAME);
         environment.setValue("Tomcat User");
         ctx.getNamingResources().addEnvironment(environment);
+        
+        Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
+        ctx.addServletMapping("/", "jndiServlet");
+        
+        tomcat.start();
+        
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("Hello, Tomcat User", res.toString());
+    }
+
+    /** 
+     * Test for enabling JNDI and using global resources.
+     */
+    public void testEnableNamingGlobal() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        StandardContext ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+        
+        // You can customise the context by calling its API
+        
+        // Enable JNDI - it is disabled by default
+        tomcat.enableNaming();
+
+        ContextEnvironment environment = new ContextEnvironment();
+        environment.setType("java.lang.String");
+        environment.setName("globalTest");
+        environment.setValue("Tomcat User");
+        tomcat.getServer().getGlobalNamingResources().addEnvironment(environment);
+        
+        ContextResourceLink link = new ContextResourceLink();
+        link.setGlobal("globalTest");
+        link.setName(HelloWorldJndi.JNDI_ENV_NAME);
+        ctx.getNamingResources().addResourceLink(link);
         
         Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
         ctx.addServletMapping("/", "jndiServlet");
