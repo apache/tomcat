@@ -1658,10 +1658,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destfile" value="${commons-dbcp.home}/build.xml" />
     </antcall>
     <mkdir dir="${tomcat-dbcp.home}"/>
-  	<condition property="build.dbcp">
-  	  <not>
-  	    <available file="${tomcat-dbcp.jar}"/>
-      </not>
+  	<condition property="no.build.dbcp">
+      <available file="${tomcat-dbcp.jar}"/>
     </condition>
     <antcall target="build-tomcat-dbcp">
       <param name="basedir" value="${tomcat-dbcp.home}" />
@@ -1674,10 +1672,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destdir" value="${base.path}"/>
     </antcall>
     <mkdir dir="${jasper-jdt.home}"/>
-    <condition property="build.jasper-jdt">
-      <not>
-        <available file="${jasper-jdt.jar}"/>
-      </not>
+    <condition property="no.build.jasper-jdt">
+      <available file="${jasper-jdt.jar}"/>
     </condition>
     <antcall target="build-jasper-jdt">
       <param name="basedir" value="${jasper-jdt.home}" />
@@ -1706,7 +1702,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- =============== Targets for dependencies that need to =============== -->
   <!-- ================  be built rather than used directly ================ -->
 
-  <target name="build-tomcat-dbcp" depends="build-manifests" if="build.dbcp">
+  <target name="build-tomcat-dbcp" depends="build-manifests" unless="no.build.dbcp">
     <copy todir="${tomcat-dbcp.home}">
       <fileset dir="${commons-pool.home}">
         <include name="**/*.java" />
@@ -1751,7 +1747,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="build-jasper-jdt" depends="build-manifests"
-  	      if="build.jasper-jdt">
+  	      unless="no.build.jasper-jdt">
     <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
   	<jarIt jarfile="${jasper-jdt.jar}"
   	  filesDir="${jasper-jdt.home}"
