@@ -1215,7 +1215,6 @@ public abstract class ContainerBase
     public synchronized void addValve(Valve valve) {
 
         pipeline.addValve(valve);
-        fireContainerEvent(ADD_VALVE_EVENT, valve);
     }
 
     public ObjectName[] getValveObjectNames() {
@@ -1264,7 +1263,6 @@ public abstract class ContainerBase
     public synchronized void removeValve(Valve valve) {
 
         pipeline.removeValve(valve);
-        fireContainerEvent(REMOVE_VALVE_EVENT, valve);
     }
 
 
