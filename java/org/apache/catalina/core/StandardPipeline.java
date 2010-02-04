@@ -472,7 +472,8 @@ public class StandardPipeline
 				current = current.getNext();
 			}
         }
-
+        
+        container.fireContainerEvent(Container.ADD_VALVE_EVENT, valve);
     }
 
 
@@ -558,14 +559,15 @@ public class StandardPipeline
             unregisterValve(valve);
         }
     
+        container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);
     }
 
 
     public Valve getFirst() {
         if (first != null) {
             return first;
-        } else {
-            return basic;
         }
+        
+        return basic;
     }
 }
