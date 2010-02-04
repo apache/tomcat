@@ -781,7 +781,7 @@ public class StandardHost
      public String [] getValveNames()
          throws Exception
     {
-         Valve [] valves = this.getValves();
+         Valve [] valves = this.getPipeline().getValves();
          String [] mbeanNames = new String[valves.length];
          for (int i = 0; i < valves.length; i++) {
              if( valves[i] == null ) continue;
