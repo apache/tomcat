@@ -43,7 +43,7 @@ public class TestELInJsp extends TomcatBaseTest {
                 "/test/bug36923.jsp");
         
         String result = res.toString();
-        assertTrue(result.indexOf("00-${hello world}") > 0);
+        assertEcho(result, "00-${hello world}");
     }
 
     public void testBug42565() throws Exception {
@@ -59,22 +59,22 @@ public class TestELInJsp extends TomcatBaseTest {
                 "/test/bug42565.jsp");
         
         String result = res.toString();
-        assertTrue(result.indexOf("00-false") > 0);
-        assertTrue(result.indexOf("01-false") > 0);
-        assertTrue(result.indexOf("02-false") > 0);
-        assertTrue(result.indexOf("03-false") > 0);
-        assertTrue(result.indexOf("04-false") > 0);
-        assertTrue(result.indexOf("05-false") > 0);
-        assertTrue(result.indexOf("06-false") > 0);
-        assertTrue(result.indexOf("07-false") > 0);
-        assertTrue(result.indexOf("08-false") > 0);
-        assertTrue(result.indexOf("09-false") > 0);
-        assertTrue(result.indexOf("10-false") > 0);
-        assertTrue(result.indexOf("11-false") > 0);
-        assertTrue(result.indexOf("12-false") > 0);
-        assertTrue(result.indexOf("13-false") > 0);
-        assertTrue(result.indexOf("14-false") > 0);
-        assertTrue(result.indexOf("15-false") > 0);
+        assertEcho(result, "00-false");
+        assertEcho(result, "01-false");
+        assertEcho(result, "02-false");
+        assertEcho(result, "03-false");
+        assertEcho(result, "04-false");
+        assertEcho(result, "05-false");
+        assertEcho(result, "06-false");
+        assertEcho(result, "07-false");
+        assertEcho(result, "08-false");
+        assertEcho(result, "09-false");
+        assertEcho(result, "10-false");
+        assertEcho(result, "11-false");
+        assertEcho(result, "12-false");
+        assertEcho(result, "13-false");
+        assertEcho(result, "14-false");
+        assertEcho(result, "15-false");
     }
 
     public void testBug44994() throws Exception {
@@ -91,9 +91,9 @@ public class TestELInJsp extends TomcatBaseTest {
                 "/test/bug44994.jsp");
         
         String result = res.toString();
-        assertTrue(result.indexOf("00-none") > 0);
-        assertTrue(result.indexOf("01-one") > 0);
-        assertTrue(result.indexOf("02-many") > 0);
+        assertEcho(result, "00-none");
+        assertEcho(result, "01-one");
+        assertEcho(result, "02-many");
     }
 
     public void testBug45427() throws Exception {
@@ -111,24 +111,24 @@ public class TestELInJsp extends TomcatBaseTest {
         
         String result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
-        assertTrue(result.indexOf("00-hello world") > 0);
-        assertTrue(result.indexOf("01-hello 'world") > 0);
-        assertTrue(result.indexOf("02-hello \"world") > 0);
-        assertTrue(result.indexOf("03-hello world") > 0);
-        assertTrue(result.indexOf("04-hello 'world") > 0);
-        assertTrue(result.indexOf("05-hello \"world") > 0);
-        assertTrue(result.indexOf("06-hello world") > 0);
-        assertTrue(result.indexOf("07-hello 'world") > 0);
-        assertTrue(result.indexOf("08-hello \"world") > 0);
-        assertTrue(result.indexOf("09-hello world") > 0);
-        assertTrue(result.indexOf("10-hello 'world") > 0);
-        assertTrue(result.indexOf("11-hello \"world") > 0);
-        assertTrue(result.indexOf("12-hello world") > 0);
-        assertTrue(result.indexOf("13-hello 'world") > 0);
-        assertTrue(result.indexOf("14-hello \"world") > 0);
-        assertTrue(result.indexOf("15-hello world") > 0);
-        assertTrue(result.indexOf("16-hello 'world") > 0);
-        assertTrue(result.indexOf("17-hello \"world") > 0);
+        assertEcho(result, "00-hello world");
+        assertEcho(result, "01-hello 'world");
+        assertEcho(result, "02-hello \"world");
+        assertEcho(result, "03-hello world");
+        assertEcho(result, "04-hello 'world");
+        assertEcho(result, "05-hello \"world");
+        assertEcho(result, "06-hello world");
+        assertEcho(result, "07-hello 'world");
+        assertEcho(result, "08-hello \"world");
+        assertEcho(result, "09-hello world");
+        assertEcho(result, "10-hello 'world");
+        assertEcho(result, "11-hello \"world");
+        assertEcho(result, "12-hello world");
+        assertEcho(result, "13-hello 'world");
+        assertEcho(result, "14-hello \"world");
+        assertEcho(result, "15-hello world");
+        assertEcho(result, "16-hello 'world");
+        assertEcho(result, "17-hello \"world");
     }
 
     public void testBug45451() throws Exception {
@@ -146,90 +146,89 @@ public class TestELInJsp extends TomcatBaseTest {
         
         String result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
-        assertTrue(result.indexOf("00-\\'hello world\\'") > 0);
-        assertTrue(result.indexOf("01-\\'hello world\\'") > 0);
-        assertTrue(result.indexOf("02-\\'hello world\\'") > 0);
-        assertTrue(result.indexOf("03-\\'hello world\\'") > 0);
+        assertEcho(result, "00-\\'hello world\\'");
+        assertEcho(result, "01-\\'hello world\\'");
+        assertEcho(result, "02-\\'hello world\\'");
+        assertEcho(result, "03-\\'hello world\\'");
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451b.jsp");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
         //          processor
-        assertTrue(result.indexOf("00-2") > 0);
-        assertTrue(result.indexOf("01-${1+1}") > 0);
-        assertTrue(result.indexOf("02-\\${1+1}") > 0);
-        assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("04-2") > 0);
-        assertTrue(result.indexOf("05-${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\2") > 0);      
-        assertTrue(result.indexOf("07-\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\2") > 0); 
-        assertTrue(result.indexOf("09-2") > 0);
-        assertTrue(result.indexOf("10-#{1+1}") > 0);
-        assertTrue(result.indexOf("11-\\2") > 0);      
-        assertTrue(result.indexOf("12-\\#{1+1}") > 0);
-        assertTrue(result.indexOf("13-\\\\2") > 0); 
+        assertEcho(result, "00-2");
+        assertEcho(result, "01-${1+1}");
+        assertEcho(result, "02-\\${1+1}");
+        assertEcho(result, "03-\\\\${1+1}");
+        assertEcho(result, "04-2");
+        assertEcho(result, "05-${1+1}");
+        assertEcho(result, "06-\\2");
+        assertEcho(result, "07-\\${1+1}");
+        assertEcho(result, "08-\\\\2"); 
+        assertEcho(result, "09-2");
+        assertEcho(result, "10-#{1+1}");
+        assertEcho(result, "11-\\2");
+        assertEcho(result, "12-\\#{1+1}");
+        assertEcho(result, "13-\\\\2"); 
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451c.jsp");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // TODO - Currently we allow a single unescaped \ in attribute values
         //        Review if this should cause a warning/error
-        assertTrue(result.indexOf("00-${1+1}") > 0);
-        assertTrue(result.indexOf("01-\\${1+1}") > 0);
-        assertTrue(result.indexOf("02-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("03-\\\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("04-${1+1}") > 0);
-        assertTrue(result.indexOf("05-\\${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\${1+1}") > 0);
-        assertTrue(result.indexOf("07-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("09-#{1+1}") > 0);
-        assertTrue(result.indexOf("10-\\#{1+1}") > 0);
-        assertTrue(result.indexOf("11-\\#{1+1}") > 0);
-        assertTrue(result.indexOf("12-\\\\#{1+1}") > 0);
-        assertTrue(result.indexOf("13-\\\\#{1+1}") > 0);
+        assertEcho(result, "00-${1+1}");
+        assertEcho(result, "01-\\${1+1}");
+        assertEcho(result, "02-\\\\${1+1}");
+        assertEcho(result, "03-\\\\\\${1+1}");
+        assertEcho(result, "04-${1+1}");
+        assertEcho(result, "05-\\${1+1}");
+        assertEcho(result, "06-\\${1+1}");
+        assertEcho(result, "07-\\\\${1+1}");
+        assertEcho(result, "08-\\\\${1+1}");
+        assertEcho(result, "09-#{1+1}");
+        assertEcho(result, "10-\\#{1+1}");
+        assertEcho(result, "11-\\#{1+1}");
+        assertEcho(result, "12-\\\\#{1+1}");
+        assertEcho(result, "13-\\\\#{1+1}");
 
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451d.jspx");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // \\ Is *not* an escape sequence in XML attributes
-        assertTrue(result.indexOf("00-2") > 0);
-        assertTrue(result.indexOf("01-${1+1}") > 0);
-        assertTrue(result.indexOf("02-\\${1+1}") > 0);
-        assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("04-2") > 0);
-        assertTrue(result.indexOf("05-${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\${1+1}") > 0);
-        assertTrue(result.indexOf("07-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("09-2") > 0);
-        assertTrue(result.indexOf("10-#{1+1}") > 0);
-        assertTrue(result.indexOf("11-\\#{1+1}") > 0);
-        assertTrue(result.indexOf("12-\\\\#{1+1}") > 0);
-        assertTrue(result.indexOf("13-\\\\\\#{1+1}") > 0);
+        assertEcho(result, "00-2");
+        assertEcho(result, "01-${1+1}");
+        assertEcho(result, "02-\\${1+1}");
+        assertEcho(result, "03-\\\\${1+1}");
+        assertEcho(result, "04-2");
+        assertEcho(result, "05-${1+1}");
+        assertEcho(result, "06-\\${1+1}");
+        assertEcho(result, "07-\\\\${1+1}");
+        assertEcho(result, "08-\\\\\\${1+1}");
+        assertEcho(result, "09-2");
+        assertEcho(result, "10-#{1+1}");
+        assertEcho(result, "11-\\#{1+1}");
+        assertEcho(result, "12-\\\\#{1+1}");
+        assertEcho(result, "13-\\\\\\#{1+1}");
         
         res = getUrl("http://localhost:" + getPort() + "/test/bug45451e.jsp");
         result = res.toString();
-        System.out.println(result);
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
         //          processor
-        assertTrue(result.indexOf("00-2") > 0);
-        assertTrue(result.indexOf("01-${1+1}") > 0);
-        assertTrue(result.indexOf("02-\\${1+1}") > 0);
-        assertTrue(result.indexOf("03-\\\\${1+1}") > 0);
-        assertTrue(result.indexOf("04-2") > 0);
-        assertTrue(result.indexOf("05-${1+1}") > 0);
-        assertTrue(result.indexOf("06-\\2") > 0);      
-        assertTrue(result.indexOf("07-\\${1+1}") > 0);
-        assertTrue(result.indexOf("08-\\\\2") > 0); 
-        assertTrue(result.indexOf("09-#{1+1}") > 0);
-        assertTrue(result.indexOf("10-\\#{1+1}") > 0);
-        assertTrue(result.indexOf("11-\\#{1+1}") > 0);
-        assertTrue(result.indexOf("12-\\\\#{1+1}") > 0);
-        assertTrue(result.indexOf("13-\\\\#{1+1}") > 0);
+        assertEcho(result, "00-2");
+        assertEcho(result, "01-${1+1}");
+        assertEcho(result, "02-\\${1+1}");
+        assertEcho(result, "03-\\\\${1+1}");
+        assertEcho(result, "04-2");
+        assertEcho(result, "05-${1+1}");
+        assertEcho(result, "06-\\2");      
+        assertEcho(result, "07-\\${1+1}");
+        assertEcho(result, "08-\\\\2"); 
+        assertEcho(result, "09-#{1+1}");
+        assertEcho(result, "10-\\#{1+1}");
+        assertEcho(result, "11-\\#{1+1}");
+        assertEcho(result, "12-\\\\#{1+1}");
+        assertEcho(result, "13-\\\\#{1+1}");
     }
 
     public void testBug45511() throws Exception {
@@ -246,8 +245,8 @@ public class TestELInJsp extends TomcatBaseTest {
                 "/test/bug45511.jsp");
         
         String result = res.toString();
-        assertTrue(result.indexOf("00-true") > 0);
-        assertTrue(result.indexOf("01-false") > 0);
+        assertEcho(result, "00-true");
+        assertEcho(result, "01-false");
     }
 
     public void testBug46596() throws Exception {
@@ -262,7 +261,8 @@ public class TestELInJsp extends TomcatBaseTest {
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug46596.jsp");
-        assertTrue(res.toString().indexOf("{OK}") > 0);
+        String result = res.toString();
+        assertEcho(result, "{OK}");
     }
     
     public void testBug47413() throws Exception {
@@ -279,18 +279,18 @@ public class TestELInJsp extends TomcatBaseTest {
                 "/test/bug47413.jsp");
         
         String result = res.toString();
-        assertTrue(result.indexOf("00-hello world") > 0);
-        assertTrue(result.indexOf("01-hello world") > 0);
-        assertTrue(result.indexOf("02-3.22") > 0);
-        assertTrue(result.indexOf("03-3.22") > 0);
-        assertTrue(result.indexOf("04-17") > 0);
-        assertTrue(result.indexOf("05-17") > 0);
-        assertTrue(result.indexOf("06-hello world") > 0);
-        assertTrue(result.indexOf("07-hello world") > 0);
-        assertTrue(result.indexOf("08-0.0") > 0);
-        assertTrue(result.indexOf("09-0.0") > 0);
-        assertTrue(result.indexOf("10-0") > 0);
-        assertTrue(result.indexOf("11-0") > 0);
+        assertEcho(result, "00-hello world");
+        assertEcho(result, "01-hello world");
+        assertEcho(result, "02-3.22");
+        assertEcho(result, "03-3.22");
+        assertEcho(result, "04-17");
+        assertEcho(result, "05-17");
+        assertEcho(result, "06-hello world");
+        assertEcho(result, "07-hello world");
+        assertEcho(result, "08-0.0");
+        assertEcho(result, "09-0.0");
+        assertEcho(result, "10-0");
+        assertEcho(result, "11-0");
     }
 
     public void testBug48112() throws Exception {
@@ -305,7 +305,8 @@ public class TestELInJsp extends TomcatBaseTest {
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48112.jsp");
-        assertTrue(res.toString().indexOf("{OK}") > 0);
+        String result = res.toString();
+        assertEcho(result, "{OK}");
     }
     
     public void testELMisc() throws Exception {
@@ -321,18 +322,18 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/el-misc.jsp");
         String result = res.toString();
-        assertTrue(result.indexOf("00-\\\\\\\"${'hello world'}") > 0);
-        assertTrue(result.indexOf("01-\\\\\\\"\\${'hello world'}") > 0);
-        assertTrue(result.indexOf("02-\\\"${'hello world'}") > 0);
-        assertTrue(result.indexOf("03-\\\"\\hello world") > 0);
-        assertTrue(result.indexOf("2az-04") > 0);
-        assertTrue(result.indexOf("05-a2z") > 0);
-        assertTrue(result.indexOf("06-az2") > 0);
-        assertTrue(result.indexOf("2az-07") > 0);
-        assertTrue(result.indexOf("08-a2z") > 0);
-        assertTrue(result.indexOf("09-az2") > 0);
-        assertTrue(result.indexOf("10-${'foo'}bar") > 0);
-        assertTrue(result.indexOf("11-\"}") > 0);
+        assertEcho(result, "00-\\\\\\\"${'hello world'}");
+        assertEcho(result, "01-\\\\\\\"\\${'hello world'}");
+        assertEcho(result, "02-\\\"${'hello world'}");
+        assertEcho(result, "03-\\\"\\hello world");
+        assertEcho(result, "2az-04");
+        assertEcho(result, "05-a2z");
+        assertEcho(result, "06-az2");
+        assertEcho(result, "2az-07");
+        assertEcho(result, "08-a2z");
+        assertEcho(result, "09-az2");
+        assertEcho(result, "10-${'foo'}bar");
+        assertEcho(result, "11-\"}");
     }
 
     public void testScriptingExpression() throws Exception {
@@ -348,18 +349,18 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/script-expr.jsp");
         String result = res.toString();
-        assertTrue(result.indexOf("00-hello world") > 0);
-        assertTrue(result.indexOf("01-hello \"world") > 0);
-        assertTrue(result.indexOf("02-hello \\\"world") > 0);
-        assertTrue(result.indexOf("03-hello ${world") > 0);
-        assertTrue(result.indexOf("04-hello \\${world") > 0);
-        assertTrue(result.indexOf("05-hello world") > 0);
-        assertTrue(result.indexOf("06-hello \"world") > 0);
-        assertTrue(result.indexOf("07-hello \\\"world") > 0);
-        assertTrue(result.indexOf("08-hello ${world") > 0);
-        assertTrue(result.indexOf("09-hello \\${world") > 0);
-        assertTrue(result.indexOf("10-hello <% world") > 0);
-        assertTrue(result.indexOf("11-hello %> world") > 0);
+        assertEcho(result, "00-hello world");
+        assertEcho(result, "01-hello \"world");
+        assertEcho(result, "02-hello \\\"world");
+        assertEcho(result, "03-hello ${world");
+        assertEcho(result, "04-hello \\${world");
+        assertEcho(result, "05-hello world");
+        assertEcho(result, "06-hello \"world");
+        assertEcho(result, "07-hello \\\"world");
+        assertEcho(result, "08-hello ${world");
+        assertEcho(result, "09-hello \\${world");
+        assertEcho(result, "10-hello <% world");
+        assertEcho(result, "11-hello %> world");
     }
 
     public void testELMethod() throws Exception {
@@ -375,8 +376,13 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/el-method.jsp");
         String result = res.toString();
-        assertTrue(result.indexOf("00-Hello JUnit from Tomcat") > 0);
-        assertTrue(result.indexOf("01-Hello JUnit from Tomcat") > 0);
-        assertTrue(result.indexOf("02-Hello JUnit from Tomcat") > 0);
+        assertEcho(result, "00-Hello JUnit from Tomcat");
+        assertEcho(result, "01-Hello JUnit from Tomcat");
+        assertEcho(result, "02-Hello JUnit from Tomcat");
+    }
+
+    // Assertion for text contained with <p></p>, e.g. printed by tags:echo 
+    private static void assertEcho(String result, String expected) {
+        assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }
