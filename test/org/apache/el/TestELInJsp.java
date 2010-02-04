@@ -322,7 +322,6 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/el-misc.jsp");
         String result = res.toString();
-        System.out.println(result);
         assertEcho(result, "00-\\\\\\\"${'hello world'}");
         assertEcho(result, "01-\\\\\\\"\\${'hello world'}");
         assertEcho(result, "02-\\\"${'hello world'}");
