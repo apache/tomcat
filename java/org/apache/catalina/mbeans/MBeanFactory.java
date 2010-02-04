@@ -248,7 +248,7 @@ public class MBeanFactory extends BaseModelMBean {
         AccessLogValve accessLogger = new AccessLogValve();
         ContainerBase containerBase = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.addValve(accessLogger);
+        containerBase.getPipeline().addValve(accessLogger);
         ObjectName oname = accessLogger.getObjectName();
         return (oname.toString());
 
@@ -481,7 +481,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.getPipeline().addValve(valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
 
@@ -504,7 +504,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.getPipeline().addValve(valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
         
@@ -527,7 +527,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.getPipeline().addValve(valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
 
@@ -961,7 +961,7 @@ public class MBeanFactory extends BaseModelMBean {
         for (int i = 0; i < valves.length; i++) {
             ObjectName voname = ((ValveBase) valves[i]).getObjectName();
             if (voname.equals(oname)) {
-                container.removeValve(valves[i]);
+                container.getPipeline().removeValve(valves[i]);
             }
         }
     }

@@ -421,7 +421,7 @@ public class ContextConfig
         if (authenticator != null && context instanceof ContainerBase) {
             Pipeline pipeline = ((ContainerBase) context).getPipeline();
             if (pipeline != null) {
-                ((ContainerBase) context).addValve(authenticator);
+                ((ContainerBase) context).getPipeline().addValve(authenticator);
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString(
                                     "contextConfig.authenticatorConfigured",
