@@ -214,8 +214,8 @@ public class AttributeParser {
     private void parseEL() {
         boolean endEL = false;
         boolean insideLiteral = false;
+        char literalQuote = 0;
         while (i < size && !endEL) {
-            char literalQuote = '\'';
             char ch = nextChar();
             if (ch == '\'' || ch == '\"') {
                 if (insideLiteral) {
