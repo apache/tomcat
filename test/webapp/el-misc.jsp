@@ -30,5 +30,11 @@
     <tags:echo echo="09-az${\"2\"}" />
     <tags:echo echo="10-\${'foo'}${'bar'}" />
     <tags:echo echo="11-${\"\\\"}\"}" />
+    <tags:echo echo="12-${'foo'}\\${'bar'}\\${'baz'}" />
+    <tags:echo echo="13-${'foo'}\\${\"bar\"}\\${'baz'}" />
+    <tags:echo echo="14-${\"foo\"}\\${'bar'}\\${\"baz\"}" />
+    <tags:echo echo='15-${\'foo\'}\\${"bar"}\\${\'baz\'}' />
+    <tags:echo echo='16-${"foo"}\\${\'bar\'}\\${"baz"}' />
+    <tags:echo echo='17-${"foo"}\\${&apos;bar&apos;}\\${&quot;baz&quot;}' />
   </body>
 </html>
