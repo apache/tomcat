@@ -42,16 +42,16 @@ public class TestGenerator extends TomcatBaseTest {
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
         // in Java Strings
-        assertTrue(result.indexOf("00-hello 'world'") > 0);
-        assertTrue(result.indexOf("01-hello 'world") > 0);
-        assertTrue(result.indexOf("02-hello world'") > 0);
-        assertTrue(result.indexOf("03-hello world'") > 0);
-        assertTrue(result.indexOf("04-hello world\"") > 0);
-        assertTrue(result.indexOf("05-hello \"world\"") > 0);
-        assertTrue(result.indexOf("06-hello \"world") > 0);
-        assertTrue(result.indexOf("07-hello world\"") > 0);
-        assertTrue(result.indexOf("08-hello world'") > 0);
-        assertTrue(result.indexOf("09-hello world\"") > 0);
+        assertEcho(result, "00-hello 'world'");
+        assertEcho(result, "01-hello 'world");
+        assertEcho(result, "02-hello world'");
+        assertEcho(result, "03-hello world'");
+        assertEcho(result, "04-hello world\"");
+        assertEcho(result, "05-hello \"world\"");
+        assertEcho(result, "06-hello \"world");
+        assertEcho(result, "07-hello world\"");
+        assertEcho(result, "08-hello world'");
+        assertEcho(result, "09-hello world\"");
     }
 
     public void testBug45015b() throws Exception {
@@ -73,5 +73,10 @@ public class TestGenerator extends TomcatBaseTest {
 
         // Failure is expected
         assertNotNull(e);
+    }
+
+    /** Assertion for text printed by tags:echo */
+    private static void assertEcho(String result, String expected) {
+        assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }
