@@ -80,6 +80,10 @@ public interface Pipeline {
      * be associated with this Container, or <code>IllegalStateException</code>
      * if it is already associated with a different Container.</p>
      *
+     * <p>Implementation note: Implementations are expected to trigger the
+     * {@link Container#ADD_VALVE_EVENT} for the associated container if this
+     * call is successful.</p>
+     * 
      * @param valve Valve to be added
      *
      * @exception IllegalArgumentException if this Container refused to
@@ -106,6 +110,10 @@ public interface Pipeline {
      * found and removed, the Valve's <code>setContainer(null)</code> method
      * will be called if it implements <code>Contained</code>.
      *
+     * <p>Implementation note: Implementations are expected to trigger the
+     * {@link Container#REMOVE_VALVE_EVENT} for the associated container if this
+     * call is successful.</p>
+     *
      * @param valve Valve to be removed
      */
     public void removeValve(Valve valve);
@@ -123,5 +131,18 @@ public interface Pipeline {
      */
     public boolean isAsyncSupported();
 
+
+    /**
+     * Return the Container with which this Pipeline is associated.
+     */
+    public Container getContainer();
+
+
+    /**
+     * Set the Container with which this Pipeline is associated.
+     *
+     * @param container The new associated container
+     */
+    public void setContainer(Container container);
 
 }
