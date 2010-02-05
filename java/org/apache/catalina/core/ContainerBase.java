@@ -36,6 +36,7 @@ import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
+import org.apache.catalina.CatalinaFactory;
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
@@ -229,7 +230,8 @@ public abstract class ContainerBase
     /**
      * The Pipeline object with which this Container is associated.
      */
-    protected Pipeline pipeline = new StandardPipeline(this);
+    protected Pipeline pipeline =
+        CatalinaFactory.getFactory().createPipeline(this);
 
 
     /**
@@ -1214,10 +1216,6 @@ public abstract class ContainerBase
     public synchronized void addValve(Valve valve) {
 
         pipeline.addValve(valve);
-    }
-
-    public ObjectName[] getValveObjectNames() {
-        return ((StandardPipeline)pipeline).getValveObjectNames();
     }
 
 
