@@ -25,6 +25,9 @@ import java.io.*;
  * Accept and display a value.
  */
 public class ValuesTag extends TagSupport {
+
+    private static final long serialVersionUID = 1L;
+
     // Using "-1" as the default value,
     // in the assumption that it won't be used as the value.
     // Cannot use null here, because null is an important case
@@ -50,6 +53,7 @@ public class ValuesTag extends TagSupport {
         this.doubleValue = doubleValue;
     }
 
+    @Override
     public int doEndTag() throws JspException {
         JspWriter out = pageContext.getOut();
 
