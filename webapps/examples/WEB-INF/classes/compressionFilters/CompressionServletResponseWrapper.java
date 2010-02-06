@@ -140,11 +140,12 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
             System.out.println("createOutputStream gets called");
         }
 
-        CompressionResponseStream stream = new CompressionResponseStream(origResponse);
-        stream.setDebugLevel(debug);
-        stream.setBuffer(threshold);
+        CompressionResponseStream compressedStream =
+            new CompressionResponseStream(origResponse);
+        compressedStream.setDebugLevel(debug);
+        compressedStream.setBuffer(threshold);
 
-        return stream;
+        return compressedStream;
 
     }
 

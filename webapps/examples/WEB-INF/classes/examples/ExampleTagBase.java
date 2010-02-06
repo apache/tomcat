@@ -21,6 +21,8 @@ import javax.servlet.jsp.tagext.*;
 
 public abstract class ExampleTagBase extends BodyTagSupport {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public void setParent(Tag parent) {
         this.parent = parent;

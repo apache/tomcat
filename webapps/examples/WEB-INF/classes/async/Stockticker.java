@@ -83,14 +83,11 @@ public class Stockticker implements Runnable {
                             l.tick(stock);
                         }
                         
-//                        System.out.println("Stock: " + stock.getSymbol()
-//                                + " Price: " + stock.getValueAsString()
-//                                + " Change: " + stock.getLastChangeAsString());
                     }
                     Thread.sleep(850);
                 }
             } catch (InterruptedException ix) {
-
+                // Ignore
             } catch (Exception x) {
                 x.printStackTrace();
             }
