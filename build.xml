@@ -847,9 +847,11 @@
     <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
       <classpath refid="tomcat.test.classpath" />
 
-      <formatter type="plain" usefile="false" />
+      <formatter type="plain" usefile="true" />
 
-      <batchtest haltonerror="true" haltonfailure="true">
+      <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
+      <test todir="${tomcat.build}/logs" name="${test.entry}" if="test.entry"/>
+      <batchtest todir="${tomcat.build}/logs" haltonerror="true" haltonfailure="true" unless="test.entry">
         <fileset dir="test" >
           <!-- Include all by default -->
           <include name="**/Test*.java" />
