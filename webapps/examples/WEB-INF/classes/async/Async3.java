@@ -24,13 +24,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-
 public class Async3 extends HttpServlet {
-    private static final Log log = LogFactory.getLog(Async3.class);
-    public Async3() {
-    }
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

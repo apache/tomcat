@@ -113,9 +113,9 @@ public class SetCharacterEncodingFilter implements Filter {
 
         // Conditionally select and set the character encoding to be used
         if (ignore || (request.getCharacterEncoding() == null)) {
-            String encoding = selectEncoding(request);
-            if (encoding != null)
-                request.setCharacterEncoding(encoding);
+            String characterEncoding = selectEncoding(request);
+            if (characterEncoding != null)
+                request.setCharacterEncoding(characterEncoding);
         }
 
         // Pass control on to the next filter
@@ -127,13 +127,13 @@ public class SetCharacterEncodingFilter implements Filter {
     /**
      * Place this filter into service.
      *
-     * @param filterConfig The filter configuration object
+     * @param fConfig The filter configuration object
      */
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig fConfig) throws ServletException {
 
-        this.filterConfig = filterConfig;
-        this.encoding = filterConfig.getInitParameter("encoding");
-        String value = filterConfig.getInitParameter("ignore");
+        this.filterConfig = fConfig;
+        this.encoding = fConfig.getInitParameter("encoding");
+        String value = fConfig.getInitParameter("ignore");
         if (value == null)
             this.ignore = true;
         else if (value.equalsIgnoreCase("true"))

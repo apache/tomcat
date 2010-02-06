@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ChatServlet
     extends HttpServlet implements CometProcessor {
 
+    private static final long serialVersionUID = 1L;
+
     protected ArrayList<HttpServletResponse> connections = 
         new ArrayList<HttpServletResponse>();
     protected MessageSender messageSender = null;
