@@ -24,9 +24,10 @@ import java.io.IOException;
 /**
  * Log the contents of the body. Could be used to handle errors etc. 
  */
-public class LogTag 
-    extends ExampleTagBase
-{
+public class LogTag extends ExampleTagBase {
+
+    private static final long serialVersionUID = 1L;
+
     boolean toBrowser = false;
     
     public void setToBrowser(String value) {

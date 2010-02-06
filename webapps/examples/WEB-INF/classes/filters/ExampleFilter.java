@@ -90,19 +90,19 @@ public final class ExampleFilter implements Filter {
      */
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain)
-	throws IOException, ServletException {
+        throws IOException, ServletException {
 
-	// Store ourselves as a request attribute (if requested)
-	if (attribute != null)
-	    request.setAttribute(attribute, this);
+        // Store ourselves as a request attribute (if requested)
+        if (attribute != null)
+            request.setAttribute(attribute, this);
 
-	// Time and log the subsequent processing
-	long startTime = System.currentTimeMillis();
+        // Time and log the subsequent processing
+        long startTime = System.currentTimeMillis();
         chain.doFilter(request, response);
-	long stopTime = System.currentTimeMillis();
-	filterConfig.getServletContext().log
-	    (this.toString() + ": " + (stopTime - startTime) +
-	     " milliseconds");
+        long stopTime = System.currentTimeMillis();
+        filterConfig.getServletContext().log
+            (this.toString() + ": " + (stopTime - startTime) +
+             " milliseconds");
 
     }
 
@@ -110,12 +110,12 @@ public final class ExampleFilter implements Filter {
     /**
      * Place this filter into service.
      *
-     * @param filterConfig The filter configuration object
+     * @param fConfig The filter configuration object
      */
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig fConfig) throws ServletException {
 
-	this.filterConfig = filterConfig;
-        this.attribute = filterConfig.getInitParameter("attribute");
+        this.filterConfig = fConfig;
+        this.attribute = fConfig.getInitParameter("attribute");
 
     }
 
@@ -126,12 +126,12 @@ public final class ExampleFilter implements Filter {
     @Override
     public String toString() {
 
-	if (filterConfig == null)
-	    return ("TimingFilter()");
-	StringBuilder sb = new StringBuilder("TimingFilter(");
-	sb.append(filterConfig);
-	sb.append(")");
-	return (sb.toString());
+        if (filterConfig == null)
+            return ("TimingFilter()");
+        StringBuilder sb = new StringBuilder("TimingFilter(");
+        sb.append(filterConfig);
+        sb.append(")");
+        return (sb.toString());
 
     }
 

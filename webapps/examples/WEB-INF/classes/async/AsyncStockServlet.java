@@ -36,6 +36,8 @@ import async.Stockticker.TickListener;
 
 public class AsyncStockServlet extends HttpServlet implements TickListener, AsyncListener{
 
+    private static final long serialVersionUID = 1L;
+
     public static final String POLL = "POLL";
     public static final String LONG_POLL = "LONG-POLL";
     public static final String STREAM = "STREAM";
@@ -98,7 +100,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
             writer.flush();
             response.flushBuffer();
         }catch (IOException x) {
-            try {actx.complete();}catch (Exception ignore){}
+            try {actx.complete();}catch (Exception ignore){/* Ignore */}
         }
     }
 

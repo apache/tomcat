@@ -26,9 +26,6 @@ public class ValuesBean {
     private double doubleValue;
     private long longValue;
 
-    public ValuesBean() {
-    }
-
     public String getString() {
         return this.string;
     }
