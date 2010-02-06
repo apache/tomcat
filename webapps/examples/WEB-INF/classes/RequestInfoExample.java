@@ -33,6 +33,7 @@ import util.HTMLFilter;
 
 public class RequestInfoExample extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
 
     ResourceBundle rb = ResourceBundle.getBundle("LocalStrings");
 

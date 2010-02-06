@@ -26,9 +26,10 @@ import java.io.IOException;
  * <foo att1="..." att2="...." att3="...." />
  */
 
-public class FooTag 
-    extends ExampleTagBase 
-{
+public class FooTag extends ExampleTagBase {
+
+    private static final long serialVersionUID = 1L;
+
     private String atts[] = new String[3];
     int i = 0;
     

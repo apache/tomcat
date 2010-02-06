@@ -28,9 +28,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public class Async1 extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
     private static final Log log = LogFactory.getLog(Async1.class);
-    public Async1() {
-    }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
