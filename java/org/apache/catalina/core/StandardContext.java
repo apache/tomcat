@@ -55,7 +55,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
@@ -2054,7 +2053,7 @@ public class StandardContext
 
     
     public JspConfigDescriptor getJspConfigDescriptor() {
-        return null;
+        return jspConfigDescriptor;
     }
 
 
