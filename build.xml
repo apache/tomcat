@@ -1628,19 +1628,19 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
 
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.dll}/win32/tcnative-1.dll"/>
+      <param name="sourcefile" value="${tomcat-native.dll.win32}"/>
       <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.x86"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.dll}/win64/x64/tcnative-1.dll"/>
+      <param name="sourcefile" value="${tomcat-native.dll.x64}"/>
       <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.x64"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${tomcat-native.dll}/win64/ia64/tcnative-1.dll"/>
+      <param name="sourcefile" value="${tomcat-native.dll.i64}"/>
       <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.i64"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
