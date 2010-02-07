@@ -351,7 +351,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * on the wrapped request object.
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
-    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public String getRealPath(String path) {
 	return this.request.getRealPath(path);
     }
