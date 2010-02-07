@@ -351,8 +351,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * on the wrapped request object.
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public String getRealPath(String path) {
 	return this.request.getRealPath(path);
     }
@@ -493,7 +492,8 @@ public class ServletRequestWrapper implements ServletRequest {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public boolean isWrapperFor(Class<? extends ServletRequest> wrappedType) {
+    @SuppressWarnings("unchecked") // Spec API does not use generics
+    public boolean isWrapperFor(Class wrappedType) {
         if (wrappedType.isAssignableFrom(request.getClass())) {
             return true;
         }

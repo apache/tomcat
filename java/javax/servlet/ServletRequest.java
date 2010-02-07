@@ -540,13 +540,10 @@ public interface ServletRequest {
     
 
     /**
-     * 
      * @deprecated 	As of Version 2.1 of the Java Servlet API,
      * 			use {@link ServletContext#getRealPath} instead.
-     *
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public String getRealPath(String path);
     
     

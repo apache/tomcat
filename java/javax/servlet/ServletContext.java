@@ -353,10 +353,10 @@ public interface ServletContext {
      * <p>In lieu of this method, servlets can share information using the 
      * <code>ServletContext</code> class and can perform shared business logic
      * by invoking methods on common non-servlet classes.
-     *
+     * 
+     * @deprecated
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public Servlet getServlet(String name) throws ServletException;
     
   
@@ -374,10 +374,10 @@ public interface ServletContext {
      * remains only to preserve binary compatibility. This method
      * will be permanently removed in a future version of the Java
      * Servlet API.
-     *
+     * 
+     * @deprecated
      */
-    
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public Enumeration<Servlet> getServlets();
     
     
@@ -394,10 +394,10 @@ public interface ServletContext {
      * this method always returns an empty <code>Enumeration</code> and 
      * remains only to preserve binary compatibility. This method will 
      * be permanently removed in a future version of the Java Servlet API.
-     *
+     * 
+     * @deprecated
      */
- 
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public Enumeration<String> getServletNames();
     
   
@@ -430,10 +430,10 @@ public interface ServletContext {
      * <p>This method was originally defined to write an 
      * exception's stack trace and an explanatory error message
      * to the servlet log file.
-     *
+     * 
+     * @deprecated
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public void log(Exception exception, String msg);
     
     
