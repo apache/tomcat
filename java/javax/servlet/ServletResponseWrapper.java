@@ -231,7 +231,8 @@ public class ServletResponseWrapper implements ServletResponse {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public boolean isWrapperFor(Class<? extends ServletResponse> wrappedType) {
+    @SuppressWarnings("unchecked") // Spec API does not use generics
+    public boolean isWrapperFor(Class wrappedType) {
         if (wrappedType.isAssignableFrom(response.getClass())) {
             return true;
         }

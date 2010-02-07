@@ -56,19 +56,16 @@ extends ServletException {
     private int         seconds;           // unavailability estimate
 
     /**
-     * 
-     * @deprecated	As of Java Servlet API 2.2, use {@link
-     * 			#UnavailableException(String)} instead.
-     *
      * @param servlet 	the <code>Servlet</code> instance that is
      *                  unavailable
      *
      * @param msg 	a <code>String</code> specifying the
      *                  descriptive message
-     *
+     * 
+     * @deprecated  As of Java Servlet API 2.2, use {@link
+     *          #UnavailableException(String)} instead.
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public UnavailableException(Servlet servlet, String msg) {
 	super(msg);
 	this.servlet = servlet;
@@ -76,8 +73,6 @@ extends ServletException {
     }
  
     /**
-     * @deprecated	As of Java Servlet API 2.2, use {@link
-     *			#UnavailableException(String, int)} instead.
      *
      * @param seconds	an integer specifying the number of seconds
      * 			the servlet expects to be unavailable; if
@@ -89,10 +84,11 @@ extends ServletException {
      * @param msg	a <code>String</code> specifying the descriptive 
      *			message, which can be written to a log file or 
      *			displayed for the user.
-     *
+     * 
+     * @deprecated  As of Java Servlet API 2.2, use {@link
+     *          #UnavailableException(String, int)} instead.
      */
-    
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public UnavailableException(int seconds, Servlet servlet, String msg) {
 	super(msg);
 	this.servlet = servlet;
@@ -172,16 +168,14 @@ extends ServletException {
     }
   
     /**
-     * @deprecated	As of Java Servlet API 2.2, with no replacement.
-     *
      * Returns the servlet that is reporting its unavailability.
      * 
      * @return		the <code>Servlet</code> object that is 
      *			throwing the <code>UnavailableException</code>
      *
+     * @deprecated  As of Java Servlet API 2.2, with no replacement.
      */
-     
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
     public Servlet getServlet() {
 	return servlet;
     }

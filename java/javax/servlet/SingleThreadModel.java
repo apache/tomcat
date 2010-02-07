@@ -44,8 +44,7 @@ package javax.servlet;
  * @deprecated	As of Java Servlet API 2.4, with no direct
  *	replacement.
  */
-
-@Deprecated
+@SuppressWarnings("dep-ann") // Spec API does not use dep-ann
 public interface SingleThreadModel {
     // No methods
 }

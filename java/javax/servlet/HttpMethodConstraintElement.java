@@ -16,12 +16,19 @@
 */
 package javax.servlet;
 
+import java.util.ResourceBundle;
+
 /**
  * @since Servlet 3.0
  * TODO SERVLET3 - Add comments
  */
 public class HttpMethodConstraintElement extends HttpConstraintElement {
-    
+
+    // Can't inherit from HttpConstraintElement as API does not allow it
+    private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
+    private static final ResourceBundle lStrings =
+        ResourceBundle.getBundle(LSTRING_FILE);
+
     private String methodName;
 
     public HttpMethodConstraintElement(String methodName) {

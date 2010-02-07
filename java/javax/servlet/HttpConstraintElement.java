@@ -28,7 +28,7 @@ import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
 public class HttpConstraintElement {
     
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
-    protected static final ResourceBundle lStrings =
+    private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
     private EmptyRoleSemantic emptyRoleSemantic = EmptyRoleSemantic.PERMIT;
