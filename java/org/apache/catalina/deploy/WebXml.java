@@ -1300,7 +1300,20 @@ public class WebXml {
         }
 
         // Do this last as it depends on servlets
-        // TODO
+        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
+            String jspServletName = context.findServletMapping("*.jsp");
+            if (jspServletName == null) {
+                jspServletName = "jsp";
+            }
+            if (context.findChild(jspServletName) != null) {
+                context.addServletMapping(jspPropertyGroup.getUrlPattern(),
+                        jspServletName, true);
+            } else {
+                if(log.isDebugEnabled())
+                    log.debug("Skiping " + jspPropertyGroup.getUrlPattern() +
+                            " , no servlet " + jspServletName);
+            }
+        }
     }
     
     /**
