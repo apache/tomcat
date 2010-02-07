@@ -198,8 +198,7 @@ public interface HttpSession {
     *			version of the Java Servlet API.
     *
     */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public HttpSessionContext getSessionContext();
     
     
@@ -225,10 +224,6 @@ public interface HttpSession {
     
     
     /**
-     *
-     * @deprecated 	As of Version 2.2, this method is
-     * 			replaced by {@link #getAttribute}.
-     *
      * @param name		a string specifying the name of the object
      *
      * @return			the object with the specified name
@@ -236,9 +231,10 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      *
+     * @deprecated  As of Version 2.2, this method is
+     *          replaced by {@link #getAttribute}.
      */
-  
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public Object getValue(String name);
     
     
@@ -265,10 +261,6 @@ public interface HttpSession {
     
 
     /**
-     *
-     * @deprecated 	As of Version 2.2, this method is
-     * 			replaced by {@link #getAttributeNames}
-     *
      * @return				an array of <code>String</code>
      *					objects specifying the
      *					names of all the objects bound to
@@ -277,9 +269,10 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      *
+     * @deprecated  As of Version 2.2, this method is
+     *          replaced by {@link #getAttributeNames}
      */
-    
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public String[] getValueNames();
     
     
@@ -322,10 +315,6 @@ public interface HttpSession {
 
     
     /**
-     *
-     * @deprecated 	As of Version 2.2, this method is
-     * 			replaced by {@link #setAttribute}
-     *
      * @param name			the name to which the object is bound;
      *					cannot be null
      *
@@ -334,9 +323,10 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      *
+     * @deprecated  As of Version 2.2, this method is
+     *          replaced by {@link #setAttribute}
      */
- 
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public void putValue(String name, Object value);
 
 
@@ -372,18 +362,16 @@ public interface HttpSession {
 
 
     /**
-     *
-     * @deprecated 	As of Version 2.2, this method is
-     * 			replaced by {@link #removeAttribute}
-     *
      * @param name				the name of the object to
      *						remove from this session
      *
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
+     *
+     * @deprecated  As of Version 2.2, this method is
+     *          replaced by {@link #removeAttribute}
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public void removeValue(String name);
 
 

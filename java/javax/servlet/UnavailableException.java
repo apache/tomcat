@@ -65,7 +65,7 @@ extends ServletException {
      * @deprecated  As of Java Servlet API 2.2, use {@link
      *          #UnavailableException(String)} instead.
      */
-    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public UnavailableException(Servlet servlet, String msg) {
 	super(msg);
 	this.servlet = servlet;
@@ -88,7 +88,7 @@ extends ServletException {
      * @deprecated  As of Java Servlet API 2.2, use {@link
      *          #UnavailableException(String, int)} instead.
      */
-    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public UnavailableException(int seconds, Servlet servlet, String msg) {
 	super(msg);
 	this.servlet = servlet;
@@ -175,7 +175,7 @@ extends ServletException {
      *
      * @deprecated  As of Java Servlet API 2.2, with no replacement.
      */
-    @SuppressWarnings("dep-ann") // Spec API does not use dep-ann
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public Servlet getServlet() {
 	return servlet;
     }
