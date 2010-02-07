@@ -35,9 +35,7 @@ import java.util.Enumeration;
  * @see			HttpSessionBindingListener
  *
  */
-
-
-@Deprecated
+@SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
 public interface HttpSessionContext {
 
     /**
@@ -48,8 +46,7 @@ public interface HttpSessionContext {
      *			a future version of this API.
      *
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public HttpSession getSession(String sessionId);
     
     
@@ -63,8 +60,7 @@ public interface HttpSessionContext {
      *			in a future version of this API.
      *
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public Enumeration<String> getIds();
 }
 

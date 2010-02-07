@@ -657,8 +657,7 @@ public interface HttpServletRequest extends ServletRequest {
      *				instead.
      *
      */
-
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public boolean isRequestedSessionIdFromUrl();
 
 
