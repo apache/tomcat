@@ -20,6 +20,7 @@ package org.apache.catalina;
 
 
 import javax.servlet.ServletContext;
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
@@ -624,18 +625,6 @@ public interface Context extends Container {
 
 
     /**
-     * Add the given URL pattern as a jsp-property-group.  This maps
-     * resources that match the given pattern so they will be passed
-     * to the JSP container.  Though there are other elements in the
-     * property group, we only care about the URL pattern here.  The
-     * JSP container will parse the rest.
-     *
-     * @param pattern URL pattern to be mapped 
-     */
-    public void addJspMapping(String pattern);
-
-
-    /**
      * Add a Locale Encoding Mapping (see Sec 5.4 of Servlet spec 2.4)
      *
      * @param locale locale to map an encoding for
@@ -691,15 +680,6 @@ public interface Context extends Container {
     public void addServletMapping(String pattern, String name);
 
 
-    /**
-     * Add a JSP tag library for the specified URI.
-     *
-     * @param uri URI, relative to the web.xml file, of this tag library
-     * @param location Location of the tag library descriptor
-     */
-    public void addTaglib(String uri, String location);
-
-    
     /**
      * Add a resource which will be watched for reloading by the host auto
      * deployer. Note: this will not be used in embedded mode.
@@ -911,23 +891,6 @@ public interface Context extends Container {
 
 
     /**
-     * Return the tag library descriptor location for the specified taglib
-     * URI, if any; otherwise, return <code>null</code>.
-     *
-     * @param uri URI, relative to the web.xml file
-     */
-    public String findTaglib(String uri);
-
-
-    /**
-     * Return the URIs of all tag libraries for which a tag library
-     * descriptor location has been specified.  If none are specified,
-     * a zero-length array is returned.
-     */
-    public String[] findTaglibs();
-
-
-    /**
      * Return the set of watched resources for this Context. If none are 
      * defined, a zero length array will be returned.
      */
@@ -1078,14 +1041,6 @@ public interface Context extends Container {
 
 
     /**
-     * Remove the tag library location for the specified tag library URI.
-     *
-     * @param uri URI, relative to the web.xml file
-     */
-    public void removeTaglib(String uri);
-
-    
-    /**
      * Remove the specified watched resource name from the list associated
      * with this Context.
      * 
@@ -1156,5 +1111,12 @@ public interface Context extends Container {
      * context.
      */
     public void setEffectiveMinorVersion(int minor);
+    
+    
+    /**
+     * Obtain the JSP configuration for this context.
+     */
+    public JspConfigDescriptor getJspConfigDescriptor();
+
 }
 

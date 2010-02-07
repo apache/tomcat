@@ -14,13 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.servlet.descriptor;
 
-/**
- * @since Servlet 3.0
- * TODO SERVLET3 - Add comments
- */
-public interface TaglibDescriptor {
-    public String getTaglibURI();
-    public String getTaglibLocation();
+package org.apache.catalina.core;
+
+import java.util.Collection;
+import java.util.HashSet;
+
+import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
+
+public class ApplicationJspConfigDescriptor implements JspConfigDescriptor {
+
+    private Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
+        new HashSet<JspPropertyGroupDescriptor>();
+
+    private Collection<TaglibDescriptor> taglibs =
+        new HashSet<TaglibDescriptor>();
+
+    @Override
+    public Collection<JspPropertyGroupDescriptor> getJspPropertyGroups() {
+        return jspPropertyGroups;
+    }
+
+    @Override
+    public Collection<TaglibDescriptor> getTaglibs() {
+        return taglibs;
+    }
+
 }
