@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.servlet.ServletContext;
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
@@ -151,7 +153,9 @@ public final class TldConfig  implements LifecycleListener {
      * instance of any URI will be processed.
      */
     private Set<String> taglibUris = new HashSet<String>();
-    
+
+    private Set<String> webxmlTaglibUris = new HashSet<String>();
+
     private ArrayList<String> listeners = new ArrayList<String>();
 
     // --------------------------------------------------------- Public Methods
@@ -168,6 +172,13 @@ public final class TldConfig  implements LifecycleListener {
      */
     public boolean isKnownTaglibUri(String uri) {
         return taglibUris.contains(uri);
+    }
+
+    /**
+     * Determines if the provided URI is a known taglib URI.
+     */
+    public boolean isKnownWebxmlTaglibUri(String uri) {
+        return webxmlTaglibUris.contains(uri);
     }
 
     /**
@@ -348,10 +359,12 @@ public final class TldConfig  implements LifecycleListener {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("tldConfig.webxmlStart"));
         }
-     
-        String taglibs[] = context.findTaglibs();
-        for (int i = 0; i < taglibs.length; i++) {
-            String resourcePath = context.findTaglib(taglibs[i]);
+
+        Collection<TaglibDescriptor> descriptors =
+            context.getJspConfigDescriptor().getTaglibs();
+
+        for (TaglibDescriptor descriptor : descriptors) {
+            String resourcePath = descriptor.getTaglibLocation();
             // Note: Whilst the Servlet 2.4 DTD implies that the location must
             // be a context-relative path starting with '/', JSP.7.3.6.1 states
             // explicitly how paths that do not start with '/' should be
@@ -359,22 +372,23 @@ public final class TldConfig  implements LifecycleListener {
             if (!resourcePath.startsWith("/")) {
                 resourcePath = WEB_INF + resourcePath;
             }
-            if (taglibUris.contains(taglibs[i])) {
+            if (taglibUris.contains(descriptor.getTaglibURI())) {
                 log.warn(sm.getString("tldConfig.webxmlSkip", resourcePath,
-                        taglibs[i]));
+                        descriptor.getTaglibURI()));
             } else {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("tldConfig.webxmlAdd", resourcePath,
-                            taglibs[i]));
+                            descriptor.getTaglibURI()));
                 }
                 try {
                     InputStream stream = context.getServletContext(
                             ).getResourceAsStream(resourcePath);
                     tldScanStream(stream);
-                    taglibUris.add(taglibs[i]);
+                    taglibUris.add(descriptor.getTaglibURI());
+                    webxmlTaglibUris.add(descriptor.getTaglibURI());
                 } catch (IOException ioe) {
                     log.warn(sm.getString("tldConfig.webxmlFail", resourcePath,
-                            taglibs[i]), ioe);
+                            descriptor.getTaglibURI()), ioe);
                 }
             }
         }
@@ -564,6 +578,7 @@ public final class TldConfig  implements LifecycleListener {
             }
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             taglibUris.clear();
+            webxmlTaglibUris.clear();
             listeners.clear();
         }
     }
