@@ -1291,7 +1291,7 @@ public class WebXml {
         }
         for (Entry<String, String> entry : taglibs.entrySet()) {
             TaglibDescriptor descriptor = new ApplicationTaglibDescriptor(
-                    entry.getKey(), entry.getValue());
+                    entry.getValue(), entry.getKey());
             context.getJspConfigDescriptor().getTaglibs().add(descriptor);
         }
         
