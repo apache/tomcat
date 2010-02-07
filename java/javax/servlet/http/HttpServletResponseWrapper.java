@@ -90,7 +90,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * on the wrapped response object.
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public String encodeUrl(String url) {
 	return this._getHttpServletResponse().encodeUrl(url);
     }
@@ -100,7 +100,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * on the wrapped response object.
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public String encodeRedirectUrl(String url) {
 	return this._getHttpServletResponse().encodeRedirectUrl(url);
     }
@@ -194,7 +194,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * on the wrapped response object.
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
-     @Deprecated
+    @SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
     public void setStatus(int sc, String sm) {
 	this._getHttpServletResponse().setStatus(sc, sm);
     }
