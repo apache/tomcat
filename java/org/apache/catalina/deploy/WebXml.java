@@ -166,7 +166,9 @@ public class WebXml {
     public void setPublicId(String publicId) {
         this.publicId = publicId;
         // Update major and minor version
-        if (org.apache.catalina.startup.Constants.WebSchemaPublicId_30.
+        if (publicId == null) {
+            // skip
+        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_30.
                 equalsIgnoreCase(publicId) ||
                 org.apache.catalina.startup.Constants.WebFragmentSchemaPublicId_30.
                 equalsIgnoreCase(publicId)) {
