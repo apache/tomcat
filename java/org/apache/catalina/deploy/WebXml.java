@@ -1934,7 +1934,9 @@ public class WebXml {
         }
         
         if (dest.getLoadOnStartup() == null) {
-            dest.setLoadOnStartup(src.getLoadOnStartup().toString());
+            if (src.getLoadOnStartup() != null) {
+                dest.setLoadOnStartup(src.getLoadOnStartup().toString());
+            }
         } else if (src.getLoadOnStartup() != null) {
             if (failOnConflict &&
                     !src.getLoadOnStartup().equals(dest.getLoadOnStartup())) {
@@ -1943,7 +1945,9 @@ public class WebXml {
         }
         
         if (dest.getEnabled() == null) {
-            dest.setEnabled(src.getEnabled().toString());
+            if (src.getEnabled() != null) {
+                dest.setEnabled(src.getEnabled().toString());
+            }
         } else if (src.getEnabled() != null) {
             if (failOnConflict &&
                     !src.getEnabled().equals(dest.getEnabled())) {
@@ -1971,7 +1975,9 @@ public class WebXml {
         }
         
         if (dest.getAsyncSupported() == null) {
-            dest.setAsyncSupported(src.getAsyncSupported().toString());
+            if (src.getAsyncSupported() != null) {
+                dest.setAsyncSupported(src.getAsyncSupported().toString());
+            }
         } else if (src.getAsyncSupported() != null) {
             if (failOnConflict &&
                     !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
