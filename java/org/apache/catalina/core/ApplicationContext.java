@@ -1375,8 +1375,7 @@ public class ApplicationContext
 
     @Override
     public JspConfigDescriptor getJspConfigDescriptor() {
-        // TODO SERVLET3
-        return null;
+        return context.getJspConfigDescriptor();
     }
 
 
