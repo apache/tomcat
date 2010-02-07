@@ -258,12 +258,13 @@ public final class FileStore extends StoreBase {
         }
 
         FileInputStream fis = null;
+        BufferedInputStream bis = null;
         ObjectInputStream ois = null;
         Loader loader = null;
         ClassLoader classLoader = null;
         try {
             fis = new FileInputStream(file.getAbsolutePath());
-            BufferedInputStream bis = new BufferedInputStream(fis);
+            bis = new BufferedInputStream(fis);
             Container container = manager.getContainer();
             if (container != null)
                 loader = container.getLoader();
@@ -278,13 +279,19 @@ public final class FileStore extends StoreBase {
                 manager.getContainer().getLogger().debug("No persisted data file found");
             return (null);
         } catch (IOException e) {
-            if (ois != null) {
+            if (bis != null) {
                 try {
-                    ois.close();
+                    bis.close();
                 } catch (IOException f) {
                     // Ignore
                 }
-                ois = null;
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
             }
             throw e;
         }
@@ -297,12 +304,10 @@ public final class FileStore extends StoreBase {
             return (session);
         } finally {
             // Close the input stream
-            if (ois != null) {
-                try {
-                    ois.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
+            try {
+                ois.close();
+            } catch (IOException f) {
+                // Ignore
             }
         }
     }
@@ -357,9 +362,9 @@ public final class FileStore extends StoreBase {
             fos = new FileOutputStream(file.getAbsolutePath());
             oos = new ObjectOutputStream(new BufferedOutputStream(fos));
         } catch (IOException e) {
-            if (oos != null) {
+            if (fos != null) {
                 try {
-                    oos.close();
+                    fos.close();
                 } catch (IOException f) {
                     // Ignore
                 }
