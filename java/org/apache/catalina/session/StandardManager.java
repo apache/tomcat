@@ -355,12 +355,13 @@ public class StandardManager
         if (log.isDebugEnabled())
             log.debug(sm.getString("standardManager.loading", pathname));
         FileInputStream fis = null;
+        BufferedInputStream bis = null;
         ObjectInputStream ois = null;
         Loader loader = null;
         ClassLoader classLoader = null;
         try {
             fis = new FileInputStream(file.getAbsolutePath());
-            BufferedInputStream bis = new BufferedInputStream(fis);
+            bis = new BufferedInputStream(fis);
             if (container != null)
                 loader = container.getLoader();
             if (loader != null)
@@ -380,13 +381,19 @@ public class StandardManager
             return;
         } catch (IOException e) {
             log.error(sm.getString("standardManager.loading.ioe", e), e);
-            if (ois != null) {
+            if (fis != null) {
                 try {
-                    ois.close();
+                    fis.close();
                 } catch (IOException f) {
                     // Ignore
                 }
-                ois = null;
+            }
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
             }
             throw e;
         }
@@ -408,31 +415,24 @@ public class StandardManager
                 }
             } catch (ClassNotFoundException e) {
                 log.error(sm.getString("standardManager.loading.cnfe", e), e);
-                if (ois != null) {
-                    try {
-                        ois.close();
-                    } catch (IOException f) {
-                        // Ignore
-                    }
-                    ois = null;
+                try {
+                    ois.close();
+                } catch (IOException f) {
+                    // Ignore
                 }
                 throw e;
             } catch (IOException e) {
                 log.error(sm.getString("standardManager.loading.ioe", e), e);
-                if (ois != null) {
-                    try {
-                        ois.close();
-                    } catch (IOException f) {
-                        // Ignore
-                    }
-                    ois = null;
+                try {
+                    ois.close();
+                } catch (IOException f) {
+                    // Ignore
                 }
                 throw e;
             } finally {
                 // Close the input stream
                 try {
-                    if (ois != null)
-                        ois.close();
+                    ois.close();
                 } catch (IOException f) {
                     // ignored
                 }
@@ -499,13 +499,12 @@ public class StandardManager
             oos = new ObjectOutputStream(new BufferedOutputStream(fos));
         } catch (IOException e) {
             log.error(sm.getString("standardManager.unloading.ioe", e), e);
-            if (oos != null) {
+            if (fos != null) {
                 try {
-                    oos.close();
+                    fos.close();
                 } catch (IOException f) {
                     // Ignore
                 }
-                oos = null;
             }
             throw e;
         }
@@ -527,13 +526,10 @@ public class StandardManager
                 }
             } catch (IOException e) {
                 log.error(sm.getString("standardManager.unloading.ioe", e), e);
-                if (oos != null) {
-                    try {
-                        oos.close();
-                    } catch (IOException f) {
-                        // Ignore
-                    }
-                    oos = null;
+                try {
+                    oos.close();
+                } catch (IOException f) {
+                    // Ignore
                 }
                 throw e;
             }
@@ -542,18 +538,12 @@ public class StandardManager
         // Flush and close the output stream
         try {
             oos.flush();
-            oos.close();
-            oos = null;
-        } catch (IOException e) {
-            if (oos != null) {
-                try {
-                    oos.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
-                oos = null;
+        } finally {
+            try {
+                oos.close();
+            } catch (IOException f) {
+                // Ignore
             }
-            throw e;
         }
 
         // Expire all the sessions we just wrote
