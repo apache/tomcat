@@ -34,9 +34,13 @@ import java.util.Map.Entry;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationJspPropertyGroupDescriptor;
+import org.apache.catalina.core.ApplicationTaglibDescriptor;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -1161,7 +1165,12 @@ public class WebXml {
         for (FilterMap filterMap : filterMaps) {
             context.addFilterMap(filterMap);
         }
-        // jsp-property-group needs to be after servlet configuration
+        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
+            JspPropertyGroupDescriptor descriptor =
+                new ApplicationJspPropertyGroupDescriptor(jspPropertyGroup);
+            context.getJspConfigDescriptor().getJspPropertyGroups().add(
+                    descriptor);
+        }
         for (String listener : listeners) {
             context.addApplicationListener(listener);
         }
@@ -1279,7 +1288,9 @@ public class WebXml {
             }
         }
         for (Entry<String, String> entry : taglibs.entrySet()) {
-            context.addTaglib(entry.getKey(), entry.getValue());
+            TaglibDescriptor descriptor = new ApplicationTaglibDescriptor(
+                    entry.getKey(), entry.getValue());
+            context.getJspConfigDescriptor().getTaglibs().add(descriptor);
         }
         
         // Context doesn't use version directly
@@ -1289,9 +1300,7 @@ public class WebXml {
         }
 
         // Do this last as it depends on servlets
-        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
-            context.addJspMapping(jspPropertyGroup.getUrlPattern());
-        }
+        // TODO
     }
     
     /**

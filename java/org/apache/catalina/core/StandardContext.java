@@ -54,6 +54,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
@@ -563,13 +565,6 @@ public class StandardContext
 
 
     /**
-     * The JSP tag libraries defined in web.xml for this web application, keyed
-     * by URI.
-     */
-    private HashMap<String, String> taglibs = new HashMap<String, String>();
-
-
-    /**
      * Amount of ms that the container will wait for servlets to unload.
      */
     private long unloadDelay = 2000;
@@ -766,6 +761,9 @@ public class StandardContext
     private int effectiveMajorVersion = 3;
     
     private int effectiveMinorVersion = 0;
+
+    private JspConfigDescriptor jspConfigDescriptor =
+        new ApplicationJspConfigDescriptor();
 
     // ----------------------------------------------------- Context Properties
 
@@ -2054,6 +2052,11 @@ public class StandardContext
 
     }
 
+    
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        return null;
+    }
+
 
     // ------------------------------------------------------ Public Properties
 
@@ -2530,30 +2533,6 @@ public class StandardContext
     }
 
     /**
-     * Add the given URL pattern as a jsp-property-group.  This maps
-     * resources that match the given pattern so they will be passed
-     * to the JSP container.  Though there are other elements in the
-     * property group, we only care about the URL pattern here.  The
-     * JSP container will parse the rest.
-     *
-     * @param pattern URL pattern to be mapped
-     */
-    public void addJspMapping(String pattern) {
-        String servletName = findServletMapping("*.jsp");
-        if (servletName == null) {
-            servletName = "jsp";
-        }
-
-        if( findChild(servletName) != null) {
-            addServletMapping(pattern, servletName, true);
-        } else {
-            if(log.isDebugEnabled())
-                log.debug("Skiping " + pattern + " , no servlet " + servletName);
-        }
-    }
-
-
-    /**
      * Add a Locale Encoding Mapping (see Sec 5.4 of Servlet spec 2.4)
      *
      * @param locale locale to map an encoding for
@@ -2729,22 +2708,6 @@ public class StandardContext
         mapper.addWrapper(pattern, wrapper, jspWildCard);
 
         fireContainerEvent("addServletMapping", pattern);
-
-    }
-
-
-    /**
-     * Add a JSP tag library for the specified URI.
-     *
-     * @param uri URI, relative to the web.xml file, of this tag library
-     * @param location Location of the tag library descriptor
-     */
-    public void addTaglib(String uri, String location) {
-
-        synchronized (taglibs) {
-            taglibs.put(uri, location);
-        }
-        fireContainerEvent("addTaglib", uri);
 
     }
 
@@ -3287,36 +3250,6 @@ public class StandardContext
 
 
     /**
-     * Return the tag library descriptor location for the specified taglib
-     * URI, if any; otherwise, return <code>null</code>.
-     *
-     * @param uri URI, relative to the web.xml file
-     */
-    public String findTaglib(String uri) {
-
-        synchronized (taglibs) {
-            return (taglibs.get(uri));
-        }
-
-    }
-
-
-    /**
-     * Return the URIs of all tag libraries for which a tag library
-     * descriptor location has been specified.  If none are specified,
-     * a zero-length array is returned.
-     */
-    public String[] findTaglibs() {
-
-        synchronized (taglibs) {
-            String results[] = new String[taglibs.size()];
-            return (taglibs.keySet().toArray(results));
-        }
-
-    }
-
-
-    /**
      * Return <code>true</code> if the specified welcome file is defined
      * for this Context; otherwise return <code>false</code>.
      *
@@ -3827,20 +3760,6 @@ public class StandardContext
         mapper.removeWrapper(pattern);
         fireContainerEvent("removeServletMapping", pattern);
 
-    }
-
-
-    /**
-     * Remove the tag library location forthe specified tag library URI.
-     *
-     * @param uri URI, relative to the web.xml file
-     */
-    public void removeTaglib(String uri) {
-
-        synchronized (taglibs) {
-            taglibs.remove(uri);
-        }
-        fireContainerEvent("removeTaglib", uri);
     }
 
 
@@ -4968,7 +4887,7 @@ public class StandardContext
         applicationListeners = new String[0];
         applicationEventListenersObjects = new Object[0];
         applicationLifecycleListenersObjects = new Object[0];
-        taglibs = new HashMap<String, String>();
+        jspConfigDescriptor = new ApplicationJspConfigDescriptor();
         
         if(log.isDebugEnabled())
             log.debug("resetContext " + oname);
