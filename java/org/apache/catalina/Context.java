@@ -681,6 +681,19 @@ public interface Context extends Container {
 
 
     /**
+     * Add a new servlet mapping, replacing any existing mapping for
+     * the specified pattern.
+     *
+     * @param pattern URL pattern to be mapped
+     * @param name Name of the corresponding servlet to execute
+     * @param jspWildCard true if name identifies the JspServlet
+     * and pattern contains a wildcard; false otherwise
+     */
+    public void addServletMapping(String pattern, String name,
+            boolean jspWildcard);
+
+
+    /**
      * Add a resource which will be watched for reloading by the host auto
      * deployer. Note: this will not be used in embedded mode.
      * 
