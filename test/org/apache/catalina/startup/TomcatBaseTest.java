@@ -25,6 +25,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.LogManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -68,6 +70,13 @@ public abstract class TomcatBaseTest extends TestCase {
     
     @Override
     public void setUp() throws Exception {
+        // Need to use JULI and to configure a ConsoleHandler so log messages
+        // from the tests are visible
+        System.setProperty("java.util.logging.config.class",
+                "org.apache.juli.ClassLoaderLogManager");
+        LogManager.getLogManager().getLogger("").addHandler(
+            new ConsoleHandler());
+
         tempDir = new File("output/tmp");
         tempDir.mkdir();
         
