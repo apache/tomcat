@@ -44,7 +44,7 @@ import junit.framework.TestCase;
 public abstract class TomcatBaseTest extends TestCase {
     private Tomcat tomcat;
     private File tempDir;
-    private static int port = 8001;
+    private static int port = 8000;
 
     /**
      * Make Tomcat instance accessible to sub-classes.
@@ -79,15 +79,16 @@ public abstract class TomcatBaseTest extends TestCase {
 
         tempDir = new File("output/tmp");
         tempDir.mkdir();
+        File appBase = new File(tempDir, "webapps");
+        appBase.mkdir();
         
         tomcat = new Tomcat();
         tomcat.setBaseDir(tempDir.getAbsolutePath());
-        tomcat.getHost().setAppBase(tempDir.getAbsolutePath() + "/webapps");
+        tomcat.getHost().setAppBase(appBase.getAbsolutePath());
           
         // If each test is running on same port - they
         // may interfere with each other (on unix at least)
-        port++;
-        tomcat.setPort(port);
+        tomcat.setPort(getNextPort());
     }
     
     @Override
