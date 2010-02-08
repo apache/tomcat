@@ -2541,151 +2541,154 @@ public class WebappClassLoader
 
         synchronized (jarFiles) {
 
-            if (!openJARs()) {
-                return null;
-            }
-            for (i = 0; (entry == null) && (i < jarFilesLength); i++) {
-
-                jarEntry = jarFiles[i].getJarEntry(path);
-
-                if (jarEntry != null) {
-
-                    entry = new ResourceEntry();
-                    try {
-                        entry.codeBase = getURL(jarRealFiles[i], false);
-                        String jarFakeUrl = getURI(jarRealFiles[i]).toString();
-                        jarFakeUrl = "jar:" + jarFakeUrl + "!/" + path;
-                        entry.source = new URL(jarFakeUrl);
-                        entry.lastModified = jarRealFiles[i].lastModified();
-                    } catch (MalformedURLException e) {
-                        return null;
-                    }
-                    contentLength = (int) jarEntry.getSize();
-                    try {
-                        entry.manifest = jarFiles[i].getManifest();
-                        binaryStream = jarFiles[i].getInputStream(jarEntry);
-                    } catch (IOException e) {
-                        return null;
-                    }
-
-                    // Extract resources contained in JAR to the workdir
-                    if (antiJARLocking && !(path.endsWith(".class"))) {
-                        byte[] buf = new byte[1024];
-                        File resourceFile = new File
-                            (loaderDir, jarEntry.getName());
-                        if (!resourceFile.exists()) {
-                            Enumeration<JarEntry> entries =
-                                jarFiles[i].entries();
-                            while (entries.hasMoreElements()) {
-                                JarEntry jarEntry2 =  entries.nextElement();
-                                if (!(jarEntry2.isDirectory()) 
-                                    && (!jarEntry2.getName().endsWith
-                                        (".class"))) {
-                                    resourceFile = new File
-                                        (loaderDir, jarEntry2.getName());
-                                    try {
-                                        if (!resourceFile.getCanonicalPath().startsWith(
-                                                canonicalLoaderDir)) {
+            try {
+                if (!openJARs()) {
+                    return null;
+                }
+                for (i = 0; (entry == null) && (i < jarFilesLength); i++) {
+    
+                    jarEntry = jarFiles[i].getJarEntry(path);
+    
+                    if (jarEntry != null) {
+    
+                        entry = new ResourceEntry();
+                        try {
+                            entry.codeBase = getURL(jarRealFiles[i], false);
+                            String jarFakeUrl = getURI(jarRealFiles[i]).toString();
+                            jarFakeUrl = "jar:" + jarFakeUrl + "!/" + path;
+                            entry.source = new URL(jarFakeUrl);
+                            entry.lastModified = jarRealFiles[i].lastModified();
+                        } catch (MalformedURLException e) {
+                            return null;
+                        }
+                        contentLength = (int) jarEntry.getSize();
+                        try {
+                            entry.manifest = jarFiles[i].getManifest();
+                            binaryStream = jarFiles[i].getInputStream(jarEntry);
+                        } catch (IOException e) {
+                            return null;
+                        }
+    
+                        // Extract resources contained in JAR to the workdir
+                        if (antiJARLocking && !(path.endsWith(".class"))) {
+                            byte[] buf = new byte[1024];
+                            File resourceFile = new File
+                                (loaderDir, jarEntry.getName());
+                            if (!resourceFile.exists()) {
+                                Enumeration<JarEntry> entries =
+                                    jarFiles[i].entries();
+                                while (entries.hasMoreElements()) {
+                                    JarEntry jarEntry2 =  entries.nextElement();
+                                    if (!(jarEntry2.isDirectory()) 
+                                        && (!jarEntry2.getName().endsWith
+                                            (".class"))) {
+                                        resourceFile = new File
+                                            (loaderDir, jarEntry2.getName());
+                                        try {
+                                            if (!resourceFile.getCanonicalPath().startsWith(
+                                                    canonicalLoaderDir)) {
+                                                throw new IllegalArgumentException(
+                                                        sm.getString("webappClassLoader.illegalJarPath",
+                                                    jarEntry2.getName()));
+                                            }
+                                        } catch (IOException ioe) {
                                             throw new IllegalArgumentException(
-                                                    sm.getString("webappClassLoader.illegalJarPath",
-                                                jarEntry2.getName()));
-                                        }
-                                    } catch (IOException ioe) {
-                                        throw new IllegalArgumentException(
-                                                sm.getString("webappClassLoader.validationErrorJarPath",
-                                                        jarEntry2.getName()), ioe);
-                                    }                                 
-                                    resourceFile.getParentFile().mkdirs();
-                                    FileOutputStream os = null;
-                                    InputStream is = null;
-                                    try {
-                                        is = jarFiles[i].getInputStream
-                                            (jarEntry2);
-                                        os = new FileOutputStream
-                                            (resourceFile);
-                                        while (true) {
-                                            int n = is.read(buf);
-                                            if (n <= 0) {
-                                                break;
-                                            }
-                                            os.write(buf, 0, n);
-                                        }
-                                    } catch (IOException e) {
-                                        // Ignore
-                                    } finally {
+                                                    sm.getString("webappClassLoader.validationErrorJarPath",
+                                                            jarEntry2.getName()), ioe);
+                                        }                                 
+                                        resourceFile.getParentFile().mkdirs();
+                                        FileOutputStream os = null;
+                                        InputStream is = null;
                                         try {
-                                            if (is != null) {
-                                                is.close();
+                                            is = jarFiles[i].getInputStream
+                                                (jarEntry2);
+                                            os = new FileOutputStream
+                                                (resourceFile);
+                                            while (true) {
+                                                int n = is.read(buf);
+                                                if (n <= 0) {
+                                                    break;
+                                                }
+                                                os.write(buf, 0, n);
                                             }
                                         } catch (IOException e) {
-                                        }
-                                        try {
-                                            if (os != null) {
-                                                os.close();
+                                            // Ignore
+                                        } finally {
+                                            try {
+                                                if (is != null) {
+                                                    is.close();
+                                                }
+                                            } catch (IOException e) {
                                             }
-                                        } catch (IOException e) {
+                                            try {
+                                                if (os != null) {
+                                                    os.close();
+                                                }
+                                            } catch (IOException e) {
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+    
                     }
-
+    
                 }
-
-            }
-
-            if (entry == null) {
-                synchronized (notFoundResources) {
-                    notFoundResources.put(name, name);
-                }
-                return null;
-            }
-
-            if (binaryStream != null) {
-
-                byte[] binaryContent = new byte[contentLength];
-
-                int pos = 0;
-                try {
-
-                    while (true) {
-                        int n = binaryStream.read(binaryContent, pos,
-                                                  binaryContent.length - pos);
-                        if (n <= 0)
-                            break;
-                        pos += n;
+    
+                if (entry == null) {
+                    synchronized (notFoundResources) {
+                        notFoundResources.put(name, name);
                     }
-                } catch (IOException e) {
-                    log.error(sm.getString("webappClassLoader.readError", name), e);
                     return null;
-                } finally {
-                    try {
-                        binaryStream.close();
-                    } catch (IOException e) {}
                 }
-                if (fileNeedConvert) {
-                    // Workaround for certain files on platforms that use
-                    // EBCDIC encoding, when they are read through FileInputStream.
-                    // See commit message of rev.303915 for details
-                    // http://svn.apache.org/viewvc?view=revision&revision=303915
-                    String str = new String(binaryContent,0,pos);
+    
+                if (binaryStream != null) {
+    
+                    byte[] binaryContent = new byte[contentLength];
+    
+                    int pos = 0;
                     try {
-                        binaryContent = str.getBytes("UTF-8");
-                    } catch (Exception e) {
+    
+                        while (true) {
+                            int n = binaryStream.read(binaryContent, pos,
+                                                      binaryContent.length - pos);
+                            if (n <= 0)
+                                break;
+                            pos += n;
+                        }
+                    } catch (IOException e) {
+                        log.error(sm.getString("webappClassLoader.readError", name), e);
                         return null;
                     }
+                    if (fileNeedConvert) {
+                        // Workaround for certain files on platforms that use
+                        // EBCDIC encoding, when they are read through FileInputStream.
+                        // See commit message of rev.303915 for details
+                        // http://svn.apache.org/viewvc?view=revision&revision=303915
+                        String str = new String(binaryContent,0,pos);
+                        try {
+                            binaryContent = str.getBytes("UTF-8");
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }
+                    entry.binaryContent = binaryContent;
+    
+                    // The certificates are only available after the JarEntry 
+                    // associated input stream has been fully read
+                    if (jarEntry != null) {
+                        entry.certificates = jarEntry.getCertificates();
+                    }
+    
                 }
-                entry.binaryContent = binaryContent;
-
-                // The certificates are only available after the JarEntry 
-                // associated input stream has been fully read
-                if (jarEntry != null) {
-                    entry.certificates = jarEntry.getCertificates();
+            } finally {
+                if (binaryStream != null) {
+                    try {
+                        binaryStream.close();
+                    } catch (IOException e) { /* Ignore */}
                 }
-
             }
-
         }
 
         // Add the entry in the local resource repository
