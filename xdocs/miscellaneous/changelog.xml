@@ -36,6 +36,13 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.19 and 1.1.20">
+  <changelog>
+    <fix>
+      Prevent crashing JVM on shutdown. (mturk)
+    </fix>
+  </changelog>
+</section>
 <section name="Changes between 1.1.18 and 1.1.19">
   <changelog>
     <fix>
