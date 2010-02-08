@@ -45,6 +45,40 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(result, "01-\\");
     }
 
+    public void testBug48668a() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug48668a.jsp");
+        String result = res.toString();
+        assertEcho(result, "00-Hello world</p>#{foo.bar}");
+        assertEcho(result, "01-Hello world</p>${foo.bar}");
+    }
+
+    public void testBug48668b() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug48668b.jsp");
+        String result = res.toString();
+        System.out.println(result);
+        assertEcho(result, "00-Hello world</p>#{foo.bar}");
+    }
+
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
