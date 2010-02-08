@@ -1413,9 +1413,9 @@ class Parser implements TagConstants {
             parseXMLScriptlet(parent);
         } else if (reader.matches("<jsp:text")) {
             parseXMLTemplateText(parent);
-        } else if (reader.matches("${") && !pageInfo.isELIgnored()) {
+        } else if (!pageInfo.isELIgnored() && reader.matches("${")) {
             parseELExpression(parent, '$');
-        } else if (reader.matches("#{") && !pageInfo.isELIgnored()) {
+        } else if (!pageInfo.isELIgnored() && reader.matches("#{")) {
             parseELExpression(parent, '#');
         } else if (reader.matches("<jsp:")) {
             parseStandardAction(parent);
