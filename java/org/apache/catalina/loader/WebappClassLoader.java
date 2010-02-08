@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
@@ -430,7 +431,9 @@ public class WebappClassLoader
      * instability. As such, enabling this should be viewed as an option of last
      * resort in a development environment and is not recommended in a
      * production environment. If not specified, the default value of
-     * <code>false</code> will be used. 
+     * <code>false</code> will be used. Note that instances of
+     * java.util.TimerThread will always be terminate since a safe method exists
+     * to do so.
      */
     private boolean clearReferencesStopThreads = false;
 
@@ -1960,6 +1963,13 @@ public class WebappClassLoader
                         continue;
                     }
                    
+                    // TimerThread is not normally visible
+                    if (thread.getClass().getName().equals(
+                            "java.util.TimerThread")) {
+                        clearReferencesStopTimerThread(thread);
+                        continue;
+                    }
+
                     log.error(sm.getString("webappClassLoader.warnThread",
                             thread.getName()));
                     
@@ -2017,6 +2027,53 @@ public class WebappClassLoader
     }
 
     
+    private void clearReferencesStopTimerThread(Thread thread) {
+        
+        // Need to get references to:
+        // - newTasksMayBeScheduled field
+        // - queue field
+        // - queue.clear()
+        
+        try {
+            Field newTasksMayBeScheduledField =
+                thread.getClass().getDeclaredField("newTasksMayBeScheduled");
+            newTasksMayBeScheduledField.setAccessible(true);
+            Field queueField = thread.getClass().getDeclaredField("queue");
+            queueField.setAccessible(true);
+    
+            Object queue = queueField.get(thread);
+            
+            Method clearMethod = queue.getClass().getDeclaredMethod("clear");
+            clearMethod.setAccessible(true);
+            
+            synchronized(queue) {
+                newTasksMayBeScheduledField.setBoolean(thread, false);
+                clearMethod.invoke(queue);
+                queue.notify();  // In case queue was already empty.
+            }
+            
+            log.error(sm.getString("webappClassLoader.warnTimerThread",
+                    thread.getName()));
+
+        } catch (NoSuchFieldException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.stopTimerThreadFail",
+                    thread.getName()), e);
+        } catch (IllegalAccessException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.stopTimerThreadFail",
+                    thread.getName()), e);
+        } catch (NoSuchMethodException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.stopTimerThreadFail",
+                    thread.getName()), e);
+        } catch (InvocationTargetException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.stopTimerThreadFail",
+                    thread.getName()), e);
+        }
+    }
+
     private void clearReferencesThreadLocals() {
         Thread[] threads = getThreads();
 
