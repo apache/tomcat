@@ -445,6 +445,7 @@ public final class StandardServer
             // Match against our command string
             boolean match = command.toString().equals(shutdown);
             if (match) {
+                log.info(sm.getString("standardServer.shutdownViaPort"));
                 break;
             } else
                 log.warn("StandardServer.await: Invalid command '" +
