@@ -39,7 +39,7 @@
 <section name="Changes between 1.1.19 and 1.1.20">
   <changelog>
     <fix>
-      Prevent crashing JVM on shutdown. (mturk)
+      <bug>48584</bug>: Prevent crashing JVM on shutdown. (mturk)
     </fix>
   </changelog>
 </section>
