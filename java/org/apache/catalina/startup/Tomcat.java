@@ -587,9 +587,9 @@ public class Tomcat {
             System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
         if (oldValue != null) {
             if (oldValue.contains(value)) {
-                value = value + ":" + oldValue;
-            } else {
                 value = oldValue;
+            } else {
+                value = value + ":" + oldValue;
             }
         }
         System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
