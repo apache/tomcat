@@ -581,13 +581,19 @@ public class Tomcat {
         server.addLifecycleListener(new NamingContextListener());
         
         System.setProperty("catalina.useNaming", "true");
+
         String value = "org.apache.naming";
         String oldValue =
             System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
         if (oldValue != null) {
-            value = value + ":" + oldValue;
+            if (oldValue.contains(value)) {
+                value = value + ":" + oldValue;
+            } else {
+                value = oldValue;
+            }
         }
         System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
+
         value = System.getProperty
             (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
         if (value == null) {
