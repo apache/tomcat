@@ -62,8 +62,6 @@ public class ResourceLinkFactory
      * @param newGlobalContext new global context value
      */
     public static void setGlobalContext(Context newGlobalContext) {
-        if (globalContext != null)
-            return;
         globalContext = newGlobalContext;
     }
 
