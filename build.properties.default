@@ -105,18 +105,19 @@ commons-daemon.jar=${commons-daemon.lib}/commons-daemon.jar
 commons-daemon.loc=${base-commons.loc}/daemon/binaries/commons-daemon-1.0.1.tar.gz
 commons-daemon.jsvc.tar.gz=${commons-daemon.lib}/bin/jsvc.tar.gz
 
-# ----- JSON Libraries, 
-json-lib.home=${base.path}/json-20080701
-json-lib.lib=http://repo1.maven.org/maven2/org/json/json/20080701/json-20080701.jar
-json-lib.jar=json.jar
-
-# ----- Dojo Toolkit 
-dojo-js.home=${base.path}/dojo-release-1.1.1
-dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
-dojo-js.jar=${dojo-js.home}/dojo/dojo.js
-
 # ----- JUnit Unit Test Suite, version 3.7 or later -----
 junit.home=${base.path}/junit3.8.2
 junit.lib=${junit.home}
 junit.jar=${junit.lib}/junit.jar
 junit.loc=${base-sf.loc}/junit/junit3.8.2.zip
+
+# ----- JSON Libraries (for bayeux module) -----
+json-lib.home=${base.path}/json-20080701
+json-lib.lib=http://repo1.maven.org/maven2/org/json/json/20080701/json-20080701.jar
+json-lib.jar=json.jar
+
+# ----- Dojo Toolkit (for bayeux module) -----
+dojo-js.home=${base.path}/dojo-release-1.1.1
+dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
+dojo-js.jar=${dojo-js.home}/dojo/dojo.js
+
