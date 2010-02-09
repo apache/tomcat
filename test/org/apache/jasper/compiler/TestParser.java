@@ -75,8 +75,8 @@ public class TestParser extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48668b.jsp");
         String result = res.toString();
-        System.out.println(result);
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
+        assertEcho(result, "01-Hello world</p>#{foo2");
     }
 
     /** Assertion for text printed by tags:echo */
