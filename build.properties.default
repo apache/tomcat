@@ -54,9 +54,17 @@ base-sf.loc=http://downloads.sourceforge.net
 commons-logging-version=1.1.1
 commons-logging-src.loc=${base-commons.loc}/logging/source/commons-logging-${commons-logging-version}-src.tar.gz
 
-# ----- Webservices -----
-jaxrpc-src.loc=http://repo1.maven.org/maven2/geronimo-spec/geronimo-spec-jaxrpc/1.1-rc4/geronimo-spec-jaxrpc-1.1-rc4.jar
-wsdl4j-src.loc=http://repo1.maven.org/maven2/wsdl4j/wsdl4j/1.6.1/wsdl4j-1.6.1.jar
+# ----- Webservices - JAX RPC -----
+jaxrpc-lib.version=1.1-rc4
+jaxrpc-lib.home=${base.path}/jaxrpc-${jaxrpc-lib.version}
+jaxrpc-lib.loc=http://repo1.maven.org/maven2/geronimo-spec/geronimo-spec-jaxrpc/${jaxrpc-lib.version}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
+jaxrpc-lib.jar=${jaxrpc-lib.home}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
+
+# ----- Webservices - WSDL4J -----
+wsdl4j-lib.version=1.6.1
+wsdl4j-lib.home=${base.path}/wsdl4j-${wsdl4j-lib.version}
+wsdl4j-lib.loc=http://repo1.maven.org/maven2/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${wsdl4j-lib.version}.jar
+wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 
 # ----- Eclipse JDT, version 3.2 or later -----
 jdt.home=${base.path}/eclipse/plugins
