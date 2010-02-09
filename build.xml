@@ -969,16 +969,21 @@
           description="Build web services extras package">
 
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${jaxrpc-src.loc}"/>
-      <param name="destfile" value="${tomcat.extras}/webservices/jaxrpc.jar"/>
-      <param name="destdir" value="${tomcat.extras}/webservices/"/>
+      <param name="sourcefile" value="${jaxrpc-lib.loc}"/>
+      <param name="destfile" value="${jaxrpc-lib.jar}"/>
+      <param name="destdir" value="${jaxrpc-lib.home}"/>
     </antcall>
 
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${wsdl4j-src.loc}"/>
-      <param name="destfile" value="${tomcat.extras}/webservices/wsdl4j.jar"/>
-      <param name="destdir" value="${tomcat.extras}/webservices/"/>
+      <param name="sourcefile" value="${wsdl4j-lib.loc}"/>
+      <param name="destfile" value="${wsdl4j-lib.jar}"/>
+      <param name="destdir" value="${wsdl4j-lib.home}"/>
     </antcall>
+
+    <copy file="${jaxrpc-lib.jar}"
+          tofile="${tomcat.extras}/webservices/jaxrpc.jar" />
+    <copy file="${wsdl4j-lib.jar}"
+          tofile="${tomcat.extras}/webservices/wsdl4j.jar" />
 
     <!-- Compile web services classes components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
