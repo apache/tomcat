@@ -20,6 +20,7 @@
   <head><title>Bug 48668b test case</title></head>
   <body>
     <p><tags:echo echo="00-Hello world" />#{foo.bar}</p>
+    <p><tags:echo echo="01-Hello world" />#{foo${1 + 1}</p>
   </body>
 </html>
 
