@@ -79,6 +79,12 @@
 	<target name="bayeux">
     <mkdir dir="${tomcat.extras}"/>
 
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${json-lib.lib}"/>
+      <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
+      <param name="destdir" value="${json-lib.home}"/>
+    </antcall>
+
     <antcall target="downloadgz">
       <param name="sourcefile" value="${dojo-js.loc}"/>
       <param name="destfile" value="${dojo-js.jar}"/>
