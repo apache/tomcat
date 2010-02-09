@@ -2170,9 +2170,17 @@ public class WebappClassLoader
                                 args[2] = value.getClass().getCanonicalName();
                                 args[3] = value.toString();
                             }
-                            log.error(sm.getString(
-                                    "webappClassLoader.clearThreadLocal",
-                                    args));
+                            if (value == null) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString(
+                                            "webappClassLoader.clearThreadLocal",
+                                            args));
+                                }
+                            } else {
+                                log.error(sm.getString(
+                                        "webappClassLoader.clearThreadLocal",
+                                        args));
+                            }
                             mapRemove.invoke(map, entry);
                         }
                     }
