@@ -362,7 +362,7 @@
 
   </target>
 
-  <target name="compile" depends="build-prepare,download">
+  <target name="compile" depends="build-prepare,download-compile">
 
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
@@ -827,7 +827,7 @@
 
   </target>
 
-  <target name="test-compile" depends="compile" >
+  <target name="test-compile" depends="compile,download-test-compile" >
     <mkdir dir="${test.classes}"/>
     <!-- Compile -->
     <javac srcdir="test" destdir="${test.classes}"
@@ -1051,7 +1051,7 @@
     </antcall>
   </target>
 
-  <target name="dist-prepare">
+  <target name="dist-prepare" depends="download-dist">
     <!-- This is why releasing must be done on Windows / with wine:
          otherwise this check fails and the .exe distro is not generated -->
     <condition property="execute.installer">
@@ -1622,15 +1622,69 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete dir="${tomcat.output}" />
   </target>
 
-  <!-- Download and dependency building -->
-  <target name="download"
-          description="Download (and build as necessary) dependent components" >
+	
+  <!-- ================ Download and dependency building =================== -->
+
+  <target name="download-compile"
+	      description="Download (and build) components necessary to compile" >
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${tomcat-native.loc}"/>
       <param name="destfile" value="${tomcat-native.tar.gz}"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-daemon.loc}"/>
+      <param name="destfile" value="${commons-daemon.jar}"/>
+    </antcall>
+
+    <!-- Download src and build Tomcat DBCP bundle -->
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-pool-src.loc}"/>
+      <param name="destfile" value="${commons-pool.home}/build.xml" />
+    </antcall>
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-dbcp-src.loc}"/>
+      <param name="destfile" value="${commons-dbcp.home}/build.xml" />
+    </antcall>
+    <mkdir dir="${tomcat-dbcp.home}"/>
+    <condition property="no.build.dbcp">
+      <available file="${tomcat-dbcp.jar}"/>
+    </condition>
+    <antcall target="build-tomcat-dbcp">
+      <param name="basedir" value="${tomcat-dbcp.home}" />
+    </antcall>
+
+    <!-- Download src and build Jasper JDT bundle -->
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${jdt.loc}"/>
+      <param name="destfile" value="${jdt.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+    <mkdir dir="${jasper-jdt.home}"/>
+    <condition property="no.build.jasper-jdt">
+      <available file="${jasper-jdt.jar}"/>
+    </condition>
+    <antcall target="build-jasper-jdt">
+      <param name="basedir" value="${jasper-jdt.home}" />
+    </antcall>
+
+  </target>
+
+  <target name="download-test-compile"
+          description="Download additional components for the tests" >
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${junit.loc}"/>
+      <param name="destfile" value="${junit.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+
+  </target>
+
+  <target name="download-dist"
+          description="Download additional components for a distribution" >
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${tomcat-native.dll}/win32/tcnative-1.dll"/>
@@ -1650,61 +1704,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-daemon.loc}"/>
-      <param name="destfile" value="${commons-daemon.jar}"/>
-    </antcall>
-
-    <!-- Download src and build Tomcat DBCP bundle -->
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-pool-src.loc}"/>
-      <param name="destfile" value="${commons-pool.home}/build.xml" />
-    </antcall>
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-dbcp-src.loc}"/>
-      <param name="destfile" value="${commons-dbcp.home}/build.xml" />
-    </antcall>
-    <mkdir dir="${tomcat-dbcp.home}"/>
-  	<condition property="no.build.dbcp">
-      <available file="${tomcat-dbcp.jar}"/>
-    </condition>
-    <antcall target="build-tomcat-dbcp">
-      <param name="basedir" value="${tomcat-dbcp.home}" />
-    </antcall>
-
-    <!-- Dpwnload src and build Jasper JDT bundle -->
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${jdt.loc}"/>
-      <param name="destfile" value="${jdt.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-    <mkdir dir="${jasper-jdt.home}"/>
-    <condition property="no.build.jasper-jdt">
-      <available file="${jasper-jdt.jar}"/>
-    </condition>
-    <antcall target="build-jasper-jdt">
-      <param name="basedir" value="${jasper-jdt.home}" />
-    </antcall>
-
     <antcall target="downloadzip">
       <param name="sourcefile" value="${nsis.loc}"/>
       <param name="destfile" value="${nsis.exe}"/>
       <param name="destdir" value="${nsis.home}/.."/>
     </antcall>
 
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${json-lib.lib}"/>
-      <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
-      <param name="destdir" value="${json-lib.home}"/>
-    </antcall>
-
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${junit.loc}"/>
-      <param name="destfile" value="${junit.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-
   </target>
+
 
   <!-- =============== Targets for dependencies that need to =============== -->
   <!-- ================  be built rather than used directly ================ -->
