@@ -69,8 +69,8 @@ wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 # ----- Eclipse JDT, version 3.2 or later -----
 jdt.home=${base.path}/eclipse/plugins
 jdt.lib=${jdt.home}
-jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar
-jdt.loc=http://archive.eclipse.org/eclipse/downloads/drops/R-3.3.1-200709211145/eclipse-JDT-3.3.1.zip
+jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.4.4.v_894_R34x.jar
+jdt.loc=http://archive.eclipse.org/eclipse/downloads/drops/R-3.4.2-200902111700/eclipse-JDT-SDK-3.4.2.zip
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.1.19
