@@ -186,6 +186,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 if (contentLength >= 0) {
                     hconn.setRequestProperty("Content-Length",
                                              "" + contentLength);
+                    
+                    hconn.setFixedLengthStreamingMode(contentLength);
                 }
             } else {
                 hconn.setDoOutput(false);
