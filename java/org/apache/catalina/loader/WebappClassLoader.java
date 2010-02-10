@@ -436,6 +436,14 @@ public class WebappClassLoader
      */
     private boolean clearReferencesStopThreads = false;
 
+    /**
+     * Should Tomcat call {@link org.apache.juli.logging.LogFactory#release()}
+     * when the class loader is stopped? If not specified, the default value
+     * of <code>true</code> is used. Changing the default setting is likely to
+     * lead to memory leaks and other issues.
+     */
+    private boolean clearReferencesLogFactoryRelease = true;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -635,6 +643,26 @@ public class WebappClassLoader
      public void setClearReferencesStopThreads(
              boolean clearReferencesStopThreads) {
          this.clearReferencesStopThreads = clearReferencesStopThreads;
+     }
+
+
+     /**
+      * Return the clearReferencesLogFactoryRelease flag for this Context.
+      */
+     public boolean getClearReferencesLogFactoryRelease() {
+         return (this.clearReferencesLogFactoryRelease);
+     }
+
+
+     /**
+      * Set the clearReferencesLogFactoryRelease feature for this Context.
+      *
+      * @param clearReferencesLogFactoryRelease The new flag value
+      */
+     public void setClearReferencesLogFactoryRelease(
+             boolean clearReferencesLogFactoryRelease) {
+         this.clearReferencesLogFactoryRelease =
+             clearReferencesLogFactoryRelease;
      }
 
 
@@ -1741,7 +1769,9 @@ public class WebappClassLoader
         IntrospectionUtils.clear();
         
         // Clear the classloader reference in common-logging
-        org.apache.juli.logging.LogFactory.release(this);
+        if (clearReferencesLogFactoryRelease) {
+            org.apache.juli.logging.LogFactory.release(this);
+        }
         
         // Clear the classloader reference in the VM's bean introspector
         java.beans.Introspector.flushCaches();
