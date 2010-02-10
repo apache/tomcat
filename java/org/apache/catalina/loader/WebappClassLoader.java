@@ -620,7 +620,7 @@ public class WebappClassLoader
 
 
      /**
-      * Return the clearReferencesStatic flag for this Context.
+      * Return the clearReferencesStopThreads flag for this Context.
       */
      public boolean getClearReferencesStopThreads() {
          return (this.clearReferencesStopThreads);
