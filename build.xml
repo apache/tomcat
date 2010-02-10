@@ -295,8 +295,9 @@
 
   <patternset id="files.jasper-jdt">
     <include name="org/eclipse/jdt/core/compiler/**"/>
+    <include name="org/eclipse/jdt/core/JDTCompilerAdapter*"/>
+    <include name="org/eclipse/jdt/internal/antadapter/**"/>
     <include name="org/eclipse/jdt/internal/compiler/**"/>
-    <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
   </patternset>
 
   <patternset id="files.tomcat-dbcp">
@@ -1657,10 +1658,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
 
     <!-- Download src and build Jasper JDT bundle -->
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${jdt.loc}"/>
+    <antcall target="downloadfile-2">
+      <param name="sourcefile.1" value="${jdt.loc.1}"/>
+      <param name="sourcefile.2" value="${jdt.loc.2}"/>
       <param name="destfile" value="${jdt.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${jdt.home}"/>
     </antcall>
     <mkdir dir="${jasper-jdt.home}"/>
     <condition property="no.build.jasper-jdt">
@@ -1817,6 +1819,37 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <get src="${sourcefile}" dest="${destfile}" />
   </target>
 
+  <target name="downloadfile-2" unless="exist" depends="testexist">
+    <!-- Download the file from the two alternative locations -->
+    <mkdir dir="${destdir}" />
+
+    <antcall target="trydownload">
+      <param name="sourcefile" value="${sourcefile.1}" />
+    </antcall>
+
+    <antcall target="trydownload">
+      <param name="sourcefile" value="${sourcefile.2}" />
+    </antcall>
+
+    <available file="${destfile}" property="exist"/>
+    <fail unless="exist" message="Failed to download [${destfile}]. All download sources are unavailable." />
+  </target>
+
+  <target name="trydownload.check" depends="setproxy">
+    <condition property="trydownload.run">
+      <and>
+        <not>
+          <available file="${destfile}" />
+        </not>
+        <http url="${sourcefile}" />
+      </and>
+    </condition>
+  </target>
+
+  <target name="trydownload" if="trydownload.run" depends="trydownload.check">
+    <!-- Downloads a file if not yet downloaded and the source URL is available -->
+    <get src="${sourcefile}" dest="${destfile}" />
+  </target>
 
   <!-- ======================= Macros, Taskdefs etc ======================== -->
 
