@@ -1664,13 +1664,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destfile" value="${jdt.jar}"/>
       <param name="destdir" value="${jdt.home}"/>
     </antcall>
-    <mkdir dir="${jasper-jdt.home}"/>
     <condition property="no.build.jasper-jdt">
-      <available file="${jasper-jdt.jar}"/>
+      <and>
+        <available file="${jasper-jdt.jar}"/>
+        <uptodate targetfile="${jasper-jdt.jar}" srcfile="${jdt.jar}"/>
+        <uptodate targetfile="${jasper-jdt.jar}" srcfile="${basedir}/build.xml"/>
+      </and>
     </condition>
-    <antcall target="build-jasper-jdt">
-      <param name="basedir" value="${jasper-jdt.home}" />
-    </antcall>
+    <antcall target="build-jasper-jdt" />
 
   </target>
 
@@ -1764,6 +1765,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="build-jasper-jdt" depends="build-manifests"
   	      unless="no.build.jasper-jdt">
+    <delete dir="${jasper-jdt.home}"/>
+    <mkdir dir="${jasper-jdt.home}"/>
     <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
   	<jarIt jarfile="${jasper-jdt.jar}"
   	  filesDir="${jasper-jdt.home}"
@@ -1771,6 +1774,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   	  manifest="${tomcat.manifests}/default.manifest"
   	  notice="${tomcat.home}/res/META-INF/jasper-jdt.jar.notice"
   	  license="${tomcat.home}/res/META-INF/jasper-jdt.jar.license"/>
+    <delete includeEmptyDirs="true">
+      <fileset dir="${jasper-jdt.home}">
+        <include name="**/*"/>
+        <exclude name="jasper-jdt.jar"/>
+      </fileset>
+    </delete>
   </target>
 
 
