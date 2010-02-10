@@ -2794,8 +2794,9 @@ public class WebdavServlet
     // --------------------------------------------- WebdavResolver Inner Class
     /**
      * Work around for XML parsers that don't fully respect
-     * {@link DocumentBuilderFactory#setExpandEntityReferences(false)}. External
-     * references are filtered out for security reasons. See CVE-2007-5461.
+     * {@link DocumentBuilderFactory#setExpandEntityReferences(boolean)} when
+     * called with <code>false</code>. External references are filtered out for
+     * security reasons. See CVE-2007-5461.
      */
     private class WebdavResolver implements EntityResolver {
         private ServletContext context;
