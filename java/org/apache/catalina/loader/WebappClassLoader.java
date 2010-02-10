@@ -47,7 +47,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
@@ -629,9 +628,9 @@ public class WebappClassLoader
 
 
      /**
-      * Set the clearReferencesStatic feature for this Context.
+      * Set the clearReferencesStopThreads feature for this Context.
       *
-      * @param clearReferencesStatic The new flag value
+      * @param clearReferencesStopThreads The new flag value
       */
      public void setClearReferencesStopThreads(
              boolean clearReferencesStopThreads) {
