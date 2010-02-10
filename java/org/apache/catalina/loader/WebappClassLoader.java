@@ -2354,7 +2354,7 @@ public class WebappClassLoader
         if (clazz != null)
             return clazz;
 
-        synchronized (this) {
+        synchronized (name.intern()) {
             clazz = entry.loadedClass;
             if (clazz != null)
                 return clazz;
