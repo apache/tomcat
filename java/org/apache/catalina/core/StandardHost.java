@@ -19,6 +19,11 @@
 package org.apache.catalina.core;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
@@ -27,6 +32,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Valve;
+import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.modeler.Registry;
@@ -161,6 +167,14 @@ public class StandardHost
      * Should we create directories upon startup for appBase and xmlBase
      */
      private boolean createDirs = true;
+
+     
+     /**
+      * Track the class loaders for the child web applications so memory leaks
+      * can be detected.
+      */
+     private Map<ClassLoader, String> childClassLoaders =
+         new WeakHashMap<ClassLoader, String>();
 
     // ------------------------------------------------------------- Properties
 
@@ -565,9 +579,40 @@ public class StandardHost
             throw new IllegalArgumentException
                 (sm.getString("standardHost.notContext"));
         super.addChild(child);
-
+        
+        // Record a reference to the context's class loader to aid memory leak
+        // detection
+        if (child.getLoader() != null) {
+            childClassLoaders.put(child.getLoader().getClassLoader(),
+                    child.getName());
+        }
     }
 
+
+    /**
+     * Attempt to identify the contexts that have a class loader memory leak.
+     * This is usually triggered on context reload. Note: This method attempts
+     * to force a full garbage collection. This should be used with extreme
+     * caution on a production system.
+     */
+    public String[] findReloadedContextMemoryLeaks() {
+        
+        System.gc();
+        
+        List<String> result = new ArrayList<String>();
+        
+        for (Map.Entry<ClassLoader, String> entry :
+                childClassLoaders.entrySet()) {
+            ClassLoader cl = entry.getKey();
+            if (cl instanceof WebappClassLoader) {
+                if (!((WebappClassLoader) cl).isStarted()) {
+                    result.add(entry.getValue());
+                }
+            }
+        }
+        
+        return result.toArray(new String[result.size()]);
+    }
 
     /**
      * Return the set of alias names for this Host.  If none are defined,
