@@ -62,8 +62,11 @@
         <item name="23) APR/Native"         href="apr.html"/>
         <item name="24) Virtual Hosting"    href="virtual-hosting-howto.html"/>
         <item name="25) Advanced IO"        href="aio.html"/>
-        <item name="26) Additional Components" href="extras.html"/>
-        <item name="27) Mavenized" href="maven-jars.html"/>
+        <item name="26) Additional Components"
+              href="extras.html"/>
+        <item name="27) Mavenized"          href="maven-jars.html"/>
+        <item name="28) Security Considerations"
+              href="security-howto.html"/>
     </menu>
 
     <menu name="Reference">
