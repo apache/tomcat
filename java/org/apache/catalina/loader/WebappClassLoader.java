@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
@@ -1773,6 +1774,9 @@ public class WebappClassLoader
             org.apache.juli.logging.LogFactory.release(this);
         }
         
+        // Clear any cached resource bundles
+        ResourceBundle.clearCache(this);
+
         // Clear the classloader reference in the VM's bean introspector
         java.beans.Introspector.flushCaches();
 
