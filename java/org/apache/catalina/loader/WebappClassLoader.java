@@ -25,6 +25,7 @@ import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,6 +48,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
@@ -66,6 +69,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.jasper.servlet.JasperLoader;
 import org.apache.naming.JndiPermission;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
@@ -1773,6 +1777,9 @@ public class WebappClassLoader
             org.apache.juli.logging.LogFactory.release(this);
         }
         
+        // Clear the resource bundle cache
+        clearReferencesResourceBundles();
+
         // Clear the classloader reference in the VM's bean introspector
         java.beans.Introspector.flushCaches();
 
@@ -2312,6 +2319,83 @@ public class WebappClassLoader
     }
     
     
+    /**
+     * Clear the {@link ResourceBundle} cache of any bundles loaded by this
+     * class loader or any class loader where this loader is a parent class
+     * loader. Whilst {@link ResourceBundle#clearCache()} could be used there
+     * are complications around the {@link JasperLoader} that mean a reflection
+     * based approach is more likely to be complete.
+     * 
+     * The ResourceBundle is using WeakReferences so it shouldn't be pinning the
+     * class loader in memory. However, it is. Therefore clear ou the
+     * references.
+     */
+    private void clearReferencesResourceBundles() {
+        // Get a reference to the cache
+        try {
+            Field cacheListField =
+                ResourceBundle.class.getDeclaredField("cacheList");
+            cacheListField.setAccessible(true);
+
+            // Java 6 uses ConcurrentMap
+            // Java 5 uses SoftCache extends Abstract Map
+            // So use Map and it *should* work with both
+            Map<?,?> cacheList = (Map<?,?>) cacheListField.get(null);
+            
+            // Get the keys (loader references are in the key)
+            Set<?> keys = cacheList.keySet();
+            
+            Field loaderRefField = null;
+            
+            // Iterate over the keys looking at the loader instances
+            Iterator<?> keysIter = keys.iterator();
+            
+            int countRemoved = 0;
+            
+            while (keysIter.hasNext()) {
+                Object key = keysIter.next();
+                
+                if (loaderRefField == null) {
+                    loaderRefField =
+                        key.getClass().getDeclaredField("loaderRef");
+                    loaderRefField.setAccessible(true);
+                }
+                WeakReference<?> loaderRef =
+                    (WeakReference<?>) loaderRefField.get(key);
+                
+                ClassLoader loader = (ClassLoader) loaderRef.get();
+                
+                while (loader != null && loader != this) {
+                    loader = loader.getParent();
+                }
+                
+                if (loader != null) {
+                    keysIter.remove();
+                    countRemoved++;
+                }
+            }
+            
+            if (countRemoved > 0 && log.isDebugEnabled()) {
+                log.debug(sm.getString(
+                        "webappClassLoader.clearReferencesResourceBundlesCount",
+                        Integer.valueOf(countRemoved)));
+            }
+        } catch (SecurityException e) {
+            log.error(sm.getString(
+                    "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+        } catch (NoSuchFieldException e) {
+            log.error(sm.getString(
+                    "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+        } catch (IllegalArgumentException e) {
+            log.error(sm.getString(
+                    "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+        } catch (IllegalAccessException e) {
+            log.error(sm.getString(
+                    "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+        }
+    }
+
+
     /**
      * Determine whether a class was loaded by this class loader or one of
      * its child class loaders.
