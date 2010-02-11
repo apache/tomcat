@@ -20,6 +20,7 @@ package org.apache.jasper.servlet;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -416,6 +417,9 @@ public class JspServletWrapper {
 
     public void destroy() {
         if (theServlet != null) {
+            // Memory leak prevention - ResourceBundle caches resources based
+            // on class loader
+            ResourceBundle.clearCache(ctxt.getJspLoader());
             theServlet.destroy();
             InstanceManager instanceManager = InstanceManagerFactory.getInstanceManager(config);
             try {
