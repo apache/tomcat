@@ -578,15 +578,16 @@ public class StandardHost
     @Override
     public void addChild(Container child) {
 
+        if (child instanceof Lifecycle) {
+            ((Lifecycle) child).addLifecycleListener(
+                    new MemoryLeakTrackingListener());
+        }
+
         if (!(child instanceof Context))
             throw new IllegalArgumentException
                 (sm.getString("standardHost.notContext"));
         super.addChild(child);
 
-        if (child instanceof Lifecycle) {
-            ((Lifecycle) child).addLifecycleListener(
-                    new MemoryLeakTrackingListener());
-        }
     }
 
 
