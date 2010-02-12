@@ -2039,6 +2039,11 @@ public class WebdavServlet
             return;
 
         CacheEntry cacheEntry = resources.lookupCache(path);
+        if (!cacheEntry.exists) {
+        	// File is in directory listing but doesn't appear to exist
+        	// Broken symlink or odd permission settings?
+        	return;
+        }
 
         generatedXML.writeElement(null, "response", XMLWriter.OPENING);
         String status = new String("HTTP/1.1 " + WebdavStatus.SC_OK + " "
