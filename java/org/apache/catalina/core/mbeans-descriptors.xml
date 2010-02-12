@@ -543,7 +543,7 @@
     <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
     
     <operation name="findReloadedContextMemoryLeaks"
-               description="Provide a list of contexts that have leaked memory on reload. This will attempt to force a full garbage collection. Use with extreme caution on prouction systems."
+               description="Provide a list of contexts that have leaked memory on reload. This will attempt to force a full garbage collection. Use with extreme caution on production systems."
                impact="ACTION"
                returnType="[Ljava.lang.String;" />
 
