@@ -218,6 +218,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
             message = start(path);
         } else if (command.equals("/stop")) {
             message = stop(path);
+        } else if (command.equals("/findleaks")) {
+            message = findleaks();
         } else {
             // Try GET
             doGet(request,response);
@@ -616,6 +618,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[4] = newNonce;
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
+        // Diagnostics section
+        args = new Object[6];
+        args[0] = sm.getString("htmlManagerServlet.diagnosticsTitle");
+        args[1] = sm.getString("htmlManagerServlet.diagnosticsLeak");
+        args[2] = response.encodeURL(
+                request.getContextPath() + "/html/findleaks");
+        args[3] = newNonce;
+        args[4] = sm.getString("htmlManagerServlet.diagnosticsLeakWarning");
+        args[5] = sm.getString("htmlManagerServlet.diagnosticsLeakButton");
+        writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
+
         // Server Header Section
         args = new Object[7];
         args[0] = sm.getString("htmlManagerServlet.serverTitle");
@@ -750,6 +763,33 @@ public final class HTMLManagerServlet extends ManagerServlet {
         return stringWriter.toString();
     }
 
+    /**
+     * Find potential memory leaks caused by web application reload.
+     *
+     * @see ManagerServlet#findleaks(PrintWriter) 
+     *
+     * @return message String
+     */
+    protected String findleaks() {
+
+        StringBuilder msg = new StringBuilder();
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        super.findleaks(printWriter);
+
+        if (stringWriter.getBuffer().length() > 0) {
+            msg.append(sm.getString("htmlManagerServlet.findleaksList"));
+            msg.append(stringWriter.toString());
+        } else {
+            msg.append(sm.getString("htmlManagerServlet.findleaksNone"));
+        }
+        
+        return msg.toString();
+    }
+    
+    
     /**
      * @see javax.servlet.Servlet#getServletInfo()
      */
@@ -1126,7 +1166,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
@@ -1137,11 +1177,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{3}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{5}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
@@ -1153,7 +1193,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
@@ -1163,13 +1203,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{1}\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{7}\"></small>" +
         "  </form>\n" +
         " </td>\n" +
@@ -1179,11 +1219,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{3}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{5}\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{7}</small>&nbsp;\n" +
@@ -1193,7 +1233,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{1}\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
@@ -1215,7 +1255,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
         "<form method=\"post\" action=\"{2}\">\n" +
-        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{7}\"" +
+        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{7}\" >" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
@@ -1285,4 +1325,31 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<br>\n" +
         "\n";
 
+    private static final String DIAGNOSTICS_SECTION =
+        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<tr>\n" +
+        " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
+        "</tr>\n" +
+        "<tr>\n" +
+        " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
+        "</tr>\n" +
+        "<tr>\n" +
+        " <td colspan=\"2\">\n" +
+        "<form method=\"post\" action=\"{2}\">\n" +
+        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{3}\" >" +
+        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<tr>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <input type=\"submit\" value=\"{5}\">\n" +
+        " </td>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <small>{4}</small>\n" +
+        " </td>\n" +
+        "</tr>\n" +
+        "</table>\n" +
+        "</form>\n" +
+        "</td>\n" +
+        "</tr>\n" +
+        "</table>\n" +
+        "<br>";
 }

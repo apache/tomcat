@@ -53,6 +53,7 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Session;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
@@ -364,6 +365,8 @@ public class ManagerServlet
             stop(writer, path);
         } else if (command.equals("/undeploy")) {
             undeploy(writer, path);
+        } else if (command.equals("/findleaks")) {
+            findleaks(writer);
         } else {
             writer.println(sm.getString("managerServlet.unknownCommand",
                                         command));
@@ -496,6 +499,25 @@ public class ManagerServlet
     // -------------------------------------------------------- Private Methods
 
 
+    /**
+     * Find potential memory leaks caused by web application reload.
+     */
+    protected void findleaks(PrintWriter writer) {
+        
+        if (!(host instanceof StandardHost)) {
+            writer.println(sm.getString("managerServlet.findleaksFail"));
+            return;
+        }
+        
+        String[] results =
+            ((StandardHost) host).findReloadedContextMemoryLeaks();
+        
+        for (String result : results) {
+            writer.println(result);
+        }
+    }
+    
+    
     /**
      * Store server configuration.
      * 
