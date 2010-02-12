@@ -47,10 +47,10 @@
     <p>The following is a quick configuration guide for Java 6:</p>
     <p>Add the following parameters to your Tomcat startup script:
     <source>
-    set CATALINA_OPTS="-Dcom.sun.management.jmxremote \
+    set CATALINA_OPTS=-Dcom.sun.management.jmxremote \
     -Dcom.sun.management.jmxremote.port=%my.jmx.port% \
     -Dcom.sun.management.jmxremote.ssl=false \
-    -Dcom.sun.management.jmxremote.authenticate=false"
+    -Dcom.sun.management.jmxremote.authenticate=false
     </source>
     </p>
     <p>
