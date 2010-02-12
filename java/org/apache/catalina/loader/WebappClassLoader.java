@@ -2177,15 +2177,13 @@ public class WebappClassLoader
                         ThreadLocal.class);
             mapRemove.setAccessible(true);
             Object[] table = (Object[]) internalTableField.get(map);
+            int staleEntriesCount = 0;
             if (table != null) {
                 for (int j =0; j < table.length; j++) {
                     if (table[j] != null) {
                         boolean remove = false;
                         // Check the key
-                        Field keyField =
-                            Reference.class.getDeclaredField("referent");
-                        keyField.setAccessible(true);
-                        Object key = keyField.get(table[j]);
+                        Object key = ((Reference<?>) table[j]).get();
                         if (this.equals(key) || (key != null &&
                                 this == key.getClass().getClassLoader())) {
                             remove = true;
@@ -2200,7 +2198,6 @@ public class WebappClassLoader
                             remove = true;
                         }
                         if (remove) {
-                            Object entry = ((Reference<?>) table[j]).get();
                             Object[] args = new Object[4];
                             if (key != null) {
                                 args[0] = key.getClass().getCanonicalName();
@@ -2221,10 +2218,20 @@ public class WebappClassLoader
                                         "webappClassLoader.clearThreadLocal",
                                         args));
                             }
-                            mapRemove.invoke(map, entry);
+                            if (key == null) {
+                              staleEntriesCount++;
+                            } else {
+                              mapRemove.invoke(map, key);
+                            }
                         }
                     }
                 }
+            }
+            if (staleEntriesCount > 0) {
+                Method mapRemoveStale =
+                    map.getClass().getDeclaredMethod("expungeStaleEntries");
+                mapRemoveStale.setAccessible(true);
+                mapRemoveStale.invoke(map);
             }
         }
     }
