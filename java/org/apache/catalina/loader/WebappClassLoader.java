@@ -2213,7 +2213,7 @@ public class WebappClassLoader
                             if (value == null) {
                                 if (log.isDebugEnabled()) {
                                     log.debug(sm.getString(
-                                            "webappClassLoader.clearThreadLocal",
+                                            "webappClassLoader.clearThreadLocalDebug",
                                             args));
                                 }
                             } else {
