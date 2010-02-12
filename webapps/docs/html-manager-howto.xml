@@ -36,7 +36,7 @@ to manage your web applications without having to shut down and restart
 Tomcat.  This document is for the HTML web interface to the web application
 <a href="manager-howto.html">manager</a>.</p>
 
-<p>The interface is divided into five sections:
+<p>The interface is divided into six sections:
 <ul>
   <li><strong>Message</strong> - Displays success and failure messages.</li>
   <li><strong>Manager</strong> - General manager operations like list and
@@ -44,6 +44,7 @@ Tomcat.  This document is for the HTML web interface to the web application
   <li><strong>Applications</strong> - List of web applications and
       commands.</li>
   <li><strong>Deploy</strong> - Deploying web applications.</li>
+  <li><strong>Diagnostocs</strong> - Identifying potential problems.</li>
   <li><strong>Server Information</strong> - Information about the Tomcat
       server.</li>
 </ul>
@@ -544,6 +545,19 @@ error message.  Possible causes for problems include:</p>
 </ul>
 
 </subsection>
+</section>
+
+<section name="Diagnostics">
+
+<p><strong>The find leaks diagnostic triggers a full garbage collection. It
+should be used with extreme caution on production systems.</strong></p>
+
+<p>The find leaks diagnostic attempts to identify web applications that have
+caused memory leaks when they were reloaded. Results should always be confirmed
+with a profiler. The diagnostic uses additional functionality provided by the
+StandardHost implementation. It will not work if a custom host is used that
+does not extend StandardHost.</p>
+
 </section>
 
 <section name="Server Information">
