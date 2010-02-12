@@ -1782,6 +1782,10 @@ public class WebappClassLoader
         }
         
         // Clear the resource bundle cache
+        // This shouldn't be necessary, the cache uses weak references but
+        // it has caused leaks. Oddly, using the leak detection code in
+        // standard host allows the class loader to be GC'd. This has been seen
+        // on Sun but not IBM JREs. Maybe a bug in Sun's GC impl?
         clearReferencesResourceBundles();
 
         // Clear the classloader reference in the VM's bean introspector
@@ -2395,8 +2399,13 @@ public class WebappClassLoader
             log.error(sm.getString(
                     "webappClassLoader.clearReferencesResourceBundlesFail"), e);
         } catch (NoSuchFieldException e) {
-            log.error(sm.getString(
-                    "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+            if (System.getProperty("java.vendor").startsWith("Sun")) {
+                log.error(sm.getString(
+                "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+            } else {
+                log.debug(sm.getString(
+                "webappClassLoader.clearReferencesResourceBundlesFail"), e);
+            }
         } catch (IllegalArgumentException e) {
             log.error(sm.getString(
                     "webappClassLoader.clearReferencesResourceBundlesFail"), e);
