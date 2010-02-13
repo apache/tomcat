@@ -539,7 +539,7 @@ public class Connector
 
     /**
      * Return the port number on which we listen for requests.
-     */
+     /
     public int getPort() {
 
         return (this.port);
@@ -557,6 +557,10 @@ public class Connector
         this.port = port;
         setProperty("port", String.valueOf(port));
 
+    }
+    
+    public int getPort() {
+        return this.port;
     }
 
 
