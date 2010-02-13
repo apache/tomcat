@@ -124,13 +124,19 @@ public class DefaultServlet
     /**
      * Allow customized directory listing per directory.
      */
-    protected String  localXsltFile = null;
+    protected String localXsltFile = null;
 
 
     /**
+     * Allow customized directory listing per context.
+     */
+    protected String contextXsltFile = null;
+    
+    
+    /**
      * Allow customized directory listing per instance.
      */
-    protected String  globalXsltFile = null;
+    protected String globalXsltFile = null;
 
 
     /**
@@ -248,6 +254,7 @@ public class DefaultServlet
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
+        contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
         localXsltFile = getServletConfig().getInitParameter("localXsltFile");
         readmeFile = getServletConfig().getInitParameter("readmeFile");
 
@@ -1195,6 +1202,9 @@ public class DefaultServlet
                     trimmed.equalsIgnoreCase(localXsltFile))
                     continue;
 
+                if ((cacheEntry.name + trimmed).equals(contextXsltFile))
+                    continue;
+
                 CacheEntry childCacheEntry =
                     resources.lookupCache(cacheEntry.name + resourceName);
                 if (!childCacheEntry.exists) {
@@ -1492,9 +1502,17 @@ public class DefaultServlet
             } catch (NamingException e) {
                 if (debug > 10)
                     log("localXsltFile '" + localXsltFile + "' not found", e);
-
-                return null;
             }
+        }
+
+        if (contextXsltFile != null) {
+            InputStream is =
+                getServletContext().getResourceAsStream(contextXsltFile);
+            if (is != null)
+                return is;
+
+            if (debug > 10)
+                log("contextXsltFile '" + contextXsltFile + "' not found");
         }
 
         /*  Open and read in file in one fell swoop to reduce chance
