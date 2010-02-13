@@ -962,9 +962,9 @@ class Generator {
         }
 
         /**
-         * Scans through all child nodes of the given parent for <param>
-         * subelements. For each <param> element, if its value is specified via
-         * a Named Attribute (<jsp:attribute>), generate the code to evaluate
+         * Scans through all child nodes of the given parent for &lt;param&gt;
+         * subelements. For each &lt;param&gt; element, if its value is specified via
+         * a Named Attribute (&lt;jsp:attribute&gt;), generate the code to evaluate
          * those bodies first.
          * <p>
          * If parent is null, simply returns.
@@ -1380,7 +1380,7 @@ class Generator {
         public void visit(Node.PlugIn n) throws JasperException {
 
             /**
-             * A visitor to handle <jsp:param> in a plugin
+             * A visitor to handle &lt;jsp:param&gt; in a plugin
              */
             class ParamVisitor extends Node.Visitor {
 
