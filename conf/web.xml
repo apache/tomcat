@@ -80,7 +80,12 @@
   <!--   localXsltFile       Make directory listings an XML doc and         -->
   <!--                       pass the result to this style sheet residing   -->
   <!--                       in that directory. This overrides              -->
-  <!--                        globalXsltFile[null]                          -->
+  <!--                       contextXsltFile and globalXsltFile[null]       -->
+  <!--                                                                      -->
+  <!--   contextXsltFile     Make directory listings an XML doc and         -->
+  <!--                       pass the result to this style sheet which is   -->
+  <!--                       relative to the context root. This overrides   -->
+  <!--                       globalXsltFile[null]                           -->
   <!--                                                                      -->
   <!--   globalXsltFile      Site wide configuration version of             -->
   <!--                       localXsltFile This argument is expected        -->
