@@ -185,9 +185,15 @@ public class ELSupport {
         if (type.isAssignableFrom(obj.getClass())) {
             return (Enum<?>) obj;
         }
+        
+        if (!(obj instanceof String)) {
+            throw new ELException(MessageFactory.get("error.convert",
+                    obj, obj.getClass(), type));
+        }
+
         Enum<?> result;
         try {
-             result = Enum.valueOf(type, obj.toString());
+             result = Enum.valueOf(type, (String) obj);
         } catch (IllegalArgumentException iae) {
             throw new ELException(MessageFactory.get("error.convert",
                     obj, obj.getClass(), type));
