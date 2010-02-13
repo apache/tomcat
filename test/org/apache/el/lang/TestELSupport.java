@@ -92,9 +92,10 @@ public class TestELSupport extends TestCase {
         Object output = null;
         try {
             output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumC.class);
-        } finally {
-            assertEquals(TestEnumC.VALA1, output);
+        } catch (ELException ele) {
+            // Ignore
         }
+        assertNull(output);
     }
 
     private static void testIsSame(Object value) {
