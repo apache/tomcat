@@ -257,11 +257,11 @@ public class ServiceRefFactory
                 ArrayList<String> soaproles = new ArrayList<String>();
 
                 while (((ServiceRef) ref).getHandlersSize() > 0) {
-                    HandlerRef handler = ((ServiceRef) ref).getHandler();
-                    HandlerInfo handlerref = new HandlerInfo();
+                    HandlerRef handlerRef = ((ServiceRef) ref).getHandler();
+                    HandlerInfo handlerInfo = new HandlerInfo();
 
                     // Loading handler Class
-                    tmp = handler.get(HandlerRef.HANDLER_CLASS);
+                    tmp = handlerRef.get(HandlerRef.HANDLER_CLASS);
                     if ((tmp == null) || (tmp.getContent() == null))
                         break;
                     Class<?> handlerClass = null;
@@ -276,51 +276,51 @@ public class ServiceRefFactory
                     ArrayList<QName> headers = new ArrayList<QName>();
                     Hashtable<String,String> config = new Hashtable<String,String>();
                     ArrayList<String> portNames = new ArrayList<String>();
-                    for (int i = 0; i < handler.size(); i++)
-                        if (HandlerRef.HANDLER_LOCALPART.equals(handler.get(i).getType())) {
+                    for (int i = 0; i < handlerRef.size(); i++)
+                        if (HandlerRef.HANDLER_LOCALPART.equals(handlerRef.get(i).getType())) {
                             String localpart = "";
                             String namespace = "";
-                            localpart = (String) handler.get(i).getContent();
-                            if (HandlerRef.HANDLER_NAMESPACE.equals(handler.get(i + 1).getType())) {
+                            localpart = (String) handlerRef.get(i).getContent();
+                            if (HandlerRef.HANDLER_NAMESPACE.equals(handlerRef.get(i + 1).getType())) {
                                 i++;
-                                namespace = (String) handler.get(i).getContent();
+                                namespace = (String) handlerRef.get(i).getContent();
                             }
                             QName header = new QName(namespace, localpart);
                             headers.add(header);
-                        } else if (HandlerRef.HANDLER_PARAMNAME.equals(handler.get(i).getType())) {
+                        } else if (HandlerRef.HANDLER_PARAMNAME.equals(handlerRef.get(i).getType())) {
                             String paramName = "";
                             String paramValue = "";
-                            paramName = (String) handler.get(i).getContent();
-                            if (HandlerRef.HANDLER_PARAMVALUE.equals(handler.get(i + 1).getType())) {
+                            paramName = (String) handlerRef.get(i).getContent();
+                            if (HandlerRef.HANDLER_PARAMVALUE.equals(handlerRef.get(i + 1).getType())) {
                                 i++;
-                                paramValue = (String) handler.get(i).getContent();
+                                paramValue = (String) handlerRef.get(i).getContent();
                             }
                             config.put(paramName, paramValue);
-                        } else if (HandlerRef.HANDLER_SOAPROLE.equals(handler.get(i).getType())) {
+                        } else if (HandlerRef.HANDLER_SOAPROLE.equals(handlerRef.get(i).getType())) {
                             String soaprole = "";
-                            soaprole = (String) handler.get(i).getContent();
+                            soaprole = (String) handlerRef.get(i).getContent();
                             soaproles.add(soaprole);
-                        } else if (HandlerRef.HANDLER_PORTNAME.equals(handler.get(i).getType())) {
+                        } else if (HandlerRef.HANDLER_PORTNAME.equals(handlerRef.get(i).getType())) {
                             String portName = "";
-                            portName = (String) handler.get(i).getContent();
+                            portName = (String) handlerRef.get(i).getContent();
                             portNames.add(portName);
                         }
 
                     // Set the handlers informations
-                    handlerref.setHandlerClass(handlerClass);
-                    handlerref.setHeaders(headers.toArray(new QName[headers.size()]));
-                    handlerref.setHandlerConfig(config);
+                    handlerInfo.setHandlerClass(handlerClass);
+                    handlerInfo.setHeaders(headers.toArray(new QName[headers.size()]));
+                    handlerInfo.setHandlerConfig(config);
 
                     if (!portNames.isEmpty()) {
                         Iterator<String> iter = portNames.iterator();
                         while (iter.hasNext())
                             initHandlerChain(new QName(iter.next()), handlerRegistry,
-                                    handlerref, soaproles);
+                                    handlerInfo, soaproles);
                     } else {
                         Enumeration<QName> e = portComponentRef.elements();
                         while(e.hasMoreElements())
                             initHandlerChain(e.nextElement(), handlerRegistry,
-                                    handlerref, soaproles);
+                                    handlerInfo, soaproles);
                     }
                 }
             }
@@ -353,18 +353,18 @@ public class ServiceRefFactory
 
 
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
-            HandlerInfo handlerref, ArrayList<String> soaprolesToAdd) {
-        HandlerChain handlerList = (HandlerChain) handlerRegistry.getHandlerChain(portName);
-        handlerList.add(handlerref);
-        String[] soaprolesRegistered = handlerList.getRoles();
+            HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
+        HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
+        handlerChain.add(handlerInfo);
+        String[] soaprolesRegistered = handlerChain.getRoles();
         String [] soaproles = new String[soaprolesRegistered.length + soaprolesToAdd.size()];
         int i;
         for (i = 0;i < soaprolesRegistered.length; i++)
             soaproles[i] = soaprolesRegistered[i];
         for (int j = 0; j < soaprolesToAdd.size(); j++)
             soaproles[i+j] = soaprolesToAdd.get(j);
-        handlerList.setRoles(soaproles);
-        handlerRegistry.setHandlerChain(portName, handlerList);
+        handlerChain.setRoles(soaproles);
+        handlerRegistry.setHandlerChain(portName, handlerChain);
     }
 
 
