@@ -168,7 +168,7 @@ class Generator {
     }
 
     /**
-     * Finds the <jsp:body> subelement of the given parent node. If not
+     * Finds the &lt;jsp:body&gt; subelement of the given parent node. If not
      * found, null is returned.
      */
     protected static Node.JspBody findJspBody(Node parent) {
