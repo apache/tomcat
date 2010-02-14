@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
@@ -50,7 +50,7 @@ public class TestKeepAliveCount extends TomcatBaseTest{
             if (init) return;
             
             Tomcat tomcat = getTomcatInstance();
-            StandardContext root = tomcat.addContext("", TEMP_DIR);
+            Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMapping("/test", "Simple");
             tomcat.getConnector().setProperty("maxKeepAliveRequests", "5");
