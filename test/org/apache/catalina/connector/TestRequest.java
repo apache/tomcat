@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -125,7 +125,7 @@ public class TestRequest extends TomcatBaseTest {
             if (init) return;
             
             Tomcat tomcat = getTomcatInstance();
-            StandardContext root = tomcat.addContext("", TEMP_DIR);
+            Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
             root.addServletMapping("/test", "Bug37794");
             tomcat.start();
@@ -206,7 +206,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        Context ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
 
         LoginConfig config = new LoginConfig();

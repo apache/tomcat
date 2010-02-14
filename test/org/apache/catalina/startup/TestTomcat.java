@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -169,7 +168,7 @@ public class TestTomcat extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        org.apache.catalina.Context ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
         // You can customize the context by calling 
         // its API
@@ -230,7 +229,7 @@ public class TestTomcat extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        org.apache.catalina.Context ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
         
         // You can customise the context by calling its API
@@ -260,7 +259,7 @@ public class TestTomcat extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        org.apache.catalina.Context ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
         
         // You can customise the context by calling its API
@@ -299,7 +298,7 @@ public class TestTomcat extends TomcatBaseTest {
         
         File appDir = new File("output/build/webapps" + contextPath);
         // app dir is relative to server home
-        StandardContext ctx =
+        org.apache.catalina.Context ctx =
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
         Tomcat.addServlet(ctx, "testGetResource", new GetResource());

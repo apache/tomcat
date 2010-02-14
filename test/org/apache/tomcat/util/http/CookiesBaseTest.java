@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
 
@@ -68,7 +68,7 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
 
     public static void addServlets(Tomcat tomcat) {
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        Context ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
