@@ -9,7 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -19,7 +20,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        Context ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
         
         Tomcat.addServlet(ctx, "taskServlet", new TaskServlet());
@@ -31,7 +32,11 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         getUrl("http://localhost:" + getPort() + "/");
         
         // Stop the context
-        ctx.stop();
+        if (ctx instanceof Lifecycle) {
+            ((Lifecycle) ctx).stop();
+        } else {
+            fail("Test requires context implements Lifecycle");
+        }
         
         // If the thread still exists, we have a thread/memory leak
         Thread[] threads = getThreads();

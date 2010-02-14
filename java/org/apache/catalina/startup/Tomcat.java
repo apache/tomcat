@@ -31,11 +31,16 @@ import javax.servlet.ServletException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
@@ -47,6 +52,9 @@ import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.catalina.session.StandardManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or 
 // get temp dir is called we need to create it. This will avoid the 
@@ -83,16 +91,19 @@ import org.apache.catalina.session.StandardManager;
  * @author Costin Manolache
  */
 public class Tomcat {
+	private static final Log log = LogFactory.getLog(Tomcat.class);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
+
     // Single engine, service, server, connector - few cases need more,
     // they can use server.xml
-    protected StandardServer server;
-    protected StandardService service;
-    protected StandardEngine engine;
+    protected Server server;
+    protected Service service;
+    protected Engine engine;
     protected Connector connector; // for more - customize the classes
     
     // To make it a bit easier to config for the common case
     // ( one host, one context ). 
-    protected StandardHost host;
+    protected Host host;
 
     // TODO: it's easy to add support for more hosts - but is it 
     // really needed ?
@@ -154,10 +165,10 @@ public class Tomcat {
      * 
      * @param contextPath
      * @param baseDir
-     * @return new StandardContext
+     * @return new Context
      * @throws ServletException 
      */
-    public StandardContext addWebapp(String contextPath, 
+    public Context addWebapp(String contextPath, 
                                      String baseDir) throws ServletException {
         
         return addWebapp(getHost(), contextPath, baseDir);    
@@ -191,7 +202,7 @@ public class Tomcat {
      *  @param baseDir base dir for the context, for static files. Must exist, 
      *  relative to the server home
      */
-    public StandardContext addContext(String contextPath, 
+    public Context addContext(String contextPath, 
                                       String baseDir) {
         return addContext(getHost(), contextPath, baseDir);
     }
@@ -214,12 +225,11 @@ public class Tomcat {
      * @param servletClass  The class to be used for the Servlet
      * @return The wrapper for the servlet
      */
-    public StandardWrapper addServlet(String contextPath, 
+    public Wrapper addServlet(String contextPath, 
             String servletName, 
             String servletClass) {
         Container ctx = getHost().findChild(contextPath);
-        return addServlet((StandardContext) ctx, 
-                servletName, servletClass);
+        return addServlet((Context) ctx, servletName, servletClass);
     }
 
     /**
@@ -229,11 +239,11 @@ public class Tomcat {
      * @param servletClass  The class to be used for the Servlet
      * @return The wrapper for the servlet
      */
-    public static StandardWrapper addServlet(StandardContext ctx, 
+    public static Wrapper addServlet(Context ctx, 
                                       String servletName, 
                                       String servletClass) {
         // will do class for name and set init params
-        StandardWrapper sw = (StandardWrapper)ctx.createWrapper();
+        Wrapper sw = ctx.createWrapper();
         sw.setServletClass(servletClass);
         sw.setName(servletName);
         ctx.addChild(sw);
@@ -249,12 +259,11 @@ public class Tomcat {
      * @param servlet       The Servlet to add
      * @return The wrapper for the servlet
      */
-    public StandardWrapper addServlet(String contextPath, 
+    public Wrapper addServlet(String contextPath, 
             String servletName, 
             Servlet servlet) {
         Container ctx = getHost().findChild(contextPath);
-        return addServlet((StandardContext) ctx, 
-                servletName, servlet);
+        return addServlet((Context) ctx, servletName, servlet);
     }
 
     /**
@@ -264,11 +273,11 @@ public class Tomcat {
      * @param servlet       The Servlet to add
      * @return The wrapper for the servlet
      */
-    public static StandardWrapper addServlet(StandardContext ctx,
+    public static Wrapper addServlet(Context ctx,
                                       String servletName, 
                                       Servlet servlet) {
         // will do class for name and set init params
-        StandardWrapper sw = new ExistingStandardWrapper(servlet);
+        Wrapper sw = new ExistingStandardWrapper(servlet);
         sw.setName(servletName);
         ctx.addChild(sw);
         
@@ -277,22 +286,35 @@ public class Tomcat {
     
     
     /**
-     * Initialize and start the server.
+     * Initialize and start the server, assuming that the Server implementation
+     * implements {@link Lifecycle} (the standard implementation does). If it
+     * does not, the {@link Server} must be started directly.
      * @throws LifecycleException 
      */
     public void start() throws LifecycleException {
         getServer();
         getConnector();
         server.initialize();
-        server.start();
+        if (server instanceof Lifecycle) {
+            ((Lifecycle) server).start();
+        } else {
+            log.warn(sm.getString("tomcat.startNotLifecycle"));
+        }
     }
 
     /** 
-     * Stop the server.
+     * Stop the server, assuming that the Server implementation implements
+     * {@link Lifecycle} (the standard implementation does). If it does not, the
+     * {@link Server} must be stopped directly.
      * @throws LifecycleException 
      */
     public void stop() throws LifecycleException {
-        getServer().stop();
+        getServer();
+        if (server instanceof Lifecycle) {
+            ((Lifecycle) server).stop();
+        } else {
+            log.warn(sm.getString("tomcat.stopNotLifecycle"));
+        }
     }
 
 
@@ -353,7 +375,7 @@ public class Tomcat {
      * Get the service object. Can be used to add more 
      * connectors and few other global settings.
      */
-    public StandardService getService() {
+    public Service getService() {
         getServer();
         return service;
     }
@@ -365,11 +387,11 @@ public class Tomcat {
      * 
      * @param host
      */
-    public void setHost(StandardHost host) {
+    public void setHost(Host host) {
         this.host = host;
     }
     
-    public StandardHost getHost() {
+    public Host getHost() {
         if (host == null) {
             host = new StandardHost();
             host.setName(hostname);
@@ -393,7 +415,7 @@ public class Tomcat {
     /** 
      * Access to the engine, for further customization.
      */
-    public StandardEngine getEngine() {
+    public Engine getEngine() {
         if(engine == null ) {
             getServer();
             engine = new StandardEngine();
@@ -408,7 +430,7 @@ public class Tomcat {
      * Get the server object. You can add listeners and few more
      * customizations. JNDI is disabled by default.  
      */
-    public StandardServer getServer() {
+    public Server getServer() {
         
         if (server != null) {
             return server;
@@ -427,14 +449,16 @@ public class Tomcat {
         return server;
     }
 
-    public StandardContext addContext(StandardHost host, 
-                                      String contextPath, 
-                                      String dir) {
+    public Context addContext(Host host, String contextPath, String dir) {
         silence(contextPath);
-        StandardContext ctx = new StandardContext();
+        Context ctx = new StandardContext();
         ctx.setPath( contextPath );
         ctx.setDocBase(dir);
-        ctx.addLifecycleListener(new FixContextListener());
+        if (ctx instanceof Lifecycle) {
+            ((Lifecycle) ctx).addLifecycleListener(new FixContextListener());
+        } else {
+            log.warn(sm.getString("tomcat.addContextNotLifecycle"));
+        }
         
         if (host == null) {
             getHost().addChild(ctx);
@@ -444,23 +468,27 @@ public class Tomcat {
         return ctx;
     }
     
-    public StandardContext addWebapp(StandardHost host, 
-                                     String url, String path) {
+    public Context addWebapp(Host host, String url, String path) {
         silence(url);
 
-        StandardContext ctx = new StandardContext();
+        Context ctx = new StandardContext();
         ctx.setPath( url );
         ctx.setDocBase(path);
         if (defaultRealm == null) {
             initSimpleAuth();
         }
         ctx.setRealm(defaultRealm);
-        ctx.addLifecycleListener(new DefaultWebXmlListener());
-        
-        ContextConfig ctxCfg = new ContextConfig();
-        ctx.addLifecycleListener( ctxCfg );
-        // prevent it from looking ( if it finds one - it'll have dup error )
-        ctxCfg.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
+        if (ctx instanceof Lifecycle) {
+            ((Lifecycle) ctx).addLifecycleListener(new DefaultWebXmlListener());
+            
+            ContextConfig ctxCfg = new ContextConfig();
+            ((Lifecycle) ctx).addLifecycleListener(ctxCfg);
+            
+            // prevent it from looking ( if it finds one - it'll have dup error )
+            ctxCfg.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
+        } else {
+            log.warn(sm.getString("tomcat.addWebappNotLifecycle"));
+        }
         
         if (host == null) {
             getHost().addChild(ctx);
@@ -572,13 +600,21 @@ public class Tomcat {
     }
     
     /**
-     * Enables JNDI naming which is disabled by default.
+     * Enables JNDI naming which is disabled by default. Server must implement
+     * {@link Lifecycle} in order for the {@link NamingContextListener} to be
+     * used.
+     * 
      */
     public void enableNaming() {
         // Make sure getServer() has been called as that is where naming is
         // disabled
         getServer();
-        server.addLifecycleListener(new NamingContextListener());
+        if (server instanceof Lifecycle) {
+            ((Lifecycle) server).addLifecycleListener(
+                    new NamingContextListener());
+        } else {
+            log.warn(sm.getString("tomcat.namingNotLifecycle"));
+        }
         
         System.setProperty("catalina.useNaming", "true");
 
@@ -607,23 +643,23 @@ public class Tomcat {
      * Provide default configuration for a context. This is the programmatic
      * equivalent of the default web.xml. 
      * 
-     *  TODO: in normal tomcat, if default-web.xml is not found, use this 
+     *  TODO: in normal Tomcat, if default-web.xml is not found, use this 
      *  method
      *  
      * @param contextPath   The context to set the defaults for
      */
     public void initWebappDefaults(String contextPath) {
         Container ctx = getHost().findChild(contextPath);
-        initWebappDefaults((StandardContext) ctx);
+        initWebappDefaults((Context) ctx);
     }
     
     /**
      * Static version of {@link #initWebappDefaults(String)}
      * @param ctx   The context to set the defaults for
      */
-    public static void initWebappDefaults(StandardContext ctx) {
+    public static void initWebappDefaults(Context ctx) {
         // Default servlet 
-        StandardWrapper servlet = addServlet(
+        Wrapper servlet = addServlet(
                 ctx, "default", "org.apache.catalina.servlets.DefaultServlet");
         servlet.setLoadOnStartup(1);
 
@@ -680,15 +716,12 @@ public class Tomcat {
     /**
      * Fix reload - required if reloading and using programmatic configuration.
      * When a context is reloaded, any programmatic configuration is lost. This
-     * listener sets the equivalent of conf/web.xml when the context starts. The
-     * context needs to be an instance of StandardContext for this listener to
-     * have any effect.
+     * listener sets the equivalent of conf/web.xml when the context starts.
      */
     public static class DefaultWebXmlListener implements LifecycleListener {
         public void lifecycleEvent(LifecycleEvent event) {
-            if (Lifecycle.BEFORE_START_EVENT.equals(event.getType()) &&
-                    event.getLifecycle() instanceof StandardContext) {
-                initWebappDefaults((StandardContext) event.getLifecycle());
+            if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
+                initWebappDefaults((Context) event.getLifecycle());
             }
         }
     }

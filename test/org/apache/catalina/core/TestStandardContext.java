@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -49,7 +50,7 @@ public class TestStandardContext extends TomcatBaseTest {
         File docBase = new File(tomcat.getHost().getAppBase(), "ROOT");
         docBase.mkdirs();
         
-        StandardContext root = tomcat.addContext("", "ROOT");
+        Context root = tomcat.addContext("", "ROOT");
        
         // Add test a filter that fails
         FilterDef filterDef = new FilterDef();
