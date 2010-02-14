@@ -33,7 +33,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Context;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -131,7 +131,7 @@ public final class ExtensionValidator {
      */
     public static synchronized boolean validateApplication(
                                            DirContext dirContext, 
-                                           StandardContext context)
+                                           Context context)
                     throws IOException {
 
         String appName = context.getPath();
