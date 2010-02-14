@@ -27,6 +27,7 @@ import org.apache.catalina.deploy.TestSecurityConstraint;
 import org.apache.catalina.deploy.TestWebXml;
 import org.apache.catalina.deploy.TestWebXmlOrdering;
 import org.apache.catalina.ha.session.TestSerializablePrincipal;
+import org.apache.catalina.loader.TestWebappClassLoaderMemoryLeak;
 import org.apache.catalina.startup.TestTomcat;
 import org.apache.catalina.startup.TestTomcatSSL;
 import org.apache.catalina.util.TestRequestUtil;
@@ -67,6 +68,8 @@ public class TestAll {
         suite.addTestSuite(TestWebXmlOrdering.class);
         // ha.session
         suite.addTestSuite(TestSerializablePrincipal.class);
+        // loader
+        suite.addTestSuite(TestWebappClassLoaderMemoryLeak.class);
         // startup
         suite.addTestSuite(TestTomcat.class);
         suite.addTestSuite(TestTomcatSSL.class);
