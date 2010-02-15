@@ -18,7 +18,6 @@
 
 package org.apache.catalina.connector;
 
-import java.net.URLEncoder;
 import java.util.HashMap;
 
 import javax.management.MBeanRegistration;
@@ -32,7 +31,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.Adapter;
@@ -963,11 +961,11 @@ public class Connector
 
         this.initialized = true;
 
-        if( oname == null && (container instanceof StandardEngine)) {
+        if (oname == null) {
             try {
                 // we are loaded directly, via API - and no name was given to us
-                StandardEngine cb=(StandardEngine)container;
-                oname = createObjectName(cb.getName(), "Connector");
+                // Engine name is used as domain name for MBeans
+                oname = createObjectName(container.getName(), "Connector");
                 Registry.getRegistry(null, null)
                     .registerComponent(this, oname, null);
                 controller=oname;
