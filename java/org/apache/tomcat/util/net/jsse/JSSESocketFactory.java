@@ -310,9 +310,6 @@ public class JSSESocketFactory
             truststorePassword =
                 System.getProperty("javax.net.ssl.trustStorePassword");
         }
-        if( truststorePassword == null ) {
-            truststorePassword = getKeystorePassword();
-        }
         if(log.isDebugEnabled()) {
             log.debug("TrustPass = " + truststorePassword);
         }
@@ -343,7 +340,7 @@ public class JSSESocketFactory
             log.debug("trustProvider = " + truststoreProvider);
         }
 
-        if (truststoreFile != null && truststorePassword != null){
+        if (truststoreFile != null){
             trustStore = getStore(truststoreType, truststoreProvider,
                     truststoreFile, truststorePassword);
         }
@@ -374,8 +371,12 @@ public class JSSESocketFactory
                 }
                 istream = new FileInputStream(keyStoreFile);
             }
-
-            ks.load(istream, pass.toCharArray());
+            
+            char[] storePass = null;
+            if (pass != null) {
+                storePass = pass.toCharArray(); 
+            }
+            ks.load(istream, storePass);
         } catch (FileNotFoundException fnfe) {
             log.error(sm.getString("jsse.keystore_load_failed", type, path,
                     fnfe.getMessage()), fnfe);
