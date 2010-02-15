@@ -921,9 +921,7 @@
     <attribute name="truststorePass" required="false">
       <p>The password to access the trust store. The default is the value of the
       <code>javax.net.ssl.trustStorePassword</code> system property. If that
-      property is null, the value of <code>keystorePass</code> is used as the
-      default. If neither this attribute, the default system property nor
-      <code>keystorePass</code>is set, no trust store will be configured.</p>
+      property is null, no trust store password will be configured.</p>
     </attribute>
 
     <attribute name="truststoreProvider" required="false">
