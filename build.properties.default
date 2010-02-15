@@ -85,9 +85,9 @@ tomcat-native.dll.win32=${tomcat-native.home}/tcnative-1.dll.x86
 tomcat-native.dll.x64=${tomcat-native.home}/tcnative-1.dll.x64
 tomcat-native.dll.i64=${tomcat-native.home}/tcnative-1.dll.i64
 # ----- Commons DBCP, version 1.1 or later -----
-commons-dbcp.version=1.2.2
-commons-dbcp.home=${base.path}/commons-dbcp-r734404-src
-commons-dbcp-src.loc=http://people.apache.org/~markt/dev/commons-dbcp-r734404-src.tar.gz
+commons-dbcp.version=1.4
+commons-dbcp.home=${base.path}/commons-dbcp-1.4-src
+commons-dbcp-src.loc=${base-commons.loc}/dbcp/source/commons-dbcp-1.4-src.tar.gz
 
 # ----- Commons Pool, version 1.1 or later -----
 commons-pool.home=${base.path}/commons-pool-1.5.4-src
