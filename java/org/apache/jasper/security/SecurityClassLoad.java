@@ -99,6 +99,9 @@ public final class SecurityClassLoad {
             loader.loadClass( basePackage +
                 "runtime.JspContextWrapper");   
 
+            // Trigger loading of class and reading of property
+            SecurityUtil.isPackageProtectionEnabled();
+            
             loader.loadClass( basePackage +
                 "servlet.JspServletWrapper");
 
