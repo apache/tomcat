@@ -513,6 +513,9 @@ public class ManagerServlet
             ((StandardHost) host).findReloadedContextMemoryLeaks();
         
         for (String result : results) {
+            if ("".equals(result)) {
+                result = "/";
+            }
             writer.println(result);
         }
     }
