@@ -44,7 +44,7 @@ Tomcat.  This document is for the HTML web interface to the web application
   <li><strong>Applications</strong> - List of web applications and
       commands.</li>
   <li><strong>Deploy</strong> - Deploying web applications.</li>
-  <li><strong>Diagnostocs</strong> - Identifying potential problems.</li>
+  <li><strong>Diagnostics</strong> - Identifying potential problems.</li>
   <li><strong>Server Information</strong> - Information about the Tomcat
       server.</li>
 </ul>
