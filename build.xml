@@ -52,6 +52,7 @@
   <!-- Exact spec versions (for the manifests) -->
   <property name="servlet.revision" value="FR" />
   <property name="jsp.revision" value="FR" />
+  <property name="el.revision" value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -401,12 +402,17 @@
     <filter token="target.jdk" value="${compile.target}"/>
     <filter token="servlet.revision" value="${servlet.revision}"/>
     <filter token="jsp.revision" value="${jsp.revision}"/>
+    <filter token="el.revision" value="${el.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
       encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
-      <fileset dir="${tomcat.home}/res/META-INF" includes="*.manifest" />
+      <fileset dir="${tomcat.home}/res/META-INF" >
+        <include name="*.manifest" />
+        <include name="*.license" />
+        <include name="*.notice" />
+      </fileset>
     </copy>
 
   </target>
@@ -415,28 +421,30 @@
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.annotations-api" />
+      filesId="files.annotations-api"
+      manifest="${tomcat.manifests}/annotations-api.jar.manifest" />
 
     <!-- Servlet 3.0 Implementation JAR File -->
     <jarIt jarfile="${servlet-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.servlet-api"
       manifest="${tomcat.manifests}/servlet-api.jar.manifest"
-      notice="res/META-INF/servlet-api.jar.notice"
-      license="res/META-INF/servlet-api.jar.license" />
+      notice="${tomcat.manifests}/servlet-api.jar.notice"
+      license="${tomcat.manifests}/servlet-api.jar.license" />
 
     <!-- JSP 2.1 Implementation JAR File -->
     <jarIt jarfile="${jsp-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jsp-api"
       manifest="${tomcat.manifests}/jsp-api.jar.manifest"
-      notice="res/META-INF/jsp-api.jar.notice"
-      license="res/META-INF/jsp-api.jar.license" />
+      notice="${tomcat.manifests}/jsp-api.jar.notice"
+      license="${tomcat.manifests}/jsp-api.jar.license" />
 
     <!-- JSP 2.1 EL Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.el-api" />
+      filesId="files.el-api"
+      manifest="${tomcat.manifests}/el-api.jar.manifest" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap.jar}"
@@ -500,9 +508,9 @@
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
-      <zipfileset file="res/META-INF/default.notice"
+      <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
-      <zipfileset file="res/META-INF/default.license"
+      <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
@@ -510,9 +518,9 @@
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
-      <zipfileset file="res/META-INF/default.notice"
+      <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
-      <zipfileset file="res/META-INF/default.license"
+      <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
@@ -520,9 +528,9 @@
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
-      <zipfileset file="res/META-INF/default.notice"
+      <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
-      <zipfileset file="res/META-INF/default.license"
+      <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
 
@@ -1872,9 +1880,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <attribute name="manifest" description="the manifest file use"
                default="${tomcat.manifests}/default.manifest" />
     <attribute name="notice" description="the LICENSE file to use"
-               default="${tomcat.home}/res/META-INF/default.notice" />
+               default="${tomcat.manifests}/default.notice" />
     <attribute name="license" description="the NOTICE file to use"
-               default="${tomcat.home}/res/META-INF/default.license" />
+               default="${tomcat.manifests}/default.license" />
     <sequential>
       <jar jarfile="@{jarfile}" manifest="@{manifest}" index="yes">
         <fileset dir="@{filesDir}">
