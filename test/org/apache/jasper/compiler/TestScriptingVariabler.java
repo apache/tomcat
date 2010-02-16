@@ -93,4 +93,24 @@ public class TestScriptingVariabler extends TomcatBaseTest {
         assertNull(e);
     }
 
+    public void testBug48616b() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        Exception e = null;
+        try {
+            getUrl("http://localhost:" + getPort() + "/test/bug48616b.jsp");
+        } catch (IOException ioe) {
+            e = ioe;
+        }
+
+        // Should not fail
+        assertNull(e);
+    }
 }
