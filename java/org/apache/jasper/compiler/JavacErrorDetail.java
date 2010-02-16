@@ -96,6 +96,13 @@ public class JavacErrorDetail {
                 fis = new FileInputStream(ctxt.getServletJavaFileName());
                 String[] javaLines = readFile(fis);
     
+                if (jspLines.length < jspBeginLineNum) {
+                    // Avoid ArrayIndexOutOfBoundsException
+                    // Probably bug 48494 but could be some other cause
+                    jspExtract = Localizer.getMessage("jsp.error.bug48494");
+                    return;
+                }
+                
                 // If the line contains the opening of a multi-line scriptlet
                 // block, then the JSP line number we got back is probably
                 // faulty.  Scan forward to match the java line...
