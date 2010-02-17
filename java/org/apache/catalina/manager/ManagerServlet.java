@@ -46,7 +46,6 @@ import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Role;
 import org.apache.catalina.Server;

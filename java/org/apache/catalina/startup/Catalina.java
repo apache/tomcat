@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.logging.LogManager;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
 import org.apache.juli.ClassLoaderLogManager;
