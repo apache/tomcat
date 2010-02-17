@@ -49,9 +49,8 @@ import org.apache.catalina.Executor;
  * @author Craig R. McClanahan
  */
 
-public class StandardService
-        implements Lifecycle, Service, MBeanRegistration 
- {
+public class StandardService implements Service, MBeanRegistration {
+
     private static final Log log = LogFactory.getLog(StandardService.class);
    
 
