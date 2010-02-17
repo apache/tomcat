@@ -608,12 +608,12 @@ public class HostConfig
                     digester.reset();
                 }
             }
-            if (context instanceof Lifecycle) {
-                Class<?> clazz = Class.forName(host.getConfigClass());
-                LifecycleListener listener =
-                    (LifecycleListener) clazz.newInstance();
-                ((Lifecycle) context).addLifecycleListener(listener);
-            }
+
+            Class<?> clazz = Class.forName(host.getConfigClass());
+            LifecycleListener listener =
+                (LifecycleListener) clazz.newInstance();
+            context.addLifecycleListener(listener);
+
             context.setConfigFile(contextXml.getAbsolutePath());
             context.setPath(contextPath);
             // Add the associated docBase to the redeployed list if it's a WAR
@@ -901,12 +901,11 @@ public class HostConfig
                 (xml.getAbsolutePath(), new Long(xml.lastModified()));
             }
 
-            if (context instanceof Lifecycle) {
-                Class<?> clazz = Class.forName(host.getConfigClass());
-                LifecycleListener listener =
-                    (LifecycleListener) clazz.newInstance();
-                ((Lifecycle) context).addLifecycleListener(listener);
-            }
+            Class<?> clazz = Class.forName(host.getConfigClass());
+            LifecycleListener listener =
+                (LifecycleListener) clazz.newInstance();
+            context.addLifecycleListener(listener);
+
             context.setPath(contextPath);
             context.setDocBase(file);
             host.addChild(context);
@@ -1036,12 +1035,11 @@ public class HostConfig
                 context = (Context) Class.forName(contextClass).newInstance();
             }
 
-            if (context instanceof Lifecycle) {
-                Class<?> clazz = Class.forName(host.getConfigClass());
-                LifecycleListener listener =
-                    (LifecycleListener) clazz.newInstance();
-                ((Lifecycle) context).addLifecycleListener(listener);
-            }
+            Class<?> clazz = Class.forName(host.getConfigClass());
+            LifecycleListener listener =
+                (LifecycleListener) clazz.newInstance();
+            context.addLifecycleListener(listener);
+
             context.setPath(contextPath);
             context.setDocBase(file);
             host.addChild(context);
@@ -1240,7 +1238,7 @@ public class HostConfig
                     log.info(sm.getString("hostConfig.reload", app.name));
                 Container context = host.findChild(app.name);
                 try {
-                    ((Lifecycle) context).stop();
+                    context.stop();
                 } catch (Exception e) {
                     log.warn(sm.getString
                              ("hostConfig.context.restart", app.name), e);
@@ -1248,7 +1246,7 @@ public class HostConfig
                 // If the context was not started (for example an error 
                 // in web.xml) we'll still get to try to start
                 try {
-                    ((Lifecycle) context).start();
+                    context.start();
                 } catch (Exception e) {
                     log.warn(sm.getString
                              ("hostConfig.context.restart", app.name), e);

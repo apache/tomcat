@@ -39,7 +39,6 @@ import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
@@ -581,7 +580,7 @@ public class HostManagerServlet
 
         // Start host
         try {
-            ((Lifecycle) engine.findChild(name)).start();
+            engine.findChild(name).start();
             writer.println
                 (sm.getString("hostManagerServlet.started", name));
         } catch (Throwable t) {
@@ -631,7 +630,7 @@ public class HostManagerServlet
 
         // Start host
         try {
-            ((Lifecycle) engine.findChild(name)).stop();
+            engine.findChild(name).stop();
             writer.println
                 (sm.getString("hostManagerServlet.stopped", name));
         } catch (Throwable t) {
