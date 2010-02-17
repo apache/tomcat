@@ -152,10 +152,9 @@ public class StandardService
         this.container = container;
         if ((this.container != null) && (this.container instanceof Engine))
             ((Engine) this.container).setService(this);
-        if (started && (this.container != null) &&
-            (this.container instanceof Lifecycle)) {
+        if (started && (this.container != null)) {
             try {
-                ((Lifecycle) this.container).start();
+                this.container.start();
             } catch (LifecycleException e) {
                 // Ignore
             }
@@ -164,10 +163,9 @@ public class StandardService
             for (int i = 0; i < connectors.length; i++)
                 connectors[i].setContainer(this.container);
         }
-        if (started && (oldContainer != null) &&
-            (oldContainer instanceof Lifecycle)) {
+        if (started && (oldContainer != null)) {
             try {
-                ((Lifecycle) oldContainer).stop();
+                oldContainer.stop();
             } catch (LifecycleException e) {
                 // Ignore
             }
@@ -515,9 +513,7 @@ public class StandardService
         // Start our defined Container first
         if (container != null) {
             synchronized (container) {
-                if (container instanceof Lifecycle) {
-                    ((Lifecycle) container).start();
-                }
+                container.start();
             }
         }
 
@@ -582,9 +578,7 @@ public class StandardService
         // Stop our defined Container second
         if (container != null) {
             synchronized (container) {
-                if (container instanceof Lifecycle) {
-                    ((Lifecycle) container).stop();
-                }
+                container.stop();
             }
         }
         // FIXME pero -- Why container stop first? KeepAlive connections can send request! 

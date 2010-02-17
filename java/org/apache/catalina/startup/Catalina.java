@@ -498,16 +498,14 @@ public class Catalina extends Embedded {
         initStreams();
 
         // Start the new server
-        if (getServer() instanceof Lifecycle) {
-            try {
-                getServer().initialize();
-            } catch (LifecycleException e) {
-                if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
-                    throw new java.lang.Error(e);
-                else   
-                    log.error("Catalina.start", e);
-                
-            }
+        try {
+            getServer().initialize();
+        } catch (LifecycleException e) {
+            if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
+                throw new java.lang.Error(e);
+            else   
+                log.error("Catalina.start", e);
+            
         }
 
         long t2 = System.nanoTime();
@@ -557,12 +555,10 @@ public class Catalina extends Embedded {
         long t1 = System.nanoTime();
         
         // Start the new server
-        if (getServer() instanceof Lifecycle) {
-            try {
-                ((Lifecycle) getServer()).start();
-            } catch (LifecycleException e) {
-                log.error("Catalina.start: ", e);
-            }
+        try {
+            getServer().start();
+        } catch (LifecycleException e) {
+            log.error("Catalina.start: ", e);
         }
 
         long t2 = System.nanoTime();
@@ -608,12 +604,10 @@ public class Catalina extends Embedded {
         }
 
         // Shut down the server
-        if (getServer() instanceof Lifecycle) {
-            try {
-                ((Lifecycle) getServer()).stop();
-            } catch (LifecycleException e) {
-                log.error("Catalina.stop", e);
-            }
+        try {
+            getServer().stop();
+        } catch (LifecycleException e) {
+            log.error("Catalina.stop", e);
         }
 
     }

@@ -2835,9 +2835,8 @@ public class StandardContext
                 try {
                     Class<?> clazz = Class.forName(wrapperLifecycles[i]);
                     LifecycleListener listener =
-                      (LifecycleListener) clazz.newInstance();
-                    if (wrapper instanceof Lifecycle)
-                        ((Lifecycle) wrapper).addLifecycleListener(listener);
+                        (LifecycleListener) clazz.newInstance();
+                    wrapper.addLifecycleListener(listener);
                 } catch (Throwable t) {
                     log.error("createWrapper", t);
                     return (null);
@@ -4491,8 +4490,7 @@ public class StandardContext
                 // Start our child containers, if any
                 Container children[] = findChildren();
                 for (int i = 0; i < children.length; i++) {
-                    if (children[i] instanceof Lifecycle)
-                        ((Lifecycle) children[i]).start();
+                    children[i].start();
                 }
 
                 // Start the Valves in our pipeline (including the basic),
@@ -4752,8 +4750,7 @@ public class StandardContext
             // Stop our child containers, if any
             Container[] children = findChildren();
             for (int i = 0; i < children.length; i++) {
-                if (children[i] instanceof Lifecycle)
-                    ((Lifecycle) children[i]).stop();
+                children[i].stop();
             }
 
             // Stop our filters

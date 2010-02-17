@@ -347,9 +347,9 @@ public class Embedded  extends StandardService {
         engines = results;
 
         // Start this Engine if necessary
-        if (started && (engine instanceof Lifecycle)) {
+        if (started) {
             try {
-                ((Lifecycle) engine).start();
+                engine.start();
             } catch (LifecycleException e) {
                 log.error("Engine.start", e);
             }
@@ -484,7 +484,7 @@ public class Embedded  extends StandardService {
 
         ContextConfig config = new ContextConfig();
         config.setCustomAuthenticators(authenticators);
-        ((Lifecycle) context).addLifecycleListener(config);
+        context.addLifecycleListener(config);
 
         return (context);
 
@@ -666,14 +666,12 @@ public class Embedded  extends StandardService {
         }
 
         // Stop this Engine if necessary
-        if (engine instanceof Lifecycle) {
-            if( log.isDebugEnabled() )
-                log.debug(" Stopping this Engine");
-            try {
-                ((Lifecycle) engine).stop();
-            } catch (LifecycleException e) {
-                log.error("Engine.stop", e);
-            }
+        if( log.isDebugEnabled() )
+            log.debug(" Stopping this Engine");
+        try {
+            engine.stop();
+        } catch (LifecycleException e) {
+            log.error("Engine.stop", e);
         }
 
         // Remove this Engine from our set of defined Engines
@@ -827,8 +825,7 @@ public class Embedded  extends StandardService {
 
         // Start our defined Engines first
         for (int i = 0; i < engines.length; i++) {
-            if (engines[i] instanceof Lifecycle)
-                ((Lifecycle) engines[i]).start();
+            engines[i].start();
         }
 
         // Start our defined Connectors second
@@ -868,8 +865,7 @@ public class Embedded  extends StandardService {
 
         // Stop our defined Engines second
         for (int i = 0; i < engines.length; i++) {
-            if (engines[i] instanceof Lifecycle)
-                ((Lifecycle) engines[i]).stop();
+            engines[i].stop();
         }
 
     }
