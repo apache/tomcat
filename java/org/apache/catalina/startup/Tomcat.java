@@ -52,9 +52,6 @@ import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.catalina.session.StandardManager;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or 
 // get temp dir is called we need to create it. This will avoid the 
@@ -91,9 +88,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Costin Manolache
  */
 public class Tomcat {
-	private static final Log log = LogFactory.getLog(Tomcat.class);
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
-
     // Single engine, service, server, connector - few cases need more,
     // they can use server.xml
     protected Server server;
@@ -295,11 +289,7 @@ public class Tomcat {
         getServer();
         getConnector();
         server.initialize();
-        if (server instanceof Lifecycle) {
-            ((Lifecycle) server).start();
-        } else {
-            log.warn(sm.getString("tomcat.startNotLifecycle"));
-        }
+        server.start();
     }
 
     /** 
@@ -310,11 +300,7 @@ public class Tomcat {
      */
     public void stop() throws LifecycleException {
         getServer();
-        if (server instanceof Lifecycle) {
-            ((Lifecycle) server).stop();
-        } else {
-            log.warn(sm.getString("tomcat.stopNotLifecycle"));
-        }
+        server.stop();
     }
 
 
@@ -454,11 +440,7 @@ public class Tomcat {
         Context ctx = new StandardContext();
         ctx.setPath( contextPath );
         ctx.setDocBase(dir);
-        if (ctx instanceof Lifecycle) {
-            ((Lifecycle) ctx).addLifecycleListener(new FixContextListener());
-        } else {
-            log.warn(sm.getString("tomcat.addContextNotLifecycle"));
-        }
+        ctx.addLifecycleListener(new FixContextListener());
         
         if (host == null) {
             getHost().addChild(ctx);
@@ -478,17 +460,14 @@ public class Tomcat {
             initSimpleAuth();
         }
         ctx.setRealm(defaultRealm);
-        if (ctx instanceof Lifecycle) {
-            ((Lifecycle) ctx).addLifecycleListener(new DefaultWebXmlListener());
-            
-            ContextConfig ctxCfg = new ContextConfig();
-            ((Lifecycle) ctx).addLifecycleListener(ctxCfg);
-            
-            // prevent it from looking ( if it finds one - it'll have dup error )
-            ctxCfg.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
-        } else {
-            log.warn(sm.getString("tomcat.addWebappNotLifecycle"));
-        }
+
+        ctx.addLifecycleListener(new DefaultWebXmlListener());
+        
+        ContextConfig ctxCfg = new ContextConfig();
+        ctx.addLifecycleListener(ctxCfg);
+        
+        // prevent it from looking ( if it finds one - it'll have dup error )
+        ctxCfg.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
         
         if (host == null) {
             getHost().addChild(ctx);
@@ -609,12 +588,7 @@ public class Tomcat {
         // Make sure getServer() has been called as that is where naming is
         // disabled
         getServer();
-        if (server instanceof Lifecycle) {
-            ((Lifecycle) server).addLifecycleListener(
-                    new NamingContextListener());
-        } else {
-            log.warn(sm.getString("tomcat.namingNotLifecycle"));
-        }
+        server.addLifecycleListener(new NamingContextListener());
         
         System.setProperty("catalina.useNaming", "true");
 
