@@ -561,9 +561,10 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         }
 
-        public final V get(String key) {
+        @Override
+        public final V get(Object key) {
             if (key != null) {
-                return getAttribute(key);
+                return getAttribute((String) key);
             }
             return null;
         }
@@ -574,18 +575,19 @@ public class ImplicitObjectELResolver extends ELResolver {
                 throw new NullPointerException();
             }
             if (value == null) {
-                this.removeAttribute(key.toString());
+                this.removeAttribute(key);
             } else {
-                this.setAttribute(key.toString(), value);
+                this.setAttribute(key, value);
             }
             return null;
         }
 
-        public final V remove(String key) {
+        @Override
+        public final V remove(Object key) {
             if (key == null) {
                 throw new NullPointerException();
             }
-            this.removeAttribute(key.toString());
+            this.removeAttribute((String) key);
             return null;
         }
 
