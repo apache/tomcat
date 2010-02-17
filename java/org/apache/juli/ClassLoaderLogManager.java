@@ -50,25 +50,8 @@ public class ClassLoaderLogManager extends LogManager {
         
         @Override
         public void run() {
-            // The JVM us being shutdown. Make sure all loggers for all class
-            // loaders are shutdown
-            for (ClassLoaderLogInfo clLogInfo : classLoaderLoggers.values()) {
-                for (Logger logger : clLogInfo.loggers.values()) {
-                    resetLogger(logger);
-                }
-            }
-        }
-            
-        private void resetLogger(Logger logger) {
-            
-            Handler[] handlers = logger.getHandlers();
-            for (Handler handler : handlers) {
-                logger.removeHandler(handler);
-                try {
-                    handler.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
+            if (useShutdownHook) {
+                shutdown();
             }
         }
 
@@ -105,7 +88,29 @@ public class ClassLoaderLogManager extends LogManager {
      */
     protected ThreadLocal<String> prefix = new ThreadLocal<String>();
 
+
+    /**
+     * Determines if the shutdown hook is used to perform any necessary
+     * clean-up such as flushing buffered handlers on JVM shutdown. Defaults to
+     * <code>true</code> but may be set to false if another component ensures
+     * that 
+     */
+    protected boolean useShutdownHook = true;
+
     
+    // ------------------------------------------------------------- Properties
+
+
+    public boolean isUseShutdownHook() {
+        return useShutdownHook;
+    }
+
+
+    public void setUseShutdownHook(boolean useShutdownHook) {
+        this.useShutdownHook = useShutdownHook;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -294,7 +299,35 @@ public class ClassLoaderLogManager extends LogManager {
         readConfiguration(is, Thread.currentThread().getContextClassLoader());
     
     }
+
+
+    /**
+     * Shuts down the logging system.
+     */
+    public void shutdown() {
+        // The JVM us being shutdown. Make sure all loggers for all class
+        // loaders are shutdown
+        for (ClassLoaderLogInfo clLogInfo : classLoaderLoggers.values()) {
+            for (Logger logger : clLogInfo.loggers.values()) {
+                resetLogger(logger);
+            }
+        }
+    }
+
+    // -------------------------------------------------------- Private Methods
+    private void resetLogger(Logger logger) {
         
+        Handler[] handlers = logger.getHandlers();
+        for (Handler handler : handlers) {
+            logger.removeHandler(handler);
+            try {
+                handler.close();
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+    }
+
     // ------------------------------------------------------ Protected Methods
 
 
