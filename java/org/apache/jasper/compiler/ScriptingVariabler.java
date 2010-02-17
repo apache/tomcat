@@ -59,11 +59,11 @@ class ScriptingVariabler {
     static class ScriptingVariableVisitor extends Node.Visitor {
 
         private ErrorDispatcher err;
-        private Hashtable<String,Integer> scriptVars;
-        
+        private Map<String, Integer> scriptVars;
+
         public ScriptingVariableVisitor(ErrorDispatcher err) {
             this.err = err;
-            scriptVars = new Hashtable<String,Integer>();
+            scriptVars = new HashMap<String,Integer>();
         }
 
         @Override
@@ -83,7 +83,7 @@ class ScriptingVariabler {
                 return;
             }
 
-            Vector<Object> vec = new Vector<Object>();
+            List<Object> vec = new ArrayList<Object>();
 
             Integer ownRange = null;
             Node.CustomTag parent = n.getCustomTagParent();
@@ -107,11 +107,8 @@ class ScriptingVariabler {
                     String varName = varInfos[i].getVarName();
                     
                     Integer currentRange = scriptVars.get(varName);
-                    // If a fragment helper has been used for the parent tag
-                    // the scripting variables always need to be declared
                     if (currentRange == null ||
-                            ownRange.compareTo(currentRange) > 0 ||
-                            parent != null && isImplementedAsFragment(parent)) {
+                            ownRange.compareTo(currentRange) > 0) {
                         scriptVars.put(varName, ownRange);
                         vec.add(varInfos[i]);
                     }
@@ -134,11 +131,8 @@ class ScriptingVariabler {
                     }
 
                     Integer currentRange = scriptVars.get(varName);
-                    // If a fragment helper has been used for the parent tag
-                    // the scripting variables always need to be declared
                     if (currentRange == null ||
-                            ownRange.compareTo(currentRange) > 0 ||
-                            parent != null && isImplementedAsFragment(parent)) {
+                            ownRange.compareTo(currentRange) > 0) {
                         scriptVars.put(varName, ownRange);
                         vec.add(tagVarInfos[i]);
                     }
@@ -149,22 +143,6 @@ class ScriptingVariabler {
         }
     }
 
-    private static boolean isImplementedAsFragment(Node.CustomTag n) {
-        // Replicates logic from Generator to determine if a fragment
-        // helper will be used
-        if (n.implementsSimpleTag()) {
-            if (Generator.findJspBody(n) == null) {
-                if (!n.hasEmptyBody()) {
-                    return true;
-                }
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    
     public static void set(Node.Nodes page, ErrorDispatcher err)
             throws JasperException {
         page.visit(new CustomTagCounter());
