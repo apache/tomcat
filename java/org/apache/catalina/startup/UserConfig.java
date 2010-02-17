@@ -298,12 +298,10 @@ public final class UserConfig
               (Context) clazz.newInstance();
             context.setPath(contextPath);
             context.setDocBase(app.toString());
-            if (context instanceof Lifecycle) {
-                clazz = Class.forName(configClass);
-                LifecycleListener listener =
-                  (LifecycleListener) clazz.newInstance();
-                ((Lifecycle) context).addLifecycleListener(listener);
-            }
+            clazz = Class.forName(configClass);
+            LifecycleListener listener =
+                (LifecycleListener) clazz.newInstance();
+            context.addLifecycleListener(listener);
             host.addChild(context);
         } catch (Exception e) {
             host.getLogger().error(sm.getString("userConfig.error", user), e);

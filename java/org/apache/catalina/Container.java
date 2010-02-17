@@ -81,7 +81,7 @@ import org.apache.juli.logging.Log;
  * @version $Revision$ $Date$
  */
 
-public interface Container {
+public interface Container extends Lifecycle {
 
 
     // ----------------------------------------------------- Manifest Constants

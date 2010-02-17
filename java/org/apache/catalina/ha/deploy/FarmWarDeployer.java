@@ -28,7 +28,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterDeployer;
@@ -559,7 +558,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         if (context != null) {
             if(log.isDebugEnabled())
                 log.debug("Undeploy local context " +path );
-            ((Lifecycle) context).stop();
+            context.stop();
             File war = new File(getAppBase(), getDocBase(path) + ".war");
             File dir = new File(getAppBase(), getDocBase(path));
             File xml = new File(configBase, getConfigFile(path) + ".xml");

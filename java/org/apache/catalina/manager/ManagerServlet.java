@@ -1245,7 +1245,7 @@ public class ManagerServlet
                                             RequestUtil.filter(displayPath)));
                 return;
             }
-            ((Lifecycle) context).start();
+            context.start();
             if (context.getAvailable())
                 writer.println
                     (sm.getString("managerServlet.started", displayPath));
@@ -1296,7 +1296,7 @@ public class ManagerServlet
                 writer.println(sm.getString("managerServlet.noSelf"));
                 return;
             }
-            ((Lifecycle) context).stop();
+            context.stop();
             writer.println(sm.getString("managerServlet.stopped", displayPath));
         } catch (Throwable t) {
             log("ManagerServlet.stop[" + displayPath + "]", t);
@@ -1347,7 +1347,7 @@ public class ManagerServlet
                 addServiced(path);
                 try {
                     // Try to stop the context first to be nicer
-                    ((Lifecycle) context).stop();
+                    context.stop();
                 } catch (Throwable t) {
                     // Ignore
                 }

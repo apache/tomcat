@@ -342,9 +342,9 @@ public final class StandardServer
                 }
             }
 
-            if (started && (service instanceof Lifecycle)) {
+            if (started) {
                 try {
-                    ((Lifecycle) service).start();
+                    service.start();
                 } catch (LifecycleException e) {
                     // Ignore
                 }
@@ -525,12 +525,10 @@ public final class StandardServer
             }
             if (j < 0)
                 return;
-            if (services[j] instanceof Lifecycle) {
-                try {
-                    ((Lifecycle) services[j]).stop();
-                } catch (LifecycleException e) {
-                    // Ignore
-                }
+            try {
+                services[j].stop();
+            } catch (LifecycleException e) {
+                // Ignore
             }
             int k = 0;
             Service results[] = new Service[services.length - 1];
@@ -723,8 +721,7 @@ public final class StandardServer
         // Start our defined Services
         synchronized (services) {
             for (int i = 0; i < services.length; i++) {
-                if (services[i] instanceof Lifecycle)
-                    ((Lifecycle) services[i]).start();
+                services[i].start();
             }
         }
 
@@ -757,8 +754,7 @@ public final class StandardServer
 
         // Stop our defined Services
         for (int i = 0; i < services.length; i++) {
-            if (services[i] instanceof Lifecycle)
-                ((Lifecycle) services[i]).stop();
+            services[i].stop();
         }
 
         // Notify our interested LifecycleListeners
