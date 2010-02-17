@@ -166,7 +166,7 @@ public class CometConnectionManagerValve
         started = true;
 
         if (container instanceof Context) {
-            ((Lifecycle) container).addLifecycleListener(this);
+            container.addLifecycleListener(this);
         }
         
     }
@@ -190,7 +190,7 @@ public class CometConnectionManagerValve
         started = false;
 
         if (container instanceof Context) {
-            ((Lifecycle) container).removeLifecycleListener(this);
+            container.removeLifecycleListener(this);
         }
 
     }

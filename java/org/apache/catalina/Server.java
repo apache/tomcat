@@ -45,7 +45,7 @@ import org.apache.catalina.deploy.NamingResources;
  * @version $Revision$ $Date$
  */
 
-public interface Server {
+public interface Server extends Lifecycle {
 
 
     // ------------------------------------------------------------- Properties

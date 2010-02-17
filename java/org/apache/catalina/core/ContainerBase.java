@@ -787,10 +787,10 @@ public abstract class ContainerBase
             children.put(child.getName(), child);
 
             // Start child
-            if (started && startChildren && (child instanceof Lifecycle)) {
+            if (started && startChildren) {
                 boolean success = false;
                 try {
-                    ((Lifecycle) child).start();
+                    child.start();
                     success = true;
                 } catch (LifecycleException e) {
                     log.error("ContainerBase.addChild: start: ", e);
@@ -919,14 +919,14 @@ public abstract class ContainerBase
             children.remove(child.getName());
         }
         
-        if (started && (child instanceof Lifecycle)) {
+        if (started) {
             try {
                 if( child instanceof ContainerBase ) {
                     if( ((ContainerBase)child).started ) {
-                        ((Lifecycle) child).stop();
+                        child.stop();
                     }
                 } else {
-                    ((Lifecycle) child).stop();
+                    child.stop();
                 }
             } catch (LifecycleException e) {
                 log.error("ContainerBase.removeChild: stop: ", e);
@@ -1043,8 +1043,7 @@ public abstract class ContainerBase
         // Start our child containers, if any
         Container children[] = findChildren();
         for (int i = 0; i < children.length; i++) {
-            if (children[i] instanceof Lifecycle)
-                ((Lifecycle) children[i]).start();
+            children[i].start();
         }
 
         // Start the Valves in our pipeline (including the basic), if any
@@ -1096,8 +1095,7 @@ public abstract class ContainerBase
         // Stop our child containers, if any
         Container children[] = findChildren();
         for (int i = 0; i < children.length; i++) {
-            if (children[i] instanceof Lifecycle)
-                ((Lifecycle) children[i]).stop();
+            children[i].stop();
         }
         // Remove children - so next start can work
         children = findChildren();

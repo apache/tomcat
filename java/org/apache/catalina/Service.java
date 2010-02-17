@@ -34,7 +34,7 @@ import org.apache.catalina.connector.Connector;
  * @version $Revision$ $Date$
  */
 
-public interface Service {
+public interface Service extends Lifecycle {
 
     // ------------------------------------------------------------- Properties
 

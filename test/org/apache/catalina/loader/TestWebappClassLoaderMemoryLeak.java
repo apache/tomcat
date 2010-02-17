@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -32,11 +31,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         getUrl("http://localhost:" + getPort() + "/");
         
         // Stop the context
-        if (ctx instanceof Lifecycle) {
-            ((Lifecycle) ctx).stop();
-        } else {
-            fail("Test requires context implements Lifecycle");
-        }
+        ctx.stop();
         
         // If the thread still exists, we have a thread/memory leak
         Thread[] threads = getThreads();
