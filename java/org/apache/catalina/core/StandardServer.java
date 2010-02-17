@@ -34,7 +34,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
@@ -57,9 +56,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Craig R. McClanahan
  * @version $Revision$ $Date$
  */
-public final class StandardServer
-    implements Lifecycle, Server, MBeanRegistration 
- {
+public final class StandardServer implements Server, MBeanRegistration {
+
     private static final Log log = LogFactory.getLog(StandardServer.class);
    
 
