@@ -302,7 +302,7 @@ public class ServerLifecycleListener
         context.addContainerListener(this);
         if (context instanceof StandardContext) {
             ((StandardContext) context).addPropertyChangeListener(this);
-            ((StandardContext) context).addLifecycleListener(this);
+            context.addLifecycleListener(this);
         }
 
         // If the context is privileged, give a reference to it
