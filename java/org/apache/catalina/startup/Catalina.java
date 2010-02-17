@@ -28,11 +28,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
+import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
@@ -572,6 +574,15 @@ public class Catalina extends Embedded {
                     shutdownHook = new CatalinaShutdownHook();
                 }
                 Runtime.getRuntime().addShutdownHook(shutdownHook);
+                
+                // If JULI is being used, disable JULI's shutdown hook since
+                // shutdown hooks run in parallel and log messages may be lost
+                // if JULI's hook completes before the CatalinaShutdownHook()
+                LogManager logManager = LogManager.getLogManager();
+                if (logManager instanceof ClassLoaderLogManager) {
+                    ((ClassLoaderLogManager) logManager).setUseShutdownHook(
+                            false);
+                }
             }
         } catch (Throwable t) {
             // This will fail on JDK 1.2. Ignoring, as Tomcat can run
@@ -652,6 +663,13 @@ public class Catalina extends Embedded {
                 Catalina.this.stop();
             }
             
+            // If JULI is used, shut JULI down *after* the server shuts down
+            // so log messages aren't lost
+            LogManager logManager = LogManager.getLogManager();
+            if (logManager instanceof ClassLoaderLogManager) {
+                ((ClassLoaderLogManager) logManager).shutdown();
+            }
+
         }
 
     }
