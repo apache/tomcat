@@ -524,6 +524,35 @@ public class ImplicitObjectELResolver extends ELResolver {
             return set;
         }
 
+        @Override
+        public final int size() {
+            int size = 0;
+            Enumeration<String> e = getAttributeNames();
+            if (e != null) {
+                while (e.hasMoreElements()) {
+                    e.nextElement();
+                    size++;
+                }
+            }
+            return size;
+        }
+
+        @Override
+        public final boolean containsKey(Object key) {
+            if (key == null) {
+                return false;
+            }
+            Enumeration<String> e = getAttributeNames();
+            if (e != null) {
+                while (e.hasMoreElements()) {
+                    if (key.equals(e.nextElement())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         private class ScopeEntry implements Map.Entry<String,V> {
 
             private final String key;
