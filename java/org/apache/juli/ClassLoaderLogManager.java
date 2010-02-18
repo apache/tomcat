@@ -305,7 +305,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Shuts down the logging system.
      */
     public void shutdown() {
-        // The JVM us being shutdown. Make sure all loggers for all class
+        // The JVM is being shutdown. Make sure all loggers for all class
         // loaders are shutdown
         for (ClassLoaderLogInfo clLogInfo : classLoaderLoggers.values()) {
             for (Logger logger : clLogInfo.loggers.values()) {
