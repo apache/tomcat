@@ -1112,8 +1112,10 @@ public class AjpAprProcessor implements ActionHook {
 
         first = false;
         bodyMessage.reset();
-        readMessage(bodyMessage, false, false);
-
+        if (!readMessage(bodyMessage, false, false)) {
+            // Invalid message
+            return false;
+        }
         // No data received.
         if (bodyMessage.getLen() == 0) {
             // just the header
@@ -1182,11 +1184,21 @@ public class AjpAprProcessor implements ActionHook {
             read(headerLength);
         }
         inputBuffer.get(message.getBuffer(), 0, headerLength);
-        message.processHeader();
-        read(message.getLen());
-        inputBuffer.get(message.getBuffer(), headerLength, message.getLen());
-
-        return true;
+        int messageLength = message.processHeader();
+        if (messageLength < 0) {
+            // Invalid AJP header signature
+            // TODO: Throw some exception and close the connection to frontend.
+            return false;
+        }
+        else if (messageLength == 0) {
+            // Zero length message.
+            return true;
+        }
+        else {
+            read(messageLength);
+            inputBuffer.get(message.getBuffer(), headerLength, messageLength);
+            return true;
+        }
 
     }
 
