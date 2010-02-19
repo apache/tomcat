@@ -348,7 +348,7 @@
     <delete file="${base.path}/file.zip"/>
   </target>
   
-  <target name="download">
+  <target name="download" unless="skip.download">
     <mkdir dir="${base.path}"/>
 <!-- 
     <antcall target="downloadzip">

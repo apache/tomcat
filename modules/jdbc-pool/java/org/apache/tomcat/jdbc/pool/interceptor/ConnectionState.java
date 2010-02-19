@@ -56,6 +56,17 @@ public class ConnectionState extends JdbcInterceptor  {
     public void reset(ConnectionPool parent, PooledConnection con) {
         if (parent==null || con==null) return;
         PoolConfiguration poolProperties = parent.getPoolProperties();
+        if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
+            try {
+                if (transactionIsolation==null || transactionIsolation.intValue()!=poolProperties.getDefaultTransactionIsolation()) {
+                    con.getConnection().setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+                    transactionIsolation = Integer.valueOf(poolProperties.getDefaultTransactionIsolation());
+                }
+            }catch (SQLException x) {
+                transactionIsolation = null;
+                log.error("Unable to reset transaction isolation state to connection.",x);
+            }
+        }
         if (poolProperties.getDefaultReadOnly()!=null) {
             try {
                 if (readOnly==null || readOnly.booleanValue()!=poolProperties.getDefaultReadOnly().booleanValue()) {
@@ -89,17 +100,7 @@ public class ConnectionState extends JdbcInterceptor  {
                 log.error("Unable to reset default catalog state to connection.",x);
             }
         }
-        if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
-            try {
-                if (transactionIsolation==null || transactionIsolation.intValue()!=poolProperties.getDefaultTransactionIsolation()) {
-                    con.getConnection().setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
-                    transactionIsolation = Integer.valueOf(poolProperties.getDefaultTransactionIsolation());
-                }
-            }catch (SQLException x) {
-                transactionIsolation = null;
-                log.error("Unable to reset transaction isolation state to connection.",x);
-            }
-        }
+        
     }
 
     @Override
