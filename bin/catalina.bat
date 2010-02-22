@@ -43,10 +43,10 @@ rem   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 rem                   "stop", or "run" command is executed.
 rem
 rem   JPDA_TRANSPORT  (Optional) JPDA transport used when the "jpda start"
-rem                   command is executed. The default is "dt_shmem".
+rem                   command is executed. The default is "dt_socket".
 rem
 rem   JPDA_ADDRESS    (Optional) Java runtime options used when the "jpda start"
-rem                   command is executed. The default is "jdbconn".
+rem                   command is executed. The default is 8000.
 rem
 rem   JPDA_SUSPEND    (Optional) Java runtime options used when the "jpda start"
 rem                   command is executed. Specifies whether JVM should suspend
