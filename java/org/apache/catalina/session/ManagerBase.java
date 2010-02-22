@@ -821,22 +821,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         session.setMaxInactiveInterval(this.maxInactiveInterval);
         if (sessionId == null) {
             sessionId = generateSessionId();
-            // FIXME: Code to be used in case route replacement is needed
-            /*
-        } else {
-            String jvmRoute = getJvmRoute();
-            if (getJvmRoute() != null) {
-                String requestJvmRoute = null;
-                int index = sessionId.indexOf(".");
-                if (index > 0) {
-                    requestJvmRoute = sessionId
-                            .substring(index + 1, sessionId.length());
-                }
-                if (requestJvmRoute != null && !requestJvmRoute.equals(jvmRoute)) {
-                    sessionId = sessionId.substring(0, index) + "." + jvmRoute;
-                }
-            }
-            */
         }
         session.setId(sessionId);
         sessionCounter++;
