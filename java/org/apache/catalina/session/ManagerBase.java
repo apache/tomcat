@@ -821,17 +821,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         session.setMaxInactiveInterval(this.maxInactiveInterval);
         if (sessionId == null) {
             sessionId = generateSessionId();
-        // FIXME WHy we need no duplication check?
-        /*         
-             synchronized (sessions) {
-                while (sessions.get(sessionId) != null) { // Guarantee
-                    // uniqueness
-                    duplicates++;
-                    sessionId = generateSessionId();
-                }
-            }
-        */
-            
             // FIXME: Code to be used in case route replacement is needed
             /*
         } else {
