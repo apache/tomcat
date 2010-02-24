@@ -19,6 +19,7 @@ package org.apache.jasper;
 
 import java.io.BufferedReader;
 import java.io.CharArrayWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -947,15 +948,18 @@ public class JspC implements Options {
         while (!done) {
             int current = reader.read();
             while (current != '>') {
+                if (current < 0) {
+                    throw new EOFException();
+                }
                 result.append((char) current);
                 current = reader.read();
             }
             result.append((char) current);
             
             int len = result.length();
-            if (len > 7 && result.substring(0, 4).equals("<!--")) {
+            if (len > 4 && result.substring(0, 4).equals("<!--")) {
                 // This is a comment - make sure we are at the end
-                if (result.substring(len - 3, len).equals("-->")) {
+                if (len >= 7 && result.substring(len - 3, len).equals("-->")) {
                     done = true;
                 }
             } else {
