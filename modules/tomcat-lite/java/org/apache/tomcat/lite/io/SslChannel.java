@@ -5,12 +5,14 @@ package org.apache.tomcat.lite.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
@@ -30,9 +32,13 @@ public class SslChannel extends IOChannel implements Runnable {
     
     IOBuffer in = new IOBuffer(this);
     IOBuffer out = new IOBuffer(this);
+
+    long handshakeTimeout = 10000;
+    // Used for session reuse
+    String host;
+    int port;
     
     public SslChannel() {
-        
     }
     
     ByteBuffer myAppOutData;
@@ -52,13 +58,30 @@ public class SslChannel extends IOChannel implements Runnable {
 
     private boolean closeHandshake = false;
     
-    private void initSsl() throws GeneralSecurityException {
+    /**
+     * Setting the host/port enables clients to reuse SSL session - 
+     * less traffic and encryption overhead at startup, assuming the 
+     * server caches the session ( i.e. single server or distributed cache ).
+     * 
+     * SSL ticket extension is another possibility.
+     */
+    public SslChannel setTarget(String host, int port) {
+        this.host = host;
+        this.port = port;
+        return this;
+    }
+    
+    private synchronized void initSsl() throws GeneralSecurityException {
         if (sslEngine != null) {
             return;
         }
         
         if (client) {
-            sslEngine = sslCtx.createSSLEngine();
+            if (port > 0) {
+                sslEngine = sslCtx.createSSLEngine(host, port);
+            } else {
+                sslEngine = sslCtx.createSSLEngine();
+            }
             sslEngine.setUseClientMode(client);
         } else {
             sslEngine = sslCtx.createSSLEngine();
@@ -89,7 +112,7 @@ public class SslChannel extends IOChannel implements Runnable {
     
     
     @Override
-    public void setSink(IOChannel net) throws IOException {
+    public synchronized void setSink(IOChannel net) throws IOException {
         try {
             initSsl();
             super.setSink(net);
@@ -97,7 +120,7 @@ public class SslChannel extends IOChannel implements Runnable {
             log.log(Level.SEVERE, "Error initializing ", e);
         }
     }
-
+    
     @Override
     public IOBuffer getIn() {
         return in;
@@ -118,7 +141,7 @@ public class SslChannel extends IOChannel implements Runnable {
      */
     public int processInput(IOBuffer netIn, IOBuffer appIn) throws IOException {
         if (log.isLoggable(Level.FINEST)) {
-            log.finest("JSSE: processInput " + handshakeInProgress + " " + netIn.getBufferCount());
+            log.info("JSSE: processInput " + handshakeInProgress + " " + netIn.getBufferCount());
         }
         if (!handshakeDone && !handshakeInProgress) {
             handshakeInProgress = true;
@@ -134,6 +157,7 @@ public class SslChannel extends IOChannel implements Runnable {
     private synchronized int processRealInput(IOBuffer netIn, IOBuffer appIn) throws IOException {
         int rd = 0;
         boolean needsMore = true;
+        boolean notEnough = false;
 
         while (needsMore) {
             if (netIn.isClosedAndEmpty()) {
@@ -142,9 +166,14 @@ public class SslChannel extends IOChannel implements Runnable {
                 return -1;
             }
             myNetInData.compact();
-            int rdNow = netIn.read(myNetInData);
-            myNetInData.flip();
-            if (rdNow == 0) {
+            int rdNow;
+            try {
+                rdNow = netIn.read(myNetInData);
+            } finally {
+                myNetInData.flip();
+            }
+            if (rdNow == 0 && (myNetInData.remaining() == 0 || 
+                    notEnough)) {
                 return rd;
             }
             if (rdNow == -1) {
@@ -153,10 +182,18 @@ public class SslChannel extends IOChannel implements Runnable {
                 return rd;
             }
 
+            notEnough = true; // next read of 0
             while (myNetInData.remaining() > 0) {
                 myAppInData.compact();
-                unwrapR = sslEngine.unwrap(myNetInData, myAppInData);
-                myAppInData.flip();
+                try {
+                    unwrapR = sslEngine.unwrap(myNetInData, myAppInData);
+                } catch (SSLException ex) {
+                    log.warning("Read error: " + ex);
+                    close();
+                    return -1;
+                } finally {
+                    myAppInData.flip();
+                }
                 if (myAppInData.remaining() > 0) {
                     in.write(myAppInData); // all will be written
                 }
@@ -216,50 +253,78 @@ public class SslChannel extends IOChannel implements Runnable {
     }
     
     public void close() throws IOException {
-        sslEngine.closeOutbound(); // mark as closed
-        myNetOutData.compact();
-        SSLEngineResult wrap = sslEngine.wrap(EMPTY, 
-                myNetOutData);
-        myNetOutData.flip();
-        if (wrap.getStatus() != Status.CLOSED) {
-            System.err.println("Unexpected status " + wrap);
+        if (net.getOut().isAppendClosed()) {
+            return;
         }
-        net.getOut().write(myNetOutData);
+        sslEngine.closeOutbound(); // mark as closed
+        synchronized(myNetOutData) {
+            myNetOutData.compact();
+
+            SSLEngineResult wrap;
+            try {
+                wrap = sslEngine.wrap(EMPTY, myNetOutData);
+                if (wrap.getStatus() != Status.CLOSED) {
+                    log.warning("Unexpected close status " + wrap);
+                }
+            } catch (Throwable t ) {
+                log.info("Error wrapping " + myNetOutData);
+            } finally {
+                myNetOutData.flip();
+            }
+            if (myNetOutData.remaining() > 0) {
+                net.getOut().write(myNetOutData);
+            }
+        }
         // TODO: timer to close socket if we don't get
         // clean close handshake
+        super.close();
     }
     
-    private synchronized void startRealSending() throws IOException {
-        while (true) {
-        
-            myAppOutData.compact();
-            int rd = out.read(myAppOutData);
-            myAppOutData.flip();
-            if (rd == 0) {
-                break;
-            }
-            if (rd < 0) {
-                close();
-                break;
-            }
+    private Object sendLock = new Object();
     
-            myNetOutData.compact();
-            SSLEngineResult wrap = sslEngine.wrap(myAppOutData, 
-                    myNetOutData);
-            myNetOutData.flip();
-            net.getOut().write(myNetOutData);
-                        
-            if (wrap != null) {
-                switch (wrap.getStatus()) {
-                case BUFFER_UNDERFLOW: {
+    private void startRealSending() throws IOException {
+        // Only one thread at a time
+        synchronized (sendLock) {
+            while (true) {
+                
+                myAppOutData.compact();
+                int rd;
+                try {
+                    rd = out.read(myAppOutData);
+                } finally {
+                    myAppOutData.flip();
+                }
+                if (rd == 0) {
                     break;
                 }
-                case OK: {
+                if (rd < 0) {
+                    close();
                     break;
                 }
-                case BUFFER_OVERFLOW: {
-                    throw new IOException("Overflow");
+
+                SSLEngineResult wrap;
+                synchronized(myNetOutData) {
+                    myNetOutData.compact();
+                    try {
+                        wrap = sslEngine.wrap(myAppOutData, 
+                                myNetOutData);
+                    } finally {
+                        myNetOutData.flip();
+                    }
+                    net.getOut().write(myNetOutData);
                 }
+                if (wrap != null) {
+                    switch (wrap.getStatus()) {
+                    case BUFFER_UNDERFLOW: {
+                        break;
+                    }
+                    case OK: {
+                        break;
+                    }
+                    case BUFFER_OVERFLOW: {
+                        throw new IOException("Overflow");
+                    }
+                    }
                 }
             }
         }
@@ -275,22 +340,26 @@ public class SslChannel extends IOChannel implements Runnable {
     // We'll need to unregister and register again from the selector.
     private void handleHandshking() { 
         if (log.isLoggable(Level.FINEST)) {
-            log.finest("Starting handshake");
+            log.info("Starting handshake");
         }
         handshakeInProgress = true;
 
-        new Thread(this).start();
+        ((SslConnector) connector).handshakeExecutor.execute(this);
     }
     
     private void endHandshake() throws IOException {
         if (log.isLoggable(Level.FINEST)) {
-            log.finest("Handshake done");
+            log.info("Handshake done " + net.getIn().available());
         }
         handshakeDone = true;
         handshakeInProgress = false;
         if (flushing) {
             flushing = false;
             startSending();
+        }
+        if (myNetInData.remaining() > 0 || net.getIn().available() > 0) {
+            // Last SSL packet also includes data.
+            handleReceived(net);
         }
     }
 
@@ -311,26 +380,41 @@ public class SslChannel extends IOChannel implements Runnable {
             
             long t0 = System.currentTimeMillis();
             
-            while (hstatus != HandshakeStatus.FINISHED) {
+            while (hstatus != HandshakeStatus.NOT_HANDSHAKING 
+                    && hstatus != HandshakeStatus.FINISHED 
+                    && !net.getIn().isAppendClosed()) {
+                if (System.currentTimeMillis() - t0 > handshakeTimeout) {
+                    throw new TimeoutException();
+                }
                 if (wrap != null && wrap.getStatus() == Status.CLOSED) {
                     break;
                 }
                 if (log.isLoggable(Level.FINEST)) {
-                    log.finest("-->doHandshake() loop: status = " + hstatus + " " +
+                    log.info("-->doHandshake() loop: status = " + hstatus + " " +
                             sslEngine.getHandshakeStatus());
                 }
                 
                 if (hstatus == HandshakeStatus.NEED_WRAP) {
                     // || initial - for client
                     initial = false;
-                    myNetOutData.compact();
-                    
-                    wrap = sslEngine.wrap(myAppOutData, myNetOutData);
-                    myNetOutData.flip();
-                    
-                    hstatus = wrap.getHandshakeStatus();
+                    synchronized(myNetOutData) {
+                        myNetOutData.compact();
 
-                    net.getOut().write(myNetOutData);
+                        try {
+                            wrap = sslEngine.wrap(myAppOutData, myNetOutData);
+                        } catch (Throwable t) {
+                            t.printStackTrace();
+                            close();
+                            return;
+                        } finally {
+                            myNetOutData.flip();
+                        }
+
+                        hstatus = wrap.getHandshakeStatus();
+                        if (myNetOutData.remaining() > 0) {
+                            net.getOut().write(myNetOutData);
+                        }
+                    }
                     net.startSending();
 
                     
@@ -356,11 +440,17 @@ public class SslChannel extends IOChannel implements Runnable {
                                 || wrap.getStatus() == Status.BUFFER_UNDERFLOW
                                 || (hstatus == HandshakeStatus.NEED_UNWRAP && myNetInData.remaining() == 0)) {
                             myNetInData.compact();
-                            int rd = net.getIn().read(myNetInData);
-                            myNetInData.flip();
+                            // non-blocking
+                            int rd;
+                            try {
+                                rd = net.getIn().read(myNetInData);
+                            } finally {
+                                myNetInData.flip();
+                            }
                             if (rd == 0) {
-                                net.getIn().waitData(10000);
-                                continue;
+                                net.getIn().waitData(handshakeTimeout - 
+                                        (System.currentTimeMillis() - t0));
+                                rd = net.getIn().read(myNetInData);
                             }
                             if (rd < 0) {
                                 // in closed
@@ -368,7 +458,7 @@ public class SslChannel extends IOChannel implements Runnable {
                             }
                         }
                         if (log.isLoggable(Level.FINEST)) {
-                            log.finest("Unwrap chunk done " + hstatus + " " + wrap 
+                            log.info("Unwrap chunk done " + hstatus + " " + wrap 
                                 + " " + sslEngine.getHandshakeStatus());
                         }
 
@@ -384,7 +474,7 @@ public class SslChannel extends IOChannel implements Runnable {
                     long t1task = System.currentTimeMillis();
                     hstatus = sslEngine.getHandshakeStatus();
                     if (log.isLoggable(Level.FINEST)) {
-                        log.finest("Tasks done in " + (t1task - t0task) + " new status " +
+                        log.info("Tasks done in " + (t1task - t0task) + " new status " +
                                 hstatus);
                     }
                     
@@ -401,6 +491,7 @@ public class SslChannel extends IOChannel implements Runnable {
             try {
                 close();
                 net.close();
+                sendHandleReceivedCallback();
             } catch (IOException ex) {
                 log.log(Level.SEVERE, "Error closing", ex);                
             }
@@ -417,6 +508,11 @@ public class SslChannel extends IOChannel implements Runnable {
 
     public SslChannel setSslContext(SSLContext sslCtx) {
         this.sslCtx = sslCtx;
+        return this;
+    }
+    
+    public SslChannel setSslConnector(SslConnector con) {
+        this.connector = con;
         return this;
     }
 }

@@ -54,9 +54,9 @@ import org.apache.tomcat.lite.http.MultiMap.Entry;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBuffer;
 import org.apache.tomcat.lite.io.FastHttpDateFormat;
+import org.apache.tomcat.lite.util.LocaleParser;
 import org.apache.tomcat.servlets.session.UserSessionManager;
 import org.apache.tomcat.servlets.util.Enumerator;
-import org.apache.tomcat.servlets.util.LocaleParser;
 import org.apache.tomcat.servlets.util.RequestUtil;
 
 
@@ -206,8 +206,6 @@ public abstract class ServletRequestImpl implements HttpServletRequest {
     public static final String WORK_DIR_ATTR =
         "javax.servlet.context.tempdir";
 
-    protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
-
 
     /**
      * The default Locale if none are specified.
@@ -228,13 +226,6 @@ public abstract class ServletRequestImpl implements HttpServletRequest {
     protected Cookie[] cookies = null;
 
 
-    /**
-     * The set of SimpleDateFormat formats to use in getDateHeader().
-     *
-     * Notice that because SimpleDateFormat is not thread-safe, we can't
-     * declare formats[] as a static variable.
-     */
-    protected SimpleDateFormat formats[] = null;
     
 
     /**
@@ -683,28 +674,7 @@ public abstract class ServletRequestImpl implements HttpServletRequest {
      *  cannot be converted to a date
      */
     public long getDateHeader(String name) {
-
-        String value = getHeader(name);
-        if (value == null)
-            return (-1L);
-        if (formats == null) {
-            formats = new SimpleDateFormat[] {
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
-                new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-                new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
-            };
-            formats[0].setTimeZone(GMT_ZONE);
-            formats[1].setTimeZone(GMT_ZONE);
-            formats[2].setTimeZone(GMT_ZONE);
-        }
-        
-        // Attempt to convert the date header in a variety of formats
-        long result = FastHttpDateFormat.parseDate(value, formats);
-        if (result != (-1L)) {
-            return result;
-        }
-        throw new IllegalArgumentException(value);
-
+        return httpRequest.getDateHeader(name);
     }
 
     /**

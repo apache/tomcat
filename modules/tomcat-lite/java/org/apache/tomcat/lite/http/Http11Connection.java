@@ -4,6 +4,8 @@ package org.apache.tomcat.lite.http;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -144,6 +146,8 @@ public class Http11Connection extends HttpConnection
                 return closeInHead();
             }
         }
+        
+        
         return true;
     }
     
@@ -209,6 +213,11 @@ public class Http11Connection extends HttpConnection
             if (!headersReceived) {
                 headRecvBuf.wrapTo(headW);
                 parseMessage(activeHttp, headW);
+                // Part of parseMessage we can switch the protocol
+                if (switchedProtocol != null) {
+                    return;
+                }
+                
                 if (serverMode && activeHttp.httpReq.decodedUri.remaining() == 0) {
                     abort(activeHttp, "Invalid url");
                 }
@@ -552,6 +561,8 @@ public class Http11Connection extends HttpConnection
         return statusCode.remaining() > 0;
     }
 
+    List<String> connectionHeaders = new ArrayList<String>();
+    
     private void parseHeaders(HttpChannel http, HttpMessageBytes msgBytes,
             BBuffer head) 
                 throws IOException {
@@ -559,6 +570,9 @@ public class Http11Connection extends HttpConnection
         head.readLine(line);
         
         int idx = 0;
+        
+        BBuffer upgrade = null;
+        
         while(line.remaining() > 0) {
             // not empty..
             idx = msgBytes.addHeader();
@@ -567,7 +581,23 @@ public class Http11Connection extends HttpConnection
             parseHeader(http, head, line, nameBuf, valBuf);
             
             // TODO: process 'interesting' headers here.
+            if (nameBuf.equalsIgnoreCase("connection")) {
+                // TODO: save and remove if not recognized
+            }
+            if (nameBuf.equalsIgnoreCase("upgrade")) {
+                upgrade = valBuf;
+            }
         }
+        
+        if (upgrade != null) {
+            if (upgrade.equalsIgnoreCase("WebSocket")) {
+                
+            } else if (upgrade.equalsIgnoreCase("SPDY/1.0")) {
+                
+            }
+        }
+        
+        // TODO: process connection headers 
     }
 
     /**
@@ -1406,8 +1436,10 @@ public class Http11Connection extends HttpConnection
         HttpChannel httpCh = activeHttp; 
         boolean ssl = httpCh.getRequest().isSecure();
         if (ssl) {
-            SslChannel ch1 = new SslChannel();
-            ch1.setSslContext(httpConnector.sslConnector.getSSLContext());
+            String[] hostPort = httpCh.getTarget().split(":");
+            
+            SslChannel ch1 = httpConnector.sslConnector.channel(
+                    hostPort[0], Integer.parseInt(hostPort[1]));
             ch1.setSink(net);
             net.addFilterAfter(ch1);
             net = ch1;
@@ -1419,7 +1451,7 @@ public class Http11Connection extends HttpConnection
         }
 
         if (!net.isOpen()) {
-            httpCh.abort("Can't connect");
+            httpCh.abort(net.lastException());
             return;
         }
         

@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.tomcat.servlets.util;
+package org.apache.tomcat.lite.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,7 +165,10 @@ public final class Base64 {
         return encodedData;
     }
 
-
+    public byte[] decode(String enc) {
+        return decode(enc.getBytes());
+    }
+    
     /**
      * Decodes Base64 data into octects
      *

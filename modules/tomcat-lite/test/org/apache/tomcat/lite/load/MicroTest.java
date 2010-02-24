@@ -44,6 +44,7 @@ public class MicroTest extends TestCase {
             mappingData.recycle();
             mapper.map(host, uri, mappingData);
         }
-        System.out.println("Elapsed:" + (System.currentTimeMillis() - time));        
+        // TODO: asserts
+        //System.out.println("Elapsed:" + (System.currentTimeMillis() - time));        
     }
 }

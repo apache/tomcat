@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.tomcat.integration.jmx.JMXProxyServlet;
-import org.apache.tomcat.integration.jmx.JmxObjectManagerSpi;
 import org.apache.tomcat.integration.jmx.UJmxHandler;
 import org.apache.tomcat.integration.jmx.UJmxObjectManagerSpi;
 import org.apache.tomcat.integration.simple.Main;
@@ -29,13 +29,12 @@ import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.http.services.EchoCallback;
 import org.apache.tomcat.lite.http.services.SleepCallback;
 import org.apache.tomcat.lite.io.BBuffer;
+import org.apache.tomcat.lite.io.IOConnector;
 import org.apache.tomcat.lite.io.SocketConnector;
 import org.apache.tomcat.lite.io.SslConnector;
 import org.apache.tomcat.lite.proxy.HttpProxyService;
 import org.apache.tomcat.lite.proxy.StaticContentService;
 import org.apache.tomcat.lite.service.IOStatus;
-import org.apache.tomcat.lite.servlet.ServletConfigImpl;
-import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Server with lost of test servlets.
@@ -54,15 +53,20 @@ public class TestMain {
     
     private SimpleObjectManager om;
 
+    private boolean init = false;
+    
     private SocketConnector serverCon = new SocketConnector();
     
     private HttpConnector testClient = DefaultHttpConnector.get();
     private HttpConnector testServer = new HttpConnector(serverCon);
     private HttpConnector testProxy = new HttpConnector(serverCon);
-
+    private HttpConnector sslServer;
+    
     private HttpProxyService proxy;
 
     UJmxObjectManagerSpi jmx = new UJmxObjectManagerSpi();
+
+    private IOConnector sslCon;
         
     public static TestMain shared() {
         if (defaultServer == null) {
@@ -118,8 +122,6 @@ public class TestMain {
         });
 
         d.addWrapper(mCtx, "/ujmx", new UJmxHandler(jmx));
-        d.addWrapper(mCtx, "/jmx", 
-                new ServletConfigImpl(new JMXProxyServlet()));
     }
 
     public void run() {
@@ -142,10 +144,11 @@ public class TestMain {
         return 8443;
     }
     
-    protected void startAll(int basePort) throws IOException {
+    protected synchronized void startAll(int basePort) throws IOException {
         int port = basePort + 903;
-        if (proxy == null) {
-
+        if (!init) {
+            init = true;
+            
             proxy = new HttpProxyService()
                 .withHttpClient(testClient);
             testProxy.setPort(port);
@@ -169,18 +172,21 @@ public class TestMain {
                 e.printStackTrace();
             }
             
-            SslConnector sslCon = new SslConnector()
+            sslCon = new SslConnector()
                 .setKeysResource("org/apache/tomcat/lite/http/test.keystore", 
                     "changeit");
-            HttpConnector sslServer = new HttpConnector(sslCon);
+            sslServer = new HttpConnector(sslCon);
             initTestCallback(sslServer.getDispatcher());            
             sslServer.setPort(basePort + 443);
             sslServer.start();
+
+//            System.setProperty("javax.net.debug", "ssl");
             
-//          testProxy.setDebugHttp(true);
-//          testProxy.setDebug(true);
-//          testClient.setDebug(true);
-//          testClient.setDebugHttp(true);
+//            Logger.getLogger("SSL").setLevel(Level.FINEST);
+//            testProxy.setDebugHttp(true);
+//            testProxy.setDebug(true);
+//            testClient.setDebug(true);
+//            testClient.setDebugHttp(true);
 //            testServer.setDebugHttp(true);
 //            testServer.setDebug(true);
 //            sslServer.setDebug(true);
@@ -204,9 +210,17 @@ public class TestMain {
     public void bindConnector(HttpConnector con, final String base) {
         om.bind("HttpConnector-" + base, con);
         om.bind("HttpConnectionPool-" + base, con.cpool);
-        SocketConnector sc = (SocketConnector) con.getIOConnector();
-        om.bind("NioThread-" + base, sc.getSelector());
-
+        IOConnector io = con.getIOConnector();
+        int ioLevel = 0;
+        while (io != null) {
+            om.bind("IOConnector-" + (ioLevel++) + "-" + base, io);
+            if (io instanceof SocketConnector) {
+                om.bind("NioThread-" + base, 
+                        ((SocketConnector) io).getSelector());
+                
+            }
+            io = io.getNet();
+        }
         con.cpool.setEvents(new HttpConnectionPool.HttpConnectionPoolEvents() {
 
             @Override
@@ -251,13 +265,12 @@ public class TestMain {
         if (om == null) {
             om = new SimpleObjectManager();
         }
-        // All objects visible in JMX via util.registry
-        // ( optional dependency )
-        om.register(new JmxObjectManagerSpi());
         om.register(jmx);
         
-        
+        // Additional settings, via spring-like config file
         om.loadResource(cfgFile);
+        
+        // initialization - using runnables
         String run = (String) om.getProperty("RUN");
         String[] runNames = run == null ? new String[] {} : run.split(",");
         for (String name: runNames) {
@@ -271,6 +284,7 @@ public class TestMain {
         bindConnector(testServer, "TestServer");
         bindConnector(testClient, "Client");
         bindConnector(testProxy, "Proxy");
+        bindConnector(sslServer, "Https");
         
     }
     
@@ -291,14 +305,14 @@ public class TestMain {
         return out;
     }
     
-    public static ByteChunk getUrl(String path) throws IOException {
-        ByteChunk out = new ByteChunk();
+    public static BBuffer getUrl(String path) throws IOException {
+        BBuffer out = BBuffer.allocate();
         getUrl(path, out);
         return out;
     }
 
     public static HttpURLConnection getUrl(String path, 
-                             ByteChunk out) throws IOException {
+                             BBuffer out) throws IOException {
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();

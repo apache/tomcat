@@ -21,6 +21,12 @@ public abstract class IOConnector {
         public void handleReceived(IOChannel ch) throws IOException;
     }
 
+    /** 
+     * Callback for accept and connect.
+     *
+     * Will also be called if an error happens while connecting, in 
+     * which case the connection will be closed.
+     */
     public static interface ConnectedCallback {
         public void handleConnected(IOChannel ch) throws IOException;
     }
@@ -33,6 +39,10 @@ public abstract class IOConnector {
     
     public Timer getTimer() {
         return timer;
+    }
+    
+    public IOConnector getNet() {
+        return null;
     }
     
     public abstract void acceptor(IOConnector.ConnectedCallback sc, 

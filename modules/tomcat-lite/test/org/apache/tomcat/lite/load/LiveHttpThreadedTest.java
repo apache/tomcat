@@ -17,20 +17,11 @@
 package org.apache.tomcat.lite.load;
 
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
 import junit.framework.TestCase;
 
@@ -39,8 +30,8 @@ import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
+import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.SocketConnector;
-import org.apache.tomcat.util.buf.ByteChunk;
 
 /*
   Notes on memory use ( from heap dumps ): 
@@ -81,11 +72,9 @@ public class LiveHttpThreadedTest extends TestCase {
         new HttpConnector(new SocketConnector());
     
     ThreadRunner tr;
-    static MBeanServer server;
-    static boolean dumpHeap = false;
+    static boolean dumpHeap = true;
     
     AtomicInteger ok = new AtomicInteger();
-    Object lock = new Object();
     int reqCnt;
 
     Map<HttpRequest, HttpRequest> active = new HashMap();
@@ -95,63 +84,69 @@ public class LiveHttpThreadedTest extends TestCase {
     }
     
     public void test1000Async() throws Exception {
-        try {
-            asyncRequest(10, 100, false, clientCon);
-        } finally {
-            dumpHeap("heapAsync.bin");
-        }
+//        try {
+            asyncRequest(10, 100, false, false, clientCon, "AsyncHttp");
+//          } finally {
+//          dumpHeap("heapAsync.bin");
+//      }
 
     }
 
     public void test10000Async() throws Exception {
-        try {
-            asyncRequest(20, 500, false, clientCon);
-        } finally {
-            dumpHeap("heapAsyncBig.bin");
-        }
+        asyncRequest(20, 500, false, false, clientCon, "AsyncHttp");
+    }
+
+
+    public void test1000AsyncSsl() throws Exception {
+        asyncRequest(20, 50, false, true, clientCon, "AsyncHttpSsl");
+    }
+
+    public void test10000AsyncSsl() throws Exception {
+        asyncRequest(20, 500, false, true, clientCon, "AsyncHttpSsl");
     }
 
     public void test1000AsyncSpdy() throws Exception {
-        try {
-            asyncRequest(10, 100, true, spdyClient);
-        } finally {
-            dumpHeap("heapSpdy1000.bin");
-        }
-
+        asyncRequest(10, 100, true, false, spdyClient, "AsyncSpdy");
     }
 
     public void test10000AsyncSpdy() throws Exception {
-        try {
-            asyncRequest(20, 500, true, spdyClient);
-        } finally {
-            dumpHeap("heapSpdy10000.bin");
-        }
+        asyncRequest(20, 500, true, false, spdyClient, "AsyncSpdy");
     }
 
     public void test1000AsyncSpdyComp() throws Exception {
-        try {
-            asyncRequest(10, 100, true, spdyClientCompress);
-        } finally {
-            dumpHeap("heapSpdy1000Comp.bin");
-        }
-
+            asyncRequest(10, 100, true, false, spdyClientCompress, "AsyncSpdyComp");
     }
 
     public void test10000AsyncSpdyComp() throws Exception {
-        try {
-            asyncRequest(20, 500, true, spdyClientCompress);
-        } finally {
-            dumpHeap("heapSpdy10000.bin");
-        }
+        asyncRequest(20, 500, true, false, spdyClientCompress, "AsyncSpdyComp");
     }
 
-    public void asyncRequest(int thr, int perthr, 
-            final boolean spdy, final HttpConnector clientCon) throws Exception {
+    public void test1000AsyncSpdySsl() throws Exception {
+        asyncRequest(10, 100, true, true, spdyClient, "AsyncSpdySsl");
+    }
+
+    public void test1000AsyncSpdyCompSsl() throws Exception {
+        asyncRequest(10, 100, true, true, spdyClientCompress, "AsyncSpdyCompSsl");
+    }
+
+    public void test10000AsyncSpdyCompSsl() throws Exception {
+        asyncRequest(20, 500, true, true, spdyClientCompress, "AsyncSpdyCompSsl");
+    }
+
+    Object thrlock = new Object();
+    Object lock = new Object();
+    
+    public void asyncRequest(final int thr, int perthr, 
+            final boolean spdy, final boolean ssl, 
+            final HttpConnector clientCon, String test) throws Exception {
+        clientCon.getConnectionPool().clear();
         reqCnt = thr * perthr;
         long t0 = System.currentTimeMillis();
+
         tr = new ThreadRunner(thr, perthr) {
             public void makeRequest(int i) throws Exception {
-                HttpRequest cstate = clientCon.request("localhost", 8802);
+                HttpRequest cstate = clientCon.request("localhost", 
+                        ssl ? 8443 : 8802);
                 synchronized (active) {
                     active.put(cstate, cstate);
                 }
@@ -160,39 +155,96 @@ public class LiveHttpThreadedTest extends TestCase {
                     // a negotiation.
                     cstate.setProtocol("SPDY/1.0");
                 }
+                if (ssl) {
+                    cstate.setSecure(true);
+                }
                 cstate.requestURI().set("/hello");
                 cstate.setCompletedCallback(reqCallback);
                 // no body
                 cstate.getBody().close();
-                // Send the request, wait response
-                Thread.currentThread().sleep(20);
+                
                 cstate.send();
+                
+                while (active.size() >= thr) {
+                    synchronized(thrlock) {
+                        thrlock.wait();
+                    }
+                }
             }
         };
         tr.run();
-        assertEquals(0, tr.errors.get());
         synchronized (lock) {
             if (ok.get() < reqCnt) {
                 lock.wait(reqCnt * 100);
             }
         }
+        long time = (System.currentTimeMillis() - t0);
+
+        System.err.println("====== " + test + 
+                " threads: " + thr + ", req: " + 
+                reqCnt + ", sendTime" + tr.time + 
+                ", time: " + time + 
+                ", connections: " + clientCon.getConnectionPool().getSocketCount() +
+                ", avg: " + (time / reqCnt));
+
         assertEquals(reqCnt, ok.get());
-        System.err.println(reqCnt + " Async requests: " + (System.currentTimeMillis() - t0));
+        assertEquals(0, tr.errors.get());
     }
+    
+    RequestCompleted reqCallback = new RequestCompleted() {
+        @Override
+        public void handle(HttpChannel data, Object extraData) 
+        throws IOException {
+            String out = data.getIn().copyAll(null).toString();
+            if (200 != data.getResponse().getStatus()) {
+                System.err.println("Wrong status");
+                tr.errors.incrementAndGet();            
+            } else if (!"Hello world".equals(out)) {
+                tr.errors.incrementAndGet();
+                System.err.println("bad result " + out);
+            }        
+            synchronized (active) {
+                active.remove(data.getRequest());
+            }
+            synchronized (thrlock) {
+                thrlock.notify();                
+            }
+            data.release();
+            int okres = ok.incrementAndGet();
+            if (okres >= reqCnt) {
+                synchronized (lock) {
+                    lock.notify();
+                }
+            }
+        }
+    };
+
+
 
     public void testURLRequest1000() throws Exception {
-        urlRequest(10, 100);
+        urlRequest(10, 100, false, "HttpURLConnection");
     }
 
     public void xtestURLRequest10000() throws Exception {
-        urlRequest(20, 500);
+        urlRequest(20, 500, false, "HttpURLConnection");
+
+    }
+
+    // I can't seem to get 1000 requests to all complete...
+    public void xtestURLRequestSsl100() throws Exception {
+        urlRequest(10, 10, true, "HttpURLConnectionSSL");
+    }
+
+    public void xtestURLRequestSsl10000() throws Exception {
+        urlRequest(20, 500, true, "HttpURLConnectionSSL");
 
     }
 
     /** 
      * HttpURLConnection client against lite.http server.
      */
-    public void urlRequest(int thr, int cnt) throws Exception {
+    public void urlRequest(int thr, int cnt, final boolean ssl, String test) 
+            throws Exception {
         long t0 = System.currentTimeMillis();
 
 
@@ -203,8 +255,11 @@ public class LiveHttpThreadedTest extends TestCase {
 
                 public void makeRequest(int i) throws Exception {
                     try {
-                        ByteChunk out = new ByteChunk();
-                        HttpURLConnection con = TestMain.getUrl("http://localhost:8802/hello", out);
+                        BBuffer out = BBuffer.allocate();
+                        String url = ssl ? "https://localhost:8443/hello" :
+                            "http://localhost:8802/hello";
+                        HttpURLConnection con = 
+                            TestMain.getUrl(url, out);
                         if (con.getResponseCode() != 200) {
                             errors.incrementAndGet();
                         }
@@ -220,62 +275,17 @@ public class LiveHttpThreadedTest extends TestCase {
             };
             tr.run();
             assertEquals(0, tr.errors.get());
+            long time = (System.currentTimeMillis() - t0);
 
-            System.err.println(thr + " threads, " + (thr * cnt) + " total blocking URL requests: " + 
-                    (System.currentTimeMillis() - t0));
-
-            //assertEquals(testServer., actual)
+            System.err.println("====== " + test + " threads: " + thr + ", req: " + 
+                    (thr * cnt) + ", time: " + time + ", avg: " +
+                    (time / (thr * cnt)));
         } finally {
-            dumpHeap("heapURLReq.bin");
+            //dumpHeap("heapURLReq.bin");
         }
     }
 
     // TODO: move to a servlet
-    private void dumpHeap(String file) throws InstanceNotFoundException,
-    MBeanException, ReflectionException, MalformedObjectNameException {
-        if (!dumpHeap) {
-            return;
-        }
-        if (server == null) {
-            server = ManagementFactory.getPlatformMBeanServer();
-
-        }
-        File f1 = new java.io.File(file);
-        if (f1.exists()) {
-            f1.delete();
-        }
-        server.invoke(new ObjectName("com.sun.management:type=HotSpotDiagnostic"),
-                "dumpHeap",
-                new Object[] {file, Boolean.FALSE /* live */}, 
-                new String[] {String.class.getName(), "boolean"});
-    }
-
-
-    RequestCompleted reqCallback = new RequestCompleted() {
-        @Override
-        public void handle(HttpChannel data, Object extraData) 
-        throws IOException {
-            String out = data.getIn().copyAll(null).toString();
-            if (200 != data.getResponse().getStatus()) {
-                System.err.println("Wrong status");
-                tr.errors.incrementAndGet();            
-            }
-            if (!"Hello world".equals(out)) {
-                tr.errors.incrementAndGet();
-                System.err.println("bad result " + out);
-            }        
-            synchronized (active) {
-                active.remove(data.getRequest());
-            }
-            data.release();
-            int okres = ok.incrementAndGet();
-            if (okres >= reqCnt) {
-                synchronized (lock) {
-                    lock.notify();
-                }
-            }
-        }
-    };
 
 
 }

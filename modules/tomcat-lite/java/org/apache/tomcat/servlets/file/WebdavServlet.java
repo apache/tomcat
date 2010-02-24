@@ -18,6 +18,9 @@ package org.apache.tomcat.servlets.file;
 
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,10 +40,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.tomcat.servlets.util.FastHttpDateFormat;
-import org.apache.tomcat.servlets.util.Range;
+import org.apache.tomcat.lite.util.CopyUtils;
+import org.apache.tomcat.lite.util.FastHttpDateFormat;
+import org.apache.tomcat.lite.util.Range;
+import org.apache.tomcat.lite.util.URLEncoder;
+import org.apache.tomcat.lite.util.UrlUtils;
+import org.apache.tomcat.lite.util.XMLWriter;
 import org.apache.tomcat.servlets.util.RequestUtil;
-import org.apache.tomcat.servlets.util.UrlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -420,7 +426,7 @@ public class WebdavServlet extends DefaultServlet {
      * @param path Path which has to be rewiten
      */
     protected String rewriteUrl(String path) {
-        return urlEncoder.encode( path );
+        return urlEncoder.encodeURL( path );
     }
 
 
@@ -841,7 +847,7 @@ public class WebdavServlet extends DefaultServlet {
 
         try {
             // will override 
-            OutputStream fos = getFilesystem().getOutputStream(resFile.getPath());
+            OutputStream fos = getOut(resFile.getPath());
             CopyUtils.copy(resourceInputStream, fos);
         } catch(IOException e) {
             result = false;
@@ -866,6 +872,7 @@ public class WebdavServlet extends DefaultServlet {
      * Handle a partial PUT.  New content specified in request is appended to
      * existing content in oldRevisionContent (if present). This code does
      * not support simultaneous partial updates to the same resource.
+     * @throws FileNotFoundException 
      */
 //    protected File executePartialPut(HttpServletRequest req, Range range,
 //                                     String path)
@@ -928,6 +935,10 @@ public class WebdavServlet extends DefaultServlet {
 //
 //    }
 
+
+    private OutputStream getOut(String path) throws FileNotFoundException {
+        return new FileOutputStream(path);
+    }
 
     /**
      * COPY Method.
@@ -1044,7 +1055,7 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         // Remove url encoding from destination
-        destinationPath = RequestUtil.URLDecode(destinationPath, "UTF8");
+        destinationPath = URLEncoder.URLDecode(destinationPath, "UTF8");
 
         destinationPath = removeDestinationPrefix(req, destinationPath);
 
@@ -1222,8 +1233,8 @@ public class WebdavServlet extends DefaultServlet {
         } else {
 
             try {
-                CopyUtils.copy(getFilesystem().getInputStream(object.getPath()), 
-                    getFilesystem().getOutputStream(dest));
+                CopyUtils.copy(new FileInputStream(object.getPath()), 
+                    getOut(dest));
             } catch(IOException ex ) {
                 errorList.put
                 (source,
