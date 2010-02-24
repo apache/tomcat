@@ -115,6 +115,10 @@ public class HttpConnector {
         return dispatcher;
     }
     
+    public HttpConnectionPool getConnectionPool() {
+        return cpool;
+    }
+    
     public HttpConnector withIOConnector(IOConnector selectors) {
         ioConnector = selectors;
         return this;

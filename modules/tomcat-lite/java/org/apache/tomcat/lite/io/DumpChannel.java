@@ -46,7 +46,9 @@ public class DumpChannel extends IOChannel {
             }
             any = true;
             out("IN", first, false);
-            in.queue(first);
+            if (!in.isAppendClosed()) {
+                in.queue(first);
+            }
         }
     }
 

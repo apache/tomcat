@@ -239,6 +239,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     
     @Override
     public void handleClosed(NioChannel ch) throws IOException {
+        lastException = ch.lastException;
         closed(); // our callback.
     }
     

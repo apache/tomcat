@@ -175,6 +175,30 @@ public class HttpRequest extends HttpMessage {
         return (mappingData);
     }
     
+    /**
+     * Return the portion of the request URI used to select the Context
+     * of the Request.
+     */
+    public String getContextPath() {
+        return (getMappingData().contextPath.toString());
+    }
+
+    public String getPathInfo() {
+        CBuffer pathInfo = getMappingData().pathInfo;
+        if (pathInfo.length() == 0) {
+            return null;
+        }
+        return (getMappingData().pathInfo.toString());
+    }
+
+    /**
+     * Return the portion of the request URI used to select the servlet
+     * that will process this request.
+     */
+    public String getServletPath() {
+        return (getMappingData().wrapperPath.toString());
+    }
+    
     /** 
      * Parse query parameters - but not POST body. 
      * 
@@ -843,6 +867,9 @@ public class HttpRequest extends HttpMessage {
      */
     protected void processReceivedHeaders() throws IOException {
         BBuffer url = getMsgBytes().url();
+        if (url.remaining() == 0) {
+            System.err.println("No input");
+        }
         if (url.get(0) == 'h') {
             int firstSlash = url.indexOf('/', 0);
             schemeMB.appendAscii(url.array(), 

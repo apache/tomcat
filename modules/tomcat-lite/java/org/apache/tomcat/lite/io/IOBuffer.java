@@ -342,8 +342,12 @@ public class IOBuffer {
     
     public int write(ByteBuffer bb) throws IOException {
         int len = bb.remaining();
+        int pos = bb.position();
+        if (len == 0) {
+            return 0;
+        }
         append(bb);
-        bb.position(bb.position() + len);
+        bb.position(pos + len);
         return len;
     }
     

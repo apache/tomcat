@@ -14,9 +14,11 @@
     <property name="tomcat.lite.src" value="${basedir}/" />
     <property name="classes" value="${basedir}/target/tomcat-lite/classes" />
     <property name="test-classes" value="${basedir}/target/tomcat-lite/test-classes" />
+    <property name="http.test-classes" value="${basedir}/target/tomcat-lite/http-test-classes" />
     <property name="jar.dir" value="${basedir}/target/tomcat-lite/" />
     <property name="MAIN" value="org.apache.tomcat.integration.simple.Main"/>
     <property name="compile.source" value="1.6"/>
+    <property name="compile.debug" value="true"/>
  
     <!-- All Ivy downloads -->
     <path id='lite-classpath'>
@@ -31,9 +33,109 @@
         <pathelement location="target/lib/commons-codec.jar"/>
     </path>
 
+    <target name="http" depends="http.compile,http.test,http.pack"/>
+    
+    <target name="http.compile" 
+           description="Compile only the HTTP connector classes, no servlets">
+        <mkdir dir="${classes}"/>
+        <javac destdir="${classes}"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               source="${compile.source}"
+               optimize="${compile.optimize}"
+               encoding="ISO-8859-1">
+            <classpath refid="lite-classpath" />
+            <src path="${tomcat.lite.src}/java" />
+            <classpath refid="head-classpath" />
+            <exclude name="org/apache/tomcat/servlets/**"/>
+            <exclude name="org/apache/tomcat/lite/servlet/**"/>
+        </javac>
+        <copy todir="${classes}">
+            <fileset dir="${tomcat.lite.src}/java" 
+                includes="**/*.properties **/*.xml" />
+        </copy>
+    </target>
+     
+    <target name="http.test.compile" 
+           description="Test only the HTTP connector classes, no servlets">
+        <mkdir dir="${http.test-classes}"/>
+        <javac destdir="${http.test-classes}"
+                debug="${compile.debug}"
+                deprecation="${compile.deprecation}"
+                source="${compile.source}"
+                optimize="${compile.optimize}"
+                encoding="ISO-8859-1"
+         >
+             <classpath refid="lite-classpath" />
+             <classpath refid="head-classpath" />
+             <classpath path="${classes}" />
+             <src path="${tomcat.lite.src}/test" />
+            <exclude name="org/apache/tomcat/lite/servlet/**"/>
+            <exclude name="org/apache/coyote/lite/**"/>
+            <exclude name="org/apache/tomcat/test/watchdog/**"/>
+         </javac>
+        <copy todir="${http.test-classes}">
+            <fileset dir="${tomcat.lite.src}/test" 
+                includes="**/*.properties **/*.xml  **/*.bin **/*.keystore" />
+        </copy>
+   </target>
+        
+      <target name="http.test" depends="http.test.compile" >
+          <!-- also: perTest(default) -->
+          <junit printsummary="on" fork="once"
+                    timeout="600000" maxmemory="1G" outputtoformatters="no"
+                    >
+              <classpath refid="lite-classpath" />
+              <classpath refid="head-classpath" />
+              <classpath path="${http.test-classes}" />
+              <classpath path="${classes}" />
+
+            <formatter type="brief" usefile="false" />
+
+            <batchtest>
+              <fileset dir="test" >
+                 <!-- Include all by default -->
+                  <include name="**/*Test.java" />
+                  <include name="**/*Tests.java" />
+                 <!-- Exclude TestAll ortherwise there will be duplicated -->
+                 <exclude name="**/TestAll.java" />
+                 <!-- Exclude helper classes -->
+                 <exclude name="**/Tester*.java" />
+
+                     <exclude name="org/apache/tomcat/lite/servlet/**"/>
+                     <exclude name="org/apache/coyote/lite/**"/>
+                     <exclude name="org/apache/tomcat/test/watchdog/**"/>
+              </fileset>
+             </batchtest>
+              </junit>        
+    </target>
+    
+    <target name="runtest" depends="http.test.compile">
+        <junit printsummary="withOutAndErr" fork="no" dir="${tomcat.base}">
+            <sysproperty key="tests" value="${tests}"/>
+            <classpath refid="lite-classpath" />
+            <classpath refid="head-classpath" />
+            <classpath path="${http.test-classes}" />
+            <classpath path="${classes}" />
+
+            <formatter type="plain" usefile="false" />
+
+          <batchtest>
+            <fileset dir="test" >
+                <include name="**/${test}.java" />
+            </fileset>
+           </batchtest>
+            </junit>        
+        
+     </target>
+    
+    <target name="http.pack" 
+           description="Pack the HTTP client and connector">
+    </target>
      
     <target name="compile" 
-           description="Build against tomcat head">
+           description="Build all classes against tomcat head.">
+        <mkdir dir="${classes}"/>
         <javac destdir="${classes}"
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
@@ -59,14 +161,12 @@
                deprecation="${compile.deprecation}"
                source="${compile.source}"
                optimize="${compile.optimize}"
-               encoding="ISO-8859-1"
-        >
+               encoding="ISO-8859-1">
             <classpath refid="lite-classpath" />
             <src path="${tomcat.lite.src}/java" />
             <exclude name="**/ServletApi30.java"/>
             <exclude name="org/apache/tomcat/coyote/servlet/*.java"/>
         </javac>
-
         <copy todir="${classes}">
             <fileset dir="${tomcat.lite.src}/java" 
                 includes="**/*.properties **/*.xml" />

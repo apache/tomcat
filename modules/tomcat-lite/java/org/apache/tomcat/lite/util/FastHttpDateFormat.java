@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.servlets.util;
+package org.apache.tomcat.lite.util;
 
 import java.text.DateFormat;
 import java.text.ParseException;

@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.tomcat.servlets.util;
+package org.apache.tomcat.lite.util;
 
 import java.util.ArrayList;
 import java.util.Locale;

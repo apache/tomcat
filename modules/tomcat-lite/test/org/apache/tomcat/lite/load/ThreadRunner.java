@@ -45,7 +45,6 @@ public class ThreadRunner {
         }
         long t1 = System.currentTimeMillis();
         time = t1 - t0;
-        System.err.println("TimeNB: " + (t1 - t0) + " " + res);
     }
     
     public void makeRequests(int cnt) {
