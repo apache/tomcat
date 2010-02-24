@@ -4,16 +4,23 @@ package org.apache.tomcat.lite.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
 import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.BufferedIOReader;
 import org.apache.tomcat.lite.io.CBuffer;
+import org.apache.tomcat.lite.io.FastHttpDateFormat;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOInputStream;
 import org.apache.tomcat.lite.io.IOOutputStream;
@@ -113,7 +120,9 @@ public abstract class HttpMessage {
             }
         }
     }
-    
+
+    protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
+
     private HttpMessageBytes msgBytes = new HttpMessageBytes();
     
     protected HttpMessage.State state = HttpMessage.State.HEAD;
@@ -148,6 +157,15 @@ public abstract class HttpMessage {
 
     long contentLength = -2;
     boolean chunked;
+    
+    /**
+     * The set of SimpleDateFormat formats to use in getDateHeader().
+     *
+     * Notice that because SimpleDateFormat is not thread-safe, we can't
+     * declare formats[] as a static variable.
+     */
+    protected SimpleDateFormat formats[] = null;
+
     
     BBuffer clBuffer = BBuffer.allocate(64);
     
@@ -188,6 +206,41 @@ public abstract class HttpMessage {
     public MultiMap getMimeHeaders() {
         return headers;
     }
+    
+    /**
+     * Return the value of the specified date header, if any; otherwise
+     * return -1.
+     *
+     * @param name Name of the requested date header
+     *
+     * @exception IllegalArgumentException if the specified header value
+     *  cannot be converted to a date
+     */
+    public long getDateHeader(String name) {
+
+        String value = getHeader(name);
+        if (value == null)
+            return (-1L);
+        if (formats == null) {
+            formats = new SimpleDateFormat[] {
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
+                new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
+                new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
+            };
+            formats[0].setTimeZone(GMT_ZONE);
+            formats[1].setTimeZone(GMT_ZONE);
+            formats[2].setTimeZone(GMT_ZONE);
+        }
+        
+        // Attempt to convert the date header in a variety of formats
+        long result = FastHttpDateFormat.parseDate(value, formats);
+        if (result != (-1L)) {
+            return result;
+        }
+        throw new IllegalArgumentException(value);
+
+    }
+
     
     public Collection<String> getHeaderNames() {
 
@@ -373,6 +426,14 @@ public abstract class HttpMessage {
         return in;
     }
     
+    public InputStream getInputStream() {
+        return in;
+    }
+    
+    public IOOutputStream getOutputStream() {
+        return out;
+    }
+    
     public IOOutputStream getBodyOutputStream() {
         return out;
     }
@@ -409,6 +470,10 @@ public abstract class HttpMessage {
     public BufferedReader getReader() throws IOException {
         reader.setEncoding(getCharacterEncoding());
         return bufferedReader;
+    }
+
+    public PrintWriter getWriter() {
+        return new PrintWriter(getBodyWriter());
     }
     
     public HttpWriter getBodyWriter() {

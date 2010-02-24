@@ -28,7 +28,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * 
  * All objects of interest are registered automatically.
  */
-public class JmxObjectManagerSpi extends ObjectManager {
+public class JmxObjectManagerSpi extends ObjectManager implements Runnable {
     Registry registry;
     Logger log = Logger.getLogger("JmxObjectManager");
     
@@ -54,5 +54,15 @@ public class JmxObjectManagerSpi extends ObjectManager {
     public Object get(String key) {
         return null;
     }
+    
+    ObjectManager om;
+    
+    public void setObjectManager(ObjectManager om) {
+        this.om = om;
+    }
 
+    public void run() {
+        om.register(this);
+        // TODO: register existing objects in JMX
+    }
 }

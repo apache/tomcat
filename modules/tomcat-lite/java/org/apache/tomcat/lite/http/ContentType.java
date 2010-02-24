@@ -72,7 +72,7 @@ public class ContentType {
         int index = type.indexOf(';');
         while (index != -1) {
             index++;
-            while (index < len && Character.isSpace(type.charAt(index))) {
+            while (index < len && Character.isWhitespace(type.charAt(index))) {
                 index++;
             }
             if (index+8 < len

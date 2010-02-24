@@ -32,6 +32,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.lite.util.URLEncoder;
 import org.apache.tomcat.servlets.util.RequestUtil;
 
 /**
@@ -430,7 +431,7 @@ public class WebappFilterMapper implements Filter {
         }
 
         public void setURLPattern(String urlPattern) {
-            this.urlPattern = RequestUtil.URLDecode(urlPattern);
+            this.urlPattern = URLEncoder.URLDecode(urlPattern);
         }
         
         /**
