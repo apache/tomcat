@@ -558,6 +558,12 @@ with a profiler. The diagnostic uses additional functionality provided by the
 StandardHost implementation. It will not work if a custom host is used that
 does not extend StandardHost.</p>
 
+<p>Explicitely triggering a full garbage collection from Java Code is documented
+to be unreliable. Furthermore, depending on the JVM used, there are options to
+disable explicit GC triggering, like <code>-XX:+DisableExplicitGC</code>.
+If you want to make sure, that the diagnostics were successfully running a full GC,
+you will need to check using tools like GC logging, JConsole or simlar.</p>
+
 </section>
 
 <section name="Server Information">
