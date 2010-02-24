@@ -39,7 +39,8 @@ public class LiveHttp1Test extends TestCase {
         // DefaultHttpConnector.get().setDebugHttp(true);
         TestMain.getTestServer();
 
-        httpClient = DefaultHttpConnector.get().request("localhost", clientPort);
+        httpClient = DefaultHttpConnector.get().request("localhost", 
+                clientPort);
 
         bodyRecvBuffer.recycle();
     }

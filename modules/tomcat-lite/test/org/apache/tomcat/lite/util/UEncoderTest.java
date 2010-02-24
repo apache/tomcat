@@ -15,12 +15,12 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.util.buf;
+package org.apache.tomcat.lite.util;
 
 import junit.framework.TestCase;
 
 public class UEncoderTest extends TestCase {
-    UEncoder enc=new UEncoder();
+    URLEncoder enc=new URLEncoder();
     
     /*
      * 
@@ -33,7 +33,7 @@ public class UEncoderTest extends TestCase {
         assertEquals("test", eurl1);
         
         eurl1=enc.encodeURL("/test");
-        assertEquals("%2ftest", eurl1);
+        assertEquals("/test", eurl1);
 
         // safe ranges
         eurl1=enc.encodeURL("test$-_.");
@@ -43,7 +43,7 @@ public class UEncoderTest extends TestCase {
         assertEquals("test$-_.!*'(),", eurl1);
 
         eurl1=enc.encodeURL("//test");
-        assertEquals("%2f%2ftest", eurl1);
+        assertEquals("//test", eurl1);
 
         
     }

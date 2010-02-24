@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.Channel;
-import java.nio.channels.SelectionKey;
 
 
 /** 

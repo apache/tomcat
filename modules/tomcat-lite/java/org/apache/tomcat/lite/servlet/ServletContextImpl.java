@@ -53,6 +53,8 @@ import javax.servlet.ServletException;
 import org.apache.tomcat.integration.ObjectManager;
 import org.apache.tomcat.lite.http.BaseMapper;
 import org.apache.tomcat.lite.io.FileConnectorJavaIo;
+import org.apache.tomcat.lite.util.MimeMap;
+import org.apache.tomcat.lite.util.UrlUtils;
 import org.apache.tomcat.servlets.config.ConfigLoader;
 import org.apache.tomcat.servlets.config.ServletContextConfig;
 import org.apache.tomcat.servlets.config.ServletContextConfig.FilterData;
@@ -60,9 +62,7 @@ import org.apache.tomcat.servlets.config.ServletContextConfig.FilterMappingData;
 import org.apache.tomcat.servlets.config.ServletContextConfig.ServletData;
 import org.apache.tomcat.servlets.session.UserSessionManager;
 import org.apache.tomcat.servlets.util.Enumerator;
-import org.apache.tomcat.servlets.util.MimeMap;
 import org.apache.tomcat.servlets.util.RequestUtil;
-import org.apache.tomcat.servlets.util.UrlUtils;
 
 
 /**

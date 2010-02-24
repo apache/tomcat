@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,6 +154,40 @@ public class IOWriter extends Writer {
         }
     }
 
+    // TODO: use it for utf-8
+    public static int char2utf8(byte[] ba, int off, char c, char c1) {
+        int i = 0;
+        if (c < 0x80) {
+            ba[off++] = (byte) (c & 0xFF);
+            return 1;
+        } else if (c < 0x800)
+        {
+            ba[off++] = (byte) (0xC0 | c >> 6);
+            ba[off++] = (byte) (0x80 | c & 0x3F);
+            return 2;
+        }
+        else if (c < 0x10000)
+        {
+            ba[off++] = (byte) ((0xE0 | c >> 12));
+            ba[off++] = (byte) ((0x80 | c >> 6 & 0x3F));
+            ba[off++] = (byte) ((0x80 | c & 0x3F));
+            return 3;
+        }
+        else if (c < 0x200000)
+        {
+            ba[off++] = (byte) ((0xF0 | c >> 18));
+            ba[off++] = (byte) ((0x80 | c >> 12 & 0x3F));
+            ba[off++] = (byte) ((0x80 | c >> 6 & 0x3F));
+            ba[off++] = (byte) ((0x80 | c & 0x3F));
+            return 4;
+        }
+
+        
+        return i;
+    }
+    
+
+    
     /**
      * Just send the chars to the byte[], without flushing down.
      * 

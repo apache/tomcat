@@ -410,23 +410,17 @@ public class NioThread implements Runnable {
           }
 
           readInterest(ch, true);
-
+      } catch (Throwable t) {
+          close(ch, t);
+      }
+      try {
           if (ch.callback != null) {
               ch.callback.handleConnected(ch);
           }
-      } catch (Throwable t) {
-          log.warning("Error in connect, closing " + t);
-          close(ch, t);
-          try {
-              if (ch.callback != null) {
-                  ch.callback.handleConnected(ch);
-              }
-          } catch(Throwable t1) {
-              log.warning("Double error in connect, callback broken too");
-              t1.printStackTrace();
-          }
-          
+      } catch(Throwable t1) {
+          log.log(Level.WARNING, "Error in connect callback", t1);
       }
+
   }
 
   private void handleAccept(NioChannel ch, SelectionKey sk)
@@ -729,17 +723,17 @@ public class NioThread implements Runnable {
    */
   public int close(NioChannel selectorData, Throwable exception) throws IOException {
       synchronized (closeInterest) {
+          if (exception != null) {
+              selectorData.lastException = exception;
+          }
+          selectorData.readInterest = false;
           if (isSelectorThread()) {
               closeIOThread(selectorData, true);
               return 0;
           }
-          if (exception != null) {
-              selectorData.lastException = exception;
-          }
           if (!selectorData.inClosed) {
               closeInterest.add(selectorData);
           }
-          selectorData.readInterest = false;
       }
       selector.wakeup();
       return 0;

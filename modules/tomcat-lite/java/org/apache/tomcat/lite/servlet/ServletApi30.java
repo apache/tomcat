@@ -33,147 +33,33 @@ import org.apache.tomcat.lite.http.HttpRequest;
 
 public class ServletApi30  extends ServletApi {
     public ServletContextImpl newContext() {
-        return new ServletContextImpl() {
-            protected void initEngineDefaults() throws ServletException {
-                super.initEngineDefaults();
-                setAttribute(InstanceManager.class.getName(),
-                        new LiteInstanceManager(getObjectManager()));
-            }
-            @Override
-            public Dynamic addFilter(String filterName, String className) {
-                FilterConfigImpl fc = new FilterConfigImpl(this);
-                fc.setData(filterName, null, new HashMap());
-                fc.setData(filterName, className, new HashMap());
-                filters.put(filterName, fc);
-                return new DynamicFilterRegistration(fc);
-            }
-
-            @Override
-            public Dynamic addFilter(String filterName, Filter filter) {
-                FilterConfigImpl fc = new FilterConfigImpl(this);
-                fc.setData(filterName, null, new HashMap());
-                fc.setFilter(filter);
-                filters.put(filterName, fc);
-                return new DynamicFilterRegistration(fc);
-            }
-
-            @Override
-            public Dynamic addFilter(String filterName,
-                    Class<? extends Filter> filterClass) {
-                FilterConfigImpl fc = new FilterConfigImpl(this);
-                fc.setData(filterName, null, new HashMap());
-                fc.setFilterClass(filterClass);
-                filters.put(filterName, fc);
-                return new DynamicFilterRegistration(fc);
-            }
-
-            @Override
-            public javax.servlet.ServletRegistration.Dynamic addServlet(
-                    String servletName, String className) {
-                return null;
-            }
-
-            @Override
-            public javax.servlet.ServletRegistration.Dynamic addServlet(
-                    String servletName, Servlet servlet) {
-                return null;
-            }
-
-            @Override
-            public javax.servlet.ServletRegistration.Dynamic addServlet(
-                    String servletName, Class<? extends Servlet> servletClass) {
-                return null;
-            }
-
-
-            @Override
-            public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
-                return null;
-            }
-
-
-            @Override
-            public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-                return null;
-            }
-
-            @Override
-            public FilterRegistration getFilterRegistration(String filterName) {
-                return null;
-            }
-
-            @Override
-            public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-                return null;
-            }
-
-            @Override
-            public JspConfigDescriptor getJspConfigDescriptor() {
-                return null;
-            }
-
-            @Override
-            public ServletRegistration getServletRegistration(String servletName) {
-                return null;
-            }
-
-            @Override
-            public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-                return null;
-            }
-
-            @Override
-            public SessionCookieConfig getSessionCookieConfig() {
-                return null;
-            }
-
-            @Override
-            public void setSessionTrackingModes(
-                    EnumSet<SessionTrackingMode> sessionTrackingModes)
-                    throws IllegalStateException, IllegalArgumentException {
-            }
-            
-            public int getMajorVersion() {
-                return 3;
-            }
-            
-            public int getMinorVersion() {
-                return 0;
-            }
-            
-        };
+        return new Servlet30ContextImpl();
     }
 
     public ServletRequestImpl newRequest(HttpRequest req) {
         return new ServletRequestImpl(req) {
 
-            @Override
             public Part getPart(String name) {
                 return null;
             }
 
-            @Override
             public Collection<Part> getParts() throws IOException,
                     ServletException {
                 return null;
             }
 
-            @Override
             public AsyncContext getAsyncContext() {
                 return null;
             }
 
-            @Override
             public DispatcherType getDispatcherType() {
                 return null;
             }
 
-            @Override
             public AsyncContext startAsync() {
                 return null;
             }
 
-            @Override
             public AsyncContext startAsync(ServletRequest servletRequest,
                     ServletResponse servletResponse) {
                 return null;
@@ -182,6 +68,99 @@ public class ServletApi30  extends ServletApi {
         };
     }
     
+    public final class Servlet30ContextImpl extends ServletContextImpl {
+        protected void initEngineDefaults() throws ServletException {
+            super.initEngineDefaults();
+            setAttribute(InstanceManager.class.getName(),
+                    new LiteInstanceManager(getObjectManager()));
+        }
+
+        public Dynamic addFilter(String filterName, String className) {
+            FilterConfigImpl fc = new FilterConfigImpl(this);
+            fc.setData(filterName, null, new HashMap());
+            fc.setData(filterName, className, new HashMap());
+            filters.put(filterName, fc);
+            return new DynamicFilterRegistration(fc);
+        }
+
+        public Dynamic addFilter(String filterName, Filter filter) {
+            FilterConfigImpl fc = new FilterConfigImpl(this);
+            fc.setData(filterName, null, new HashMap());
+            fc.setFilter(filter);
+            filters.put(filterName, fc);
+            return new DynamicFilterRegistration(fc);
+        }
+
+        public Dynamic addFilter(String filterName,
+                Class<? extends Filter> filterClass) {
+            FilterConfigImpl fc = new FilterConfigImpl(this);
+            fc.setData(filterName, null, new HashMap());
+            fc.setFilterClass(filterClass);
+            filters.put(filterName, fc);
+            return new DynamicFilterRegistration(fc);
+        }
+
+        public javax.servlet.ServletRegistration.Dynamic addServlet(
+                String servletName, String className) {
+            return null;
+        }
+
+        public javax.servlet.ServletRegistration.Dynamic addServlet(
+                String servletName, Servlet servlet) {
+            return null;
+        }
+
+        public javax.servlet.ServletRegistration.Dynamic addServlet(
+                String servletName, Class<? extends Servlet> servletClass) {
+            return null;
+        }
+
+        public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
+            return null;
+        }
+
+        public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+            return null;
+        }
+
+        public FilterRegistration getFilterRegistration(String filterName) {
+            return null;
+        }
+
+        public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+            return null;
+        }
+
+        public JspConfigDescriptor getJspConfigDescriptor() {
+            return null;
+        }
+
+        public ServletRegistration getServletRegistration(String servletName) {
+            return null;
+        }
+
+        public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+            return null;
+        }
+
+        public SessionCookieConfig getSessionCookieConfig() {
+            return null;
+        }
+
+        public int getMajorVersion() {
+            return 3;
+        }
+
+        public int getMinorVersion() {
+            return 0;
+        }
+
+        public void setSessionTrackingModes(
+                Set<SessionTrackingMode> sessionTrackingModes)
+                throws IllegalStateException, IllegalArgumentException {
+        }
+    }
+
     private final class LiteInstanceManager implements InstanceManager {
         private ObjectManager om;
 
