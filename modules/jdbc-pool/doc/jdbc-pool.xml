@@ -472,6 +472,13 @@
     <attributes>
     </attributes>  
   </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor">
+    <p>See <bug>48392</bug>. Interceptor to wrap statements and result sets in order to prevent access to the actual connection
+       using the methods <code>ResultSet.getStatement().getConnection()</code> and <code>Statement.getConnection()</code>
+    </p>   
+    <attributes>
+    </attributes>  
+  </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport">
     <p>Keeps track of query performance and issues log entries when queries exceed a time threshold of fail.
        The log level used is <code>WARN</code>
