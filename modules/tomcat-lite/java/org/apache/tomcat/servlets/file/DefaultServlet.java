@@ -41,8 +41,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.tomcat.servlets.util.Range;
-import org.apache.tomcat.servlets.util.URLEncoder;
+
+import org.apache.tomcat.lite.util.CopyUtils;
+import org.apache.tomcat.lite.util.Dir2Html;
+import org.apache.tomcat.lite.util.Range;
+import org.apache.tomcat.lite.util.URLEncoder;
 
 /**
  * The default resource-serving servlet for most web applications,
@@ -124,8 +127,6 @@ public class DefaultServlet  extends HttpServlet {
 
 
     // --------------------------------------------------------- Public Methods
-    protected Filesystem fs;
-
     /**
      * Finalize this servlet.
      */
@@ -136,10 +137,6 @@ public class DefaultServlet  extends HttpServlet {
      * Initialize this servlet.
      */
     public void init() throws ServletException {
-        if (fs == null) {
-            // R/O - no write
-            fs = new Filesystem();
-        }
 
         String realPath = getServletContext().getRealPath("/");
         basePath = new File(realPath);
@@ -148,7 +145,7 @@ public class DefaultServlet  extends HttpServlet {
         } catch (IOException e) {
             basePathName = basePath.getAbsolutePath();
         }
-        log("Init fs " + fs + " base: " + basePathName);
+        log("Init default serviet, base: " + basePathName);
         
         // Set our properties from the initialization parameters
         String value = null;
@@ -183,14 +180,6 @@ public class DefaultServlet  extends HttpServlet {
             output = 256;
     }
 
-    public void setFilesystem(Filesystem fs) {
-        this.fs = fs;
-    }
-    
-    public Filesystem getFilesystem() {
-        return fs;
-    }
-    
     public void setBasePath(String s) {
         this.basePathName = s;
         this.basePath = new File(s);
@@ -391,6 +380,64 @@ public class DefaultServlet  extends HttpServlet {
 //        }
     }
     
+    public void renderDir(HttpServletRequest request, 
+            HttpServletResponse response, 
+            File resFile,
+            String fileEncoding,
+            boolean content,
+            String relativePath) throws IOException {
+        
+        String contentType = "text/html;charset=" + fileEncoding;
+
+        ServletOutputStream ostream = null;
+        PrintWriter writer = null;
+        
+        if (content) {
+            // Trying to retrieve the servlet output stream
+            try {
+                ostream = response.getOutputStream();
+            } catch (IllegalStateException e) {
+                // If it fails, we try to get a Writer instead if we're
+                // trying to serve a text file
+                if ( (contentType == null)
+                     || (contentType.startsWith("text")) ) {
+                    writer = response.getWriter();
+                } else {
+                    throw e;
+                }
+            }
+
+        }
+
+        // Set the appropriate output headers
+        response.setContentType(contentType);
+        
+        InputStream renderResult = null;
+
+        if (content) {
+            // Serve the directory browser
+            renderResult =
+                dir2Html.render(request.getContextPath(), resFile, relativePath);
+        }
+
+
+        // Copy the input stream to our output stream (if requested)
+        if (content) {
+            try {
+                response.setBufferSize(output);
+            } catch (IllegalStateException e) {
+                // Silent catch
+            }
+            if (ostream != null) {
+                CopyUtils.copy(renderResult, ostream);
+            } else {
+                CopyUtils.copy(renderResult, writer, fileEncoding);
+            }
+        }
+        
+            
+    }
+    
 
     /**
      * Serve the specified resource, optionally including the data content.
@@ -430,7 +477,7 @@ public class DefaultServlet  extends HttpServlet {
                                    request.getRequestURI());
                 return;
             }
-            dir2Html.renderDir(request, response, resFile, fileEncoding, content,
+            renderDir(request, response, resFile, fileEncoding, content,
                     path);
             
             return;

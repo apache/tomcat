@@ -21,7 +21,7 @@ import java.nio.channels.ByteChannel;
  * @author Costin Manolache
  */
 public abstract class IOChannel implements ByteChannel, IOConnector.DataReceivedCallback, 
-        IOConnector.DataFlushedCallback { //, IOConnector.ClosedCallback {
+        IOConnector.DataFlushedCallback {  
     
     protected IOChannel net;
     protected IOChannel app;
@@ -38,6 +38,8 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     // Last activity timestamp.
     // TODO: update, etc
     public long ts;
+    
+    protected Throwable lastException;
     
     public void setConnectedCallback(IOConnector.ConnectedCallback connectedCallback) {
         this.connectedCallback = connectedCallback;
@@ -131,7 +133,18 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
             }
         } 
     }
-  
+
+    /** 
+     * Return last IO exception. 
+     * 
+     * The channel is async, exceptions can happen at any time. 
+     * The normal callback will be called ( connected, received ), it 
+     * should check if the channel is closed and the exception.
+     */
+    public Throwable lastException() {
+        return lastException;
+    }
+    
     public void close() throws IOException {
         shutdownOutput();
         // Should it read the buffers ? 

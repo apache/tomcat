@@ -28,7 +28,6 @@ public class TomcatLiteCoyoteTest extends TestCase {
                 tomcat.setPort(8885);
                 tomcat.setBaseDir("../../output/build/webapps");
                 
-                tomcat.addWebapp("/examples", "examples");
                 tomcat.addWebapp("/", "ROOT");
 
                 
@@ -67,11 +66,11 @@ public class TomcatLiteCoyoteTest extends TestCase {
     public void testSimple() throws IOException {
         HttpConnector clientCon = DefaultHttpConnector.get();
         HttpChannel ch = clientCon.get("localhost", 8885);
-        ch.getRequest().setRequestURI("/examples/servlets/servlet/HelloWorldExample");
+        ch.getRequest().setRequestURI("/index.html");
         ch.getRequest().send();
         BBuffer res = ch.readAll(null, 0);
         
-        assertTrue(res.toString().indexOf("<title>Hello World!</title>") >= 0);
+        assertTrue(res.toString(), res.toString().indexOf("<title>Apache Tomcat</title>") >= 0);
     }
     
     

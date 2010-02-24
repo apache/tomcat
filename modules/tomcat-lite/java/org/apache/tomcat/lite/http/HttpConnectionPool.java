@@ -282,14 +282,14 @@ public class HttpConnectionPool {
 
         if (con.isOpen()) {
             hits.incrementAndGet();
-            if (debug) {
-                httpCh.trace("HTTP_CONNECT: Reuse connection " + target + " " + this);
-            }
+//            if (debug) {
+//                log.info("HTTP_CONNECT: Reuse connection " + target + " " + this);
+//            }
             con.sendRequest(httpCh);
         } else {
             misses.incrementAndGet();
             if (debug) {
-                httpCh.trace("HTTP_CONNECT: Start connection " + target + " " + this);
+                log.info("HTTP_CONNECT: Start connection " + target + " " + this);
             }
             httpConnect(httpCh, target, ssl, 
                     (Http11Connection) con);
@@ -300,7 +300,7 @@ public class HttpConnectionPool {
             boolean ssl, IOConnector.ConnectedCallback cb)
             throws IOException {
         if (debug) {
-            httpCh.trace("HTTP_CONNECT: New connection " + target);
+            log.info("HTTP_CONNECT: New connection " + target);
         }
         String[] hostPort = target.split(":");
 
@@ -341,9 +341,6 @@ public class HttpConnectionPool {
             // again.
             if (remoteServer.pending.size() == 0) {
                 con.activeHttp = null;
-                if (debug) {
-                    log.info("After request: no pending");
-                }
                 return;
             }
             req = remoteServer.pending.remove();

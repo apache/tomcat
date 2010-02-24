@@ -19,7 +19,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -28,8 +27,9 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -42,6 +42,12 @@ import javax.net.ssl.X509TrustManager;
 
 public class SslConnector extends IOConnector {
 
+    /**
+     * TODO: option to require validation.
+     * TODO: remember cert signature. This is needed to support self-signed 
+     * certs, like those used by the test. 
+     * 
+     */
     public static class BasicTrustManager implements X509TrustManager {
     
         private X509Certificate[] chain;
@@ -64,20 +70,21 @@ public class SslConnector extends IOConnector {
     public static TrustManager[] trustAllCerts = new TrustManager[] { 
         new BasicTrustManager() }; 
 
-    static final boolean debug = false;
 
-    static {
-        if (debug) {
-            System.setProperty("javax.net.debug", "ssl");
-        }
-    }
+    static final boolean debug = false;
+    
     IOConnector net;
     private KeyManager[] keyManager; 
     SSLContext sslCtx;
     boolean server;
     private TrustManager[] trustManagers;
     
-    Executor handshakeExecutor;
+    public AtomicInteger handshakeCount = new AtomicInteger();
+    public AtomicInteger handshakeOk = new AtomicInteger();
+    public AtomicInteger handshakeErr = new AtomicInteger();
+    public AtomicInteger handshakeTime = new AtomicInteger();
+    
+    Executor handshakeExecutor = Executors.newCachedThreadPool();
     static int id = 0;
     
     public SslConnector() {
@@ -92,7 +99,7 @@ public class SslConnector extends IOConnector {
             try {
                 sslCtx = SSLContext.getInstance("TLS");
                 if (trustManagers == null) {
-                    trustManagers =
+                    trustManagers = 
                         new TrustManager[] {new BasicTrustManager()}; 
 
                 }
@@ -115,6 +122,18 @@ public class SslConnector extends IOConnector {
         return net;
     }
     
+    public SslChannel channel(String host, int port) {
+        return new SslChannel()
+            .setTarget(host, port)
+            .setSslContext(getSSLContext())
+            .setSslConnector(this);
+    }
+
+    public SslChannel serverChannel() {
+        return new SslChannel()
+            .setSslContext(getSSLContext())
+            .setSslConnector(this).withServer();
+    }
     
     @Override
     public void acceptor(final ConnectedCallback sc, CharSequence port, Object extra) 
@@ -129,9 +148,7 @@ public class SslConnector extends IOConnector {
                     first = dch;
                 }
                 
-                IOChannel sslch = new SslChannel()
-                    .setSslContext(sslCtx)
-                    .withServer();
+                IOChannel sslch = serverChannel();
                 sslch.setSink(first);
                 first.addFilterAfter(sslch);
 
@@ -148,7 +165,7 @@ public class SslConnector extends IOConnector {
     }
     
     @Override
-    public void connect(String host, int port, final ConnectedCallback sc)
+    public void connect(final String host, final int port, final ConnectedCallback sc)
             throws IOException {
         getNet().connect(host, port, new ConnectedCallback() {
 
@@ -161,8 +178,7 @@ public class SslConnector extends IOConnector {
                     first = dch;
                 }
                 
-                IOChannel sslch = new SslChannel()
-                    .setSslContext(sslCtx);
+                IOChannel sslch = channel(host, port);
                 sslch.setSink(first);
                 first.addFilterAfter(sslch);
 
@@ -318,7 +334,7 @@ public class SslConnector extends IOConnector {
 
     public static void fixUrlConnection() {
         try {
-            SSLContext sc = SSLContext.getInstance("SSL");
+            SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, SslConnector.trustAllCerts, null);
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
                     sc.getSocketFactory());

@@ -21,14 +21,11 @@ package org.apache.tomcat.integration.jmx;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.tomcat.integration.DynamicObject;
-import org.apache.tomcat.integration.ObjectManager;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
 import org.apache.tomcat.lite.http.HttpWriter;
@@ -47,8 +44,11 @@ import org.apache.tomcat.lite.http.HttpChannel.HttpService;
  */
 public class UJmxHandler implements HttpService {
 
-    private static Logger log = Logger.getLogger(UJmxHandler.class.getName());
+    protected static Logger log = Logger.getLogger(UJmxHandler.class.getName());
     private UJmxObjectManagerSpi jmx;
+    
+    public UJmxHandler() {
+    }
     
     public UJmxHandler(UJmxObjectManagerSpi jmx) {
         this.jmx = jmx;
@@ -56,7 +56,6 @@ public class UJmxHandler implements HttpService {
     
     public void getAttribute(PrintWriter writer, String onameStr, String att) {
         try {
-            
             Object bean = jmx.objects.get(onameStr);
             Class beanClass = bean.getClass();
             DynamicObject ci = jmx.getClassInfo(beanClass);

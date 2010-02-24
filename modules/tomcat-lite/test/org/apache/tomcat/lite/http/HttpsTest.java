@@ -17,33 +17,24 @@
 
 package org.apache.tomcat.lite.http;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import junit.framework.TestCase;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.SslConnector;
-import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.lite.util.Base64;
 
 public class HttpsTest extends TestCase {
     
     static int port = 8443;
     final HttpConnector httpClient = TestMain.shared().getClient();
     
-    public void setUp() {
-        Logger.getLogger("SSL").setLevel(Level.FINEST);
-    }
-
     public void testSimpleClient() throws Exception {
         checkResponse(httpClient);
     }
     
-    
     public void testSimpleServer() throws Exception {
-        ByteChunk res = TestMain.getUrl("https://localhost:8443/hello");
+        BBuffer res = TestMain.getUrl("https://localhost:8443/hello");
         assertTrue(res.toString().indexOf("Hello") >= 0);
     }       
 
@@ -52,7 +43,7 @@ public class HttpsTest extends TestCase {
         HttpRequest ch = httpCon.request("localhost", port).setSecure(true);
         
         ch.setRequestURI("/hello");
-        ch.setProtocol("HTTP/1.0");
+        ch.setProtocol("HTTP/1.0"); // to force close
         ch.send();
         BBuffer res = ch.readAll();
         
@@ -60,7 +51,7 @@ public class HttpsTest extends TestCase {
     }    
     
     public void testSimpleClient20() throws Exception {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             checkResponse(httpClient);
         }
     }
@@ -98,7 +89,7 @@ public class HttpsTest extends TestCase {
         TestMain.shared().initTestCallback(con.getDispatcher());
         con.start();
         
-        ByteChunk res = TestMain.getUrl("https://localhost:8444" + 
+        BBuffer res = TestMain.getUrl("https://localhost:8444" + 
             "/hello");
         assertTrue(res.toString().indexOf("Hello") >= 0);
         
