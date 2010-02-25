@@ -70,20 +70,17 @@ import org.apache.tools.ant.util.FileUtils;
  *
  * It can be used as an Ant task using:
  * <pre>
- *   &lt;taskdef classname="org.apache.jasper.JspC" name="jasper2" &gt;
+ *   &lt;taskdef classname="org.apache.jasper.JspC" name="jasper" &gt;
  *      &lt;classpath&gt;
  *          &lt;pathelement location="${java.home}/../lib/tools.jar"/&gt;
- *          &lt;fileset dir="${ENV.CATALINA_HOME}/server/lib"&gt;
- *              &lt;include name="*.jar"/&gt;
- *          &lt;/fileset&gt;
- *          &lt;fileset dir="${ENV.CATALINA_HOME}/common/lib"&gt;
+ *          &lt;fileset dir="${ENV.CATALINA_HOME}/lib"&gt;
  *              &lt;include name="*.jar"/&gt;
  *          &lt;/fileset&gt;
  *          &lt;path refid="myjars"/&gt;
  *       &lt;/classpath&gt;
  *  &lt;/taskdef&gt;
  *
- *  &lt;jasper2 verbose="0"
+ *  &lt;jasper verbose="0"
  *           package="my.package"
  *           uriroot="${webapps.dir}/${webapp.name}"
  *           webXmlFragment="${build.dir}/generated_web.xml"
@@ -269,6 +266,12 @@ public class JspC implements Options {
         }
     }
 
+    /**
+     * Apply command-line arguments.
+     * 
+     * @param arg
+     *            The arguments
+     */
     public void setArgs(String[] arg) throws JasperException {
         args = arg;
         String tok;
@@ -375,43 +378,76 @@ public class JspC implements Options {
         }
     }
 
+    /**
+     * In JspC this always returns <code>true</code>.
+     * {@inheritDoc}
+     */
     public boolean getKeepGenerated() {
         // isn't this why we are running jspc?
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean getTrimSpaces() {
         return trimSpaces;
     }
 
+    /**
+     * Sets the option to trim white spaces between directives or actions.
+     */
     public void setTrimSpaces(boolean ts) {
         this.trimSpaces = ts;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isPoolingEnabled() {
         return poolingEnabled;
     }
 
+    /**
+     * Sets the option to enable the tag handler pooling.
+     */
     public void setPoolingEnabled(boolean poolingEnabled) {
         this.poolingEnabled = poolingEnabled;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isXpoweredBy() {
         return xpoweredBy;
     }
 
+    /**
+     * Sets the option to enable generation of X-Powered-By response header.
+     */
     public void setXpoweredBy(boolean xpoweredBy) {
         this.xpoweredBy = xpoweredBy;
     }
 
+    /**
+     * In JspC this always returns <code>true</code>.
+     * {@inheritDoc}
+     */
     public boolean getDisplaySourceFragment() {
         return true;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
     }
 
+    /**
+     * Sets the option to issue a compilation error if the class attribute
+     * specified in useBean action is invalid.
+     */
     public void setErrorOnUseBeanInvalidClassAttribute(boolean b) {
         errorOnUseBeanInvalidClassAttribute = b;
     }
@@ -421,7 +457,7 @@ public class JspC implements Options {
     }
 
     /**
-     * Are we supporting HTML mapped servlets?
+     * {@inheritDoc}
      */
     public boolean getMappedFile() {
         return mappedFile;
@@ -432,23 +468,31 @@ public class JspC implements Options {
         return null;
     }
 
+    /**
+     * Sets the option to include debug information in compiled class.
+     */
     public void setClassDebugInfo( boolean b ) {
         classDebugInfo=b;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean getClassDebugInfo() {
         // compile with debug info
         return classDebugInfo;
     }
 
-     /**
-      * @see Options#isCaching()
+    /**
+     * {@inheritDoc}
      */
     public boolean isCaching() {
         return caching;
     }
 
     /**
+     * Sets the option to enable caching.
+     * 
      * @see Options#isCaching()
      */
     public void setCaching(boolean caching) {
@@ -456,57 +500,61 @@ public class JspC implements Options {
     }
 
     /**
-     * @see Options#getCache()
+     * {@inheritDoc}
      */
     public Map<String, TagLibraryInfo> getCache() {
         return cache;
     }
 
     /**
-     * Background compilation check intervals in seconds
+     * In JspC this always returns <code>0</code>.
+     * {@inheritDoc}
      */
     public int getCheckInterval() {
         return 0;
     }
 
     /**
-     * Modification test interval.
+     * In JspC this always returns <code>0</code>.
+     * {@inheritDoc}
      */
     public int getModificationTestInterval() {
         return 0;
     }
 
     /**
-     * Is Jasper being used in development mode?
+     * In JspC this always returns <code>false</code>.
+     * {@inheritDoc}
      */
     public boolean getDevelopment() {
         return false;
     }
 
     /**
-     * Is the generation of SMAP info for JSR45 debugging suppressed?
+     * {@inheritDoc}
      */
     public boolean isSmapSuppressed() {
         return smapSuppressed;
     }
 
     /**
-     * Set smapSuppressed flag.
+     * Sets smapSuppressed flag.
      */
     public void setSmapSuppressed(boolean smapSuppressed) {
         this.smapSuppressed = smapSuppressed;
     }
 
-    
     /**
-     * Should SMAP info for JSR45 debugging be dumped to a file?
+     * {@inheritDoc}
      */
     public boolean isSmapDumped() {
         return smapDumped;
     }
 
     /**
-     * Set smapSuppressed flag.
+     * Sets smapDumped flag.
+     * 
+     * @see Options#isSmapDumped()
      */
     public void setSmapDumped(boolean smapDumped) {
         this.smapDumped = smapDumped;
@@ -525,10 +573,7 @@ public class JspC implements Options {
     }
 
     /**
-     * Indicates whether text strings are to be generated as char arrays.
-     *
-     * @return true if text strings are to be generated as char arrays, false
-     * otherwise
+     * {@inheritDoc}
      */
     public boolean genStringAsCharArray() {
         return genStringAsCharArray;
@@ -536,24 +581,25 @@ public class JspC implements Options {
 
     /**
      * Sets the class-id value to be sent to Internet Explorer when using
-     * <jsp:plugin> tags.
-     *
-     * @param ieClassId Class-id value
+     * &lt;jsp:plugin&gt; tags.
+     * 
+     * @param ieClassId
+     *            Class-id value
      */
     public void setIeClassId(String ieClassId) {
         this.ieClassId = ieClassId;
     }
 
     /**
-     * Gets the class-id value that is sent to Internet Explorer when using
-     * <jsp:plugin> tags.
-     *
-     * @return Class-id value
+     * {@inheritDoc}
      */
     public String getIeClassId() {
         return ieClassId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public File getScratchDir() {
         return scratchDir;
     }
@@ -569,48 +615,63 @@ public class JspC implements Options {
     }
 
     /**
-     * Compiler to use.
+     * {@inheritDoc}
      */
     public String getCompiler() {
         return compiler;
     }
 
+    /**
+     * Sets the option to determine what compiler to use.
+     * 
+     * @see Options#getCompiler()
+     */
     public void setCompiler(String c) {
         compiler=c;
     }
 
     /**
-     * Compiler class name to use.
+     * {@inheritDoc}
      */
     public String getCompilerClassName() {
         return null;
     }
-    
+
     /**
-     * @see Options#getCompilerTargetVM
+     * {@inheritDoc}
      */
     public String getCompilerTargetVM() {
         return compilerTargetVM;
     }
 
+    /**
+     * Sets the compiler target VM.
+     * 
+     * @see Options#getCompilerTargetVM()
+     */
     public void setCompilerTargetVM(String vm) {
         compilerTargetVM = vm;
     }
 
     /**
-     * @see Options#getCompilerSourceVM()
+     * {@inheritDoc}
      */
      public String getCompilerSourceVM() {
          return compilerSourceVM;
      }
-        
-    /**
-     * @see Options#getCompilerSourceVM()
-     */
+
+     /**
+      * Sets the compiler source VM.
+      * 
+      * @see Options#getCompilerSourceVM()
+      */
     public void setCompilerSourceVM(String vm) {
         compilerSourceVM = vm;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TldLocationsCache getTldLocationsCache() {
         return tldLocationsCache;
     }
@@ -635,16 +696,26 @@ public class JspC implements Options {
         javaEncoding = encodingName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean getFork() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getClassPath() {
         if( classPath != null )
             return classPath;
         return System.getProperty("java.class.path");
     }
 
+    /**
+     * Sets the classpath used while compiling the servlets generated from JSP
+     * files
+     */
     public void setClassPath(String s) {
         classPath=s;
     }
@@ -676,7 +747,7 @@ public class JspC implements Options {
     }
 
     /**
-     * Sets the project.
+     * Sets the Ant project.
      *
      * @param theProject The project
      */
@@ -685,7 +756,7 @@ public class JspC implements Options {
     }
 
     /**
-     * Returns the project: may be null if not running
+     * Returns the project: may be <code>null</code> if not running
      * inside an Ant project.
      *
      * @return The project
@@ -696,7 +767,7 @@ public class JspC implements Options {
 
     /**
      * Base dir for the webapp. Used to generate class names and resolve
-     * includes
+     * includes.
      */
     public void setUriroot( String s ) {
         if( s==null ) {
@@ -770,6 +841,9 @@ public class JspC implements Options {
         }
     }
 
+    /**
+     * Sets the package name to be used for the generated servlet classes.
+     */
     public void setPackage( String p ) {
         targetPackage=p;
     }
@@ -799,32 +873,59 @@ public class JspC implements Options {
         webxmlLevel=ALL_WEBXML;
     }
 
+    /**
+     * Sets the option to merge generated web.xml fragment into the
+     * WEB-INF/web.xml file of the web application that we were processing.
+     * 
+     * @param b
+     *            <code>true</code> to merge the fragment into the existing
+     *            web.xml file of the processed web application
+     *            ({uriroot}/WEB-INF/web.xml), <code>false</code> to keep the
+     *            generated web.xml fragment
+     */
     public void setAddWebXmlMappings(boolean b) {
         addWebXmlMappings = b;
     }
 
     /**
-     * Set the option that throws an exception in case of a compilation error.
+     * Sets the option that throws an exception in case of a compilation error.
      */
     public void setFailOnError(final boolean b) {
         failOnError = b;
     }
 
+    /**
+     * Returns true if an exception will be thrown in case of a compilation
+     * error.
+     */
     public boolean getFailOnError() {
         return failOnError;
     }
 
     /**
-     * Obtain JSP configuration information specified in web.xml.
+     * {@inheritDoc}
      */
     public JspConfig getJspConfig() {
         return jspConfig;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TagPluginManager getTagPluginManager() {
         return tagPluginManager;
     }
 
+    /**
+     * Adds servlet declaration and mapping for the JSP page servlet to the
+     * generated web.xml fragment.
+     * 
+     * @param file
+     *            Context-relative path to the JSP file, e.g.
+     *            <code>/index.jsp</code>
+     * @param clctxt
+     *            Compilation context of the servlet
+     */
     public void generateWebMapping( String file, JspCompilationContext clctxt )
         throws IOException
     {
