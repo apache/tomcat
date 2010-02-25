@@ -452,20 +452,11 @@ public class JspC implements Options {
         errorOnUseBeanInvalidClassAttribute = b;
     }
 
-    public int getTagPoolSize() {
-        return Constants.MAX_POOL_SIZE;
-    }
-
     /**
      * {@inheritDoc}
      */
     public boolean getMappedFile() {
         return mappedFile;
-    }
-
-    // Off-line compiler, no need for security manager
-    public Object getProtectionDomain() {
-        return null;
     }
 
     /**
@@ -602,16 +593,6 @@ public class JspC implements Options {
      */
     public File getScratchDir() {
         return scratchDir;
-    }
-
-    public Class<?> getJspCompilerPlugin() {
-       // we don't compile, so this is meaningless
-        return null;
-    }
-
-    public String getJspCompilerPath() {
-       // we don't compile, so this is meaningless
-        return null;
     }
 
     /**
