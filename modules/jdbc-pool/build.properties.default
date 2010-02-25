@@ -72,9 +72,9 @@ c3p0.home=${base.path}/c3p0-0.9.1.2
 c3p0.jar=${c3p0.home}/lib/c3p0-0.9.1.2.jar
 c3p0.loc=http://superb-east.dl.sourceforge.net/sourceforge/c3p0/c3p0-0.9.1.2.bin.zip
 
-mysql.home=${base.path}/mysql-connector-java-5.1.7
-mysql.jar=${mysql.home}/mysql-connector-java-5.1.7-bin.jar
-mysql.loc=http://mysql.mirrors.pair.com/Downloads/Connector-J/mysql-connector-java-5.1.7.zip
+mysql.home=${base.path}/mysql-connector-java-5.1.12
+mysql.jar=${mysql.home}/mysql-connector-java-5.1.12-bin.jar
+mysql.loc=http://mysql.he.net/Downloads/Connector-J/mysql-connector-java-5.1.12.zip
 
 dbcp.home=${base.path}/commons-dbcp-1.2
 dbcp.jar=${dbcp.home}/commons-dbcp-1.2.jar
