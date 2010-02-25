@@ -98,8 +98,8 @@ public class JavacErrorDetail {
     
                 if (jspLines.length < jspBeginLineNum) {
                     // Avoid ArrayIndexOutOfBoundsException
-                    // Probably bug 48494 but could be some other cause
-                    jspExtract = Localizer.getMessage("jsp.error.bug48494");
+                    // Probably bug 48498 but could be some other cause
+                    jspExtract = Localizer.getMessage("jsp.error.bug48498");
                     return;
                 }
                 
