@@ -86,7 +86,7 @@ public interface Options {
     /**
      * Indicates whether SMAP info for JSR45 debugging should be dumped to a
      * file.
-     * Ignored is suppressSmap() is true
+     * Ignored if suppressSmap() is true.
      */
     public boolean isSmapDumped();
 
@@ -96,7 +96,10 @@ public interface Options {
     public boolean getTrimSpaces();
 
     /**
-     * Class ID for use in the plugin tag when the browser is IE. 
+     * Gets the class-id value that is sent to Internet Explorer when using
+     * &lt;jsp:plugin&gt; tags.
+     *
+     * @return Class-id value
      */
     public String getIeClassId();
 
@@ -113,21 +116,28 @@ public interface Options {
 
     /**
      * Compiler to use.
+     * 
+     * <p>
+     * If <code>null</code> (the default), the java compiler from Eclipse JDT
+     * project, bundled with Tomcat, will be used. Otherwise, the
+     * <code>javac</code> task from Apache Ant will be used to call an external
+     * java compiler and the value of this option will be passed to it. See
+     * Apache Ant documentation for the possible values.
      */
     public String getCompiler();
 
     /**
-     * The compiler target VM, e.g. 1.1, 1.2, 1.3, 1.4, or 1.5.
+     * The compiler target VM, e.g. 1.1, 1.2, 1.3, 1.4, 1.5 or 1.6.
      */
     public String getCompilerTargetVM();
 
     /**
-     * Compiler source VM, e.g. 1.3, 1.4, or 1.5.
+     * The compiler source VM, e.g. 1.3, 1.4, 1.5 or 1.6.
      */
     public String getCompilerSourceVM();   
 
     /**
-     * Java compiler class to use.
+     * Jasper Java compiler class to use.
      */
     public String getCompilerClassName();   
 
@@ -151,7 +161,11 @@ public interface Options {
     public String getJavaEncoding();
 
     /**
-     * boolean flag to tell Ant whether to fork JSP page compilations.
+     * The boolean flag to tell Ant whether to fork JSP page compilations.
+     * 
+     * <p>
+     * Is used only when Jasper uses an external java compiler (wrapped through
+     * a <code>javac</code> Apache Ant task).
      */
     public boolean getFork();
 
@@ -171,7 +185,10 @@ public interface Options {
     public TagPluginManager getTagPluginManager();
 
     /**
-     * Are Text strings to be generated as char arrays?
+     * Indicates whether text strings are to be generated as char arrays.
+     * 
+     * @return <code>true</code> if text strings are to be generated as char
+     *         arrays, <code>false</code> otherwise
      */
     public boolean genStringAsCharArray();
     
@@ -186,11 +203,15 @@ public interface Options {
     public boolean isCaching();
     
     /**
-     * The web-application wide cache for the returned TreeNode
-     * by parseXMLDocument in TagLibraryInfoImpl.parseTLD,
-     * if isCaching returns true.
+     * The web-application wide cache for the TagLibraryInfo tag library
+     * descriptors, used if {@link #isCaching()} returns <code>true</code>.
      * 
-     * @return the Map(String uri, TreeNode tld) instance.
+     * <p>
+     * Using this cache avoids the cost of repeating the parsing of a tag
+     * library descriptor XML file (performed by TagLibraryInfoImpl.parseTLD).
+     * </p>
+     * 
+     * @return the Map(String uri, TagLibraryInfo tld) instance.
      */
     public Map<String, TagLibraryInfo> getCache();
     
