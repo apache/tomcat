@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -115,6 +115,8 @@ public class JspC implements Options {
     protected static final String SWITCH_FILE_WEBAPP = "-webapp";
     protected static final String SWITCH_WEBAPP_INC = "-webinc";
     protected static final String SWITCH_WEBAPP_XML = "-webxml";
+    protected static final String SWITCH_WEBAPP_XML_ENCODING = "-webxmlencoding";
+    protected static final String SWITCH_ADD_WEBAPP_XML_MAPPINGS = "-addwebxmlmappings";
     protected static final String SWITCH_MAPPED = "-mapped";
     protected static final String SWITCH_XPOWERED_BY = "-xpoweredBy";
     protected static final String SWITCH_TRIM_SPACES = "-trimSpaces";
@@ -213,6 +215,7 @@ public class JspC implements Options {
     // Generation of web.xml fragments
     protected String webxmlFile;
     protected int webxmlLevel;
+    protected String webxmlEncoding;
     protected boolean addWebXmlMappings = false;
 
     protected Writer mapout;
@@ -313,6 +316,10 @@ public class JspC implements Options {
                 if (webxmlFile != null) {
                     webxmlLevel = ALL_WEBXML;
                 }
+            } else if (tok.equals(SWITCH_WEBAPP_XML_ENCODING)) {
+                setWebXmlEncoding(nextArg());
+            } else if (tok.equals(SWITCH_ADD_WEBAPP_XML_MAPPINGS)) {
+                setAddWebXmlMappings(true);
             } else if (tok.equals(SWITCH_MAPPED)) {
                 mappedFile = true;
             } else if (tok.equals(SWITCH_XPOWERED_BY)) {
@@ -855,6 +862,20 @@ public class JspC implements Options {
     }
 
     /**
+     * Sets the encoding to be used to read and write web.xml files.
+     * 
+     * <p>
+     * If not specified, defaults to the platform default encoding.
+     * </p>
+     * 
+     * @param encoding
+     *            Encoding, e.g. "UTF-8".
+     */
+    public void setWebXmlEncoding(String encoding) {
+        webxmlEncoding = encoding;
+    }
+
+    /**
      * Sets the option to merge generated web.xml fragment into the
      * WEB-INF/web.xml file of the web application that we were processing.
      * 
@@ -955,10 +976,10 @@ public class JspC implements Options {
         String insertEndMarker =
             Localizer.getMessage("jspc.webinc.insertEnd");
 
-        BufferedReader reader = new BufferedReader(new FileReader(webXml));
-        BufferedReader fragmentReader =
-            new BufferedReader(new FileReader(webxmlFile));
-        PrintWriter writer = new PrintWriter(new FileWriter(webXml2));
+        BufferedReader reader = new BufferedReader(openWebxmlReader(webXml));
+        BufferedReader fragmentReader = new BufferedReader(
+                openWebxmlReader(new File(webxmlFile)));
+        PrintWriter writer = new PrintWriter(openWebxmlWriter(webXml2));
 
         // Insert the <servlet> and <servlet-mapping> declarations
         boolean inserted = false;
@@ -1321,8 +1342,7 @@ public class JspC implements Options {
     protected void initWebXml() {
         try {
             if (webxmlLevel >= INC_WEBXML) {
-                File fmapings = new File(webxmlFile);
-                mapout = new FileWriter(fmapings);
+                mapout = openWebxmlWriter(new File(webxmlFile));
                 servletout = new CharArrayWriter();
                 mappingout = new CharArrayWriter();
             } else {
@@ -1535,4 +1555,26 @@ public class JspC implements Options {
              return FileUtils.getFileUtils().resolveFile(getProject().getBaseDir(), s);
          }
      }
+
+    private Reader openWebxmlReader(File file) throws IOException {
+        FileInputStream fis = new FileInputStream(file);
+        try {
+            return webxmlEncoding != null ? new InputStreamReader(fis,
+                    webxmlEncoding) : new InputStreamReader(fis);
+        } catch (IOException ex) {
+            fis.close();
+            throw ex;
+        }
+    }
+
+    private Writer openWebxmlWriter(File file) throws IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+        try {
+            return webxmlEncoding != null ? new OutputStreamWriter(fos,
+                    webxmlEncoding) : new OutputStreamWriter(fos);
+        } catch (IOException ex) {
+            fos.close();
+            throw ex;
+        }
+    }
 }
