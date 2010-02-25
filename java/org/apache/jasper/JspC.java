@@ -882,9 +882,9 @@ public class JspC implements Options {
         boolean inserted = false;
         int current = reader.read();
         while (current > -1) {
-            if (!inserted && current == '<') {
+            if (current == '<') {
                 String element = getElement(reader);
-                if (insertBefore.contains(element)) {
+                if (!inserted && insertBefore.contains(element)) {
                     // Insert generated content here
                     writer.println(insertStartMarker);
                     while (true) {
@@ -898,11 +898,26 @@ public class JspC implements Options {
                     writer.println(insertEndMarker);
                     writer.println();
                     writer.write(element);
-                } else if (element.contains(insertStartMarker)) {
+                    inserted = true;
+                } else if (element.equals(insertStartMarker)) {
                     // Skip the previous auto-generated content
-                    while (!element.contains(insertEndMarker)) {
-                        element = getElement(reader);
+                    while (true) {
+                        current = reader.read();
+                        if (current < 0) {
+                            throw new EOFException();
+                        }
+                        if (current == '<') {
+                            element = getElement(reader);
+                            if (element.equals(insertEndMarker)) {
+                                break;
+                            }
+                        }
                     }
+                    current = reader.read();
+                    while (current == '\n' || current == '\r') {
+                        current = reader.read();
+                    }
+                    continue;
                 } else {
                     writer.write(element);
                 }
