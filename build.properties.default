@@ -35,7 +35,7 @@ version.suffix=-dev
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
 # contexts by the various build scripts.
-base.path=/usr/share/java
+base.path=/home/mturk/Workplace/tomcat/repository
 #base.path=C:/path/to/the/repository
 #base.path=/usr/local
 
@@ -103,11 +103,15 @@ nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-2.45.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
-commons-daemon.home=${base.path}/commons-daemon-1.0.1
+commons-daemon.version=1.0.2
+commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.lib=${commons-daemon.home}
-commons-daemon.jar=${commons-daemon.lib}/commons-daemon.jar
-commons-daemon.loc=${base-commons.loc}/daemon/binaries/commons-daemon-1.0.1.tar.gz
-commons-daemon.jsvc.tar.gz=${commons-daemon.lib}/bin/jsvc.tar.gz
+commons-daemon.jar=${commons-daemon.lib}/commons-daemon-${commons-daemon.version}.jar
+commons-daemon.bin.loc=${base-commons.loc}/daemon/binaries/${commons-daemon.version}/commons-daemon-${commons-daemon.version}-bin.tar.gz
+commons-daemon.native.src.tgz=${commons-daemon.home}/commons-daemon-${commons-daemon.version}-native-src.tar.gz
+commons-daemon.native.win.zip=${commons-daemon.home}/commons-daemon-${commons-daemon.version}-bin-windows.zip
+commons-daemon.native.src.loc=${base-commons.loc}/daemon/source/commons-daemon-${commons-daemon.version}-native-src.tar.gz
+commons-daemon.native.win.loc=${base-commons.loc}/daemon/binaries/${commons-daemon.version}/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
 # ----- JUnit Unit Test Suite, version 3.7 or later -----
 junit.home=${base.path}/junit3.8.2
