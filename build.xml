@@ -624,9 +624,10 @@
 
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
             file="${tomcat-native.tar.gz}" />
+    <copy tofile="${tomcat.build}/bin/commons-daemon-native.tar.gz"
+            file="${commons-daemon.native.src.tgz}" />
 
-    <copy todir="${tomcat.build}/bin" file="${commons-daemon.jar}" />
-    <copy todir="${tomcat.build}/bin" file="${commons-daemon.jsvc.tar.gz}" />
+    <copy tofile="${tomcat.build}/bin/commons-daemon.jar" file="${commons-daemon.jar}" />
 
     <!-- Copy scripts -->
     <copy todir="${tomcat.build}/bin">
@@ -1128,15 +1129,15 @@
 
     <!-- Windows binaries -->
     <!-- 32 bit -->
-    <copy file="res/procrun/tomcat${version.major}.exe"
+    <copy file="${commons-daemon.home}/windows/prunsrv.exe"
         tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
-    <copy file="res/procrun/tomcat${version.major}w.exe"
+    <copy file="${commons-daemon.home}/windows/prunmgr.exe"
         tofile="${tomcat.dist}/bin/tomcat${version.major}w.exe" />
     <!-- 64 bit amd -->
-    <copy file="res/procrun/amd64/tomcat${version.major}.exe"
+    <copy file="${commons-daemon.home}/windows/amd64/prunsrv.exe"
         tofile="${tomcat.dist}/bin/x64/tomcat${version.major}.exe" />
     <!-- 64 bit ia -->
-    <copy file="res/procrun/ia64/tomcat${version.major}.exe"
+    <copy file="${commons-daemon.home}/windows/ia64/prunsrv.exe"
         tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
     <!-- tc native -->
     <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
@@ -1643,9 +1644,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
+    <!-- Download src and build Commons Daemon -->
     <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-daemon.loc}"/>
+      <param name="sourcefile" value="${commons-daemon.bin.loc}"/>
       <param name="destfile" value="${commons-daemon.jar}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${commons-daemon.native.src.loc}"/>
+      <param name="destfile" value="${commons-daemon.native.src.tgz}"/>
+      <param name="destdir" value="${commons-daemon.home}"/>
     </antcall>
 
     <!-- Download src and build Tomcat DBCP bundle -->
@@ -1713,6 +1721,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${tomcat-native.dll}/win64/ia64/tcnative-1.dll"/>
       <param name="destfile" value="${tomcat-native.dll.i64}"/>
       <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${commons-daemon.native.win.loc}"/>
+      <param name="destdir" value="${commons-daemon.home}/windows"/>
     </antcall>
 
     <antcall target="downloadzip">
