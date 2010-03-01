@@ -87,8 +87,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "org.apache.catalina.manager.NONCE";
     protected static final String NONCE_REQUEST = "nonce";
         
-    protected static final String sessionsListJspPath  = "/sessionsList.jsp";
-    protected static final String sessionDetailJspPath = "/sessionDetail.jsp";
+    protected static final String sessionsListJspPath  = "/WEB-INF/jsp/sessionsList.jsp";
+    protected static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
 
     static {
         URL_ENCODER = new URLEncoder();
