@@ -114,6 +114,11 @@
   <subsection name="Coyote">
     <changelog>
       <update>
+        Port SSLInsecureRenegotiation from mod_ssl. This requires
+        to use tomcat-native 1.2.21 that have option to detect this
+        support from OpenSSL library. (mturk)
+      </update>
+      <update>
         Allow bigger AJP packets also for request bodies and responses
         using the packetSize attribute of the Connector. (rjung)
       </update>
