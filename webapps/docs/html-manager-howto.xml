@@ -549,21 +549,30 @@ error message.  Possible causes for problems include:</p>
 
 <section name="Diagnostics">
 
+<subsection name="Finding memory leaks">
+
 <p><strong>The find leaks diagnostic triggers a full garbage collection. It
 should be used with extreme caution on production systems.</strong></p>
 
 <p>The find leaks diagnostic attempts to identify web applications that have
-caused memory leaks when they were reloaded. Results should always be confirmed
+caused memory leaks when they were stopped, reloaded or undeployed. Results
+should always be confirmed
 with a profiler. The diagnostic uses additional functionality provided by the
 StandardHost implementation. It will not work if a custom host is used that
 does not extend StandardHost.</p>
 
-<p>Explicitly triggering a full garbage collection from Java Code is documented
+<p>This diagnostic will list context paths for the web applications that were
+stopped, reloaded or undeployed, but which classes from the previous runs
+are still present in memory, thus being a memory leak. If an application
+has been reloaded several times, it may be listed several times.</p>
+
+<p>Explicitly triggering a full garbage collection from Java code is documented
 to be unreliable. Furthermore, depending on the JVM used, there are options to
 disable explicit GC triggering, like <code>-XX:+DisableExplicitGC</code>.
 If you want to make sure, that the diagnostics were successfully running a full GC,
 you will need to check using tools like GC logging, JConsole or similar.</p>
 
+</subsection>
 </section>
 
 <section name="Server Information">
