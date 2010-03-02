@@ -53,7 +53,7 @@
   system administrator can use to keep the server secure and reliable.</p>
 
   <p><strong>WARNING</strong> - A security audit
-  have been conducted using the Tomcat 6 codebase. Most of the critical
+  have been conducted using the Tomcat codebase. Most of the critical
   package have been protected and a new security package protection mechanism 
   has been implemented. Still, make sure that you are satisfied with your SecurityManager 
   configuration before allowing untrusted users to publish web applications, 
@@ -69,7 +69,7 @@
   by Tomcat will have.  There are a number of Permission classes that are
   a standard part of the JDK, and you can create your own Permission class
   for use in your own web applications.  Both techniques are used in
-  Tomcat 6.</p>
+  Tomcat.</p>
 
 
   <subsection name="Standard Permissions">

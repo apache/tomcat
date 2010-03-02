@@ -31,7 +31,7 @@
 
 <section name="Introduction">
 
-<p>Tomcat 6 uses JMX MBeans as the technology for implementing 
+<p>Tomcat uses JMX MBeans as the technology for implementing 
 manageability of Tomcat.</p>
 
 <p>The descriptions of JMX MBeans for Catalina are in the mbeans-descriptor.xml 

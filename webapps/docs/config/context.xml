@@ -35,9 +35,9 @@
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
-    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat 6.</p>
+    the directory into which you have installed Tomcat.</p>
     </em></blockquote>
 
   <p>The <strong>Context</strong> element represents a <em>web
@@ -67,7 +67,8 @@
   web application for this virtual host, and is used to process all
   requests that do not match any other Context's context path.</p>
 
-  <p><b>For Tomcat 6, unlike Tomcat 4.x, it is NOT recommended to place
+  <p><b>For the current versions of Tomcat, unlike Tomcat 4.x,
+  it is NOT recommended to place
   &lt;Context&gt; elements directly in the server.xml file.</b> This
   is because it makes modifying the <strong>Context</strong> configuration
   more invasive since the main <code>conf/server.xml</code> file cannot be

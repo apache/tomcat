@@ -36,12 +36,12 @@
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
-    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat 6.</p>
+    the directory into which you have installed Tomcat.</p>
     </em></blockquote>
 
-<p>To install and configure SSL support on Tomcat 6, you need to follow
+<p>To install and configure SSL support on Tomcat, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <ol>
 <li>Create a certificate keystore by executing the following command:
@@ -342,7 +342,7 @@ sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 <p>The final step is to configure the Connector in the
 <code>$CATALINA_BASE/conf/server.xml</code> file, where
 <code>$CATALINA_BASE</code> represents the base directory for the
-Tomcat 6 instance.  An example <code>&lt;Connector&gt;</code> element
+Tomcat instance.  An example <code>&lt;Connector&gt;</code> element
 for an SSL connector is included in the default <code>server.xml</code>
 file installed with Tomcat.  For JSSE, it should look something like this:</p>
 <source>

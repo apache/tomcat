@@ -37,7 +37,7 @@
   <subsection name="Introduction">
 
     <p>The purpose of the <strong>JNDIRealm</strong> implementation is to
-    provide a mechanism by which Tomcat 6 can acquire information needed
+    provide a mechanism by which Tomcat can acquire information needed
     to authenticate web application users, and define their security roles,
     from a directory server or other service accessed via JNDI APIs.  For
     integration with Catalina, this class must implement the
