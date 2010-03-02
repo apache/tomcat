@@ -309,6 +309,14 @@ public class AprEndpoint extends AbstractEndpoint {
     public void setSSLVerifyDepth(int SSLVerifyDepth) { this.SSLVerifyDepth = SSLVerifyDepth; }
 
 
+    /**
+     * SSL allow insecure renegotiation for the the client that does not
+     * support the secure renegotiation.
+     */
+    protected boolean SSLInsecureRenegotiation = false;
+    public void seSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
+    public boolean getSSLInsecureRenegotiation() { return SSLInsecureRenegotiation; }
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -460,6 +468,15 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             // Create SSL Context
             sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
+            if (SSLInsecureRenegotiation) {
+                if (SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION))
+                    SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                else {
+                    // OpenSSL does not support unsafe legacy renegotiation.
+                    log.warn(sm.getString("endpoint.warn.noInsecureReneg",
+                                          SSL.versionString()));
+                }
+            }
             // List the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
             // Load Server key and certificate
