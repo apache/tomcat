@@ -314,7 +314,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * support the secure renegotiation.
      */
     protected boolean SSLInsecureRenegotiation = false;
-    public void seSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
+    public void setSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
     public boolean getSSLInsecureRenegotiation() { return SSLInsecureRenegotiation; }
 
     // --------------------------------------------------------- Public Methods
