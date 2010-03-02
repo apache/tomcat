@@ -469,9 +469,15 @@ public class AprEndpoint extends AbstractEndpoint {
             // Create SSL Context
             sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
             if (SSLInsecureRenegotiation) {
-                if (SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION))
-                    SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                else {
+                boolean legacyRenegSupported = false;
+                try {
+                    legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                    if (legacyRenegSupported)
+                        SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                } catch (UnsatisfiedLinkError e) {
+                    // Ignore
+                }
+                if (!legacyRenegSupported) {
                     // OpenSSL does not support unsafe legacy renegotiation.
                     log.warn(sm.getString("endpoint.warn.noInsecureReneg",
                                           SSL.versionString()));
