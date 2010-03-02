@@ -230,6 +230,11 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setOptions)(TCN_STDARGS, jlong ctx,
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
+#ifndef SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION
+    /* Clear the flag if not supported */
+    if (opt & 0x00040000)
+        opt &= ~0x00040000;
+#endif
     SSL_CTX_set_options(c->ctx, opt);
 }
 

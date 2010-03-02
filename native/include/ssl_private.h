@@ -199,8 +199,6 @@
     || (errnum == X509_V_ERR_CERT_UNTRUSTED) \
     || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))
 
-
-
 #define SSL_DEFAULT_PASS_PROMPT "Some of your private key files are encrypted for security reasons.\n"  \
                                 "In order to read them you have to provide the pass phrases.\n"         \
                                 "Enter password :"

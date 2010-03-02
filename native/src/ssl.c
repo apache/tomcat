@@ -813,6 +813,15 @@ TCN_IMPLEMENT_CALL(jstring, SSL, getLastError)(TCN_STDARGS)
     return tcn_new_string(e, buf);
 }
 
+TCN_IMPLEMENT_CALL(jboolean, SSL, hasOp)(TCN_STDARGS, jint op)
+{
+#ifdef SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION
+    if (op & SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION)
+        return JNI_TRUE;
+#endif
+    return JNI_FALSE;
+}
+
 #else
 /* OpenSSL is not supported.
  * Create empty stubs.
@@ -918,4 +927,10 @@ TCN_IMPLEMENT_CALL(jstring, SSL, getLastError)(TCN_STDARGS)
     return NULL;
 }
 
+TCN_IMPLEMENT_CALL(jboolean, SSL, hasOp)(TCN_STDARGS, jint op)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(op);
+    return JNI_FALSE;
+}
 #endif
