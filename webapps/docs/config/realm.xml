@@ -55,9 +55,9 @@
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
-    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat 6.</p>
+    the directory into which you have installed Tomcat.</p>
     </em></blockquote>
 
 </section>
@@ -565,7 +565,7 @@
 
     <h3>JAAS Realm (org.apache.catalina.realm.JAASRealm)</h3>
 
-    <p><strong>JAASRealm</strong> is an implementation of the Tomcat 6
+    <p><strong>JAASRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through the Java
     Authentication &amp; Authorization Service (JAAS) framework which is now
     provided as part of the standard J2SE API.</p>
@@ -624,7 +624,7 @@
 
     <h3>Combined Realm (org.apache.catalina.realm.CombinedRealm)</h3>
 
-    <p><strong>CombinedRealm</strong> is an implementation of the Tomcat 6
+    <p><strong>CombinedRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through one or more
     sub-Realms.</p>
 
@@ -648,7 +648,7 @@
 
     <h3>LockOut Realm (org.apache.catalina.realm.LockOutRealm)</h3>
 
-    <p><strong>LockOutRealm</strong> is an implementation of the Tomcat 6
+    <p><strong>LockOutRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that extends the CombinedRealm to provide lock
     out functionality to provide a user lock out mechanism if there are too many
     failed authentication attempts in a given period of time.</p>

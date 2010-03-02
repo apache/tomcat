@@ -37,7 +37,7 @@
   <subsection name="Introduction">
 
     <p>The purpose of the <strong>JDBCRealm</strong> implementation is to
-    provide a mechanism by which Tomcat 6 can acquire information needed
+    provide a mechanism by which Tomcat can acquire information needed
     to authenticate web application users, and define their security roles,
     from a relational database accessed via JDBC APIs.  For integration
     with Catalina, the resulting class(es) must implement the

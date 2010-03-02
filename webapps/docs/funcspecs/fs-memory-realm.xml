@@ -37,10 +37,10 @@
   <subsection name="Introduction">
 
     <p>The purpose of the <strong>MemoryRealm</strong> implementation is to
-    provide a mechanism by which Tomcat 6 can acquire information needed
+    provide a mechanism by which Tomcat can acquire information needed
     to authenticate web application users, and define their security roles,
     from a simple text-based configuration file in XML format.  This is
-    intended to simplify the initial installation and operation of Tomcat 6,
+    intended to simplify the initial installation and operation of Tomcat,
     without the complexity of configuring a database or directory server
     based Realm.  It is not intended for production use.</p>
 

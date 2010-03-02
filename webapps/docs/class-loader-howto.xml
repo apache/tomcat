@@ -33,7 +33,7 @@
 
 <section name="Overview">
 
-<p>Like many server applications, Tomcat 6 installs a variety of class loaders
+<p>Like many server applications, Tomcat installs a variety of class loaders
 (that is, classes that implement <code>java.lang.ClassLoader</code>) to allow
 different portions of the container, and the web applications running on the
 container, to have access to different repositories of available classes and
@@ -48,7 +48,7 @@ class loader(s) cannot find the requested class or resource.  The model for
 web application class loaders differs slightly from this, as discussed below,
 but the main principles are the same.</p>
 
-<p>When Tomcat 6 is started, it creates a set of class loaders that are
+<p>When Tomcat is started, it creates a set of class loaders that are
 organized into the following parent-child relationships, where the parent
 class loader is above the child class loader:</p>
 
@@ -70,7 +70,7 @@ the following section.</p>
 
 <section name="Class Loader Definitions">
 
-<p>As indicated in the diagram above, Tomcat 6 creates the following class
+<p>As indicated in the diagram above, Tomcat creates the following class
 loaders as it is initialized:</p>
 <ul>
 <li><strong>Bootstrap</strong> - This class loader contains the basic runtime
@@ -82,14 +82,14 @@ loaders as it is initialized:</p>
 <li><strong>System</strong> - This class loader is normally initialized from
     the contents of the <code>CLASSPATH</code> environment variable.  All such
     classes are visible to both Tomcat internal classes, and to web
-    applications.  However, the standard Tomcat 6 startup scripts
+    applications.  However, the standard Tomcat startup scripts
     (<code>$CATALINA_HOME/bin/catalina.sh</code> or
     <code>%CATALINA_HOME%\bin\catalina.bat</code>) totally ignore the contents
     of the <code>CLASSPATH</code> environment variable itself, and instead
     build the System class loader from the following repositories:
     <ul>
     <li><em>$CATALINA_HOME/bin/bootstrap.jar</em> - Contains the main() method
-        that is used to initialize the Tomcat 6 server, and the class loader
+        that is used to initialize the Tomcat server, and the class loader
         implementation classes it depends on.</li>
     <li><em>$CATALINA_HOME/bin/tomcat-juli.jar</em> - Package renamed Commons 
         logging API, and java.util.logging LogManager.</li>
@@ -104,7 +104,7 @@ loaders as it is initialized:</p>
     <ul>
     <li><em>annotations-api.jar</em> - JEE annotations classes.</li>
     <li><em>catalina.jar</em> - Implementation of the Catalina servlet
-        container portion of Tomcat 6.</li>
+        container portion of Tomcat.</li>
     <li><em>catalina-ant.jar</em> - Tomcat Catalina Ant tasks.</li>
     <li><em>catalina-ha.jar</em> - High availability package.</li>
     <li><em>catalina-tribes.jar</em> - Group communication package.</li>
@@ -123,7 +123,7 @@ loaders as it is initialized:</p>
         of messages is needed.</li>
     </ul></li>
 <li><strong>WebappX</strong> - A class loader is created for each web
-    application that is deployed in a single Tomcat 6 instance.  All unpacked
+    application that is deployed in a single Tomcat instance.  All unpacked
     classes and resources in the <code>/WEB-INF/classes</code> directory of
     your web application archive, plus classes and resources in JAR files
     under the <code>/WEB-INF/lib</code> directory of your web application
@@ -143,7 +143,7 @@ the XML parser components in J2SE 1.4+), the J2SE 1.4 endorsed feature can be
 used.
 Last, any JAR containing servlet API classes will be ignored by the 
 classloader.
-All other class loaders in Tomcat 6 follow the usual delegation pattern.</p>
+All other class loaders in Tomcat follow the usual delegation pattern.</p>
 
 <p>Therefore, from the perspective of a web application, class or resource
 loading looks in the following repositories, in this order:</p>

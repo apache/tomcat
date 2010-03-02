@@ -33,7 +33,7 @@
 
 <section name="Installation">
 
-<p>In order to use Tomcat 6 for developing web applications, you must first
+<p>In order to use Tomcat for developing web applications, you must first
 install it (and the software it depends on).  The required steps are outlined
 in the following subsections.</p>
 
@@ -53,12 +53,12 @@ are available at
 <p>Binary downloads of the <strong>Tomcat</strong> server are available from
 <a href="http://tomcat.apache.org/download-60.cgi">http://tomcat.apache.org/download-60.cgi</a>.
 This manual assumes you are using the most recent release
-of Tomcat 6.  Detailed instructions for downloading and installing
-Tomcat 6 are available <a href="../setup.html">here</a>.</p>
+of Tomcat 7.  Detailed instructions for downloading and installing
+Tomcat are available <a href="../setup.html">here</a>.</p>
 
 <p>In the remainder of this manual, example shell scripts assume that you have
 set an environment variable <code>CATALINA_HOME</code> that contains the
-pathname to the directory in which Tomcat 6 has been installed. Optionally, if
+pathname to the directory in which Tomcat has been installed. Optionally, if
 Tomcat has been configured for multiple instances, each instance will have its
 own <code>CATALINA_BASE</code> configured.</p>
 
