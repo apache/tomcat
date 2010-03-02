@@ -118,19 +118,19 @@ API Specification, version 2.3, which you should consult for more details.</p>
 
 <section name="Shared Library Files">
 
-<p>Like most servlet containers, Tomcat 6 also supports mechanisms to install
+<p>Like most servlet containers, Tomcat also supports mechanisms to install
 library JAR files (or unpacked classes) once, and make them visible to all
 installed web applications (without having to be included inside the web
 application itself.  The details of how Tomcat locates and shares such
 classes are described in the
 <a href="../class-loader-howto.html">Class Loader HOW-TO</a> documentation.
-The location commonly used within a Tomcat 6 installation for shared code is
+The location commonly used within a Tomcat installation for shared code is
 <strong>$CATALINA_HOME/lib</strong>. JAR files placed here are visible both to
 web applications and internal Tomcat code. This is a good place to put JDBC
 drivers that are required for both your application or internal Tomcat use
 (such as for a JDBCRealm).</p>
 
-<p>Out of the box, a standard Tomcat 6 installation includes a variety
+<p>Out of the box, a standard Tomcat installation includes a variety
 of pre-installed shared library files, including:</p>
 <ul>
 <li>The <em>Servlet 3.0</em> and <em>JSP 2.1</em> APIs that are fundamental
@@ -162,7 +162,7 @@ included element.</p>
 
 <p><strong>NOTE</strong> - The Servlet Specification includes a Document
 Type Descriptor (DTD) for the web application deployment descriptor, and
-Tomcat 6 enforces the rules defined here when processing your application's
+Tomcat enforces the rules defined here when processing your application's
 <code>/WEB-INF/web.xml</code> file.  In particular, you <strong>must</strong>
 enter your descriptor elements (such as <code>&lt;filter&gt;</code>,
 <code>&lt;servlet&gt;</code>, and <code>&lt;servlet-mapping&gt;</code> in
@@ -183,19 +183,19 @@ information on the Context element.</p>
 </section>
 
 
-<section name="Deployment With Tomcat 6">
+<section name="Deployment With Tomcat">
 
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
-    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat 6.</p>
+    the directory into which you have installed Tomcat.</p>
     </em></blockquote>
 
 <p>In order to be executed, a web application must be deployed on
 a servlet container.  This is true even during development.
-We will describe using Tomcat 6 to provide the execution environment.
+We will describe using Tomcat to provide the execution environment.
 A web application can be deployed in Tomcat by one of the following
 approaches:</p>
 <ul>
@@ -219,18 +219,18 @@ approaches:</p>
     directory that Tomcat created, and then restart Tomcat, in order to reflect
     your changes.
     <br/><br/></li>
-<li><em>Use the Tomcat 6 "Manager" web application to deploy and undeploy
-    web applications</em>.  Tomcat 6 includes a web application, deployed
+<li><em>Use the Tomcat "Manager" web application to deploy and undeploy
+    web applications</em>.  Tomcat includes a web application, deployed
     by default on context path <code>/manager</code>, that allows you to
     deploy and undeploy applications on a running Tomcat server without
     restarting it.  See the administrator documentation (TODO: hyperlink)
     for more information on using the Manager web application.<br/><br/></li>
-<li><em>Use "Manager" Ant Tasks In Your Build Script</em>.  Tomcat 6
+<li><em>Use "Manager" Ant Tasks In Your Build Script</em>.  Tomcat
     includes a set of custom task definitions for the <code>Ant</code>
     build tool that allow you to automate the execution of commands to the
     "Manager" web application.  These tasks are used in the Tomcat deployer.
     <br/><br/></li>
-<li><em>Use the Tomcat Deployer</em>.  Tomcat 6 includes a packaged tool
+<li><em>Use the Tomcat Deployer</em>.  Tomcat includes a packaged tool
     bundling the Ant tasks, and can be used to automatically precompile JSPs
     which are part of the web application before deployment to the server.
     <br/><br/></li>
