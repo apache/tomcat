@@ -106,9 +106,7 @@
         </xsl:if>
         </td>
         <td>
-          <font face="arial,helvetica,sanserif">
-            <h1><xsl:value-of select="$project/title"/></h1>
-          </font>
+          <h1><font face="arial,helvetica,sanserif"><xsl:value-of select="$project/title"/></font></h1>
         </td>
         <td>
           <xsl:comment>APACHE LOGO</xsl:comment>
@@ -134,7 +132,7 @@
       <tr>
 
         <xsl:comment>LEFT SIDE NAVIGATION</xsl:comment>
-        <td width="20%" valign="top" nowrap="true" class="noPrint">
+        <td width="20%" valign="top" nowrap="nowrap" class="noPrint">
           <xsl:apply-templates select="project/body/menu"/>
         </td>
 
@@ -238,6 +236,23 @@
   </xsl:template>
 
 
+  <!-- Generate table of contents -->
+  <xsl:template match="toc">
+    <ul><xsl:apply-templates mode="toc" select="following::section"/></ul>
+  </xsl:template>
+
+  <xsl:template mode="toc" match="section|subsection">
+    <xsl:variable name="name">
+      <xsl:value-of select="@name"/>
+    </xsl:variable>
+    <li><a href="#{$name}"><xsl:value-of select="@name"/></a>
+    <xsl:if test="subsection">
+      <ol><xsl:apply-templates mode="toc" select="subsection"/></ol>
+    </xsl:if>
+    </li>
+  </xsl:template>
+
+
   <!-- Process a source code example -->
   <xsl:template match="source">
     <xsl:variable name="void">
@@ -247,35 +262,35 @@
       <table cellspacing="4" cellpadding="0" border="0">
         <tr>
           <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
           <td bgcolor="{$source-color}" height="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
           <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
         </tr>
         <tr>
           <td bgcolor="{$source-color}" width="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
           <td bgcolor="#ffffff" height="1"><pre>
             <xsl:value-of select="."/>
           </pre></td>
           <td bgcolor="{$source-color}" width="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
         </tr>
         <tr>
           <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
           <td bgcolor="{$source-color}" height="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
           <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
+            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
         </tr>
       </table>
