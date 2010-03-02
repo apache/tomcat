@@ -29,6 +29,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
 <section name="Introduction">
 
 <p>In many production environments it is very useful to have the capability
@@ -36,7 +40,7 @@ to manage your web applications without having to shut down and restart
 Tomcat.  This document is for the HTML web interface to the web application
 <a href="manager-howto.html">manager</a>.</p>
 
-<p>The interface is divided into six sections:
+<p>The interface is divided into six sections:</p>
 <ul>
   <li><strong>Message</strong> - Displays success and failure messages.</li>
   <li><strong>Manager</strong> - General manager operations like list and
@@ -48,7 +52,6 @@ Tomcat.  This document is for the HTML web interface to the web application
   <li><strong>Server Information</strong> - Information about the Tomcat
       server.</li>
 </ul>
-</p>
 
 </section>
 
@@ -68,7 +71,7 @@ application documentation.
 
 <section name="Manager">
 
-<p>The Manager section has three links:
+<p>The Manager section has three links:</p>
 <ul>
   <li><strong>List Applications</strong> - Redisplay a list of web
       applications.</li>
@@ -76,7 +79,6 @@ application documentation.
   <li><strong>Manager Help</strong> - A link to the comprehensive Manager
       App HOW TO.</li>
 </ul>
-</p>
 
 </section>
 
@@ -84,7 +86,7 @@ application documentation.
 
 <p>The Applications section lists information about all the installed web
 applications and provides links for managing them. For each web application
-the following is displayed:
+the following is displayed:</p>
 <ul>
   <li><strong>Path</strong> - The web application context path.</li>
   <li><strong>Display Name</strong> - The display name for the web application
@@ -113,7 +115,6 @@ the following is displayed:
       </ul>
   </li>
 </ul>
-</p>
 
 <subsection name="Start">
 
@@ -129,7 +130,7 @@ OK - Started application at context path /examples
 </source>
 
 <p>Otherwise, the Message will start with <code>FAIL</code> and include an
-error message.  Possible causes for problems include:
+error message.  Possible causes for problems include:</p>
 <ul>
 <li><em>Encountered exception</em>
     <blockquote>             
@@ -152,7 +153,6 @@ error message.  Possible causes for problems include:
     The <code>path</code> parameter is required.
     </blockquote></li>       
 </ul>
-</p>
 
 </subsection>
 
@@ -162,14 +162,14 @@ error message.  Possible causes for problems include:
 deployed.  Any request that comes in while an application is
 stopped will see an HTTP error 404, and this application will show as
 "stopped" on a list applications command.</p>
-                             
+
 <p>If this command succeeds, you will see a Message like this:</p>
 <source>
 OK - Stopped application at context path /examples
 </source>
-                             
+
 <p>Otherwise, the Message will start with <code>FAIL</code> and include an
-error message.  Possible causes for problems include:
+error message.  Possible causes for problems include:</p>
 <ul>                         
 <li><em>Encountered exception</em>
     <blockquote>             
@@ -192,7 +192,6 @@ error message.  Possible causes for problems include:
     The <code>path</code> parameter is required.
     </blockquote></li>       
 </ul>
-</p>
 
 </subsection>
 
@@ -217,7 +216,7 @@ OK - Reloaded application at context path /examples
 </source>
 
 <p>Otherwise, the Message will start with <code>FAIL</code> and include an
-error message.  Possible causes for problems include:
+error message.  Possible causes for problems include:</p>
 <ul>
 <li><em>Encountered exception</em>
     <blockquote>             
@@ -250,7 +249,6 @@ error message.  Possible causes for problems include:
     the application again to pick up your changes.
     </blockquote></li>       
 </ul>
-</p>
 
 </subsection>
 
@@ -268,14 +266,14 @@ remove it from Tomcat (which also makes this context path available for
 reuse later).  This command is the logical opposite of the
 <code>/deploy</code> Ant command, and the related deploy features available 
 in the HTML manager.</p>
-                             
+
 <p>If this command succeeds, you will see a Message like this:</p>
 <source>
 OK - Undeployed application at context path /examples
 </source>
-                             
+
 <p>Otherwise, the Message will start with <code>FAIL</code> and include an
-error message.  Possible causes for problems include:
+error message.  Possible causes for problems include:</p>
 <ul>                         
 <li><em>Encountered exception</em>
     <blockquote>             
@@ -298,7 +296,6 @@ error message.  Possible causes for problems include:
     The <code>path</code> parameter is required.
     </blockquote></li>       
 </ul>
-</p>
 
 </subsection>
 
@@ -335,22 +332,22 @@ refer to the entire WAR file.</p>
 
 <p>In this example the web application located in the directory
 <code>C:\path\to\foo</code> on the Tomcat server (running on Windows)
-is deployed as the web application context named <code>/footoo</code>.
+is deployed as the web application context named <code>/footoo</code>.</p>
 <source>
 Context Path: /footoo
 WAR or Directory URL: file:C:/path/to/foo
 </source>
-</p>
+
 
 <p>In this example the ".war" file <code>/path/to/bar.war</code> on the
 Tomcat server (running on Unix) is deployed as the web application
 context named <code>/bar</code>. Notice that there is no <code>path</code>
 parameter so the context path defaults to the name of the web application
-archive file without the ".war" extension.
+archive file without the ".war" extension.</p>
 <source>
 WAR or Directory URL: jar:file:/path/to/bar.war!/
 </source>
-</p>
+
 
 <h3>Deploy a Directory or War from the Host appBase</h3>
 
@@ -362,20 +359,20 @@ or the war file name without the ".war" extension is used as the path.</p>
 <code>foo</code> in the Host appBase directory of the Tomcat server is
 deployed as the web application context named <code>/foo</code>. Notice
 that there is no <code>path</code> parameter so the context path defaults
-to the name of the web application directory.
+to the name of the web application directory.</p>
 <source>
 WAR or Directory URL: foo
 </source>
-</p>
+
 
 <p>In this example the ".war" file <code>bar.war</code> located in your
 Host appBase directory on the Tomcat server is deployed as the web
-application context named <code>/bartoo</code>.
+application context named <code>/bartoo</code>.</p>
 <source>
 Context Path: /bartoo
 WAR or Directory URL: bar.war
 </source>
-</p>
+
 
 <h3>Deploy using a Context configuration ".xml" file</h3>
 
@@ -388,7 +385,7 @@ configuration file.</p>
 <p>A Context configuration ".xml" file can contain valid XML for a
 web application Context just as if it were configured in your
 Tomcat <code>server.xml</code> configuration file. Here is an
-example for Tomcat running on Windows:
+example for Tomcat running on Windows:</p>
 <source>
 &lt;Context path="/foobar" docBase="C:\path\to\application\foobar"
          debug="0"&gt;
@@ -399,27 +396,27 @@ example for Tomcat running on Windows:
 
 &lt;/Context&gt;
 </source>
-</p>
+
 
 <p>Use of the <i>WAR or Directory URL</i> is optional. When used
 to select a web application ".war" file or directory it overrides any
 docBase configured in the context configuration ".xml" file.</p>
 
 <p>Here is an example of installing an application using a Context
-configuration ".xml" file for Tomcat running on Windows.
+configuration ".xml" file for Tomcat running on Windows.</p>
 <source>
 XML Configuration file URL: file:C:/path/to/context.xml
 </source>
-</p>
+
 
 <p>Here is an example of installing an application using a Context
 configuration ".xml" file and a web application ".war" file located
-on the server (Tomcat running on Unix).
+on the server (Tomcat running on Unix).</p>
 <source>
 XML Configuration file URL: file:/path/to/context.xml
 WAR or Directory URL: jar:file:/path/to/bar.war!/
 </source>
-</p>
+
 
 </subsection>
 
