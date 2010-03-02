@@ -37,7 +37,7 @@
   <p>The <strong>AJP Connector</strong> element represents a
   <strong>Connector</strong> component that communicates with a web
   connector via the <code>AJP</code> protocol.  This is used for cases
-  where you wish to invisibly integrate Tomcat 6 into an existing (or new)
+  where you wish to invisibly integrate Tomcat into an existing (or new)
   Apache installation, and you want Apache to handle the static content
   contained in the web application, and/or utilize Apache's SSL
   processing.</p>

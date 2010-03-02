@@ -51,7 +51,7 @@ manual is described in more detail below.</p>
 <section name="Apache Tomcat User Guide">
 
 <p>The following documents will assist you in downloading, installing
-Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
+Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
 
 <ol>
 <li><a href="introduction.html"><strong>Introduction</strong></a> - A
@@ -87,7 +87,7 @@ Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
     - Configuring a JNDI DataSoure with a DB connection pool.
     Examples for many popular databases.</li>
 <li><a href="class-loader-howto.html"><strong>Classloading</strong></a>
-    - Information about class loading in Apache Tomcat 6, including where to place
+    - Information about class loading in Apache Tomcat, including where to place
     your application classes so that they are visible.</li>
 <li><a href="jasper-howto.html"><strong>JSPs</strong></a>
     - Information about Jasper configuration, as well as the JSP compiler
@@ -101,7 +101,7 @@ Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
 <li><a href="cgi-howto.html"><strong>CGI</strong></a> -
     Using CGIs with Apache Tomcat.</li>
 <li><a href="proxy-howto.html"><strong>Proxy Support</strong></a> -
-    Configuring Apache Tomcat 6 to run behind a proxy server (or a web server
+    Configuring Apache Tomcat to run behind a proxy server (or a web server
     functioning as a proxy server).</li>
 <li><a href="mbeans-descriptor-howto.html"><strong>MBean Descriptor</strong></a> -
     Configuring MBean descriptors files for custom components.</li>
@@ -135,7 +135,7 @@ Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
 <section name="Reference">
 
 <p>The following documents are aimed at <em>System Administrators</em> who
-are responsible for installing, configuring, and operating a Apache Tomcat 6 server.
+are responsible for installing, configuring, and operating an Apache Tomcat server.
 </p>
 <ul>
 <li><a href="RELEASE-NOTES.txt"><strong>Release notes</strong></a>
@@ -143,7 +143,7 @@ are responsible for installing, configuring, and operating a Apache Tomcat 6 ser
     </li>
 <li><a href="config/index.html"><strong>Apache Tomcat Server Configuration Reference</strong></a>
     - Reference manual that documents all available elements and attributes
-      that may be placed into a Apache Tomcat 6 <code>conf/server.xml</code> file.
+      that may be placed into the Apache Tomcat <code>conf/server.xml</code> file.
     </li>
 <li><a href="http://tomcat.apache.org/connectors-doc/index.html"><strong>JK Documentation</strong></a>
     - Complete documentation and HOWTOs on the JK native webserver connector,
@@ -165,7 +165,7 @@ are responsible for installing, configuring, and operating a Apache Tomcat 6 ser
 the development of the <em>Apache Tomcat</em> project.</p>
 <ul>
 <li><a href="building.html"><strong>Building from Source</strong></a> -
-    Details the steps necessary to download Apache Tomcat 6 source code (and the
+    Details the steps necessary to download Apache Tomcat source code (and the
     other packages that it depends on), and build a binary distribution from
     those sources.
     </li>
@@ -180,7 +180,7 @@ the development of the <em>Apache Tomcat</em> project.</p>
     </li>
 <li><a href="funcspecs/index.html"><strong>Functional Specifications</strong></a>
     - Requirements specifications for features of the <em>Catalina</em> servlet
-    container portion of Apache Tomcat 6.</li>
+    container portion of Apache Tomcat.</li>
 <li><a href="api/index.html"><strong>Javadocs</strong></a>
     - Javadoc API documentation for Apache Tomcat's internals.</li>
 <li><a href="architecture/index.html"><strong>Apache Tomcat Architecture</strong></a>

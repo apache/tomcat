@@ -33,7 +33,7 @@
 
 <section name="Introduction">
 
-<p>Tomcat 6 provides a JNDI <strong>InitialContext</strong> implementation
+<p>Tomcat provides a JNDI <strong>InitialContext</strong> implementation
 instance for each web application running under it, in a manner that is 
 compatible with those provided by a 
 <a href="http://java.sun.com/j2ee">Java2 Enterprise Edition</a> application 
@@ -64,7 +64,7 @@ resources:</p>
 <li><code><strong>&lt;resource-ref&gt;</strong></code> - Resource reference,
     which is typically to an object factory for resources such as a JDBC
     <code>DataSource</code>, a JavaMail <code>Session</code>, or custom
-    object factories configured into Tomcat 6.</li>
+    object factories configured into Tomcat.</li>
 <li><code><strong>&lt;resource-env-ref&gt;</strong></code> - Resource
     environment reference, a new variation of <code>resource-ref</code>
     added in Servlet 2.4 that is simpler to configure for resources
@@ -140,7 +140,7 @@ attribute to "true").</p>
 
 <section name="Global configuration">
 
-<p>Tomcat 6 maintains a separate namespace of global resources for the 
+<p>Tomcat maintains a separate namespace of global resources for the 
 entire server.  These are configured in the 
 <a href="config/globalresources.html">
 <code><strong>&lt;GlobalNameingResources&gt;</strong></code></a> element of 
@@ -185,7 +185,7 @@ conn.close();
 
 <section name="Tomcat Standard Resource Factories">
 
-  <p>Tomcat 6 includes a series of standard resource factories that can
+  <p>Tomcat includes a series of standard resource factories that can
   provide services to your web applications, but give you configuration
   flexibility (via the
   <a href="config/context.html"><code>&lt;Context&gt;</code></a> element)
@@ -196,7 +196,7 @@ conn.close();
   <p>See <a href="#Adding Custom Resource Factories">Adding Custom
   Resource Factories</a> for information about how to create, install,
   configure, and use your own custom resource factory classes with
-  Tomcat 6.</p>
+  Tomcat.</p>
 
   <p><em>NOTE</em> - Of the standard resource factories, only the
   "JDBC Data Source" and "User Transaction" factories are mandated to
@@ -400,7 +400,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     configuration details that the client application must be aware of
     (including the name of the SMTP host to be used for message sending).</p>
 
-    <p>Tomcat 6 includes a standard resource factory that will create
+    <p>Tomcat includes a standard resource factory that will create
     <code>javax.mail.Session</code> session instances for you, already
     configured to connect to an SMTP server.
     In this way, the application is totally insulated from changes in the
@@ -532,7 +532,7 @@ Transport.send(message);
     to support the functionality required by that application.  The J2EE
     Platform Specification requires J2EE Application Servers to make
     available a <em>DataSource</em> implementation (that is, a connection
-    pool for JDBC connections) for this purpose.  Tomcat 6 offers exactly
+    pool for JDBC connections) for this purpose.  Tomcat offers exactly
     the same support, so that database-based applications you develop on
     Tomcat using this service will run unchanged on any J2EE server.</p>
 
@@ -689,7 +689,7 @@ conn.close();
 <section name="Adding Custom Resource Factories">
 
   <p>If none of the standard resource factories meet your needs, you can write
-  your own factory and integrate it into Tomcat 6, and then configure the use
+  your own factory and integrate it into Tomcat, and then configure the use
   of this factory in the
   <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
   the web application. In the example below, we will create a factory that only

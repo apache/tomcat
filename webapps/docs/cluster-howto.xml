@@ -136,7 +136,7 @@ should be completed:</p>
 <ol>
   <li>Using session persistence, and saving the session to a shared file system (PersistenceManager + FileStore)</li>
   <li>Using session persistence, and saving the session to a shared database (PersistenceManager + JDBCStore)</li>
-  <li>Using in-memory-replication, using the SimpleTcpCluster that ships with Tomcat 6 (lib/catalina-tribes.jar + lib/catalina-ha.jar)</li>
+  <li>Using in-memory-replication, using the SimpleTcpCluster that ships with Tomcat (lib/catalina-tribes.jar + lib/catalina-ha.jar)</li>
 </ol>
 
 <p>In this release of session replication, Tomcat can perform an all-to-all replication of session state using the <code>DeltaManager</code> or 
@@ -309,7 +309,7 @@ should be completed:</p>
     <p>
         This is a template for the manager configuration that will be used if no manager is defined in the &lt;Context&gt;
         element. In Tomcat 5.x each webapp marked distributable had to use the same manager, this is no longer the case
-        since Tomcat 6 you can define a manager class for each webapp, so that you can mix managers in your cluster.
+        since Tomcat you can define a manager class for each webapp, so that you can mix managers in your cluster.
         Obviously the managers on one node's application has to correspond with the same manager on the same application on the other node.
         If no manager has been specified for the webapp, and the webapp is marked &lt;distributable/&gt; Tomcat will take this manager configuration 
         and create a manager instance cloning this configuration.
