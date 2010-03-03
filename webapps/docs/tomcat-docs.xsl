@@ -471,7 +471,7 @@
   <!-- Link to a SVN revision report -->
   <xsl:template match="rev">
       <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+      <a href="{$link}">r<xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Process everything else by just passing it through -->
