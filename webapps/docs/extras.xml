@@ -29,6 +29,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
   <section name="Introduction">
   <p>
     A number of additional third party components may be used with Apache

@@ -29,6 +29,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
 <section name="Introduction">
 
 <p>The CGI (Common Gateway Interface) defines a way for a web server to
