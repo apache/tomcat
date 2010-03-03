@@ -14,4 +14,5 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@ tag %><%@ attribute name="echo" deferredValue="true" %><p>${echo}</p>
+<%@ tag %><%@ attribute name="echo" deferredValue="true" %><%@
+tag body-content="empty" %><p>${echo}</p>
