@@ -39,6 +39,7 @@ import org.apache.el.TestValueExpressionImpl;
 import org.apache.el.lang.TestELSupport;
 import org.apache.jasper.compiler.TestAttributeParser;
 import org.apache.jasper.compiler.TestGenerator;
+import org.apache.jasper.compiler.TestJspDocumentParser;
 import org.apache.jasper.compiler.TestParser;
 import org.apache.jasper.compiler.TestScriptingVariabler;
 import org.apache.jasper.compiler.TestValidator;
@@ -89,6 +90,7 @@ public class TestAll {
         
         // o.a.jasper
         suite.addTestSuite(TestAttributeParser.class);
+        suite.addTestSuite(TestJspDocumentParser.class);
         suite.addTestSuite(TestGenerator.class);
         suite.addTestSuite(TestParser.class);
         suite.addTestSuite(TestScriptingVariabler.class);
