@@ -29,6 +29,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
 <section name="Introduction">
 
 <p>SSI (Server Side Includes) are directives that are placed in HTML pages,

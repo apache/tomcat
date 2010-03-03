@@ -30,6 +30,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
   <section name="Introduction">
 
   <p>Monitoring is a key aspect of system administration. Looking inside a

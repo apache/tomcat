@@ -28,6 +28,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
   <section name="Introduction">
     <p>Tomcat is configured to be reasonable secure for must use cases by
     default. Some environments may require more, or less, secure configurations.
@@ -99,7 +103,7 @@
     
     <subsection name="Listeners">
       <p>The APR Lifecycle Listener is not stable if compiled on Solaris using
-      gcc. It using the APR/native connector on Solaris, comppile it with the
+      gcc. It using the APR/native connector on Solaris, compile it with the
       Sun Studio compiler.</p>
     </subsection>
     
@@ -150,7 +154,7 @@
       necessary for Tomcat to be able to distinguish between secure and
       non-secure connections received by a proxy, the proxy must use separate
       connectors to pass secure and non-secure requests to Tomcat. If the
-      proxy uses AJP then the SSL attributes of the client conenction are
+      proxy uses AJP then the SSL attributes of the client connection are
       passed via the AJP protocol and separate connectors are not needed.</p>
       
       <p>The <strong>tomcatAuthentication</strong> attribute is used with the
@@ -220,11 +224,11 @@
       configured within each web application. Alternatively, the version number
       can be changed by creating the following file in
       CATALINA_HOME/lib/org/apache/catalina/util/ServerInfo.properties with the
-      content as follows:
+      content as follows:</p>
       <source>
 server.info=Apache Tomcat/7.0.x
       </source>
-      Modify the values as required. Note that this will also change the version
+      <p>Modify the values as required. Note that this will also change the version
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
       script will still report the version number.</p>
@@ -239,7 +243,7 @@ server.info=Apache Tomcat/7.0.x
       tomcat-users.xml require a restart of Tomcat to take effect.</p>
       
       <p>The JDBCRealm is not recommended for production use as it single
-      threaded for all authentication and authorisation options. Use the
+      threaded for all authentication and authorization options. Use the
       DataSourceRealm instead.</p>
       
       <p>The UserDatabaseRealm is not intended for large-scale installations. It

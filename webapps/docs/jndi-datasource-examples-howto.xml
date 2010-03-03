@@ -33,14 +33,7 @@
 <body>
 
 <section name="Table of Contents">
-<p>
-<a href="#Introduction">Introduction</a><br />
-<a href="#Database Connection Pool (DBCP) Configurations">
-Database Connection Pool (DBCP) Configurations</a><br />
-<a href="#Non DBCP Solutions">Non DBCP Solutions</a><br />
-<a href="#Oracle 8i with OCI client">Oracle 8i with OCI client</a><br />
-<a href="#Common Problems">Common Problems</a><br />
-</p>
+<toc/>
 </section>
 
 <section name="Introduction">
