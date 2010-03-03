@@ -29,6 +29,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
   <section name="Introduction">
     <p>
       This document introduces several ways to set up Tomcat for running

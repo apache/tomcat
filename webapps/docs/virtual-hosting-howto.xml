@@ -28,6 +28,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
   <section name="Assumptions">
     <p>
       For the sake of this how-to, assume you have a development host with two

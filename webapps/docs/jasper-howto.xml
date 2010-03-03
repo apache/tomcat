@@ -31,13 +31,7 @@
 <body>
 
 <section name="Table of Contents">
-<p>
-<a href="#Introduction">Introduction</a><br />
-<a href="#Configuration">Configuration</a><br />
-<a href="#Production Configuration">Production Configuration</a><br />
-<a href="#Web Application Compilation">Web Application Compilation</a><br />
-<a href="#Using Jikes">Using Jikes</a><br />
-</p>
+<toc/>
 </section>
 
 <section name="Introduction">
