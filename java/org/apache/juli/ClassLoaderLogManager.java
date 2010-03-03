@@ -93,9 +93,9 @@ public class ClassLoaderLogManager extends LogManager {
      * Determines if the shutdown hook is used to perform any necessary
      * clean-up such as flushing buffered handlers on JVM shutdown. Defaults to
      * <code>true</code> but may be set to false if another component ensures
-     * that 
+     * that {@link #shutdown()} is called.
      */
-    protected boolean useShutdownHook = true;
+    protected volatile boolean useShutdownHook = true;
 
     
     // ------------------------------------------------------------- Properties
