@@ -30,41 +30,7 @@
 <body>
 
 <section name="Table of Contents">
-
-<p>
-<a href="#Introduction">Introduction</a><br />
-<a href="#Configuring Manager Application Access">
-Configuring Manager Application Access</a><br />
-<a href="#Supported Manager Commands">Supported Manager Commands</a><br />
-<blockquote>
-<a href="#Deploy A New Application Remotely">Deploy A New Application Remotely</a><br />
-<a href="#Deploy A New Application from a Local Path">Deploy A New Application from a Local Path</a><br />
-<a href="#List Currently Deployed Applications">
-List Currently Deployed Applications</a><br />
-<a href="#Reload An Existing Application">Reload An Existing Application</a><br />
-<a href="#List OS and JVM Properties">List OS and JVM Properties</a><br />
-<a href="#List Available Global JNDI Resources">
-List Available Global JNDI Resources</a><br />
-<a href="#List Available Security Roles">List Available Security Roles</a><br />
-<a href="#Session Statistics">Session Statistics</a><br />
-<a href="#Start an Existing Application">Start an Existing Application</a><br />
-<a href="#Stop an Existing Application">Stop an Existing Application</a><br />
-<a href="#Undeploy an Existing Application">
-Undeploy an Existing Application</a><br />
-<a href="#Server Status">Server Status</a><br />
-<a href="#Finding memory leaks">Finding memory leaks</a><br />
-</blockquote>
-<a href="#Executing Manager Commands With Ant">
-Executing Manager Commands With Ant</a><br />
-<a href="#Using the JMX Proxy Servlet">
-Using the JMX Proxy Servlet</a><br />
-<blockquote>
-<a href="#What is JMX Proxy Servlet">What is JMX Proxy Servlet?</a><br />
-<a href="#JMX Query command">Query command</a><br />
-<a href="#JMX Set command">Set command</a><br />
-</blockquote>
-</p>
-
+<toc/>
 </section>
 
 <section name="Introduction">
@@ -104,18 +70,17 @@ the following functions:</p>
 Manager web application <code>Context</code> to a new host install the
 <code>manager.xml</code> context configuration file in the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
-example:
+example:</p>
 <pre>
 &lt;Context path="/manager" debug="0" privileged="true"
          docBase="/usr/local/kinetic/tomcat6/server/webapps/manager"&gt;
 &lt;/Context&gt;
 </pre>
-</p>
 
 <p>If you have Tomcat configured to support multiple virtual hosts
 (websites) you would need to configure a Manager for each.</p>
 
-<p>There are three ways to use the <code>Manager</code> web application.
+<p>There are three ways to use the <code>Manager</code> web application.</p>
 <ul>
 <li>As an application with a user interface you use in your browser.
 Here is an example URL where you can replace <code>localhost</code> with
@@ -130,19 +95,18 @@ Supported Manager Commands</a> for more information.</li>
 <a href="#Executing Manager Commands With Ant">Executing Manager Commands
 With Ant</a> for more information.</li>
 </ul>
-</p>
 
 </section>
 
 <section name="Configuring Manager Application Access">
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <blockquote>
+    <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
+    </blockquote>
 
 <p>It would be quite unsafe to ship Tomcat with default settings that allowed
 anyone on the Internet to execute the Manager application on your server.
@@ -150,7 +114,7 @@ Therefore, the Manager application is shipped with the requirement that anyone
 who attempts to use it must authenticate themselves, using a username and
 password that have the role <strong>manager-script</strong> associated with
 them. Further, there is no username in the default users file
-(<conf>$CATALINA_BASE/conf/tomcat-users.xml</conf>) that is assigned this
+(<code>$CATALINA_BASE/conf/tomcat-users.xml</code>) that is assigned this
 role.  Therefore, access to the Manager application is completely disabled
 by default.</p>
 
@@ -197,7 +161,7 @@ the role <strong>manager</strong>.</p>
 <p>In addition to the password restrictions the manager web application
 could be restricted by the remote IP address or host by adding a
 <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.  Here is
-an example of restricting access to the localhost by IP address:
+an example of restricting access to the localhost by IP address:</p>
 <pre>
 &lt;Context path="/manager" privileged="true"
          docBase="/usr/local/kinetic/tomcat6/server/webapps/manager"&gt;
@@ -205,7 +169,6 @@ an example of restricting access to the localhost by IP address:
                 allow="127\.0\.0\.1"/&gt;
 &lt;/Context&gt;
 </pre>
-</p>
 </section>
 
 
@@ -287,7 +250,7 @@ removed) by use of the <code>/undeploy</code> command.</p>
 including a Context configuration XML file in 
 <code>/META-INF/context.xml</code>.</p>
 
-<p>URL parameters include:
+<p>URL parameters include:</p>
 <ul>
 <li><code>update</code>: When set to true, any existing update will be
     undeployed first. The default value is set to false.</li>
@@ -295,7 +258,6 @@ including a Context configuration XML file in
     deployed webapp with a version number. The application version can
     be later redeployed when needed using only the tag.</li>
 </ul>
-</p>
 
 <p><strong>NOTE</strong> - This command is the logical
 opposite of the <code>/undeploy</code> command.</p>
@@ -344,11 +306,11 @@ This command is the logical opposite of the <code>/undeploy</code> command.</p>
 <p>This can be used to deploy a previous version of a web application, which
 has been deployed using the <code>tag</code> attribute. Note that the work
 directory for the manager webapp will contain the previously deployed WARs;
-removing it would make the deployment fail.
+removing it would make the deployment fail.</p>
 <source>
 http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag
 </source>
-</p>
+
 
 <h3>Deploy a Directory or WAR by URL</h3>
 
@@ -363,21 +325,21 @@ the entire WAR file.</p>
 
 <p>In this example the web application located in the directory
 <code>/path/to/foo</code> on the Tomcat server is deployed as the
-web application context named <code>/footoo</code>.
+web application context named <code>/footoo</code>.</p>
 <source>
 http://localhost:8080/manager/text/deploy?path=/footoo&amp;war=file:/path/to/foo
 </source>
-</p>
+
 
 <p>In this example the ".war" file <code>/path/to/bar.war</code> on the
 Tomcat server is deployed as the web application context named
 <code>/bar</code>. Notice that there is no <code>path</code> parameter
 so the context path defaults to the name of the web application archive
-file without the ".war" extension.
+file without the ".war" extension.</p>
 <source>
 http://localhost:8080/manager/text/deploy?war=jar:file:/path/to/bar.war!/
 </source>
-</p>
+
 
 <h3>Deploy a Directory or War from the Host appBase</h3>
 
@@ -388,19 +350,19 @@ extension is used as the path.</p>
 <p>In this example the web application located in a sub directory named
 <code>foo</code> in the Host appBase directory of the Tomcat server is
 deployed as the web application context named <code>/foo</code>. Notice
-that the context path used is the name of the web application directory.
+that the context path used is the name of the web application directory.</p>
 <source>
 http://localhost:8080/manager/text/deploy?war=foo
 </source>
-</p>
+
 
 <p>In this example the ".war" file <code>bar.war</code> located in your
 Host appBase directory on the Tomcat server is deployed as the web
-application context named <code>/bar</code>.
+application context named <code>/bar</code>.</p>
 <source>
 http://localhost:8080/manager/text/deploy?war=bar.war
 </source>
-</p>
+
 
 <h3>Deploy using a Context configuration ".xml" file</h3>
 
@@ -413,7 +375,7 @@ configuration file.</p>
 <p>A Context configuration ".xml" file can contain valid XML for a
 web application Context just as if it were configured in your
 Tomcat <code>server.xml</code> configuration file. Here is an
-example:
+example:</p>
 <source>
 &lt;Context path="/foobar" docBase="/path/to/application/foobar"
          debug="0"&gt;
@@ -424,26 +386,26 @@ example:
 
 &lt;/Context&gt;
 </source>
-</p>
+
 
 <p>When the optional <code>war</code> parameter is set to the URL
 for a web application ".war" file or directory it overrides any
 docBase configured in the context configuration ".xml" file.</p>
 
 <p>Here is an example of deploying an application using a Context
-configuration ".xml" file.
+configuration ".xml" file.</p>
 <source>
 http://localhost:8080/manager/text/deploy?config=file:/path/context.xml
 </source>
-</p>
+
 
 <p>Here is an example of deploying an application using a Context
 configuration ".xml" file and a web application ".war" file located
-on the server.
+on the server.</p>
 <source>
 http://localhost:8080/manager/text/deploy?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/
 </source>
-</p>
+
 
 <h3>Deployment Notes</h3>
 
@@ -1257,7 +1219,7 @@ can be used:
 calling a Catalina task more than once,
 badly set Ant tasks depends chains may cause that a task be called
 more than once in the same Ant run, even if not intended to. A bit of caution should be exercised when you are
-capturing output from that task, because this could lead to something unexpected:
+capturing output from that task, because this could lead to something unexpected:</p>
 <ul>
 <li>when capturing in a property you will find in it only the output from the <em>first</em> call, because
 Ant properties are immutable and once set they cannot be changed,
@@ -1267,7 +1229,6 @@ output, unless you are using the <code>append="true"</code> attribute, in which 
 see the output of each task call appended to the file.
 </li>
 </ul>
-</p>
 
 </subsection>
 
