@@ -1617,7 +1617,7 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  getRoles(" + dn + ")");
 
         // Start with roles retrieved from the user entry
-        ArrayList<String> list = user.roles;
+        List<String> list = user.roles;
         if (list == null) {
             list = new ArrayList<String>();
         }
@@ -2218,21 +2218,21 @@ public class JNDIRealm extends RealmBase {
      // ------------------------------------------------------ Private Classes
     
      /**
-      * A private class representing a User
+      * A protected class representing a User
       */
      protected static class User {
          
-         private String username = null;
-         private String dn = null;
-         private String password = null;
-         private ArrayList<String> roles = null;
+         final private String username;
+         final private String dn;
+         final private String password;
+         final private List<String> roles;
 
-         User(String username, String dn, String password,
-                 ArrayList<String> roles) {
+         protected User(String username, String dn, String password,
+                 List<String> roles) {
              this.username = username;
              this.dn = dn;
              this.password = password;
-             this.roles = roles;
+             this.roles = Collections.unmodifiableList(roles);
          }
     
          public String getUserName() {
@@ -2248,7 +2248,7 @@ public class JNDIRealm extends RealmBase {
          }
          
          public List<String> getRoles() {
-             return Collections.unmodifiableList(roles);
+             return roles;
          }
      }
 }
