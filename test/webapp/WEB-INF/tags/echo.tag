@@ -14,4 +14,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@ tag %><%@ attribute name="echo" type="java.lang.String"%><p>${echo}</p>
+<%@ tag %><%@
+attribute name="echo" type="java.lang.String"%><%@
+tag body-content="empty" %><p>${echo}</p>
