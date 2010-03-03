@@ -16,4 +16,4 @@
 --%>
 <%@ tag%><%@
 attribute name="echo" type="java.lang.String" rtexprvalue="false"
-%><p>${echo}</p>
+%><%@ tag body-content="empty" %><p>${echo}</p>
