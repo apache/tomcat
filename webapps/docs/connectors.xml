@@ -29,6 +29,10 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
+
 <section name="Introduction">
 
 <p>Choosing a connector to use with Tomcat can be difficult. This page will

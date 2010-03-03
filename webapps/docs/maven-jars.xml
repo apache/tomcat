@@ -29,6 +29,9 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
 
 <section name="Using Tomcat libraries With Maven">
     <subsection name="Tomcat Snapshots">
