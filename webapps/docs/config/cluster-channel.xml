@@ -29,6 +29,9 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
 
 <section name="Introduction">
   The cluster channel is the main component of a small framework we've nicknamed Apache Tribes.<br/>

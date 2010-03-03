@@ -30,6 +30,9 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
 
 <section name="Administered Objects Overview">
 
