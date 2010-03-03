@@ -607,6 +607,14 @@ public class Catalina extends Embedded {
             // doesn't get invoked twice
             if (useShutdownHook) {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
+
+                // If JULI is being used, re-enable JULI's shutdown to ensure
+                // log messages are not lost
+                LogManager logManager = LogManager.getLogManager();
+                if (logManager instanceof ClassLoaderLogManager) {
+                    ((ClassLoaderLogManager) logManager).setUseShutdownHook(
+                            true);
+                }
             }
         } catch (Throwable t) {
             // This will fail on JDK 1.2. Ignoring, as Tomcat can run
