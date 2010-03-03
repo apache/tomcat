@@ -29,20 +29,10 @@
 
 <body>
 
-    <section name="Table of Contents">
-    <ul>
-        <li><a href="#Introduction">Introduction</a></li>
-        <li><a href="#Installation">Installation</a></li>
-        <li><a href="#A word on Contexts">A word on Contexts</a></li>
-        <li><a href="#Deployment on Tomcat startup">Deployment on Tomcat startup</a></li>
-        <li><a href="#Deploying on a running Tomcat server">Deploying on a running Tomcat server</a></li>
-        <li><a href="#Deploying using the Tomcat Manager">Deploying using the Tomcat Manager</a></li>
-        <li><a href="#Deploying using the Client Deployer Package">Deploying using
-            the Tomcat Client Deployer</a></li>
-    </ul>
-    
-    </section>
-    
+<section name="Table of Contents">
+<toc/>
+</section>
+
     <section name="Introduction">
         <p>
             Deployment is the term used for the process of installing a web
@@ -51,15 +41,14 @@
         </p>
         <p>
             Web application deployment may be accomplished in a number of ways
-            within the Tomcat server.
-            <ul>
+            within the Tomcat server.</p>
+        <ul>
                 <li>Statically; the web application is setup before Tomcat is started</li>
                 <li>
                     Dynamically; in conjunction with the Tomcat Manager web application or 
                     manipulating already deployed web applications
                 </li>
-            </ul>
-        </p>
+        </ul>
         <p>
             The Tomcat Manager is a tool that allows URL-based web application
             deployment features. There is also a tool called the Client Deployer,
@@ -125,11 +114,13 @@
             these Context Descriptors to perform their roles properly.
         </p>
         <p>
-            The locations for Context Descriptors are;
-            <ol>
+            The locations for Context Descriptors are:
+        </p>
+        <ol>
                 <li>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml</li>
                 <li>$CATALINA_BASE/webapps/[webappname]/META-INF/context.xml</li>
-            </ol>
+        </ol>
+        <p>
             Files in (1) are named [webappname].xml but files in (2) are named
             context.xml. If a Context Descriptor is not provided for a Context,
             Tomcat configures the Context using default values. 
