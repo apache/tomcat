@@ -31,35 +31,8 @@
 
 <body>
 
-
 <section name="Table of Contents">
-
-<p>
-<a href="#Quick Start">Quick Start</a><br />
-<blockquote>
-<a href="#What is a Realm?">What is a Realm?</a><br />
-<a href="#Configuring a Realm">Configuring a Realm</a><br />
-</blockquote>
-<a href="#Common Features">Common Features</a><br />
-<blockquote>
-<a href="#Digested Passwords">Digested Passwords</a><br />
-<a href="#Example Application">Example Application</a><br />
-<a href="#Manager Application">Manager Application</a><br />
-<a href="#Realm Logging">Logging Within Realms</a><br />
-</blockquote>
-<a href="#Standard Realm Implementations">
-Standard Realm Implementations</a><br />
-<blockquote>
-<a href="#JDBCRealm">JDBCRealm</a><br />
-<a href="#DataSourceRealm">DataSourceRealm</a><br />
-<a href="#JNDIRealm">JNDIRealm</a><br />
-<a href="#MemoryRealm">MemoryRealm</a><br />
-<a href="#JAASRealm">JAASRealm</a><br />
-<a href="#CombinedRealm">CombinedRealm</a><br />
-<a href="#LockOutRealm">LockOutRealm</a><br />
-</blockquote>
-</p>
-
+<toc/>
 </section>
 
 <section name="Quick Start">

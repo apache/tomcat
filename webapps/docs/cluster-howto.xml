@@ -30,10 +30,13 @@
 
 <body>
 
-
 <section name="Important Note">
 <p><b>You can also check the <a href="config/cluster.html">configuration reference documentation.</a></b>
 </p>
+</section>
+
+<section name="Table of Contents">
+<toc/>
 </section>
 
 <section name="For the impatient">

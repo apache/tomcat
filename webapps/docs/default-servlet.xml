@@ -29,18 +29,8 @@
 
 <body>
 
-<section name="Introduction">
-
-This discusses different ways to manipulate the default servlet. Topics are
-<ul>
-  <li><a href="#what">What is the DefaultServlet?</a></li>
-  <li><a href="#where">Where is it declared?</a></li>
-  <li><a href="#change">What can I change?</a></li>
-  <li><a href="#dir">How do I customize directory listings?</a></li>
-  <li><a href="#secure">How do I secure directory listings?</a></li>
-
-</ul>
-
+<section name="Table of Contents">
+<toc/>
 </section>
 
 <section name="What is the DefaultServlet">
