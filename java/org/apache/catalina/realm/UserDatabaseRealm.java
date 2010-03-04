@@ -32,6 +32,7 @@ import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -241,16 +242,15 @@ public class UserDatabaseRealm
 
 
     /**
-     * Prepare for active use of the public methods of this Component.
+     * Prepare for the beginning of active use of the public methods of this
+     * component and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
     @Override
-    public synchronized void start() throws LifecycleException {
-
-        // Perform normal superclass initialization
-        super.start();
+    protected void startInternal() throws LifecycleException {
 
         try {
             Context context =
@@ -267,25 +267,26 @@ public class UserDatabaseRealm
                 (sm.getString("userDatabaseRealm.noDatabase", resourceName));
         }
 
+        super.startInternal();
     }
 
 
     /**
-     * Gracefully shut down active use of the public methods of this Component.
+     * Gracefully terminate the active use of the public methods of this
+     * component and implement the requirements of
+     * {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
     @Override
-    public synchronized void stop() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Perform normal superclass finalization
-        super.stop();
+        super.stopInternal();
 
         // Release reference to our user database
         database = null;
 
     }
-
-
 }

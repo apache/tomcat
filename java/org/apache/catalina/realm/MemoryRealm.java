@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -282,16 +283,15 @@ public class MemoryRealm  extends RealmBase {
 
 
     /**
-     * Prepare for active use of the public methods of this Component.
+     * Prepare for the beginning of active use of the public methods of this
+     * component and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
     @Override
-    public synchronized void start() throws LifecycleException {
-
-        // Perform normal superclass initialization
-        super.start();
+    protected void startInternal() throws LifecycleException {
 
         // Validate the existence of our database file
         File file = new File(pathname);
@@ -319,24 +319,6 @@ public class MemoryRealm  extends RealmBase {
             digester.reset();
         }
 
+        super.startInternal();
     }
-
-
-    /**
-     * Gracefully shut down active use of the public methods of this Component.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
-     */
-    @Override
-    public synchronized void stop() throws LifecycleException {
-
-        // Perform normal superclass finalization
-        super.stop();
-
-        // No shutdown activities required
-
-    }
-
-
 }
