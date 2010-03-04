@@ -1059,9 +1059,11 @@ public class Connector extends LifecycleBase
     @Override
     public String toString() {
         // Not worth caching this right now
-        StringBuilder sb = new StringBuilder("Connector-");
+        StringBuilder sb = new StringBuilder("Connector[");
         sb.append(getProtocol());
+        sb.append('-');
         sb.append(getPort());
+        sb.append(']');
         return sb.toString();
     }
 
