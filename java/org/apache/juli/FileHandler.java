@@ -135,15 +135,15 @@ public class FileHandler
         writerLock.readLock().lock();
         // If the date has changed, switch log files
         if (!date.equals(tsDate)) {
-        	// Update to writeLock before we switch
+            // Update to writeLock before we switch
             writerLock.readLock().unlock();
-        	writerLock.writeLock().lock();
-        	// Make sure another thread hasn't already done this
-        	if (!date.equals(tsDate)) {
-	            closeWriter();
-	            date = tsDate;
-	            openWriter();
-        	}
+            writerLock.writeLock().lock();
+            // Make sure another thread hasn't already done this
+            if (!date.equals(tsDate)) {
+                closeWriter();
+                date = tsDate;
+                openWriter();
+            }
             // Down grade to read-lock. This ensures the writer remains valid
             // until the log message is written
             writerLock.readLock().lock();
@@ -155,7 +155,7 @@ public class FileHandler
             result = getFormatter().format(record);
         } catch (Exception e) {
             reportError(null, e, ErrorManager.FORMAT_FAILURE);
-        	writerLock.readLock().unlock();
+            writerLock.readLock().unlock();
             return;
         }
         
@@ -172,7 +172,7 @@ public class FileHandler
             reportError(null, e, ErrorManager.WRITE_FAILURE);
             return;
         } finally {
-        	writerLock.readLock().unlock();
+            writerLock.readLock().unlock();
         }
     }
     
@@ -214,14 +214,14 @@ public class FileHandler
     public void flush() {
 
         try {
-        	writerLock.readLock().lock();
+            writerLock.readLock().lock();
             if (writer == null)
                 return;
             writer.flush();
         } catch (Exception e) {
             reportError(null, e, ErrorManager.FLUSH_FAILURE);
         } finally {
-        	writerLock.readLock().unlock();
+            writerLock.readLock().unlock();
         }
         
     }
