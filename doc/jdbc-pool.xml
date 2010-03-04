@@ -88,7 +88,7 @@
       <li>Get JMX notifications and log entries when connections are suspected for being abandoned. This is similar to
           the <code>removeAbandonedTimeout</code> but it doesn't take any action, only reports the information. 
           This is achieved using the <code>suspectTimeout</code> attribute.</li> 
-      <li>Connections can be retrieved from a <code>java.sql.Driver</code> or a <code>javax.sql.DataSource</code>
+      <li>Connections can be retrieved from a <code>java.sql.Driver</code>, <code>javax.sql.DataSource</code> or <code>javax.sql.XADataSource</code> 
           This is achieved using the <code>dataSource</code> and <code>dataSourceJNDI</code> attributes.</li>
       <li>XA connection support</li>
     </ol>
@@ -149,7 +149,8 @@
         <p>factory is required, and the value should be <code>org.apache.tomcat.jdbc.pool.DataSourceFactory</code></p>
       </attribute>
       <attribute name="type" required="true">
-        <p>Type should always be <code>javax.sql.DataSource</code></p>
+        <p>Type should always be <code>javax.sql.DataSource</code> or <code>javax.sql.XADataSource</code></p>
+        <p>Depending on the type a <code>org.apache.tomcat.jdbc.pool.DataSource</code> or a <code>org.apache.tomcat.jdbc.pool.XADataSource</code> will be created.</p>
       </attribute>
     </attributes>
   </subsection>
