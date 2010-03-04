@@ -32,6 +32,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
@@ -42,6 +43,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.security.SecurityConfig;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
@@ -186,11 +188,6 @@ public class Embedded  extends StandardService {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-
-    /**
-     * Has this component been started yet?
-     */
-    protected boolean started = false;
 
     /**
      * Use await.
@@ -347,7 +344,7 @@ public class Embedded  extends StandardService {
         engines = results;
 
         // Start this Engine if necessary
-        if (started) {
+        if (getState().isAvailable()) {
             try {
                 engine.start();
             } catch (LifecycleException e) {
@@ -796,15 +793,14 @@ public class Embedded  extends StandardService {
 
 
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
+     * Start nested components ({@link Connector}s and {@link Engine}s) and
+     * implement the requirements of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         if( log.isInfoEnabled() )
             log.info("Starting tomcat server");
@@ -815,12 +811,8 @@ public class Embedded  extends StandardService {
         // Initialize some naming specific properties
         initNaming();
 
-        // Validate and update our current component state
-        if (started)
-            throw new LifecycleException
-                (sm.getString("embedded.alreadyStarted"));
+        setState(LifecycleState.STARTING);
         lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
         initialized = true;
 
         // Start our defined Engines first
@@ -838,25 +830,20 @@ public class Embedded  extends StandardService {
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.
+     * Stop nested components ({@link Connector}s and {@link Engine}s) and
+     * implement the requirements of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
     @Override
-    public void stop() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         if( log.isDebugEnabled() )
             log.debug("Stopping embedded server");
 
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException
-                (sm.getString("embedded.notStarted"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+        fireLifecycleEvent(STOP_EVENT, null);
+        setState(LifecycleState.STARTING);
 
         // Stop our defined Connectors first
         for (int i = 0; i < connectors.length; i++) {
