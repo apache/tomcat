@@ -28,10 +28,10 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
@@ -51,9 +51,9 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 
 
-public class Connector
-    implements Lifecycle, MBeanRegistration
-{
+public class Connector extends LifecycleBase
+        implements Lifecycle, MBeanRegistration {
+
     private static final Log log = LogFactory.getLog(Connector.class);
 
 
@@ -132,12 +132,6 @@ public class Connector
 
 
     /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
      * The port number on which we listen for requests.
      */
     protected int port = 0;
@@ -209,12 +203,6 @@ public class Connector
 
 
     /**
-     * Has this component been started yet?
-     */
-    protected boolean started = false;
-
-
-    /**
      * The shutdown signal to our background thread
      */
     protected boolean stopped = false;
@@ -273,7 +261,7 @@ public class Connector
       */
      protected boolean useBodyEncodingForURI = false;
 
-
+     
      protected static HashMap<String,String> replacements =
          new HashMap<String,String>();
      static {
@@ -380,15 +368,6 @@ public class Connector
 
         this.allowTrace = allowTrace;
         setProperty("allowTrace", String.valueOf(allowTrace));
-
-    }
-
-    /**
-     * Is this connector available for processing requests?
-     */
-    public boolean isAvailable() {
-
-        return (started);
 
     }
 
@@ -889,44 +868,6 @@ public class Connector
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
-    /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to add
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-
     protected ObjectName createObjectName(String domain, String type)
             throws MalformedObjectNameException {
         Object addressObj = getProperty("address");
@@ -1026,18 +967,11 @@ public class Connector
      *
      * @exception LifecycleException if a fatal startup error occurs
      */
-    public void start() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         if( !initialized )
             initialize();
 
-        // Validate and update our current state
-        if (started ) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("coyoteConnector.alreadyStarted"));
-            return;
-        }
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
+        setState(LifecycleState.STARTING);
 
         // We can't register earlier - the JMX registration of this happens
         // in Server.start callback
@@ -1093,16 +1027,9 @@ public class Connector
      *
      * @exception LifecycleException if a fatal shutdown error occurs
      */
-    public void stop() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
-        // Validate and update our current state
-        if (!started) {
-            log.error(sm.getString("coyoteConnector.notStarted"));
-            return;
-
-        }
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+        setState(LifecycleState.STOPPING);
 
         try {
             mapperListener.destroy();
@@ -1122,6 +1049,20 @@ public class Connector
                  ("coyoteConnector.protocolHandlerDestroyFailed", e));
         }
 
+    }
+
+
+    /**
+     * Provide a useful toString() implementation as it may be used when logging
+     * Lifecycle errors to identify the component.
+     */
+    @Override
+    public String toString() {
+        // Not worth caching this right now
+        StringBuilder sb = new StringBuilder("Connector-");
+        sb.append(getProtocol());
+        sb.append(getPort());
+        return sb.toString();
     }
 
 
@@ -1163,7 +1104,7 @@ public class Connector
 
     public void postDeregister() {
         try {
-            if( started ) {
+            if(getState().isAvailable()) {
                 stop();
             }
         } catch( Throwable t ) {
