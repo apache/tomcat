@@ -32,6 +32,7 @@ import java.util.logging.LogManager;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.StandardServer;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.digester.Digester;
@@ -542,7 +543,7 @@ public class Catalina extends Embedded {
      * Start a new server instance.
      */
     @Override
-    public void start() {
+    protected void startInternal() {
 
         if (getServer() == null) {
             load();
@@ -554,7 +555,10 @@ public class Catalina extends Embedded {
         }
 
         long t1 = System.nanoTime();
-        
+
+        setState(LifecycleState.STARTING);
+        lifecycle.fireLifecycleEvent(START_EVENT, null);
+
         // Start the new server
         try {
             getServer().start();
@@ -589,8 +593,10 @@ public class Catalina extends Embedded {
         }
 
         if (await) {
+            setState(LifecycleState.STARTED);
+            fireLifecycleEvent(AFTER_START_EVENT, null);
             await();
-            stop();
+            setState(LifecycleState.MUST_STOP);
         }
 
     }
@@ -600,7 +606,10 @@ public class Catalina extends Embedded {
      * Stop an existing server instance.
      */
     @Override
-    public void stop() {
+    protected void stopInternal() {
+
+        fireLifecycleEvent(STOP_EVENT, null);
+        setState(LifecycleState.STOPPING);
 
         try {
             // Remove the ShutdownHook first so that server.stop() 
@@ -667,7 +676,11 @@ public class Catalina extends Embedded {
         public void run() {
 
             if (getServer() != null) {
-                Catalina.this.stop();
+                try {
+                    Catalina.this.stop();
+                } catch (LifecycleException e) {
+                    log.error(sm.getString("catalina.shutdownHookFail"), e);
+                }
             }
             
             // If JULI is used, shut JULI down *after* the server shuts down
