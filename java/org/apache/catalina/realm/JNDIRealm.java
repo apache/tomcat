@@ -52,6 +52,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.Base64;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 
@@ -2032,16 +2033,15 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Prepare for active use of the public methods of this Component.
+     * Prepare for the beginning of active use of the public methods of this
+     * component and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-
-        // Perform normal superclass initialization
-        super.start();
+    protected void startInternal() throws LifecycleException {
 
         // Validate that we can open our connection
         try {
@@ -2050,20 +2050,22 @@ public class JNDIRealm extends RealmBase {
             throw new LifecycleException(sm.getString("jndiRealm.open"), e);
         }
 
+        super.startInternal();
     }
 
 
     /**
-     * Gracefully shut down active use of the public methods of this Component.
+     * Gracefully terminate the active use of the public methods of this
+     * component and implement the requirements of
+     * {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
-    @Override
-    public void stop() throws LifecycleException {
+     @Override
+    protected void stopInternal() throws LifecycleException {
 
-        // Perform normal superclass finalization
-        super.stop();
+        super.stopInternal();
 
         // Close any open directory server connection
         close(this.context);
