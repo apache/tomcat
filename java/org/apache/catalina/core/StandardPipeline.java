@@ -27,11 +27,10 @@ import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
-import org.apache.catalina.util.LifecycleSupport;
-import org.apache.tomcat.util.res.StringManager;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -51,9 +50,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Craig R. McClanahan
  */
 
-public class StandardPipeline
-    implements Pipeline, Contained, Lifecycle 
- {
+public class StandardPipeline extends LifecycleBase
+        implements Pipeline, Contained {
 
     private static final Log log = LogFactory.getLog(StandardPipeline.class);
 
@@ -103,25 +101,6 @@ public class StandardPipeline
      * Descriptive information about this implementation.
      */
     protected String info = "org.apache.catalina.core.StandardPipeline/1.0";
-
-
-    /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Has this component been started yet?
-     */
-    protected boolean started = false;
 
 
     /**
@@ -177,60 +156,15 @@ public class StandardPipeline
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
     /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-    /**
-     * Prepare for active use of the public methods of this Component.
+     * Start {@link Valve}s) in this pipeline and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
-    public synchronized void start() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (started)
-            throw new LifecycleException
-                (sm.getString("standardPipeline.alreadyStarted"));
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
-
-        started = true;
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
 
         // Start the Valves in our pipeline (including the basic), if any
         Valve current = first;
@@ -244,34 +178,21 @@ public class StandardPipeline
         	current = current.getNext();
         }
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
-
+        setState(LifecycleState.STARTING);
     }
 
 
     /**
-     * Gracefully shut down active use of the public methods of this Component.
+     * Stop {@link Valve}s) in this pipeline and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
-    public synchronized void stop() throws LifecycleException {
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
 
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException
-                (sm.getString("standardPipeline.notStarted"));
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+        setState(LifecycleState.STOPPING);
 
         // Stop the Valves in our pipeline (including the basic), if any
         Valve current = first;
@@ -284,11 +205,21 @@ public class StandardPipeline
             unregisterValve(current);
         	current = current.getNext();
         }
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
     }
 
+    
+    /**
+     * Return a String representation of this component.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Pipeline[");
+        sb.append(container);
+        sb.append(']');
+        return sb.toString();
+    }
+    
+    
     private void registerValve(Valve valve) {
 
         if( valve instanceof ValveBase &&
@@ -373,7 +304,7 @@ public class StandardPipeline
 
         // Stop the old component if necessary
         if (oldBasic != null) {
-            if (started && (oldBasic instanceof Lifecycle)) {
+            if (getState().isAvailable() && (oldBasic instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) oldBasic).stop();
                 } catch (LifecycleException e) {
@@ -445,7 +376,7 @@ public class StandardPipeline
             ((Contained) valve).setContainer(this.container);
 
         // Start the new component if necessary
-        if (started) {
+        if (getState().isAvailable()) {
             if (valve instanceof Lifecycle) {
                 try {
                     ((Lifecycle) valve).start();
@@ -547,7 +478,7 @@ public class StandardPipeline
             ((Contained) valve).setContainer(null);
 
         // Stop this valve if necessary
-        if (started) {
+        if (getState().isAvailable()) {
             if (valve instanceof Lifecycle) {
                 try {
                     ((Lifecycle) valve).stop();
