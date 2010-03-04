@@ -505,14 +505,11 @@ public class NamingContext implements Context {
 
     /**
      * Creates and binds a new context. Creates a new context with the given 
-     * name and binds it in this context.
+     * name and binds it in the target context (that named by all but 
+     * terminal atomic component of the name). All intermediate contexts and 
+     * the target context must already exist.
      * 
-     * @param name The name of the context to create; may not be empty.  If the
-     *             name consists of a single component then the sub-context is
-     *             created with a prefix of the name of this context. If the
-     *             name has multiple components then name.prefix(name.size()-1)
-     *             must be the name of this context.
-     * 
+     * @param name the name of the context to create; may not be empty
      * @return the newly created context
      * @exception NameAlreadyBoundException if name is already bound
      * @exception InvalidAttributesException if creation of the subcontext 
@@ -523,25 +520,8 @@ public class NamingContext implements Context {
         throws NamingException {
         checkWritable();
         
-        String contextName = null;
-        
-        if (name.size() == 1) {
-            if (this.name.endsWith("/")) {
-                contextName = this.name + name.get(0);
-            } else {
-                contextName = this.name + "/" + name.get(0);
-            }
-        } else {
-            if (!name.getPrefix(name.size()-1).toString().equals(name)) {
-                throw new NamingException(
-                        sm.getString("namingContext.createSubContextInvalid",
-                                name, this.name));
-            }
-            contextName = name.toString();
-        }
-        
-        Context newContext = new NamingContext(env, contextName);
-        bind(name.getSuffix(name.size() -1), newContext);
+        Context newContext = new NamingContext(env, this.name);
+        bind(name, newContext);
         
         return newContext;
     }
