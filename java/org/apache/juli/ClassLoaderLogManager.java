@@ -302,8 +302,14 @@ public class ClassLoaderLogManager extends LogManager {
 
     @Override
     public void reset() throws SecurityException {
-        ClassLoader classLoader = Thread.currentThread()
-                .getContextClassLoader();
+        Thread thread = Thread.currentThread();
+        if (thread.getClass().getName().startsWith(
+                "java.util.logging.LogManager$")) {
+            // Ignore the call from java.util.logging.LogManager.Cleaner,
+            // because we have our own shutdown hook
+            return;
+        }
+        ClassLoader classLoader = thread.getContextClassLoader();
         ClassLoaderLogInfo clLogInfo = getClassLoaderInfo(classLoader);
         resetLoggers(clLogInfo);
         super.reset();
