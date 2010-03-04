@@ -35,6 +35,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.Constants;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -591,39 +592,22 @@ public class JAASRealm
     // ------------------------------------------------------ Lifecycle Methods
 
 
-    /**
-     *
-     * Prepare for active use of the public methods of this <code>Component</code>.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
-     */
-    @Override
-    public void start() throws LifecycleException {
-
-        // Perform normal superclass initialization
-        super.start();
+     /**
+      * Prepare for the beginning of active use of the public methods of this
+      * component and implement the requirements of
+      * {@link LifecycleBase#startInternal()}.
+      *
+      * @exception LifecycleException if this component detects a fatal error
+      *  that prevents this component from being used
+      */
+     @Override
+     protected void startInternal() throws LifecycleException {
 
         // These need to be called after loading configuration, in case
         // useContextClassLoader appears after them in xml config
         parseClassNames(userClassNames, userClasses);
         parseClassNames(roleClassNames, roleClasses);
-    }
 
-
-    /**
-     * Gracefully shut down active use of the public methods of this <code>Component</code>.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
-     */
-    @Override
-    public void stop() throws LifecycleException {
-
-        // Perform normal superclass finalization
-        super.stop();
-
-    }
-
-
+        super.startInternal();
+     }
 }

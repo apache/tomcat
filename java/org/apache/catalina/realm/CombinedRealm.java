@@ -30,6 +30,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -218,15 +219,14 @@ public class CombinedRealm extends RealmBase {
 
     /**
      * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called before any of the public
-     * methods of this component are utilized.  It should also send a
-     * LifecycleEvent of type START_EVENT to any registered listeners.
+     * component and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         // Start 'sub-realms' then this one
     	Iterator<Realm> iter = realms.iterator();
     	
@@ -243,23 +243,22 @@ public class CombinedRealm extends RealmBase {
             	}
             }
         }
-        super.start();
+        super.startInternal();
     }
 
 
     /**
      * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.  It should also send a LifecycleEvent
-     * of type STOP_EVENT to any registered listeners.
+     * component and implement the requirements of
+     * {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
      @Override
-    public void stop() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         // Stop this realm, then the sub-realms (reverse order to start)
-        super.stop();
+        super.stopInternal();
         for (Realm realm : realms) {
             if (realm instanceof Lifecycle) {
                 ((Lifecycle) realm).stop();

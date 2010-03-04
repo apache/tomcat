@@ -32,6 +32,7 @@ import javax.sql.DataSource;
 import org.apache.naming.ContextBindings;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -617,17 +618,15 @@ public class DataSourceRealm
 
 
     /**
-     *
-     * Prepare for active use of the public methods of this Component.
+     * Prepare for the beginning of active use of the public methods of this
+     * component and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-
-        // Perform normal superclass initialization
-        super.start();
+    protected void startInternal() throws LifecycleException {
 
         // Create the roles PreparedStatement string
         StringBuilder temp = new StringBuilder("SELECT ");
@@ -648,22 +647,7 @@ public class DataSourceRealm
         temp.append(userNameCol);
         temp.append(" = ?");
         preparedCredentials = temp.toString();
+        
+        super.startInternal();
     }
-
-
-    /**
-     * Gracefully shut down active use of the public methods of this Component.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
-     */
-    @Override
-    public void stop() throws LifecycleException {
-
-        // Perform normal superclass finalization
-        super.stop();
-
-    }
-
-
 }
