@@ -138,39 +138,43 @@ public class FileHandler
             // Update to writeLock before we switch
             writerLock.readLock().unlock();
             writerLock.writeLock().lock();
-            // Make sure another thread hasn't already done this
-            if (!date.equals(tsDate)) {
-                closeWriter();
-                date = tsDate;
-                openWriter();
+            try {
+                // Make sure another thread hasn't already done this
+                if (!date.equals(tsDate)) {
+                    closeWriter();
+                    date = tsDate;
+                    openWriter();
+                }
+                // Down grade to read-lock. This ensures the writer remains valid
+                // until the log message is written
+                writerLock.readLock().lock();
+            } finally {
+                writerLock.writeLock().unlock();
             }
-            // Down grade to read-lock. This ensures the writer remains valid
-            // until the log message is written
-            writerLock.readLock().lock();
-            writerLock.writeLock().unlock();
         }
 
-        String result = null;
         try {
-            result = getFormatter().format(record);
-        } catch (Exception e) {
-            reportError(null, e, ErrorManager.FORMAT_FAILURE);
-            writerLock.readLock().unlock();
-            return;
-        }
-        
-        try {
-            if (writer!=null) {
-                writer.write(result);
-                if (bufferSize < 0) {
-                    writer.flush();
-                }
-            } else {
-                reportError("FileHandler is closed or not yet initialized, unable to log ["+result+"]", null, ErrorManager.WRITE_FAILURE);
+            String result = null;
+            try {
+                result = getFormatter().format(record);
+            } catch (Exception e) {
+                reportError(null, e, ErrorManager.FORMAT_FAILURE);
+                return;
             }
-        } catch (Exception e) {
-            reportError(null, e, ErrorManager.WRITE_FAILURE);
-            return;
+
+            try {
+                if (writer!=null) {
+                    writer.write(result);
+                    if (bufferSize < 0) {
+                        writer.flush();
+                    }
+                } else {
+                    reportError("FileHandler is closed or not yet initialized, unable to log ["+result+"]", null, ErrorManager.WRITE_FAILURE);
+                }
+            } catch (Exception e) {
+                reportError(null, e, ErrorManager.WRITE_FAILURE);
+                return;
+            }
         } finally {
             writerLock.readLock().unlock();
         }
@@ -190,8 +194,8 @@ public class FileHandler
 
     protected void closeWriter() {
         
+        writerLock.writeLock().lock();
         try {
-            writerLock.writeLock().lock();
             if (writer == null)
                 return;
             writer.write(getFormatter().getTail(this));
@@ -213,8 +217,8 @@ public class FileHandler
     @Override
     public void flush() {
 
+        writerLock.readLock().lock();
         try {
-            writerLock.readLock().lock();
             if (writer == null)
                 return;
             writer.flush();
@@ -319,13 +323,13 @@ public class FileHandler
         dir.mkdirs();
 
         // Open the current log file
+        writerLock.writeLock().lock();
         try {
             String pathname = dir.getAbsolutePath() + File.separator +
                 prefix + date + suffix;
             String encoding = getEncoding();
             FileOutputStream fos = new FileOutputStream(pathname, true);
             OutputStream os = bufferSize>0?new BufferedOutputStream(fos,bufferSize):fos;
-            writerLock.writeLock().lock();
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding)
                                        : new OutputStreamWriter(os), false);
