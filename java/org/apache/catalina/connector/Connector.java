@@ -26,7 +26,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -51,8 +50,7 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 
 
-public class Connector extends LifecycleBase
-        implements Lifecycle, MBeanRegistration {
+public class Connector extends LifecycleBase implements MBeanRegistration {
 
     private static final Log log = LogFactory.getLog(Connector.class);
 
@@ -967,6 +965,7 @@ public class Connector extends LifecycleBase
      *
      * @exception LifecycleException if a fatal startup error occurs
      */
+    @Override
     protected void startInternal() throws LifecycleException {
         if( !initialized )
             initialize();
@@ -1027,6 +1026,7 @@ public class Connector extends LifecycleBase
      *
      * @exception LifecycleException if a fatal shutdown error occurs
      */
+    @Override
     protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
