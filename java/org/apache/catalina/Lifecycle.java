@@ -21,14 +21,52 @@ package org.apache.catalina;
 
 /**
  * Common interface for component life cycle methods.  Catalina components
- * may, but are not required to, implement this interface (as well as the
- * appropriate interface(s) for the functionality they support) in order to
- * provide a consistent mechanism to start and stop the component.
+ * may implement this interface (as well as the appropriate interface(s) for
+ * the functionality they support) in order to provide a consistent mechanism
+ * to start and stop the component.
+ * <br>
+ * The valid state transitions for components that support Lifecycle are:
+ * <pre>
+ *                  --------------------<--------------------------
+ *                  |                                             |
+ *     start()      |        auto          auto         stop()    |       
+ * NEW --->--- STARTING_PREP -->- STARTING -->- STARTED -->---    |
+ *                                                 |         |    |
+ *                                     auto        |         |    |
+ *      ---------<----- MUST_STOP --<---------------         |    |
+ *      |                                                    |    |
+ *      ---------------------------<--------------------------    ^
+ *      |                                                         |
+ *      |        auto          auto                start()        |
+ * STOPPING_PREP -->- STOPPING -->- STOPPED -------------->--------
+ *      ^
+ *      |stop()
+ *      |
+ *   FAILED
+ * 
+ * Any state can transition to FAILED.
+ * 
+ * Calling start() while a component is in states STARTING_PREP, STARTING or
+ * STARTED has no effect.
+ * 
+ * Calling stop() while a component is in states STOPPING_PREP, STOPPING or
+ * STOPPED has no effect.
+ * 
+ * MUST_STOP is used to indicate that the {@link #stop()} should be called on
+ * the component as soon as {@link start()} exits.
+ * 
+ * Attempting any other transition will throw {@link LifecycleException}.
+ * 
+ * </pre>
+ * The {@link LifecycleEvent}s fired during state changes are defined in the
+ * methods that trigger the changed. No {@link LifecycleEvent}s are fired if the
+ * attempted transition is not valid.
+ * 
+ * TODO: Not all components may transition from STOPPED to STARTING_PREP
  *
  * @author Craig R. McClanahan
  * @version $Revision$ $Date$
  */
-
 public interface Lifecycle {
 
 
@@ -118,8 +156,21 @@ public interface Lifecycle {
     /**
      * Prepare for the beginning of active use of the public methods of this
      * component.  This method should be called before any of the public
-     * methods of this component are utilized.  It should also send a
-     * LifecycleEvent of type START_EVENT to any registered listeners.
+     * methods of this component are utilized. The following
+     * {@link LifecycleEvent}s will be fired in the following order:
+     * <ol>
+     *   <li>BEFORE_START_EVENT: At the beginning of the method. It is as this
+     *                           point the state transitions to
+     *                           {@link LifecycleState#STARTING_PREP}.</li>
+     *   <li>START_EVENT: During the method once it is safe to call start() for
+     *                    any child components. It is at this point that the
+     *                    state transitions to {@link LifecycleState#STARTING}
+     *                    and that the public methods may be used.</li>
+     *   <li>AFTER_START_EVENT: At the end of the method, immediately before it
+     *                          returns. It is at this point that the state
+     *                          transitions to {@link LifecycleState#STARTED}.
+     *                          </li>
+     * </ol>
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -129,14 +180,35 @@ public interface Lifecycle {
 
     /**
      * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.  It should also send a LifecycleEvent
-     * of type STOP_EVENT to any registered listeners.
-     *
+     * component. Once the STOP_EVENT is fired, the public methods should not
+     * be used. The following {@link LifecycleEvent}s will be fired in the
+     * following order:
+     * <ol>
+     *   <li>BEFORE_STOP_EVENT: At the beginning of the method. It is at this
+     *                          point that the state transitions to
+     *                          {@link LifecycleState#STOPPING_PREP}.</li>
+     *   <li>STOP_EVENT: During the method once it is safe to call stop() for
+     *                   any child components. It is at this point that the
+     *                   state transitions to {@link LifecycleState#STOPPING}
+     *                   and that the public methods may no longer be used.</li>
+     *   <li>AFTER_STOP_EVENT: At the end of the method, immediately before it
+     *                         returns. It is at this point that the state
+     *                         transitions to {@link LifecycleState#STOPPED}.
+     *                         </li>
+     * </ol>
+     * 
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
     public void stop() throws LifecycleException;
 
 
+    /**
+     * Obtain the current state of the source component.
+     * 
+     * @return The current state of the source component.
+     */
+    // TODO Remove this comment once all components that implement Lifecycle
+    //      have had this method added
+    //public LifecycleState getState();
 }
