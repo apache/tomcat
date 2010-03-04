@@ -28,11 +28,11 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -49,7 +49,8 @@ import org.apache.catalina.Executor;
  * @author Craig R. McClanahan
  */
 
-public class StandardService implements Service, MBeanRegistration {
+public class StandardService extends LifecycleBase
+        implements Service, MBeanRegistration {
 
     private static final Log log = LogFactory.getLog(StandardService.class);
    
@@ -71,12 +72,6 @@ public class StandardService implements Service, MBeanRegistration {
 
 
     /**
-     * The lifecycle event support for this component.
-     */
-    private LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
      * The string manager for this package.
      */
     private static final StringManager sm =
@@ -86,12 +81,6 @@ public class StandardService implements Service, MBeanRegistration {
      * The <code>Server</code> that owns this Service, if any.
      */
     private Server server = null;
-
-    /**
-     * Has this component been started?
-     */
-    private boolean started = false;
-
 
     /**
      * The property change support for this component.
@@ -151,7 +140,7 @@ public class StandardService implements Service, MBeanRegistration {
         this.container = container;
         if ((this.container != null) && (this.container instanceof Engine))
             ((Engine) this.container).setService(this);
-        if (started && (this.container != null)) {
+        if (getState().isAvailable() && (this.container != null)) {
             try {
                 this.container.start();
             } catch (LifecycleException e) {
@@ -162,7 +151,7 @@ public class StandardService implements Service, MBeanRegistration {
             for (int i = 0; i < connectors.length; i++)
                 connectors[i].setContainer(this.container);
         }
-        if (started && (oldContainer != null)) {
+        if (getState().isAvailable() && (oldContainer != null)) {
             try {
                 oldContainer.stop();
             } catch (LifecycleException e) {
@@ -266,7 +255,7 @@ public class StandardService implements Service, MBeanRegistration {
                 }
             }
 
-            if (started) {
+            if (getState().isAvailable()) {
                 try {
                     ((Lifecycle) connector).start();
                 } catch (LifecycleException e) {
@@ -330,7 +319,7 @@ public class StandardService implements Service, MBeanRegistration {
             }
             if (j < 0)
                 return;
-            if (started) {
+            if (getState().isAvailable()) {
                 try {
                     ((Lifecycle) connectors[j]).stop();
                 } catch (LifecycleException e) {
@@ -380,43 +369,6 @@ public class StandardService implements Service, MBeanRegistration {
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
-    /**
-     * Add a LifecycleEvent listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a LifecycleEvent listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-    
     /**
      * Adds a named executor to the service
      * @param ex Executor
@@ -425,7 +377,7 @@ public class StandardService implements Service, MBeanRegistration {
         synchronized (executors) {
             if (!executors.contains(ex)) {
                 executors.add(ex);
-                if (started)
+                if (getState().isAvailable())
                     try {
                         ex.start();
                     } catch (LifecycleException x) {
@@ -468,7 +420,7 @@ public class StandardService implements Service, MBeanRegistration {
      */
     public void removeExecutor(Executor ex) {
         synchronized (executors) {
-            if ( executors.remove(ex) && started ) {
+            if ( executors.remove(ex) && getState().isAvailable() ) {
                 try {
                     ex.stop();
                 } catch (LifecycleException e) {
@@ -481,33 +433,21 @@ public class StandardService implements Service, MBeanRegistration {
 
 
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called before any of the public
-     * methods of this component are utilized.  It should also send a
-     * LifecycleEvent of type START_EVENT to any registered listeners.
+     * Start nested components ({@link Executor}s, {@link Connector}s and
+     * {@link Container}s) and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
-        // Validate and update our current component state
-        if (started) {
-            if (log.isInfoEnabled()) {
-                log.info(sm.getString("standardService.start.started"));
-            }
-            return;
-        }
-        
         if( ! initialized )
             init(); 
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
         if(log.isInfoEnabled())
             log.info(sm.getString("standardService.start.name", this.name));
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
+        setState(LifecycleState.STARTING);
 
         // Start our defined Container first
         if (container != null) {
@@ -528,31 +468,18 @@ public class StandardService implements Service, MBeanRegistration {
                 ((Lifecycle) connectors[i]).start();
             }
         }
-        
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
-
     }
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.  It should also send a LifecycleEvent
-     * of type STOP_EVENT to any registered listeners.
+     * Stop nested components ({@link Executor}s, {@link Connector}s and
+     * {@link Container}s) and implement the requirements of
+     * {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
-    public void stop() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (!started) {
-            return;
-        }
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
+    protected void stopInternal() throws LifecycleException {
 
         // Stop our defined Connectors first
         synchronized (connectors) {
@@ -568,11 +495,9 @@ public class StandardService implements Service, MBeanRegistration {
             // Ignore
         }
 
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         if(log.isInfoEnabled())
-            log.info
-                (sm.getString("standardService.stop.name", this.name));
-        started = false;
+            log.info(sm.getString("standardService.stop.name", this.name));
+        setState(LifecycleState.STOPPING);
 
         // Stop our defined Container second
         if (container != null) {
@@ -610,11 +535,6 @@ public class StandardService implements Service, MBeanRegistration {
                 }
             }
         }
-        
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
-
     }
 
 
@@ -673,7 +593,7 @@ public class StandardService implements Service, MBeanRegistration {
     }
     
     public void destroy() throws LifecycleException {
-        if( started ) stop();
+        if(getState().isAvailable()) stop();
         // FIXME unregister should be here probably -- stop doing that ?
     }
 
