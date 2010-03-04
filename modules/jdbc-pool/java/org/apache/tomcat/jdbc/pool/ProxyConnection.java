@@ -68,13 +68,19 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return (iface.isInstance(connection.getConnection()));
+        if (iface == XAConnection.class && connection.getXAConnection()!=null) {
+            return true;
+        } else {
+            return (iface.isInstance(connection.getConnection()));
+        }
     }
 
 
     public Object unwrap(Class<?> iface) throws SQLException {
         if (iface == PooledConnection.class) {
             return connection;
+        }else if (iface == XAConnection.class) {
+            return connection.getXAConnection();
         } else if (isWrapperFor(iface)) {
             return connection.getConnection();
         } else {

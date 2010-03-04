@@ -749,6 +749,7 @@ public class PoolProperties implements PoolConfiguration {
         boolean result = timer && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
         result = result || (timer && getSuspectTimeout()>0); 
         result = result || (timer && isTestWhileIdle() && getValidationQuery()!=null);
+        result = result || (timer && getMinEvictableIdleTimeMillis()>0); 
         return result;
     }
     
