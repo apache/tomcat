@@ -2227,7 +2227,7 @@ public class JNDIRealm extends RealmBase {
          final private String password;
          final private List<String> roles;
 
-         protected User(String username, String dn, String password,
+         public User(String username, String dn, String password,
                  List<String> roles) {
              this.username = username;
              this.dn = dn;
