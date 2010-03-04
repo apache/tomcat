@@ -300,6 +300,14 @@ public class ClassLoaderLogManager extends LogManager {
     
     }
 
+    @Override
+    public void reset() throws SecurityException {
+        ClassLoader classLoader = Thread.currentThread()
+                .getContextClassLoader();
+        ClassLoaderLogInfo clLogInfo = getClassLoaderInfo(classLoader);
+        resetLoggers(clLogInfo);
+        super.reset();
+    }
 
     /**
      * Shuts down the logging system.
@@ -308,23 +316,33 @@ public class ClassLoaderLogManager extends LogManager {
         // The JVM is being shutdown. Make sure all loggers for all class
         // loaders are shutdown
         for (ClassLoaderLogInfo clLogInfo : classLoaderLoggers.values()) {
-            for (Logger logger : clLogInfo.loggers.values()) {
-                resetLogger(logger);
-            }
+            resetLoggers(clLogInfo);
         }
     }
 
     // -------------------------------------------------------- Private Methods
-    private void resetLogger(Logger logger) {
-        
-        Handler[] handlers = logger.getHandlers();
-        for (Handler handler : handlers) {
-            logger.removeHandler(handler);
-            try {
-                handler.close();
-            } catch (Exception e) {
-                // Ignore
+    private void resetLoggers(ClassLoaderLogInfo clLogInfo) {
+        // This differs from LogManager#resetLogger() in that we close not all
+        // handlers of all loggers, but only those that are present in our
+        // ClassLoaderLogInfo#handlers list. That is because our #addLogger(..)
+        // method can use handlers from the parent class loaders, and closing
+        // handlers that the current class loader does not own would be not
+        // good.
+        synchronized (clLogInfo) {
+            for (Logger logger : clLogInfo.loggers.values()) {
+                Handler[] handlers = logger.getHandlers();
+                for (Handler handler : handlers) {
+                    logger.removeHandler(handler);
+                }
             }
+            for (Handler handler : clLogInfo.handlers.values()) {
+                try {
+                    handler.close();
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+            clLogInfo.handlers.clear();
         }
     }
 
