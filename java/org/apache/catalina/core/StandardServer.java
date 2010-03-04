@@ -651,6 +651,7 @@ public final class StandardServer extends LifecycleBase
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     protected void startInternal() throws LifecycleException {
 
         setState(LifecycleState.STARTING);
@@ -671,6 +672,7 @@ public final class StandardServer extends LifecycleBase
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
