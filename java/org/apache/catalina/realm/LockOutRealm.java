@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -78,15 +79,14 @@ public class LockOutRealm extends CombinedRealm {
 
     /**
      * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called before any of the public
-     * methods of this component are utilized.  It should also send a
-     * LifecycleEvent of type START_EVENT to any registered listeners.
+     * component and implement the requirements of
+     * {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         // Configure the list of failed users to delete the oldest entry once it
         // exceeds the specified size
         failedUsers = new LinkedHashMap<String, LockRecord>(cacheSize, 0.75f,
@@ -109,7 +109,7 @@ public class LockOutRealm extends CombinedRealm {
             }
         };
 
-        super.start();
+        super.startInternal();
     }
 
 
