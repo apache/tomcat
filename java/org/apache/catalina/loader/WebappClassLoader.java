@@ -68,6 +68,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.jasper.servlet.JasperLoader;
 import org.apache.naming.JndiPermission;
@@ -107,6 +108,9 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * <p>
  * <strong>IMPLEMENTATION NOTE</strong> - No check for sealing violations or
  * security is made unless a security manager is present.
+ * <p>
+ * TODO: Is there any requirement to provide a proper Lifecycle implementation
+ *       rather than the current stubbed implementation?
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
@@ -1637,6 +1641,16 @@ public class WebappClassLoader
      * @param listener The listener to remove
      */
     public void removeLifecycleListener(LifecycleListener listener) {
+    }
+
+
+    /**
+     * Obtain the current state of the source component.
+     * 
+     * @return The current state of the source component.
+     */
+    public LifecycleState getState() {
+        return LifecycleState.NEW;
     }
 
 

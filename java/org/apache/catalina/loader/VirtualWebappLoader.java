@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.StringTokenizer;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.util.LifecycleBase;
 
 /**
  * Simple webapp classloader that allows a customized classpath to be added
@@ -80,8 +81,15 @@ public class VirtualWebappLoader extends WebappLoader {
         virtualClasspath = path;
     }
 
+    /**
+     * Implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
     @Override
-    public void start() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // just add any jar/directory set in virtual classpath to the
         // repositories list before calling start on the standard WebappLoader
@@ -94,7 +102,7 @@ public class VirtualWebappLoader extends WebappLoader {
             addRepository(file.toURI().toString());
         }
 
-        super.start();
+        super.startInternal();
     }
 
 }
