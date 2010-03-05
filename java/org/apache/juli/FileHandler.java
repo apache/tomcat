@@ -145,10 +145,10 @@ public class FileHandler
                     date = tsDate;
                     openWriter();
                 }
+            } finally {
                 // Down grade to read-lock. This ensures the writer remains valid
                 // until the log message is written
                 writerLock.readLock().lock();
-            } finally {
                 writerLock.writeLock().unlock();
             }
         }
