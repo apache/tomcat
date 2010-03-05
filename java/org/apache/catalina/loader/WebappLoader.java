@@ -51,10 +51,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
@@ -80,8 +80,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @version $Revision$ $Date$
  */
 
-public class WebappLoader
-    implements Lifecycle, Loader, PropertyChangeListener, MBeanRegistration  {
+public class WebappLoader extends LifecycleBase
+    implements Loader, PropertyChangeListener, MBeanRegistration  {
 
     // ----------------------------------------------------------- Constructors
 
@@ -145,12 +145,6 @@ public class WebappLoader
 
 
     /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
      * The Java class name of the ClassLoader implementation to be used.
      * This class should extend WebappClassLoader, otherwise, a different 
      * loader implementation must be used.
@@ -182,12 +176,6 @@ public class WebappLoader
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Has this component been started?
-     */
-    private boolean started = false;
 
 
     /**
@@ -379,7 +367,7 @@ public class WebappLoader
         results[repositories.length] = repository;
         repositories = results;
 
-        if (started && (classLoader != null)) {
+        if (getState().isAvailable() && (classLoader != null)) {
             classLoader.addRepository(repository);
             if( loaderRepositories != null ) loaderRepositories.add(repository);
             setClassPath();
@@ -515,43 +503,6 @@ public class WebappLoader
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
-    /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
     private boolean initialized=false;
 
     public void init() {
@@ -595,25 +546,26 @@ public class WebappLoader
     }
 
     /**
-     * Start this component, initializing our associated class loader.
+     * Start associated {@link ClassLoader} and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if a lifecycle error occurs
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
-        // Validate and update our current component state
+    @Override
+    protected void startInternal() throws LifecycleException {
+
         if( ! initialized ) init();
-        if (started)
-            throw new LifecycleException
-                (sm.getString("webappLoader.alreadyStarted"));
+
         if (log.isDebugEnabled())
             log.debug(sm.getString("webappLoader.starting"));
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
 
         if (container.getResources() == null) {
             log.info("No resources for " + container);
+            setState(LifecycleState.STARTING);
             return;
         }
+        
         // Register a stream handler factory for the JNDI protocol
         URLStreamHandlerFactory streamHandlerFactory =
             new DirContextURLStreamHandlerFactory();
@@ -678,24 +630,24 @@ public class WebappLoader
             throw new LifecycleException("start: ", t);
         }
 
+        setState(LifecycleState.STARTING);
     }
 
 
     /**
-     * Stop this component, finalizing our associated class loader.
+     * Stop associated {@link ClassLoader} and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if a lifecycle error occurs
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void stop() throws LifecycleException {
+    @Override
+    protected void stopInternal() throws LifecycleException {
 
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException
-                (sm.getString("webappLoader.notStarted"));
         if (log.isDebugEnabled())
             log.debug(sm.getString("webappLoader.stopping"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+
+        setState(LifecycleState.STOPPING);
 
         // Remove context attributes as appropriate
         if (container instanceof Context) {
@@ -725,7 +677,6 @@ public class WebappLoader
         classLoader = null;
 
         destroy();
-
     }
 
 
