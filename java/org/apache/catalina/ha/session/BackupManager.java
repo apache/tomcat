@@ -30,6 +30,7 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
+import org.apache.catalina.util.LifecycleBase;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -129,7 +130,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     }
     
     public ClusterMessage requestCompleted(String sessionId) {
-        if ( !this.started ) return null;
+        if (!getState().isAvailable()) return null;
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
         map.replicate(sessionId,false);
         return null;
@@ -182,21 +183,22 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     public String getName() {
         return this.name;
     }
+
+
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.<BR>
-     * Starts the cluster communication channel, this will connect with the other nodes
-     * in the cluster, and request the current session state to be transferred to this node.
-     * @exception IllegalStateException if this component has already been
-     *  started
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * Starts the cluster communication channel, this will connect with the
+     * other nodes in the cluster, and request the current session state to be
+     * transferred to this node.
+     * 
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-        if ( this.started ) return;
-        
+    protected synchronized void startInternal() throws LifecycleException {
+
         try {
             cluster.registerManager(this);
             CatalinaCluster catclust = cluster;
@@ -207,12 +209,12 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
                                                           getClassLoaders());
             map.setChannelSendOptions(mapSendOptions);
             this.sessions = map;
-            super.start();
-            this.started = true;
         }  catch ( Exception x ) {
             log.error("Unable to start BackupManager",x);
             throw new LifecycleException("Failed to start BackupManager",x);
         }
+
+        super.startInternal();
     }
     
     public String getMapName() {
@@ -222,33 +224,28 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
         return name;
     }
 
+
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.<BR>
-     * This will disconnect the cluster communication channel and stop the listener thread.
-     * @exception IllegalStateException if this component has not been started
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     * 
+     * This will disconnect the cluster communication channel and stop the
+     * listener thread.
+     *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
     @Override
-    public void stop() throws LifecycleException
-    {
+    protected synchronized void stopInternal() throws LifecycleException {
+
+        super.stopInternal();
         
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
         if ( map!=null ) {
             map.breakdown();
         }
-        if ( !this.started ) return;
-        try {
-        } catch ( Exception x ){
-            log.error("Unable to stop BackupManager",x);
-            throw new LifecycleException("Failed to stop BackupManager",x);
-        } finally {
-            super.stop();
-        }
-        cluster.removeManager(this);
 
+        cluster.removeManager(this);
     }
 
     @Override
