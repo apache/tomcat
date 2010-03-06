@@ -409,7 +409,7 @@
 
     <property name="jvmRoute">
       <p>Provides a default value for the <code>jvmRoute</code> attribute of the
-      <a href="engine.html">Engine</a> element. It does not override the a value
+      <a href="engine.html">Engine</a> element. It does not override the value
       configured on the <a href="engine.html">Engine</a> element.</p>
     </property>
 
@@ -455,7 +455,7 @@
       not specified, the default value of <code>true</code> will be used.</p>
     </property>
     
-    <property name="org.apache.catalina.startup.EXIT_ON_INIT_FAILURE">
+    <property name="org.apache.catalina.startup. EXIT_ON_INIT_FAILURE">
       <p>If <code>true</code>, the server will exit if an exception happens
          during the server initialization phase. The default is <code>false</code>.</p>
     </property>
