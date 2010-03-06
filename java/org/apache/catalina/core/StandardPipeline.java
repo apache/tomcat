@@ -326,13 +326,15 @@ public class StandardPipeline extends LifecycleBase
         if (valve instanceof Contained) {
             ((Contained) valve).setContainer(this.container);
         }
-        if (valve instanceof Lifecycle) {
+        if (getState().isAvailable() && valve instanceof Lifecycle) {
             try {
                 ((Lifecycle) valve).start();
             } catch (LifecycleException e) {
                 log.error("StandardPipeline.setBasic: start", e);
                 return;
             }
+            // Register the newly added valve
+            registerValve(valve);
         }
 
         // Update the pipeline
