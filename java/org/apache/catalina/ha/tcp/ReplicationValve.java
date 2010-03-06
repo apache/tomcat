@@ -397,19 +397,6 @@ public class ReplicationValve
         nrOfCrossContextSendRequests = 0;
     }
     
-    /**
-     * Return a String rendering of this object.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder("ReplicationValve[");
-        if (container != null)
-            sb.append(container.getName());
-        sb.append("]");
-        return (sb.toString());
-
-    }
 
     // --------------------------------------------------------- Protected Methods
 

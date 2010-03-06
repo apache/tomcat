@@ -29,12 +29,11 @@ import java.util.Properties;
 
 import javax.servlet.ServletException;
 
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -114,9 +113,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Peter Rossbach
  */
 
-public final class JDBCAccessLogValve 
-    extends ValveBase 
-    implements Lifecycle {
+public final class JDBCAccessLogValve extends ValveBase {
 
     // ----------------------------------------------------------- Constructors
 
@@ -222,21 +219,9 @@ public final class JDBCAccessLogValve
 
 
     /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
      * The string manager for this package.
      */
     private static final StringManager sm = StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Has this component been started yet?
-     */
-    private boolean started = false;
 
 
     // ------------------------------------------------------------- Properties
@@ -528,40 +513,6 @@ public final class JDBCAccessLogValve
 
 
     /**
-     * Adds a Lifecycle listener.
-     * 
-     * @param listener The listener to add.
-     */  
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Removes a Lifecycle listener.
-     * 
-     * @param listener The listener to remove.
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-    /**
      * Open (if necessary) and return a database connection for use by
      * this AccessLogValve.
      *
@@ -640,45 +591,41 @@ public final class JDBCAccessLogValve
         }
 
     }
+    
+    
     /**
-     * Invoked by Tomcat on startup. The database connection is set here.
-     * 
-     * @exception LifecycleException Can be thrown on lifecycle 
-     * inconsistencies or on database errors (as a wrapped SQLException).
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
-
-        if (started)
-            throw new LifecycleException
-                (sm.getString("accessLogValve.alreadyStarted"));
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
-
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        
         try {
             open() ;        
         } catch (SQLException e) {
             throw new LifecycleException(e);
         }
 
+        setState(LifecycleState.STARTING);
     }
 
 
     /**
-     * Invoked by tomcat on shutdown. The database connection is closed here.
-     * 
-     * @exception LifecycleException Can be thrown on lifecycle 
-     * inconsistencies or on database errors (as a wrapped SQLException).
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void stop() throws LifecycleException {
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
 
-        if (!started)
-            throw new LifecycleException
-                (sm.getString("accessLogValve.notStarted"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+        setState(LifecycleState.STOPPING);
         
         close() ;
-
     }
 
 

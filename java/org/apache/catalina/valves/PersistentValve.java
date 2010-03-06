@@ -47,8 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Revision$ $Date$
  */
 
-public class PersistentValve
-    extends ValveBase {
+public class PersistentValve extends ValveBase {
 
     //------------------------------------------------------ Constructor
     public PersistentValve() {

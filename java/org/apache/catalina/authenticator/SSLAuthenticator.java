@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.ActionCode;
 import org.apache.catalina.Globals;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
 
@@ -162,39 +161,4 @@ public class SSLAuthenticator
         return (true);
 
     }
-
-
-    // ------------------------------------------------------ Lifecycle Methods
-
-
-    /**
-     * Initialize the database we will be using for client verification
-     * and certificate validation (if any).
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
-     */
-    @Override
-    public void start() throws LifecycleException {
-
-        super.start();
-
-    }
-
-
-    /**
-     * Finalize the database we used for client verification and
-     * certificate validation (if any).
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
-     */
-    @Override
-    public void stop() throws LifecycleException {
-
-        super.stop();
-
-    }
-
-
 }

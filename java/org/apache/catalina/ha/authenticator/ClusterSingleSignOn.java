@@ -31,6 +31,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.util.LifecycleBase;
 
 
 
@@ -105,20 +106,17 @@ public class ClusterSingleSignOn
 
 
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-
-	super.start();
-
-	clusterSSOListener = new ClusterSingleSignOnListener();
-	clusterSSOListener.setClusterSSO(this);
+    protected synchronized void startInternal() throws LifecycleException {
+        
+        clusterSSOListener = new ClusterSingleSignOnListener();
+        clusterSSOListener.setClusterSSO(this);
 
         // Load the cluster component, if any
         try {
@@ -147,55 +145,33 @@ public class ClusterSingleSignOn
                 }
             }
             if (cluster == null) {
-		throw new LifecycleException
-		    ("There is no Cluster for ClusterSingleSignOn");
+                throw new LifecycleException(
+                        "There is no Cluster for ClusterSingleSignOn");
             }
-
         } catch (Throwable t) {
-	    throw new LifecycleException
-		("ClusterSingleSignOn exception during clusterLoad " + t);
+            throw new LifecycleException(
+                    "ClusterSingleSignOn exception during clusterLoad " + t);
         }
 
+        super.startInternal();
     }
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
     @Override
-    public void stop() throws LifecycleException {
+    protected synchronized void stopInternal() throws LifecycleException {
 
-	super.stop();
+        super.stopInternal();
 
-	if (getCluster() != null) {
-	    getCluster().removeClusterListener(clusterSSOListener);
-	}
-
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Return a String rendering of this object.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder("ClusterSingleSignOn[");
-        if (container == null )
-            sb.append("Container is null");
-        else
-            sb.append(container.getName());
-        sb.append("]");
-        return (sb.toString());
-
+        if (getCluster() != null) {
+            getCluster().removeClusterListener(clusterSSOListener);
+        }
     }
 
 
