@@ -27,16 +27,12 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleSupport;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.valves.ValveBase;
 
@@ -62,9 +58,7 @@ import org.apache.catalina.valves.ValveBase;
  * @version $Revision$ $Date$
  */
 
-public class SingleSignOn
-    extends ValveBase
-    implements Lifecycle, SessionListener {
+public class SingleSignOn extends ValveBase implements SessionListener {
 
     //------------------------------------------------------ Constructor
     public SingleSignOn() {
@@ -90,11 +84,6 @@ public class SingleSignOn
 
 
     /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-    /**
      * Indicates whether this valve should require a downstream Authenticator to
      * reauthenticate each request, or if it itself can bind a UserPrincipal
      * and AuthType object to the request.
@@ -114,11 +103,6 @@ public class SingleSignOn
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-
-    /**
-     * Component started flag.
-     */
-    protected boolean started = false;
 
     /**
      * Optional SSO cookie domain.
@@ -214,84 +198,6 @@ public class SingleSignOn
     public void setRequireReauthentication(boolean required)
     {
         this.requireReauthentication = required;
-    }
-
-
-    // ------------------------------------------------------ Lifecycle Methods
-
-
-    /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
-     */
-    public void start() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (started)
-            throw new LifecycleException
-                (sm.getString("authenticator.alreadyStarted"));
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
-
-    }
-
-
-    /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
-     */
-    public void stop() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException
-                (sm.getString("authenticator.notStarted"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
-
     }
 
 
@@ -425,26 +331,6 @@ public class SingleSignOn
 
         // Invoke the next Valve in our pipeline
         getNext().invoke(request, response);
-
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Return a String rendering of this object.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder("SingleSignOn[");
-        if (container == null )
-            sb.append("Container is null");
-        else
-            sb.append(container.getName());
-        sb.append("]");
-        return (sb.toString());
 
     }
 

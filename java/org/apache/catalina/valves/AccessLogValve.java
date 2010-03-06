@@ -36,12 +36,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
@@ -119,9 +118,7 @@ import org.apache.juli.logging.LogFactory;
  * @version $Revision$ $Date$
  */
 
-public class AccessLogValve
-    extends ValveBase
-    implements Lifecycle {
+public class AccessLogValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(AccessLogValve.class);
 
@@ -151,12 +148,6 @@ public class AccessLogValve
      */
     protected static final String info =
         "org.apache.catalina.valves.AccessLogValve/2.1";
-
-
-    /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
 
 
     /**
@@ -201,12 +192,6 @@ public class AccessLogValve
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Has this component been started yet?
-     */
-    protected boolean started = false;
 
 
     /**
@@ -539,7 +524,8 @@ public class AccessLogValve
      */
     @Override
     public void backgroundProcess() {
-        if (started && getEnabled() && writer != null && buffered) {
+        if (getState().isAvailable() && getEnabled() && writer != null &&
+                buffered) {
             writer.flush();
         }
     }    
@@ -558,7 +544,7 @@ public class AccessLogValve
     public void invoke(Request request, Response response) throws IOException,
             ServletException {
 
-        if (started && getEnabled()) {                
+        if (getState().isAvailable() && getEnabled()) {                
             // Pass this request on to the next valve in our pipeline
             long t1 = System.currentTimeMillis();
     
@@ -799,54 +785,15 @@ public class AccessLogValve
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
     /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-        lifecycle.addLifecycleListener(listener);
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-        return lifecycle.findLifecycleListeners();
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to add
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-        lifecycle.removeLifecycleListener(listener);
-    }
-
-
-    /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (started)
-            throw new LifecycleException(sm
-                    .getString("accessLogValve.alreadyStarted"));
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
 
         // Initialize the timeZone, Date formatters, and currentDate
         timezone = TimeZone.getDefault();
@@ -860,26 +807,22 @@ public class AccessLogValve
         fileDateFormatter.setTimeZone(timezone);
         dateStamp = fileDateFormatter.format(currentDateStruct.get().currentDate);
         open();
+        
+        setState(LifecycleState.STARTING);
     }
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
-    public void stop() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException(sm
-                    .getString("accessLogValve.notStarted"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
         
+        setState(LifecycleState.STOPPING);
         close();
     }
     

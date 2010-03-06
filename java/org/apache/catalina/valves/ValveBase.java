@@ -32,6 +32,8 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
@@ -39,6 +41,7 @@ import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.ContainerBase;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -55,7 +58,7 @@ import org.apache.juli.logging.LogFactory;
  * @version $Revision$ $Date$
  */
 
-public abstract class ValveBase
+public abstract class ValveBase extends LifecycleBase
     implements Contained, Valve, MBeanRegistration {
     private static final Log log = LogFactory.getLog(ValveBase.class);
 
@@ -225,16 +228,47 @@ public abstract class ValveBase
 
 
     /**
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        
+        setState(LifecycleState.STARTING);
+    }
+
+
+    /**
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
+
+        setState(LifecycleState.STOPPING);
+    }
+    
+    
+    /**
      * Return a String rendering of this object.
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(this.getClass().getName());
-        sb.append("[");
-        if (container != null)
+        sb.append('[');
+        if (container == null) {
+            sb.append("Container is null");
+        } else {
             sb.append(container.getName());
-        sb.append("]");
-        return (sb.toString());
+        }
+        sb.append(']');
+        return sb.toString();
     }
 
 
