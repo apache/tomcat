@@ -35,9 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
@@ -48,7 +46,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.DateTool;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
@@ -76,9 +74,9 @@ import org.apache.juli.logging.LogFactory;
  */
 
 
-public abstract class AuthenticatorBase
-    extends ValveBase
-    implements Authenticator, Lifecycle {
+public abstract class AuthenticatorBase extends ValveBase
+        implements Authenticator {
+
     private static final Log log = LogFactory.getLog(AuthenticatorBase.class);
 
 
@@ -168,12 +166,6 @@ public abstract class AuthenticatorBase
     protected boolean securePagesWithPragma = true;
     
     /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
      * A random number generator to use when generating session identifiers.
      */
     protected Random random = null;
@@ -198,12 +190,6 @@ public abstract class AuthenticatorBase
      * if there is one.
      */
     protected SingleSignOn sso = null;
-
-
-    /**
-     * Has this component been started?
-     */
-    protected boolean started = false;
 
 
     /**
@@ -836,61 +822,16 @@ public abstract class AuthenticatorBase
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
     /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (started)
-            throw new LifecycleException
-                (sm.getString("authenticator.alreadyStarted"));
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
-
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        
         // Look up the SingleSignOn implementation in our request processing
         // path, if there is one
         Container parent = context.getParent();
@@ -916,29 +857,22 @@ public abstract class AuthenticatorBase
                 log.debug("No SingleSignOn Valve is present");
         }
 
+        super.startInternal();
     }
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
-    public void stop() throws LifecycleException {
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
 
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException
-                (sm.getString("authenticator.notStarted"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+        super.stopInternal();
 
         sso = null;
-
     }
-
-
 }
