@@ -124,24 +124,24 @@ public class ClusterSingleSignOn
             Cluster cluster = getCluster();
             // stop remove cluster binding
             if(cluster == null) {
-		Container host = getContainer();
-		if(host != null && host instanceof Host) {
-		    cluster = host.getCluster();
-		    if(cluster != null && cluster instanceof CatalinaCluster) {
-			setCluster((CatalinaCluster) cluster);
-			getCluster().addClusterListener(clusterSSOListener);
-		    } else {
-			Container engine = host.getParent();
-			if(engine != null && engine instanceof Engine) {
-			    cluster = engine.getCluster();
-			    if(cluster != null && cluster instanceof CatalinaCluster) {
-				setCluster((CatalinaCluster) cluster);
-				getCluster().addClusterListener(clusterSSOListener);
-			    }
-			} else {
-			    cluster = null;
-			}
-		    }
+                Container host = getContainer();
+                if(host != null && host instanceof Host) {
+                    cluster = host.getCluster();
+                    if(cluster != null && cluster instanceof CatalinaCluster) {
+                        setCluster((CatalinaCluster) cluster);
+                        getCluster().addClusterListener(clusterSSOListener);
+                    } else {
+                        Container engine = host.getParent();
+                        if(engine != null && engine instanceof Engine) {
+                            cluster = engine.getCluster();
+                            if(cluster != null && cluster instanceof CatalinaCluster) {
+                                setCluster((CatalinaCluster) cluster);
+                                getCluster().addClusterListener(clusterSSOListener);
+                            }
+                        } else {
+                            cluster = null;
+                        }
+                    }
                 }
             }
             if (cluster == null) {
@@ -190,31 +190,31 @@ public class ClusterSingleSignOn
     @Override
     protected void associate(String ssoId, Session session) {
 
-	if (cluster != null) {
-	    messageNumber++;
-	    SingleSignOnMessage msg =
-		new SingleSignOnMessage(cluster.getLocalMember(),
-					ssoId, session.getId());
-	    Manager mgr = session.getManager();
-	    if ((mgr != null) && (mgr instanceof ClusterManager))
-		msg.setContextName(((ClusterManager) mgr).getName());
+        if (cluster != null) {
+            messageNumber++;
+            SingleSignOnMessage msg =
+                new SingleSignOnMessage(cluster.getLocalMember(),
+                                        ssoId, session.getId());
+            Manager mgr = session.getManager();
+            if ((mgr != null) && (mgr instanceof ClusterManager))
+                msg.setContextName(((ClusterManager) mgr).getName());
 
-	    msg.setAction(SingleSignOnMessage.ADD_SESSION);
+            msg.setAction(SingleSignOnMessage.ADD_SESSION);
 
-	    cluster.sendClusterDomain(msg);
+            cluster.sendClusterDomain(msg);
 
-	    if (containerLog.isDebugEnabled())
-		containerLog.debug("SingleSignOnMessage Send with action "
-				   + msg.getAction());
-	}
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("SingleSignOnMessage Send with action "
+                                   + msg.getAction());
+        }
 
-	associateLocal(ssoId, session);
+        associateLocal(ssoId, session);
 
     }
 
     protected void associateLocal(String ssoId, Session session) {
 
-	super.associate(ssoId, session);
+        super.associate(ssoId, session);
 
     }
 
@@ -230,30 +230,30 @@ public class ClusterSingleSignOn
     @Override
     protected void deregister(String ssoId, Session session) {
 
-	if (cluster != null) {
-	    messageNumber++;
-	    SingleSignOnMessage msg =
-		new SingleSignOnMessage(cluster.getLocalMember(),
-					ssoId, session.getId());
-	    Manager mgr = session.getManager();
-	    if ((mgr != null) && (mgr instanceof ClusterManager))
-		msg.setContextName(((ClusterManager) mgr).getName());
+        if (cluster != null) {
+            messageNumber++;
+            SingleSignOnMessage msg =
+                new SingleSignOnMessage(cluster.getLocalMember(),
+                                        ssoId, session.getId());
+            Manager mgr = session.getManager();
+            if ((mgr != null) && (mgr instanceof ClusterManager))
+                msg.setContextName(((ClusterManager) mgr).getName());
 
-	    msg.setAction(SingleSignOnMessage.DEREGISTER_SESSION);
+            msg.setAction(SingleSignOnMessage.DEREGISTER_SESSION);
 
-	    cluster.sendClusterDomain(msg);
-	    if (containerLog.isDebugEnabled())
-		containerLog.debug("SingleSignOnMessage Send with action "
-				   + msg.getAction());
-	}
+            cluster.sendClusterDomain(msg);
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("SingleSignOnMessage Send with action "
+                                   + msg.getAction());
+        }
 
-	deregisterLocal(ssoId, session);
+        deregisterLocal(ssoId, session);
 
     }
 
     protected void deregisterLocal(String ssoId, Session session) {
 
-	super.deregister(ssoId, session);
+        super.deregister(ssoId, session);
 
     }
 
@@ -268,26 +268,26 @@ public class ClusterSingleSignOn
     @Override
     protected void deregister(String ssoId) {
 
-	if (cluster != null) {
-	    messageNumber++;
-	    SingleSignOnMessage msg =
-		new SingleSignOnMessage(cluster.getLocalMember(),
-					ssoId, null);
-	    msg.setAction(SingleSignOnMessage.LOGOUT_SESSION);
+        if (cluster != null) {
+            messageNumber++;
+            SingleSignOnMessage msg =
+                new SingleSignOnMessage(cluster.getLocalMember(),
+                                        ssoId, null);
+            msg.setAction(SingleSignOnMessage.LOGOUT_SESSION);
 
-	    cluster.sendClusterDomain(msg);
-	    if (containerLog.isDebugEnabled())
-		containerLog.debug("SingleSignOnMessage Send with action "
-				   + msg.getAction());
-	}
+            cluster.sendClusterDomain(msg);
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("SingleSignOnMessage Send with action "
+                                   + msg.getAction());
+        }
 
-	deregisterLocal(ssoId);
+        deregisterLocal(ssoId);
 
     }
 
     protected void deregisterLocal(String ssoId) {
 
-	super.deregister(ssoId);
+        super.deregister(ssoId);
 
     }
 
@@ -307,30 +307,30 @@ public class ClusterSingleSignOn
     protected void register(String ssoId, Principal principal, String authType,
                   String username, String password) {
 
-	if (cluster != null) {
-	    messageNumber++;
-	    SingleSignOnMessage msg =
-		new SingleSignOnMessage(cluster.getLocalMember(),
-					ssoId, null);
-	    msg.setAction(SingleSignOnMessage.REGISTER_SESSION);
-	    msg.setAuthType(authType);
-	    msg.setUsername(username);
-	    msg.setPassword(password);
+        if (cluster != null) {
+            messageNumber++;
+            SingleSignOnMessage msg =
+                new SingleSignOnMessage(cluster.getLocalMember(),
+                                        ssoId, null);
+            msg.setAction(SingleSignOnMessage.REGISTER_SESSION);
+            msg.setAuthType(authType);
+            msg.setUsername(username);
+            msg.setPassword(password);
 
-	    cluster.sendClusterDomain(msg);
-	    if (containerLog.isDebugEnabled())
-		containerLog.debug("SingleSignOnMessage Send with action "
-				   + msg.getAction());
-	}
+            cluster.sendClusterDomain(msg);
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("SingleSignOnMessage Send with action "
+                                   + msg.getAction());
+        }
 
-	registerLocal(ssoId, principal, authType, username, password);
+        registerLocal(ssoId, principal, authType, username, password);
 
     }
 
     protected void registerLocal(String ssoId, Principal principal, String authType,
                   String username, String password) {
 
-	super.register(ssoId, principal, authType, username, password);
+        super.register(ssoId, principal, authType, username, password);
 
     }
 
@@ -365,30 +365,30 @@ public class ClusterSingleSignOn
     protected void update(String ssoId, Principal principal, String authType,
                           String username, String password) {
 
-	if (cluster != null) {
-	    messageNumber++;
-	    SingleSignOnMessage msg =
-		new SingleSignOnMessage(cluster.getLocalMember(),
-					ssoId, null);
-	    msg.setAction(SingleSignOnMessage.UPDATE_SESSION);
-	    msg.setAuthType(authType);
-	    msg.setUsername(username);
-	    msg.setPassword(password);
+        if (cluster != null) {
+            messageNumber++;
+            SingleSignOnMessage msg =
+                new SingleSignOnMessage(cluster.getLocalMember(),
+                                        ssoId, null);
+            msg.setAction(SingleSignOnMessage.UPDATE_SESSION);
+            msg.setAuthType(authType);
+            msg.setUsername(username);
+            msg.setPassword(password);
 
-	    cluster.sendClusterDomain(msg);
-	    if (containerLog.isDebugEnabled())
-		containerLog.debug("SingleSignOnMessage Send with action "
-				   + msg.getAction());
-	}
+            cluster.sendClusterDomain(msg);
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("SingleSignOnMessage Send with action "
+                                   + msg.getAction());
+        }
 
-	updateLocal(ssoId, principal, authType, username, password);
+        updateLocal(ssoId, principal, authType, username, password);
 
     }
 
     protected void updateLocal(String ssoId, Principal principal, String authType,
                           String username, String password) {
 
-	super.update(ssoId, principal, authType, username, password);
+        super.update(ssoId, principal, authType, username, password);
 
     }
 
@@ -403,31 +403,31 @@ public class ClusterSingleSignOn
     @Override
     protected void removeSession(String ssoId, Session session) {
 
-	if (cluster != null) {
-	    messageNumber++;
-	    SingleSignOnMessage msg =
-		new SingleSignOnMessage(cluster.getLocalMember(),
-					ssoId, session.getId());
+        if (cluster != null) {
+            messageNumber++;
+            SingleSignOnMessage msg =
+                new SingleSignOnMessage(cluster.getLocalMember(),
+                                        ssoId, session.getId());
 
-	    Manager mgr = session.getManager();
-	    if ((mgr != null) && (mgr instanceof ClusterManager))
-		msg.setContextName(((ClusterManager) mgr).getName());
+            Manager mgr = session.getManager();
+            if ((mgr != null) && (mgr instanceof ClusterManager))
+                msg.setContextName(((ClusterManager) mgr).getName());
 
-	    msg.setAction(SingleSignOnMessage.REMOVE_SESSION);
+            msg.setAction(SingleSignOnMessage.REMOVE_SESSION);
 
-	    cluster.sendClusterDomain(msg);
-	    if (containerLog.isDebugEnabled())
-		containerLog.debug("SingleSignOnMessage Send with action "
-				   + msg.getAction());
-	}
+            cluster.sendClusterDomain(msg);
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("SingleSignOnMessage Send with action "
+                                   + msg.getAction());
+        }
 
-	removeSessionLocal(ssoId, session);
+        removeSessionLocal(ssoId, session);
     }
 
     protected void removeSessionLocal(String ssoId, Session session) {
 
-	super.removeSession(ssoId, session);
-	
+        super.removeSession(ssoId, session);
+        
     }
 
 }
