@@ -48,8 +48,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Revision$ $Date$
  */
 
-public class ErrorReportValve
-    extends ValveBase {
+public class ErrorReportValve extends ValveBase {
 
     //------------------------------------------------------ Constructor
     public ErrorReportValve() {
@@ -296,5 +295,4 @@ public class ErrorReportValve
         }
         return trace.toString();
     }
-
 }
