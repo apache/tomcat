@@ -29,10 +29,10 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
@@ -47,7 +47,7 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -72,8 +72,8 @@ import org.apache.catalina.ha.jmx.ClusterJmxHelper;
  * @author Peter Rossbach
  * @version $Revision$, $Date$
  */
-public class SimpleTcpCluster 
-    implements CatalinaCluster, Lifecycle, LifecycleListener, IDynamicProperty,
+public class SimpleTcpCluster extends LifecycleBase
+    implements CatalinaCluster, LifecycleListener, IDynamicProperty,
                MembershipListener, ChannelListener{
 
     public static final Log log = LogFactory.getLog(SimpleTcpCluster.class);
@@ -136,16 +136,6 @@ public class SimpleTcpCluster
      * The Container associated with this Cluster.
      */
     protected Container container = null;
-
-    /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-    /**
-     * Has this component been started?
-     */
-    protected boolean started = false;
 
     /**
      * The property change support for this component.
@@ -535,7 +525,7 @@ public class SimpleTcpCluster
         ClusterManager cmanager = (ClusterManager) manager ;
         cmanager.setDistributable(true);
         // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
+        fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
         String clusterName = getManagerName(cmanager.getName(), manager);
         cmanager.setName(clusterName);
         cmanager.setCluster(this);
@@ -543,7 +533,7 @@ public class SimpleTcpCluster
     
         managers.put(clusterName, cmanager);
         // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);    
+        fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);    
     }
 
     /**
@@ -555,11 +545,11 @@ public class SimpleTcpCluster
         if (manager != null && manager instanceof ClusterManager ) {
             ClusterManager cmgr = (ClusterManager) manager;
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(BEFORE_MANAGERUNREGISTER_EVENT,manager);
+            fireLifecycleEvent(BEFORE_MANAGERUNREGISTER_EVENT,manager);
             managers.remove(getManagerName(cmgr.getName(),manager));
             cmgr.setCluster(null);
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(AFTER_MANAGERUNREGISTER_EVENT, manager);
+            fireLifecycleEvent(AFTER_MANAGERUNREGISTER_EVENT, manager);
         }
     }
 
@@ -609,35 +599,6 @@ public class SimpleTcpCluster
         if ( isHeartbeatBackgroundEnabled() && channel !=null ) channel.heartbeat();
     }
 
-    /**
-     * Add a lifecycle event listener to this component.
-     * 
-     * @param listener
-     *            The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-        lifecycle.addLifecycleListener(listener);
-    }
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     * 
-     * @param listener
-     *            The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-        lifecycle.removeLifecycleListener(listener);
-    }
 
     /**
      * Use as base to handle start/stop/periodic Events from host. Currently
@@ -653,26 +614,17 @@ public class SimpleTcpCluster
     // ------------------------------------------------------ public
 
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component. This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized. <BR>
-     * Starts the cluster communication channel, this will connect with the
-     * other nodes in the cluster, and request the current session state to be
-     * transferred to this node.
-     * 
-     * @exception IllegalStateException
-     *                if this component has already been started
-     * @exception LifecycleException
-     *                if this component detects a fatal error that prevents this
-     *                component from being used
+     * Start Cluster and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
-        if (started)
-            throw new LifecycleException(sm.getString("cluster.alreadyStarted"));
+    @Override
+    protected void startInternal() throws LifecycleException {
+
         if (log.isInfoEnabled()) log.info("Cluster is about to start");
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, this);
         try {
             checkDefaults();
             registerClusterValve();
@@ -680,15 +632,15 @@ public class SimpleTcpCluster
             channel.addChannelListener(this);
             channel.start(channelStartOptions);
             if (clusterDeployer != null) clusterDeployer.start();
-            this.started = true;
             //register JMX objects
             ClusterJmxHelper.registerDefaultCluster(this);
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(AFTER_START_EVENT, this);
         } catch (Exception x) {
             log.error("Unable to start cluster.", x);
             throw new LifecycleException(x);
         }
+        
+        setState(LifecycleState.STARTING);
     }
 
     protected void checkDefaults() {
@@ -750,25 +702,18 @@ public class SimpleTcpCluster
         }
     }
 
+    
     /**
-     * Gracefully terminate the active cluster component.<br/>
-     * This will disconnect the cluster communication channel, stop the
-     * listener and deregister the valves from host or engine.<br/><br/>
-     * <b>Note:</b><br/>The sub elements receiver, sender, membership,
-     * listener or valves are not removed. You can easily start the cluster again.
-     * 
-     * @exception IllegalStateException
-     *                if this component has not been started
-     * @exception LifecycleException
-     *                if this component detects a fatal error that needs to be
-     *                reported
+     * Stop Cluster and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void stop() throws LifecycleException {
+    @Override
+    protected void stopInternal() throws LifecycleException {
 
-        if (!started)
-            throw new IllegalStateException(sm.getString("cluster.notStarted"));
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, this);
+        setState(LifecycleState.STOPPING);
 
         if (clusterDeployer != null) clusterDeployer.stop();
         this.managers.clear();
@@ -784,13 +729,25 @@ public class SimpleTcpCluster
         } catch (Exception x) {
             log.error("Unable to stop cluster valve.", x);
         }
-        started = false;
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, this);
-   }
+    }
 
     
-
+    /**
+     * Return a String rendering of this object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(this.getClass().getName());
+        sb.append('[');
+        if (container == null) {
+            sb.append("Container is null");
+        } else {
+            sb.append(container.getName());
+        }
+        sb.append(']');
+        return sb.toString();
+    }
+    
 
     /**
      * send message to all cluster members
@@ -850,9 +807,9 @@ public class SimpleTcpCluster
             hasMembers = channel.hasMembers();
             if (log.isInfoEnabled()) log.info("Replication member added:" + member);
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(BEFORE_MEMBERREGISTER_EVENT, member);
+            fireLifecycleEvent(BEFORE_MEMBERREGISTER_EVENT, member);
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(AFTER_MEMBERREGISTER_EVENT, member);
+            fireLifecycleEvent(AFTER_MEMBERREGISTER_EVENT, member);
         } catch (Exception x) {
             log.error("Unable to connect to replication system.", x);
         }
@@ -869,9 +826,9 @@ public class SimpleTcpCluster
             hasMembers = channel.hasMembers();            
             if (log.isInfoEnabled()) log.info("Received member disappeared:" + member);
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(BEFORE_MEMBERUNREGISTER_EVENT, member);
+            fireLifecycleEvent(BEFORE_MEMBERUNREGISTER_EVENT, member);
             // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(AFTER_MEMBERUNREGISTER_EVENT, member);
+            fireLifecycleEvent(AFTER_MEMBERUNREGISTER_EVENT, member);
         } catch (Exception x) {
             log.error("Unable remove cluster node from replication system.", x);
         }
@@ -921,7 +878,7 @@ public class SimpleTcpCluster
             if (notifyLifecycleListenerOnFailure) {
                 Member dest = message.getAddress();
                 // Notify our interested LifecycleListeners
-                lifecycle.fireLifecycleEvent(RECEIVE_MESSAGE_FAILURE_EVENT,
+                fireLifecycleEvent(RECEIVE_MESSAGE_FAILURE_EVENT,
                         new SendMessageData(message, dest, null));
             }
             log.debug("Message " + message.toString() + " from type "
