@@ -22,14 +22,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.LifecycleState;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-public class StandardThreadExecutor implements Executor, ResizableExecutor {
+public class StandardThreadExecutor extends LifecycleBase
+        implements Executor, ResizableExecutor {
     
     // ---------------------------------------------- Properties
     /**
@@ -77,8 +78,6 @@ public class StandardThreadExecutor implements Executor, ResizableExecutor {
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
     
-    private LifecycleSupport lifecycle = new LifecycleSupport(this);
-    
     private TaskQueue taskqueue = null;
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
@@ -88,23 +87,40 @@ public class StandardThreadExecutor implements Executor, ResizableExecutor {
 
     
     // ---------------------------------------------- Public Methods
-    public void start() throws LifecycleException {
-        lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
+    
+    /**
+     * Start the component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    @Override
+    protected void startInternal() throws LifecycleException {
+
         taskqueue = new TaskQueue(maxQueueSize);
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
         taskqueue.setParent(executor);
-        lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
+
+        setState(LifecycleState.STARTING);
     }
-    
-    public void stop() throws LifecycleException{
-        lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
+
+
+    /**
+     * Stop the component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that needs to be reported
+     */
+    @Override
+    protected void stopInternal() throws LifecycleException {
+
+        setState(LifecycleState.STOPPING);
         if ( executor != null ) executor.shutdownNow();
         executor = null;
         taskqueue = null;
-        lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
     }
     
     public void execute(Runnable command, long timeout, TimeUnit unit) {
@@ -201,34 +217,6 @@ public class StandardThreadExecutor implements Executor, ResizableExecutor {
         return maxQueueSize;
     }
     
-    /**
-     * Add a LifecycleEvent listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-        lifecycle.addLifecycleListener(listener);
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-        return lifecycle.findLifecycleListeners();
-    }
-
-
-    /**
-     * Remove a LifecycleEvent listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-        lifecycle.removeLifecycleListener(listener);
-    }
-
     // Statistics from the thread pool
     public int getActiveCount() {
         return (executor != null) ? executor.getActiveCount() : 0;
@@ -258,13 +246,12 @@ public class StandardThreadExecutor implements Executor, ResizableExecutor {
 
     @Override
     public boolean resizePool(int corePoolSize, int maximumPoolSize) {
-        if (executor == null) {
+        if (executor == null)
             return false;
-        } else {
-            executor.setCorePoolSize(corePoolSize);
-            executor.setMaximumPoolSize(maximumPoolSize);
-            return true;
-        }
+
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaximumPoolSize(maximumPoolSize);
+        return true;
     }
 
 
