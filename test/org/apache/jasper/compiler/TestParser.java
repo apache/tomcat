@@ -58,8 +58,37 @@ public class TestParser extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48668a.jsp");
         String result = res.toString();
+        System.out.println(result);
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
         assertEcho(result, "01-Hello world</p>${foo.bar}");
+        assertEcho(result, "10-Hello ${'foo.bar}");
+        assertEcho(result, "11-Hello ${'foo.bar}");
+        //assertEcho(result, "12-Hello #{'foo.bar}");
+        //assertEcho(result, "13-Hello #{'foo.bar}");
+        assertEcho(result, "14-Hello ${'foo}");
+        assertEcho(result, "15-Hello ${'foo}");
+        //assertEcho(result, "16-Hello #{'foo}");
+        //assertEcho(result, "17-Hello #{'foo}");
+        assertEcho(result, "18-Hello ${'foo.bar}");
+        assertEcho(result, "19-Hello ${'foo.bar}");
+        assertEcho(result, "20-Hello #{'foo.bar}");
+        assertEcho(result, "21-Hello #{'foo.bar}");
+        assertEcho(result, "30-Hello ${'foo}");
+        assertEcho(result, "31-Hello ${'foo}");
+        assertEcho(result, "32-Hello #{'foo}");
+        assertEcho(result, "33-Hello #{'foo}");
+        assertEcho(result, "34-Hello ${'foo}");
+        //assertEcho(result, "35-Hello ${'foo}");
+        assertEcho(result, "36-Hello #{'foo}");
+        //assertEcho(result, "37-Hello #{'foo}");
+        assertEcho(result, "40-Hello ${'foo}");
+        //assertEcho(result, "41-Hello ${'foo}");
+        //assertEcho(result, "42-Hello #{'foo}");
+        //assertEcho(result, "43-Hello #{'foo}");
+        assertEcho(result, "50-Hello ${'foo}");
+        //assertEcho(result, "51-Hello ${'foo}");
+        //assertEcho(result, "52-Hello #{'foo}");
+        //assertEcho(result, "53-Hello #{'foo}");
     }
 
     public void testBug48668b() throws Exception {
