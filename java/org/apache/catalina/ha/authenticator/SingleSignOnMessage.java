@@ -49,11 +49,11 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
     private String uniqueId = null;
 
     public SingleSignOnMessage(Member source,
-			       String ssoId,
-			       String sessionId) {
+                               String ssoId,
+                               String sessionId) {
         this.address = source;
-	this.ssoId = ssoId;
-	this.sessionId = sessionId;
+        this.ssoId = ssoId;
+        this.sessionId = sessionId;
     }
     
     /**
@@ -62,7 +62,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      * that originally sent it.
      */
     public Member getAddress() {
-	return address;
+        return address;
     }
 
     /**
@@ -72,7 +72,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      * @param member Member
      */
     public void setAddress(Member member) {
-	this.address = member;
+        this.address = member;
     }
 
     /**
@@ -101,12 +101,12 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      * @return String
      */
     public String getUniqueId() {
-	if (this.uniqueId != null)
-	    return this.uniqueId;
-	StringBuilder result = new StringBuilder(getSsoId());
-	result.append("#-#");
-	result.append(System.currentTimeMillis());
-	return result.toString();
+        if (this.uniqueId != null)
+            return this.uniqueId;
+        StringBuilder result = new StringBuilder(getSsoId());
+        result.append("#-#");
+        result.append(System.currentTimeMillis());
+        return result.toString();
     }
 
     public void setUniqueId(String uniqueId) {
@@ -114,59 +114,59 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
     }
 
     public int getAction() {
-	return action;
+        return action;
     }
 
     public void setAction(int action) {
-	this.action = action;
+        this.action = action;
     }
 
     public String getSsoId() {
-	return ssoId;
+        return ssoId;
     }
 
     public void setSsoId(String ssoId) {
-	this.ssoId = ssoId;
+        this.ssoId = ssoId;
     }
 
     public String getContextName() {
-	return ctxname;
+        return ctxname;
     }
 
     public void setContextName(String ctxname) {
-	this.ctxname = ctxname;
+        this.ctxname = ctxname;
     }
 
     public String getSessionId() {
-	return sessionId;
+        return sessionId;
     }
 
     public void setSessionId(String sessionId) {
-	this.sessionId = sessionId;
+        this.sessionId = sessionId;
     }
 
     public String getAuthType() {
-	return authType;
+        return authType;
     }
 
     public void setAuthType(String authType) {
-	this.authType = authType;
+        this.authType = authType;
     }
 
     public String getPassword() {
-	return password;
+        return password;
     }
 
     public void setPassword(String password) {
-	this.password = password;
+        this.password = password;
     }
 
     public String getUsername() {
-	return username;
+        return username;
     }
 
     public void setUsername(String username) {
-	this.username = username;
+        this.username = username;
     }
 
 
@@ -179,9 +179,9 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
     public String toString() {
 
         StringBuilder sb = new StringBuilder("SingleSignOnMessage[action=");
-	sb.append(getAction()).append(", ssoId=").append(getSsoId());
-	sb.append(", sessionId=").append(getSessionId()).append(", username=");
-	sb.append(getUsername()).append("]");
+        sb.append(getAction()).append(", ssoId=").append(getSsoId());
+        sb.append(", sessionId=").append(getSessionId()).append(", username=");
+        sb.append(getUsername()).append("]");
         return (sb.toString());
 
     }
