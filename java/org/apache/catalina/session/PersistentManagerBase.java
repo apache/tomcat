@@ -31,10 +31,10 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.Log;
@@ -53,9 +53,8 @@ import org.apache.juli.logging.LogFactory;
  * @version $Revision$ $Date$
  */
 
-public abstract class PersistentManagerBase
-    extends ManagerBase
-    implements Lifecycle, PropertyChangeListener {
+public abstract class PersistentManagerBase extends ManagerBase
+    implements PropertyChangeListener {
 
     private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
 
@@ -140,12 +139,6 @@ public abstract class PersistentManagerBase
 
 
     /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
      * The maximum number of active Sessions allowed, or -1 for no limit.
      */
     protected int maxActiveSessions = -1;
@@ -155,12 +148,6 @@ public abstract class PersistentManagerBase
      * The descriptive name of this Manager implementation (for logging).
      */
     private static String name = "PersistentManagerBase";
-
-
-    /**
-     * Has this component been started yet?
-     */
-    protected boolean started = false;
 
 
     /**
@@ -433,26 +420,6 @@ public abstract class PersistentManagerBase
     public String getName() {
 
         return (name);
-
-    }
-
-
-    /**
-     * Get the started status.
-     */
-    protected boolean isStarted() {
-
-        return started;
-
-    }
-
-
-    /**
-     * Set the started flag
-     */
-    protected void setStarted(boolean started) {
-
-        this.started = started;
 
     }
 
@@ -932,65 +899,19 @@ public abstract class PersistentManagerBase
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
     /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
-    public void start() throws LifecycleException {
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
 
-        // Validate and update our current component state
-        if (started) {
-            log.info(sm.getString("standardManager.alreadyStarted"));
-            return;
-        }
         if( ! initialized )
             init();
         
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
-        started = true;
-
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
             log.debug("Force random number initialization starting");
@@ -1003,31 +924,25 @@ public abstract class PersistentManagerBase
         else if (store instanceof Lifecycle)
             ((Lifecycle)store).start();
 
+        setState(LifecycleState.STARTING);
     }
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
-   public void stop() throws LifecycleException {
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
 
         if (log.isDebugEnabled())
             log.debug("Stopping");
 
-        // Validate and update our current component state
-        if (!isStarted()) {
-            log.info(sm.getString("standardManager.notStarted"));
-            return;
-        }
+        setState(LifecycleState.STOPPING);
         
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        setStarted(false);
-
         if (getStore() != null && saveOnRestart) {
             unload();
         } else {
@@ -1089,7 +1004,7 @@ public abstract class PersistentManagerBase
      */
     protected void processMaxIdleSwaps() {
 
-        if (!isStarted() || maxIdleSwap < 0)
+        if (!getState().isAvailable() || maxIdleSwap < 0)
             return;
 
         Session sessions[] = findSessions();
@@ -1132,7 +1047,7 @@ public abstract class PersistentManagerBase
      */
     protected void processMaxActiveSwaps() {
 
-        if (!isStarted() || getMaxActiveSessions() < 0)
+        if (!getState().isAvailable() || getMaxActiveSessions() < 0)
             return;
 
         Session sessions[] = findSessions();
@@ -1182,7 +1097,7 @@ public abstract class PersistentManagerBase
      */
     protected void processMaxIdleBackups() {
 
-        if (!isStarted() || maxIdleBackup < 0)
+        if (!getState().isAvailable() || maxIdleBackup < 0)
             return;
 
         Session sessions[] = findSessions();

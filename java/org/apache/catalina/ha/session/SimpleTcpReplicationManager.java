@@ -19,6 +19,7 @@ package org.apache.catalina.ha.session;
 import java.io.IOException;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
@@ -27,6 +28,8 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.tribes.io.ReplicationStream;
+import org.apache.catalina.util.LifecycleBase;
+
 import java.io.ByteArrayInputStream;
 import org.apache.catalina.Loader;
 
@@ -67,15 +70,10 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
     //the group name
     protected String mGroupName = "TomcatReplication";
 
-    //somehow start() gets called more than once
-    protected boolean mChannelStarted = false;
-
     //log to screen
     protected boolean mPrintToScreen = true;
 
     protected boolean defaultMode = false;
-
-    protected boolean mManagerRunning = false;
 
     /** Use synchronous rather than asynchronous replication. Every session modification (creation, change, removal etc)
      * will be sent to all members. The call will then wait for max milliseconds, or forever (if timeout is 0) for
@@ -138,11 +136,6 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         this.defaultMode = defaultMode;
     }
     
-    public boolean isManagerRunning()
-    {
-        return mManagerRunning;
-    }
-
     public void setUseDirtyFlag(boolean usedirtyflag)
     {
         this.useDirtyFlag = usedirtyflag;
@@ -465,28 +458,28 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
     public String getName() {
         return this.name;
     }
+
+
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.<BR>
-     * Starts the cluster communication channel, this will connect with the other nodes
-     * in the cluster, and request the current session state to be transferred to this node.
-     * @exception IllegalStateException if this component has already been
-     *  started
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * Starts the cluster communication channel, this will connect with the
+     * other nodes in the cluster, and request the current session state to be
+     * transferred to this node.
+     * 
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-        mManagerRunning = true;
-        super.start();
+    protected synchronized void startInternal() throws LifecycleException {
+
         try {
-            //the channel is already running
-            if ( mChannelStarted ) return;
             if(log.isInfoEnabled())
                 log.info("Starting clustering manager...:"+getName());
             if ( cluster == null ) {
                 log.error("Starting... no cluster associated with this context:"+getName());
+                setState(LifecycleState.FAILED);
                 return;
             }
             cluster.registerManager(this);
@@ -524,27 +517,28 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
                 if(log.isInfoEnabled())
                     log.info("Manager["+getName()+"], skipping state transfer. No members active in cluster group.");
             }//end if
-            mChannelStarted = true;
+            super.startInternal();
         }  catch ( Exception x ) {
             log.error("Unable to start SimpleTcpReplicationManager",x);
+            setState(LifecycleState.FAILED);
         }
     }
 
+
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component.  This method should be the last one called on a given
-     * instance of this component.<BR>
-     * This will disconnect the cluster communication channel and stop the listener thread.
-     * @exception IllegalStateException if this component has not been started
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * This will disconnect the cluster communication channel and stop the
+     * listener thread.
+     * 
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
     @Override
-    public void stop() throws LifecycleException
-    {
-        mManagerRunning = false;
-        mChannelStarted = false;
-        super.stop();
+    protected synchronized void stopInternal() throws LifecycleException {
+
+        super.stopInternal();
         try
         {
             this.sessions.clear();
