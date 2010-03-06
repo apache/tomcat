@@ -33,7 +33,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardContext;
@@ -42,7 +42,7 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.ha.ClusterManager;
 
@@ -83,11 +83,6 @@ public class DeltaManager extends ClusterManagerBase{
     private static final String info = "DeltaManager/2.1";
 
     /**
-     * Has this component been started yet?
-     */
-    private boolean started = false;
-
-    /**
      * The descriptive name of this Manager implementation (for logging).
      */
     protected static String managerName = "DeltaManager";
@@ -100,11 +95,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     private ReplicationValve replicationValve = null ;
     
-    /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
     /**
      * The maximum number of active Sessions allowed, or -1 for no limit.
      */
@@ -758,54 +748,16 @@ public class DeltaManager extends ClusterManagerBase{
         return fos.toByteArray();
     }
 
-    // ------------------------------------------------------ Lifecycle Methods
-
     /**
-     * Add a lifecycle event listener to this component.
-     * 
-     * @param listener
-     *            The listener to add
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void addLifecycleListener(LifecycleListener listener) {
-        lifecycle.addLifecycleListener(listener);
-    }
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-        return lifecycle.findLifecycleListeners();
-    }
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     * 
-     * @param listener
-     *            The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-        lifecycle.removeLifecycleListener(listener);
-    }
-
-    /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component. This method should be called after <code>configure()</code>,
-     * and before any of the public methods of the component are utilized.
-     * 
-     * @exception LifecycleException
-     *                if this component detects a fatal error that prevents this
-     *                component from being used
-     */
-    public void start() throws LifecycleException {
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
         if (!initialized) init();
-
-        // Validate and update our current component state
-        if (started) {
-            return;
-        }
-        started = true;
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
 
         // Force initialization of the random number generator
         generateSessionId();
@@ -862,6 +814,8 @@ public class DeltaManager extends ClusterManagerBase{
         } catch (Throwable t) {
             log.error(sm.getString("deltaManager.managerLoad"), t);
         }
+        
+        setState(LifecycleState.STARTING);
     }
 
     /**
@@ -998,26 +952,20 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component. This method should be the last one called on a given instance
-     * of this component.
-     * 
-     * @exception LifecycleException
-     *                if this component detects a fatal error that needs to be
-     *                reported
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
-    public void stop() throws LifecycleException {
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
 
         if (log.isDebugEnabled())
             log.debug(sm.getString("deltaManager.stopped", getName()));
 
-
-        // Validate and update our current component state
-        if (!started)
-            throw new LifecycleException(sm.getString("deltaManager.notStarted"));
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
-
+        setState(LifecycleState.STOPPING);
+        
         // Expire all active sessions
         if (log.isInfoEnabled()) log.info(sm.getString("deltaManager.expireSessions", getName()));
         Session sessions[] = findSessions();
