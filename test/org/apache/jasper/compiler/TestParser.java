@@ -78,17 +78,17 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(result, "32-Hello #{'foo}");
         assertEcho(result, "33-Hello #{'foo}");
         assertEcho(result, "34-Hello ${'foo}");
-        //assertEcho(result, "35-Hello ${'foo}");
+        assertEcho(result, "35-Hello ${'foo}");
         assertEcho(result, "36-Hello #{'foo}");
-        //assertEcho(result, "37-Hello #{'foo}");
+        assertEcho(result, "37-Hello #{'foo}");
         assertEcho(result, "40-Hello ${'foo}");
-        //assertEcho(result, "41-Hello ${'foo}");
-        //assertEcho(result, "42-Hello #{'foo}");
-        //assertEcho(result, "43-Hello #{'foo}");
+        assertEcho(result, "41-Hello ${'foo}");
+        assertEcho(result, "42-Hello #{'foo}");
+        assertEcho(result, "43-Hello #{'foo}");
         assertEcho(result, "50-Hello ${'foo}");
-        //assertEcho(result, "51-Hello ${'foo}");
-        //assertEcho(result, "52-Hello #{'foo}");
-        //assertEcho(result, "53-Hello #{'foo}");
+        assertEcho(result, "51-Hello ${'foo}");
+        assertEcho(result, "52-Hello #{'foo}");
+        assertEcho(result, "53-Hello #{'foo}");
     }
 
     public void testBug48668b() throws Exception {
