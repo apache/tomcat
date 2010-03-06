@@ -131,8 +131,8 @@ public abstract class LifecycleBase implements Lifecycle {
                 state.equals(LifecycleState.MUST_STOP)) {
             stop();
         } else {
-            // Shouldn't be necessary but acts as a check that sub-classes are doing
-            // what they are supposed to.
+            // Shouldn't be necessary but acts as a check that sub-classes are
+            // doing what they are supposed to.
             if (!state.equals(LifecycleState.STARTING)) {
                 invalidTransition(Lifecycle.AFTER_START_EVENT);
             }
