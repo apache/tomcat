@@ -362,6 +362,20 @@
     <mkdir dir="${tomcat.build}/temp"/>
     <mkdir dir="${tomcat.build}/webapps"/>
 
+    <!-- Property that determines if manifests need updating -->
+    <uptodate property="manifests.uptodate"
+        targetfile="${tomcat.manifests}/default.manifest" >
+      <srcfiles file="${user.home}/build.properties" />
+      <srcfiles file="${basedir}/build.properties" />
+      <srcfiles file="${basedir}/build.properties.default" />
+      <srcfiles file="${basedir}/build.xml" />
+      <srcfiles dir="${tomcat.home}/res/META-INF" >
+        <include name="*.manifest" />
+        <include name="*.license" />
+        <include name="*.notice" />
+      </srcfiles>
+    </uptodate>
+  	
   </target>
 
   <target name="compile" depends="build-prepare,download-compile">
@@ -396,7 +410,7 @@
 
   </target>
 
-  <target name="build-manifests" >
+  <target name="build-manifests" unless="manifests.uptodate">
     <!-- Filtering tokens for JAR manifests-->
     <filter token="source.jdk" value="${compile.source}"/>
     <filter token="target.jdk" value="${compile.target}"/>
