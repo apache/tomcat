@@ -42,19 +42,19 @@
     <p>32-<tags:bug48668 noexpr="Hello #{'foo}"/></p>
     <p>33-Hello <tags:bug48668 noexpr="#{'foo}"/></p>
     <p>34-<tags:bug48668><jsp:attribute name="noexpr">Hello ${'foo}</jsp:attribute></tags:bug48668></p>
-<%--<p>35-Hello <tags:bug48668><jsp:attribute name="noexpr">${'foo}</jsp:attribute></tags:bug48668></p>--%>
+    <p>35-Hello <tags:bug48668><jsp:attribute name="noexpr">${'foo}</jsp:attribute></tags:bug48668></p>
     <p>36-<tags:bug48668><jsp:attribute name="noexpr">Hello #{'foo}</jsp:attribute></tags:bug48668></p>
-<%--<p>37-Hello <tags:bug48668><jsp:attribute name="noexpr">#{'foo}</jsp:attribute></tags:bug48668></p>--%>
+    <p>37-Hello <tags:bug48668><jsp:attribute name="noexpr">#{'foo}</jsp:attribute></tags:bug48668></p>
 
     <p>40-<tags:bug48668><jsp:attribute name="fragment">Hello ${'foo}</jsp:attribute></tags:bug48668></p>
     <p>41-Hello <tags:bug48668><jsp:attribute name="fragment">${'foo}</jsp:attribute></tags:bug48668></p>
     <p>42-<tags:bug48668><jsp:attribute name="fragment">Hello #{'foo}</jsp:attribute></tags:bug48668></p>
-<%--<p>43-Hello <tags:bug48668><jsp:attribute name="fragment">#{'foo}</jsp:attribute></tags:bug48668></p>--%>
+    <p>43-Hello <tags:bug48668><jsp:attribute name="fragment">#{'foo}</jsp:attribute></tags:bug48668></p>
 
     <p>50-<tags:bug48668>Hello ${'foo}</tags:bug48668></p>
     <p>51-Hello <tags:bug48668>${'foo}</tags:bug48668></p>
     <p>52-<tags:bug48668>Hello #{'foo}</tags:bug48668></p>
-<%--<p>53-Hello <tags:bug48668>#{'foo}</tags:bug48668></p>--%>
+    <p>53-Hello <tags:bug48668>#{'foo}</tags:bug48668></p>
   </body>
 </html>
 
