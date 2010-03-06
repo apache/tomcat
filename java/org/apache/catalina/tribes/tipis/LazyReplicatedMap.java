@@ -92,7 +92,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap {
          * @param initialCapacity int - the size of this map, see HashMap
          */
         public LazyReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, int initialCapacity, ClassLoader[] cls) {
-            super(owner, channel,timeout,mapContextName,initialCapacity, LazyReplicatedMap.DEFAULT_LOAD_FACTOR, Channel.SEND_OPTIONS_DEFAULT, cls);
+            super(owner, channel,timeout,mapContextName,initialCapacity, AbstractReplicatedMap.DEFAULT_LOAD_FACTOR, Channel.SEND_OPTIONS_DEFAULT, cls);
         }
 
         /**
@@ -102,7 +102,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap {
          * @param mapContextName String - unique name for this map, to allow multiple maps per channel
          */
         public LazyReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, ClassLoader[] cls) {
-            super(owner, channel,timeout,mapContextName, LazyReplicatedMap.DEFAULT_INITIAL_CAPACITY,LazyReplicatedMap.DEFAULT_LOAD_FACTOR,Channel.SEND_OPTIONS_DEFAULT, cls);
+            super(owner, channel,timeout,mapContextName, AbstractReplicatedMap.DEFAULT_INITIAL_CAPACITY,AbstractReplicatedMap.DEFAULT_LOAD_FACTOR,Channel.SEND_OPTIONS_DEFAULT, cls);
         }
 
 
