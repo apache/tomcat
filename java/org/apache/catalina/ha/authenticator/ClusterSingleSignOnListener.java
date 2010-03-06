@@ -83,44 +83,44 @@ public class ClusterSingleSignOnListener extends ClusterListener {
         if (myobj != null && myobj instanceof SingleSignOnMessage) {
             SingleSignOnMessage msg = (SingleSignOnMessage) myobj;
             int action = msg.getAction();
-	    Session session = null;
+            Session session = null;
 
-	    if (log.isDebugEnabled())
-		log.debug("SingleSignOnMessage Received with action "
-			  + msg.getAction());
+            if (log.isDebugEnabled())
+                log.debug("SingleSignOnMessage Received with action "
+                          + msg.getAction());
 
-	    switch(action) {
-	    case SingleSignOnMessage.ADD_SESSION:
-		session = getSession(msg.getSessionId(),
-				     msg.getContextName());
-		if (session != null)
-		    clusterSSO.associateLocal(msg.getSsoId(), session);
-		break;
-	    case SingleSignOnMessage.DEREGISTER_SESSION:
-		session = getSession(msg.getSessionId(),
-				     msg.getContextName());
-		if (session != null)
-		    clusterSSO.deregisterLocal(msg.getSsoId(), session);
-		break;
-	    case SingleSignOnMessage.LOGOUT_SESSION:
-		clusterSSO.deregisterLocal(msg.getSsoId());
-		break;
-	    case SingleSignOnMessage.REGISTER_SESSION:
-		clusterSSO.registerLocal(msg.getSsoId(), null, msg.getAuthType(),
-					 msg.getUsername(), msg.getPassword());
-		break;
-	    case SingleSignOnMessage.UPDATE_SESSION:
-		clusterSSO.updateLocal(msg.getSsoId(), null, msg.getAuthType(),
-				       msg.getUsername(), msg.getPassword());
-		break;
-	    case SingleSignOnMessage.REMOVE_SESSION:
-		session = getSession(msg.getSessionId(),
-				     msg.getContextName());
-		if (session != null)
-		    clusterSSO.removeSessionLocal(msg.getSsoId(), session);
-		break;
-	    }
-	}
+            switch(action) {
+            case SingleSignOnMessage.ADD_SESSION:
+                session = getSession(msg.getSessionId(),
+                                     msg.getContextName());
+                if (session != null)
+                    clusterSSO.associateLocal(msg.getSsoId(), session);
+                break;
+            case SingleSignOnMessage.DEREGISTER_SESSION:
+                session = getSession(msg.getSessionId(),
+                                     msg.getContextName());
+                if (session != null)
+                    clusterSSO.deregisterLocal(msg.getSsoId(), session);
+                break;
+            case SingleSignOnMessage.LOGOUT_SESSION:
+                clusterSSO.deregisterLocal(msg.getSsoId());
+                break;
+            case SingleSignOnMessage.REGISTER_SESSION:
+                clusterSSO.registerLocal(msg.getSsoId(), null, msg.getAuthType(),
+                                         msg.getUsername(), msg.getPassword());
+                break;
+            case SingleSignOnMessage.UPDATE_SESSION:
+                clusterSSO.updateLocal(msg.getSsoId(), null, msg.getAuthType(),
+                                       msg.getUsername(), msg.getPassword());
+                break;
+            case SingleSignOnMessage.REMOVE_SESSION:
+                session = getSession(msg.getSessionId(),
+                                     msg.getContextName());
+                if (session != null)
+                    clusterSSO.removeSessionLocal(msg.getSsoId(), session);
+                break;
+            }
+        }
     }
 
     /**
@@ -139,44 +139,44 @@ public class ClusterSingleSignOnListener extends ClusterListener {
 
 
     private Session getSession(String sessionId, String ctxname) {
-	
-	Map<String,ClusterManager> managers = clusterSSO.getCluster().getManagers();
-	Session session = null;
+        
+        Map<String,ClusterManager> managers = clusterSSO.getCluster().getManagers();
+        Session session = null;
 
-	if (ctxname == null) {
-	    java.util.Iterator<String> i = managers.keySet().iterator();
-	    while (i.hasNext()) {
-		String key = i.next();
-		ClusterManager mgr = managers.get(key);
-		if (mgr != null) {
-		    try {
-			session = mgr.findSession(sessionId);
-		    } catch (IOException io) {
-			log.error("Session doesn't exist:" + io);
-		    }
-		    return session;
-		} else {
-		    //this happens a lot before the system has started
-		    // up
-		    if (log.isDebugEnabled())
-			log.debug("Context manager doesn't exist:"
-				  + key);
-		}
-	    }
-	} else {
-	    ClusterManager mgr = managers.get(ctxname);
-	    if (mgr != null) {
-		try {
-		    session = mgr.findSession(sessionId);
-		} catch (IOException io) {
-		    log.error("Session doesn't exist:" + io);
-		}
-		return session;
-	    } else if (log.isErrorEnabled())
-		log.error("Context manager doesn't exist:" + ctxname);
-	}
+        if (ctxname == null) {
+            java.util.Iterator<String> i = managers.keySet().iterator();
+            while (i.hasNext()) {
+                String key = i.next();
+                ClusterManager mgr = managers.get(key);
+                if (mgr != null) {
+                    try {
+                        session = mgr.findSession(sessionId);
+                    } catch (IOException io) {
+                        log.error("Session doesn't exist:" + io);
+                    }
+                    return session;
+                } else {
+                    //this happens a lot before the system has started
+                    // up
+                    if (log.isDebugEnabled())
+                        log.debug("Context manager doesn't exist:"
+                                  + key);
+                }
+            }
+        } else {
+            ClusterManager mgr = managers.get(ctxname);
+            if (mgr != null) {
+                try {
+                    session = mgr.findSession(sessionId);
+                } catch (IOException io) {
+                    log.error("Session doesn't exist:" + io);
+                }
+                return session;
+            } else if (log.isErrorEnabled())
+                log.error("Context manager doesn't exist:" + ctxname);
+        }
 
-	return null;
+        return null;
     }
 }
 
