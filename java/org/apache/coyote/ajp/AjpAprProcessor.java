@@ -42,6 +42,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -572,7 +573,7 @@ public class AjpAprProcessor implements ActionHook {
                     log.error(sm.getString("ajpprocessor.certs.fail"), e);
                     return;
                 }
-                request.setAttribute(AprEndpoint.CERTIFICATE_KEY, jsseCerts);
+                request.setAttribute(AbstractEndpoint.CERTIFICATE_KEY, jsseCerts);
             }
 
         } else if (actionCode == ActionCode.ACTION_REQ_HOST_ATTRIBUTE) {
@@ -786,19 +787,19 @@ public class AjpAprProcessor implements ActionHook {
             case Constants.SC_A_SSL_CIPHER :
                 request.scheme().setString("https");
                 requestHeaderMessage.getBytes(tmpMB);
-                request.setAttribute(AprEndpoint.CIPHER_SUITE_KEY,
+                request.setAttribute(AbstractEndpoint.CIPHER_SUITE_KEY,
                                      tmpMB.toString());
                 break;
 
             case Constants.SC_A_SSL_SESSION :
                 request.scheme().setString("https");
                 requestHeaderMessage.getBytes(tmpMB);
-                request.setAttribute(AprEndpoint.SESSION_ID_KEY,
+                request.setAttribute(AbstractEndpoint.SESSION_ID_KEY,
                                      tmpMB.toString());
                 break;
 
             case Constants.SC_A_SSL_KEY_SIZE :
-                request.setAttribute(AprEndpoint.KEY_SIZE_KEY,
+                request.setAttribute(AbstractEndpoint.KEY_SIZE_KEY,
                                      new Integer(requestHeaderMessage.getInt()));
                 break;
 

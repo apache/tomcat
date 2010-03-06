@@ -54,6 +54,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -1116,7 +1117,7 @@ public class Http11AprProcessor implements ActionHook {
                     // Cipher suite
                     Object sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_CIPHER);
                     if (sslO != null) {
-                        request.setAttribute(AprEndpoint.CIPHER_SUITE_KEY, sslO);
+                        request.setAttribute(AbstractEndpoint.CIPHER_SUITE_KEY, sslO);
                     }
                     // Get client certificate and the certificate chain if present
                     // certLength == -1 indicates an error
@@ -1133,16 +1134,16 @@ public class Http11AprProcessor implements ActionHook {
                         }
                     }
                     if (certs != null) {
-                        request.setAttribute(AprEndpoint.CERTIFICATE_KEY, certs);
+                        request.setAttribute(AbstractEndpoint.CERTIFICATE_KEY, certs);
                     }
                     // User key size
                     sslO = new Integer(SSLSocket.getInfoI(socket, SSL.SSL_INFO_CIPHER_USEKEYSIZE));
-                    request.setAttribute(AprEndpoint.KEY_SIZE_KEY, sslO);
+                    request.setAttribute(AbstractEndpoint.KEY_SIZE_KEY, sslO);
 
                     // SSL session ID
                     sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_SESSION_ID);
                     if (sslO != null) {
-                        request.setAttribute(AprEndpoint.SESSION_ID_KEY, sslO);
+                        request.setAttribute(AbstractEndpoint.SESSION_ID_KEY, sslO);
                     }
                     //TODO provide a hook to enable the SSL session to be
                     // invalidated. Set AprEndpoint.SESSION_MGR req attr
@@ -1181,7 +1182,7 @@ public class Http11AprProcessor implements ActionHook {
                             }
                         }
                         if (certs != null) {
-                            request.setAttribute(AprEndpoint.CERTIFICATE_KEY, certs);
+                            request.setAttribute(AbstractEndpoint.CERTIFICATE_KEY, certs);
                         }
                     }
                 } catch (Exception e) {
