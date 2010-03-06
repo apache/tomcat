@@ -1,4 +1,9 @@
 <!--
+  NOTE:  The sample user and role entries below are wrapped in a comment
+  and thus are ignored when reading this file. Do not forget to remove
+  <!.. ..> that surrounds them.
+-->
+<!--
   <role rolename="tomcat"/>
   <role rolename="role1"/>
   <user username="tomcat" password="tomcat" roles="tomcat"/>
