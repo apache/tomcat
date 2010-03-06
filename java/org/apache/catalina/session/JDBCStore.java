@@ -22,6 +22,8 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.CustomObjectInputStream;
+import org.apache.catalina.util.LifecycleBase;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -959,24 +961,32 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Called once when this Store is first started.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-        super.start();
+    protected synchronized void startInternal() throws LifecycleException {
 
         // Open connection to the database
         this.dbConnection = getConnection();
+        
+        super.startInternal();
     }
 
     /**
-     * Gracefully terminate everything associated with our db.
-     * Called once when this Store is stopping.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public void stop() throws LifecycleException {
-        super.stop();
+    protected synchronized void stopInternal() throws LifecycleException {
+        
+        super.stopInternal();
 
         // Close and release everything associated with our db.
         if (dbConnection != null) {
