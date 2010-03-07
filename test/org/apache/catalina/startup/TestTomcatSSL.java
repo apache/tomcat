@@ -144,8 +144,11 @@ public class TestTomcatSSL extends TomcatBaseTest {
         os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
         os.flush();
 
+        
         InputStream is = socket.getInputStream();
 
+        // Make sure the NIO connector has read the request before the handshake
+        Thread.sleep(100);
         socket.startHandshake();
         handshakeDone = false;
         byte[] b = new byte[0];
