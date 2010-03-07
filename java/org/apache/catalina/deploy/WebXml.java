@@ -112,8 +112,13 @@ public class WebXml {
     // Common elements and attributes
     
     // Required attribute of web-app element
-    private String version = null;
-    public String getVersion() { return version; }
+    public String getVersion() {
+        StringBuilder sb = new StringBuilder(3);
+        sb.append(majorVersion);
+        sb.append('.');
+        sb.append(minorVersion);
+        return sb.toString();
+    }
     /**
      * Set the version for this web.xml file
      * @param version   Values of <code>null</code> will be ignored
@@ -121,7 +126,6 @@ public class WebXml {
     public void setVersion(String version) {
         if (version == null) return;
         
-        this.version = version;
         // Update major and minor version
         // Expected format is n.n - allow for any number of digits just in case
         String major = null;
@@ -571,12 +575,7 @@ public class WebXml {
         sb.append("         xsi:schemaLocation=");
         sb.append("\"http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\"\n");
         sb.append("         version=\"");
-        if (version != null) {
-            sb.append(version);
-        } else {
-            // Should be non-null but in case it isn't assume 3.0
-            sb.append("3.0");
-        }
+        sb.append(getVersion());
         sb.append("\"\n");
         sb.append("         metadata-complete=\"true\">\n\n");
 
