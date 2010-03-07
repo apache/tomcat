@@ -45,13 +45,16 @@ public class ELParser {
 
     private boolean escapeBS; // is '\' an escape char in text outside EL?
 
+    private final boolean isDeferredSyntaxAllowedAsLiteral;
+
     private static final String reservedWords[] = { "and", "div", "empty",
             "eq", "false", "ge", "gt", "instanceof", "le", "lt", "mod", "ne",
             "not", "null", "or", "true" };
 
-    public ELParser(String expression) {
+    public ELParser(String expression, boolean isDeferredSyntaxAllowedAsLiteral) {
         index = 0;
         this.expression = expression;
+        this.isDeferredSyntaxAllowedAsLiteral = isDeferredSyntaxAllowedAsLiteral;
         expr = new ELNode.Nodes();
     }
 
@@ -61,10 +64,14 @@ public class ELParser {
      * @param expression
      *            The input expression string of the form Char* ('${' Char*
      *            '}')* Char*
+     * @param isDeferredSyntaxAllowedAsLiteral
+     *                      Are deferred expressions treated as literals?
      * @return Parsed EL expression in ELNode.Nodes
      */
-    public static ELNode.Nodes parse(String expression) {
-        ELParser parser = new ELParser(expression);
+    public static ELNode.Nodes parse(String expression,
+            boolean isDeferredSyntaxAllowedAsLiteral) {
+        ELParser parser = new ELParser(expression,
+                isDeferredSyntaxAllowedAsLiteral);
         while (parser.hasNextChar()) {
             String text = parser.skipUntilEL();
             if (text.length() > 0) {
@@ -188,11 +195,13 @@ public class ELParser {
                     buf.append('\\');
                     if (!escapeBS)
                         prev = '\\';
-                } else if (ch == '$' || ch == '#') {
+                } else if (ch == '$'
+                        || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
                     buf.append(ch);
                 }
                 // else error!
-            } else if (prev == '$' || prev == '#') {
+            } else if (prev == '$'
+                    || (!isDeferredSyntaxAllowedAsLiteral && prev == '#')) {
                 if (ch == '{') {
                     this.type = prev;
                     prev = 0;
@@ -201,7 +210,8 @@ public class ELParser {
                 buf.append(prev);
                 prev = 0;
             }
-            if (ch == '\\' || ch == '$' || ch == '#') {
+            if (ch == '\\' || ch == '$'
+                    || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
                 prev = ch;
             } else {
                 buf.append(ch);

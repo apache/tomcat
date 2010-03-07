@@ -152,6 +152,20 @@ public abstract class Compiler {
                     JspUtil.booleanValue(
                             jspProperty.isErrorOnUndeclaredNamespace()));
         }
+        if (ctxt.getTagInfo() != null) {
+            try {
+                double libraryVersion = Double.parseDouble(ctxt.getTagInfo()
+                        .getTagLibrary().getRequiredVersion());
+                if (libraryVersion < 2.0) {
+                    pageInfo.setELIgnored(true);
+                }
+                if (libraryVersion < 2.1) {
+                    pageInfo.setDeferredSyntaxAllowedAsLiteral(true);
+                }
+            } catch (NumberFormatException ex) {
+                // ignored
+            }
+        }
 
         ctxt.checkOutputDir();
         String javaFileName = ctxt.getServletJavaFileName();
