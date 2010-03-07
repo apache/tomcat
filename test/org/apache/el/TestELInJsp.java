@@ -33,7 +33,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug36923() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp");
+        File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -49,7 +49,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug42565() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp");
+        File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -81,7 +81,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -100,7 +100,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -135,7 +135,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -235,7 +235,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -253,7 +253,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -269,7 +269,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -297,7 +297,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -313,7 +313,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -346,7 +346,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
@@ -373,7 +373,7 @@ public class TestELInJsp extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
