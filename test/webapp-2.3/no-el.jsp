@@ -17,5 +17,6 @@
 <html>
   <body>
     <p>00-${'hello world'}</p>
+    <p>01-#{'hello world'}</p>
   </body>
 </html>
