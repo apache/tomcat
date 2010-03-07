@@ -20,8 +20,12 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.tagext.TagSupport;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestValidator extends TomcatBaseTest {
     
@@ -44,5 +48,55 @@ public class TestValidator extends TomcatBaseTest {
 
         // Failure is expected
         assertNotNull(e);
+    }
+    
+
+    public void testTldVersions30() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        assertTrue(result.indexOf("<p>${'00-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>${'02-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+    }
+    
+    public static class Echo extends TagSupport {
+
+        private static final long serialVersionUID = 1L;
+
+        private String echo = null;
+
+        public void setEcho(String echo) {
+            this.echo = echo;
+        }
+
+        public String getEcho() {
+            return echo;
+        }
+
+        @Override
+        public int doStartTag() throws JspException {
+            try {
+                pageContext.getOut().print("<p>" + echo + "</p>");
+            } catch (IOException e) {
+                pageContext.getServletContext().log("Tag (Echo21) failure", e);
+            }
+            return super.doStartTag();
+        }
     }
 }
