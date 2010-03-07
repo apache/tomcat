@@ -284,8 +284,8 @@ public class ContextConfig
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.START_EVENT)) {
-            start();
+        if (event.getType().equals(Lifecycle.CONFIGURE_EVENT)) {
+            configure();
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
@@ -821,9 +821,9 @@ public class ContextConfig
     
     
     /**
-     * Process a "start" event for this Context.
+     * Process a "contextConfig" event for this Context.
      */
-    protected synchronized void start() {
+    protected synchronized void configure() {
         // Called from StandardContext.start()
 
         if (log.isDebugEnabled())

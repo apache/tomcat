@@ -57,6 +57,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.log.SystemLogHandler;
@@ -675,7 +676,7 @@ public class StandardWrapper
     public void backgroundProcess() {
         super.backgroundProcess();
         
-        if (!started)
+        if (!getState().isAvailable())
             return;
         
         if (getServlet() != null && (getServlet() instanceof PeriodicEventListener)) {
@@ -1613,13 +1614,14 @@ public class StandardWrapper
 
 
     /**
-     * Start this component, pre-loading the servlet if the load-on-startup
-     * value is set appropriately.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if a fatal error occurs during startup
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
+    protected synchronized void startInternal() throws LifecycleException {
     
         // Send j2ee.state.starting notification 
         if (this.getObjectName() != null) {
@@ -1630,7 +1632,7 @@ public class StandardWrapper
         }
         
         // Start up this component
-        super.start();
+        super.startInternal();
 
         if( oname != null )
             registerJMX((StandardContext)getParent());
@@ -1652,13 +1654,14 @@ public class StandardWrapper
 
 
     /**
-     * Stop this component, gracefully shutting down the servlet if it has
-     * been initialized.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if a fatal error occurs during shutdown
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public void stop() throws LifecycleException {
+    protected synchronized void stopInternal() throws LifecycleException {
 
         setAvailable(Long.MAX_VALUE);
         
@@ -1679,7 +1682,7 @@ public class StandardWrapper
         }
 
         // Shut down this component
-        super.stop();
+        super.stopInternal();
 
         // Send j2ee.state.stoppped notification 
         if (this.getObjectName() != null) {

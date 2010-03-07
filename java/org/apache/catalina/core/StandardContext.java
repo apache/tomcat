@@ -69,6 +69,7 @@ import org.apache.catalina.InstanceListener;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
@@ -92,6 +93,7 @@ import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ExtensionValidator;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.juli.logging.Log;
@@ -234,11 +236,6 @@ public class StandardContext
     private final Object applicationParametersLock = new Object();
     
 
-    /**
-     * The application available flag for this Context.
-     */
-    private boolean available = false;
-    
     /**
      * The broadcaster that sends j2ee notifications. 
      */
@@ -1133,23 +1130,8 @@ public class StandardContext
      */
     public boolean getAvailable() {
 
-        return (this.available);
-
-    }
-
-
-    /**
-     * Set the application available flag for this Context.
-     *
-     * @param available The new application available flag
-     */
-    public void setAvailable(boolean available) {
-
-        boolean oldAvailable = this.available;
-        this.available = available;
-        support.firePropertyChange("available",
-                                   oldAvailable,
-                                   this.available);
+        // TODO Remove this method entirely
+        return getState().isAvailable();
 
     }
 
@@ -2020,7 +2002,7 @@ public class StandardContext
     @Override
     public synchronized void setResources(DirContext resources) {
 
-        if (started) {
+        if (getState().isAvailable()) {
             throw new IllegalStateException
                 (sm.getString("standardContext.resources.started"));
         }
@@ -2129,7 +2111,7 @@ public class StandardContext
 
         this.workDir = workDir;
 
-        if (started) {
+        if (getState().isAvailable()) {
             postWorkDirectory();
         }
     }
@@ -3331,7 +3313,7 @@ public class StandardContext
     public synchronized void reload() {
 
         // Validate our current component state
-        if (!started)
+        if (!getState().isAvailable())
             throw new IllegalStateException
                 (sm.getString("containerBase.notStarted", logName()));
 
@@ -4325,18 +4307,15 @@ public class StandardContext
 
 
     /**
-     * Start this Context component.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if a startup error occurs
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public synchronized void start() throws LifecycleException {
-        //if (lazy ) return;
-        if (started) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("containerBase.alreadyStarted", logName()));
-            return;
-        }
+    protected synchronized void startInternal() throws LifecycleException {
+
         if( !initialized ) { 
             try {
                 init();
@@ -4357,10 +4336,6 @@ public class StandardContext
             Registry.getRegistry(null, null).unregisterComponent(oname);
         }
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
-
-        setAvailable(false);
         setConfigured(false);
         boolean ok = true;
 
@@ -4461,8 +4436,6 @@ public class StandardContext
 
             if (ok) {
                 
-                started = true;
-
                 // Start our subordinate components, if any
                 if ((loader != null) && (loader instanceof Lifecycle))
                     ((Lifecycle) loader).start();
@@ -4500,7 +4473,7 @@ public class StandardContext
                 }
                 
                 // Notify our interested LifecycleListeners
-                lifecycle.fireLifecycleEvent(START_EVENT, null);
+                fireLifecycleEvent(Lifecycle.CONFIGURE_EVENT, null);
                 
                 // Acquire clustered manager
                 Manager contextManager = null;
@@ -4585,11 +4558,6 @@ public class StandardContext
                 postWelcomeFiles();
             }
             
-            if (ok) {
-                // Notify our interested LifecycleListeners
-                lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
-            }
-            
             // Configure and call application event listeners
             if (ok) {
                 if (!listenerStart()) {
@@ -4633,15 +4601,8 @@ public class StandardContext
         if (ok) {
             if (log.isDebugEnabled())
                 log.debug("Starting completed");
-            setAvailable(true);
         } else {
             log.error(sm.getString("standardContext.startFailed", getName()));
-            try {
-                stop();
-            } catch (Throwable t) {
-                log.error(sm.getString("standardContext.startCleanup"), t);
-            }
-            setAvailable(false);
         }
 
         // JMX registration
@@ -4664,11 +4625,11 @@ public class StandardContext
         }
 
         // Reinitializing if something went wrong
-        if (!ok && started) {
-            stop();
+        if (!ok) {
+            setState(LifecycleState.FAILED);
+        } else {
+            setState(LifecycleState.STARTING);
         }
-
-        //cacheContext();
     }
 
     private Map<String, Map<String, String>> buildInjectionMap(NamingResources namingResources) {
@@ -4714,23 +4675,15 @@ public class StandardContext
     }
 
     /**
-     * Stop this Context component.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if a shutdown error occurs
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public synchronized void stop() throws LifecycleException {
+    protected synchronized void stopInternal() throws LifecycleException {
 
-        // Validate and update our current component state
-        if (!started) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("containerBase.notStarted", logName()));
-            return;
-        }
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
-        
         // Send j2ee.state.stopping notification 
         if (this.getObjectName() != null) {
             Notification notification = 
@@ -4739,8 +4692,7 @@ public class StandardContext
             broadcaster.sendNotification(notification);
         }
         
-        // Mark this application as unavailable while we shut down
-        setAvailable(false);
+        setState(LifecycleState.STOPPING);
 
         // Binding thread
         ClassLoader oldCCL = bindThread();
@@ -4772,9 +4724,6 @@ public class StandardContext
             // Normal container shutdown processing
             if (log.isDebugEnabled())
                 log.debug("Processing standard container shutdown");
-            // Notify our interested LifecycleListeners
-            lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-            started = false;
 
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle) {
@@ -4829,9 +4778,6 @@ public class StandardContext
         //reset the instance manager
         instanceManager = null;
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
-
         if (log.isDebugEnabled())
             log.debug("Stopping complete");
 
@@ -4861,7 +4807,7 @@ public class StandardContext
         super.destroy();
 
         // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(DESTROY_EVENT, null);
+        fireLifecycleEvent(DESTROY_EVENT, null);
 
         synchronized (instanceListenersLock) {
             instanceListeners = new String[0];
@@ -5470,7 +5416,7 @@ public class StandardContext
 
     @Override
     public void preDeregister() throws Exception {
-        if( started ) {
+        if (getState().isAvailable()) {
             try {
                 stop();
             } catch( Exception ex ) {
@@ -5542,7 +5488,7 @@ public class StandardContext
         super.init();
         
         // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(INIT_EVENT, null);
+        fireLifecycleEvent(INIT_EVENT, null);
 
         // Send j2ee.state.starting notification 
         if (this.getObjectName() != null) {

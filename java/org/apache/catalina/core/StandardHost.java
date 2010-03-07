@@ -37,6 +37,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.startup.HostConfig;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.modeler.Registry;
 
@@ -764,16 +765,15 @@ public class StandardHost
     }
     
     /**
-     * Start this host.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
     @Override
-    public synchronized void start() throws LifecycleException {
-        if( started ) {
-            return;
-        }
+    protected synchronized void startInternal() throws LifecycleException {
+        
         if( ! initialized )
             init();
 
@@ -824,8 +824,8 @@ public class StandardHost
             else
                 log.debug(sm.getString("standardHost.validationDisabled"));
         }
-        super.start();
-
+        
+        super.startInternal();
     }
 
 
