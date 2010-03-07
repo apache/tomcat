@@ -127,6 +127,15 @@ public interface Lifecycle {
     public static final String PERIODIC_EVENT = "periodic";
 
 
+    /**
+     * The LifecycleEvent type for the "configure" event. Use by those
+     * components that use a separate component to perform configuration and
+     * need to signal when configuration should be performed - usually after
+     * {@link #BEFORE_START_EVENT} and before {@link #START_EVENT}.
+     */
+    public static final String CONFIGURE_EVENT = "configure";
+
+    
     // --------------------------------------------------------- Public Methods
 
 
@@ -208,7 +217,5 @@ public interface Lifecycle {
      * 
      * @return The current state of the source component.
      */
-    // TODO Remove this comment once all components that implement Lifecycle
-    //      have had this method added
-    //public LifecycleState getState();
+    public LifecycleState getState();
 }
