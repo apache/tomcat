@@ -44,7 +44,7 @@ import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
@@ -52,7 +52,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -122,7 +122,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Craig R. McClanahan
  */
 
-public abstract class ContainerBase
+public abstract class ContainerBase extends LifecycleBase
     implements Container, MBeanRegistration {
 
     private static final org.apache.juli.logging.Log log=
@@ -165,12 +165,6 @@ public abstract class ContainerBase
      * The processor delay for this component.
      */
     protected int backgroundProcessorDelay = -1;
-
-
-    /**
-     * The lifecycle event support for this component.
-     */
-    protected LifecycleSupport lifecycle = new LifecycleSupport(this);
 
 
     /**
@@ -254,10 +248,8 @@ public abstract class ContainerBase
 
 
     /**
-     * Has this component been started?
+     * Has this component been initialized?
      */
-    protected boolean started = false;
-
     protected boolean initialized=false;
 
     /**
@@ -352,7 +344,7 @@ public abstract class ContainerBase
         this.loader = loader;
 
         // Stop the old component if necessary
-        if (started && (oldLoader != null) &&
+        if (getState().isAvailable() && (oldLoader != null) &&
             (oldLoader instanceof Lifecycle)) {
             try {
                 ((Lifecycle) oldLoader).stop();
@@ -364,7 +356,7 @@ public abstract class ContainerBase
         // Start the new component if necessary
         if (loader != null)
             loader.setContainer(this);
-        if (started && (loader != null) &&
+        if (getState().isAvailable() && (loader != null) &&
             (loader instanceof Lifecycle)) {
             try {
                 ((Lifecycle) loader).start();
@@ -422,7 +414,7 @@ public abstract class ContainerBase
         this.manager = manager;
 
         // Stop the old component if necessary
-        if (started && (oldManager != null) &&
+        if (getState().isAvailable() && (oldManager != null) &&
             (oldManager instanceof Lifecycle)) {
             try {
                 ((Lifecycle) oldManager).stop();
@@ -434,7 +426,7 @@ public abstract class ContainerBase
         // Start the new component if necessary
         if (manager != null)
             manager.setContainer(this);
-        if (started && (manager != null) &&
+        if (getState().isAvailable() && (manager != null) &&
             (manager instanceof Lifecycle)) {
             try {
                 ((Lifecycle) manager).start();
@@ -486,7 +478,7 @@ public abstract class ContainerBase
         this.cluster = cluster;
 
         // Stop the old component if necessary
-        if (started && (oldCluster != null) &&
+        if (getState().isAvailable() && (oldCluster != null) &&
             (oldCluster instanceof Lifecycle)) {
             try {
                 ((Lifecycle) oldCluster).stop();
@@ -499,7 +491,7 @@ public abstract class ContainerBase
         if (cluster != null)
             cluster.setContainer(this);
 
-        if (started && (cluster != null) &&
+        if (getState().isAvailable() && (cluster != null) &&
             (cluster instanceof Lifecycle)) {
             try {
                 ((Lifecycle) cluster).start();
@@ -675,7 +667,7 @@ public abstract class ContainerBase
         this.realm = realm;
 
         // Stop the old component if necessary
-        if (started && (oldRealm != null) &&
+        if (getState().isAvailable() && (oldRealm != null) &&
             (oldRealm instanceof Lifecycle)) {
             try {
                 ((Lifecycle) oldRealm).stop();
@@ -687,7 +679,7 @@ public abstract class ContainerBase
         // Start the new component if necessary
         if (realm != null)
             realm.setContainer(this);
-        if (started && (realm != null) &&
+        if (getState().isAvailable() && (realm != null) &&
             (realm instanceof Lifecycle)) {
             try {
                 ((Lifecycle) realm).start();
@@ -787,7 +779,7 @@ public abstract class ContainerBase
             children.put(child.getName(), child);
 
             // Start child
-            if (started && startChildren) {
+            if (getState().isAvailable() && startChildren) {
                 boolean success = false;
                 try {
                     child.start();
@@ -919,13 +911,9 @@ public abstract class ContainerBase
             children.remove(child.getName());
         }
         
-        if (started) {
+        if (getState().isAvailable()) {
             try {
-                if( child instanceof ContainerBase ) {
-                    if( ((ContainerBase)child).started ) {
-                        child.stop();
-                    }
-                } else {
+                if (child.getState().isAvailable()) {
                     child.stop();
                 }
             } catch (LifecycleException e) {
@@ -966,63 +954,15 @@ public abstract class ContainerBase
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
-
-
     /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
-    public void addLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.addLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
-     */
-    public LifecycleListener[] findLifecycleListeners() {
-
-        return lifecycle.findLifecycleListeners();
-
-    }
-
-
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeLifecycleListener(LifecycleListener listener) {
-
-        lifecycle.removeLifecycleListener(listener);
-
-    }
-
-
-    /**
-     * Prepare for active use of the public methods of this Component.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that prevents it from being started
+     *  that prevents this component from being used
      */
-    public synchronized void start() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (started) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("containerBase.alreadyStarted", logName()));
-            return;
-        }
-        
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
-
-        started = true;
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
 
         // Start our subordinate components, if any
         if ((loader != null) && (loader instanceof Lifecycle))
@@ -1050,42 +990,29 @@ public abstract class ContainerBase
         if (pipeline instanceof Lifecycle)
             ((Lifecycle) pipeline).start();
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
+
+        setState(LifecycleState.STARTING);
 
         // Start our thread
         threadStart();
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
 
     }
 
 
     /**
-     * Gracefully shut down active use of the public methods of this Component.
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     *  that prevents this component from being used
      */
-    public synchronized void stop() throws LifecycleException {
-
-        // Validate and update our current component state
-        if (!started) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("containerBase.notStarted", logName()));
-            return;
-        }
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
 
         // Stop our thread
         threadStop();
 
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        started = false;
+        setState(LifecycleState.STOPPING);
 
         // Stop the Valves in our pipeline (including the basic), if any
         if (pipeline instanceof Lifecycle) {
@@ -1122,10 +1049,6 @@ public abstract class ContainerBase
         if ((loader != null) && (loader instanceof Lifecycle)) {
             ((Lifecycle) loader).stop();
         }
-
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
-
     }
 
     /** Init method, part of the MBean lifecycle.
@@ -1160,7 +1083,7 @@ public abstract class ContainerBase
     }
     
     public void destroy() throws Exception {
-        if( started ) {
+        if (getState().isAvailable()) {
             stop();
         }
         initialized=false;
@@ -1224,7 +1147,7 @@ public abstract class ContainerBase
      */
     public void backgroundProcess() {
         
-        if (!started)
+        if (!getState().isAvailable())
             return;
 
         if (cluster != null) {
@@ -1264,7 +1187,7 @@ public abstract class ContainerBase
             }
             current = current.getNext();
         }
-        lifecycle.fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
+        fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
     }
 
 

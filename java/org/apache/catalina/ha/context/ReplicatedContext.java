@@ -26,11 +26,10 @@ import org.apache.catalina.core.ApplicationContext;
 import org.apache.catalina.Globals;
 import javax.servlet.ServletContext;
 import java.util.AbstractMap;
-import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleListener;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.catalina.util.Enumerator;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 
 import org.apache.juli.logging.Log;
@@ -40,20 +39,21 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  * @version 1.0
  */
-public class ReplicatedContext extends StandardContext implements LifecycleListener,MapOwner {
+public class ReplicatedContext extends StandardContext implements MapOwner {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
     private static final Log log = LogFactory.getLog( ReplicatedContext.class );
-    protected boolean startComplete = false;
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
     
-    public void lifecycleEvent(LifecycleEvent event) {
-        if (AFTER_START_EVENT.equals(event.getType())) 
-            startComplete = true;
-    }
-
+    /**
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
     @Override
-    public synchronized void start() throws LifecycleException {
-        if ( this.started ) return;
+    protected synchronized void startInternal() throws LifecycleException {
+
         if( !initialized ) { 
             try {
                 init();
@@ -61,7 +61,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
                 throw new LifecycleException("Error initializaing ", ex);
             }
         }
-        super.addLifecycleListener(this);            
+
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
             if (this.context == null) this.context = new ReplApplContext(this);
@@ -72,33 +72,30 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
                 ((ReplApplContext)this.context).setAttributeMap(map);
                 if (getAltDDName() != null) context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
             }
-            super.start();
+            super.startInternal();
         }  catch ( Exception x ) {
             log.error("Unable to start ReplicatedContext",x);
             throw new LifecycleException("Failed to start ReplicatedContext",x);
         }
     }
     
+    /**
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
     @Override
-    public synchronized void stop() throws LifecycleException
-    {
-        if ( !this.started ) return;
+    protected synchronized void stopInternal() throws LifecycleException {
+        
+        super.stopInternal();
+
         AbstractMap<String,Object> map =
             ((ReplApplContext)this.context).getAttributeMap();
         if ( map!=null && map instanceof ReplicatedMap) {
             ((ReplicatedMap)map).breakdown();
         }
-        try {
-            super.lifecycle.removeLifecycleListener(this);
-        } catch ( Exception x ){
-            log.error("Unable to stop ReplicatedContext",x);
-            throw new LifecycleException("Failed to stop ReplicatedContext",x);
-        } finally {
-            this.startComplete = false;
-            super.stop();
-        }
-        
-
     }
 
 
@@ -169,7 +166,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
         
         @Override
         public void setAttribute(String name, Object value) {
-            if ( (!getParent().startComplete) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
+            if ( (!getParent().getState().isAvailable()) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
                 tomcatAttributes.put(name,value);
             } else
                 super.setAttribute(name,value);
