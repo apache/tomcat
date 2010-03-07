@@ -51,6 +51,81 @@ public class TestValidator extends TomcatBaseTest {
     }
     
 
+    public void testTldVersions23() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp-2.3");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        assertTrue(result.indexOf("<p>${'00-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>${'02-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>${'04-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>${'06-hello world'}</p>") > 0);
+    }
+
+    
+    public void testTldVersions24() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp-2.4");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        assertTrue(result.indexOf("<p>${'00-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>${'02-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+    }
+
+    
+    public void testTldVersions25() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp-2.5");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        assertTrue(result.indexOf("<p>${'00-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>${'02-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+    }
+
+    
     public void testTldVersions30() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
