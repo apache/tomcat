@@ -1075,11 +1075,16 @@ class Validator {
                         || (!n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("<%=")));
                 boolean elExpression = false;
                 boolean deferred = false;
+                double libraryVersion = Double.parseDouble(
+                        tagInfo.getTagLibrary().getRequiredVersion());
+                boolean deferredSyntaxAllowedAsLiteral =
+                    pageInfo.isDeferredSyntaxAllowedAsLiteral() ||
+                    libraryVersion < 2.1;
 
                 ELNode.Nodes el = null;
                 if (!runtimeExpression && !pageInfo.isELIgnored()) {
-                    el = ELParser.parse(attrs.getValue(i), pageInfo
-                            .isDeferredSyntaxAllowedAsLiteral());
+                    el = ELParser.parse(attrs.getValue(i),
+                            deferredSyntaxAllowedAsLiteral);
                     Iterator<ELNode> nodes = el.iterator();
                     while (nodes.hasNext()) {
                         ELNode node = nodes.next();
