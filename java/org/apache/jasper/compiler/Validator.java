@@ -1077,12 +1077,15 @@ class Validator {
                 boolean deferred = false;
                 double libraryVersion = Double.parseDouble(
                         tagInfo.getTagLibrary().getRequiredVersion());
+                boolean elIgnored =
+                    pageInfo.isELIgnored() ||
+                    libraryVersion < 2.0;
                 boolean deferredSyntaxAllowedAsLiteral =
                     pageInfo.isDeferredSyntaxAllowedAsLiteral() ||
                     libraryVersion < 2.1;
 
                 ELNode.Nodes el = null;
-                if (!runtimeExpression && !pageInfo.isELIgnored()) {
+                if (!runtimeExpression && !elIgnored) {
                     el = ELParser.parse(attrs.getValue(i),
                             deferredSyntaxAllowedAsLiteral);
                     Iterator<ELNode> nodes = el.iterator();
