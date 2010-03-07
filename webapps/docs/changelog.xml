@@ -32,9 +32,13 @@
   </properties>
 
 <body>
-<section name="Tomcat Trunk">
+<section name="Tomcat 7.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <update>
+        Update Servlet support to the Servlet 3.0 specification. Note
+        asynchronous support is not yet complete. (markt/fhanik)
+      </update>
       <update>
         <bug>46925</bug>: Replace recursive search for nested roles with
         iterative search. Patch provided by Stefan Zoerner. (rjung)
@@ -109,6 +113,11 @@
         directories and/or WAR files to be mapped to paths within the context.
         (markt)
       </add>
+      <update>
+        Provide clearer definition of Lifecycle interface, particularly start
+        and stop, and align components that implement Lifecycle with this
+        definition. (markt)  
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -155,6 +164,12 @@
   <subsection name="Jasper">
     <changelog>
       <update>
+        Update JSP support to the JSP 2.2 specification. (markt)
+      </update>
+      <update>
+        Update EL support to the EL 2.2 specification. (markt)
+      </update>
+      <update>
         <rev>787978</rev> Use "1.6" as the default value for compilerSourceVM and compilerTargetVM
         options of Jasper. (kkolinko)
       </update>
@@ -195,9 +210,13 @@
         in the documentation. (fhanik)
       </update>
       <add>
-        A number of additional roles were added to the Manager application to
-        separate out permissions for the HTML interface, the text interface and
-        the JMX proxy. (markt) 
+        A number of additional roles were added to the Manager and Host Manager
+        applications to separate out permissions for the HTML interface, the
+        text interface and the JMX proxy. (markt) 
+      </add>
+      <add>
+        CSRF protection was added to the Manager and Host Manager applications.
+        (markt)
       </add>
     </changelog>
   </subsection>
