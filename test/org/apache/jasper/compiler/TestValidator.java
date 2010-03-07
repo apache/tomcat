@@ -29,7 +29,7 @@ public class TestValidator extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = 
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         
