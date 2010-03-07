@@ -45,14 +45,14 @@ public class JspConfig {
     private ServletContext ctxt;
     private volatile boolean initialized = false;
 
-    private String defaultIsXml = null;		// unspecified
+    private final static String defaultIsXml = null;		// unspecified
     private String defaultIsELIgnored = null;	// unspecified
-    private String defaultIsScriptingInvalid = null;
+    private final static String defaultIsScriptingInvalid = null;
     private String defaultDeferedSyntaxAllowedAsLiteral = null;
-    private String defaultTrimDirectiveWhitespaces = null;
-    private String defaultDefaultContentType = null;
-    private String defaultBuffer = null;
-    private String defaultErrorOnUndeclaredNamespace = "false";
+    private final static String defaultTrimDirectiveWhitespaces = null;
+    private final static String defaultDefaultContentType = null;
+    private final static String defaultBuffer = null;
+    private final static String defaultErrorOnUndeclaredNamespace = "false";
     private JspProperty defaultJspProperty;
 
     public JspConfig(ServletContext ctxt) {
@@ -87,7 +87,11 @@ public class JspConfig {
             if (webApp == null
                     || getVersion(webApp) < 2.4) {
                 defaultIsELIgnored = "true";
+                defaultDeferedSyntaxAllowedAsLiteral = "true";
                 return;
+            }
+            if (getVersion(webApp) < 2.5) {
+                defaultDeferedSyntaxAllowedAsLiteral = "true";
             }
             TreeNode jspConfig = webApp.findChild("jsp-config");
             if (jspConfig == null) {
