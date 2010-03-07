@@ -879,8 +879,6 @@
         <fileset dir="test" >
           <!-- Include all by default -->
           <include name="**/Test*.java" />
-          <!-- Exclude TestAll otherwise there will be duplicates -->
-          <exclude name="**/TestAll.java" />
           <!-- Exclude helper classes -->
           <exclude name="**/Tester*.java" />
           <!-- Exclude the tests known to fail -->
