@@ -79,6 +79,7 @@ public class TestWebXml extends TestCase {
                 org.apache.catalina.startup.Constants.WebDtdPublicId_22);
         assertEquals(2, webxml.getMajorVersion());
         assertEquals(2, webxml.getMinorVersion());
+        assertEquals("2.2", webxml.getVersion());
     }
 
     public void testParsePublicIdVersion23() {
@@ -89,6 +90,7 @@ public class TestWebXml extends TestCase {
                 org.apache.catalina.startup.Constants.WebDtdPublicId_23);
         assertEquals(2, webxml.getMajorVersion());
         assertEquals(3, webxml.getMinorVersion());
+        assertEquals("2.3", webxml.getVersion());
     }
 
     public void testParsePublicIdVersion24() {
@@ -99,6 +101,7 @@ public class TestWebXml extends TestCase {
                 org.apache.catalina.startup.Constants.WebSchemaPublicId_24);
         assertEquals(2, webxml.getMajorVersion());
         assertEquals(4, webxml.getMinorVersion());
+        assertEquals("2.4", webxml.getVersion());
     }
 
     public void testParsePublicIdVersion25() {
@@ -109,6 +112,7 @@ public class TestWebXml extends TestCase {
                 org.apache.catalina.startup.Constants.WebSchemaPublicId_25);
         assertEquals(2, webxml.getMajorVersion());
         assertEquals(5, webxml.getMinorVersion());
+        assertEquals("2.5", webxml.getVersion());
     }
 
     public void testParsePublicIdVersion30() {
@@ -119,5 +123,6 @@ public class TestWebXml extends TestCase {
                 org.apache.catalina.startup.Constants.WebSchemaPublicId_30);
         assertEquals(3, webxml.getMajorVersion());
         assertEquals(0, webxml.getMinorVersion());
+        assertEquals("3.0", webxml.getVersion());
     }
 }
