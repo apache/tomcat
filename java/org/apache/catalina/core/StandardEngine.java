@@ -33,6 +33,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Service;
 import org.apache.catalina.realm.JAASRealm;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -404,15 +405,15 @@ public class StandardEngine
     }
     
     /**
-     * Start this Engine component.
+     * Start this component and implement the requirements
+     * of {@link LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if a startup error occurs
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
      */
     @Override
-    public void start() throws LifecycleException {
-        if( started ) {
-            return;
-        }
+    protected synchronized void startInternal() throws LifecycleException {
+        
         if( !initialized ) {
             init();
         }
@@ -448,13 +449,22 @@ public class StandardEngine
         }
 
         // Standard container startup
-        super.start();
-
+        super.startInternal();
     }
+
     
+    /**
+     * Stop this component and implement the requirements
+     * of {@link LifecycleBase#stopInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
     @Override
-    public void stop() throws LifecycleException {
-        super.stop();
+    protected synchronized void stopInternal() throws LifecycleException {
+        
+        super.stopInternal();
+
         if( mbeans != null ) {
             try {
                 Registry.getRegistry(null, null).invoke(mbeans, "stop", false);
