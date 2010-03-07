@@ -58,17 +58,16 @@ public class TestParser extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48668a.jsp");
         String result = res.toString();
-        System.out.println(result);
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
         assertEcho(result, "01-Hello world</p>${foo.bar}");
         assertEcho(result, "10-Hello ${'foo.bar}");
         assertEcho(result, "11-Hello ${'foo.bar}");
-        //assertEcho(result, "12-Hello #{'foo.bar}");
-        //assertEcho(result, "13-Hello #{'foo.bar}");
+        assertEcho(result, "12-Hello #{'foo.bar}");
+        assertEcho(result, "13-Hello #{'foo.bar}");
         assertEcho(result, "14-Hello ${'foo}");
         assertEcho(result, "15-Hello ${'foo}");
-        //assertEcho(result, "16-Hello #{'foo}");
-        //assertEcho(result, "17-Hello #{'foo}");
+        assertEcho(result, "16-Hello #{'foo}");
+        assertEcho(result, "17-Hello #{'foo}");
         assertEcho(result, "18-Hello ${'foo.bar}");
         assertEcho(result, "19-Hello ${'foo.bar}");
         assertEcho(result, "20-Hello #{'foo.bar}");

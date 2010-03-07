@@ -24,13 +24,13 @@
 
     <p>10-<tags:bug48668 expr="Hello ${'foo.bar}" /></p>
     <p>11-Hello <tags:bug48668 expr="${'foo.bar}" /></p>
-<%--<p>12-<tags:bug48668 expr="Hello #{'foo.bar}" /></p>--%>
-<%--<p>13-Hello <tags:bug48668 expr="#{'foo.bar}" /></p>--%>
+    <p>12-<tags:bug48668 expr="Hello #{'foo.bar}" /></p>
+    <p>13-Hello <tags:bug48668 expr="#{'foo.bar}" /></p>
 
     <p>14-<tags:bug48668 expr="Hello ${'foo" />}</p>
     <p>15-Hello <tags:bug48668 expr="${'foo" />}</p>
-<%--<p>16-<tags:bug48668 expr="Hello #{'foo" />}</p>--%>
-<%--<p>17-Hello <tags:bug48668 expr="#{'foo" />}</p>--%>
+    <p>16-<tags:bug48668 expr="Hello #{'foo" />}</p>
+    <p>17-Hello <tags:bug48668 expr="#{'foo" />}</p>
 
     <p>18-<tags:bug48668 ><jsp:attribute name="expr">Hello ${'foo.bar}</jsp:attribute></tags:bug48668></p>
     <p>19-Hello <tags:bug48668 ><jsp:attribute name="expr">${'foo.bar}</jsp:attribute></tags:bug48668></p>
