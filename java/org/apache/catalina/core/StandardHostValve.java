@@ -416,18 +416,25 @@ final class StandardHostValve
         request.setPathInfo(errorPage.getLocation());
 
         try {
-            // Reset the response (keeping the real error code and message)
-            response.resetBuffer(true);
-
             // Forward control to the specified location
             ServletContext servletContext =
                 request.getContext().getServletContext();
             RequestDispatcher rd =
                 servletContext.getRequestDispatcher(errorPage.getLocation());
-            rd.forward(request.getRequest(), response.getResponse());
 
-            // If we forward, the response is suspended again
-            response.setSuspended(false);
+            if (response.isCommitted()) {
+                // Response is committed - including the error page is the
+                // best we can do 
+                rd.include(request.getRequest(), response.getResponse());
+            } else {
+                // Reset the response (keeping the real error code and message)
+                response.resetBuffer(true);
+
+                rd.forward(request.getRequest(), response.getResponse());
+
+                // If we forward, the response is suspended again
+                response.setSuspended(false);
+            }
 
             // Indicate that we have successfully processed this custom page
             return (true);
