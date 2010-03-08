@@ -61,6 +61,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
@@ -887,7 +888,7 @@ public class ApplicationContext
     private FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass, Filter filter) throws IllegalStateException {
         
-        if (context.initialized) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addFilter.ise",
@@ -1016,7 +1017,7 @@ public class ApplicationContext
     private ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass, Servlet servlet) throws IllegalStateException {
         
-        if (context.initialized) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addServlet.ise",
@@ -1145,7 +1146,7 @@ public class ApplicationContext
     public void setSessionTrackingModes(
             Set<SessionTrackingMode> sessionTrackingModes) {
 
-        if (context.getAvailable()) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
                     sm.getString("applicationContext.setSessionTracking.ise",
                             getContextPath()));
@@ -1230,7 +1231,7 @@ public class ApplicationContext
 
     @Override
     public <T extends EventListener> void addListener(T t) {
-        if (context.getAvailable()) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
                     sm.getString("applicationContext.addListener.ise",
                             getContextPath()));
@@ -1300,7 +1301,7 @@ public class ApplicationContext
     @Override
     public void declareRoles(String... roleNames) {
         
-        if (context.initialized) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addRole.ise",
