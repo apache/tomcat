@@ -85,7 +85,6 @@ do the following:
 * Go to that directory, and do:
 
     cd ${tomcat.source}
-    ant download
     ant
 
 * NOTE: Users accessing the Internet through a proxy must use a properties
