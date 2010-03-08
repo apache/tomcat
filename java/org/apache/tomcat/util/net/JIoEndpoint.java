@@ -187,10 +187,12 @@ public class JIoEndpoint extends AbstractEndpoint {
         public void run() {
         	boolean close = false;
             // Process the request from this socket
-            if (!setSocketOptions(socket.getSocket())) { //this does a handshake and resets socket value
+            if ( (!socket.isKeptAlive()) && (!setSocketOptions(socket.getSocket())) ) { //this does a handshake and resets socket value
             	close = true;
-            } else if (!handler.process(socket)) {
-                close = true;
+            }
+            
+            if ( (!close) ) {
+                close = !handler.process(socket);
             }
             if (close) {
             	// Close socket
@@ -203,7 +205,10 @@ public class JIoEndpoint extends AbstractEndpoint {
                     // Ignore
                 }
             } else {
+                socket.setKeptAlive(true);
+                socket.access();
                 //keepalive connection
+                //TODO - servlet3 check async status, we may just be in a hold pattern
                 getExecutor().execute(new SocketProcessor(socket));
             }
             // Finish up this request
