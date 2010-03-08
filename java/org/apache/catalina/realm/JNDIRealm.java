@@ -30,7 +30,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.naming.Context;
 import javax.naming.CommunicationException;
@@ -1683,12 +1685,12 @@ public class JNDIRealm extends RealmBase {
             // Directory Groups". It avoids group slurping and handles cyclic group memberships as well.
             // See http://middleware.internet2.edu/dir/ for details
 
-            Set<String> newGroupDNs = new HashSet<String>(groupMap.keySet());
-            while (!newGroupDNs.isEmpty()) {
-                Set<String> newThisRound = new HashSet<String>(); // Stores the groups we find in this iteration
+            Map<String, String> newGroups = new HashMap<String,String>(groupMap);
+            while (!newGroups.isEmpty()) {
+                Map<String, String> newThisRound = new HashMap<String, String>(); // Stores the groups we find in this iteration
 
-                for (String groupDN : newGroupDNs) {
-                    filter = roleFormat.format(new String[] { groupDN });
+                for (Entry<String, String> group : newGroups.entrySet()) {
+                    filter = roleFormat.format(new String[] { group.getKey(), group.getValue() });
 
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Perform a nested group search with base "+ roleBase + " and filter " + filter);
@@ -1706,7 +1708,7 @@ public class JNDIRealm extends RealmBase {
                             String name = getAttributeValue(roleName, attrs);
                             if (name != null && dname != null && !groupMap.keySet().contains(dname)) {
                                 groupMap.put(dname, name);
-                                newThisRound.add(dname);
+                                newThisRound.put(dname, name);
 
                                 if (containerLog.isTraceEnabled()) {
                                     containerLog.trace("  Found nested role " + dname + " -> " + name);
@@ -1720,7 +1722,7 @@ public class JNDIRealm extends RealmBase {
                     }
                 }
 
-                newGroupDNs = newThisRound;
+                newGroups = newThisRound;
             }
         }
 
