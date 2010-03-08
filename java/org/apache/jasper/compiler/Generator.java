@@ -1711,6 +1711,20 @@ class Generator {
                         pageInfo.getVarInfoNames().add(info.getVarName());
                 }
             }
+            TagVariableInfo[] tagInfos = n.getTagVariableInfos();
+            if (tagInfos != null && tagInfos.length > 0) {
+                for (int i = 0; i < tagInfos.length; i++) {
+                    TagVariableInfo tagInfo = tagInfos[i];
+                    if (tagInfo != null) {
+                        String name = tagInfo.getNameFromAttribute();
+                        if (name == null) {
+                            name = tagInfo.getNameGiven();
+                        }
+                        pageInfo.getVarInfoNames().add(name);
+                    }
+                }
+            }
+            
             
             if (n.implementsSimpleTag()) {
                 generateCustomDoTag(n, handlerInfo, tagHandlerVar);
