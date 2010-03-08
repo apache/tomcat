@@ -651,6 +651,12 @@ find the names of roles associated with the authenticated user:</p>
 <li><strong>roleName</strong> - the attribute in a role entry
      containing the name of that role.</li>
 
+<li><strong>roleNested</strong> - enable nested roles. Set to
+     <code>true</code> if you want to nest roles in roles. If configured
+     every newly found roleName and distinguished
+     Name will be recursively tried for a new role search.
+     The default value is <code>false</code>.</li>
+
 </ul>
 
 </li>
