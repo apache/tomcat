@@ -1052,25 +1052,23 @@ class Generator {
                 java.lang.reflect.Method meth = JspRuntimeLibrary
                         .getReadMethod(bean, property);
                 String methodName = meth.getName();
-                out
-                        .printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString("
-                                + "((("
-                                + beanName
-                                + ")_jspx_page_context.findAttribute("
-                                + "\""
-                                + name + "\"))." + methodName + "())));");
+                out.printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString("
+                        + "((("
+                        + beanName
+                        + ")_jspx_page_context.findAttribute("
+                        + "\""
+                        + name + "\"))." + methodName + "())));");
             } else if (varInfoNames.contains(name)) {
                 // The object is a custom action with an associated
                 // VariableInfo entry for this name.
                 // Get the class name and then introspect at runtime.
-                out
-                        .printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString"
-                                + "(org.apache.jasper.runtime.JspRuntimeLibrary.handleGetProperty"
-                                + "(_jspx_page_context.findAttribute(\""
-                                + name
-                                + "\"), \""
-                                + property
-                                + "\")));");
+                out.printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString"
+                        + "(org.apache.jasper.runtime.JspRuntimeLibrary.handleGetProperty"
+                        + "(_jspx_page_context.findAttribute(\""
+                        + name
+                        + "\"), \""
+                        + property
+                        + "\")));");
             } else {
                 StringBuilder msg =
                     new StringBuilder("jsp:getProperty for bean with name '");
