@@ -27,23 +27,25 @@ package org.apache.catalina;
  * <br>
  * The valid state transitions for components that support Lifecycle are:
  * <pre>
- *                  --------------------<--------------------------
- *                  |                                             |
- *     start()      |        auto          auto         stop()    |       
- * NEW --->--- STARTING_PREP -->- STARTING -->- STARTED -->---    |
- *                                                 |         |    |
- *                                     auto        |         |    |
- *      ---------<----- MUST_STOP --<---------------         |    |
- *      |                                                    |    |
- *      ---------------------------<--------------------------    ^
- *      |                                                         |
- *      |        auto          auto                start()        |
- * STOPPING_PREP -->- STOPPING -->- STOPPED -------------->--------
- *      ^
- *      |stop()
- *      |
- *   FAILED
- * 
+ *                            --------------------<--------------------------
+ *                            |                                             |
+ *               start()      |        auto          auto         stop()    |       
+ * NEW ------------->--- STARTING_PREP -->- STARTING -->- STARTED -->---    |
+ *  |                                                        |         |    |
+ *  |                                            auto        |         |    |
+ *  |stop()       ---------<----- MUST_STOP --<---------------         |    |
+ *  |             |                                                    |    |
+ *  |             ---------------------------<--------------------------    ^
+ *  |             |                                                         |
+ *  |             |        auto          auto                start()        |
+ *  |        STOPPING_PREP -->- STOPPING -->- STOPPED -------------->--------
+ *  |             ^                              ^
+ *  |             |stop()                        |
+ *  |             |                              |
+ *  |          FAILED                            |
+ *  |                                            |
+ *  --->------------------------------>-----------
+ *   
  * Any state can transition to FAILED.
  * 
  * Calling start() while a component is in states STARTING_PREP, STARTING or
@@ -51,6 +53,11 @@ package org.apache.catalina;
  * 
  * Calling stop() while a component is in states STOPPING_PREP, STOPPING or
  * STOPPED has no effect.
+ * 
+ * Calling stop() while a component is in state NEW transitions the component
+ * to STOPPED. This is typically encountered when a component fails to start and
+ * does not start all its sub-components. When the component is stopped, it will
+ * try to stop all sub-components - even those it didn't start.
  * 
  * MUST_STOP is used to indicate that the {@link #stop()} should be called on
  * the component as soon as {@link start()} exits.
