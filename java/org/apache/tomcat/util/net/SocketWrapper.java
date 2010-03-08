@@ -21,13 +21,14 @@ public class SocketWrapper<E> {
     
     protected volatile E socket;
     
-    protected long lastAccess = -1;
-    protected boolean currentAccess = false;
+    protected volatile long lastAccess = -1;
+    protected volatile boolean currentAccess = false;
     protected long timeout = -1;
     protected boolean error = false;
     protected long lastRegistered = 0;
     protected volatile int keepAliveLeft = 100;
     protected boolean async = false;
+    protected boolean keptAlive = false;
     
     public SocketWrapper(E socket) {
         reset(socket);
@@ -55,5 +56,6 @@ public class SocketWrapper<E> {
     public int getKeepAliveLeft() { return this.keepAliveLeft; }
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
     public int decrementKeepAlive() { return (--keepAliveLeft);}
-
+    public boolean isKeptAlive() {return keptAlive;}
+    public void setKeptAlive(boolean keptAlive) {this.keptAlive = keptAlive;}
 }
