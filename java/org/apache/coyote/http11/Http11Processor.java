@@ -185,12 +185,13 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             error = true;
         }
 
-        boolean keptAlive = false;
+        boolean keptAlive = socketWrapper.isKeptAlive();
 
         while (started && !error && keepAlive) {
 
             // Parsing the request header
             try {
+                //TODO - calculate timeout based on length in queue (System.currentTimeMills() - wrapper.getLastAccess() is the time in queue)
                 if (keptAlive) {
                     if (keepAliveTimeout > 0) {
                         socket.setSoTimeout(keepAliveTimeout);
