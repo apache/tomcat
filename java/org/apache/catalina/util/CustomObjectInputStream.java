@@ -75,8 +75,14 @@ public final class CustomObjectInputStream
         try {
             return Class.forName(classDesc.getName(), false, classLoader);
         } catch (ClassNotFoundException e) {
-            // Try also the superclass because of primitive types
-            return super.resolveClass(classDesc);
+            try {
+                // Try also the superclass because of primitive types
+                return super.resolveClass(classDesc);
+            } catch (ClassNotFoundException e2) {
+                // Rethrow original exception, as it can have more information
+                // about why the class was not found. BZ 48007
+                throw e;
+            }
         }
     }
 
