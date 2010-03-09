@@ -107,7 +107,7 @@ public class TestELInJsp extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45427.jsp");
+                "/test/bug45nnn/bug45427.jsp");
         
         String result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
@@ -142,7 +142,7 @@ public class TestELInJsp extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45451a.jsp");
+                "/test/bug45nnn/bug45451a.jsp");
         
         String result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
@@ -151,7 +151,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "02-\\'hello world\\'");
         assertEcho(result, "03-\\'hello world\\'");
         
-        res = getUrl("http://localhost:" + getPort() + "/test/bug45451b.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451b.jsp");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
@@ -171,7 +171,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "12-\\#{1+1}");
         assertEcho(result, "13-\\\\2"); 
         
-        res = getUrl("http://localhost:" + getPort() + "/test/bug45451c.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451c.jsp");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // TODO - Currently we allow a single unescaped \ in attribute values
@@ -191,7 +191,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "12-\\\\#{1+1}");
         assertEcho(result, "13-\\\\#{1+1}");
 
-        res = getUrl("http://localhost:" + getPort() + "/test/bug45451d.jspx");
+        res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451d.jspx");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // \\ Is *not* an escape sequence in XML attributes
@@ -210,7 +210,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "12-\\\\#{1+1}");
         assertEcho(result, "13-\\\\\\#{1+1}");
         
-        res = getUrl("http://localhost:" + getPort() + "/test/bug45451e.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451e.jsp");
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
@@ -242,7 +242,7 @@ public class TestELInJsp extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45511.jsp");
+                "/test/bug45nnn/bug45511.jsp");
         
         String result = res.toString();
         assertEcho(result, "00-true");

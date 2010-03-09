@@ -37,7 +37,7 @@ public class TestGenerator extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45015a.jsp");
+                "/test/bug45nnn/bug45015a.jsp");
         
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
@@ -66,7 +66,7 @@ public class TestGenerator extends TomcatBaseTest {
 
         Exception e = null;
         try {
-            getUrl("http://localhost:" + getPort() + "/test/bug45015b.jsp");
+            getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015b.jsp");
         } catch (IOException ioe) {
             e = ioe;
         }
