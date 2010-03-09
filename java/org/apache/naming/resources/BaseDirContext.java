@@ -366,7 +366,7 @@ public abstract class BaseDirContext implements DirContext {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
-    public Object lookup(Name name)
+    public final Object lookup(Name name)
         throws NamingException {
         return lookup(name.toString());
     }
@@ -566,7 +566,7 @@ public abstract class BaseDirContext implements DirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration<Binding> listBindings(Name name)
+    public final NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         return listBindings(name.toString());
     }
@@ -581,8 +581,16 @@ public abstract class BaseDirContext implements DirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration<Binding> listBindings(String name)
-        throws NamingException;
+    public final NamingEnumeration<Binding> listBindings(String name)
+        throws NamingException {
+        if (!aliases.isEmpty()) {
+            AliasResult result = findAlias(name);
+            if (result.dirContext != null) {
+                return result.dirContext.listBindings(result.aliasName);
+            }
+        }
+        return doListBindings(name);
+    }
 
 
     /**
@@ -1364,6 +1372,9 @@ public abstract class BaseDirContext implements DirContext {
         throws NamingException;
 
     protected abstract Object doLookup(String name) throws NamingException;
+
+    protected abstract NamingEnumeration<Binding> doListBindings(String name)
+        throws NamingException;
 
     protected abstract String doGetRealPath(String name);
 
