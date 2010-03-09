@@ -36,7 +36,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48627.jsp");
+                "/test/bug48nnn/bug48627.jsp");
         
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
@@ -56,7 +56,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48668a.jsp");
+                "/test/bug48nnn/bug48668a.jsp");
         String result = res.toString();
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
         assertEcho(result, "01-Hello world</p>${foo.bar}");
@@ -101,7 +101,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48668b.jsp");
+                "/test/bug48nnn/bug48668b.jsp");
         String result = res.toString();
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
         assertEcho(result, "01-Hello world</p>#{foo2");
