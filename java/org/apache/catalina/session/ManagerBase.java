@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -184,6 +186,7 @@ public abstract class ManagerBase extends LifecycleBase
     protected int sessionCounter=0;
 
     protected int maxActive=0;
+    private final ReadWriteLock maxActiveLock = new ReentrantReadWriteLock();
 
     // number of duplicated session ids - anything >0 means we have problems
     protected int duplicates=0;
@@ -764,8 +767,17 @@ public abstract class ManagerBase extends LifecycleBase
 
         sessions.put(session.getIdInternal(), session);
         int size = sessions.size();
-        if( size > maxActive ) {
-            maxActive = size;
+        
+        maxActiveLock.readLock().lock();
+        if (size > maxActive) {
+            maxActiveLock.readLock().unlock();
+            maxActiveLock.writeLock().lock();
+            if (size > maxActive) {
+                maxActive = size;
+            }
+            maxActiveLock.writeLock().unlock();
+        } else {
+            maxActiveLock.readLock().unlock();
         }
     }
 
@@ -1076,12 +1088,17 @@ public abstract class ManagerBase extends LifecycleBase
      * @return The highest number of concurrent active sessions
      */
     public int getMaxActive() {
-        return maxActive;
+        maxActiveLock.readLock().lock();
+        int result = maxActive;
+        maxActiveLock.readLock().unlock();
+        return result;
     }
 
 
     public void setMaxActive(int maxActive) {
+        maxActiveLock.writeLock().lock();
         this.maxActive = maxActive;
+        maxActiveLock.writeLock().unlock();
     }
 
 
