@@ -304,7 +304,7 @@ public class TestELInJsp extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48112.jsp");
+                "/test/bug48nnn/bug48112.jsp");
         String result = res.toString();
         assertEcho(result, "{OK}");
     }

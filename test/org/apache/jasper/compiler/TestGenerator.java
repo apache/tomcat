@@ -100,7 +100,7 @@ public class TestGenerator extends TomcatBaseTest {
 
         Exception e = null;
         try {
-            getUrl("http://localhost:" + getPort() + "/test/bug48701-fail.jsp");
+            getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48701-fail.jsp");
         } catch (IOException ioe) {
             e = ioe;
         }
@@ -110,19 +110,19 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     public void testBug48701UseBean() throws Exception {
-        testBug48701("bug48701-UseBean.jsp");
+        testBug48701("bug48nnn/bug48701-UseBean.jsp");
     }
     
     public void testBug48701VariableInfo() throws Exception {
-        testBug48701("bug48701-VI.jsp");
+        testBug48701("bug48nnn/bug48701-VI.jsp");
     }
     
     public void testBug48701TagVariableInfoNameGiven() throws Exception {
-        testBug48701("bug48701-TVI-NG.jsp");
+        testBug48701("bug48nnn/bug48701-TVI-NG.jsp");
     }
     
     public void testBug48701TagVariableInfoNameFromAttribute() throws Exception {
-        testBug48701("bug48701-TVI-NFA.jsp");
+        testBug48701("bug48nnn/bug48701-TVI-NFA.jsp");
     }
     
     private void testBug48701(String jsp) throws Exception {
