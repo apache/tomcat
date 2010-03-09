@@ -1726,9 +1726,12 @@ class Generator {
                     TagVariableInfo tagInfo = tagInfos[i];
                     if (tagInfo != null) {
                         String name = tagInfo.getNameGiven();
-                        if (name != null) {
-                            pageInfo.getVarInfoNames().add(name);
+                        if (name == null) {
+                            String nameFromAttribute =
+                                tagInfo.getNameFromAttribute();
+                            name = n.getAttributeValue(nameFromAttribute);
                         }
+                        pageInfo.getVarInfoNames().add(name);
                     }
                 }
             }
