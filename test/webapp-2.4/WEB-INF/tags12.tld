@@ -25,11 +25,12 @@
 
   <tag>
     <name>Echo</name>
-    <tagclass>org.apache.jasper.compiler.TestValidator$Echo</tagclass>
+    <tag-class>org.apache.jasper.compiler.TestValidator$Echo</tag-class>
     <body-content>empty</body-content>
     <attribute>
       <name>echo</name>
       <required>yes</required>
+      <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
 
