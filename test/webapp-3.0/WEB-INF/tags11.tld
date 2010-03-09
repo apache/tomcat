@@ -30,6 +30,7 @@
     <attribute>
       <name>echo</name>
       <required>yes</required>
+      <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
 
