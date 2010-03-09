@@ -892,7 +892,7 @@ public class FileDirContext extends BaseDirContext {
 
 
     /**
-     * This specialized resource implementation avoids opening the IputStream
+     * This specialized resource implementation avoids opening the InputStream
      * to the file right away (which would put a lock on the file).
      */
     protected class FileResource extends Resource {
@@ -933,7 +933,9 @@ public class FileDirContext extends BaseDirContext {
         public InputStream streamContent()
             throws IOException {
             if (binaryContent == null) {
-                inputStream = new FileInputStream(file);
+                FileInputStream fis = new FileInputStream(file);
+                inputStream = fis;
+                return fis;
             }
             return super.streamContent();
         }
