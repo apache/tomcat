@@ -1725,7 +1725,8 @@ public class JNDIRealm extends RealmBase {
             }
         }
 
-        return new ArrayList<String>(groupMap.values());
+        list.addAll(groupMap.values());
+        return list;
     }
 
 
