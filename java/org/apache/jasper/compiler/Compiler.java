@@ -152,18 +152,19 @@ public abstract class Compiler {
                     JspUtil.booleanValue(
                             jspProperty.isErrorOnUndeclaredNamespace()));
         }
-        if (ctxt.getTagInfo() != null) {
+        if (ctxt.isTagFile()) {
             try {
                 double libraryVersion = Double.parseDouble(ctxt.getTagInfo()
                         .getTagLibrary().getRequiredVersion());
                 if (libraryVersion < 2.0) {
-                    pageInfo.setELIgnored(true);
+                    pageInfo.setIsELIgnored("true", null, errDispatcher, true);
                 }
                 if (libraryVersion < 2.1) {
-                    pageInfo.setDeferredSyntaxAllowedAsLiteral(true);
+                    pageInfo.setDeferredSyntaxAllowedAsLiteral("true", null,
+                            errDispatcher, true);
                 }
             } catch (NumberFormatException ex) {
-                // ignored
+                errDispatcher.jspError(ex);
             }
         }
 
