@@ -28,11 +28,44 @@
     <tag-class>org.apache.jasper.compiler.TestScriptingVariabler$Bug48616aTag</tag-class>
     <body-content>JSP</body-content>
   </tag>
-
   <tag>
     <name>Bug48616b</name>
     <tag-class>org.apache.jasper.compiler.TestScriptingVariabler$Bug48616bTag</tag-class>
     <tei-class>org.apache.jasper.compiler.TestScriptingVariabler$Bug48616bTei</tei-class>
     <body-content>JSP</body-content>
   </tag>
+  
+  <tag>
+    <name>Bug48701a</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
+    <tei-class>org.apache.jasper.compiler.TestGenerator$Bug48701TEI</tei-class>
+    <body-content>empty</body-content>
+  </tag>
+  <tag>
+    <name>Bug48701b</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
+    <body-content>empty</body-content>
+    <variable>
+      <name-given>now</name-given>
+      <variable-class>org.apache.jasper.compiler.TestGenerator.Bean</variable-class>
+      <declare>true</declare>
+      <scope>AT_END</scope>
+    </variable>
+  </tag>
+  <tag>
+    <name>Bug48701c</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>beanName</name>
+      <type>java.lang.String</type>
+    </attribute>
+    <variable>
+      <name-from-attribute>beanName</name-from-attribute>
+      <variable-class>org.apache.jasper.compiler.TestGenerator.Bean</variable-class>
+      <declare>true</declare>
+      <scope>AT_END</scope>
+    </variable>
+  </tag>
+  
 </taglib>
