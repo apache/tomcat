@@ -33,7 +33,6 @@ import org.apache.naming.ContextBindings;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
 *
@@ -96,13 +95,6 @@ public class DataSourceRealm
      * The column in the user role table that names a role
      */
     protected String roleNameCol = null;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
