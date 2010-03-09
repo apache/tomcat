@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
@@ -85,13 +84,6 @@ public class MemoryRealm  extends RealmBase {
      */
     private Map<String,GenericPrincipal> principals =
         new HashMap<String,GenericPrincipal>();
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties
