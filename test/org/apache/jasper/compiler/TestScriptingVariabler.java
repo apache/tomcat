@@ -84,7 +84,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
 
         Exception e = null;
         try {
-            getUrl("http://localhost:" + getPort() + "/test/bug48616.jsp");
+            getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48616.jsp");
         } catch (IOException ioe) {
             e = ioe;
         }
@@ -105,7 +105,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
 
         Exception e = null;
         try {
-            getUrl("http://localhost:" + getPort() + "/test/bug48616b.jsp");
+            getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48616b.jsp");
         } catch (IOException ioe) {
             e = ioe;
         }

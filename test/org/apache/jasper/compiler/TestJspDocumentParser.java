@@ -58,7 +58,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
 
         Exception e = null;
         try {
-            getUrl("http://localhost:" + getPort() + "/test/bug48827.jspx");
+            getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48827.jspx");
         } catch (IOException ioe) {
             e = ioe;
         }
