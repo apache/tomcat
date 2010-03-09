@@ -29,12 +29,12 @@ import org.apache.catalina.util.LifecycleBase;
  * webapp without the need for assembly all the webapp dependencies as jars in
  * WEB-INF/lib.
  *
- * <code>
+ * <pre>
  * &lt;Context docBase="\webapps\mydocbase">
  *   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
  *              virtualClasspath="\dir\classes;\somedir\somejar.jar"/>
  * &lt;/Context>
- * </code>
+ * </pre>
  *
  *
  * <strong>This is not meant to be used for production.
