@@ -294,6 +294,9 @@ public class JspCompilationContext {
             }
             if (jarUrl != null) {
                 result = new URL(jarUrl.toExternalForm() + res.substring(1));
+            } else {
+                // May not be in a JAR in some IDE environments
+                result = context.getResource(canonicalURI(res));
             }
         } else if (res.startsWith("jar:file:")) {
                 // This is a tag file packaged in a jar that is being checked
