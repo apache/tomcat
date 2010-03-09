@@ -320,7 +320,7 @@ public class FileDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<Binding> listBindings(String name)
+    protected NamingEnumeration<Binding> doListBindings(String name)
         throws NamingException {
 
         File file = file(name);
