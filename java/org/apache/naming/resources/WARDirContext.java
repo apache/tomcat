@@ -187,30 +187,16 @@ public class WARDirContext extends BaseDirContext {
     /**
      * Retrieves the named object.
      * 
-     * @param name the name of the object to look up
+     * @param strName the name of the object to look up
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    protected Object doLookup(String name)
+    protected Object doLookup(String strName)
         throws NamingException {
-        return lookup(new CompositeName(name));
-    }
 
+        Name name = new CompositeName(strName);
 
-    /**
-     * Retrieves the named object. If name is empty, returns a new instance 
-     * of this context (which represents the same naming context as this 
-     * context, but its environment may be modified independently and it may 
-     * be accessed concurrently).
-     * 
-     * @param name the name of the object to look up
-     * @return the object bound to name
-     * @exception NamingException if a naming exception is encountered
-     */
-    @Override
-    public Object lookup(Name name)
-        throws NamingException {
         if (name.isEmpty())
             return this;
         Entry entry = treeLookup(name);
@@ -318,34 +304,17 @@ public class WARDirContext extends BaseDirContext {
      * If a binding is added to or removed from this context, its effect on 
      * an enumeration previously returned is undefined.
      * 
-     * @param name the name of the context to list
+     * @param strName the name of the context to list
      * @return an enumeration of the bindings in this context. 
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<Binding> listBindings(String name)
+    protected NamingEnumeration<Binding> doListBindings(String strName)
         throws NamingException {
-        return listBindings(new CompositeName(name));
-    }
+        
+        Name name = new CompositeName(strName);
 
-
-    /**
-     * Enumerates the names bound in the named context, along with the 
-     * objects bound to them. The contents of any subcontexts are not 
-     * included.
-     * <p>
-     * If a binding is added to or removed from this context, its effect on 
-     * an enumeration previously returned is undefined.
-     * 
-     * @param name the name of the context to list
-     * @return an enumeration of the bindings in this context. 
-     * Each element of the enumeration is of type Binding.
-     * @exception NamingException if a naming exception is encountered
-     */
-    @Override
-    public NamingEnumeration<Binding> listBindings(Name name)
-        throws NamingException {
         if (name.isEmpty())
             return new NamingContextBindingsEnumeration(list(entries).iterator(),
                     this);
