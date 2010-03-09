@@ -91,6 +91,14 @@
       be used.</p>
     </property>
 
+    <property name="org.apache.jasper.compiler. Generator.STRICT_GET_PROPERTY">
+      <p>If <code>true</code>, the requirement to have the object referenced in
+      <code>jsp:getProperty</code> action to be previously "introduced"
+      to the JSP processor, as specified in the chapter JSP.5.3 of JSP 2.0 and
+      later specifications, is enforced. If not specified, the specification
+      compliant default of <code>true</code> will be used.</p>
+    </property>
+
     <property name="org.apache.jasper.compiler. Parser.STRICT_QUOTE_ESCAPING">
       <p>If <code>false</code> the requirements for escaping quotes in JSP
       attributes will be relaxed so that an unescaped quote will not
