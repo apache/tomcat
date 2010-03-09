@@ -1160,7 +1160,7 @@ public class DeltaManager extends ClusterManagerBase{
         rejectedSessions = 0 ;
         sessionReplaceCounter = 0 ;
         counterNoStateTransfered = 0 ;
-        maxActive = getActiveSessions() ;
+        setMaxActive(getActiveSessions());
         sessionCounter = getActiveSessions() ;
         counterReceive_EVT_ALL_SESSION_DATA = 0;
         counterReceive_EVT_GET_ALL_SESSIONS = 0;
