@@ -36,7 +36,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -158,13 +157,6 @@ public class JAASRealm
      * The list of role class names, split out for easy processing.
      */
     protected List<String> roleClasses = new ArrayList<String>();
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**

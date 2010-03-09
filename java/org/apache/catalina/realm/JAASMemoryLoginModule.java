@@ -36,7 +36,6 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.apache.catalina.authenticator.Constants;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
@@ -109,12 +108,6 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
      */
     protected Principal principal = null;
 
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
     /**
      * The state information that is shared with other configured

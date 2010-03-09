@@ -33,7 +33,6 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -80,13 +79,6 @@ public class UserDatabaseRealm
      * we will be utilizing.
      */
     protected String resourceName = "UserDatabase";
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties

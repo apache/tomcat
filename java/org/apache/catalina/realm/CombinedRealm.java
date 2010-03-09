@@ -31,7 +31,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -45,12 +44,6 @@ public class CombinedRealm extends RealmBase {
 
     private static final Log log = LogFactory.getLog(CombinedRealm.class);
 
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-    
     /**
      * The list of Realms contained by this Realm.
      */
