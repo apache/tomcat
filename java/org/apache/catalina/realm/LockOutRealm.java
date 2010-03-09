@@ -91,6 +91,7 @@ public class LockOutRealm extends CombinedRealm {
         // exceeds the specified size
         failedUsers = new LinkedHashMap<String, LockRecord>(cacheSize, 0.75f,
                 true) {
+            private static final long serialVersionUID = 1L;
             @Override
             protected boolean removeEldestEntry(
                     Map.Entry<String, LockRecord> eldest) {
