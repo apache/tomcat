@@ -29,6 +29,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
@@ -722,9 +723,12 @@ public class CoyoteAdapter implements Adapter {
         if (count <= 0)
             return;
 
+        String sessionCookieName =
+            ApplicationSessionCookieConfig.getSessionCookieName(context);
+
         for (int i = 0; i < count; i++) {
             ServerCookie scookie = serverCookies.getCookie(i);
-            if (scookie.getName().equals(Globals.SESSION_COOKIE_NAME)) {
+            if (scookie.getName().equals(sessionCookieName)) {
                 // Override anything requested in the URL
                 if (!request.isRequestedSessionIdFromCookie()) {
                     // Accept only the first session id cookie
