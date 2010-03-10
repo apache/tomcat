@@ -202,8 +202,8 @@ public class JspServletWrapper {
             }
             if (options.getDevelopment() || firstTime ) {
                 synchronized (this) {
-                    firstTime = false;
                     ctxt.compile();
+                    firstTime = false;
                 }
             } else {
                 if (compileException != null) {
