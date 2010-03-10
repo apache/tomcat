@@ -112,10 +112,12 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
      * @param httpOnly    Should session cookie be configured as httpOnly
      * @param emptyPath   Should session cookie be configured with empty path
      * @param contextPath Context path to use if required       
+     * @param domain      Domain to use for the session cookie. If null, use the
+     *                    domain specified by the scc parameter.
      */
     public static Cookie createSessionCookie(SessionCookieConfig scc,
             String sessionId, boolean secure, boolean httpOnly,
-            boolean emptyPath, String contextPath) {
+            boolean emptyPath, String contextPath, String domain) {
 
        // Session config can over-ride default name  
        String cookieName = scc.getName();
@@ -127,9 +129,14 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
        // Just apply the defaults.
        cookie.setMaxAge(scc.getMaxAge());
        cookie.setComment(scc.getComment());
-       // Avoid possible NPE
-       if (scc.getDomain() != null) {
-           cookie.setDomain(scc.getDomain());
+       
+       if (domain == null) {
+           // Avoid possible NPE
+           if (scc.getDomain() != null) {
+               cookie.setDomain(scc.getDomain());
+           }
+       } else {
+           cookie.setDomain(domain);
        }
 
        // Always set secure if the request is secure
