@@ -105,12 +105,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
 
 
     /**
-     * Use "/" as path for session cookies ?
-     */
-    protected boolean emptySessionPath = false;
-
-
-    /**
      * The "enable DNS lookups" flag for this Connector.
      */
     protected boolean enableLookups = false;
@@ -393,29 +387,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     public void setContainer(Container container) {
 
         this.container = container;
-
-    }
-
-
-    /**
-     * Return the "empty session path" flag.
-     */
-    public boolean getEmptySessionPath() {
-
-        return (this.emptySessionPath);
-
-    }
-
-
-    /**
-     * Set the "empty session path" flag.
-     *
-     * @param emptySessionPath The new "empty session path" flag value
-     */
-    public void setEmptySessionPath(boolean emptySessionPath) {
-
-        this.emptySessionPath = emptySessionPath;
-        setProperty("emptySessionPath", String.valueOf(emptySessionPath));
 
     }
 
