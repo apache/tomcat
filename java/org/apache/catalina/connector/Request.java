@@ -2273,14 +2273,8 @@ public class Request
         
         if (response != null) {
             Cookie newCookie =
-                ApplicationSessionCookieConfig.createSessionCookie(
-                        context.getServletContext().getSessionCookieConfig(),
-                        newSessionId,
-                        secure,
-                        context.getUseHttpOnly(),
-                        response.getConnector().getEmptySessionPath(),
-                        context.getEncodedPath(),
-                        context.getSessionCookieDomain());
+                ApplicationSessionCookieConfig.createSessionCookie(context,
+                        newSessionId, secure);
             response.addCookie(newCookie);
         }
     }
@@ -2542,7 +2536,7 @@ public class Request
         // Do not reuse the session id if it is from a URL, to prevent possible
         // phishing attacks
         // Use the SSL session ID if one is present. 
-        if ((connector.getEmptySessionPath() 
+        if (("/".equals(context.getSessionCookiePath()) 
                 && isRequestedSessionIdFromCookie()) || requestedSessionSSL ) {
             session = manager.createSession(getRequestedSessionId());
         } else {
@@ -2556,13 +2550,7 @@ public class Request
                                SessionTrackingMode.COOKIE)) {
             Cookie cookie =
                 ApplicationSessionCookieConfig.createSessionCookie(
-                        context.getServletContext().getSessionCookieConfig(),
-                        session.getIdInternal(),
-                        isSecure(),
-                        context.getUseHttpOnly(),
-                        connector.getEmptySessionPath(),
-                        context.getEncodedPath(),
-                        context.getSessionCookieDomain());
+                        context, session.getIdInternal(), isSecure());
             
             response.addCookieInternal(cookie);
         }

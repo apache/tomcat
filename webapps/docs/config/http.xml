@@ -79,13 +79,6 @@
       HTTP method. If not specified, this attribute is set to false.</p>
     </attribute>
 
-    <attribute name="emptySessionPath" required="false">
-      <p>If set to <code>true</code>, all paths for session cookies will be set
-      to <code>/</code>. This can be useful for portlet specification
-      implementations. If not specified, this attribute is set to
-      <code>false</code>.</p>
-    </attribute>
-
     <attribute name="enableLookups" required="false">
       <p>Set to <code>true</code> if you want calls to
       <code>request.getRemoteHost()</code> to perform DNS lookups in
