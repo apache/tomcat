@@ -354,7 +354,7 @@ elif [ "$1" = "stop" ] ; then
   SLEEP=5
   if [ ! -z "$1" ]; then
     echo $1 | grep "[^0-9]" > /dev/null 2>&1
-    if [ $? -eq 1 ]; then
+    if [ $? -gt 0 ]; then
       SLEEP=$1
       shift
     fi
@@ -369,7 +369,7 @@ elif [ "$1" = "stop" ] ; then
   if [ ! -z "$CATALINA_PID" ]; then
     if [ -f "$CATALINA_PID" ]; then
       kill -0 `cat $CATALINA_PID` >/dev/null 2>&1
-      if [ $? -eq 1 ]; then
+      if [ $? -gt 0 ]; then
         echo "PID file ($CATALINA_PID) found but no matching process was found. Stop aborted."
         exit 1
       fi
@@ -390,7 +390,7 @@ elif [ "$1" = "stop" ] ; then
     if [ -f "$CATALINA_PID" ]; then
       while [ $SLEEP -ge 0 ]; do 
         kill -0 `cat $CATALINA_PID` >/dev/null 2>&1
-        if [ $? -eq 1 ]; then
+        if [ $? -gt 0 ]; then
           rm $CATALINA_PID
           break
         fi
