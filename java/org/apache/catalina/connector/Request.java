@@ -2279,7 +2279,8 @@ public class Request
                         secure,
                         context.getUseHttpOnly(),
                         response.getConnector().getEmptySessionPath(),
-                        context.getEncodedPath());
+                        context.getEncodedPath(),
+                        context.getSessionCookieDomain());
             response.addCookie(newCookie);
         }
     }
@@ -2560,7 +2561,8 @@ public class Request
                         isSecure(),
                         context.getUseHttpOnly(),
                         connector.getEmptySessionPath(),
-                        context.getEncodedPath());
+                        context.getEncodedPath(),
+                        context.getSessionCookieDomain());
             
             response.addCookieInternal(cookie);
         }
