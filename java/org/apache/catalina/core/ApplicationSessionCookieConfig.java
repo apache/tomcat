@@ -122,11 +122,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         //       2. Values from SessionCookieConfig
         //       3. Defaults
 
-        String cookieName = scc.getName();
-        if (cookieName == null) {
-            cookieName = Globals.SESSION_COOKIE_NAME;
-        }
-        Cookie cookie = new Cookie(cookieName, sessionId);
+        Cookie cookie = new Cookie(getSessionCookieName(context), sessionId);
        
         // Just apply the defaults.
         cookie.setMaxAge(scc.getMaxAge());
@@ -161,5 +157,34 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         cookie.setPath(contextPath);
 
         return cookie;
+    }
+    
+    
+    /**
+     * Determine the name to use for the session cookie for the provided
+     * context.
+     * @param context
+     */
+    public static String getSessionCookieName(Context context) {
+        
+        // Priority is:
+        // 1. Cookie name defined in context
+        // 2. Cookie name configured for app
+        // 3. Default defined by spec
+        if (context != null) {
+            String cookieName = context.getSessionCookieName();
+            if (cookieName != null && cookieName.length() > 0) {
+                return cookieName;
+            }
+            
+            SessionCookieConfig scc =
+                context.getServletContext().getSessionCookieConfig();
+            cookieName = scc.getName();
+            if (cookieName != null && cookieName.length() > 0) {
+                return cookieName;
+            }
+        }
+        
+        return Globals.SESSION_COOKIE_NAME;
     }
 }
