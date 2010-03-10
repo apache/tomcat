@@ -211,12 +211,31 @@ public interface Context extends Container {
      * @param sessionCookieDomain   The domain to use
      */
     public void setSessionCookieDomain(String sessionCookieDomain);
+
+    
+    /**
+     * Gets the path to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @return  The value of the default session cookie path or null if not
+     *          specified
+     */
+    public String getSessionCookiePath();
+    
+    
+    /**
+     * Sets the path to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @param sessionCookiePath   The path to use
+     */
+    public void setSessionCookiePath(String sessionCookiePath);
+
     
     /**
      * Return the "allow crossing servlet contexts" flag.
      */
     public boolean getCrossContext();
-
 
     
     /**
