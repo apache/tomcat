@@ -175,6 +175,7 @@ public interface Context extends Container {
      */
     public void setCookies(boolean cookies);
 
+    
     /**
      * Gets the value of the use HttpOnly cookies for session cookies flag.
      * 
@@ -191,6 +192,25 @@ public interface Context extends Container {
      *                          for session cookies
      */
     public void setUseHttpOnly(boolean useHttpOnly);
+    
+    
+    /**
+     * Gets the domain to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @return  The value of the default session cookie domain or null if not
+     *          specified
+     */
+    public String getSessionCookieDomain();
+    
+    
+    /**
+     * Sets the domain to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @param sessionCookieDomain   The domain to use
+     */
+    public void setSessionCookieDomain(String sessionCookieDomain);
     
     /**
      * Return the "allow crossing servlet contexts" flag.

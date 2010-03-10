@@ -716,11 +716,20 @@ public class StandardContext
      */
     private boolean saveConfig = true;
 
+    
     /**
      * The flag that indicates that session cookies should use HttpOnly
      */
     private boolean useHttpOnly = true;
 
+    
+    /**
+     * The domain to use for session cookies. <code>null</code> indicates that
+     * the domain is controlled by the application.
+     */
+    private String sessionCookieDomain;
+    
+    
     /**
      * The Jar scanner to use to search for Jars that might contain
      * configuration information such as TLDs or web-fragment.xml files. 
@@ -1272,7 +1281,31 @@ public class StandardContext
     }
     
     
-
+    /**
+     * Gets the domain to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @return  The value of the default session cookie domain or null if not
+     *          specified
+     */
+    public String getSessionCookieDomain() {
+        return sessionCookieDomain;
+    }
+    
+    
+    /**
+     * Sets the domain to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @param sessionCookieDomain   The domain to use
+     */
+    public void setSessionCookieDomain(String sessionCookieDomain) {
+        String oldSessionCookieDomain = this.sessionCookieDomain;
+        this.sessionCookieDomain = sessionCookieDomain;
+        support.firePropertyChange("sessionCookieDomain",
+                oldSessionCookieDomain, sessionCookieDomain);
+    }
+    
 
     /**
      * Return the "allow crossing servlet contexts" flag.

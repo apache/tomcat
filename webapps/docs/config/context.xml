@@ -237,6 +237,13 @@
         on demand.</p>
       </attribute>
 
+      <attribute name="sessionCookieDomain" required="false">
+        <p>The domain to be used for all session cookies created for this
+        context. If set, this overrides any domain set by the web application.
+        If not set, the value specified by the web application, if any, will be
+        used.</p>
+      </attribute>
+      
       <attribute name="wrapperClass" required="false">
         <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
         implementation class that will be used for servlets managed by this
