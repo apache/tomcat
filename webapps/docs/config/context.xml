@@ -244,6 +244,17 @@
         used.</p>
       </attribute>
       
+      <attribute name="sessionCookiePath" required="false">
+        <p>The path to be used for all session cookies created for this
+        context. If set, this overrides any path set by the web application.
+        If not set, the value specified by the web application will be used, or
+        the context path used if the web application does not explicitly set
+        one. To configure all web application to use an empty path (this can be
+        useful for portlet specification implementations) set this attribute to
+        <code>/</code> in the global <code>CATALINA_BASE/conf/context.xml</code>
+        file.</p>
+      </attribute>
+      
       <attribute name="wrapperClass" required="false">
         <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
         implementation class that will be used for servlets managed by this

@@ -731,6 +731,13 @@ public class StandardContext
     
     
     /**
+     * The path to use for session cookies. <code>null</code> indicates that
+     * the path is controlled by the application.
+     */
+    private String sessionCookiePath;
+    
+    
+    /**
      * The Jar scanner to use to search for Jars that might contain
      * configuration information such as TLDs or web-fragment.xml files. 
      */
@@ -1304,6 +1311,32 @@ public class StandardContext
         this.sessionCookieDomain = sessionCookieDomain;
         support.firePropertyChange("sessionCookieDomain",
                 oldSessionCookieDomain, sessionCookieDomain);
+    }
+    
+
+    /**
+     * Gets the path to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @return  The value of the default session cookie path or null if not
+     *          specified
+     */
+    public String getSessionCookiePath() {
+        return sessionCookiePath;
+    }
+    
+    
+    /**
+     * Sets the path to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @param sessionCookiePath   The path to use
+     */
+    public void setSessionCookiePath(String sessionCookiePath) {
+        String oldSessionCookiePath = this.sessionCookiePath;
+        this.sessionCookiePath = sessionCookiePath;
+        support.firePropertyChange("sessionCookiePath",
+                oldSessionCookiePath, sessionCookiePath);
     }
     
 

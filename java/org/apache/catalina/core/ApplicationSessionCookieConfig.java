@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.Cookie;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 
 public class ApplicationSessionCookieConfig implements SessionCookieConfig {
@@ -105,62 +106,60 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     /**
      * Creates a new session cookie for the given session ID
      *
-     * @param scc         The default session cookie configuration
+     * @param conetxt     The Context for the web application
      * @param sessionId   The ID of the session for which the cookie will be
      *                    created
      * @param secure      Should session cookie be configured as secure
-     * @param httpOnly    Should session cookie be configured as httpOnly
-     * @param emptyPath   Should session cookie be configured with empty path
-     * @param contextPath Context path to use if required       
-     * @param domain      Domain to use for the session cookie. If null, use the
-     *                    domain specified by the scc parameter.
      */
-    public static Cookie createSessionCookie(SessionCookieConfig scc,
-            String sessionId, boolean secure, boolean httpOnly,
-            boolean emptyPath, String contextPath, String domain) {
+    public static Cookie createSessionCookie(Context context,
+            String sessionId, boolean secure) {
 
-       // Session config can over-ride default name  
-       String cookieName = scc.getName();
-       if (cookieName == null) {
-           cookieName = Globals.SESSION_COOKIE_NAME;
-       }
-       Cookie cookie = new Cookie(cookieName, sessionId);
-       
-       // Just apply the defaults.
-       cookie.setMaxAge(scc.getMaxAge());
-       cookie.setComment(scc.getComment());
-       
-       if (domain == null) {
-           // Avoid possible NPE
-           if (scc.getDomain() != null) {
-               cookie.setDomain(scc.getDomain());
-           }
-       } else {
-           cookie.setDomain(domain);
-       }
+        SessionCookieConfig scc =
+            context.getServletContext().getSessionCookieConfig();
 
-       // Always set secure if the request is secure
-       if (scc.isSecure() || secure) {
-           cookie.setSecure(true);
-       }
+        // NOTE: The priority order for session cookie configuration is:
+        //       1. Context level configuration
+        //       2. Values from SessionCookieConfig
+        //       3. Defaults
 
-       // Always set httpOnly if the context is configured for that
-       if (scc.isHttpOnly() || httpOnly) {
-           cookie.setHttpOnly(true);
-       }
+        String cookieName = scc.getName();
+        if (cookieName == null) {
+            cookieName = Globals.SESSION_COOKIE_NAME;
+        }
+        Cookie cookie = new Cookie(cookieName, sessionId);
        
-       // Don't set the path if the connector is configured to over-ride
-       if (!emptyPath && scc.getPath() != null) {
-           cookie.setPath(scc.getPath());
-       } else {
-           if (!emptyPath && contextPath != null && (contextPath.length() > 0)) {
-               cookie.setPath(contextPath);
-           } else {
-               cookie.setPath("/");
-           }
-       }
-       return cookie;
-   }
-   
- 
+        // Just apply the defaults.
+        cookie.setMaxAge(scc.getMaxAge());
+        cookie.setComment(scc.getComment());
+       
+        if (context.getSessionCookieDomain() == null) {
+            // Avoid possible NPE
+            if (scc.getDomain() != null) {
+                cookie.setDomain(scc.getDomain());
+            }
+        } else {
+            cookie.setDomain(context.getSessionCookieDomain());
+        }
+
+        // Always set secure if the request is secure
+        if (scc.isSecure() || secure) {
+            cookie.setSecure(true);
+        }
+
+        // Always set httpOnly if the context is configured for that
+        if (scc.isHttpOnly() || context.getUseHttpOnly()) {
+            cookie.setHttpOnly(true);
+        }
+       
+        String contextPath = context.getSessionCookiePath();
+        if (contextPath == null || contextPath.length() == 0) {
+            contextPath = scc.getPath();
+        }
+        if (contextPath == null || contextPath.length() == 0) {
+            contextPath = context.getEncodedPath();
+        }
+        cookie.setPath(contextPath);
+
+        return cookie;
+    }
 }
