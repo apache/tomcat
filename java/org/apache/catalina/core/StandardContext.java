@@ -718,6 +718,13 @@ public class StandardContext
 
     
     /**
+     * The name to use for session cookies. <code>null</code> indicates that
+     * the name is controlled by the application.
+     */
+    private String sessionCookieName;
+    
+    
+    /**
      * The flag that indicates that session cookies should use HttpOnly
      */
     private boolean useHttpOnly = true;
@@ -1261,6 +1268,33 @@ public class StandardContext
                                    this.cookies);
 
     }
+    
+    
+    /**
+     * Gets the name to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @return  The value of the default session cookie name or null if not
+     *          specified
+     */
+    public String getSessionCookieName() {
+        return sessionCookieName;
+    }
+    
+    
+    /**
+     * Sets the name to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @param sessionCookieName   The name to use
+     */
+    public void setSessionCookieName(String sessionCookieName) {
+        String oldSessionCookieName = this.sessionCookieName;
+        this.sessionCookieName = sessionCookieName;
+        support.firePropertyChange("sessionCookieName",
+                oldSessionCookieName, sessionCookieName);
+    }
+
     
     /**
      * Gets the value of the use HttpOnly cookies for session cookies flag.

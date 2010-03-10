@@ -268,9 +268,7 @@ public final class Globals {
      * The name of the cookie used to pass the session identifier back
      * and forth with the client.
      */
-    public static final String SESSION_COOKIE_NAME =
-        System.getProperty("org.apache.catalina.SESSION_COOKIE_NAME",
-                "JSESSIONID");
+    public static final String SESSION_COOKIE_NAME = "JSESSIONID";
 
 
     /**
