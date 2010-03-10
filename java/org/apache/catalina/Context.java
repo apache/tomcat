@@ -177,6 +177,25 @@ public interface Context extends Container {
 
     
     /**
+     * Gets the name to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @return  The value of the default session cookie name or null if not
+     *          specified
+     */
+    public String getSessionCookieName();
+    
+    
+    /**
+     * Sets the name to use for session cookies. Overrides any setting that
+     * may be specified by the application.
+     * 
+     * @param sessionCookieName   The name to use
+     */
+    public void setSessionCookieName(String sessionCookieName);
+
+    
+    /**
      * Gets the value of the use HttpOnly cookies for session cookies flag.
      * 
      * @return <code>true</code> if the HttpOnly flag should be set on session
