@@ -40,10 +40,6 @@
         asynchronous support is not yet complete. (markt/fhanik)
       </update>
       <update>
-        <bug>46925</bug>: Replace recursive search for nested roles with
-        iterative search. Patch provided by Stefan Zoerner. (rjung)
-      </update>
-      <update>
         Switch from AnnotationProcessor to InstanceManager. Patch provided by
         David Jecks with modifications by Remy. (remm/fhanik)
       </update>
@@ -55,28 +51,13 @@
         <rev>651977</rev> Add some missing control checks to
         <code>ThreadWithAttributes</code>. (markt) 
       </fix>
-      <fix>
-        <rev>656084</rev> Small performance improvement for NIO. (fhanik) 
-      </fix>
-      <fix>
-        <rev>666232</rev> Prevent NPE stacktrace and lost log message when
-        logger has been shutdown. Instead log the error, with the message.
-        (fhanik)
-      </fix>
       <add>
         <rev>677640</rev> Add a startup class that does not require any
         configuration files. (costin)
       </add>
       <fix>
-        <rev>677910</rev> Use platform mbean server by default. (costin)
-      </fix>
-      <fix>
         <rev>700532</rev> Log if temporary file operations within the CGI
         servlet fail. Make sure header Reader is closed on failure. (markt)
-      </fix>
-      <fix>
-        <rev>707670</rev> Correctly handle timeouts with Comet so events do not
-        stop. (fhanik)
       </fix>
       <fix>
         <rev>708541</rev> Delete references to DefaultContext which was removed
@@ -86,13 +67,6 @@
         <rev>709018</rev> Initial implementation of an asynchronous file handler
         for JULI. (fhanik)
       </add>
-      <fix>
-        <rev>713953</rev> Include name of attribute when logging failure of
-        session attribute serialization. (mturk)
-      </fix>
-      <update>
-        Improve JNDI realm compatibility with Active Directory. (rjung)
-      </update>
       <fix>
         Give session thisAccessedTime and lastAccessedTime clear semantics.
         (rjung)
@@ -141,10 +115,6 @@
         dependent line endings rather than always using <code>\r\n</code>.
         (markt)
       </fix>
-      <add>
-        <rev>701902</rev> Add support for full client-cert chains to AJP.
-        (billbarker)
-      </add>
       <update>
         Use tc-native 1.2.x which is based on APR 1.3.3+ (mturk)
       </update>
