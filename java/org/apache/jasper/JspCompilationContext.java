@@ -595,8 +595,6 @@ public class JspCompilationContext {
             } catch (JasperException ex) {
                 // Cache compilation exception
                 jsw.setCompilationException(ex);
-                // Make sure recompilation is attempted
-                jsw.setLastModificationTest(-1);
                 throw ex;
             } catch (Exception ex) {
                 JasperException je = new JasperException(
