@@ -595,6 +595,10 @@ public class JspCompilationContext {
             } catch (JasperException ex) {
                 // Cache compilation exception
                 jsw.setCompilationException(ex);
+                if (options.getDevelopment() && options.getRecompileOnFail()) {
+                    // Force a recompilation attempt on next access
+                    jsw.setLastModificationTest(-1);
+                }
                 throw ex;
             } catch (Exception ex) {
                 JasperException je = new JasperException(
