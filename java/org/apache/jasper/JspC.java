@@ -520,6 +520,16 @@ public class JspC implements Options {
         return 0;
     }
 
+
+    /**
+     * In JspC this always returns <code>false</code>.
+     * {@inheritDoc}
+     */
+    public boolean getRecompileOnFail() {
+        return false;
+    }
+    
+    
     /**
      * In JspC this always returns <code>false</code>.
      * {@inheritDoc}
