@@ -234,7 +234,7 @@ public class JspWriterImpl extends JspWriter {
      * Our own little min method, to avoid loading java.lang.Math if we've run
      * out of file descriptors and we're trying to print a stack trace.
      */
-    private int min(int a, int b) {
+    private static int min(int a, int b) {
         if (a < b) return a;
         return b;
     }
