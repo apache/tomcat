@@ -716,6 +716,16 @@
     </javac>
 
     <!-- Add sources for examples -->
+    <antcall target="examples-sources" />
+
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib"
+      failonerror="false"/>
+    <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
+
+  </target>
+
+  <target name="examples-sources" description="Create examples sources"
+          unless="examples.sources.skip" >
     <taskdef name="txt2html"
              classname="org.apache.tomcat.buildutil.Txt2Html"
              classpath="${tomcat.classes}" />
@@ -799,13 +809,7 @@
         <exclude name="source.jsp"/>
       </fileset>
     </txt2html>
-
-    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib"
-      failonerror="false"/>
-    <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
-
   </target>
-
   <target name="embed" description="Create experimental embedded jars"
     depends="build-manifests,compile" >
 
