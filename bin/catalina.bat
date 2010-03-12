@@ -80,16 +80,18 @@ rem ---------------------------------------------------------------------------
 
 rem Suppress Terminate batch job on CTRL+C
 if not ""%1"" == ""run"" goto mainEntry
-if exist "%~dp0run" goto mainEntry
-echo Y >"%~dp0run"
-echo Y >"%~dp0yes"
-call "%~f0" %* <"%~dp0yes"
+if ""%TEMP%"" == """" goto mainEntry
+if exist "%TEMP%\%~nx0.run" goto mainEntry
+echo Y>"%TEMP%\%~nx0.run"
+if not exist "%TEMP%\%~nx0.run" goto mainEntry
+echo Y>"%TEMP%\%~nx0.Y"
+call "%~f0" %* <"%TEMP%\%~nx0.Y"
 rem Use provided errorlevel
 set RETVAL=%ERRORLEVEL%
-del /Q "%~dp0yes" >NUL 2>&1
+del /Q "%TEMP%\%~nx0.Y" >NUL 2>&1
 exit /B %RETVAL%
 :mainEntry
-del /Q "%~dp0run" >NUL 2>&1
+del /Q "%TEMP%\%~nx0.run" >NUL 2>&1
 
 rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"
