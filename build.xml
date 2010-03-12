@@ -1660,7 +1660,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
-    <!-- Download src and build Commons Daemon -->
+    <!-- Download Commons Daemon -->
     <antcall target="downloadgz">
       <param name="sourcefile" value="${commons-daemon.bin.loc}"/>
       <param name="destfile" value="${commons-daemon.jar}"/>
