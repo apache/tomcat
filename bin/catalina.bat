@@ -83,9 +83,11 @@ if not ""%1"" == ""run"" goto mainEntry
 if exist "%~dp0run" goto mainEntry
 echo Y >"%~dp0run"
 echo Y >"%~dp0yes"
-call "%~dpnx0" %* <"%~dp0yes"
-rem Not actually needed
-exit /B 1
+call "%~f0" %* <"%~dp0yes"
+rem Use provided errorlevel
+set RETVAL=%ERRORLEVEL%
+del /Q "%~dp0yes" >NUL 2>&1
+exit /B %RETVAL%
 :mainEntry
 del /Q "%~dp0run" >NUL 2>&1
 
