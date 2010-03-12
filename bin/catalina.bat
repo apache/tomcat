@@ -78,6 +78,17 @@ rem
 rem $Id$
 rem ---------------------------------------------------------------------------
 
+rem Suppress Terminate batch job on CTRL+C
+if not ""%1"" == ""run"" goto mainEntry
+if exist "%~dp0run" goto mainEntry
+echo Y >"%~dp0run"
+echo Y >"%~dp0yes"
+call "%~dpnx0" %* <"%~dp0yes"
+rem Not actually needed
+exit /B 1
+:mainEntry
+del /Q "%~dp0run" >NUL 2>&1
+
 rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"
 if not "%CATALINA_HOME%" == "" goto gotHome
