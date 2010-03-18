@@ -52,9 +52,12 @@ public class PooledParallelSender extends PooledSender {
             try {
                 sender.sendMessage(destination, message);
                 sender.keepalive();
+            } catch (ChannelException x) {
+                sender.disconnect();
+                throw x;
             } finally {
-                if (!connected) disconnect();
                 returnSender(sender);
+                if (!connected) disconnect();
             }
         }
     }
