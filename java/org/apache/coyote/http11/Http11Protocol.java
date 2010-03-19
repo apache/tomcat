@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 
 import java.net.Socket;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,9 +31,12 @@ import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
+import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.ServerSocketFactory;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 
 
@@ -182,6 +186,8 @@ public class Http11Protocol extends AbstractHttp11Protocol {
         protected Http11Protocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
+        protected ConcurrentHashMap<SocketWrapper, Http11Processor> connections =
+            new ConcurrentHashMap<SocketWrapper, Http11Processor>();
 
         protected ConcurrentLinkedQueue<Http11Processor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11Processor>() {
@@ -227,14 +233,16 @@ public class Http11Protocol extends AbstractHttp11Protocol {
             this.proto = proto;
         }
 
-        public boolean process(SocketWrapper<Socket> socket) {
-            Http11Processor processor = recycledProcessors.poll();
+        
+        public SocketState process(SocketWrapper<Socket> socket) {
+            Http11Processor processor = connections.remove(socket);
             try {
-
+                if (processor == null) {
+                    processor = recycledProcessors.poll();
+                }
                 if (processor == null) {
                     processor = createProcessor();
                 }
-
                 processor.action(ActionCode.ACTION_START, null);
 
                 if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
@@ -244,9 +252,13 @@ public class Http11Protocol extends AbstractHttp11Protocol {
                     processor.setSSLSupport(null);
                 }
                 
-                return processor.process(socket);
-                //return false;
-
+                SocketState state = socket.isAsync()?processor.asyncDispatch(SocketStatus.OPEN):processor.process(socket);
+                if (state == SocketState.LONG) {
+                    connections.put(socket, processor);
+                } else {
+                    connections.remove(socket);
+                }
+                return state;
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
                 Http11Protocol.log.debug
@@ -274,7 +286,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
                 processor.action(ActionCode.ACTION_STOP, null);
                 recycledProcessors.offer(processor);
             }
-            return false;
+            return SocketState.CLOSED;
         }
         
         protected Http11Processor createProcessor() {

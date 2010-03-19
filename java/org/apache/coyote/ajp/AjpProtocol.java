@@ -41,6 +41,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -362,7 +363,7 @@ public class AjpProtocol
             this.proto = proto;
         }
 
-        public boolean process(SocketWrapper<Socket> socket) {
+        public SocketState process(SocketWrapper<Socket> socket) {
             AjpProcessor processor = recycledProcessors.poll();
             try {
 
@@ -373,7 +374,7 @@ public class AjpProtocol
                 processor.action(ActionCode.ACTION_START, null);
 
                 processor.process(socket.getSocket());
-                return false;
+                return SocketState.CLOSED;
 
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
@@ -399,7 +400,7 @@ public class AjpProtocol
                 processor.action(ActionCode.ACTION_STOP, null);
                 recycledProcessors.offer(processor);
             }
-            return false;
+            return SocketState.CLOSED;
         }
 
         protected AjpProcessor createProcessor() {

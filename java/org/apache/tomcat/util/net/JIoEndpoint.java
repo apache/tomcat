@@ -22,11 +22,15 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import org.apache.tomcat.util.net.NioEndpoint.SocketProcessor;
 
 /**
  * Handle incoming TCP connections.
@@ -100,6 +104,8 @@ public class JIoEndpoint extends AbstractEndpoint {
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
 
 
+
+
     
     // ------------------------------------------------ Handler Inner Interface
 
@@ -110,7 +116,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler {
-        public boolean process(SocketWrapper<Socket> socket);
+        public SocketState process(SocketWrapper<Socket> socket);
     }
 
 
@@ -185,16 +191,17 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
 
         public void run() {
-        	boolean close = false;
+        	SocketState state = SocketState.OPEN;
             // Process the request from this socket
-            if ( (!socket.isKeptAlive()) && (!setSocketOptions(socket.getSocket())) ) { //this does a handshake and resets socket value
-            	close = true;
+            if ( (!socket.isInitialized()) && (!setSocketOptions(socket.getSocket())) ) { 
+            	state = SocketState.CLOSED;
             }
+            socket.setInitialized(true);
             
-            if ( (!close) ) {
-                close = !handler.process(socket);
+            if ( (state != SocketState.CLOSED) ) {
+                state = handler.process(socket);
             }
-            if (close) {
+            if (state == SocketState.CLOSED) {
             	// Close socket
             	if (log.isTraceEnabled()) {
             		log.trace("Closing socket:"+socket);
@@ -204,12 +211,15 @@ public class JIoEndpoint extends AbstractEndpoint {
                 } catch (IOException e) {
                     // Ignore
                 }
-            } else {
+            } else if (state == SocketState.OPEN){
                 socket.setKeptAlive(true);
                 socket.access();
                 //keepalive connection
                 //TODO - servlet3 check async status, we may just be in a hold pattern
                 getExecutor().execute(new SocketProcessor(socket));
+            } else if (state == SocketState.LONG) {
+                socket.access();
+                waitingRequests.add(socket);
             }
             // Finish up this request
             socket = null;
@@ -430,5 +440,31 @@ public class JIoEndpoint extends AbstractEndpoint {
         return true;
     }
     
+    public boolean processSocket(SocketWrapper<Socket> socket, SocketStatus status) {
+        try {
+            if (status == SocketStatus.OPEN || status == SocketStatus.STOP) {
+                if (waitingRequests.remove(socket)) {
+                    SocketProcessor proc = new SocketProcessor(socket);
+                    getExecutor().execute(proc);
+                }
+            }
+        } catch (Throwable t) {
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
+    }
 
+    protected ConcurrentLinkedQueue<SocketWrapper> waitingRequests = new ConcurrentLinkedQueue<SocketWrapper>();
+    
+    protected class RequestProcessor implements Runnable {
+
+        @Override
+        public void run() {
+            
+        }
+        
+    }
 }
