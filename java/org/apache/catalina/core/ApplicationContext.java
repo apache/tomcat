@@ -907,6 +907,8 @@ public class ApplicationContext
         // a name
         if (filterDef == null) {
             filterDef = new FilterDef();
+            filterDef.setFilterName(filterName);
+            context.addFilterDef(filterDef);
         } else {
             if (filterDef.getFilterName() != null &&
                     filterDef.getFilterClass() != null) {
@@ -914,7 +916,6 @@ public class ApplicationContext
             }
         }
 
-        // Name must already be set
         if (filter == null) {
             filterDef.setFilterClass(filterClass);
         } else {
@@ -1036,6 +1037,8 @@ public class ApplicationContext
         // a name
         if (wrapper == null) {
             wrapper = context.createWrapper();
+            wrapper.setName(servletName);
+            context.addChild(wrapper);
         } else {
             if (wrapper.getName() != null &&
                     wrapper.getServletClass() != null) {
@@ -1043,7 +1046,6 @@ public class ApplicationContext
             }
         }
 
-        // Name must already be set
         if (servlet == null) {
             wrapper.setServletClass(servletClass);
         } else {
@@ -1176,6 +1178,9 @@ public class ApplicationContext
 
     @Override
     public boolean setInitParameter(String name, String value) {
+        
+        mergeParameters();
+        
         if (parameters.containsKey(name)) {
             return false;
         }

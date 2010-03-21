@@ -19,13 +19,11 @@ package org.apache.catalina.core;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletRegistration;
 import javax.servlet.ServletSecurityElement;
 
@@ -62,21 +60,19 @@ public class ApplicationServletRegistration
 
     @Override
     public String getInitParameter(String name) {
-        return wrapper.getServlet().getServletConfig().getInitParameter(name);
+        return wrapper.findInitParameter(name);
     }
 
     @Override
     public Map<String, String> getInitParameters() {
         ParameterMap<String,String> result = new ParameterMap<String,String>();
-        ServletConfig servletConfig =  wrapper.getServlet().getServletConfig(); 
-        Enumeration<String> parameterNames =
-            servletConfig.getInitParameterNames();
         
-        while (parameterNames.hasMoreElements()) {
-            String parameterName = parameterNames.nextElement();
-            result.put(parameterName,
-                    servletConfig.getInitParameter(parameterName));
+        String[] parameterNames = wrapper.findInitParameters();
+        
+        for (String parameterName : parameterNames) {
+            result.put(parameterName, wrapper.findInitParameter(parameterName));
         }
+
         result.setLocked(true);
         return result;
     }
