@@ -1392,7 +1392,9 @@ public class ApplicationContext
         
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {
-            new ApplicationServletRegistration((Wrapper) wrapper, context);
+            result.put(((Wrapper) wrapper).getName(),
+                    new ApplicationServletRegistration(
+                            (Wrapper) wrapper, context));
         }
 
         return result;
