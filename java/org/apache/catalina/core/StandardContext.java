@@ -1052,7 +1052,7 @@ public class StandardContext
         Object[] newListeners = new Object[len + 1];
         System.arraycopy(applicationEventListenersObjects, 0,
                 newListeners, 0, len);
-        newListeners[len + 1] = listener;
+        newListeners[len] = listener;
         applicationEventListenersObjects = newListeners;
     }
     
@@ -1091,7 +1091,7 @@ public class StandardContext
         Object[] newListeners = new Object[len + 1];
         System.arraycopy(applicationLifecycleListenersObjects, 0,
                 newListeners, 0, len);
-        newListeners[len + 1] = listener;
+        newListeners[len] = listener;
         applicationLifecycleListenersObjects = newListeners;
     }
 
