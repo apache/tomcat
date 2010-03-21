@@ -1207,27 +1207,36 @@ public class ApplicationContext
     @Override
     public void addListener(String className) {
         
-        Class<?> clazz;
-        
         try {
-             clazz = Class.forName(className);
+            Object obj = context.getInstanceManager().newInstance(className);
+
+            if (!(obj instanceof EventListener)) {
+                throw new IllegalArgumentException(sm.getString(
+                        "applicationContext.addListener.iae.wrongType",
+                        className));
+            }
+
+            EventListener listener = (EventListener) obj;
+            addListener(listener);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.cnfe", className),
+                    e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.cnfe", className),
+                    e);
+        } catch (NamingException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.cnfe", className),
+                    e);
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.cnfe", className),
+                    e);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addListener.iae.cnfe", className), e);
-        }
-        
-        if (!EventListener.class.isAssignableFrom(clazz)) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addListener.iae.wrongType", className));
-        }
-
-        try {
-            @SuppressWarnings("unchecked") // tested above
-            EventListener listener = createListener((Class<EventListener>)clazz);
-            addListener(listener);
-        } catch (ServletException e) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addListener.iae.wrongType", className),
+                    "applicationContext.addListener.iae.cnfe", className),
                     e);
         }
         
