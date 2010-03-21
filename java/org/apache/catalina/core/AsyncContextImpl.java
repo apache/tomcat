@@ -144,7 +144,9 @@ public class AsyncContextImpl implements AsyncContext {
                     throw new RuntimeException(ix);
                 }
             }
-
+            if (state.get().equals(AsyncState.DISPATCHED)) {
+                complete();
+            }
         } else {
             throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
         }
@@ -237,7 +239,7 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     public boolean isStarted() {
-        return (state.get()!=AsyncState.NOT_STARTED);
+        return (state.get() == AsyncState.STARTED);
     }
 
     public void setStarted(Context context) {
