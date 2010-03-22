@@ -22,6 +22,7 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -117,12 +118,51 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     public interface Handler {
         public SocketState process(SocketWrapper<Socket> socket);
+        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status);
     }
 
 
     // --------------------------------------------------- Acceptor Inner Class
 
+    /**
+     * Async timeout thread
+     */
+    protected class AsyncTimeout implements Runnable {
+        /**
+         * The background thread that listens for incoming TCP/IP connections and
+         * hands them off to an appropriate processor.
+         */
+        public void run() {
 
+            // Loop until we receive a shutdown command
+            while (running) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                long now = System.currentTimeMillis();
+                Iterator<SocketWrapper> sockets = waitingRequests.iterator();
+                while (sockets.hasNext()) {
+                    SocketWrapper socket = sockets.next();
+                    long access = socket.getLastAccess();
+                    if ((now-access)>socket.getTimeout()) {
+                        processSocket(socket,SocketStatus.TIMEOUT);
+                    }
+                }
+                
+                // Loop if endpoint is paused
+                while (paused) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+                
+            }
+        }
+    }
     /**
      * Server socket acceptor thread.
      */
@@ -185,9 +225,15 @@ public class JIoEndpoint extends AbstractEndpoint {
     protected class SocketProcessor implements Runnable {
         
         protected SocketWrapper<Socket> socket = null;
+        protected SocketStatus status = null;
         
         public SocketProcessor(SocketWrapper<Socket> socket) {
             this.socket = socket;
+        }
+
+        public SocketProcessor(SocketWrapper<Socket> socket, SocketStatus status) {
+            this.socket = socket;
+            this.status = status;
         }
 
         public void run() {
@@ -199,7 +245,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             socket.setInitialized(true);
             
             if ( (state != SocketState.CLOSED) ) {
-                state = handler.process(socket);
+                state = (status==null)?handler.process(socket):handler.process(socket,status);
             }
             if (state == SocketState.CLOSED) {
             	// Close socket
@@ -442,10 +488,17 @@ public class JIoEndpoint extends AbstractEndpoint {
     
     public boolean processSocket(SocketWrapper<Socket> socket, SocketStatus status) {
         try {
-            if (status == SocketStatus.OPEN || status == SocketStatus.STOP) {
+            if (status == SocketStatus.OPEN || status == SocketStatus.STOP || status == SocketStatus.TIMEOUT) {
                 if (waitingRequests.remove(socket)) {
-                    SocketProcessor proc = new SocketProcessor(socket);
-                    getExecutor().execute(proc);
+                    SocketProcessor proc = new SocketProcessor(socket,status);
+                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                    try {
+                        //threads should not be created by the webapp classloader
+                        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                        getExecutor().execute(proc);
+                    }finally {
+                        Thread.currentThread().setContextClassLoader(loader);
+                    }
                 }
             }
         } catch (Throwable t) {
