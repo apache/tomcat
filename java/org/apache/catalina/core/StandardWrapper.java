@@ -270,7 +270,7 @@ public class StandardWrapper
     /**
      * Async support
      */
-    protected boolean asyncSupported = true;
+    protected boolean asyncSupported = false;
 
     /**
      * Enabled
