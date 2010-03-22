@@ -157,6 +157,11 @@ public class ServletDef implements Serializable {
      */
     public void addInitParameter(String name, String value) {
 
+        if (parameters.containsKey(name)) {
+            // The spec does not define this but the TCK expects the first
+            // definition to take precedence
+            return;
+        }
         parameters.put(name, value);
 
     }
