@@ -40,6 +40,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
@@ -361,6 +362,10 @@ public class AjpProtocol
 
         public AjpConnectionHandler(AjpProtocol proto) {
             this.proto = proto;
+        }
+        
+        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
+            throw new UnsupportedOperationException();
         }
 
         public SocketState process(SocketWrapper<Socket> socket) {
