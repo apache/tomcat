@@ -28,6 +28,7 @@ import javax.management.ObjectName;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
@@ -39,7 +40,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
     
-    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(AbstractHttp11Protocol.class);
+    protected abstract Log getLog();
     
     protected ObjectName tpOname = null;
     protected ObjectName rgOname = null;
@@ -63,8 +64,8 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
      * Pass config info
      */
     public void setAttribute(String name, Object value) {
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("http11protocol.setattribute", name, value));
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("http11protocol.setattribute", name, value));
         }
         attributes.put(name, value);
     }
@@ -119,27 +120,27 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         try {
             endpoint.pause();
         } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.pauseerror"), ex);
+            getLog().error(sm.getString("http11protocol.endpoint.pauseerror"), ex);
             throw ex;
         }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.pause", getName()));
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.pause", getName()));
     }
 
     public void resume() throws Exception {
         try {
             endpoint.resume();
         } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.resumeerror"), ex);
+            getLog().error(sm.getString("http11protocol.endpoint.resumeerror"), ex);
             throw ex;
         }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.resume", getName()));
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.resume", getName()));
     }
 
     public void destroy() throws Exception {
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.stop", getName()));
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.stop", getName()));
         endpoint.destroy();
         if( tpOname!=null )
             Registry.getRegistry(null, null).unregisterComponent(tpOname);

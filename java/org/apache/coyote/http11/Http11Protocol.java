@@ -29,6 +29,7 @@ import javax.management.ObjectName;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
@@ -53,6 +54,8 @@ public class Http11Protocol extends AbstractHttp11Protocol {
 
     private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
+    
+    public Log getLog() { return log; }
 
 
     // ------------------------------------------------------------ Constructor
@@ -233,8 +236,11 @@ public class Http11Protocol extends AbstractHttp11Protocol {
             this.proto = proto;
         }
 
-        
         public SocketState process(SocketWrapper<Socket> socket) {
+            return process(socket,SocketStatus.OPEN);
+        }
+
+        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
             Http11Processor processor = connections.remove(socket);
             try {
                 if (processor == null) {
@@ -252,7 +258,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
                     processor.setSSLSupport(null);
                 }
                 
-                SocketState state = socket.isAsync()?processor.asyncDispatch(SocketStatus.OPEN):processor.process(socket);
+                SocketState state = socket.isAsync()?processor.asyncDispatch(status):processor.process(socket);
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                 } else {
