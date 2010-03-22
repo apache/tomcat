@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -703,13 +704,11 @@ public class DefaultServlet
             if (requestUri == null) {
                 requestUri = request.getRequestURI();
             } else {
-                // We're included, and the response.sendError() below is going
-                // to be ignored by the resource that is including us.
-                // Therefore, the only way we can let the including resource
-                // know is by including warning message in response
-                response.getWriter().write(RequestUtil.filter(
-                    sm.getString("defaultServlet.missingResource",
-                    requestUri)));
+                // We're included
+                // SRV.9.3 says we must throw a FNFE
+                throw new FileNotFoundException(
+                        sm.getString("defaultServlet.missingResource",
+                    requestUri));
             }
 
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
