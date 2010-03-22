@@ -171,12 +171,12 @@ public class TestWebXmlOrdering extends TestCase {
 
     public void testOrderWebFragmentsRelative1() {
         // First example from servlet spec
-        a.addAfterOrderOthers();
-        a.addAfterOrder("c");
-        b.addBeforeOrderOthers();
-        c.addAfterOrderOthers();
-        f.addBeforeOrderOthers();
-        f.addBeforeOrder("b");
+        a.addAfterOrderingOthers();
+        a.addAfterOrdering("c");
+        b.addBeforeOrderingOthers();
+        c.addAfterOrderingOthers();
+        f.addBeforeOrderingOthers();
+        f.addBeforeOrdering("b");
         
         Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
         
@@ -191,11 +191,11 @@ public class TestWebXmlOrdering extends TestCase {
     
     public void testOrderWebFragmentsRelative2() {
         // Second example - use fragment a for no-id fragment
-        a.addAfterOrderOthers();
-        a.addBeforeOrder("c");
-        b.addBeforeOrderOthers();
-        d.addAfterOrderOthers();
-        e.addBeforeOrderOthers();
+        a.addAfterOrderingOthers();
+        a.addBeforeOrdering("c");
+        b.addBeforeOrderingOthers();
+        d.addAfterOrderingOthers();
+        e.addBeforeOrderingOthers();
         
         Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
         
@@ -213,8 +213,8 @@ public class TestWebXmlOrdering extends TestCase {
     
     public void testOrderWebFragmentsRelative3() {
         // Third example from spec
-        a.addAfterOrder("b");
-        c.addBeforeOrderOthers();
+        a.addAfterOrdering("b");
+        c.addBeforeOrderingOthers();
         fragments.remove("e");
         fragments.remove("f");
 
@@ -231,9 +231,9 @@ public class TestWebXmlOrdering extends TestCase {
     }
     
     public void testOrderWebFragmentsrelativeCircular() {
-        a.addBeforeOrder("b");
-        b.addBeforeOrder("a");
-
+        a.addBeforeOrdering("b");
+        b.addBeforeOrdering("a");
+        
         Exception exception = null;
         
         try {

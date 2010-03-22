@@ -84,30 +84,30 @@ public class WebXml {
     // web-fragment.xml only elements
     // Relative ordering
     private Set<String> after = new LinkedHashSet<String>();
-    public void addAfterOrder(String fragmentName) {
+    public void addAfterOrdering(String fragmentName) {
         after.add(fragmentName);
     }
-    public void addAfterOrderOthers() {
+    public void addAfterOrderingOthers() {
         if (before.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString(
                     "webXml.multipleOther"));
         }
         after.add(ORDER_OTHERS);
     }
-    public Set<String> getAfterOrder() { return after; }
+    public Set<String> getAfterOrdering() { return after; }
     
     private Set<String> before = new LinkedHashSet<String>();
-    public void addBeforeOrder(String fragmentName) {
+    public void addBeforeOrdering(String fragmentName) {
         before.add(fragmentName);
     }
-    public void addBeforeOrderOthers() {
+    public void addBeforeOrderingOthers() {
         if (after.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString(
                     "webXml.multipleOther"));
         }
         before.add(ORDER_OTHERS);
     }
-    public Set<String> getBeforeOrder() { return before; }
+    public Set<String> getBeforeOrdering() { return before; }
 
     // Common elements and attributes
     
@@ -2080,11 +2080,11 @@ public class WebXml {
             // they specify others
             for (WebXml fragment : fragments.values()) {
                 String name = fragment.getName();
-                if (fragment.getBeforeOrder().contains(WebXml.ORDER_OTHERS)) {
+                if (fragment.getBeforeOrdering().contains(WebXml.ORDER_OTHERS)) {
                     // Move to beginning
                     order.remove(name);
                     order.add(0, name);
-                } else if (fragment.getAfterOrder().contains(WebXml.ORDER_OTHERS)) {
+                } else if (fragment.getAfterOrdering().contains(WebXml.ORDER_OTHERS)) {
                     // Move to end
                     order.remove(name);
                     order.add(name);
@@ -2094,7 +2094,7 @@ public class WebXml {
             // Now apply remaining ordering
             for (WebXml fragment : fragments.values()) {
                 String name = fragment.getName();
-                for (String before : fragment.getBeforeOrder()) {
+                for (String before : fragment.getBeforeOrdering()) {
                     if (!before.equals(WebXml.ORDER_OTHERS) &&
                             order.contains(before) &&
                             order.indexOf(before) < order.indexOf(name)) {
@@ -2102,7 +2102,7 @@ public class WebXml {
                         order.add(order.indexOf(before), name);
                     }
                 }
-                for (String after : fragment.getAfterOrder()) {
+                for (String after : fragment.getAfterOrdering()) {
                     if (!after.equals(WebXml.ORDER_OTHERS) &&
                             order.contains(after) &&
                             order.indexOf(after) > order.indexOf(name)) {
@@ -2116,14 +2116,14 @@ public class WebXml {
             // errors then that indicates circular references
             for (WebXml fragment : fragments.values()) {
                 String name = fragment.getName();
-                for (String before : fragment.getBeforeOrder()) {
+                for (String before : fragment.getBeforeOrdering()) {
                     if (!before.equals(WebXml.ORDER_OTHERS) &&
                             order.contains(before) &&
                             order.indexOf(before) < order.indexOf(name)) {
                         throw new IllegalArgumentException(sm.getString(""));
                     }
                 }
-                for (String after : fragment.getAfterOrder()) {
+                for (String after : fragment.getAfterOrdering()) {
                     if (!after.equals(WebXml.ORDER_OTHERS) &&
                             order.contains(after) &&
                             order.indexOf(after) > order.indexOf(name)) {
