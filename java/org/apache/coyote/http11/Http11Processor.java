@@ -628,7 +628,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             if (param==null) return;
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
-            socket.setAsyncTimeout(timeout);
+            socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
             RequestInfo rp = request.getRequestProcessor();
             AtomicBoolean dispatch = (AtomicBoolean)param;

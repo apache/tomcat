@@ -28,6 +28,8 @@ import javax.management.ObjectName;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -47,6 +49,10 @@ import org.apache.tomcat.util.net.jsse.JSSEImplementation;
  * @author Filip Hanik
  */
 public class Http11NioProtocol extends AbstractHttp11Protocol {
+    
+    private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
+    
+    protected Log getLog() { return log; }
     
     public Http11NioProtocol() {
         endpoint=new NioEndpoint();
@@ -467,7 +473,5 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
     
 
 
-    private static final org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(Http11NioProtocol.class);
 
 }
