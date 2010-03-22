@@ -232,7 +232,7 @@ public class WebRuleSet extends RuleSetBase {
                                "setLargeIcon", 0);
         digester.addCallMethod(fullPrefix + "/filter/icon/small-icon",
                                "setSmallIcon", 0);
-        digester.addCallMethod(fullPrefix + "/filter/asyncSupported",
+        digester.addCallMethod(fullPrefix + "/filter/async-supported",
                 "setAsyncSupported", 0);
 
         digester.addCallMethod(fullPrefix + "/filter/init-param",
