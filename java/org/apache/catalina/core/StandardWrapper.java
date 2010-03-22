@@ -138,10 +138,15 @@ public class StandardWrapper
 
 
     /**
-     * The (single) initialized instance of this servlet.
+     * The (single) possibly uninitialized instance of this servlet.
      */
     protected volatile Servlet instance = null;
 
+
+    /**
+     * Flag that indicates if this instance has been initialized
+     */
+    protected volatile boolean instanceInitialized = false;
 
     /**
      * The support object for our instance listeners.
@@ -830,6 +835,10 @@ public class StandardWrapper
                 }
             }
 
+            if (!instanceInitialized) {
+                initServlet(instance);
+            }
+
             if (!singleThreadModel) {
                 if (log.isTraceEnabled())
                     log.trace("  Returning non-STM instance");
@@ -1090,64 +1099,8 @@ public class StandardWrapper
             }
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
-            // Call the initialization method of this servlet
-            try {
-                instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT,
-                                                  servlet);
 
-                if( Globals.IS_SECURITY_ENABLED) {
-
-                    Object[] args = new Object[]{(facade)};
-                    SecurityUtil.doAsPrivilege("init",
-                                               servlet,
-                                               classType,
-                                               args);
-                    args = null;
-                } else {
-                    servlet.init(facade);
-                }
-
-                // Invoke jspInit on JSP pages
-                if ((loadOnStartup >= 0) && (jspFile != null)) {
-                    // Invoking jspInit
-                    DummyRequest req = new DummyRequest();
-                    req.setServletPath(jspFile);
-                    req.setQueryString(Constants.PRECOMPILE + "=true");
-                    DummyResponse res = new DummyResponse();
-
-                    if( Globals.IS_SECURITY_ENABLED) {
-                        Object[] args = new Object[]{req, res};
-                        SecurityUtil.doAsPrivilege("service",
-                                                   servlet,
-                                                   classTypeUsedInService,
-                                                   args);
-                        args = null;
-                    } else {
-                        servlet.service(req, res);
-                    }
-                }
-                instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                                  servlet);
-            } catch (UnavailableException f) {
-                instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                                  servlet, f);
-                unavailable(f);
-                throw f;
-            } catch (ServletException f) {
-                instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                                  servlet, f);
-                // If the servlet wanted to be unavailable it would have
-                // said so, so do not call unavailable(null).
-                throw f;
-            } catch (Throwable f) {
-                getServletContext().log("StandardWrapper.Throwable", f );
-                instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                                  servlet, f);
-                // If the servlet wanted to be unavailable it would have
-                // said so, so do not call unavailable(null).
-                throw new ServletException
-                    (sm.getString("standardWrapper.initException", getName()), f);
-            }
+            initServlet(servlet);
 
             // Register our newly initialized instance
             singleThreadModel = servlet instanceof SingleThreadModel;
@@ -1174,6 +1127,72 @@ public class StandardWrapper
 
     }
 
+    private synchronized void initServlet(Servlet servlet)
+            throws ServletException {
+        
+        if (instanceInitialized) return;
+
+        // Call the initialization method of this servlet
+        try {
+            instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT,
+                                              servlet);
+
+            if( Globals.IS_SECURITY_ENABLED) {
+
+                Object[] args = new Object[]{(facade)};
+                SecurityUtil.doAsPrivilege("init",
+                                           servlet,
+                                           classType,
+                                           args);
+                args = null;
+            } else {
+                servlet.init(facade);
+            }
+
+            // Invoke jspInit on JSP pages
+            if ((loadOnStartup >= 0) && (jspFile != null)) {
+                // Invoking jspInit
+                DummyRequest req = new DummyRequest();
+                req.setServletPath(jspFile);
+                req.setQueryString(Constants.PRECOMPILE + "=true");
+                DummyResponse res = new DummyResponse();
+
+                if( Globals.IS_SECURITY_ENABLED) {
+                    Object[] args = new Object[]{req, res};
+                    SecurityUtil.doAsPrivilege("service",
+                                               servlet,
+                                               classTypeUsedInService,
+                                               args);
+                    args = null;
+                } else {
+                    servlet.service(req, res);
+                }
+            }
+            instanceInitialized = true;
+
+            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
+                                              servlet);
+        } catch (UnavailableException f) {
+            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
+                                              servlet, f);
+            unavailable(f);
+            throw f;
+        } catch (ServletException f) {
+            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
+                                              servlet, f);
+            // If the servlet wanted to be unavailable it would have
+            // said so, so do not call unavailable(null).
+            throw f;
+        } catch (Throwable f) {
+            getServletContext().log("StandardWrapper.Throwable", f );
+            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
+                                              servlet, f);
+            // If the servlet wanted to be unavailable it would have
+            // said so, so do not call unavailable(null).
+            throw new ServletException
+                (sm.getString("standardWrapper.initException", getName()), f);
+        }
+    }
 
     /**
      * Remove the specified initialization parameter from this servlet.
