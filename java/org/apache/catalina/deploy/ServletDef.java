@@ -212,6 +212,17 @@ public class ServletDef implements Serializable {
         securityRoleRefs.add(securityRoleRef);
     }
 
+    /**
+     * Add a security-role-ref to the set of security-role-refs associated
+     * with this servlet.
+     */
+    public void addSecurityRoleRef(String roleName, String roleLink) {
+        SecurityRoleRef srr = new SecurityRoleRef();
+        srr.setName(roleName);
+        srr.setLink(roleLink);
+        securityRoleRefs.add(srr);
+    }
+
     
     /**
      * The multipart configuration, if any, for this servlet
