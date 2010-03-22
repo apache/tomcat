@@ -1161,6 +1161,9 @@ public class WebXml {
             context.addErrorPage(errorPage);
         }
         for (FilterDef filter : filters.values()) {
+            if (filter.getAsyncSupported() == null) {
+                filter.setAsyncSupported("false");
+            }
             context.addFilterDef(filter);
         }
         for (FilterMap filterMap : filterMaps) {
