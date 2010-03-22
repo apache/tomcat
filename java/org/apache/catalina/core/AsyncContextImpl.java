@@ -243,7 +243,8 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     public void setStarted(Context context) {
-        if (state.compareAndSet(AsyncState.NOT_STARTED, AsyncState.STARTED)) {
+        if (state.compareAndSet(AsyncState.NOT_STARTED, AsyncState.STARTED) ||
+                state.compareAndSet(AsyncState.DISPATCHED, AsyncState.STARTED)) {
             this.context = context;
         } else {
             throw new IllegalStateException("Start illegal. Invalid state: "+state.get());
