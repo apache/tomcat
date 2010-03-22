@@ -202,17 +202,18 @@ final class StandardContextValve
                 (instances.length > 0)) {
             // create post-service event
             for (int i = 0; i < instances.length; i++) {
-                if (instances[i] == null)
+                int j = (instances.length -1) -i;
+                if (instances[j] == null)
                     continue;
-                if (!(instances[i] instanceof ServletRequestListener))
+                if (!(instances[j] instanceof ServletRequestListener))
                     continue;
                 ServletRequestListener listener =
-                    (ServletRequestListener) instances[i];
+                    (ServletRequestListener) instances[j];
                 try {
                     listener.requestDestroyed(event);
                 } catch (Throwable t) {
                     container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
-                                     instances[i].getClass().getName()), t);
+                                     instances[j].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
                 }
