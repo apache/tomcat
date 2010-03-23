@@ -333,6 +333,16 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     }
 
+    
+    /**
+     * Override the getDispatcherType() method of the wrapped request.
+     * 
+     */
+    @Override
+    public DispatcherType getDispatcherType() {
+        return dispatcherType;
+    }
+
 
     // --------------------------------------------- HttpServletRequest Methods
 
