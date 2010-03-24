@@ -1539,6 +1539,15 @@ public class Request
         else return asyncContext.isStarted();
     }
 
+    public boolean isAsyncDispatching() {
+        if (asyncContext==null) return false;
+        else return (asyncContext.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
+                     asyncContext.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
+                     asyncContext.getState()==AsyncContextImpl.AsyncState.STARTED     ||
+                     asyncContext.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING ||
+                     asyncContext.getState()==AsyncContextImpl.AsyncState.COMPLETING);
+    }
+
     public boolean isAsyncSupported() {
         // TODO SERVLET3 - async
         if (this.asyncSupported==null) { 
