@@ -23,6 +23,8 @@ import javax.naming.directory.DirContext;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.Ascii;
+import org.apache.tomcat.util.res.StringManager;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -35,8 +37,12 @@ import java.util.ArrayList;
 public final class Mapper {
 
 
-    private static final org.apache.juli.logging.Log logger =
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(Mapper.class);
+    
+    protected static final StringManager sm =
+        StringManager.getManager(Mapper.class.getPackage().getName());
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -221,7 +227,7 @@ public final class Mapper {
             pos = find(hosts, hostName);
         }
         if (pos < 0) {
-            logger.error("No host found: " + hostName);
+            log.error("No host found: " + hostName);
         }
         Host host = hosts[pos];
         if (host.name.equals(hostName)) {
@@ -328,7 +334,7 @@ public final class Mapper {
             Context[] contexts = host.contextList.contexts;
             int pos2 = find(contexts, contextPath);
             if( pos2<0 ) {
-                logger.error("No context found: " + contextPath );
+                log.error("No context found: " + contextPath );
                 return;
             }
             Context context = contexts[pos2];
@@ -455,6 +461,11 @@ public final class Mapper {
     }
 
     protected void removeWrapper(Context context, String path) {
+        
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("mapper.removeWrapper", context, path));
+        }
+
         synchronized (context) {
             if (path.endsWith("/*")) {
                 // Wildcard wrapper
