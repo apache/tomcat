@@ -61,7 +61,8 @@ public class SessionUtils {
      * Lower and upper-case strings will be dynamically generated. Put mid-capitalised strings here!
      */
     private static final String[] USER_TEST_ATTRIBUTES = new String[] {
-        "Login", "User", "userName", "UserName", "Utilisateur" };
+        "Login", "User", "userName", "UserName", "Utilisateur",
+        "SPRING_SECURITY_LAST_USERNAME"};
 
     /**
      * Try to get user locale from the session, if possible.
