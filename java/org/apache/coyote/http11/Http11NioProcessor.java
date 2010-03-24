@@ -777,6 +777,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
                 dispatch.set(true);
                 endpoint.processSocket(this.socket, SocketStatus.STOP, true);
+            } else {
+                dispatch.set(true);
             }
         } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
@@ -793,7 +795,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                 endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
                 dispatch.set(true);
             } else { 
-                
+                dispatch.set(true);
             }
         }
     }
