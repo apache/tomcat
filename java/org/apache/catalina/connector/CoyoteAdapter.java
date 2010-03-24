@@ -270,26 +270,48 @@ public class CoyoteAdapter implements Adapter {
         boolean success = true;
         
         try {
-            // Calling the container
-            try {
-                if (status==SocketStatus.TIMEOUT) {
-                   AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
-                   //TODO SERVLET3 - async
-                   //configure settings for timed out
-                   asyncConImpl.setTimeoutState();
-                }
-                if (status==SocketStatus.ERROR || status==SocketStatus.STOP || status==SocketStatus.DISCONNECT) {
-                    AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
-                    //TODO SERVLET3 - async
-                    //configure settings for timed out
-                    asyncConImpl.setErrorState();
-                }
-                connector.getContainer().getPipeline().getFirst().invoke(request, response);
-            }catch (RuntimeException x) {
-                success = false;
-            } finally {
+            if (status==SocketStatus.TIMEOUT) {
+                AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
+                //TODO SERVLET3 - async
+                //configure settings for timed out
+                asyncConImpl.setTimeoutState();
             }
-
+            if (status==SocketStatus.ERROR || status==SocketStatus.STOP || status==SocketStatus.DISCONNECT) {
+                AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
+                //TODO SERVLET3 - async
+                //configure settings for timed out
+                asyncConImpl.setErrorState();
+            }
+            while (success) {
+                AsyncContextImpl impl = (AsyncContextImpl)request.getAsyncContext();
+                    // Calling the container
+                if (impl.getState()==AsyncContextImpl.AsyncState.DISPATCHED) {
+                    // Calling the container
+                    try {
+                        impl.complete();
+                        connector.getContainer().getPipeline().getFirst().invoke(request, response);
+                    } finally {
+                        success = false;
+                    }
+                } else if (impl.getState()==AsyncContextImpl.AsyncState.STARTED){
+                    //TODO SERVLET3 - async
+                    res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                    async = true;
+                    break;
+                } else if (impl.getState()==AsyncContextImpl.AsyncState.NOT_STARTED){
+                        //TODO SERVLET3 - async
+                        async = false;
+                        break;
+                } else {
+                    try {
+                        connector.getContainer().getPipeline().getFirst().invoke(request, response);
+                    }catch (RuntimeException x) {
+                        success = false;
+                    } finally {
+                    }
+                }
+            }
+            
             if (request.isComet()) {
                 if (!response.isClosed() && !response.isError()) {
                     if (request.getAvailable() || (request.getContentLength() > 0 && (!request.isParametersParsed()))) {
@@ -308,12 +330,7 @@ public class CoyoteAdapter implements Adapter {
                     request.setFilterChain(null);
                 }
             }
-
-            if (request.isAsyncStarted()) {
-                //TODO SERVLET3 - async
-                res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
-                async = true;
-            } else if (!comet) {
+            if (!async && !comet) {
                 response.finishResponse();
                 req.action(ActionCode.ACTION_POST_REQUEST , null);
             }
@@ -410,11 +427,16 @@ public class CoyoteAdapter implements Adapter {
                 }
 
             }
-
+            AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
             if (request.isAsyncStarted()) {
-                //TODO SERVLET3 - async
                 res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
                 async = true;
+            } else if (asyncConImpl!=null && 
+                          (asyncConImpl.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
+                           asyncConImpl.getState()==AsyncContextImpl.AsyncState.COMPLETING  ||
+                           asyncConImpl.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
+                           asyncConImpl.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING)) {
+                asyncDispatch(req, res, SocketStatus.OPEN);
             } else if (!comet) {
                 response.finishResponse();
                 req.action(ActionCode.ACTION_POST_REQUEST , null);
