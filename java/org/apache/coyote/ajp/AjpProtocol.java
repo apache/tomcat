@@ -22,6 +22,7 @@ import java.net.Socket;
 import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -320,6 +321,8 @@ public class AjpProtocol
         protected AjpProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
+        protected ConcurrentHashMap<SocketWrapper, AjpProcessor> connections =
+            new ConcurrentHashMap<SocketWrapper, AjpProcessor>();
 
         protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<AjpProcessor>() {
@@ -364,23 +367,28 @@ public class AjpProtocol
             this.proto = proto;
         }
         
-        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
-            throw new UnsupportedOperationException();
+        public SocketState process(SocketWrapper<Socket> socket) {
+            return process(socket,SocketStatus.OPEN);
         }
 
-        public SocketState process(SocketWrapper<Socket> socket) {
-            AjpProcessor processor = recycledProcessors.poll();
+        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
+            AjpProcessor processor = connections.remove(socket);
             try {
-
+                if (processor == null) {
+                    processor = recycledProcessors.poll();
+                }
                 if (processor == null) {
                     processor = createProcessor();
                 }
-
                 processor.action(ActionCode.ACTION_START, null);
 
-                processor.process(socket.getSocket());
-                return SocketState.CLOSED;
-
+                SocketState state = socket.isAsync()?processor.asyncDispatch(status):processor.process(socket);
+                if (state == SocketState.LONG) {
+                    connections.put(socket, processor);
+                } else {
+                    connections.remove(socket);
+                }
+                return state;
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
                 AjpProtocol.log.debug
