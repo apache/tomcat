@@ -244,12 +244,15 @@ class Parser implements TagConstants {
 
         String ret = null;
         try {
-            char quote = 0;
-            if (watch.length() == 1) {
-                quote = watch.charAt(0);
-            }
+            char quote = watch.charAt(watch.length() - 1);
+            
+            // If watch is longer than 1 character this is a scripting
+            // expression and EL is always ignored
+            boolean isElIgnored =
+                pageInfo.isELIgnored() || watch.length() > 1;
+            
             ret = AttributeParser.getUnquoted(reader.getText(start, stop),
-                    quote, pageInfo.isELIgnored(),
+                    quote, isElIgnored,
                     pageInfo.isDeferredSyntaxAllowedAsLiteral());
         } catch (IllegalArgumentException iae) {
             err.jspError(start, iae.getMessage());
