@@ -83,6 +83,27 @@ public class TestGenerator extends TomcatBaseTest {
         assertNotNull(e);
     }
 
+    public void testBug45015c() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        Exception e = null;
+        try {
+            getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015c.jsp");
+        } catch (IOException ioe) {
+            e = ioe;
+        }
+
+        // Failure is expected
+        assertNotNull(e);
+    }
+
     public void testBug48701Fail() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
