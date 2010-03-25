@@ -676,7 +676,7 @@ public class Tomcat {
         public void lifecycleEvent(LifecycleEvent event) {
             try {
                 Context context = (Context) event.getLifecycle();
-                if (event.getType().equals(Lifecycle.CONFIGURE_EVENT)) {
+                if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
                     context.setConfigured(true);
                 }
             } catch (ClassCastException e) {
