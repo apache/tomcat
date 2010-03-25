@@ -512,12 +512,4 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     protected ConcurrentLinkedQueue<SocketWrapper> waitingRequests = new ConcurrentLinkedQueue<SocketWrapper>();
     
-    protected class RequestProcessor implements Runnable {
-
-        @Override
-        public void run() {
-            
-        }
-        
-    }
 }
