@@ -135,12 +135,21 @@ public interface Lifecycle {
 
 
     /**
-     * The LifecycleEvent type for the "configure" event. Use by those
+     * The LifecycleEvent type for the "configure_start" event. Used by those
      * components that use a separate component to perform configuration and
      * need to signal when configuration should be performed - usually after
      * {@link #BEFORE_START_EVENT} and before {@link #START_EVENT}.
      */
-    public static final String CONFIGURE_EVENT = "configure";
+    public static final String CONFIGURE_START_EVENT = "configure_start";
+
+    
+    /**
+     * The LifecycleEvent type for the "configure_stop" event. Used by those
+     * components that use a separate component to perform configuration and
+     * need to signal when de-configuration should be performed - usually after
+     * {@link #STOP_EVENT} and before {@link #AFTER_STOP_EVENT}.
+     */
+    public static final String CONFIGURE_STOP_EVENT = "configure_stop";
 
     
     // --------------------------------------------------------- Public Methods
