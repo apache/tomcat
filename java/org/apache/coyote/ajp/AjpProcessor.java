@@ -482,7 +482,6 @@ public class AjpProcessor implements ActionHook {
         }
         if (async && !error) {
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-            socket.setAsync(true);
             return SocketState.LONG;
         } else {
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -513,7 +512,6 @@ public class AjpProcessor implements ActionHook {
 
         if (async) {
             if (error) {
-                socket.setAsync(false);
                 response.setStatus(500);
                 request.updateCounters();
                 recycle();
@@ -524,7 +522,6 @@ public class AjpProcessor implements ActionHook {
                 return SocketState.LONG;
             }
         } else {
-            socket.setAsync(false);
             if (error) {
                 response.setStatus(500);
             }
