@@ -183,7 +183,9 @@ final class StandardContextValve
                 ServletRequestListener listener =
                     (ServletRequestListener) instances[i];
                 try {
-                    listener.requestInitialized(event);
+                    if (!request.isAsyncDispatching()) {
+                        listener.requestInitialized(event);
+                    }
                 } catch (Throwable t) {
                     container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
                                      instances[i].getClass().getName()), t);
@@ -210,7 +212,9 @@ final class StandardContextValve
                 ServletRequestListener listener =
                     (ServletRequestListener) instances[j];
                 try {
-                    listener.requestDestroyed(event);
+                    if (!request.isAsyncDispatching()) {
+                        listener.requestDestroyed(event);
+                    }
                 } catch (Throwable t) {
                     container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
                                      instances[j].getClass().getName()), t);
