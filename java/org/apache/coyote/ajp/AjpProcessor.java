@@ -1249,6 +1249,7 @@ public class AjpProcessor implements ActionHook {
         request.recycle();
         response.recycle();
         certificates.recycle();
+        async = false;
 
     }
 
