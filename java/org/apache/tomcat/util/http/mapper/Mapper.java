@@ -463,7 +463,7 @@ public final class Mapper {
     protected void removeWrapper(Context context, String path) {
         
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapper.removeWrapper", context, path));
+            log.debug(sm.getString("mapper.removeWrapper", context.path, path));
         }
 
         synchronized (context) {
