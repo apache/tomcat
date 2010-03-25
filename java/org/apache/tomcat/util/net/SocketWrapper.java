@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 
 public class SocketWrapper<E> {
     
@@ -30,19 +32,16 @@ public class SocketWrapper<E> {
     protected boolean async = false;
     protected boolean keptAlive = false;
     protected boolean initialized = false;
+    public AtomicBoolean processing = new AtomicBoolean(false);
     
     public SocketWrapper(E socket) {
-        reset(socket);
+        this.socket = socket;
     }
     
     public E getSocket() {
         return socket;
     }
     
-    public void reset(E socket) {
-        this.socket = socket;
-    }
-
     public boolean isAsync() { return async; }
     public void setAsync(boolean async) { this.async = async; }
     public long getLastAccess() { return lastAccess; }
