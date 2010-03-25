@@ -146,12 +146,12 @@ public abstract class AbstractEndpoint {
         return socketProperties;
     }
 
-
-
-
     
     // ----------------------------------------------------------------- Properties
 
+    private int maxConnections = 10000;
+    public void setMaxConnections(int maxCon) { this.maxConnections = maxCon; }
+    public int  getMaxConnections() { return this.maxConnections; }
     /**
      * External Executor based thread pool.
      */
