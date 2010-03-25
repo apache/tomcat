@@ -1558,7 +1558,6 @@ public class Request
     }
 
     public AsyncContext getAsyncContext() {
-        // TODO SERVLET3 - async
         return this.asyncContext;
     }
 
