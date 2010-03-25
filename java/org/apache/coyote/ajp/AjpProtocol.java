@@ -385,8 +385,10 @@ public class AjpProtocol
                 SocketState state = socket.isAsync()?processor.asyncDispatch(status):processor.process(socket);
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
+                    socket.setAsync(true);
                 } else {
                     connections.remove(socket);
+                    socket.setAsync(false);
                 }
                 return state;
             } catch(java.net.SocketException e) {
