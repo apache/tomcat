@@ -30,10 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
-import org.apache.tomcat.util.net.NioEndpoint.SocketProcessor;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
 /**
  * Handle incoming TCP connections.
