@@ -4559,6 +4559,9 @@ public class StandardContext
                 if ((resources != null) && (resources instanceof Lifecycle))
                     ((Lifecycle) resources).start();
 
+                // Notify our interested LifecycleListeners
+                fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
+                
                 // Start our child containers, if any
                 Container children[] = findChildren();
                 for (int i = 0; i < children.length; i++) {
@@ -4570,9 +4573,6 @@ public class StandardContext
                 if (pipeline instanceof Lifecycle) {
                     ((Lifecycle) pipeline).start();
                 }
-                
-                // Notify our interested LifecycleListeners
-                fireLifecycleEvent(Lifecycle.CONFIGURE_EVENT, null);
                 
                 // Acquire clustered manager
                 Manager contextManager = null;
@@ -4823,6 +4823,8 @@ public class StandardContext
             // Normal container shutdown processing
             if (log.isDebugEnabled())
                 log.debug("Processing standard container shutdown");
+
+            fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
 
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle) {

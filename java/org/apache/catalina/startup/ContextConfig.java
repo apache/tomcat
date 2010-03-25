@@ -284,8 +284,8 @@ public class ContextConfig
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.CONFIGURE_EVENT)) {
-            configure();
+        if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
+            configureStart();
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
@@ -295,13 +295,13 @@ public class ContextConfig
                 context.setDocBase(originalDocBase);
                 originalDocBase = docBase;
             }
-        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
+        } else if (event.getType().equals(Lifecycle.CONFIGURE_STOP_EVENT)) {
             if (originalDocBase != null) {
                 String docBase = context.getDocBase();
                 context.setDocBase(originalDocBase);
                 originalDocBase = docBase;
             }
-            stop();
+            configureStop();
         } else if (event.getType().equals(Lifecycle.INIT_EVENT)) {
             init();
         } else if (event.getType().equals(Lifecycle.DESTROY_EVENT)) {
@@ -823,7 +823,7 @@ public class ContextConfig
     /**
      * Process a "contextConfig" event for this Context.
      */
-    protected synchronized void configure() {
+    protected synchronized void configureStart() {
         // Called from StandardContext.start()
 
         if (log.isDebugEnabled())
@@ -902,7 +902,7 @@ public class ContextConfig
     /**
      * Process a "stop" event for this Context.
      */
-    protected synchronized void stop() {
+    protected synchronized void configureStop() {
 
         if (log.isDebugEnabled())
             log.debug(sm.getString("contextConfig.stop"));
