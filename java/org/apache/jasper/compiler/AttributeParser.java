@@ -122,9 +122,7 @@ public class AttributeParser {
             boolean strict) {
         this.input = input;
         this.quote = quote;
-        // If quote is null this is a scriptign expressions and any EL syntax
-        // should be ignored
-        this.isELIgnored = isELIgnored || (quote == 0);
+        this.isELIgnored = isELIgnored;
         this.isDeferredSyntaxAllowedAsLiteral =
             isDeferredSyntaxAllowedAsLiteral;
         this.strict = strict;
