@@ -23,12 +23,12 @@
     <p><%= "02-hello \\\"world" %></p>
     <p><%= "03-hello ${world" %></p>
     <p><%= "04-hello \\${world" %></p>
-    <tags:echo echo="<%= "05-hello world" %>" />
-    <tags:echo echo="<%= "06-hello \\\"world" %>" />
-    <tags:echo echo="<%= "07-hello \\\\\\\"world" %>" />
-    <tags:echo echo="<%= "08-hello ${world" %>" />
-    <tags:echo echo="<%= "09-hello \\\\${world" %>" />
-    <tags:echo echo="10-hello <\% world" />
-    <tags:echo echo="11-hello %\> world" />
+    <tags:echo echo='<%= "05-hello world" %>' />
+    <tags:echo echo='<%= "06-hello \\\"world" %>' />
+    <tags:echo echo='<%= "07-hello \\\\\\\"world" %>' />
+    <tags:echo echo='<%= "08-hello ${world" %>' />
+    <tags:echo echo='<%= "09-hello \\\\${world" %>' />
+    <tags:echo echo='10-hello <\% world' />
+    <tags:echo echo='11-hello %\> world' />
   </body>
 </html>
