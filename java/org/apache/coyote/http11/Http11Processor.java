@@ -357,12 +357,14 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
         if (async) {
             if (error) {
+                socket.setAsync(false);
                 recycle();
                 return SocketState.CLOSED;
             } else {
                 return SocketState.LONG;
             }
         } else {
+            socket.setAsync(false);
             if ( error || (!keepAlive)) {
                 recycle();
                 return SocketState.CLOSED;
