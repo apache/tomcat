@@ -113,7 +113,8 @@ public class HostConfig
 
 
     /**
-     * Should we deploy XML Context config files?
+     * Should we deploy XML Context config files packaged with WAR files and
+     * directories?
      */
     protected boolean deployXML = false;
 
@@ -587,7 +588,8 @@ public class HostConfig
 
         // Assume this is a configuration descriptor and deploy it
         if(log.isInfoEnabled()) {
-            log.info(sm.getString("hostConfig.deployDescriptor", file));
+            log.info(sm.getString("hostConfig.deployDescriptor", file,
+                    configBase.getPath()));
         }
 
         Context context = null;
