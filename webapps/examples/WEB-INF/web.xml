@@ -301,6 +301,7 @@
     <servlet>
       <servlet-name>async0</servlet-name>
       <servlet-class>async.Async0</servlet-class>
+      <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
       <servlet-name>async0</servlet-name>
@@ -309,6 +310,7 @@
     <servlet>
       <servlet-name>async1</servlet-name>
       <servlet-class>async.Async1</servlet-class>
+      <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
       <servlet-name>async1</servlet-name>
@@ -317,6 +319,7 @@
     <servlet>
       <servlet-name>async2</servlet-name>
       <servlet-class>async.Async2</servlet-class>
+      <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
       <servlet-name>async2</servlet-name>
@@ -325,6 +328,7 @@
     <servlet>
       <servlet-name>async3</servlet-name>
       <servlet-class>async.Async3</servlet-class>
+      <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
       <servlet-name>async3</servlet-name>
@@ -333,6 +337,7 @@
     <servlet>
       <servlet-name>stock</servlet-name>
       <servlet-class>async.AsyncStockServlet</servlet-class>
+      <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
       <servlet-name>stock</servlet-name>
