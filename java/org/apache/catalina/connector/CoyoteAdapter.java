@@ -428,7 +428,7 @@ public class CoyoteAdapter implements Adapter {
 
             }
             AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
-            if (request.isAsyncStarted()) {
+            if (asyncConImpl!=null && asyncConImpl.getState()==AsyncContextImpl.AsyncState.STARTED) {
                 res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
                 async = true;
             } else if (asyncConImpl!=null && 
