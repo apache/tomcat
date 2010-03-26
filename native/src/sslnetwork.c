@@ -448,12 +448,14 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     int s, i, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
+    apr_int32_t nb;
 
     if (con->reneg_state == RENEG_ABORT) {
         *len = 0;
         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
         return APR_ECONNABORTED;
     }
+    apr_socket_opt_get(con->sock, APR_SO_NONBLOCK, &nb);
     for (;;) {
         if ((s = SSL_write(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
@@ -469,6 +471,10 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                 break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
+                    if (nb && i == SSL_ERROR_WANT_WRITE) {
+                        *len = 0;
+                        return APR_SUCCESS;
+                    }
                     if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
