@@ -1168,7 +1168,7 @@ UserDatabase Realm and a DataSource Realm.</p>
              dataSourceName="jdbc/authority"
              userTable="users" userNameCol="user_name" userCredCol="user_pass"
              userRoleTable="user_roles" roleNameCol="role_name"/&gt;
-&lt;Realm/&gt;
+&lt;/Realm&gt;
 </source>
 
 </subsection>
@@ -1216,7 +1216,7 @@ functionality to a UserDatabase Realm.</p>
 &lt;Realm className="org.apache.catalina.realm.LockOutRealm" &gt;
    &lt;Realm className="org.apache.catalina.realm.UserDatabaseRealm"
              resourceName="UserDatabase"/&gt;
-&lt;Realm/&gt;
+&lt;/Realm&gt;
 </source>
 
 </subsection>
