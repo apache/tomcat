@@ -33,7 +33,6 @@ public class Async3 extends HttpServlet {
         final AsyncContext actx = req.startAsync();
         actx.setTimeout(30*1000);
         actx.dispatch("/jsp/async/async3.jsp");
-        actx.complete();
     }
     
 
