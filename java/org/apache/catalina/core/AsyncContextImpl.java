@@ -239,7 +239,7 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     public boolean isStarted() {
-        return (state.get() == AsyncState.STARTED);
+        return (state.get() == AsyncState.STARTED || state.get() == AsyncState.DISPATCHING);
     }
 
     public void setStarted(Context context) {
