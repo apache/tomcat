@@ -74,8 +74,10 @@ public class AsyncContextImpl implements AsyncContext {
     public void complete() {
         if (state.get()==AsyncState.COMPLETING) {
             //do nothing
-        } else if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING) ||
-            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING)) {
+        } else if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
+                // TODO SERVLET3 - async
+                doInternalComplete(false);
+        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING)) {
             // TODO SERVLET3 - async
             AtomicBoolean dispatched = new AtomicBoolean(false);
             request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
