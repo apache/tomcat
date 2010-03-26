@@ -362,9 +362,9 @@ public class HostConfig
     	DeployedApplication app = deployed.get(name);
     	if (app == null) {
     		return 0L;
-    	} else {
-    		return app.timestamp;
     	}
+    	
+    	return app.timestamp;
     }
     
     
@@ -379,9 +379,9 @@ public class HostConfig
         DeployedApplication app = deployed.get(name);
         if (app == null) {
             return false;
-        } else {
-            return true;
         }
+        
+        return true;
     }
     
     
@@ -829,9 +829,6 @@ public class HostConfig
                     ostream = null;
                     istream.close();
                     istream = null;
-                    entry = null;
-                    jar.close();
-                    jar = null;
                 }
             } catch (Exception e) {
                 // Ignore and continue
@@ -868,7 +865,7 @@ public class HostConfig
         
         // Deploy the application in this WAR file
         if(log.isInfoEnabled()) 
-            log.info(sm.getString("hostConfig.deployJar", file));
+            log.info(sm.getString("hostConfig.deployWar", file));
 
         try {
             Context context = null;
@@ -928,12 +925,13 @@ public class HostConfig
                 }
                 deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         new Long(docBase.lastModified()));
-                addWatchedResources(deployedApp, docBase.getAbsolutePath(), context);
+                addWatchedResources(deployedApp, docBase.getAbsolutePath(),
+                        context);
             } else {
                 addWatchedResources(deployedApp, null, context);
             }
         } catch (Throwable t) {
-            log.error(sm.getString("hostConfig.deployJar.error", file), t);
+            log.error(sm.getString("hostConfig.deployWar.error", file), t);
         }
         
         deployed.put(contextPath, deployedApp);
@@ -1000,7 +998,8 @@ public class HostConfig
                     try {
                         context = (Context) digester.parse(xml);
                         if (context == null) {
-                            log.error(sm.getString("hostConfig.deployDescriptor.error",
+                            log.error(sm.getString(
+                                    "hostConfig.deployDescriptor.error",
                                     xml));
                             return;
                         }
@@ -1062,7 +1061,8 @@ public class HostConfig
      * @param contextPath of the context which will be checked
      */
     protected boolean deploymentExists(String contextPath) {
-        return (deployed.containsKey(contextPath) || (host.findChild(contextPath) != null));
+        return (deployed.containsKey(contextPath) ||
+                (host.findChild(contextPath) != null));
     }
     
 
@@ -1072,9 +1072,11 @@ public class HostConfig
      * @param docBase web app docBase
      * @param context web application context
      */
-    protected void addWatchedResources(DeployedApplication app, String docBase, Context context) {
-        // FIXME: Feature idea. Add support for patterns (ex: WEB-INF/*, WEB-INF/*.xml), where
-        //        we would only check if at least one resource is newer than app.timestamp
+    protected void addWatchedResources(DeployedApplication app, String docBase,
+            Context context) {
+        // FIXME: Feature idea. Add support for patterns (ex: WEB-INF/*,
+        //        WEB-INF/*.xml), where we would only check if at least one
+        //        resource is newer than app.timestamp
         File docBaseFile = null;
         if (docBase != null) {
             docBaseFile = new File(docBase);
@@ -1090,12 +1092,14 @@ public class HostConfig
                     resource = new File(docBaseFile, watchedResources[i]);
                 } else {
                     if(log.isDebugEnabled())
-                        log.debug("Ignoring non-existent WatchedResource '" + resource.getAbsolutePath() + "'");
+                        log.debug("Ignoring non-existent WatchedResource '" +
+                                resource.getAbsolutePath() + "'");
                     continue;
                 }
             }
             if(log.isDebugEnabled())
-                log.debug("Watching WatchedResource '" + resource.getAbsolutePath() + "'");
+                log.debug("Watching WatchedResource '" +
+                        resource.getAbsolutePath() + "'");
             app.reloadResources.put(resource.getAbsolutePath(), 
                     new Long(resource.lastModified()));
         }
@@ -1111,15 +1115,18 @@ public class HostConfig
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
             if (log.isDebugEnabled())
-                log.debug("Checking context[" + app.name + "] redeploy resource " + resource);
+                log.debug("Checking context[" + app.name +
+                        "] redeploy resource " + resource);
             if (resource.exists()) {
                 long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
-                if ((!resource.isDirectory()) && resource.lastModified() > lastModified) {
+                if ((!resource.isDirectory()) &&
+                        resource.lastModified() > lastModified) {
                     // Undeploy application
                     if (log.isInfoEnabled())
                         log.info(sm.getString("hostConfig.undeploy", app.name));
-                    ContainerBase context = (ContainerBase) host.findChild(app.name);
+                    ContainerBase context =
+                        (ContainerBase) host.findChild(app.name);
                     try {
                         host.removeChild(context);
                     } catch (Throwable t) {
@@ -1137,8 +1144,11 @@ public class HostConfig
                         try {
                             File current = new File(resources[j]);
                             current = current.getCanonicalFile();
-                            if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath() + File.separator))
-                                    || (current.getAbsolutePath().startsWith(configBase().getAbsolutePath()))) {
+                            if ((current.getAbsolutePath().startsWith(
+                                    appBase().getAbsolutePath() +
+                                    File.separator))
+                                    || (current.getAbsolutePath().startsWith(
+                                            configBase().getAbsolutePath()))) {
                                 if (log.isDebugEnabled())
                                     log.debug("Delete " + current);
                                 ExpandWar.delete(current);
@@ -1171,7 +1181,8 @@ public class HostConfig
                 // Undeploy application
                 if (log.isInfoEnabled())
                     log.info(sm.getString("hostConfig.undeploy", app.name));
-                ContainerBase context = (ContainerBase) host.findChild(app.name);
+                ContainerBase context = 
+                    (ContainerBase) host.findChild(app.name);
                 try {
                     host.removeChild(context);
                 } catch (Throwable t) {
@@ -1189,8 +1200,10 @@ public class HostConfig
                     try {
                         File current = new File(resources[j]);
                         current = current.getCanonicalFile();
-                        if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath() + File.separator))
-                            || (current.getAbsolutePath().startsWith(configBase().getAbsolutePath()))) {
+                        if ((current.getAbsolutePath().startsWith(
+                                appBase().getAbsolutePath() + File.separator))
+                            || (current.getAbsolutePath().startsWith(
+                                    configBase().getAbsolutePath()))) {
                             if (log.isDebugEnabled())
                                 log.debug("Delete " + current);
                             ExpandWar.delete(current);
@@ -1200,15 +1213,18 @@ public class HostConfig
                                 ("hostConfig.canonicalizing", app.name), e);
                     }
                 }
-                // Delete reload resources as well (to remove any remaining .xml descriptor)
+                // Delete reload resources as well (to remove any remaining .xml
+                // descriptor)
                 String[] resources2 =
                     app.reloadResources.keySet().toArray(new String[0]);
                 for (int j = 0; j < resources2.length; j++) {
                     try {
                         File current = new File(resources2[j]);
                         current = current.getCanonicalFile();
-                        if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath() + File.separator))
-                            || ((current.getAbsolutePath().startsWith(configBase().getAbsolutePath())
+                        if ((current.getAbsolutePath().startsWith(
+                                appBase().getAbsolutePath() + File.separator))
+                            || ((current.getAbsolutePath().startsWith(
+                                    configBase().getAbsolutePath())
                                  && (current.getAbsolutePath().endsWith(".xml"))))) {
                             if (log.isDebugEnabled())
                                 log.debug("Delete " + current);
@@ -1227,8 +1243,10 @@ public class HostConfig
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
             if (log.isDebugEnabled())
-                log.debug("Checking context[" + app.name + "] reload resource " + resource);
-            long lastModified = app.reloadResources.get(resources[i]).longValue();
+                log.debug("Checking context[" + app.name +
+                        "] reload resource " + resource);
+            long lastModified =
+                app.reloadResources.get(resources[i]).longValue();
             if ((!resource.exists() && lastModified != 0L) 
                 || (resource.lastModified() != lastModified)) {
                 // Reload application
@@ -1250,7 +1268,8 @@ public class HostConfig
                              ("hostConfig.context.restart", app.name), e);
                 }
                 // Update times
-                app.reloadResources.put(resources[i], new Long(resource.lastModified()));
+                app.reloadResources.put(resources[i],
+                        new Long(resource.lastModified()));
                 app.timestamp = System.currentTimeMillis();
                 return;
             }
