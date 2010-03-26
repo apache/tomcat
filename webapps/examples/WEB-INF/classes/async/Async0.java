@@ -34,8 +34,8 @@ public class Async0 extends HttpServlet {
     private static final Log log = LogFactory.getLog(Async0.class);
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.isAsyncStarted()) {
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        if (Boolean.TRUE == req.getAttribute("dispatch")) {
             log.info("Received dispatch, completing on the worker thread.");
             req.getAsyncContext().complete();
             log.info("After complete called started:"+req.isAsyncStarted());
@@ -47,6 +47,7 @@ public class Async0 extends HttpServlet {
             Runnable run = new Runnable() {
                 public void run() {
                     try {
+                        req.setAttribute("dispatch", Boolean.TRUE);
                         Thread.currentThread().setName("Async0-Thread");
                         log.info("Putting AsyncThread to sleep");
                         Thread.sleep(2*1000);
