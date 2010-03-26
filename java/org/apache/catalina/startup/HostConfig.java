@@ -549,10 +549,6 @@ public class HostConfig
         
         for (int i = 0; i < files.length; i++) {
 
-            if (files[i].equalsIgnoreCase("META-INF"))
-                continue;
-            if (files[i].equalsIgnoreCase("WEB-INF"))
-                continue;
             File contextXml = new File(configBase, files[i]);
             if (files[i].toLowerCase().endsWith(".xml")) {
 
