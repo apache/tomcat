@@ -619,7 +619,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 dispatch.set(true);
                 endpoint.processSocket(this.socket, SocketStatus.STOP);
             } else {
-                dispatch.set(true);
+                dispatch.set(false);
             }
         } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
