@@ -66,18 +66,22 @@ public class AsyncContextImpl implements AsyncContext {
     private Request request;
     
     public AsyncContextImpl(Request request) {
+        if (log.isDebugEnabled()) {
+            log.debug("AsyncContext created["+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+        }
         //TODO SERVLET3 - async
         this.request = request;
     }
 
     @Override
     public void complete() {
+        if (log.isDebugEnabled()) {
+            log.debug("AsyncContext Complete Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+        }
         if (state.get()==AsyncState.COMPLETING) {
             //do nothing
-        } else if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
-                // TODO SERVLET3 - async
-                doInternalComplete(false);
-        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING)) {
+        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING) ||
+                   state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
             // TODO SERVLET3 - async
             AtomicBoolean dispatched = new AtomicBoolean(false);
             request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
@@ -104,12 +108,16 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void dispatch(ServletContext context, String path) {
+        if (log.isDebugEnabled()) {
+            log.debug("AsyncContext Dispatch Called["+state.get()+"; "+path+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+        }
+
         // TODO SERVLET3 - async
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
             state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
 
             if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
-                request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
+                request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI()+"?"+request.getQueryString());
                 request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
                 request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
                 request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
@@ -166,6 +174,10 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void start(final Runnable run) {
+        if (log.isDebugEnabled()) {
+            log.debug("AsyncContext Start Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+        }
+
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
             state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
             // TODO SERVLET3 - async
@@ -386,5 +398,5 @@ public class AsyncContextImpl implements AsyncContext {
         this.servletResponse = response;
         event = new AsyncEvent(this, request, response); 
     }
-
+    public static class DebugException extends Exception {}
 }

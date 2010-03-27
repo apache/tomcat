@@ -490,6 +490,7 @@ public class Request
         
         asyncSupported = null;
         if (asyncContext!=null) asyncContext.recycle();
+        asyncContext = null;
 
     }
 
