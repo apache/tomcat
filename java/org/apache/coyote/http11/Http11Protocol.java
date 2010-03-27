@@ -242,6 +242,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
 
         public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
             Http11Processor processor = connections.remove(socket);
+            boolean recycle = true;
             try {
                 if (processor == null) {
                     processor = recycledProcessors.poll();
@@ -262,6 +263,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
+                    recycle = false;
                 } else {
                     connections.remove(socket);
                     socket.setAsync(false);
@@ -291,8 +293,10 @@ public class Http11Protocol extends AbstractHttp11Protocol {
                 //       if(proto.adapter != null) proto.adapter.recycle();
                 //                processor.recycle();
 
-                processor.action(ActionCode.ACTION_STOP, null);
-                recycledProcessors.offer(processor);
+                if (recycle) {
+                    processor.action(ActionCode.ACTION_STOP, null);
+                    recycledProcessors.offer(processor);
+                }
             }
             return SocketState.CLOSED;
         }

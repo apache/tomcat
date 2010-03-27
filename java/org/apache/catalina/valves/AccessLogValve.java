@@ -124,7 +124,7 @@ public class AccessLogValve extends ValveBase {
 
     //------------------------------------------------------ Constructor
     public AccessLogValve() {
-        super(false);
+        super(true);
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -543,13 +543,24 @@ public class AccessLogValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException,
             ServletException {
-
+        final String t1Name = AccessLogValve.class.getName()+".t1";
         if (getState().isAvailable() && getEnabled()) {                
             // Pass this request on to the next valve in our pipeline
             long t1 = System.currentTimeMillis();
+            boolean asyncdispatch = request.isAsyncDispatching();
+            if (!asyncdispatch) {
+                request.setAttribute(t1Name, new Long(t1));
+            }
     
             getNext().invoke(request, response);
     
+            //we're not done with the request
+            if (request.isAsyncDispatching()) {
+                return;
+            } else if (asyncdispatch && request.getAttribute(t1Name)!=null) {
+                t1 = ((Long)request.getAttribute(t1Name)).longValue();
+            }
+            
             long t2 = System.currentTimeMillis();
             long time = t2 - t1;
     

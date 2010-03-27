@@ -344,7 +344,7 @@ public class CoyoteAdapter implements Adapter {
         } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
-            if (!comet && !async) {
+            if (!success || (!comet && !async)) {
                 request.recycle();
                 response.recycle();
             } else {
