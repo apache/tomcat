@@ -29,6 +29,6 @@
     <tags:echo echo='<%= "08-hello ${world" %>' />
     <tags:echo echo='<%= "09-hello \\\\${world" %>' />
     <tags:echo echo='10-hello <\% world' />
-    <tags:echo echo='11-hello %\> world' />
+    <tags:echo echo="11-hello %\> world" />
   </body>
 </html>
