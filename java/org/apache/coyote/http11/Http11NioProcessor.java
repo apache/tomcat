@@ -778,7 +778,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                 dispatch.set(true);
                 endpoint.processSocket(this.socket, SocketStatus.STOP, true);
             } else {
-                dispatch.set(true);
+                dispatch.set(false);
             }
         } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
