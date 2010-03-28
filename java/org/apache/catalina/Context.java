@@ -19,6 +19,8 @@
 package org.apache.catalina;
 
 
+import java.net.URL;
+
 import javax.servlet.ServletContext;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
@@ -133,17 +135,17 @@ public interface Context extends Container {
 
 
     /**
-     * Return the path to a file to save this Context information.
+     * Return the URL of the XML descriptor for this context.
      */
-    public String getConfigFile();
+    public URL getConfigFile();
 
 
     /**
-     * Set the path to a file to save this Context information.
+     * Set the URL of the XML descriptor for this context.
      *
-     * @param configFile The path to a file to save this Context information.
+     * @param configFile The URL of the XML descriptor for this context.
      */
-    public void setConfigFile(String configFile);
+    public void setConfigFile(URL configFile);
 
 
     /**

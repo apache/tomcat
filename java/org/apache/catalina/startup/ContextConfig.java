@@ -518,11 +518,31 @@ public class ContextConfig
         if( defaultContextXml==null ) getDefaultContextXml();
 
         if (!context.getOverride()) {
-            processContextConfig(new File(getBaseDir()), defaultContextXml);
-            processContextConfig(getConfigBase(), getHostConfigPath(Constants.HostContextXml));
+            File defaultContextFile = new File(getBaseDir(), defaultContextXml);
+            if (defaultContextFile.exists()) {
+                try {
+                    URL defaultContextUrl = defaultContextFile.toURI().toURL();
+                    processContextConfig(defaultContextUrl);
+                } catch (MalformedURLException e) {
+                    log.error(sm.getString(
+                            "contextConfig.badUrl", defaultContextFile), e);
+                }
+            }
+            
+            File hostContextFile = new File(getConfigBase(),
+                    getHostConfigPath(Constants.HostContextXml));
+            if (hostContextFile.exists()) {
+                try {
+                    URL hostContextUrl = hostContextFile.toURI().toURL();
+                    processContextConfig(hostContextUrl);
+                } catch (MalformedURLException e) {
+                    log.error(sm.getString(
+                            "contextConfig.badUrl", hostContextFile), e);
+                }
+            }
         }
         if (context.getConfigFile() != null)
-            processContextConfig(new File(context.getConfigFile()), null);
+            processContextConfig(context.getConfigFile());
         
     }
 
@@ -530,43 +550,28 @@ public class ContextConfig
     /**
      * Process a context.xml.
      */
-    protected void processContextConfig(File baseDir, String resourceName) {
+    protected void processContextConfig(URL contextXml) {
         
         if (log.isDebugEnabled())
             log.debug("Processing context [" + context.getName() 
-                    + "] configuration file " + baseDir + " " + resourceName);
+                    + "] configuration file [" + contextXml + "]");
 
         InputSource source = null;
         InputStream stream = null;
 
-        File file = baseDir;
-        if (resourceName != null) {
-            file = new File(baseDir, resourceName);
-        }
-        
         try {
-            if ( !file.exists() ) {
-                if (resourceName != null) {
-                    // Use getResource and getResourceAsStream
-                    stream = getClass().getClassLoader()
-                        .getResourceAsStream(resourceName);
-                    if( stream != null ) {
-                        source = new InputSource
-                            (getClass().getClassLoader()
-                            .getResource(resourceName).toString());
-                    }
-                }
-            } else {
-                source =
-                    new InputSource("file://" + file.getAbsolutePath());
-                stream = new FileInputStream(file);
-                // Add as watched resource so that cascade reload occurs if a default
-                // config file is modified/added/removed
-                context.addWatchedResource(file.getAbsolutePath());
+            source = new InputSource(contextXml.toString());
+            stream = contextXml.openStream();
+            
+            // Add as watched resource so that cascade reload occurs if a default
+            // config file is modified/added/removed
+            if (contextXml.getProtocol() == "file") {
+                context.addWatchedResource(
+                        (new File(contextXml.toURI())).getAbsolutePath());
             }
         } catch (Exception e) {
             log.error(sm.getString("contextConfig.contextMissing",  
-                      resourceName + " " + file) , e);
+                      contextXml) , e);
         }
         
         if (source == null)
@@ -586,7 +591,7 @@ public class ContextConfig
                 }
                 if (log.isDebugEnabled())
                     log.debug("Successfully processed context [" + context.getName() 
-                            + "] configuration file " + baseDir + " " + resourceName);
+                            + "] configuration file [" + contextXml + "]");
             } catch (SAXParseException e) {
                 log.error(sm.getString("contextConfig.contextParse",
                         context.getName()), e);
