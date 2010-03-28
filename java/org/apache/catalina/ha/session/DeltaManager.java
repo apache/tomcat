@@ -686,6 +686,9 @@ public class DeltaManager extends ClusterManagerBase{
                     if (log.isWarnEnabled()) log.warn(sm.getString("deltaManager.loading.existing.session",session.getIdInternal()));
                 }
                 add(session);
+                if (notifySessionListenersOnReplication) {
+                    session.tellNew();
+                }
             }
         } catch (ClassNotFoundException e) {
             log.error(sm.getString("deltaManager.loading.cnfe", e), e);
