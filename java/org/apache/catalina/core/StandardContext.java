@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -255,9 +256,9 @@ public class StandardContext
 
 
     /**
-     * The path to a file to save this Context information.
+     * The URL of the XML descriptor for this context.
      */
-    private String configFile = null;
+    private URL configFile = null;
 
 
     /**
@@ -1196,9 +1197,9 @@ public class StandardContext
     }
 
     /**
-     * Return the path to a file to save this Context information.
+     * Return the URL of the XML descriptor for this context.
      */
-    public String getConfigFile() {
+    public URL getConfigFile() {
 
         return (this.configFile);
 
@@ -1206,11 +1207,11 @@ public class StandardContext
 
 
     /**
-     * Set the path to a file to save this Context information.
+     * Set the URL of the XML descriptor for this context.
      *
-     * @param configFile The path to a file to save this Context information.
+     * @param configFile The URL of the XML descriptor for this context.
      */
-    public void setConfigFile(String configFile) {
+    public void setConfigFile(URL configFile) {
 
         this.configFile = configFile;
     }

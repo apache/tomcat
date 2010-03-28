@@ -611,7 +611,7 @@ public class MBeanFactory extends BaseModelMBean {
                                                              "configBaseName");
             String baseName = getConfigFile(contextPath);
             File configFile = new File(new File(configPath), baseName+".xml");
-            context.setConfigFile(configFile.getAbsolutePath());
+            context.setConfigFile(configFile.toURI().toURL());
             mserver.invoke(deployer, "manageApp",
                            new Object[] {context},
                            new String[] {"org.apache.catalina.Context"});
