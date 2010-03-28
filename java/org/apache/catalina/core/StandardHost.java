@@ -131,6 +131,13 @@ public class StandardHost
 
 
     /**
+     * Should XML files be copied to $CATALINA_BASE/conf/<engine>/<host> by
+     * default when a web application is deployed?
+     */
+    private boolean copyXML = false;
+
+
+    /**
      * The Java class name of the default error reporter implementation class 
      * for deployed web applications.
      */
@@ -377,6 +384,28 @@ public class StandardHost
     }
 
 
+    /**
+     * Return the copy XML config file flag for this component.
+     */
+    public boolean isCopyXML() {
+
+        return (this.copyXML);
+
+    }
+
+
+    /**
+     * Set the copy XML config file flag for this component.
+     *
+     * @param copyXML The new copy XML flag
+     */
+    public void setCopyXML(boolean copyXML) {
+
+        this.copyXML= copyXML;
+
+    }
+    
+    
     /**
      * Return the value of the live deploy flag.  If true, it indicates that 
      * a background thread should be started that looks for web application

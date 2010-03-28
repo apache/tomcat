@@ -92,6 +92,11 @@
         and stop, and align components that implement Lifecycle with this
         definition. (markt)  
       </update>
+      <add>
+        <bug>48662</bug>: Provide a new option to control the copying of context
+        XML descriptors from web applications to the host's xmlBase. Copying of
+        XMl descriptors is now disabled by default. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
