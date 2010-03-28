@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -119,6 +120,13 @@ public class HostConfig
     protected boolean deployXML = false;
 
 
+    /**
+     * Should XML files be copied to $CATALINA_BASE/conf/<engine>/<host> by
+     * default when a web application is deployed?
+     */
+    protected boolean copyXML = false;
+    
+    
     /**
      * Should we unpack WAR files when auto-deploying applications in the
      * <code>appBase</code> directory?
@@ -233,6 +241,28 @@ public class HostConfig
 
 
     /**
+     * Return the copy XML config file flag for this component.
+     */
+    public boolean isCopyXML() {
+
+        return (this.copyXML);
+
+    }
+
+
+    /**
+     * Set the copy XML config file flag for this component.
+     *
+     * @param copyXML The new copy XML flag
+     */
+    public void setCopyXML(boolean copyXML) {
+
+        this.copyXML= copyXML;
+
+    }
+
+
+    /**
      * Return the unpack WARs flag.
      */
     public boolean isUnpackWARs() {
@@ -309,6 +339,7 @@ public class HostConfig
         try {
             host = (Host) event.getLifecycle();
             if (host instanceof StandardHost) {
+                setCopyXML(((StandardHost) host).isCopyXML());
                 setDeployXML(((StandardHost) host).isDeployXML());
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
                 setXmlNamespaceAware(((StandardHost) host).getXmlNamespaceAware());
@@ -612,7 +643,7 @@ public class HostConfig
                 (LifecycleListener) clazz.newInstance();
             context.addLifecycleListener(listener);
 
-            context.setConfigFile(contextXml.getAbsolutePath());
+            context.setConfigFile(contextXml.toURI().toURL());
             context.setPath(contextPath);
             // Add the associated docBase to the redeployed list if it's a WAR
             boolean isExternalWar = false;
@@ -806,11 +837,16 @@ public class HostConfig
         BufferedOutputStream ostream = null;
         File xml = new File
             (configBase(), file.substring(0, file.lastIndexOf(".")) + ".xml");
+        boolean xmlInWar = false;
+        
         if (deployXML && !xml.exists()) {
             try {
                 jar = new JarFile(war);
                 entry = jar.getJarEntry(Constants.ApplicationContextXml);
                 if (entry != null) {
+                    xmlInWar = true;
+                }
+                if (copyXML) {
                     istream = jar.getInputStream(entry);
                     
                     ostream =
@@ -882,7 +918,52 @@ public class HostConfig
                         digester.reset();
                     }
                 }
-                context.setConfigFile(xml.getAbsolutePath());
+                context.setConfigFile(xml.toURI().toURL());
+            } else if (deployXML && xmlInWar) {
+                synchronized (digester) {
+                    try {
+                        jar = new JarFile(war);
+                        entry =
+                            jar.getJarEntry(Constants.ApplicationContextXml);
+                        istream = jar.getInputStream(entry);
+                        context = (Context) digester.parse(istream);
+
+                        if (context == null) {
+                            log.error(sm.getString(
+                                    "hostConfig.deployDescriptor.error",
+                                    file));
+                            return;
+                        }
+                        context.setConfigFile(new URL("jar:" +
+                                war.toURI().toString() + "!/" +
+                                Constants.ApplicationContextXml));
+                    } catch (Exception e) {
+                        if (istream != null) {
+                            try {
+                                istream.close();
+                            } catch (Throwable t) {
+                                // Ignore
+                            }
+                            istream = null;
+                        }
+                    } finally {
+                        entry = null;
+                        if (jar != null) {
+                            try {
+                                jar.close();
+                            } catch (Throwable t) {
+                                // Ignore
+                            }
+                            jar = null;
+                        }
+                        digester.reset();
+                    }
+                }
+                if (context == null) {
+                    log.error(sm.getString("hostConfig.deployDescriptor.error",
+                            file));
+                    return;
+                }
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
@@ -991,9 +1072,6 @@ public class HostConfig
             File xml = new File(dir, Constants.ApplicationContextXml);
             File xmlCopy = null;
             if (deployXML && xml.exists()) {
-                // Will only do this on initial deployment. On subsequent
-                // deployments the copied xml file means we'll use
-                // deployDescriptor() instead
                 synchronized (digester) {
                     try {
                         context = (Context) digester.parse(xml);
@@ -1007,27 +1085,31 @@ public class HostConfig
                         digester.reset();
                     }
                 }
-                xmlCopy = new File(configBase(), file + ".xml");
-                InputStream is = null;
-                OutputStream os = null;
-                try {
-                    is = new FileInputStream(xml);
-                    os = new FileOutputStream(xmlCopy);
-                    IOTools.flow(is, os);
-                    // Don't catch IOE - let the outer try/catch handle it
-                } finally {
+                if (copyXML) {
+                    xmlCopy = new File(configBase(), file + ".xml");
+                    InputStream is = null;
+                    OutputStream os = null;
                     try {
-                        if (is != null) is.close();
-                    } catch (IOException e){
-                        // Ignore
+                        is = new FileInputStream(xml);
+                        os = new FileOutputStream(xmlCopy);
+                        IOTools.flow(is, os);
+                        // Don't catch IOE - let the outer try/catch handle it
+                    } finally {
+                        try {
+                            if (is != null) is.close();
+                        } catch (IOException e){
+                            // Ignore
+                        }
+                        try {
+                            if (os != null) os.close();
+                        } catch (IOException e){
+                            // Ignore
+                        }
                     }
-                    try {
-                        if (os != null) os.close();
-                    } catch (IOException e){
-                        // Ignore
-                    }
+                    context.setConfigFile(xmlCopy.toURI().toURL());
+                } else {
+                    context.setConfigFile(xml.toURI().toURL());
                 }
-                context.setConfigFile(xmlCopy.getAbsolutePath());
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
