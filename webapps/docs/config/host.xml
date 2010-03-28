@@ -363,7 +363,7 @@
         </li>
     <li>Finally, any sub-directory within the Host's <code>appBase</code> that
         has not already been deployed as a result of a context XML descriptor
-        will be deployed next. The context path used will be a slash character
+        will be deployed. The context path used will be a slash character
         ("/") followed by the directory name, unless the directory name is ROOT,
         in which case the context path will <code>/</code>. Multi-level contexts
         may be defined by using #, e.g. use a directory named
@@ -426,7 +426,7 @@
 
     <p>Finally, note that if you are defining contexts explicitly in server.xml,
     you should probably turn off automatic application deployment.  Otherwise,
-    the web applications will each be deployed twice each, and that may cause
+    the web applications will each be deployed twice, and that may cause
     problems for the applications.
     </p>
 
