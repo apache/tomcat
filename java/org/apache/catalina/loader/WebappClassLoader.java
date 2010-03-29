@@ -446,6 +446,15 @@ public class WebappClassLoader
     private boolean clearReferencesStopThreads = false;
 
     /**
+     * Should Tomcat attempt to clear any ThreadLocal objects that are instances
+     * of classes loaded by this class loader. Failure to remove any such
+     * objects will result in a memory leak on web application stop, undeploy or
+     * reload. It is disabled by default since the clearing of the ThreadLocal
+     * objects is not performed in a thread-safe manner.
+     */
+    private boolean clearReferencesThreadLocals = false;
+    
+    /**
      * Should Tomcat call {@link org.apache.juli.logging.LogFactory#release()}
      * when the class loader is stopped? If not specified, the default value
      * of <code>true</code> is used. Changing the default setting is likely to
@@ -673,6 +682,27 @@ public class WebappClassLoader
       */
      public boolean getClearReferencesLogFactoryRelease() {
          return (this.clearReferencesLogFactoryRelease);
+     }
+
+
+
+
+     /**
+      * Return the clearReferencesThreadLocals flag for this Context.
+      */
+     public boolean getClearReferencesThreadLocals() {
+         return (this.clearReferencesThreadLocals);
+     }
+
+
+     /**
+      * Set the clearReferencesThreadLocals feature for this Context.
+      *
+      * @param clearReferencesThreadLocals The new flag value
+      */
+     public void setClearReferencesThreadLocals(
+             boolean clearReferencesThreadLocals) {
+         this.clearReferencesThreadLocals = clearReferencesThreadLocals;
      }
 
 
@@ -2254,16 +2284,26 @@ public class WebappClassLoader
                                     log.debug(sm.getString(
                                             "webappClassLoader.clearThreadLocalDebug",
                                             args));
+                                    if (clearReferencesThreadLocals) {
+                                        log.debug(sm.getString(
+                                                "webappClassLoader.clearThreadLocalDebugClear"));
+                                    }
                                 }
                             } else {
                                 log.error(sm.getString(
                                         "webappClassLoader.clearThreadLocal",
                                         args));
+                                if (clearReferencesThreadLocals) {
+                                    log.info(sm.getString(
+                                            "webappClassLoader.clearThreadLocalClear"));
+                                }
                             }
-                            if (key == null) {
-                              staleEntriesCount++;
-                            } else {
-                              mapRemove.invoke(map, key);
+                            if (clearReferencesThreadLocals) {
+                                if (key == null) {
+                                  staleEntriesCount++;
+                                } else {
+                                  mapRemove.invoke(map, key);
+                                }
                             }
                         }
                     }

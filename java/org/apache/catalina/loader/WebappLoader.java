@@ -596,6 +596,8 @@ public class WebappLoader extends LifecycleBase
                         ((StandardContext) container).getClearReferencesStatic());
                 classLoader.setClearReferencesStopThreads(
                         ((StandardContext) container).getClearReferencesStopThreads());
+                classLoader.setClearReferencesThreadLocals(
+                        ((StandardContext) container).getClearReferencesThreadLocals());
             }
 
             for (int i = 0; i < repositories.length; i++) {
