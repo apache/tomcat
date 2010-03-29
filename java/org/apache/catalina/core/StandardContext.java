@@ -772,7 +772,16 @@ public class StandardContext
      * <code>false</code> will be used. 
      */
     private boolean clearReferencesStopThreads = false;
-
+    
+    /**
+     * Should Tomcat attempt to clear any ThreadLocal objects that are instances
+     * of classes loaded by this class loader. Failure to remove any such
+     * objects will result in a memory leak on web application stop, undeploy or
+     * reload. It is disabled by default since the clearing of the ThreadLocal
+     * objects is not performed in a thread-safe manner.
+     */
+    private boolean clearReferencesThreadLocals = false;
+    
     /**
      * Should the effective web.xml be logged when the context starts?
      */
@@ -2283,6 +2292,34 @@ public class StandardContext
         support.firePropertyChange("clearReferencesStopThreads",
                                    oldClearReferencesStopThreads,
                                    this.clearReferencesStopThreads);
+
+    }
+
+
+    /**
+     * Return the clearReferencesThreadLocals flag for this Context.
+     */
+    public boolean getClearReferencesThreadLocals() {
+
+        return (this.clearReferencesThreadLocals);
+
+    }
+
+
+    /**
+     * Set the clearReferencesStopThreads feature for this Context.
+     *
+     * @param clearReferencesStopThreads The new flag value
+     */
+    public void setClearReferencesThreadLocals(
+            boolean clearReferencesThreadLocals) {
+
+        boolean oldClearReferencesThreadLocals =
+            this.clearReferencesThreadLocals;
+        this.clearReferencesThreadLocals = clearReferencesThreadLocals;
+        support.firePropertyChange("clearReferencesStopThreads",
+                                   oldClearReferencesThreadLocals,
+                                   this.clearReferencesThreadLocals);
 
     }
 
