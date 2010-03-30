@@ -389,7 +389,8 @@ public class AsyncContextImpl implements AsyncContext {
         state.set(AsyncState.TIMING_OUT);
     }
     
-    public void setErrorState() {
+    public void setErrorState(Throwable t) {
+        if (t!=null) request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         state.set(AsyncState.ERROR_DISPATCHING);
     }
     
