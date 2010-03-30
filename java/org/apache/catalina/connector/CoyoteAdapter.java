@@ -280,7 +280,7 @@ public class CoyoteAdapter implements Adapter {
                 AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
                 //TODO SERVLET3 - async
                 //configure settings for timed out
-                asyncConImpl.setErrorState();
+                asyncConImpl.setErrorState(new IOException("Socket error."));
             }
             while (success) {
                 AsyncContextImpl impl = (AsyncContextImpl)request.getAsyncContext();
@@ -302,12 +302,15 @@ public class CoyoteAdapter implements Adapter {
                         //TODO SERVLET3 - async
                         async = false;
                         break;
+                } else if (impl.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING) {
+                    async = false;
+                    success = false;
+                    connector.getContainer().getPipeline().getFirst().invoke(request, response);
                 } else {
                     try {
                         connector.getContainer().getPipeline().getFirst().invoke(request, response);
-                    }catch (RuntimeException x) {
-                        success = false;
-                    } finally {
+                    } catch (RuntimeException x) {
+                        impl.setErrorState(x);
                     }
                 }
             }
@@ -394,7 +397,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         boolean comet = false;
-        boolean async = request.isAsyncStarted();
+        boolean async = false;
         
         try {
 
@@ -431,12 +434,12 @@ public class CoyoteAdapter implements Adapter {
             if (asyncConImpl!=null && asyncConImpl.getState()==AsyncContextImpl.AsyncState.STARTED) {
                 res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
                 async = true;
-            } else if (asyncConImpl!=null && 
-                          (asyncConImpl.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
-                           asyncConImpl.getState()==AsyncContextImpl.AsyncState.COMPLETING  ||
-                           asyncConImpl.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
-                           asyncConImpl.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING)) {
+            } else if (request.isAsyncDispatching()) {
                 asyncDispatch(req, res, SocketStatus.OPEN);
+                if (request.isAsyncStarted()) {
+                    async = true;
+                    res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                }
             } else if (!comet) {
                 response.finishResponse();
                 req.action(ActionCode.ACTION_POST_REQUEST , null);

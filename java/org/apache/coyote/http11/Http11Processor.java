@@ -318,21 +318,19 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (async) {
-            if (error) {
-                recycle();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
+        if (error) {
+            recycle();
+            return SocketState.CLOSED;
+        } else if (async) {
+            return SocketState.LONG;
         } else {
-            if ( error || (!keepAlive)) {
+            if (!keepAlive) {
                 recycle();
                 return SocketState.CLOSED;
             } else {
                 return SocketState.OPEN;
             }
-        }
+        } 
     }
     
     
@@ -353,15 +351,13 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (async) {
-            if (error) {
-                recycle();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
+        if (error) {
+            recycle();
+            return SocketState.CLOSED;
+        } else if (async) {
+            return SocketState.LONG;
         } else {
-            if ( error || (!keepAlive)) {
+            if (!keepAlive) {
                 recycle();
                 return SocketState.CLOSED;
             } else {
