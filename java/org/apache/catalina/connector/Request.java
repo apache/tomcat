@@ -2284,7 +2284,7 @@ public class Request
             Cookie newCookie =
                 ApplicationSessionCookieConfig.createSessionCookie(context,
                         newSessionId, secure);
-            response.addCookie(newCookie);
+            response.addCookieInternal(newCookie);
         }
     }
 
