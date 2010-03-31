@@ -589,7 +589,13 @@ public class StandardService extends LifecycleBase
         // Initialize our defined Connectors
         synchronized (connectors) {
                 for (int i = 0; i < connectors.length; i++) {
-                    connectors[i].initialize();
+                    try {
+                        connectors[i].initialize();
+                    } catch (Exception e) {
+                        log.error(sm.getString(
+                                "standardService.connector.failed",
+                                connectors[i]), e);
+                    }
                 }
         }
     }
