@@ -5714,7 +5714,7 @@ public class StandardContext
 					"web application is running"
 					),
 					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.stopped"},
+					"j2ee.state.stopping"},
 					Notification.class.getName(),
 					"web application start to stopped"
 					),
