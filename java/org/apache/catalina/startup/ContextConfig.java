@@ -32,6 +32,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -1210,7 +1211,7 @@ public class ContextConfig
             // Have to process JARs for fragments
             Map<String,WebXml> fragments = processJarsForWebFragments();
             
-            // Merge the fragments into the main web.xml
+            // Order the fragments
             Set<WebXml> orderedFragments =
                 WebXml.orderWebFragments(webXml, fragments);
 
@@ -1454,8 +1455,13 @@ public class ContextConfig
     protected void processAnnotations(Set<WebXml> fragments) {
         for(WebXml fragment : fragments) {
             if (!fragment.isMetadataComplete()) {
+                WebXml annotations = new WebXml();
                 URL url = fragment.getURL();
-                processAnnotationsUrl(url, fragment);
+                processAnnotationsUrl(url, annotations);
+                Set<WebXml> set = new HashSet<WebXml>();
+                set.add(annotations);
+                // Merge annotations into fragment - fragment takes priority
+                fragment.merge(set);
             }
         }
     }
