@@ -62,7 +62,6 @@ public class RequestInfo  {
 
     // ----------------------------------------------------- Instance Variables
     Request req;
-    Response res;
     int stage = Constants.STAGE_NEW;
     String workerThreadName;
     ObjectName rpName;
