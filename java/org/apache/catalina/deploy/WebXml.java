@@ -272,8 +272,10 @@ public class WebXml {
     
     // filter-mapping
     private Set<FilterMap> filterMaps = new LinkedHashSet<FilterMap>();
+    private Set<String> filterMappingNames = new HashSet<String>();
     public void addFilterMapping(FilterMap filterMap) {
         filterMaps.add(filterMap);
+        filterMappingNames.add(filterMap.getFilterName());
     }
     public Set<FilterMap> getFilterMappings() { return filterMaps; }
     
@@ -301,8 +303,10 @@ public class WebXml {
     
     // servlet-mapping
     private Map<String,String> servletMappings = new HashMap<String,String>();
+    private Set<String> servletMappingNames = new HashSet<String>();
     public void addServletMapping(String urlPattern, String servletName) {
         servletMappings.put(urlPattern, servletName);
+        servletMappingNames.add(servletName);
     }
     public Map<String,String> getServletMappings() { return servletMappings; }
     
@@ -1407,9 +1411,22 @@ public class WebXml {
         }
         errorPages.putAll(temp.getErrorPages());
 
+        // As per 'clarification' from the Servlet EG, filter mappings in the
+        // main web.xml override those in fragments and those in fragments
+        // override mappings in annotations
+        for (WebXml fragment : fragments) {
+            Iterator<FilterMap> iterFilterMaps =
+                fragment.getFilterMappings().iterator();
+            while (iterFilterMaps.hasNext()) {
+                FilterMap filterMap = iterFilterMaps.next();
+                if (filterMappingNames.contains(filterMap.getFilterName())) {
+                    iterFilterMaps.remove();
+                }
+            }
+        }
         for (WebXml fragment : fragments) {
             for (FilterMap filterMap : fragment.getFilterMappings()) {
-                // Always additive
+                // Additive
                 addFilterMapping(filterMap);
             }
         }
@@ -1550,10 +1567,23 @@ public class WebXml {
         serviceRefs.putAll(temp.getServiceRefs());
         mergeInjectionFlags.clear();
 
+        // As per 'clarification' from the Servlet EG, servlet mappings in the
+        // main web.xml override those in fragments and those in fragments
+        // override mappings in annotations
+        for (WebXml fragment : fragments) {
+            Iterator<Map.Entry<String,String>> iterServletMaps =
+                fragment.getServletMappings().entrySet().iterator();
+            while (iterServletMaps.hasNext()) {
+                Map.Entry<String,String> servletMap = iterServletMaps.next();
+                if (servletMappingNames.contains(servletMap.getValue())) {
+                    iterServletMaps.remove();
+                }
+            }
+        }
         for (WebXml fragment : fragments) {
             for (Map.Entry<String,String> mapping :
                     fragment.getServletMappings().entrySet()) {
-                // Always additive
+                // Additive
                 addServletMapping(mapping.getKey(), mapping.getValue());
             }
         }
