@@ -216,11 +216,23 @@ public final class AstValue extends SimpleNode {
     public Object invoke(EvaluationContext ctx, 
             @SuppressWarnings("unchecked") Class[] paramTypes,
             Object[] paramValues) throws ELException {
+        
         Target t = getTarget(ctx);
-        Method m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
+        Method m = null;
+        Object[] values = null;
+        if (isParametersProvided()) {
+            Class<?>[] types = ((AstMethodParameters)
+                    this.jjtGetChild(2)).getParameterTypes(ctx);
+            values = ((AstMethodParameters)
+                    this.jjtGetChild(2)).getParameters(ctx);
+            m = ReflectionUtil.getMethod(t.base, t.property, types);
+        } else {
+            m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
+            values = paramValues;
+        }
         Object result = null;
         try {
-            result = m.invoke(t.base, paramValues);
+            result = m.invoke(t.base, values);
         } catch (IllegalAccessException iae) {
             throw new ELException(iae);
         } catch (IllegalArgumentException iae) {
