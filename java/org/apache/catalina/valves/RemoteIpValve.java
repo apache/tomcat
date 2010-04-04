@@ -627,6 +627,11 @@ public class RemoteIpValve extends ValveBase {
                           + originalScheme + "' will be seen as newRemoteAddr='" + request.getRemoteAddr() + "', newRemoteHost='"
                           + request.getRemoteHost() + "', newScheme='" + request.getScheme() + "', newSecure='" + request.isSecure() + "'");
             }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Skip RemoteIpValve for request " + request.getRequestURI() + " with originalRemoteAddr '"
+                        + request.getRemoteAddr() + "'");
+            }
         }
         try {
             getNext().invoke(request, response);
