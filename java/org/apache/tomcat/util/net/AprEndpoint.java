@@ -848,7 +848,7 @@ public class AprEndpoint extends AbstractEndpoint {
             pool = Pool.create(serverSockPool);
             int size = pollerSize / pollerThreadCount;
             int timeout = getKeepAliveTimeout();
-            if (timeout < 0) {
+            if (timeout <= 0) {
                 timeout = socketProperties.getSoTimeout();
             }
             serverPollset = allocatePoller(size, pool, timeout);
