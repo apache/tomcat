@@ -44,13 +44,33 @@ public class TestMethodExpressionImpl extends TestCase {
                 context, "${beanB.sayHello('JUnit')}", String.class,
                 new Class<?>[] { String.class });
 
-        String result1 = (String) me1.invoke(context, null);
         assertFalse(me1.isParmetersProvided());
-        String result2 = (String) me2.invoke(context, new Object[] { "JUnit2" });
         assertTrue(me2.isParmetersProvided());
-        
-        assertNotNull(result1);
-        assertNotNull(result2);
+    }
+
+    public void testInvoke() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanB beanB = new TesterBeanB();
+        beanB.setName("Tomcat");
+        ValueExpression var =
+            factory.createValueExpression(beanB, TesterBeanB.class);
+        context.getVariableMapper().setVariable("beanB", var);
+
+        MethodExpression me1 = factory.createMethodExpression(
+                context, "${beanB.getName}", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(
+                context, "${beanB.sayHello('JUnit')}", String.class,
+                new Class<?>[] { String.class });
+        MethodExpression me3 = factory.createMethodExpression(
+                context, "${beanB.sayHello}", String.class,
+                new Class<?>[] { String.class });
+
+        assertEquals("Tomcat", me1.invoke(context, null));
+        assertEquals("Hello JUnit from Tomcat", me2.invoke(context, null));
+        assertEquals("Hello JUnit from Tomcat", me2.invoke(context, new Object[] { "JUnit2" }));
+        assertEquals("Hello JUnit2 from Tomcat", me3.invoke(context, new Object[] { "JUnit2" }));
     }
 
 }
