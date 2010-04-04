@@ -789,6 +789,10 @@ public class RemoteIpFilter implements Filter {
             }
             chain.doFilter(xRequest, response);
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Skip RemoteIpFilter for request " + request.getRequestURI() + " with originalRemoteAddr '"
+                        + request.getRemoteAddr() + "'");
+            }
             chain.doFilter(request, response);
         }
         
