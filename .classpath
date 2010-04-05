@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="java"/>
-	<classpathentry excluding="org/apache/catalina/tribes/|org/apache/catalina/valves/Benchmarks.java" kind="src" path="test"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
