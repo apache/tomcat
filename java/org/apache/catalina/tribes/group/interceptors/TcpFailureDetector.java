@@ -145,6 +145,11 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             if(log.isInfoEnabled())
                 log.info("Received memberDisappeared["+member+"] message. Will verify.");
         synchronized (membership) {
+            if (!membership.contains(member)) {
+                if(log.isInfoEnabled())
+                    log.info("Verification complete. Member already disappeared["+member+"]");
+                return;
+            }
             //check to see if the member really is gone
             //if the payload is not a shutdown message
             if (shutdown || !memberAlive(member)) {
