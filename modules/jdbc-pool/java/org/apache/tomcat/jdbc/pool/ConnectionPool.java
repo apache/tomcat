@@ -959,9 +959,25 @@ public class ConnectionPool {
      * @param con
      */
     protected void finalize(PooledConnection con) {
-        // NOOP
+        JdbcInterceptor handler = con.getHandler();
+        while (handler!=null) {
+            handler.reset(null, null);
+            handler=handler.getNext();
+        }
     }
     
+    /**
+     * Hook to perform final actions on a pooled connection object once it has been disconnected and will be discarded
+     * @param con
+     */
+    protected void disconnectEvent(PooledConnection con, boolean finalizing) {
+        JdbcInterceptor handler = con.getHandler();
+        while (handler!=null) {
+            handler.disconnected(this, con, finalizing);
+            handler=handler.getNext();
+        }
+    }
+
     /**
      * Return the object that is potentially registered in JMX for notifications
      * @return the object implementing the {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean} interface 
