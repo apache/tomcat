@@ -559,9 +559,9 @@ public abstract class AbstractEndpoint {
     public String getSessionCacheSize() { return sessionCacheSize;}
     public void setSessionCacheSize(String s) { sessionCacheSize = s;}
 
-    private String sessionCacheTimeout = "86400";
-    public String getSessionCacheTimeout() { return sessionCacheTimeout;}
-    public void setSessionCacheTimeout(String s) { sessionCacheTimeout = s;}
+    private String sessionTimeout = "86400";
+    public String getSessionTimeout() { return sessionTimeout;}
+    public void setSessionTimeout(String s) { sessionTimeout = s;}
 
     private String allowUnsafeLegacyRenegotiation = null;
     public String getAllowUnsafeLegacyRenegotiation() {
