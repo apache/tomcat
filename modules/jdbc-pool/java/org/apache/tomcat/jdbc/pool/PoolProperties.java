@@ -811,6 +811,77 @@ public class PoolProperties implements PoolConfiguration {
         public String getValue() {
             return value;
         }
+        
+        public boolean getValueAsBoolean(boolean def) {
+            if (value==null) return def;
+            if ("true".equals(value)) return true;
+            if ("false".equals(value)) return false;
+            return def;
+        }
+        
+        public int getValueAsInt(int def) {
+            if (value==null) return def;
+            try {
+                int v = Integer.parseInt(value);
+                return v;
+            }catch (NumberFormatException nfe) {
+                return def;
+            }
+        }
+        
+        public long getValueAsLong(long def) {
+            if (value==null) return def;
+            try {
+                return Long.parseLong(value);
+            }catch (NumberFormatException nfe) {
+                return def;
+            }
+        }
+
+        public byte getValueAsByte(byte def) {
+            if (value==null) return def;
+            try {
+                return Byte.parseByte(value);
+            }catch (NumberFormatException nfe) {
+                return def;
+            }
+        }
+        
+        public short getValueAsShort(short def) {
+            if (value==null) return def;
+            try {
+                return Short.parseShort(value);
+            }catch (NumberFormatException nfe) {
+                return def;
+            }
+        }
+
+        public float getValueAsFloat(float def) {
+            if (value==null) return def;
+            try {
+                return Float.parseFloat(value);
+            }catch (NumberFormatException nfe) {
+                return def;
+            }
+        }
+
+        public double getValueAsDouble(double def) {
+            if (value==null) return def;
+            try {
+                return Double.parseDouble(value);
+            }catch (NumberFormatException nfe) {
+                return def;
+            }
+        }
+ 
+        public char getValueAschar(char def) {
+            if (value==null) return def;
+            try {
+                return value.charAt(0);
+            }catch (StringIndexOutOfBoundsException nfe) {
+                return def;
+            }
+        }
         @Override
         public int hashCode() {
             return name.hashCode();
