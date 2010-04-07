@@ -539,9 +539,9 @@ public class NioEndpoint extends AbstractEndpoint {
                     sessionContext.setSessionCacheSize(
                             Integer.parseInt(getSessionCacheSize()));
                 }
-                if (getSessionCacheTimeout() != null) {
+                if (getSessionTimeout() != null) {
                     sessionContext.setSessionTimeout(
-                            Integer.parseInt(getSessionCacheTimeout()));
+                            Integer.parseInt(getSessionTimeout()));
                 }
             }
         }

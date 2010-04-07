@@ -342,7 +342,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             serverSocketFactory.setAttribute(SSL_ATTR_SESSION_CACHE_SIZE,
                     getSessionCacheSize());
             serverSocketFactory.setAttribute(SSL_ATTR_SESSION_TIMEOUT,
-                    getSessionCacheTimeout());
+                    getSessionTimeout());
             serverSocketFactory.setAttribute(SSL_ATTR_ALLOW_UNSAFE_RENEG,
                     getAllowUnsafeLegacyRenegotiation());
         }
