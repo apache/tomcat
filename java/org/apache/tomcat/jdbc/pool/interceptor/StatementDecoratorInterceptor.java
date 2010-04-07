@@ -97,21 +97,24 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             Object result = null;
             String name = method.getName();
             Constructor<?> constructor = null;
+            String sql = null;
             if (compare(CREATE_STATEMENT, name)) {
                 // createStatement
                 constructor = getConstructor(CREATE_STATEMENT_IDX, Statement.class);
             } else if (compare(PREPARE_STATEMENT, name)) {
                 // prepareStatement
                 constructor = getConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
+                sql = (String)args[0];
             } else if (compare(PREPARE_CALL, name)) {
                 // prepareCall
                 constructor = getConstructor(PREPARE_IDX, CallableStatement.class);
+                sql = (String)args[0];
             } else {
                 // do nothing, might be a future unsupported method
                 // so we better bail out and let the system continue
                 return statement;
             }
-            StatementProxy statementProxy = new StatementProxy(statement);
+            StatementProxy statementProxy = new StatementProxy(statement,sql);
             result = constructor.newInstance(new Object[] { statementProxy });
             statementProxy.setActualProxy(result);
             statementProxy.setConnection(proxy);
@@ -142,17 +145,37 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         protected Object delegate;
         private Object actualProxy;
         private Object connection;
+        private String sql;
 
-        public StatementProxy(Object parent) {
+        public StatementProxy(Object parent, String sql) {
             this.delegate = parent;
+            this.sql = sql;
+        }
+        public Object getDelegate() {
+            return this.delegate;
+        }
+        
+        public String getSql() {
+            return sql;
         }
 
         public void setConnection(Object proxy) {
             this.connection = proxy;            
         }
+        public Object getConnection() {
+            return this.connection;
+        }
 
         public void setActualProxy(Object proxy){
             this.actualProxy = proxy;
+        }
+        public Object getActualProxy() {
+            return this.actualProxy;
+        }
+        
+        public void closedInvoked() {
+            closed = true;
+            delegate = null;
         }
         
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -189,8 +212,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             // perform close cleanup
             if (close) {
-                closed = true;
-                delegate = null;
+                closeInvoked();
             }
             if (process){
                 Constructor<?> cons = getResultSetConstructor();

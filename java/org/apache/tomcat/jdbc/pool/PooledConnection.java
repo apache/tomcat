@@ -266,6 +266,7 @@ public class PooledConnection {
         setDiscarded(true);
         if (connection != null) {
             try {
+                parent.disconnectEvent(this, finalize);
                 connection.close();
             }catch (Exception ignore) {
                 if (log.isDebugEnabled()) {
