@@ -1146,7 +1146,7 @@ public class ManagerServlet
                 int time = (int)((now-sessions[i].getThisAccessedTimeInternal())/1000);
                 if (idle >= 0 && time >= idle*60) {
                     sessions[i].expire();
-                    idle++;
+                    expired++;
                 }
                 time=time/60/histoInterval;
                 if (time < 0)
@@ -1170,11 +1170,11 @@ public class ManagerServlet
                                             ">=" + maxCount*histoInterval,
                                             "" + timeout[maxCount-1]));
             if (notimeout > 0)
-                writer.println(sm.getString("managerServlet.sessiontimeout",
-                                            "unlimited","" + notimeout));
+                writer.println(sm.getString("managerServlet.sessiontimeout.unlimited",
+                                            "" + notimeout));
             if (idle >= 0)
-                writer.println(sm.getString("managerServlet.sessiontimeout",
-                                            "" + idle,"expired " + expired));
+                writer.println(sm.getString("managerServlet.sessiontimeout.expired",
+                                            "" + idle,"" + expired));
         } catch (Throwable t) {
             log("ManagerServlet.sessions[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
