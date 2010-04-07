@@ -1646,7 +1646,7 @@ public class Http11AprProcessor implements ActionHook {
                 (outputFilters[Constants.IDENTITY_FILTER]);
             contentDelimitation = true;
         } else {
-            if (entityBody && http11 && keepAlive) {
+            if (entityBody && http11) {
                 outputBuffer.addActiveFilter
                     (outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
