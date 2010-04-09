@@ -99,8 +99,8 @@ public class Poll {
      *        The descriptor array must be two times the size of pollset.
      *        and are populated as follows:
      * <PRE>
-     * descriptors[n + 0] -> returned events
-     * descriptors[n + 1] -> socket
+     * descriptors[2n + 0] -> returned events
+     * descriptors[2n + 1] -> socket
      * </PRE>
      * @param remove Remove signaled descriptors from pollset
      * @return Number of signaled descriptors (output parameter)
@@ -146,8 +146,8 @@ public class Poll {
      *        The descriptor array must be two times the size of pollset.
      *        and are populated as follows:
      * <PRE>
-     * descriptors[n + 0] -> returned events
-     * descriptors[n + 1] -> socket
+     * descriptors[2n + 0] -> returned events
+     * descriptors[2n + 1] -> socket
      * </PRE>
      * @return Number of descriptors (output parameter) in the Poll
      *         or negative APR error code.
