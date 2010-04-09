@@ -2229,14 +2229,16 @@ public class JNDIRealm extends RealmBase {
          final private String username;
          final private String dn;
          final private String password;
-         final private List<String> roles;
+         final private List<String> roles = new ArrayList<String>();
 
          public User(String username, String dn, String password,
                  List<String> roles) {
              this.username = username;
              this.dn = dn;
              this.password = password;
-             this.roles = Collections.unmodifiableList(roles);
+             if (roles != null) {
+                 this.roles.addAll(roles);
+             }
          }
     
          public String getUserName() {
