@@ -77,6 +77,9 @@ public final class SecurityClassLoad {
             "core.AsyncContextImpl$2");
         loader.loadClass
             (basePackage +
+            "core.AsyncListenerWrapper");
+        loader.loadClass
+            (basePackage +
              "core.ContainerBase$PrivilegedAddChild");
         loader.loadClass
             (basePackage +
