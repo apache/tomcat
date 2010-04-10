@@ -62,6 +62,21 @@ public final class SecurityClassLoad {
              "core.ApplicationDispatcher$PrivilegedInclude");
         loader.loadClass
             (basePackage +
+            "core.AsyncContextImpl");
+        loader.loadClass
+            (basePackage +
+            "core.AsyncContextImpl$AsyncState");
+        loader.loadClass
+            (basePackage +
+            "core.AsyncContextImpl$DebugException");
+        loader.loadClass
+            (basePackage +
+            "core.AsyncContextImpl$1");
+        loader.loadClass
+            (basePackage +
+            "core.AsyncContextImpl$2");
+        loader.loadClass
+            (basePackage +
              "core.ContainerBase$PrivilegedAddChild");
         loader.loadClass
             (basePackage +
