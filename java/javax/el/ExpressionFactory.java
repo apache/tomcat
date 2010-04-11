@@ -27,6 +27,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Properties;
 
 /**
@@ -34,14 +36,45 @@ import java.util.Properties;
  * @since 2.1
  */
 public abstract class ExpressionFactory {
+    
+    private static final boolean IS_SECURITY_ENABLED =
+        (System.getSecurityManager() != null);
 
     private static final String SERVICE_RESOURCE_NAME =
         "META-INF/services/javax.el.ExpressionFactory";
 
-    private static final String SEP = System.getProperty("file.separator");
-    private static final String PROPERTY_FILE =
-        System.getProperty("java.home") + "lib" + SEP + "el.properties";
     private static final String PROPERTY_NAME = "javax.el.ExpressionFactory";
+
+    private static final String SEP;
+    private static final String PROPERTY_FILE;
+
+    static {
+        if (IS_SECURITY_ENABLED) {
+            SEP = AccessController.doPrivileged(
+                    new PrivilegedAction<String>(){
+                        @Override
+                        public String run() {
+                            return System.getProperty("file.separator");
+                        }
+
+                    }
+            );
+            PROPERTY_FILE = AccessController.doPrivileged(
+                    new PrivilegedAction<String>(){
+                        @Override
+                        public String run() {
+                            return System.getProperty("java.home") + "lib" +
+                                    SEP + "el.properties";
+                        }
+
+                    }
+            );
+        } else {
+            SEP = System.getProperty("file.separator");
+            PROPERTY_FILE = System.getProperty("java.home") + "lib" + SEP +
+                    "el.properties";
+        }
+    }
 
     public abstract Object coerceToType(Object obj, Class<?> expectedType)
             throws ELException;
@@ -90,12 +123,34 @@ public abstract class ExpressionFactory {
         // First services API
         className = getClassNameServices(tccl);
         if (className == null) {
-            // Second el.properties file
-            className = getClassNameJreDir();
+            if (IS_SECURITY_ENABLED) {
+                className = AccessController.doPrivileged(
+                        new PrivilegedAction<String>() {
+                            @Override
+                            public String run() {
+                                return getClassNameJreDir();
+                            }
+                        }
+                );
+            } else {
+                // Second el.properties file
+                className = getClassNameJreDir();
+            }
         }
         if (className == null) {
-            // Third system property 
-            className = getClassNameSysProp();
+            if (IS_SECURITY_ENABLED) {
+                className = AccessController.doPrivileged(
+                        new PrivilegedAction<String>() {
+                            @Override
+                            public String run() {
+                                return getClassNameSysProp();
+                            }
+                        }
+                );
+            } else {
+                // Third system property 
+                className = getClassNameSysProp();
+            }
         }
         if (className == null) {
             // Fourth - default
@@ -225,4 +280,5 @@ public abstract class ExpressionFactory {
         }
         return null;
     }
+
 }
