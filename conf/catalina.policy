@@ -161,6 +161,9 @@ grant {
     permission java.util.PropertyPermission
      "org.apache.el.parser.COERCE_TO_ZERO", "read";
 
+    // E.g. the cookie code needs that.
+    permission java.util.PropertyPermission "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
+
     // Applications using Comet need to be able to access this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
 };
