@@ -643,8 +643,18 @@ public class StandardSession
     public void endAccess() {
 
         isNew = false;
-        this.thisAccessedTime = System.currentTimeMillis();
-        this.lastAccessedTime = this.thisAccessedTime;
+
+        /**
+         * The servlet spec mandates to ignore request handling time
+         * in lastAccessedTime.
+         */
+        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            this.lastAccessedTime = this.thisAccessedTime;
+            this.thisAccessedTime = System.currentTimeMillis();
+        } else {
+            this.thisAccessedTime = System.currentTimeMillis();
+            this.lastAccessedTime = this.thisAccessedTime;
+        }
 
         if (ACTIVITY_CHECK) {
             accessCount.decrementAndGet();
