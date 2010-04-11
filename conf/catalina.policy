@@ -163,6 +163,7 @@ grant {
 
     // E.g. the cookie code needs those.
     permission java.util.PropertyPermission "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
+    permission java.util.PropertyPermission "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING", "read";
     permission java.util.PropertyPermission "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "read";
 
     // Applications using Comet need to be able to access this package
