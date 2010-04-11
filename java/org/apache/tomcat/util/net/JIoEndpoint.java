@@ -22,10 +22,13 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -507,10 +510,22 @@ public class JIoEndpoint extends AbstractEndpoint {
                     ClassLoader loader = Thread.currentThread().getContextClassLoader();
                     try {
                         //threads should not be created by the webapp classloader
-                        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                        if (Globals.IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                    getClass().getClassLoader());
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(
+                                    getClass().getClassLoader());
+                        }
                         getExecutor().execute(proc);
                     }finally {
-                        Thread.currentThread().setContextClassLoader(loader);
+                        if (Globals.IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(loader);
+                        }
                     }
                 }
             }
@@ -524,5 +539,20 @@ public class JIoEndpoint extends AbstractEndpoint {
     }
 
     protected ConcurrentLinkedQueue<SocketWrapper> waitingRequests = new ConcurrentLinkedQueue<SocketWrapper>();
+
+    private static class PrivilegedSetTccl
+    implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
     
 }
