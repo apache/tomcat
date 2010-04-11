@@ -103,6 +103,15 @@ public final class ApplicationContextFacade
         classCache.put("getRequestDispatcher", clazz);
         classCache.put("getNamedDispatcher", clazz);
         classCache.put("getServlet", clazz);
+        classCache.put("setInitParameter", new Class[]{String.class, String.class});
+        classCache.put("createServlet", new Class[]{Class.class});
+        classCache.put("addServlet", new Class[]{String.class, String.class});
+        classCache.put("createFilter", new Class[]{Class.class});
+        classCache.put("addFilter", new Class[]{String.class, String.class});
+        classCache.put("createListener", new Class[]{Class.class});
+        classCache.put("addListener", clazz);
+        classCache.put("getFilterRegistration", clazz);
+        classCache.put("getServletRegistration", clazz);
         classCache.put("getInitParameter", clazz);
         classCache.put("setAttribute", new Class[]{String.class, Object.class});
         classCache.put("removeAttribute", clazz);
@@ -110,8 +119,6 @@ public final class ApplicationContextFacade
         classCache.put("getAttribute", clazz);
         classCache.put("log", clazz);
         classCache.put("setSessionTrackingModes", new Class[]{EnumSet.class} );
-        classCache.put("setSessionCookieConfig",
-                new Class[]{SessionCookieConfig.class});
     }
 
 
@@ -414,7 +421,7 @@ public final class ApplicationContextFacade
             Filter filter) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (FilterRegistration.Dynamic) doPrivileged(
-                    "addFilter", new Object[]{filterName, filter});
+                    "addFilter", new Class[]{String.class, Filter.class}, new Object[]{filterName, filter});
         } else {
             return context.addFilter(filterName, filter);
         }
@@ -425,7 +432,7 @@ public final class ApplicationContextFacade
             Class<? extends Filter> filterClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (FilterRegistration.Dynamic) doPrivileged(
-                    "addFilter", new Object[]{filterName, filterClass});
+                    "addFilter", new Object[]{filterName, filterClass.getName()});
         } else {
             return context.addFilter(filterName, filterClass);
         }
@@ -435,8 +442,15 @@ public final class ApplicationContextFacade
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (T) doPrivileged(
-                    "createFilter", new Object[]{c});
+            try {
+                return (T) invokeMethod(context, "createFilter", 
+                                              new Object[]{c});
+            } catch (Throwable t) {
+                if (t instanceof ServletException) {
+                    throw (ServletException) t;
+                }
+                return null;
+            }
         } else {
             return context.createFilter(c);
         }
@@ -446,7 +460,7 @@ public final class ApplicationContextFacade
     public FilterRegistration getFilterRegistration(String filterName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (FilterRegistration) doPrivileged(
-                    "findFilterRegistration", new Object[]{filterName});
+                    "getFilterRegistration", new Object[]{filterName});
         } else {
             return context.getFilterRegistration(filterName);
         }
@@ -468,7 +482,7 @@ public final class ApplicationContextFacade
             Servlet servlet) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged(
-                    "addServlet", new Object[]{servletName, servlet});
+                    "addServlet", new Class[]{String.class, Servlet.class}, new Object[]{servletName, servlet});
         } else {
             return context.addServlet(servletName, servlet);
         }
@@ -479,7 +493,7 @@ public final class ApplicationContextFacade
             Class <? extends Servlet> servletClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged(
-                    "addServlet", new Object[]{servletName, servletClass});
+                    "addServlet", new Object[]{servletName, servletClass.getName()});
         } else {
             return context.addServlet(servletName, servletClass);
         }
@@ -490,8 +504,15 @@ public final class ApplicationContextFacade
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (T) doPrivileged(
-                    "createServlet", new Object[]{c});
+            try {
+                return (T) invokeMethod(context, "createServlet", 
+                                              new Object[]{c});
+            } catch (Throwable t) {
+                if (t instanceof ServletException) {
+                    throw (ServletException) t;
+                }
+                return null;
+            }
         } else {
             return context.createServlet(c);
         }
@@ -501,7 +522,7 @@ public final class ApplicationContextFacade
     public ServletRegistration getServletRegistration(String servletName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration) doPrivileged(
-                    "findServletRegistration", new Object[]{servletName});
+                    "getServletRegistration", new Object[]{servletName});
         } else {
             return context.getServletRegistration(servletName);
         }
@@ -564,7 +585,7 @@ public final class ApplicationContextFacade
     public void addListener(Class<? extends EventListener> listenerClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("addListener",
-                    new Object[]{listenerClass});
+                    new Object[]{listenerClass.getName()});
         } else {
             context.addListener(listenerClass);
         }
@@ -586,7 +607,7 @@ public final class ApplicationContextFacade
     public <T extends EventListener> void addListener(T t) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("addListener",
-                    new Object[]{t});
+                    new Object[]{t.getClass().getName()});
         } else {
             context.addListener(t);
         }
@@ -598,7 +619,15 @@ public final class ApplicationContextFacade
     public <T extends EventListener> T createListener(Class<T> c)
             throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (T) doPrivileged("createListener", new Object[]{c});
+            try {
+                return (T) invokeMethod(context, "createListener", 
+                                              new Object[]{c});
+            } catch (Throwable t) {
+                if (t instanceof ServletException) {
+                    throw (ServletException) t;
+                }
+                return null;
+            }
         } else {
             return context.createListener(c);
         }
@@ -608,6 +637,7 @@ public final class ApplicationContextFacade
     @Override
     public void declareRoles(String... roleNames) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
+//FIXME
             doPrivileged("declareRoles",
                     new Object[]{roleNames});
         } else {
@@ -685,11 +715,10 @@ public final class ApplicationContextFacade
     /**
      * Use reflection to invoke the requested method. Cache the method object 
      * to speed up the process
-     *                   will be invoked
      * @param methodName The method to call.
      * @param params The arguments passed to the called method.
      */
-    private Object doPrivileged(final String methodName, final Object[] params){
+    private Object doPrivileged(final String methodName, final Object[] params) {
         try{
             return invokeMethod(context, methodName, params);
         }catch(Throwable t){
@@ -737,7 +766,7 @@ public final class ApplicationContextFacade
      */    
     private Object doPrivileged(final String methodName, 
                                 final Class<?>[] clazz,
-                                Object[] params){
+                                Object[] params) {
 
         try{
             Method method = context.getClass().getMethod(methodName, clazz);
