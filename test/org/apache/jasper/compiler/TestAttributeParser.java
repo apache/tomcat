@@ -113,6 +113,10 @@ public class TestAttributeParser extends TestCase {
         assertEquals("\\2", evalAttr("\\\\${1+1}", '\"'));
     }
     
+    public void testBug49081() {
+        assertEquals("#2", evalAttr("#${1+1}", '\"'));
+    }
+
     public void testLiteral() {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
