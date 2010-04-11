@@ -131,6 +131,7 @@ public final class SecurityClassLoad {
         throws Exception {
         String basePackage = "org.apache.catalina.";
         loader.loadClass(basePackage + "util.Enumerator");
+        loader.loadClass(basePackage + "util.ParameterMap");
     }
     
     
@@ -234,6 +235,8 @@ public final class SecurityClassLoad {
         throws Exception {
         String basePackage = "org.apache.tomcat.";
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
+        loader.loadClass
+            (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
     }
 }
 
