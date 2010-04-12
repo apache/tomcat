@@ -231,7 +231,7 @@ public final class IntrospectionUtils {
         }
     }
 
-    public static String PATH_SEPARATOR = System.getProperty("path.separator");
+    public final static String PATH_SEPARATOR = System.getProperty("path.separator");
 
     /**
      * Adds classpath entries from a vector of URL's to the "tc_path_add" System
