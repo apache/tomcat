@@ -28,8 +28,32 @@ import junit.framework.TestCase;
 public class TestELParser extends TestCase {
 
     public void testBug49081() {
+        // OP's report
         testExpression("#${1+1}", "#2");
-    }
+        
+        // Variations on a theme
+        testExpression("#", "#");
+        testExpression("##", "##");
+        testExpression("###", "###");
+        testExpression("$", "$");
+        testExpression("$$", "$$");
+        testExpression("$$$", "$$$");
+        testExpression("#$", "#$");
+        testExpression("#$#", "#$#");
+        testExpression("$#", "$#");
+        testExpression("$#$", "$#$");
+
+        testExpression("#{1+1}", "2");
+        testExpression("##{1+1}", "#2");
+        testExpression("###{1+1}", "##2");
+        testExpression("${1+1}", "2");
+        testExpression("$${1+1}", "$2");
+        testExpression("$$${1+1}", "$$2");
+        testExpression("#${1+1}", "#2");
+        testExpression("#$#{1+1}", "#$2");
+        testExpression("$#{1+1}", "$2");
+        testExpression("$#${1+1}", "$#2");
+}
 
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
