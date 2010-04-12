@@ -28,15 +28,17 @@ import junit.framework.TestCase;
 public class TestELParser extends TestCase {
 
     public void testBug49081() {
+        testExpression("#${1+1}", "#2");
+    }
+
+    private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
         
         ValueExpression ve = factory.createValueExpression(
-                context, "#${1+1}", String.class);
+                context, expression, String.class);
 
-        // First check the basics work
         String result = (String) ve.getValue(context);
-        assertEquals("#2", result);
+        assertEquals(expected, result);
     }
-
 }
