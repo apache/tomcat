@@ -38,7 +38,7 @@ import java.sql.Timestamp;
 public class ChannelData implements ChannelMessage {
     public static final ChannelData[] EMPTY_DATA_ARRAY = new ChannelData[0];
     
-    public static boolean USE_SECURE_RANDOM_FOR_UUID = false;
+    public static final boolean USE_SECURE_RANDOM_FOR_UUID = false;
     
     /**
      * The options this message was sent with
