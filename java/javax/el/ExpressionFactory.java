@@ -63,8 +63,8 @@ public abstract class ExpressionFactory {
                     new PrivilegedAction<String>(){
                         @Override
                         public String run() {
-                            return System.getProperty("java.home") + "lib" +
-                                    SEP + "el.properties";
+                            return System.getProperty("java.home") + SEP +
+                                    "lib" + SEP + "el.properties";
                         }
 
                     }
