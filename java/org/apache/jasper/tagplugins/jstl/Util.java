@@ -50,7 +50,7 @@ public class Util {
     
     public static final int HIGHEST_SPECIAL = '>';
     
-    public static char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
+    private static char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
     
     static {
         specialCharactersRepresentation['&'] = "&amp;".toCharArray();
