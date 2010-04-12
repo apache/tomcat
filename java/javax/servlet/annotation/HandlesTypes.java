@@ -22,12 +22,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This annotation is used to declare an array of application classes which are
+ * passed to a {@link javax.servlet.ServletContainerInitializer}.
+ * 
  * @since Servlet 3.0
- * TODO SERVLET3 - Add comments
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @SuppressWarnings("unchecked") // Spec API does not use generics
 public @interface HandlesTypes {
+
+    /**
+     * @return array of classes
+     */
     Class[] value();
+
 }
