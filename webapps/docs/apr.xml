@@ -68,7 +68,7 @@
     
     <p>
       Windows binaries are provided for tcnative-1, which is a statically compiled .dll which includes
-      OpenSSL and APR. It can be downloaded from <a href="http://tomcat.heanet.ie/native/">here</a>
+      OpenSSL and APR. It can be downloaded from <a href="http://tomcat.apache.org/download-native.cgi">here</a>
       as 32bit or AMD x86-64 binaries.
       In security conscious production environments, it is recommended to use separate shared dlls
       for OpenSSL, APR, and libtcnative-1, and update them as needed according to security bulletins.
