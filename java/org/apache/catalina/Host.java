@@ -235,7 +235,7 @@ public interface Host extends Container {
     /**
      * Returns true if the Host will attempt to create directories for appBase and xmlBase
      * unless they already exist.
-     * @return
+     * @return true if the Host will attempt to create directories
      */
     public boolean getCreateDirs();
     /**

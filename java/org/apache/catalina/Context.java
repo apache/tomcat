@@ -738,7 +738,7 @@ public interface Context extends Container {
      *
      * @param pattern URL pattern to be mapped
      * @param name Name of the corresponding servlet to execute
-     * @param jspWildCard true if name identifies the JspServlet
+     * @param jspWildcard true if name identifies the JspServlet
      * and pattern contains a wildcard; false otherwise
      */
     public void addServletMapping(String pattern, String name,

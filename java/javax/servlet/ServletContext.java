@@ -843,7 +843,7 @@ public interface ServletContext {
      * 
      * @param sessionTrackingModes
      * @throws IllegalArgumentException If sessionTrackingModes specifies
-     *                                  {@link SessionTrackingMode.SSL} in
+     *                                  {@link SessionTrackingMode#SSL} in
      *                                  combination with any other
      *                                  {@link SessionTrackingMode}
      * @throws IllegalStateException    If the context has already been

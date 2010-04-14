@@ -43,7 +43,7 @@ public class HttpConstraintElement {
     }
     
     /**
-     * Convenience constructor for {@link EmptyRoleSemantic.DENY}.
+     * Convenience constructor for {@link EmptyRoleSemantic#DENY}.
      * 
      */
     public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic) {

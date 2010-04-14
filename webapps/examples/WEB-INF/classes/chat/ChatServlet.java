@@ -194,14 +194,6 @@ public class ChatServlet
             running = false;
         }
 
-        /**
-         * Add specified socket and associated pool to the poller. The socket will
-         * be added to a temporary array, and polled first after a maximum amount
-         * of time equal to pollTime (in most cases, latency will be much lower,
-         * however).
-         *
-         * @param socket to add to the poller
-         */
         public void send(String user, String message) {
             synchronized (messages) {
                 messages.add("[" + user + "]: " + message);
