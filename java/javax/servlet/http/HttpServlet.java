@@ -559,25 +559,25 @@ public abstract class HttpServlet extends GenericServlet {
         int responseLength;
         
         String CRLF = "\r\n";
-        String responseString = "TRACE "+ req.getRequestURI()+
-            " " + req.getProtocol();
+        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI())
+            .append(" ").append(req.getProtocol());
         
         Enumeration<String> reqHeaderEnum = req.getHeaderNames();
         
         while( reqHeaderEnum.hasMoreElements() ) {
             String headerName = reqHeaderEnum.nextElement();
-            responseString += CRLF + headerName + ": " +
-                req.getHeader(headerName); 
+            buffer.append(CRLF).append(headerName).append(": ")
+                .append(req.getHeader(headerName)); 
         }
         
-        responseString += CRLF;
+        buffer.append(CRLF);
         
-        responseLength = responseString.length();
+        responseLength = buffer.length();
         
         resp.setContentType("message/http");
         resp.setContentLength(responseLength);
         ServletOutputStream out = resp.getOutputStream();
-        out.print(responseString);        
+        out.print(buffer.toString());        
         out.close();
         return;
     }                
