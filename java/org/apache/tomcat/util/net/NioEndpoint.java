@@ -478,6 +478,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Initialize the endpoint.
      */
+    @Override
     public void init()
         throws Exception {
 
@@ -569,6 +570,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Start the NIO endpoint, creating acceptor, poller threads.
      */
+    @Override
     public void start()
         throws Exception {
         // Initialize socket if not done before
@@ -608,6 +610,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Pause the endpoint, which will make it stop accepting new sockets.
      */
+    @Override
     public void pause() {
         if (running && !paused) {
             paused = true;
@@ -620,6 +623,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Resume the endpoint, which will make it start accepting new sockets
      * again.
      */
+    @Override
     public void resume() {
         if (running) {
             paused = false;
@@ -653,6 +657,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Deallocate NIO memory pools, and close server socket.
      */
+    @Override
     public void destroy() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("Destroy initiated for "+new InetSocketAddress(getAddress(),getPort()));
