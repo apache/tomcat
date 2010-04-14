@@ -2307,9 +2307,9 @@ public class StandardContext
 
 
     /**
-     * Set the clearReferencesStopThreads feature for this Context.
+     * Set the clearReferencesThreadLocals feature for this Context.
      *
-     * @param clearReferencesStopThreads The new flag value
+     * @param clearReferencesThreadLocals The new flag value
      */
     public void setClearReferencesThreadLocals(
             boolean clearReferencesThreadLocals) {

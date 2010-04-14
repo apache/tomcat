@@ -309,7 +309,7 @@ public class FormAuthenticator
      * @param config    Login configuration describing how authentication
      *              should be performed
      * @throws IOException  If the forward to the login page fails and the call
-     *                      to {@link HttpServletResponse#sendError(int, String)
+     *                      to {@link HttpServletResponse#sendError(int, String)}
      *                      throws an {@link IOException}
      */
     protected void forwardToLoginPage(Request request,
@@ -338,7 +338,7 @@ public class FormAuthenticator
      * @param config    Login configuration describing how authentication
      *              should be performed
      * @throws IOException  If the forward to the error page fails and the call
-     *                      to {@link HttpServletResponse#sendError(int, String)
+     *                      to {@link HttpServletResponse#sendError(int, String)}
      *                      throws an {@link IOException}
      */
     protected void forwardToErrorPage(Request request,

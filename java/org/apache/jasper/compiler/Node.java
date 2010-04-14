@@ -2292,7 +2292,7 @@ abstract class Node implements TagConstants {
         /**
          * @return true if the value represents an expression that should be fed
          *         to the expression interpreter
-         * @return false for string literals or rtexprvalues that should not be
+         *         false for string literals or rtexprvalues that should not be
          *         interpreted or reevaluated
          */
         public boolean isELInterpreterInput() {

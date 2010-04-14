@@ -1121,7 +1121,7 @@ public abstract class ContainerBase extends LifecycleBase
      * Convenience method, intended for use by the digester to simplify the
      * process of adding Valves to containers. See
      * {@link Pipeline#addValve(Valve)} for full details. Components other than
-     * the digester should use {@link #getPipeline()#addValve(Valve)} in case a
+     * the digester should use {@link #getPipeline()}.{@link #addValve(Valve)} in case a
      * future implementation provides an alternative method for the digester to
      * use.
      *

@@ -101,7 +101,7 @@ public abstract class ExpressionFactory {
      * <li>Platform default implementation -
      *     org.apache.el.ExpressionFactoryImpl</li>
      * </ol>
-     * @return
+     * @return the new ExpressionFactory
      */
     public static ExpressionFactory newInstance() {
         return newInstance(null);
@@ -111,8 +111,8 @@ public abstract class ExpressionFactory {
      * Create a new {@link ExpressionFactory} passing in the provided
      * {@link Properties}. Search order is the same as {@link #newInstance()}.
      * 
-     * @param properties
-     * @return
+     * @param properties the properties to be passed to the new instance (may be null)
+     * @return the new ExpressionFactory
      */
     public static ExpressionFactory newInstance(Properties properties) {
         String className = null;
