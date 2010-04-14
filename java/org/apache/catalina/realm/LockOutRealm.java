@@ -115,35 +115,6 @@ public class LockOutRealm extends CombinedRealm {
 
 
     /**
-     * Return the Principal associated with the specified username and
-     * credentials, if there is one; otherwise return <code>null</code>.
-     *
-     * @param username Username of the Principal to look up
-     * @param credentials Password or other credentials to use in
-     *  authenticating this username
-     */
-    @Override
-    public Principal authenticate(String username, byte[] credentials) {
-        if (isLocked(username)) {
-            // Trying to authenticate a locked user is an automatic failure
-            registerAuthFailure(username);
-            
-            log.warn(sm.getString("lockOutRealm.authLockedUser", username));
-            return null;
-        }
-
-        Principal authenticatedUser = super.authenticate(username, credentials);
-        
-        if (authenticatedUser == null) {
-            registerAuthFailure(username);
-        } else {
-            registerAuthSuccess(username);
-        }
-        return authenticatedUser;
-    }
-
-
-    /**
      * Return the Principal associated with the specified username, which
      * matches the digest calculated using the given parameters using the
      * method described in RFC 2069; otherwise return <code>null</code>.
