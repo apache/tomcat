@@ -32,7 +32,6 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
-import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -190,8 +189,8 @@ public class Http11Protocol extends AbstractHttp11Protocol {
         protected Http11Protocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
-        protected ConcurrentHashMap<SocketWrapper, Http11Processor> connections =
-            new ConcurrentHashMap<SocketWrapper, Http11Processor>();
+        protected ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor> connections =
+            new ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor>();
 
         protected ConcurrentLinkedQueue<Http11Processor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11Processor>() {
