@@ -1,0 +1,8 @@
+Apache Tomcat
+Copyright 1999-@YEAR@ The Apache Software Foundation
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+Annotation scanning is provide by Apache Jakarta BCEL which includes open source
+software developed by IBM.
