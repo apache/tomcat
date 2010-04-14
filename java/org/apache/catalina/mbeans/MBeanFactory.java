@@ -50,7 +50,6 @@ import org.apache.catalina.valves.AccessLogValve;
 import org.apache.catalina.valves.RemoteAddrValve;
 import org.apache.catalina.valves.RemoteHostValve;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
 /**
@@ -61,7 +60,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  * @version $Revision$ $Date$
  */
 
-public class MBeanFactory extends BaseModelMBean {
+public class MBeanFactory {
 
     private static final org.apache.juli.logging.Log log = 
         org.apache.juli.logging.LogFactory.getLog(MBeanFactory.class);
@@ -548,9 +547,8 @@ public class MBeanFactory extends BaseModelMBean {
                                         String docBase)
         throws Exception {
                                             
-        // XXX for backward compatibility. Remove it once supported by the admin
-        return 
-            createStandardContext(parent,path,docBase,false,false,false,false);                                  
+        return createStandardContext(parent, path, docBase, false, false,
+                false, false);                                  
     }
 
     /**
@@ -686,6 +684,38 @@ public class MBeanFactory extends BaseModelMBean {
     }
 
 
+    /**
+     * Creates a new StandardService and StandardEngine.
+     *
+     * @param domain       Domain name for the container instance
+     * @param defaultHost  Name of the default host to be used in the Engine
+     * @param baseDir      Base directory value for Engine 
+     *
+     * @exception Exception if an MBean cannot be created or registered
+     */
+    public String createStandardServiceEngine(String domain,
+            String defaultHost, String baseDir) throws Exception{
+
+        if (!(container instanceof Server)) {
+            throw new Exception();
+        }
+        
+        StandardEngine engine = new StandardEngine();
+        engine.setDomain(domain);
+        engine.setName(domain);
+        engine.setDefaultHost(defaultHost);
+        engine.setBaseDir(baseDir);
+
+        Service service = new StandardService();
+        service.setContainer(engine);
+        service.setName(domain);
+        
+        ((Server) container).addService(service);
+        
+        return engine.getJmxName().toString();
+    }
+    
+    
     /**
      * Create a new StandardManager.
      *
@@ -942,6 +972,26 @@ public class MBeanFactory extends BaseModelMBean {
         // Acquire a reference to the component to be removed
         ContainerBase container = getParentContainerFromChild(oname); 
         container.setRealm(null);
+    }
+
+
+    /**
+     * Remove an existing Service.
+     *
+     * @param name MBean Name of the component to remove
+     *
+     * @exception Exception if a component cannot be removed
+     */
+    public void removeService(String name) throws Exception {
+
+        if (!(container instanceof Server)) {
+            throw new Exception();
+        }
+        
+        // Acquire a reference to the component to be removed
+        ObjectName oname = new ObjectName(name);
+        Service service = getService(oname); 
+        ((Server) container).removeService(service);
     }
 
 
