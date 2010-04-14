@@ -34,3 +34,6 @@ The original XML Schemas for Java EE Deployment Descriptors:
  - web-fragment_3_0.xsd
  - jsp_2_2.xsd
 may be obtained from http://java.sun.com/xml/ns/javaee/
+
+Annotation scanning is provide by Apache Jakarta BCEL which includes open source
+software developed by IBM.
