@@ -18,7 +18,7 @@
 <mbeans-descriptors>
 
   <mbean         name="MBeanFactory"
-            className="org.apache.catalina.mbeans.MBeanFactory"
+                 type="org.apache.catalina.mbeans.MBeanFactory"
           description="Factory for MBeans and corresponding components"
                domain="Catalina">
 
@@ -78,15 +78,6 @@
                  type="java.lang.String"/>
       <parameter name="userTable"
           description="The table that holds user data"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createFileLogger"
-          description="Create a new FileLogger"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
                  type="java.lang.String"/>
     </operation>
 
@@ -198,36 +189,18 @@
                  type="java.lang.String"/>
     </operation>
 
-    <operation   name="createStandardEngine"
-          description="Create a new StandardEngine"
+    <operation   name="createStandardServiceEngine"
+          description="Create a new StandardService and StandardEngine"
                impact="ACTION"
            returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-      <parameter name="name"
-          description="Unique name of this Engine"
+      <parameter name="domain"
+          description="Domain used for MBeans associated with the new Service"
                  type="java.lang.String"/>
       <parameter name="defaultHost"
-          description="Default host name for this Engine"
+          description="Default host name for the new Engine"
                  type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createStandardEngineService"
-          description="Create a new StandardEngine and StandardService"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent Service"
-                 type="java.lang.String"/>
-      <parameter name="engineName"
-          description="Unique name of this Engine"
-                 type="java.lang.String"/>
-      <parameter name="defaultHost"
-          description="Default host name for this Engine"
-                 type="java.lang.String"/>
-      <parameter name="serviceName"
-          description="Unique name of this Service"
+      <parameter name="baseDir"
+          description="Base directory value for the new Engine"
                  type="java.lang.String"/>
     </operation>
 
@@ -269,39 +242,6 @@
 
     <operation   name="createStandardManager"
           description="Create a new StandardManager"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createStandardService"
-          description="Create a new StandardService"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-      <parameter name="name"
-          description="Unique name of this Service"
-                 type="java.lang.String"/>
-      <parameter name="domain"
-          description="The domain of this Service"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createSystemErrLogger"
-          description="Create a new System Error Logger"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createSystemOutLogger"
-          description="Create a new System Output Logger"
                impact="ACTION"
            returnType="java.lang.String">
       <parameter name="parent"
@@ -364,15 +304,6 @@
 
     <operation   name="removeLoader"
           description="Remove an existing Loader"
-               impact="ACTION"
-           returnType="void">
-      <parameter name="name"
-          description="MBean Name of the component to be removed"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="removeLogger"
-          description="Remove an existing Logger"
                impact="ACTION"
            returnType="void">
       <parameter name="name"
