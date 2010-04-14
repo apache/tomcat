@@ -71,8 +71,8 @@ public abstract class ExpressionFactory {
             );
         } else {
             SEP = System.getProperty("file.separator");
-            PROPERTY_FILE = System.getProperty("java.home") + "lib" + SEP +
-                    "el.properties";
+            PROPERTY_FILE = System.getProperty("java.home") + SEP + "lib" +
+                    SEP + "el.properties";
         }
     }
 
