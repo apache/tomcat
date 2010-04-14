@@ -61,7 +61,7 @@ public interface ChannelListener {
     /**
      * 
      * @return int
-     * @see Object#hashCode(int)
+     * @see Object#hashCode()
      */
     public int hashCode();
 

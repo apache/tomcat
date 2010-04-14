@@ -60,7 +60,7 @@ package org.apache.catalina;
  * try to stop all sub-components - even those it didn't start.
  * 
  * MUST_STOP is used to indicate that the {@link #stop()} should be called on
- * the component as soon as {@link start()} exits.
+ * the component as soon as {@link #start()} exits.
  * 
  * Attempting any other transition will throw {@link LifecycleException}.
  * 

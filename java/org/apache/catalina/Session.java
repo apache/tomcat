@@ -137,7 +137,7 @@ public interface Session {
 
     /**
      * Return the last client access time without invalidation check
-     * @see #getThisAccessedTime().
+     * @see #getThisAccessedTime()
      */
     public long getThisAccessedTimeInternal();
 
@@ -152,7 +152,7 @@ public interface Session {
 
     /**
      * Return the last client access time without invalidation check
-     * @see #getLastAccessedTime().
+     * @see #getLastAccessedTime()
      */
     public long getLastAccessedTimeInternal();
 

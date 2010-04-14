@@ -101,7 +101,7 @@ public class SetCharacterEncodingFilter implements Filter {
      * interpret request parameters for this request.
      *
      * @param request The servlet request we are processing
-     * @param result The servlet response we are creating
+     * @param response The servlet response we are creating
      * @param chain The filter chain we are processing
      *
      * @exception IOException if an input/output error occurs
