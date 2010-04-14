@@ -144,9 +144,10 @@ public class JIoEndpoint extends AbstractEndpoint {
                     // Ignore
                 }
                 long now = System.currentTimeMillis();
-                Iterator<SocketWrapper> sockets = waitingRequests.iterator();
+                Iterator<SocketWrapper<Socket>> sockets =
+                    waitingRequests.iterator();
                 while (sockets.hasNext()) {
-                    SocketWrapper socket = sockets.next();
+                    SocketWrapper<Socket> socket = sockets.next();
                     long access = socket.getLastAccess();
                     if ((now-access)>socket.getTimeout()) {
                         processSocket(socket,SocketStatus.TIMEOUT);
@@ -538,7 +539,8 @@ public class JIoEndpoint extends AbstractEndpoint {
         return true;
     }
 
-    protected ConcurrentLinkedQueue<SocketWrapper> waitingRequests = new ConcurrentLinkedQueue<SocketWrapper>();
+    protected ConcurrentLinkedQueue<SocketWrapper<Socket>> waitingRequests =
+        new ConcurrentLinkedQueue<SocketWrapper<Socket>>();
 
     private static class PrivilegedSetTccl
     implements PrivilegedAction<Void> {
