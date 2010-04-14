@@ -321,8 +321,8 @@ public class AjpProtocol
         protected AjpProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
-        protected ConcurrentHashMap<SocketWrapper, AjpProcessor> connections =
-            new ConcurrentHashMap<SocketWrapper, AjpProcessor>();
+        protected ConcurrentHashMap<SocketWrapper<Socket>, AjpProcessor> connections =
+            new ConcurrentHashMap<SocketWrapper<Socket>, AjpProcessor>();
 
         protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<AjpProcessor>() {
