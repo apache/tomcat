@@ -430,7 +430,7 @@ public class StandardSession
 
     /**
      * Return the last client access time without invalidation check
-     * @see #getThisAccessedTime().
+     * @see #getThisAccessedTime()
      */
     public long getThisAccessedTimeInternal() {
         return (this.thisAccessedTime);
@@ -455,7 +455,7 @@ public class StandardSession
 
     /**
      * Return the last client access time without invalidation check
-     * @see #getLastAccessedTime().
+     * @see #getLastAccessedTime()
      */
     public long getLastAccessedTimeInternal() {
         return (this.lastAccessedTime);
