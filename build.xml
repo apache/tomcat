@@ -496,7 +496,7 @@
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-api" />
 
-    <!-- Tomcat API JAR File -->
+    <!-- Tomcat Util JAR File -->
     <jarIt jarfile="${tomcat-util.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-util" />
@@ -504,7 +504,9 @@
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-coyote" />
+      filesId="files.tomcat-coyote"
+      notice="${tomcat.manifests}/tomcat-coyote.jar.notice"
+      license="${tomcat.manifests}/tomcat-coyote.license" />
 
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper.jar}"
@@ -824,8 +826,8 @@
     <jarIt jarfile="${tomcat-embed-core.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-core"
-           notice="${tomcat.manifests}/servlet-api.jar.notice"
-           license="${tomcat.manifests}/servlet-api.jar.license"/>
+           notice="${tomcat.manifests}/tomcat-embed-core.jar.notice"
+           license="${tomcat.manifests}/tomcat-embed-core.jar.license"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"/>
