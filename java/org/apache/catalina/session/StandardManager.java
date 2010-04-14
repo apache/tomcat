@@ -397,6 +397,12 @@ public class StandardManager extends ManagerBase
                     session.setManager(this);
                     sessions.put(session.getIdInternal(), session);
                     session.activate();
+                    if (!session.isValidInternal()) {
+                        // If session is already invalid,
+                        // expire session to prevent memory leak.
+                        session.setValid(true);
+                        session.expire();
+                    }
                     sessionCounter++;
                 }
             } catch (ClassNotFoundException e) {
