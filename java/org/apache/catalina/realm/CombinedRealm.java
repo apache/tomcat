@@ -80,40 +80,6 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * Return the Principal associated with the specified username and
-     * credentials, if there is one; otherwise return <code>null</code>.
-     *
-     * @param username Username of the Principal to look up
-     * @param credentials Password or other credentials to use in
-     *  authenticating this username
-     */
-    @Override
-    public Principal authenticate(String username, byte[] credentials) {
-        Principal authenticatedUser = null;
-        
-        for (Realm realm : realms) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getInfo()));
-            }
-            
-            authenticatedUser = realm.authenticate(username, credentials);
-            
-            if (authenticatedUser == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getInfo()));
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSucess", username, realm.getInfo()));
-                }
-                break;
-            }
-        }
-        return authenticatedUser;
-    }
-
-
-    /**
      * Return the Principal associated with the specified username, which
      * matches the digest calculated using the given parameters using the
      * method described in RFC 2069; otherwise return <code>null</code>.
