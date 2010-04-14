@@ -6,10 +6,17 @@
  * under the terms of the Common Public License v1.0 
  * which accompanies this distribution and is available at 
  * http://www.eclipse.org/legal/cpl-v10.html 
- *  
+ * 
  * Contributors: 
  *    Andy Clement     initial implementation 
  * ******************************************************************/
+
+/*
+ * Under the terms of the CPL v1.0, the ASF has elected to distribute this
+ * file under the Eclipse Public License (EPL) 1.0 which has been designated
+ * as the follow-on version of the CPL by the Agreement Steward.
+ */
+
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
