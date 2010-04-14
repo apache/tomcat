@@ -226,6 +226,296 @@
 
   </subsection>
 
+  <subsection name="Basic configuration to handle &#x27;x-forwarded-for&#x27;">
+    <p>
+    The filter will process the <tt>x-forwarded-for</tt> http header.
+    </p>
+    <source>
+      &lt;filter&gt;
+        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+        &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
+      &lt;/filter&gt;
+      
+      &lt;filter-mapping&gt;
+        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+        &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+      &lt;/filter-mapping&gt;
+    </source>
+  </subsection>
+    
+  <subsection name="Basic configuration to handle &#x27;x-forwarded-for&#x27; and &#x27;x-forwarded-proto&#x27;">
+  
+    <p>
+    The filter will process <tt>x-forwarded-for</tt> and 
+    <tt>x-forwarded-proto</tt> http headers. Expected value for the
+    <tt>x-forwarded-proto</tt> header in case of SSL connections is 
+    <tt>https</tt> (case insensitive). </p>
+    <source>
+      &lt;filter&gt;
+        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+        &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
+        &lt;init-param&gt;
+          &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
+          &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
+        &lt;/init-param&gt;
+      &lt;/filter&gt;
+      
+      &lt;filter-mapping&gt;
+        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+        &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+      &lt;/filter-mapping&gt;
+    </source>
+  </subsection>
+    
+  <subsection name="Advanced configuration with internal proxies">
+    <p>RemoteIpFilter configuration: </p>
+    <source>
+     &lt;filter&gt;
+       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
+         &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
+       &lt;/init-param&gt;
+     &lt;/filter&gt;
+    </source>
+    <p>Request values: 
+    <table border="1" cellpadding="5">
+      <tr>
+        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+      </tr> 
+      <tr>
+        <td> request.remoteAddr </td>
+        <td> 192.168.0.10 </td>
+        <td> 140.211.11.130 </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> 140.211.11.130, 192.168.0.10 </td>
+        <td> null </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> null </td>
+        <td> null </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-proto&#x27;<tt>]</tt> </td>
+        <td> https </td>
+        <td> https </td>
+      </tr> 
+      <tr>
+        <td> request.scheme </td>
+        <td> http </td>
+        <td> https </td>
+      </tr> 
+      <tr>
+        <td> request.secure </td>
+        <td> false </td>
+        <td> true </td>
+      </tr> 
+      <tr>
+        <td> request.serverPort </td>
+        <td> 80 </td>
+        <td> 443 </td>
+      </tr> 
+    </table>
+    </p>
+    <p>
+    Note : <tt>x-forwarded-by</tt> header is <tt>null</tt> because only 
+    internal proxies has been traversed by the request. 
+    <tt>x-forwarded-for</tt> is <tt>null</tt> because all the proxies are 
+    trusted or internal. 
+    </p>
+  </subsection>
+    
+    
+  <subsection name="Advanced configuration with trusted proxies">
+    <p>RemoteIpFilter configuration: </p>
+    <source>
+     &lt;filter&gt;
+       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
+         &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
+         &lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+       &lt;/init-param&gt;
+     &lt;/filter&gt;
+    </source>
+    <p>Request values: <table border="1" cellpadding="5">
+      <tr>
+        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+      </tr> 
+      <tr>
+        <td> request.remoteAddr </td>
+        <td> 192.168.0.10 </td>
+        <td> 140.211.11.130 </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> 140.211.11.130, proxy1, proxy2 </td>
+        <td> null </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> null </td>
+        <td> proxy1, proxy2 </td>
+      </tr> 
+    </table>
+    </p>
+    <p>
+    Note : <tt>proxy1</tt> and <tt>proxy2</tt> are both trusted proxies that 
+    come in <tt>x-forwarded-for</tt> header, they both are migrated in 
+    <tt>x-forwarded-by</tt> header. <tt>x-forwarded-for</tt> is <tt>null</tt> 
+    because all the proxies are trusted or internal.
+    </p>
+  </subsection>
+    
+  <subsection name="Advanced configuration with internal and trusted proxies">
+    <p>RemoteIpFilter configuration: </p>
+    <source>
+     &lt;filter&gt;
+       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
+         &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
+         &lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+       &lt;/init-param&gt;
+     &lt;/filter&gt;
+    </source>
+    <p>Request values: <table border="1" cellpadding="5">
+      <tr>
+        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+      </tr> 
+      <tr>
+        <td> request.remoteAddr </td>
+        <td> 192.168.0.10 </td>
+        <td> 140.211.11.130 </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> 140.211.11.130, proxy1, proxy2, 192.168.0.10 </td>
+        <td> null </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> null </td>
+        <td> proxy1, proxy2 </td>
+      </tr> 
+    </table>
+    </p>
+    <p>
+    Note : <tt>proxy1</tt> and <tt>proxy2</tt> are both trusted proxies that 
+    come in <tt>x-forwarded-for</tt> header, they both are migrated in 
+    <tt>x-forwarded-by</tt> header. As <tt>192.168.0.10</tt> is an internal 
+    proxy, it does not appear in <tt>x-forwarded-by</tt>. 
+    <tt>x-forwarded-for</tt> is <tt>null</tt> because all the proxies are 
+    trusted or internal.
+    </p>
+  </subsection>
+    
+  <subsection name="Advanced configuration with an untrusted proxy">
+    
+    <p>RemoteIpFilter configuration: </p>
+    <source>
+     &lt;filter&gt;
+       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
+       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
+         &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+       &lt;/init-param&gt;
+       &lt;init-param&gt;
+         &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
+         &lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+       &lt;/init-param&gt;
+     &lt;/filter&gt;
+    </source>
+    <p>Request values: <table border="1" cellpadding="5">
+      <tr>
+        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
+        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+      </tr> 
+      <tr>
+        <td> request.remoteAddr </td>
+        <td> 192.168.0.10 </td>
+        <td> untrusted-proxy </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> 140.211.11.130, untrusted-proxy, proxy1 </td>
+        <td> 140.211.11.130 </td>
+      </tr> 
+      <tr>
+        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> null </td>
+        <td> proxy1 </td>
+      </tr> 
+    </table>
+    </p>
+    <p>
+    Note : <tt>x-forwarded-by</tt> holds the trusted proxy <tt>proxy1</tt>. 
+    <tt>x-forwarded-by</tt> holds <tt>140.211.11.130</tt> because 
+    <tt>untrusted-proxy</tt> is not trusted and thus, we can not trust that 
+    <tt>untrusted-proxy</tt> is the actual remote ip. 
+    <tt>request.remoteAddr</tt> is <tt>untrusted-proxy</tt> that is an IP 
+    verified by <tt>proxy1</tt>. 
+    </p>
+  </subsection>
+
   <subsection name="Initialisation parameters">
   
     <p>The <strong>Remote IP Filter</strong> supports the
