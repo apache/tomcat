@@ -106,7 +106,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     /**
      * Creates a new session cookie for the given session ID
      *
-     * @param conetxt     The Context for the web application
+     * @param context     The Context for the web application
      * @param sessionId   The ID of the session for which the cookie will be
      *                    created
      * @param secure      Should session cookie be configured as secure
