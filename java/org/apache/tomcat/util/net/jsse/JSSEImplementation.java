@@ -64,6 +64,7 @@ public class JSSEImplementation extends SSLImplementation
         return ssls;
     }
 
+    @Override
     public SSLSupport getSSLSupport(SSLSession session) {
         SSLSupport ssls = factory.getSSLSupport(session);
         return ssls;

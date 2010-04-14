@@ -55,6 +55,7 @@ public class Http11Protocol extends AbstractHttp11Protocol {
     private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
     
+    @Override
     public Log getLog() { return log; }
 
 

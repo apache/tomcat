@@ -358,6 +358,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Initialize the endpoint.
      */
+    @Override
     public void init()
         throws Exception {
 
@@ -515,6 +516,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Start the APR endpoint, creating acceptor, poller and sendfile threads.
      */
+    @Override
     public void start()
         throws Exception {
         // Initialize socket if not done before
@@ -580,6 +582,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Pause the endpoint, which will make it stop accepting new sockets.
      */
+    @Override
     public void pause() {
         if (running && !paused) {
             paused = true;
@@ -592,6 +595,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * Resume the endpoint, which will make it start accepting new sockets
      * again.
      */
+    @Override
     public void resume() {
         if (running) {
             paused = false;
@@ -628,6 +632,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Deallocate APR memory pools, and close server socket.
      */
+    @Override
     public void destroy() throws Exception {
         if (running) {
             stop();
