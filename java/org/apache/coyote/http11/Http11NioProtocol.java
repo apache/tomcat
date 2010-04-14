@@ -52,6 +52,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
     
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
     
+    @Override
     protected Log getLog() { return log; }
     
     public Http11NioProtocol() {
