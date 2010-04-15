@@ -26,14 +26,13 @@
    - Done
 
 3. Implement all the new Servlet 3 features
-   - Section 1 - Compliant
-   - Section 2 - In progress
-     2.1, 2.2 - Compliant
-     2.3.1, 2.3.2 - Compliant
-     2.3.3.1, 2.3.3.2 - Compliant
-     2.3.3.3, 2.3.3.4 - In progress
-     2.3.4 - Compliant
-   - Sections 3 to 6 - not checked
+   - Sections 1 to 2 - Compliant
+   - Section 3 - in progress
+     3.1 - Compliant
+     3.2 - getParameter() aspect not yet implemented
+     3.3 to 3.6 - Compliant
+     3.7 to 3.11 - not checked
+   - Sections 4 to 6 - not checked
    - Section 7 - Compliant
    - Section 8 - in progress
      8.1 - not checked
@@ -49,21 +48,19 @@
    - Java EE spec requirements - not checked
    - JSR 196 - Recommended - Not yet implemented. Copy from Geronimo?
 
-4. Do an alpha release (from trunk)
-   - Create tc7.0.x\tags to hold release tags
+4. Do an initial release (from trunk)
+   - Create tc7.0.x\tags to hold release tags - Done
    - Add to web site
    - Update Wiki version status page
 
 5. Fix issues as they get reported
 
 6. Update for final release of the spec
+   - Done
 
-7. Aim for first stable TC7 release with final release of Servlet 3 spec
-   - Create tc7.0.x\trunk from trunk at first stable release
+7. Create tc7.0.x\trunk from trunk at first stable release
 
-8. Nice to haves in first Tomcat 7 stable release
+8. Nice to haves in first Tomcat 7 stable release inc. MBeans
+   - Lifecycle clean-up for init()/destroy()
    - Remove old, unused code
      - Clean up internal API (eg remove unused params from methods)
-     - Code needs to be ID'd and deprecated in 6.x first
-   - Support for standalone EL
-     - http://issues.apache.org/bugzilla/show_bug.cgi?id=43819
