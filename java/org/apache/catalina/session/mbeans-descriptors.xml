@@ -85,7 +85,7 @@
 
     <attribute   name="sessionCounter"
           description="Total number of sessions created by this manager"
-                 type="int" />
+                 type="long" />
 
     <attribute   name="maxActive"
           description="Maximum number of active sessions so far"
@@ -105,7 +105,7 @@
 
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
-                 type="int" />
+                 type="long" />
 
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
@@ -247,7 +247,7 @@
 
     <attribute   name="sessionCounter"
           description="Total number of sessions created by this manager"
-                 type="int" />
+                 type="long" />
 
     <attribute   name="maxActive"
           description="Maximum number of active sessions so far"
@@ -279,7 +279,7 @@
 
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
-                 type="int" />
+                 type="long" />
 
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
