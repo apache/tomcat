@@ -171,7 +171,7 @@ public abstract class ManagerBase extends LifecycleBase
     /**
      * Number of sessions that have expired.
      */
-    protected int expiredSessions = 0;
+    protected long expiredSessions = 0;
 
 
     /**
@@ -181,7 +181,7 @@ public abstract class ManagerBase extends LifecycleBase
     protected Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
     // Number of sessions created by this manager
-    protected int sessionCounter=0;
+    protected long sessionCounter=0;
 
     protected volatile int maxActive=0;
 
@@ -626,7 +626,7 @@ public abstract class ManagerBase extends LifecycleBase
      *
      * @return Number of sessions that have expired
      */
-    public int getExpiredSessions() {
+    public long getExpiredSessions() {
         return expiredSessions;
     }
 
@@ -636,7 +636,7 @@ public abstract class ManagerBase extends LifecycleBase
      *
      * @param expiredSessions Number of sessions that have expired
      */
-    public void setExpiredSessions(int expiredSessions) {
+    public void setExpiredSessions(long expiredSessions) {
         this.expiredSessions = expiredSessions;
     }
 
@@ -1035,7 +1035,7 @@ public abstract class ManagerBase extends LifecycleBase
     // -------------------------------------------------------- Package Methods
 
 
-    public void setSessionCounter(int sessionCounter) {
+    public void setSessionCounter(long sessionCounter) {
         this.sessionCounter = sessionCounter;
     }
 
@@ -1045,7 +1045,7 @@ public abstract class ManagerBase extends LifecycleBase
      *
      * @return sessions created
      */
-    public int getSessionCounter() {
+    public long getSessionCounter() {
         return sessionCounter;
     }
 

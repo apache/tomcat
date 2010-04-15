@@ -127,7 +127,7 @@ public interface Manager {
      *
      * @return Total number of sessions created by this manager.
      */
-    public int getSessionCounter();
+    public long getSessionCounter();
 
 
     /** 
@@ -135,7 +135,7 @@ public interface Manager {
      *
      * @param sessionCounter Total number of sessions created by this manager.
      */
-    public void setSessionCounter(int sessionCounter);
+    public void setSessionCounter(long sessionCounter);
 
 
     /**
@@ -171,7 +171,7 @@ public interface Manager {
      *
      * @return Number of sessions that have expired
      */
-    public int getExpiredSessions();
+    public long getExpiredSessions();
 
 
     /**
@@ -179,7 +179,7 @@ public interface Manager {
      *
      * @param expiredSessions Number of sessions that have expired
      */
-    public void setExpiredSessions(int expiredSessions);
+    public void setExpiredSessions(long expiredSessions);
 
 
     /**
