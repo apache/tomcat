@@ -66,6 +66,10 @@ public final class Parameters extends MultiMap {
         this.queryMB=queryMB;
     }
 
+    public String getEncoding() {
+        return encoding;
+    }
+
     public void setEncoding( String s ) {
         encoding=s;
         if(log.isDebugEnabled()) {
@@ -194,7 +198,7 @@ public final class Parameters extends MultiMap {
     private ByteChunk origName=new ByteChunk();
     private ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
-    private static final String DEFAULT_ENCODING = "ISO-8859-1";
+    public static final String DEFAULT_ENCODING = "ISO-8859-1";
     
     public void processParameters( byte bytes[], int start, int len ) {
         processParameters(bytes, start, len, encoding);
