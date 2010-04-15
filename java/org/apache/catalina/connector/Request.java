@@ -318,6 +318,18 @@ public class Request
 
 
     /**
+     * The parts, if any, uploaded with this request.
+     */
+    protected Collection<Part> parts = null;
+    
+    
+    /**
+     * The exception thrown, if any when parsing the parts.
+     */
+    protected Exception partsParseException = null;
+    
+    
+    /**
      * The currently active session for this request.
      */
     protected Session session = null;
@@ -441,6 +453,8 @@ public class Request
         subject = null;
         sessionParsed = false;
         parametersParsed = false;
+        parts = null;
+        partsParseException = null;
         cookiesParsed = false;
         locales.clear();
         localesParsed = false;
@@ -2431,10 +2445,34 @@ public class Request
     public Collection<Part> getParts() throws IOException, IllegalStateException,
             ServletException {
         
+        parseParts();
+        
+        if (partsParseException != null) {
+            if (partsParseException instanceof IOException) { 
+                throw (IOException) partsParseException;
+            } else if (partsParseException instanceof IllegalStateException) {
+                throw (IllegalStateException) partsParseException;
+            } else if (partsParseException instanceof ServletException) {
+                throw (ServletException) partsParseException;
+            }
+        }
+        
+        return parts;
+    }
+    
+    private void parseParts() {
+
+        // Return immediately if the parts have already been parsed
+        if (parts != null || partsParseException != null)
+            return;
+
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
         if (mce == null) {
-            return Collections.emptyList();
+            parts = Collections.emptyList();
+            return;
         }
+        
+        Parameters parameters = coyoteRequest.getParameters();
         
         File location;
         String locationStr = mce.getLocation();
@@ -2446,14 +2484,20 @@ public class Request
         }
         
         if (!location.isAbsolute() || !location.isDirectory()) {
-            throw new IOException(
+            partsParseException = new IOException(
                     sm.getString("coyoteRequest.uploadLocationInvalid",
                             location));
+            return;
         }
         
         // Create a new file upload handler
         DiskFileItemFactory factory = new DiskFileItemFactory();
-        factory.setRepository(location.getCanonicalFile());
+        try {
+            factory.setRepository(location.getCanonicalFile());
+        } catch (IOException ioe) {
+            partsParseException = ioe;
+            return;
+        }
         factory.setSizeThreshold(mce.getFileSizeThreshold());
         
         ServletFileUpload upload = new ServletFileUpload();
@@ -2461,31 +2505,48 @@ public class Request
         upload.setFileSizeMax(mce.getMaxFileSize());
         upload.setSizeMax(mce.getMaxRequestSize());
         
-        List<Part> result = new ArrayList<Part>();
+        parts = new ArrayList<Part>();
         try {
-           List<FileItem> items = upload.parseRequest(this);
-           for (FileItem item : items) {
-                result.add(new ApplicationPart(item, mce));
+            List<FileItem> items = upload.parseRequest(this);
+            for (FileItem item : items) {
+                ApplicationPart part = new ApplicationPart(item, mce);
+                parts.add(part);
+                if (part.getFilename() == null) {
+                    try {
+                        parameters.addParameterValues(part.getName(),
+                                new String[] {part.getString(
+                                        parameters.getEncoding())});
+                    } catch (UnsupportedEncodingException uee) {
+                        try {
+                            parameters.addParameterValues(part.getName(),
+                                    new String[] {part.getString(
+                                            Parameters.DEFAULT_ENCODING)});
+                        } catch (UnsupportedEncodingException e) {
+                            // Should not be possible
+                        }
+                    }
+                }
             }
             
         } catch (InvalidContentTypeException e) {
-            throw new ServletException(e);
+            partsParseException = new ServletException(e);
         } catch (FileUploadBase.SizeException e) {
-            throw new IllegalStateException(e);
+            partsParseException = new IllegalStateException(e);
         } catch (FileUploadException e) {
-            throw new IOException();
+            partsParseException = new IOException();
         }
         
-        return result;
+        return;
     }
-    
+
+
     /**
      * {@inheritDoc}
      */
     public Part getPart(String name) throws IOException, IllegalStateException,
             ServletException {
-        Collection<Part> parts = getParts();
-        Iterator<Part> iterator = parts.iterator();
+        Collection<Part> c = getParts();
+        Iterator<Part> iterator = c.iterator();
         while (iterator.hasNext()) {
             Part part = iterator.next();
             if (name.equals(part.getName())) {
@@ -2677,6 +2738,12 @@ public class Request
         } else {
             contentType = contentType.trim();
         }
+        
+        if ("multipart/form-data".equals(contentType)) {
+            parseParts();
+            return;
+        }
+        
         if (!("application/x-www-form-urlencoded".equals(contentType)))
             return;
 
