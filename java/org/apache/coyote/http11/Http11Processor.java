@@ -308,7 +308,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             // will reset it
             // thrA.setParam(null);
             // Next request
-            if (!async) {
+            if (!async || error) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }
