@@ -1300,8 +1300,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
-        "<form action=\"{1}?" + NONCE_REQUEST + "={4}\" method=\"post\" " +
+        "<form method=\"post\" action=\"{1}\" " +
         "enctype=\"multipart/form-data\">\n" +
+        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{4}\" >" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
