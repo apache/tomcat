@@ -26,12 +26,7 @@
    - Done
 
 3. Implement all the new Servlet 3 features
-   - Sections 1 to 2 - Compliant
-   - Section 3 - in progress
-     3.1 - Compliant
-     3.2 - getParameter() aspect not yet implemented
-     3.3 to 3.6 - Compliant
-     3.7 to 3.11 - not checked
+   - Sections 1 to 3 - Compliant
    - Sections 4 to 6 - not checked
    - Section 7 - Compliant
    - Section 8 - in progress
