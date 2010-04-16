@@ -35,7 +35,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     protected static final String PREPARE_STATEMENT     = "prepareStatement";
     protected static final int    PREPARE_STATEMENT_IDX = 1;
     protected static final String PREPARE_CALL          = "prepareCall";
-    protected static final int    PREPARE_IDX           = 2;
+    protected static final int    PREPARE_CALL_IDX      = 2;
 
     protected static final String[] STATEMENT_TYPES = {CREATE_STATEMENT, PREPARE_STATEMENT, PREPARE_CALL};
     protected static final int    STATEMENT_TYPE_COUNT = STATEMENT_TYPES.length;
