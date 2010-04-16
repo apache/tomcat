@@ -18,7 +18,6 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,16 +35,37 @@ public class StatementCache extends StatementDecoratorInterceptor {
     protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL}; 
     protected static final String[] PREPARED_TYPE = new String[] {PREPARE_STATEMENT}; 
     protected static final String[] NO_TYPE = new String[] {};
+    
+    protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
 
     /*begin properties for the statement cache*/
     private boolean cachePrepared = true;
     private boolean cacheCallable = false;
     private int maxCacheSize = 50;
-    private ConnectionPool parent;
     private PooledConnection pcon;
     private String[] types;
     
     
+    public boolean isCachePrepared() {
+        return cachePrepared;
+    }
+
+    public boolean isCacheCallable() {
+        return cacheCallable;
+    }
+
+    public int getMaxCacheSize() {
+        return maxCacheSize;
+    }
+
+    public String[] getTypes() {
+        return types;
+    }
+
+    public AtomicInteger getCacheSize() {
+        return cacheSize;
+    }
+
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         InterceptorProperty p = properties.get("prepared");
@@ -86,35 +106,36 @@ public class StatementCache extends StatementDecoratorInterceptor {
     
     /*begin the actual statement cache*/
     
-    private static ConcurrentHashMap<PooledConnection, ConcurrentHashMap<String,StatementProxy>> statementCache =
-        new ConcurrentHashMap<PooledConnection, ConcurrentHashMap<String,StatementProxy>>();
-    
-    
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
         if (parent==null) {
             cacheSize = null;
-            this.parent = null;
             this.pcon = null;
         } else {
             cacheSize = cacheSizeMap.get(parent);
-            this.parent = parent;
             this.pcon = con;
+            if (!pcon.getAttributes().containsKey(STATEMENT_CACHE_ATTR)) {
+                ConcurrentHashMap<String,CachedStatement> cache = new ConcurrentHashMap<String, CachedStatement>();
+                pcon.getAttributes().put(STATEMENT_CACHE_ATTR,cache);
+            }
         }
     }
 
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
-        ConcurrentHashMap<String,StatementProxy> statements = statementCache.get(con);
+        ConcurrentHashMap<String,CachedStatement> statements = 
+            (ConcurrentHashMap<String,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
+        
         if (statements!=null) {
-            for (Map.Entry<String, StatementProxy> p : statements.entrySet()) {
+            for (Map.Entry<String, CachedStatement> p : statements.entrySet()) {
                 closeStatement(p.getValue());
             }
             statements.clear();
         }
+        
         super.disconnected(parent, con, finalizing);
     }
     
-    public void closeStatement(StatementProxy st) {
+    public void closeStatement(CachedStatement st) {
         try {
             if (st==null) return;
             if (((PreparedStatement)st).isClosed()) return;
@@ -125,39 +146,59 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
     }
     
+    @Override
+    protected Object createDecorator(Object proxy, Method method, Object[] args, 
+                                     Object statement, Constructor<?> constructor, String sql) 
+    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        boolean process = process(this.types, method, false);
+        if (process) {
+            Object result = null;
+            CachedStatement statementProxy = new CachedStatement((Statement)statement,sql);
+            result = constructor.newInstance(new Object[] { statementProxy });
+            statementProxy.setActualProxy(result);
+            statementProxy.setConnection(proxy);
+            statementProxy.setConstructor(constructor);
+            return result;
+        } else {
+            return super.createDecorator(proxy, method, args, statement, constructor, sql);
+        }
+    }
+
+    
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (compare(CLOSE_VAL,method)) {
             return super.invoke(proxy, method, args);
         } else {
-            boolean process = false;
-            process = process(this.types, method, process);
-            
-            if (process) {
-                //check the cache
-                //if (isCached) {
-                    
-                //} else {
+            boolean process = process(this.types, method, false);
+            if (process && args.length>0 && args[0] instanceof String) {
+                CachedStatement statement = isCached((String)args[0]);
+                if (statement!=null) {
+                    //remove it from the cache since it is used
+                    removeStatement(statement);
+                    return statement.getActualProxy();
+                } else {
                     return super.invoke(proxy, method, args);
-                //}
+                }
             } else {
                 return super.invoke(proxy,method,args);
             }
         }
     }
     
-    public boolean isCached(String sql) {
-        ConcurrentHashMap<String,StatementProxy> cache = statementCache.get(pcon);
-        return cache.containsKey(sql);
+    public CachedStatement isCached(String sql) {
+        ConcurrentHashMap<String,CachedStatement> cache = 
+            (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
+        return cache.get(sql);
     }
     
-    public boolean cacheStatement(StatementProxy proxy) {
-        ConcurrentHashMap<String,StatementProxy> cache = statementCache.get(pcon); 
+    public boolean cacheStatement(CachedStatement proxy) {
+        ConcurrentHashMap<String,CachedStatement> cache = 
+            (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         if (proxy.getSql()==null) {
             return false;
         } else if (cache.containsKey(proxy.getSql())) {
-            cache.put(proxy.getSql(), proxy);
-            return true;
+            return false;
         } else if (cacheSize.get()>=maxCacheSize) {
             return false;
         } else if (cacheSize.incrementAndGet()>maxCacheSize) {
@@ -165,26 +206,55 @@ public class StatementCache extends StatementDecoratorInterceptor {
             return false;
         } else {
             //cache the statement
+            cache.put(proxy.getSql(), proxy);
             return true;
+        }
+    }
+
+    public boolean removeStatement(CachedStatement proxy) {
+        ConcurrentHashMap<String,CachedStatement> cache = 
+            (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
+        if (cache.remove(proxy.getSql()) != null) {
+            cacheSize.decrementAndGet();
+            return true;
+        } else {
+            return false;
         }
     }
     /*end the actual statement cache*/
 
     
-    protected class StatementProxy extends StatementDecoratorInterceptor.StatementProxy {
+    protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<Statement> {
         boolean cached = false;
-        public StatementProxy(Object parent, String sql) {
+        public CachedStatement(Statement parent, String sql) {
             super(parent, sql);
-            cached = cacheStatement(this);
         }
-
-        public void closeInvoked() {
-            super.closedInvoked();
-            if (cached) {
+        
+        @Override
+        public void closedInvoked() {
+            //should we cache it
+            boolean shouldClose = true;
+            if (cacheSize.get() < maxCacheSize) {
                 //cache a proxy so that we don't reuse the facade
-                StatementProxy proxy = new StatementProxy(getDelegate(),getSql());
-                proxy.setActualProxy(getActualProxy());
-                proxy.setConnection(getConnection());
+                CachedStatement proxy = new CachedStatement(getDelegate(),getSql());
+                try {
+                    //create a new facade
+                    Object actualProxy = getConstructor().newInstance(new Object[] { proxy });
+                    proxy.setActualProxy(actualProxy);
+                    proxy.setConnection(getConnection());
+                    proxy.setConstructor(getConstructor());
+                    if (cacheStatement(proxy)) {
+                        proxy.cached = true;
+                        shouldClose = false;
+                    }
+                } catch (Exception x) {
+                    removeStatement(proxy);
+                }
+            } 
+            closed = true;
+            delegate = null;
+            if (shouldClose) {
+                super.closedInvoked();
             }
            
         }
@@ -192,53 +262,6 @@ public class StatementCache extends StatementDecoratorInterceptor {
         public void forceClose() throws SQLException {
             super.closedInvoked();
             ((Statement)getDelegate()).close();
-        }
-        
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            // get the name of the method for comparison
-            final String name = method.getName();
-            // was close invoked?
-            boolean close = compare(JdbcInterceptor.CLOSE_VAL, name);
-            // allow close to be called multiple times
-            if (close && closed)
-                return null;
-            // are we calling isClosed?
-            if (compare(JdbcInterceptor.ISCLOSED_VAL, name))
-                return Boolean.valueOf(closed);
-            // if we are calling anything else, bail out
-            if (closed)
-                throw new SQLException("Statement closed.");
-            if (name.equals("getConnection")){
-                return getConnection();
-            }
-            boolean process = isExecuteQuery(method);
-            // check to see if we are about to execute a query
-            // if we are executing, get the current time
-            Object result = null;
-            try {
-                if (cached && close) {
-                    //dont invoke actual close
-                } else {
-                    // execute the query
-                    result = method.invoke(delegate, args);
-                }
-            } catch (Throwable t) {
-                if (t instanceof InvocationTargetException) {
-                    InvocationTargetException it = (InvocationTargetException) t;
-                    throw it.getCause() != null ? it.getCause() : it;
-                } else {
-                    throw t;
-                }
-            }
-            // perform close cleanup
-            if (close) {
-                closeInvoked();
-            }
-            if (process){
-                Constructor<?> cons = getResultSetConstructor();
-                result = cons.newInstance(new Object[]{new ResultSetProxy(getActualProxy(), result)});
-            }
-            return result;
         }
         
     }
