@@ -1688,9 +1688,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <condition property="no.build.dbcp">
       <available file="${tomcat-dbcp.jar}"/>
     </condition>
-    <antcall target="build-tomcat-dbcp">
-      <param name="basedir" value="${tomcat-dbcp.home}" />
-    </antcall>
+    <antcall target="build-tomcat-dbcp" />
 
     <!-- Download src and build Jasper JDT bundle -->
     <antcall target="downloadfile-2">
