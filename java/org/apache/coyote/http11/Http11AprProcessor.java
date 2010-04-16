@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.security.cert.CertificateFactory;
@@ -178,6 +179,12 @@ public class Http11AprProcessor implements ActionHook {
      * Comet used.
      */
     protected boolean comet = false;
+
+
+    /**
+     * Async used
+     */
+    protected boolean async = false;
 
 
     /**
@@ -777,6 +784,7 @@ public class Http11AprProcessor implements ActionHook {
         // Error flag
         error = false;
         comet = false;
+        async = false;
         keepAlive = true;
 
         int keepAliveLeft = maxKeepAliveRequests;
@@ -785,7 +793,7 @@ public class Http11AprProcessor implements ActionHook {
         boolean keptAlive = false;
         boolean openSocket = false;
 
-        while (!error && keepAlive && !comet) {
+        while (!error && keepAlive && !comet && !async) {
 
             // Parsing the request header
             try {
@@ -862,7 +870,7 @@ public class Http11AprProcessor implements ActionHook {
             }
 
             // Finish the handling of the request
-            if (!comet) {
+            if (!comet && !async) {
                 // If we know we are closing the connection, don't drain input.
                 // This way uploading a 100GB file doesn't tie up the thread 
                 // if the servlet has rejected it.
@@ -878,7 +886,7 @@ public class Http11AprProcessor implements ActionHook {
             }
             request.updateCounters();
 
-            if (!comet) {
+            if (!comet && !async) {
                 // Next request
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
@@ -900,7 +908,7 @@ public class Http11AprProcessor implements ActionHook {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (comet) {
+        if (comet  || async) {
             if (error) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
@@ -1010,6 +1018,7 @@ public class Http11AprProcessor implements ActionHook {
             // transactions with the client
 
             comet = false;
+            async = false;
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {
@@ -1212,10 +1221,32 @@ public class Http11AprProcessor implements ActionHook {
             //no op
         } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
             //TODO SERVLET3 - async
+            async = true;
         } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
           //TODO SERVLET3 - async
+            AtomicBoolean dispatch = (AtomicBoolean)param;
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
+                dispatch.set(true);
+                // endpoint.processSocket(this.socket, SocketStatus.STOP);
+            } else {
+                dispatch.set(false);
+            }
         } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
+            if (param==null) return;
+            if (socket==0) return;
+            long timeout = ((Long)param).longValue();
+            Socket.timeoutSet(socket, timeout * 1000);
+        } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
+            RequestInfo rp = request.getRequestProcessor();
+            AtomicBoolean dispatch = (AtomicBoolean)param;
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
+                endpoint.getPoller().add(this.socket);
+                dispatch.set(true);
+            } else {
+                dispatch.set(true);
+            }
         }
         
 
