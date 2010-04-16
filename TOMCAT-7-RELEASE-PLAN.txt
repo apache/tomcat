@@ -32,14 +32,14 @@
    - Section 4.5 - Compliant
    - Section 4.6 - TODO getResource() & META-INF/resources
    - Section 4.7 to 4.8 - Compliant
-   - Sections 5 to 6 - not checked
-   - Section 7 - Compliant
+   - Sections 5 to 7
    - Section 8 - in progress
-     8.1 - not checked
-     8.2 - in progress, 'just' annotation scanning left
-     8.3 - not checked
-     8.4 - not checked
-   - Sections 9 to 12 - not checked
+     8.1 - Compliant
+     8.2 - TODO - ServletContainerInitializer
+     8.3 - Scope for re-factoring
+     8.4 - Compliant
+   - Section 9 - Compliant
+   - Section 10 to 12 - not checked
    - Section 13 - In progess
      13.1 to 13.3 - Compliant
      13.4 - In progress
