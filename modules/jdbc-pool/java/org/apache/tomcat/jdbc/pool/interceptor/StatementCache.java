@@ -105,7 +105,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
     /*end the cache size*/
     
     /*begin the actual statement cache*/
-    
+    @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
         if (parent==null) {
@@ -120,7 +120,8 @@ public class StatementCache extends StatementDecoratorInterceptor {
             }
         }
     }
-
+    
+    @Override
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
         ConcurrentHashMap<String,CachedStatement> statements = 
             (ConcurrentHashMap<String,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
@@ -136,14 +137,8 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
     
     public void closeStatement(CachedStatement st) {
-        try {
-            if (st==null) return;
-            if (((PreparedStatement)st).isClosed()) return;
-            cacheSize.decrementAndGet();
-            st.forceClose();
-        }catch (SQLException sqe) {
-            //log debug message
-        }
+        if (st==null) return;
+        st.forceClose();
     }
     
     @Override
@@ -167,22 +162,18 @@ public class StatementCache extends StatementDecoratorInterceptor {
     
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (compare(CLOSE_VAL,method)) {
-            return super.invoke(proxy, method, args);
-        } else {
-            boolean process = process(this.types, method, false);
-            if (process && args.length>0 && args[0] instanceof String) {
-                CachedStatement statement = isCached((String)args[0]);
-                if (statement!=null) {
-                    //remove it from the cache since it is used
-                    removeStatement(statement);
-                    return statement.getActualProxy();
-                } else {
-                    return super.invoke(proxy, method, args);
-                }
+        boolean process = process(this.types, method, false);
+        if (process && args.length>0 && args[0] instanceof String) {
+            CachedStatement statement = isCached((String)args[0]);
+            if (statement!=null) {
+                //remove it from the cache since it is used
+                removeStatement(statement);
+                return statement.getActualProxy();
             } else {
-                return super.invoke(proxy,method,args);
+                return super.invoke(proxy, method, args);
             }
+        } else {
+            return super.invoke(proxy,method,args);
         }
     }
     
@@ -231,7 +222,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
         
         @Override
-        public void closedInvoked() {
+        public void closeInvoked() {
             //should we cache it
             boolean shouldClose = true;
             if (cacheSize.get() < maxCacheSize) {
@@ -254,14 +245,14 @@ public class StatementCache extends StatementDecoratorInterceptor {
             closed = true;
             delegate = null;
             if (shouldClose) {
-                super.closedInvoked();
+                super.closeInvoked();
             }
            
         }
         
-        public void forceClose() throws SQLException {
-            super.closedInvoked();
-            ((Statement)getDelegate()).close();
+        public void forceClose() {
+            removeStatement(this);
+            super.closeInvoked();
         }
         
     }
