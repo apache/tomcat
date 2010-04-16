@@ -188,7 +188,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         public void setConstructor(Constructor constructor) {
             this.constructor = constructor;
         }
-        public void closedInvoked() {
+        public void closeInvoked() {
             if (getDelegate()!=null) {
                 try {
                     getDelegate().close();
@@ -224,7 +224,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             try {
                 // perform close cleanup
                 if (close) {
-                    closedInvoked();
+                    closeInvoked();
                 } else {
                     // execute the query
                     result = method.invoke(delegate, args);
