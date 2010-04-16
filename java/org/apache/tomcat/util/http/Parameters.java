@@ -26,13 +26,12 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
-import org.apache.tomcat.util.collections.MultiMap;
 
 /**
  * 
  * @author Costin Manolache
  */
-public final class Parameters extends MultiMap {
+public final class Parameters {
 
     
     private static final org.apache.juli.logging.Log log=
@@ -49,8 +48,6 @@ public final class Parameters extends MultiMap {
 
     UDecoder urlDec;
     MessageBytes decodedQuery=MessageBytes.newInstance();
-    
-    public static final int INITIAL_SIZE=4;
 
     String encoding=null;
     String queryStringEncoding=null;
@@ -59,7 +56,6 @@ public final class Parameters extends MultiMap {
      * 
      */
     public Parameters() {
-        super( INITIAL_SIZE );
     }
 
     public void setQuery( MessageBytes queryMB ) {
@@ -84,9 +80,7 @@ public final class Parameters extends MultiMap {
         }
     }
 
-    @Override
     public void recycle() {
-        super.recycle();
         paramHashStringArray.clear();
         didQueryParameters=false;
         encoding=null;
