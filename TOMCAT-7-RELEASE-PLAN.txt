@@ -27,7 +27,12 @@
 
 3. Implement all the new Servlet 3 features
    - Sections 1 to 3 - Compliant
-   - Sections 4 to 6 - not checked
+   - Sections 4.1 to 4.3 - Compliant
+   - Section 4.4 - TODO - ServletContainerInitializer
+   - Section 4.5 - Compliant
+   - Section 4.6 - TODO getResource() & META-INF/resources
+   - Section 4.7 to 4.8 - Compliant
+   - Sections 5 to 6 - not checked
    - Section 7 - Compliant
    - Section 8 - in progress
      8.1 - not checked
