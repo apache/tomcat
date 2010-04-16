@@ -94,7 +94,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         try {
-            Object result = null;
             String name = method.getName();
             Constructor<?> constructor = null;
             String sql = null;
@@ -107,22 +106,30 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                 sql = (String)args[0];
             } else if (compare(PREPARE_CALL, name)) {
                 // prepareCall
-                constructor = getConstructor(PREPARE_IDX, CallableStatement.class);
+                constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
                 sql = (String)args[0];
             } else {
                 // do nothing, might be a future unsupported method
                 // so we better bail out and let the system continue
                 return statement;
             }
-            StatementProxy statementProxy = new StatementProxy(statement,sql);
-            result = constructor.newInstance(new Object[] { statementProxy });
-            statementProxy.setActualProxy(result);
-            statementProxy.setConnection(proxy);
-            return result;
+            return createDecorator(proxy, method, args, statement, constructor, sql);
         } catch (Exception x) {
             logger.warn("Unable to create statement proxy for slow query report.", x);
         }
         return statement;
+    }
+
+    protected Object createDecorator(Object proxy, Method method, Object[] args, 
+                                     Object statement, Constructor<?> constructor, String sql) 
+    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Object result = null;
+        StatementProxy statementProxy = new StatementProxy<Statement>((Statement)statement,sql);
+        result = constructor.newInstance(new Object[] { statementProxy });
+        statementProxy.setActualProxy(result);
+        statementProxy.setConnection(proxy);
+        statementProxy.setConnection(constructor);
+        return result;
     }
 
     protected boolean isExecuteQuery(String methodName) {
@@ -139,19 +146,20 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      * @author fhanik
      * 
      */
-    protected class StatementProxy implements InvocationHandler {
+    protected class StatementProxy<T extends java.sql.Statement> implements InvocationHandler {
         
         protected boolean closed = false;
-        protected Object delegate;
+        protected T delegate;
         private Object actualProxy;
         private Object connection;
         private String sql;
+        private Constructor constructor;
 
-        public StatementProxy(Object parent, String sql) {
-            this.delegate = parent;
+        public StatementProxy(T delegate, String sql) {
+            this.delegate = delegate;
             this.sql = sql;
         }
-        public Object getDelegate() {
+        public T getDelegate() {
             return this.delegate;
         }
         
@@ -173,26 +181,40 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             return this.actualProxy;
         }
         
+        
+        public Constructor getConstructor() {
+            return constructor;
+        }
+        public void setConstructor(Constructor constructor) {
+            this.constructor = constructor;
+        }
         public void closedInvoked() {
+            if (getDelegate()!=null) {
+                try {
+                    getDelegate().close();
+                }catch (SQLException ignore) {
+                }
+            }
             closed = true;
             delegate = null;
         }
         
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            // get the name of the method for comparison
-            final String name = method.getName();
+            if (compare(TOSTRING_VAL,method)) {
+                return toString();
+            }
             // was close invoked?
-            boolean close = compare(JdbcInterceptor.CLOSE_VAL, name);
+            boolean close = compare(CLOSE_VAL, method);
             // allow close to be called multiple times
             if (close && closed)
                 return null;
             // are we calling isClosed?
-            if (compare(JdbcInterceptor.ISCLOSED_VAL, name))
+            if (compare(ISCLOSED_VAL, method))
                 return Boolean.valueOf(closed);
             // if we are calling anything else, bail out
             if (closed)
                 throw new SQLException("Statement closed.");
-            if (name.equals("getConnection")){
+            if (compare(GETCONNECTION_VAL,method)){
                 return connection;
             }
             boolean process = isExecuteQuery(method);
@@ -200,8 +222,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             // if we are executing, get the current time
             Object result = null;
             try {
-                // execute the query
-                result = method.invoke(delegate, args);
+                // perform close cleanup
+                if (close) {
+                    closedInvoked();
+                } else {
+                    // execute the query
+                    result = method.invoke(delegate, args);
+                }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException) {
                     InvocationTargetException it = (InvocationTargetException) t;
@@ -210,15 +237,25 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     throw t;
                 }
             }
-            // perform close cleanup
-            if (close) {
-                closeInvoked();
-            }
             if (process){
                 Constructor<?> cons = getResultSetConstructor();
                 result = cons.newInstance(new Object[]{new ResultSetProxy(actualProxy, result)});
             }
             return result;
+        }
+        
+        public String toString() {
+            StringBuffer buf = new StringBuffer(StatementProxy.class.getName());
+            buf.append("[Proxy=");
+            buf.append(System.identityHashCode(this));
+            buf.append("; Sql=");
+            buf.append(getSql());
+            buf.append("; Delegate=");
+            buf.append(getDelegate());
+            buf.append("; Connection=");
+            buf.append(getConnection());
+            buf.append("]");
+            return buf.toString();
         }
     }
 

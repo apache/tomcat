@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.juli.logging.Log;
@@ -106,6 +107,8 @@ public class PooledConnection {
      * The parent
      */
     protected ConnectionPool parent;
+    
+    private HashMap<Object, Object> attributes = new HashMap<Object, Object>();
 
     /**
      * Weak reference to cache the list of interceptors for this connection
@@ -597,6 +600,10 @@ public class PooledConnection {
      */
     public boolean isReleased() {
         return released.get();
+    }
+    
+    public HashMap<Object,Object> getAttributes() {
+        return attributes;
     }
 
 }

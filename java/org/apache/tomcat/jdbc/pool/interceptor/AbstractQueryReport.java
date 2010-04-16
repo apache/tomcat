@@ -182,7 +182,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             }else if (compare(PREPARE_CALL,name)) {
                 //prepareCall
                 sql = (String)args[0];
-                constructor = getConstructor(PREPARE_IDX,CallableStatement.class);
+                constructor = getConstructor(PREPARE_CALL_IDX,CallableStatement.class);
                 prepareCall(sql,time);
             }else {
                 //do nothing, might be a future unsupported method
