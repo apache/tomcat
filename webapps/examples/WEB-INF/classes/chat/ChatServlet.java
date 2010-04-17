@@ -41,6 +41,8 @@ public class ChatServlet
 
     private static final long serialVersionUID = 1L;
 
+    private static final String CHARSET = "UTF-8";
+
     protected ArrayList<HttpServletResponse> connections = 
         new ArrayList<HttpServletResponse>();
     protected MessageSender messageSender = null;
@@ -82,7 +84,7 @@ public class ChatServlet
                 if ("login".equals(action)) {
                     String nickname = request.getParameter("nickname");
                     request.getSession(true).setAttribute("nickname", nickname);
-                    response.sendRedirect("post.jsp");
+                    response.sendRedirect("index.jsp");
                     event.close();
                     return;
                 }
@@ -114,15 +116,20 @@ public class ChatServlet
             HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         log("Begin for session: " + request.getSession(true).getId());
-        
+
+        response.setContentType("text/html; charset=" + CHARSET);
+
         PrintWriter writer = response.getWriter();
-        writer.println("<!doctype html public \"-//w3c//dtd html 4.0 transitional//en\">");
+        writer.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
         writer.println("<html><head><title>JSP Chat</title></head><body bgcolor=\"#FFFFFF\">");
+        writer.println("<div>Welcome to the chat. <a href='chat'>Click here to reload this window</a></div>");
         writer.flush();
 
         synchronized(connections) {
             connections.add(response);
         }
+
+        messageSender.send("Tomcat", request.getSession(true).getAttribute("nickname") + " joined the chat.");
     }
     
     protected void end(CometEvent event, HttpServletRequest request, HttpServletResponse response)
@@ -136,7 +143,6 @@ public class ChatServlet
         writer.println("</body></html>");
         
         event.close();
-        
     }
     
     protected void error(CometEvent event, HttpServletRequest request, HttpServletResponse response)
@@ -170,10 +176,12 @@ public class ChatServlet
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
         // Compatibility method: equivalent method using the regular connection model
+        response.setContentType("text/html; charset=" + CHARSET);
         PrintWriter writer = response.getWriter();
-        writer.println("<!doctype html public \"-//w3c//dtd html 4.0 transitional//en\">");
+        writer.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
         writer.println("<html><head><title>JSP Chat</title></head><body bgcolor=\"#FFFFFF\">");
-        writer.println("Chat example only supports Comet processing");
+        writer.println("Chat example only supports Comet processing. ");
+        writer.println("Configure a connector that supports Comet and try again.");
         writer.println("</body></html>");
     }
     
@@ -192,6 +200,9 @@ public class ChatServlet
         
         public void stop() {
             running = false;
+            synchronized (messages) {
+                messages.notify();
+            }
         }
 
         public void send(String user, String message) {
@@ -209,34 +220,29 @@ public class ChatServlet
 
             // Loop until we receive a shutdown command
             while (running) {
-                // Loop if endpoint is paused
-
-                if (messages.size() == 0) {
+                String[] pendingMessages;
+                synchronized (messages) {
                     try {
-                        synchronized (messages) {
+                        if (messages.size() == 0) {
                             messages.wait();
                         }
                     } catch (InterruptedException e) {
                         // Ignore
                     }
+                    pendingMessages = messages.toArray(new String[0]);
+                    messages.clear();
                 }
 
                 synchronized (connections) {
-                    String[] pendingMessages = null;
-                    synchronized (messages) {
-                        pendingMessages = messages.toArray(new String[0]);
-                        messages.clear();
-                    }
                     for (int i = 0; i < connections.size(); i++) {
                         try {
                             PrintWriter writer = connections.get(i).getWriter();
                             for (int j = 0; j < pendingMessages.length; j++) {
-                                // FIXME: Add HTML filtering
-                                writer.println(pendingMessages[j] + "<br/>");
+                                writer.println("<div>"+filter(pendingMessages[j]) + "</div>");
                             }
                             writer.flush();
                         } catch (IOException e) {
-                            log("IOExeption sending message", e);
+                            log("IOException sending message", e);
                         }
                     }
                 }
@@ -247,7 +253,38 @@ public class ChatServlet
 
     }
 
+    /**
+     * Filter the specified message string for characters that are sensitive
+     * in HTML.
+     *
+     * @param message The message string to be filtered
+     * @author Copied from org.apache.catalina.util.RequestUtil#filter(String) 
+     */
+    protected static String filter(String message) {
+        if (message == null)
+            return (null);
 
-
-
+        char content[] = new char[message.length()];
+        message.getChars(0, message.length(), content, 0);
+        StringBuilder result = new StringBuilder(content.length + 50);
+        for (int i = 0; i < content.length; i++) {
+            switch (content[i]) {
+            case '<':
+                result.append("&lt;");
+                break;
+            case '>':
+                result.append("&gt;");
+                break;
+            case '&':
+                result.append("&amp;");
+                break;
+            case '"':
+                result.append("&quot;");
+                break;
+            default:
+                result.append(content[i]);
+            }
+        }
+        return (result.toString());
+    }
 }
