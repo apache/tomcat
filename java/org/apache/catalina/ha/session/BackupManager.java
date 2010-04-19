@@ -248,9 +248,11 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
 
         setState(LifecycleState.STOPPING);
 
-        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
-        if ( map!=null ) {
-            map.breakdown();
+        if (sessions instanceof LazyReplicatedMap) {
+            LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+            if ( map!=null ) {
+                map.breakdown();
+            }
         }
 
         cluster.removeManager(this);
