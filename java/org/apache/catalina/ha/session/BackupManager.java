@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
@@ -198,6 +199,11 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
+        
+        if (!initialized) init();
+
+        // Force initialization of the random number generator
+        generateSessionId();
 
         try {
             cluster.registerManager(this);
@@ -213,8 +219,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
             log.error("Unable to start BackupManager",x);
             throw new LifecycleException("Failed to start BackupManager",x);
         }
-
-        super.startInternal();
+        setState(LifecycleState.STARTING);
     }
     
     public String getMapName() {
@@ -238,14 +243,22 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
 
-        super.stopInternal();
-        
+        if (log.isDebugEnabled())
+            log.debug("Stopping");
+
+        setState(LifecycleState.STOPPING);
+
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
         if ( map!=null ) {
             map.breakdown();
         }
 
         cluster.removeManager(this);
+        this.random = null;
+
+        if( initialized ) {
+            destroy();
+        }
     }
 
     @Override
