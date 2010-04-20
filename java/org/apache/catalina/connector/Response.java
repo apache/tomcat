@@ -235,12 +235,6 @@ public class Response
 
 
     /**
-     * The set of Cookies associated with this Response.
-     */
-    protected ArrayList<Cookie> cookies = new ArrayList<Cookie>();
-
-
-    /**
      * Using output stream flag.
      */
     protected boolean usingOutputStream = false;
@@ -281,8 +275,6 @@ public class Response
         error = false;
         isCharacterEncodingSet = false;
         
-        cookies.clear();
-
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
             if (facade != null) {
                 facade.clear();
@@ -865,15 +857,6 @@ public class Response
 
 
     /**
-     * Return an array of all cookies set for this response, or
-     * a zero-length array if no cookies have been set.
-     */
-    public Cookie[] getCookies() {
-        return cookies.toArray(new Cookie[cookies.size()]);
-    }
-
-
-    /**
      * Return the value for the specified header, or <code>null</code> if this
      * header has not been set.  If more than one value was added for this
      * name, only the first is returned; use getHeaderValues() to retrieve all
@@ -995,7 +978,6 @@ public class Response
         }
         if (!set) {
             addHeader(headername, sb.toString());
-            cookies.add(cookie);
         }
         
         
@@ -1017,8 +999,6 @@ public class Response
         // RFC2965 is not supported by browsers and the Servlet spec
         // asks for 2109.
         addHeader("Set-Cookie", sb.toString());
-
-        cookies.add(cookie);
     }
 
     public StringBuffer generateCookieString(final Cookie cookie) {
