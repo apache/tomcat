@@ -1425,10 +1425,10 @@ public class JNDIRealm extends RealmBase {
          if (containerLog.isTraceEnabled()) {
              if (validated) {
                  containerLog.trace(sm.getString("jndiRealm.authenticateSuccess",
-                                  user.username));
+                                  user.getUserName()));
              } else {
                  containerLog.trace(sm.getString("jndiRealm.authenticateFailure",
-                                  user.username));
+                                  user.getUserName()));
              }
          }
          return (validated);
@@ -1454,7 +1454,7 @@ public class JNDIRealm extends RealmBase {
         if (info == null || credentials == null)
             return (false);
 
-        String password = info.password;
+        String password = info.getPassword();
         if (password == null)
             return (false);
 
@@ -1544,7 +1544,7 @@ public class JNDIRealm extends RealmBase {
          if (credentials == null || user == null)
              return (false);
 
-         String dn = user.dn;
+         String dn = user.getDN();
          if (dn == null)
              return (false);
 
@@ -1608,8 +1608,8 @@ public class JNDIRealm extends RealmBase {
         if (user == null)
             return (null);
 
-        String dn = user.dn;
-        String username = user.username;
+        String dn = user.getDN();
+        String username = user.getUserName();
 
         if (dn == null || username == null)
             return (null);
@@ -1618,7 +1618,7 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  getRoles(" + dn + ")");
 
         // Start with roles retrieved from the user entry
-        List<String> list = user.roles;
+        List<String> list = user.getRoles();
         if (list == null) {
             list = new ArrayList<String>();
         }
@@ -1933,7 +1933,7 @@ public class JNDIRealm extends RealmBase {
         User user = getUser(context, username);
 
         if (user != null) {
-            return new GenericPrincipal(user.username, user.password,
+            return new GenericPrincipal(user.getUserName(), user.getPassword(),
                     getRoles(context, user));
         }
         
