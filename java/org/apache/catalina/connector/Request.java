@@ -2298,7 +2298,7 @@ public class Request
             Cookie newCookie =
                 ApplicationSessionCookieConfig.createSessionCookie(context,
                         newSessionId, secure);
-            response.addCookieInternal(newCookie);
+            response.addSessionCookieInternal(newCookie);
         }
     }
 
@@ -2622,7 +2622,7 @@ public class Request
                 ApplicationSessionCookieConfig.createSessionCookie(
                         context, session.getIdInternal(), isSecure());
             
-            response.addCookieInternal(cookie);
+            response.addSessionCookieInternal(cookie);
         }
 
         if (session != null) {

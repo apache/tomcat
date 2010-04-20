@@ -969,7 +969,37 @@ public class Response
 
     }
 
-
+    /**
+     * Special method for adding a session cookie as we should be overriding 
+     * any previous 
+     * @param cookie
+     */
+    public void addSessionCookieInternal(final Cookie cookie) {
+        if (isCommitted())
+            return;
+        
+        String name = cookie.getName();
+        final String headername = "Set-Cookie";
+        final String startsWith = name + "=";
+        final StringBuffer sb = generateCookieString(cookie);
+        boolean set = false;
+        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        int n = headers.size();
+        for (int i = 0; i < n; i++) {
+            if (headers.getName(i).toString().equals(headername)) {
+                if (headers.getValue(i).toString().startsWith(startsWith)) {
+                    headers.setValue(sb.toString());
+                    set = true;
+                }
+            }
+        }
+        if (!set) {
+            addHeader(headername, sb.toString());
+            cookies.add(cookie);
+        }
+        
+        
+    }
     /**
      * Add the specified Cookie to those that will be included with
      * this Response.
@@ -981,6 +1011,17 @@ public class Response
         if (isCommitted())
             return;
 
+        final StringBuffer sb = generateCookieString(cookie);
+        //if we reached here, no exception, cookie is valid
+        // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
+        // RFC2965 is not supported by browsers and the Servlet spec
+        // asks for 2109.
+        addHeader("Set-Cookie", sb.toString());
+
+        cookies.add(cookie);
+    }
+
+    public StringBuffer generateCookieString(final Cookie cookie) {
         final StringBuffer sb = new StringBuffer();
         //web application code can receive a IllegalArgumentException 
         //from the appendCookieValue invocation
@@ -1003,13 +1044,7 @@ public class Response
                      cookie.getMaxAge(), cookie.getSecure(),
                      cookie.isHttpOnly());
         }
-        //if we reached here, no exception, cookie is valid
-        // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
-        // RFC2965 is not supported by browsers and the Servlet spec
-        // asks for 2109.
-        addHeader("Set-Cookie", sb.toString());
-
-        cookies.add(cookie);
+        return sb;
     }
 
 
