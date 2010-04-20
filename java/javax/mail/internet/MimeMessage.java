@@ -18,7 +18,7 @@ package javax.mail.internet;
 
 import javax.mail.Session;
 
-public class MimeMessage {
+public class MimeMessage implements MimePart {
     public MimeMessage(Session session) {
     }
     public void setFrom(InternetAddress from) {
