@@ -102,9 +102,7 @@ public class DummyResponse
 
     public String getHeader(String name) { return null; }
     public Collection<String> getHeaderNames() { return null; }
-    public String[] getHeaderValues(@SuppressWarnings("unused") String name) {
-        return null;
-    }
+    public Collection<String> getHeaders(String name) { return null; }
     public String getMessage() { return null; }
     public int getStatus() { return -1; }
     public void reset(@SuppressWarnings("unused") int status,
@@ -133,5 +131,4 @@ public class DummyResponse
     /** @deprecated */
     @Deprecated
     public void setStatus(int status, String message) {}
-    public Collection<String> getHeaders(String name) { return null; }
 }
