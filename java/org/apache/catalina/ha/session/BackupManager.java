@@ -250,9 +250,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
 
         if (sessions instanceof LazyReplicatedMap) {
             LazyReplicatedMap map = (LazyReplicatedMap)sessions;
-            if ( map!=null ) {
-                map.breakdown();
-            }
+            map.breakdown();
         }
 
         cluster.removeManager(this);
