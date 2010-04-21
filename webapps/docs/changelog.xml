@@ -35,6 +35,9 @@
 <section name="Tomcat 7.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>43642</bug>: Add prestartminSpareThreads attribute for Executor. (jfclere)
+      </add>
       <update>
         Update Servlet support to the Servlet 3.0 specification. Note
         asynchronous support is not yet complete. (markt/fhanik)
