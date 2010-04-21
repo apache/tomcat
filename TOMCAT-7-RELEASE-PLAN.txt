@@ -32,7 +32,7 @@
    - Section 4.5 - Compliant
    - Section 4.6 - TODO getResource() & META-INF/resources
    - Section 4.7 to 4.8 - Compliant
-   - Sections 5 to 7
+   - Sections 5 to 7 - Compliant
    - Section 8 - in progress
      8.1 - Compliant
      8.2 - TODO - ServletContainerInitializer
@@ -60,7 +60,7 @@
 
 7. Create tc7.0.x\trunk from trunk at first stable release
 
-8. Nice to haves in first Tomcat 7 stable release inc. MBeans
-   - Lifecycle clean-up for init()/destroy()
+8. Nice to haves in first Tomcat 7 stable release
+   - Lifecycle clean-up for init()/destroy() inc. MBeans
    - Remove old, unused code
      - Clean up internal API (eg remove unused params from methods)
