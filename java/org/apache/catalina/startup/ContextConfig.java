@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import javax.servlet.ServletContext;
 
@@ -1237,12 +1238,48 @@ public class ContextConfig
             if (context.getLogEffectiveWebXml()) {
                 log.info("web.xml:\n" + mergedWebXml);
             }
+            
+            processResourceJARs(orderedFragments);
         } else {
             // Apply unmerged web.xml to Context
             webXml.configureContext(context);
         }        
     }
 
+    
+    /**
+     * Scan JARs that contain web-fragment.xml files that will be used to
+     * configure this application to see if they also contain static resources.
+     * If static resources are found, add them to the context. Resources are
+     * added in web-fragment.xml priority order.
+     */
+    protected void processResourceJARs(Set<WebXml> fragments) {
+        for (WebXml fragment : fragments) {
+            URL jarUrl = fragment.getURL();
+            JarFile jarFile = null;
+            try {
+                JarURLConnection conn =
+                    (JarURLConnection) jarUrl.openConnection();
+                jarFile = conn.getJarFile();   
+                ZipEntry entry = jarFile.getEntry("META-INF/resources/");
+                if (entry != null) {
+                    context.addResourceJarUrl(jarUrl);
+                }
+            } catch (IOException ioe) {
+                log.error(sm.getString("contextConfig.resourceJarFail", jarUrl,
+                        context.getPath()));
+            } finally {
+                if (jarFile != null) {
+                    try {
+                        jarFile.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            }
+        }
+    }
+    
     
     /**
      * Identify the default web.xml to be used and obtain an input source for

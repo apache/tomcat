@@ -19,11 +19,18 @@
 package org.apache.naming.resources;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import javax.naming.Binding;
 import javax.naming.Context;
@@ -131,9 +138,38 @@ public abstract class BaseDirContext implements DirContext {
         new HashMap<String,BaseDirContext>();
 
 
+    /**
+     * Alternate / backup DirContexts for static resources. These will be
+     * searched in the order they are added if the requested resource cannot be
+     * found in the primary DirContext. 
+     */
+    protected List<DirContext> altDirContexts = new ArrayList<DirContext>();
+    
+    
     // ------------------------------------------------------------- Properties
 
 
+    /**
+     * Add a resources JAR. The contents of /META-INF/resources/ will be used if
+     * a requested resource can not be found in the main context.
+     */
+    public void addResourcesJar(URL url) {
+        try {
+            JarURLConnection conn = (JarURLConnection) url.openConnection();
+            JarFile jarFile = conn.getJarFile();   
+            ZipEntry entry = jarFile.getEntry("/");
+            WARDirContext warDirContext = new WARDirContext(jarFile,
+                    new WARDirContext.Entry("/", entry));
+            warDirContext.loadEntries();
+            altDirContexts.add(warDirContext);
+        } catch (IOException ioe) {
+            // TODO: Log failure
+        } finally {
+            // TODO: Clean up
+        }
+    }
+    
+    
     /**
      * Add an alias.
      */
@@ -350,7 +386,25 @@ public abstract class BaseDirContext implements DirContext {
                 return result.dirContext.doGetRealPath(result.aliasName);
             }
         }
-        return doGetRealPath(name);
+        
+        // Next do a standard getRealPath()
+        String path = doGetRealPath(name);
+
+        if (path != null)
+            return path;
+        
+        // Check the alternate locations
+        for (DirContext altDirContext : altDirContexts) {
+            if (altDirContext instanceof BaseDirContext){
+                path = ((BaseDirContext) altDirContext).getRealPath(
+                        "META-INF/resources/" + name);
+                if (path != null)
+                    return path;
+            }
+        }
+        
+        // Really not found
+        return null; 
     }
 
     // -------------------------------------------------------- Context Methods
@@ -380,13 +434,29 @@ public abstract class BaseDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     public final Object lookup(String name) throws NamingException {
+        // First check for aliases
         if (!aliases.isEmpty()) {
             AliasResult result = findAlias(name);
             if (result.dirContext != null) {
                 return result.dirContext.lookup(result.aliasName);
             }
         }
-        return doLookup(name);
+        
+        // Next do a standard lookup
+        Object obj = doLookup(name);
+
+        if (obj != null)
+            return obj;
+        
+        // Check the alternate locations
+        for (DirContext altDirContext : altDirContexts) {
+            obj = altDirContext.lookup("META-INF/resources/" + name);
+            if (obj != null)
+                return obj;
+        }
+        
+        // Really not found
+        throw new NamingException(sm.getString("resources.notFound", name));
     }
 
     /**
@@ -589,7 +659,31 @@ public abstract class BaseDirContext implements DirContext {
                 return result.dirContext.listBindings(result.aliasName);
             }
         }
-        return doListBindings(name);
+        
+        // Next do a standard lookup
+        NamingEnumeration<Binding> bindings = doListBindings(name);
+
+        if (bindings != null)
+            return bindings;
+        
+        // Check the alternate locations
+        for (DirContext altDirContext : altDirContexts) {
+            if (altDirContext instanceof BaseDirContext)
+                bindings = ((BaseDirContext) altDirContext).doListBindings(
+                        "META-INF/resources/" + name);
+            else {
+                try {
+                    bindings = altDirContext.listBindings(name);
+                } catch (NamingException ne) {
+                    // Ignore
+                }
+            }
+            if (bindings != null)
+                return bindings;
+        }
+
+        // Really not found
+        throw new NamingException(sm.getString("resources.notFound", name));
     }
 
 
@@ -912,6 +1006,8 @@ public abstract class BaseDirContext implements DirContext {
      */
     public final Attributes getAttributes(String name, String[] attrIds)
         throws NamingException {
+        
+        // First check for aliases
         if (!aliases.isEmpty()) {
             AliasResult result = findAlias(name);
             if (result.dirContext != null) {
@@ -919,7 +1015,31 @@ public abstract class BaseDirContext implements DirContext {
                         result.aliasName, attrIds);
             }
         }
-        return doGetAttributes(name, attrIds);
+        
+        // Next do a standard lookup
+        Attributes attrs = doGetAttributes(name, attrIds);
+
+        if (attrs != null)
+            return attrs;
+        
+        // Check the alternate locations
+        for (DirContext altDirContext : altDirContexts) {
+            if (altDirContext instanceof BaseDirContext)
+                attrs = ((BaseDirContext) altDirContext).doGetAttributes(
+                        "META-INF/resources/" + name, attrIds);
+            else {
+                try {
+                    attrs = altDirContext.getAttributes(name, attrIds);
+                } catch (NamingException ne) {
+                    // Ignore
+                }
+            }
+            if (attrs != null)
+                return attrs;
+        }
+        
+        // Really not found
+        throw new NamingException(sm.getString("resources.notFound", name));
     }
 
     /**
