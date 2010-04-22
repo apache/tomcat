@@ -410,6 +410,11 @@ public class WebappClassLoader
     protected boolean hasExternalRepositories = false;
 
     /**
+     * Search external repositories first
+     */
+    protected boolean searchExternalFirst = false;
+
+    /**
      * need conversion for properties files
      */
     protected boolean needConvert = false;
@@ -535,7 +540,21 @@ public class WebappClassLoader
         this.antiJARLocking = antiJARLocking;
     }
 
-    
+    /**
+     * @return Returns the searchExternalFirst.
+     */
+    public boolean getSearchExternalFirst() {
+        return searchExternalFirst;
+    }
+
+    /**
+     * @param searchExternalFirst Whether external repositories should be searched first
+     */
+    public void setSearchExternalFirst(boolean searchExternalFirst) {
+        this.searchExternalFirst = searchExternalFirst;
+    }
+
+
     /**
      * If there is a Java SecurityManager create a read FilePermission
      * or JndiPermission for the file directory path.
@@ -1065,22 +1084,37 @@ public class WebappClassLoader
         try {
             if (log.isTraceEnabled())
                 log.trace("      findClassInternal(" + name + ")");
-            try {
-                clazz = findClassInternal(name);
-            } catch(ClassNotFoundException cnfe) {
-                if (!hasExternalRepositories) {
-                    throw cnfe;
+            if (hasExternalRepositories && searchExternalFirst) {
+                try {
+                    clazz = super.findClass(name);
+                } catch(AccessControlException ace) {
+                    log.warn("WebappClassLoader.findClassInternal(" + name
+                            + ") security exception: " + ace.getMessage(), ace);
+                    throw new ClassNotFoundException(name, ace);
+                } catch (RuntimeException e) {
+                    if (log.isTraceEnabled())
+                        log.trace("      -->RuntimeException Rethrown", e);
+                    throw e;
                 }
-            } catch(AccessControlException ace) {
-                log.warn("WebappClassLoader.findClassInternal(" + name
-                        + ") security exception: " + ace.getMessage(), ace);
-                throw new ClassNotFoundException(name, ace);
-            } catch (RuntimeException e) {
-                if (log.isTraceEnabled())
-                    log.trace("      -->RuntimeException Rethrown", e);
-                throw e;
             }
-            if ((clazz == null) && hasExternalRepositories) {
+            if ((clazz == null)) {
+                try {
+                    clazz = findClassInternal(name);
+                } catch(ClassNotFoundException cnfe) {
+                    if (!hasExternalRepositories || searchExternalFirst) {
+                        throw cnfe;
+                    }
+                } catch(AccessControlException ace) {
+                    log.warn("WebappClassLoader.findClassInternal(" + name
+                            + ") security exception: " + ace.getMessage(), ace);
+                    throw new ClassNotFoundException(name, ace);
+                } catch (RuntimeException e) {
+                    if (log.isTraceEnabled())
+                        log.trace("      -->RuntimeException Rethrown", e);
+                    throw e;
+                }
+            }
+            if ((clazz == null) && hasExternalRepositories && !searchExternalFirst) {
                 try {
                     clazz = super.findClass(name);
                 } catch(AccessControlException ace) {
@@ -1138,21 +1172,26 @@ public class WebappClassLoader
 
         URL url = null;
 
-        ResourceEntry entry = resourceEntries.get(name);
-        if (entry == null) {
-            if (securityManager != null) {
-                PrivilegedAction<ResourceEntry> dp =
-                    new PrivilegedFindResourceByName(name, name);
-                entry = AccessController.doPrivileged(dp);
-            } else {
-                entry = findResourceInternal(name, name);
+        if (hasExternalRepositories && searchExternalFirst)
+            url = super.findResource(name);
+
+        if (url == null) {
+            ResourceEntry entry = resourceEntries.get(name);
+            if (entry == null) {
+                if (securityManager != null) {
+                    PrivilegedAction<ResourceEntry> dp =
+                        new PrivilegedFindResourceByName(name, name);
+                    entry = AccessController.doPrivileged(dp);
+                } else {
+                    entry = findResourceInternal(name, name);
+                }
+            }
+            if (entry != null) {
+                url = entry.source;
             }
         }
-        if (entry != null) {
-            url = entry.source;
-        }
 
-        if ((url == null) && hasExternalRepositories)
+        if ((url == null) && hasExternalRepositories && !searchExternalFirst)
             url = super.findResource(name);
 
         if (log.isDebugEnabled()) {
@@ -1188,6 +1227,16 @@ public class WebappClassLoader
 
         int i;
 
+        // Adding the results of a call to the superclass
+        if (hasExternalRepositories && searchExternalFirst) {
+
+            Enumeration<URL> otherResourcePaths = super.findResources(name);
+
+            while (otherResourcePaths.hasMoreElements()) {
+                result.addElement(otherResourcePaths.nextElement());
+            }
+
+        }
         // Looking at the repositories
         for (i = 0; i < repositoriesLength; i++) {
             try {
@@ -1223,7 +1272,7 @@ public class WebappClassLoader
         }
 
         // Adding the results of a call to the superclass
-        if (hasExternalRepositories) {
+        if (hasExternalRepositories && !searchExternalFirst) {
 
             Enumeration<URL> otherResourcePaths = super.findResources(name);
 
@@ -3178,4 +3227,3 @@ public class WebappClassLoader
 
 
 }
-
