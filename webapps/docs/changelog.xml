@@ -35,6 +35,9 @@
 <section name="Tomcat 7.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <update>
+        Improve and document VirtualWebappLoader. (rjung)
+      </update>
       <add>
         <bug>43642</bug>: Add prestartminSpareThreads attribute for Executor. (jfclere)
       </add>
