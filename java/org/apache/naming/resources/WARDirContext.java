@@ -79,7 +79,8 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Constructor used for returning fake subcontexts.
+     * Constructor used for returning fake sub-contexts or for accessing
+     * META-INF/resources locations in bundled JAR files.
      */
     protected WARDirContext(ZipFile base, Entry entries) {
         this.base = base;
@@ -201,8 +202,8 @@ public class WARDirContext extends BaseDirContext {
             return this;
         Entry entry = treeLookup(name);
         if (entry == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
+            return null;
+            
         ZipEntry zipEntry = entry.getEntry();
         if (zipEntry.isDirectory())
             return new WARDirContext(base, entry);
@@ -320,8 +321,8 @@ public class WARDirContext extends BaseDirContext {
                     this);
         Entry entry = treeLookup(name);
         if (entry == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
+            return null;
+        
         return new NamingContextBindingsEnumeration(list(entry).iterator(),
                 this);
     }
@@ -441,8 +442,7 @@ public class WARDirContext extends BaseDirContext {
         else
             entry = treeLookup(name);
         if (entry == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
+            return null;
         
         ZipEntry zipEntry = entry.getEntry();
 
@@ -841,7 +841,7 @@ public class WARDirContext extends BaseDirContext {
     /**
      * Entries structure.
      */
-    protected class Entry implements Comparable<Object> {
+    protected static class Entry implements Comparable<Object> {
 
 
         // -------------------------------------------------------- Constructor

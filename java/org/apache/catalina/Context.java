@@ -1183,5 +1183,11 @@ public interface Context extends Container {
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
+    /**
+     * Add a URL for a JAR that contains static resources in a
+     * META-INF/resources directory that should be included in the static
+     * resources for this context.
+     */
+    public void addResourceJarUrl(URL url);
 }
 
