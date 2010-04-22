@@ -89,6 +89,10 @@
           description="The reloadable flag for this Loader"
                  type="boolean"/>
 
+    <attribute   name="searchVirtualFirst"
+          description="The searchVirtualFirst flag for this Loader"
+                 type="boolean"/>
+
     <attribute   name="repositories"
           description="Extra repositories managed by this loader"
                  type="[Ljava.lang.String;"/>
