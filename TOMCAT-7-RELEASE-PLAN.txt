@@ -26,25 +26,19 @@
    - Done
 
 3. Implement all the new Servlet 3 features
+   NOTE: Status is based on a review of the specification, not the TCK tests
    - Sections 1 to 3 - Compliant
    - Sections 4.1 to 4.3 - Compliant
    - Section 4.4 - TODO - ServletContainerInitializer
-   - Section 4.5 - Compliant
-   - Section 4.6 - TODO getResource() & META-INF/resources
-   - Section 4.7 to 4.8 - Compliant
+   - Section 4.5 to 4.8 - Compliant
    - Sections 5 to 7 - Compliant
    - Section 8 - in progress
      8.1 - Compliant
      8.2 - TODO - ServletContainerInitializer
      8.3 - Scope for re-factoring
      8.4 - Compliant
-   - Section 9 - Compliant
-   - Section 10 to 12 - not checked
-   - Section 13 - In progess
-     13.1 to 13.3 - Compliant
-     13.4 - In progress
-     13.5 to 13.10 - Compliant
-     Section 14 to 15 - not checked
+   - Sections 9 to 13 - Compliant
+   - Section 14 to 15 - not checked
    - Java EE spec requirements - not checked
    - JSR 196 - Recommended - Not yet implemented. Copy from Geronimo?
 
