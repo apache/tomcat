@@ -31,15 +31,17 @@ import javax.naming.NameNotFoundException;
 public class ImmutableNameNotFoundException
     extends NameNotFoundException {
 
+    private static final long serialVersionUID = 1L;
+    
     @Override
-    public void appendRemainingComponent(String name) {}
+    public void appendRemainingComponent(String name) {/*NOOP*/}
     @Override
-    public void appendRemainingName(Name name) {}
+    public void appendRemainingName(Name name) {/*NOOP*/}
     @Override
-    public void setRemainingName(Name name) {}
+    public void setRemainingName(Name name) {/*NOOP*/}
     @Override
-    public void setResolvedName(Name name) {}
+    public void setResolvedName(Name name) {/*NOOP*/}
     @Override
-    public void setRootCause(Throwable e) {}
+    public void setRootCause(Throwable e) {/*NOOP*/}
 
 }
