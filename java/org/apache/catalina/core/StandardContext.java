@@ -962,6 +962,21 @@ public class StandardContext
 
 
     /**
+     * Add a URL for a JAR that contains static resources in a
+     * META-INF/resources directory that should be included in the static
+     * resources for this context.
+     */
+    public void addResourceJarUrl(URL url) {
+        if (webappResources instanceof BaseDirContext) {
+            ((BaseDirContext) webappResources).addResourcesJar(url);
+        } else {
+            log.error(sm.getString("standardContext.noResourceJar", url,
+                    getPath()));
+        }
+    }
+    
+    
+    /**
      * Set the current alias configuration. The list of aliases should be of the
      * form "/aliasPath1=docBase1,/aliasPath2=docBase2" where aliasPathN must
      * include a leading '/' and docBaseN must be an absolute path to either a
@@ -2122,11 +2137,13 @@ public class StandardContext
             return;
 
         if (resources instanceof BaseDirContext) {
+            // Caching
             ((BaseDirContext) resources).setCached(isCachingAllowed());
             ((BaseDirContext) resources).setCacheTTL(getCacheTTL());
             ((BaseDirContext) resources).setCacheMaxSize(getCacheMaxSize());
             ((BaseDirContext) resources).setCacheObjectMaxSize(
                     getCacheObjectMaxSize());
+            // Alias support
             ((BaseDirContext) resources).setAliases(getAliases());
         }
         if (resources instanceof FileDirContext) {
