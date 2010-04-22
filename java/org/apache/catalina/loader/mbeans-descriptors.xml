@@ -38,6 +38,10 @@
           description="The reloadable flag for this Loader"
                  type="boolean"/>
 
+    <attribute   name="searchExternalFirst"
+          description="The searchExternalFirst flag for this Loader"
+                 type="boolean"/>
+
     <attribute   name="repositories"
           description="Extra repositories managed by this loader"
                  type="[Ljava.lang.String;"/>
@@ -131,6 +135,10 @@
 
     <attribute   name="antiJARLocking"
           description="The antiJARLocking flag for this Loader"
+                 type="boolean"/>
+
+    <attribute   name="searchExternalFirst"
+          description="The searchExternalFirst flag for this Loader"
                  type="boolean"/>
 
     <attribute   name="uRLs"
