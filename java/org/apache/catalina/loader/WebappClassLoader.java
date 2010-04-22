@@ -1679,19 +1679,30 @@ public class WebappClassLoader
 
         int filesLength = files.length;
         int jarFilesLength = jarRealFiles.length;
-        int length = filesLength + jarFilesLength + external.length;
+        int externalsLength = external.length;
+        int off = 0;
         int i;
 
         try {
 
-            URL[] urls = new URL[length];
-            for (i = 0; i < length; i++) {
-                if (i < filesLength) {
-                    urls[i] = getURL(files[i], true);
-                } else if (i < filesLength + jarFilesLength) {
-                    urls[i] = getURL(jarRealFiles[i - filesLength], true);
-                } else {
-                    urls[i] = external[i - filesLength - jarFilesLength];
+            URL[] urls = new URL[filesLength + jarFilesLength + externalsLength];
+            if (searchExternalFirst) {
+                for (i = 0; i < externalsLength; i++) {
+                    urls[i] = external[i];
+                }
+                off = externalsLength;
+            }
+            for (i = 0; i < filesLength; i++) {
+                urls[off + i] = getURL(files[i], true);
+            }
+            off += filesLength;
+            for (i = 0; i < jarFilesLength; i++) {
+                urls[off + i] = getURL(jarRealFiles[i], true);
+            }
+            off += jarFilesLength;
+            if (!searchExternalFirst) {
+                for (i = 0; i < externalsLength; i++) {
+                    urls[off + i] = external[i];
                 }
             }
 
