@@ -82,6 +82,20 @@ public class VirtualWebappLoader extends WebappLoader {
     }
 
     /**
+     * @return Returns searchVirtualFirst.
+     */
+    public boolean getSearchVirtualFirst() {
+        return getSearchExternalFirst();
+    }
+
+    /**
+     * @param searchVirtualFirst Whether the virtual class path should be searched before the webapp
+     */
+    public void setSearchVirtualFirst(boolean searchVirtualFirst) {
+        setSearchExternalFirst(searchVirtualFirst);
+    }
+
+    /**
      * Implement the requirements
      * of {@link LifecycleBase#startInternal()}.
      *
