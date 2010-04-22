@@ -202,8 +202,7 @@ public class FileDirContext extends BaseDirContext {
         File file = file(name);
 
         if (file == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
+            return null;
 
         if (file.isDirectory()) {
             FileDirContext tempContext = new FileDirContext(env);
@@ -326,9 +325,8 @@ public class FileDirContext extends BaseDirContext {
         File file = file(name);
 
         if (file == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
-
+            return null;
+        
         return new NamingContextBindingsEnumeration(list(file).iterator(),
                 this);
 
@@ -432,8 +430,7 @@ public class FileDirContext extends BaseDirContext {
         File file = file(name);
 
         if (file == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
+            return null;
 
         return new FileResourceAttributes(file);
 
