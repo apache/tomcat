@@ -837,8 +837,6 @@ final class ApplicationDispatcher
                 break;
             if (current instanceof ApplicationRequest)
                 break;
-            if (current instanceof Request)
-                break;
             previous = current;
             current = ((ServletRequestWrapper) current).getRequest();
         }
@@ -899,8 +897,6 @@ final class ApplicationDispatcher
             if (current instanceof ApplicationHttpResponse)
                 break;
             if (current instanceof ApplicationResponse)
-                break;
-            if (current instanceof Response)
                 break;
             previous = current;
             current = ((ServletResponseWrapper) current).getResponse();
