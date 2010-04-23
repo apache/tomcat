@@ -284,12 +284,19 @@
 
       <attribute name="aliases" required="false">
         <p>This attribute provides a list of external locations from which to
-        load resources for this context. These external locations will not be
-        emptied if the context is un-deployed. The list of aliases should be of
+        load resources for this context. The list of aliases should be of
         the form <code>"/aliasPath1=docBase1,/aliasPath2=docBase2"</code> where
         <code>aliasPathN</code> must include a leading '/' and
         <code>docBaseN</code> must be an absolute path to either a .war file or
         a directory.</p>
+        <p>A resource will be searched for in the first <code>docBaseN</code>
+        for which <code>aliasPathN</code> is a leading path segment of the
+        resource. If there is no such alias, then the resource will be searched
+        in the usual way.</p>
+        <p>Using '/' as an aliasPath is not allowed. Consider using
+        <code>docBase</code> instead.</p>
+        <p>These external locations will not be emptied if the context
+        is un-deployed.</p>
       </attribute>
 
       <attribute name="allowLinking" required="false">

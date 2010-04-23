@@ -57,6 +57,8 @@ import org.apache.naming.StringManager;
 
 public abstract class BaseDirContext implements DirContext {
 
+    private static final org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( BaseDirContext.class );
 
     // -------------------------------------------------------------- Constants
 
@@ -239,6 +241,10 @@ public abstract class BaseDirContext implements DirContext {
                 throw new IllegalArgumentException(
                         sm.getString("resources.invalidAliasMapping", kvp));
 
+            if (kv[0].equals("/")) {
+                throw new IllegalArgumentException(
+                        sm.getString("resources.invalidAliasNotAllowed", kv[0]));
+            }
             File aliasLoc = new File(kv[1]);
             if (!aliasLoc.exists()) {
                 throw new IllegalArgumentException(
@@ -1524,4 +1530,3 @@ public abstract class BaseDirContext implements DirContext {
         String aliasName;
     }
 }
-
