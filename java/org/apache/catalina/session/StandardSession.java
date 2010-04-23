@@ -249,7 +249,7 @@ public class StandardSession
     /**
      * The HTTP session context associated with this session.
      */
-    protected static HttpSessionContext sessionContext = null;
+    protected static volatile HttpSessionContext sessionContext = null;
 
 
     /**
@@ -1559,12 +1559,12 @@ public class StandardSession
     protected void writeObject(ObjectOutputStream stream) throws IOException {
 
         // Write the scalar instance variables (except Manager)
-        stream.writeObject(new Long(creationTime));
-        stream.writeObject(new Long(lastAccessedTime));
-        stream.writeObject(new Integer(maxInactiveInterval));
-        stream.writeObject(new Boolean(isNew));
-        stream.writeObject(new Boolean(isValid));
-        stream.writeObject(new Long(thisAccessedTime));
+        stream.writeObject(Long.valueOf(creationTime));
+        stream.writeObject(Long.valueOf(lastAccessedTime));
+        stream.writeObject(Integer.valueOf(maxInactiveInterval));
+        stream.writeObject(Boolean.valueOf(isNew));
+        stream.writeObject(Boolean.valueOf(isValid));
+        stream.writeObject(Long.valueOf(thisAccessedTime));
         stream.writeObject(id);
         if (manager.getContainer().getLogger().isDebugEnabled())
             manager.getContainer().getLogger().debug
@@ -1589,7 +1589,7 @@ public class StandardSession
 
         // Serialize the attribute count and the Serializable attributes
         int n = saveNames.size();
-        stream.writeObject(new Integer(n));
+        stream.writeObject(Integer.valueOf(n));
         for (int i = 0; i < n; i++) {
             stream.writeObject(saveNames.get(i));
             try {
