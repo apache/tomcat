@@ -2962,13 +2962,8 @@ public class Request
 
         // Process the quality values in highest->lowest order (due to
         // negating the Double value when creating the key)
-        Iterator<Double> keys = locales.keySet().iterator();
-        while (keys.hasNext()) {
-            Double key = keys.next();
-            ArrayList<Locale> list = locales.get(key);
-            Iterator<Locale> values = list.iterator();
-            while (values.hasNext()) {
-                Locale locale = values.next();
+        for (ArrayList<Locale> list : locales.values()) {
+            for (Locale locale : list) {
                 addLocale(locale);
             }
         }
