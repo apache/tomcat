@@ -212,7 +212,7 @@ public class NamingContextListener
             return;
         }
 
-        if (Lifecycle.START_EVENT.equals(event.getType())) {
+        if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType())) {
 
             if (initialized)
                 return;
@@ -272,7 +272,7 @@ public class NamingContextListener
 
             initialized = true;
 
-        } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
+        } else if (Lifecycle.CONFIGURE_STOP_EVENT.equals(event.getType())) {
 
             if (!initialized)
                 return;
