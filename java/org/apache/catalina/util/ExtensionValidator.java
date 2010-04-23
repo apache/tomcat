@@ -62,7 +62,8 @@ public final class ExtensionValidator {
     private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
     
-    private static ArrayList<Extension> containerAvailableExtensions = null;
+    private static volatile ArrayList<Extension> containerAvailableExtensions =
+        null;
     private static ArrayList<ManifestResource> containerManifestResources =
         new ArrayList<ManifestResource>();
 
