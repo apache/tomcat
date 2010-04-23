@@ -144,13 +144,10 @@ public class ClusterSingleSignOnListener extends ClusterListener {
         Session session = null;
 
         if (ctxname == null) {
-            java.util.Iterator<String> i = managers.keySet().iterator();
-            while (i.hasNext()) {
-                String key = i.next();
-                ClusterManager mgr = managers.get(key);
-                if (mgr != null) {
+            for (Map.Entry<String, ClusterManager> entry : managers.entrySet()) {
+                if (entry.getValue() != null) {
                     try {
-                        session = mgr.findSession(sessionId);
+                        session = entry.getValue().findSession(sessionId);
                     } catch (IOException io) {
                         log.error("Session doesn't exist:" + io);
                     }
@@ -160,7 +157,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
                     // up
                     if (log.isDebugEnabled())
                         log.debug("Context manager doesn't exist:"
-                                  + key);
+                                  + entry.getKey());
                 }
             }
         } else {

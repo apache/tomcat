@@ -649,11 +649,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (orig == null)
             return (new HashMap<String, String[]>());
         HashMap<String, String[]> dest = new HashMap<String, String[]>();
-        Iterator<String> keys = orig.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            dest.put(key, orig.get(key));
+        
+        for (Map.Entry<String, String[]> entry : orig.entrySet()) {
+            dest.put(entry.getKey(), entry.getValue());
         }
+
         return (dest);
 
     }
