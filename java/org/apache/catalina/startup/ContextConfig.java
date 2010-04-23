@@ -1926,9 +1926,9 @@ public class ContextConfig
             } else if ("initParams".equals(name)) {
                 Map<String,String> initParams =
                     processAnnotationWebInitParams(evp.getValue());
-                for (String paramName : initParams.keySet()) {
-                    servletDef.addInitParameter(paramName,
-                            initParams.get(paramName));
+                for (Map.Entry<String, String> entry : initParams.entrySet()) {
+                    servletDef.addInitParameter(entry.getKey(),
+                            entry.getValue());
                 }
             } else {
                 // Ignore
@@ -1996,9 +1996,9 @@ public class ContextConfig
             } else if ("initParams".equals(name)) {
                 Map<String,String> initParams =
                     processAnnotationWebInitParams(evp.getValue());
-                for (String paramName : initParams.keySet()) {
-                    filterDef.addInitParameter(paramName,
-                            initParams.get(paramName));
+                for (Map.Entry<String, String> entry : initParams.entrySet()) {
+                    filterDef.addInitParameter(entry.getKey(),
+                            entry.getValue());
                 }
             } else {
                 // Ignore
