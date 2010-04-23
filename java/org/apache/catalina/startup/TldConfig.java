@@ -66,7 +66,7 @@ public final class TldConfig  implements LifecycleListener {
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
     
     // Names of JARs that are known not to contain any TLDs
-    private static Set<String> noTldJars = null;
+    private static volatile Set<String> noTldJars = null;
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );

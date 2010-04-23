@@ -124,7 +124,7 @@ public abstract class RealmBase extends LifecycleBase
     /**
      * MD5 message digest provider.
      */
-    protected static MessageDigest md5Helper;
+    protected static volatile MessageDigest md5Helper;
 
 
     /**
