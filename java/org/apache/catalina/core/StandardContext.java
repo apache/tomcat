@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -48,6 +50,7 @@ import javax.management.ObjectName;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
@@ -228,6 +231,13 @@ public class StandardContext
         new Object[0];
 
 
+    /**
+     * The ordered set of ServletContainerInitializers for this web application.
+     */
+    private Map<ServletContainerInitializer,Set<Class<?>>> initializers =
+        new LinkedHashMap<ServletContainerInitializer,Set<Class<?>>>();
+    
+    
     /**
      * The set of application parameters defined for this application.
      */
@@ -986,6 +996,19 @@ public class StandardContext
         this.aliases = aliases;
     }
     
+    
+    /**
+     * Add a ServletContainerInitializer instance to this web application.
+     * 
+     * @param sci       The instance to add
+     * @param classes   The classes in which the initializer expressed an
+     *                  interest
+     */
+    public void addServletContainerInitializer(
+            ServletContainerInitializer sci, Set<Class<?>> classes) {
+        initializers.put(sci, classes);
+    }
+
     
     /**
      * Return the "follow standard delegation model" flag used to configure
@@ -4712,6 +4735,19 @@ public class StandardContext
                 postWelcomeFiles();
             }
             
+            // Call ServletContainerInitializers
+            for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
+                initializers.entrySet()) {
+                try {
+                    entry.getKey().onStartup(entry.getValue(),
+                            getServletContext());
+                } catch (ServletException e) {
+                    // TODO: Log error
+                    ok = false;
+                    break;
+                }
+            }
+
             // Configure and call application event listeners
             if (ok) {
                 if (!listenerStart()) {
@@ -4971,7 +5007,7 @@ public class StandardContext
 
     }
     
-    private void resetContext() throws Exception, MBeanRegistrationException {
+    private void resetContext() throws Exception {
         // Restore the original state ( pre reading web.xml in start )
         // If you extend this - override this method and make sure to clean up
         children = new HashMap<String, Container>();
@@ -4986,6 +5022,8 @@ public class StandardContext
         applicationEventListenersObjects = new Object[0];
         applicationLifecycleListenersObjects = new Object[0];
         jspConfigDescriptor = new ApplicationJspConfigDescriptor();
+        
+        initializers.clear();
         
         if(log.isDebugEnabled())
             log.debug("resetContext " + oname);
