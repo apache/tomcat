@@ -38,7 +38,6 @@ import java.util.TreeMap;
 import javax.management.AttributeNotFoundException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
@@ -4461,13 +4460,8 @@ public class StandardContext
         }
 
         // Load the collected "load on startup" servlets
-        Iterator<Integer> keys = map.keySet().iterator();
-        while (keys.hasNext()) {
-            Integer key = keys.next();
-            ArrayList<Wrapper> list = map.get(key);
-            Iterator<Wrapper> wrappers = list.iterator();
-            while (wrappers.hasNext()) {
-                Wrapper wrapper = wrappers.next();
+        for (ArrayList<Wrapper> list : map.values()) {
+            for (Wrapper wrapper : list) {
                 try {
                     wrapper.load();
                 } catch (ServletException e) {

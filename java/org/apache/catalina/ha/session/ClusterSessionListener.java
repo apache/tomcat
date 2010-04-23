@@ -17,7 +17,6 @@
 
 package org.apache.catalina.ha.session;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.catalina.ha.*;
@@ -67,18 +66,16 @@ public class ClusterSessionListener extends ClusterListener {
             //if so, wait until we are fully started up
             Map<String,ClusterManager> managers = cluster.getManagers() ;
             if (ctxname == null) {
-                Iterator<String> i = managers.keySet().iterator();
-                while (i.hasNext()) {
-                    String key = i.next();
-                    ClusterManager mgr = managers.get(key);
-                    if (mgr != null)
-                        mgr.messageDataReceived(msg);
+                for (Map.Entry<String, ClusterManager> entry :
+                        managers.entrySet()) {
+                    if (entry.getValue() != null)
+                        entry.getValue().messageDataReceived(msg);
                     else {
                         //this happens a lot before the system has started
                         // up
                         if (log.isDebugEnabled())
                             log.debug("Context manager doesn't exist:"
-                                    + key);
+                                    + entry.getKey());
                     }
                 }
             } else {
