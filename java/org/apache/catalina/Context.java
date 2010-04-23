@@ -20,7 +20,9 @@ package org.apache.catalina;
 
 
 import java.net.URL;
+import java.util.Set;
 
+import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
@@ -1183,11 +1185,23 @@ public interface Context extends Container {
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
+    
     /**
      * Add a URL for a JAR that contains static resources in a
      * META-INF/resources directory that should be included in the static
      * resources for this context.
      */
     public void addResourceJarUrl(URL url);
+    
+    
+    /**
+     * Add a ServletContainerInitializer instance to this web application.
+     * 
+     * @param sci       The instance to add
+     * @param classes   The classes in which the initializer expressed an
+     *                  interest
+     */
+    public void addServletContainerInitializer(
+            ServletContainerInitializer sci, Set<Class<?>> classes);
 }
 
