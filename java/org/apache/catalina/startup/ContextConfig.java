@@ -19,11 +19,14 @@
 package org.apache.catalina.startup;
 
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -33,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -40,7 +44,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.annotation.HandlesTypes;
 
 import org.apache.tomcat.util.bcel.classfile.AnnotationElementValue;
 import org.apache.tomcat.util.bcel.classfile.AnnotationEntry;
@@ -146,6 +152,19 @@ public class ContextConfig
      */
     protected String originalDocBase = null;
     
+
+    /**
+     * Map of ServletContainerInitializer to classes they expressed interest in.
+     */
+    protected Map<ServletContainerInitializer, Set<Class<?>>> initializerClassMap =
+        new LinkedHashMap<ServletContainerInitializer, Set<Class<?>>>();
+    
+    /**
+     * Map of Types to ServletContainerInitializer that are interested in those
+     * types.
+     */
+    protected Map<Class<?>, Set<ServletContainerInitializer>> typeInitializerMap =
+        new HashMap<Class<?>, Set<ServletContainerInitializer>>();
 
     /**
      * The string resources for this package.
@@ -1199,51 +1218,204 @@ public class ContextConfig
         }
         
         if (webXmlVersion >= 3 && !webXml.isMetadataComplete()) {
-            // Process /WEB-INF/classes for annotations
-            URL webinfClasses;
-            try {
-                webinfClasses =
-                    context.getServletContext().getResource("/WEB-INF/classes");
-                processAnnotationsUrl(webinfClasses, webXml);
-            } catch (MalformedURLException e) {
-                log.error(sm.getString("contextConfig.webinfClassesUrl"), e);
-            }
-            
-            // Have to process JARs for fragments
+            // Ordering is important here
+
+            // Step 1. Identify all the JARs packaged with the application
+            // If the JARs have a web-fragment.xml it will be parsed at this
+            // point.
             Map<String,WebXml> fragments = processJarsForWebFragments();
-            
-            // Order the fragments
+
+            // Step 2. Order the fragments.
             Set<WebXml> orderedFragments =
                 WebXml.orderWebFragments(webXml, fragments);
 
-            // Process JARs for annotations - only need to process those
-            // fragments we are going to use
-            processAnnotations(orderedFragments);
+            // Step 3. Look for ServletContainerInitializer implementations
+            ok = processServletContainerInitializers(orderedFragments);
 
-            // Merge fragment into application
+            // Step 4. Process /WEB-INF/classes for annotations
+            // This will add any matching classes to the typeInitializerMap
+            if (ok) {
+                URL webinfClasses;
+                try {
+                    webinfClasses =
+                        context.getServletContext().getResource("/WEB-INF/classes");
+                    processAnnotationsUrl(webinfClasses, webXml);
+                } catch (MalformedURLException e) {
+                    log.error(sm.getString("contextConfig.webinfClassesUrl"), e);
+                }
+            }
+
+            // Step 5. Process JARs for annotations - only need to process those
+            // fragments we are going to use
+            // This will add any matching classes to the typeInitializerMap
+            if (ok) {
+                processAnnotations(orderedFragments);
+            }
+
+            // Step 6. Merge web-fragment.xml files into the main web.xml file.
             if (ok) {
                 ok = webXml.merge(orderedFragments);
             }
 
-            // Apply merged web.xml to Context
-            webXml.configureContext(context);
-            
-            // Make the merged web.xml available to other components,
-            // specifically Jasper, to save those components from having to
-            // re-generate it.
-            String mergedWebXml = webXml.toXml();
-            context.getServletContext().setAttribute(
-                   org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
-                    mergedWebXml);
-            if (context.getLogEffectiveWebXml()) {
-                log.info("web.xml:\n" + mergedWebXml);
+            // Step 7. Apply merged web.xml to Context
+            if (ok) {
+                webXml.configureContext(context);
+
+                // Step 7a. Make the merged web.xml available to other
+                // components, specifically Jasper, to save those components
+                // from having to re-generate it.
+                // TODO Use a ServletContainerInitializer for Jasper
+                String mergedWebXml = webXml.toXml();
+                context.getServletContext().setAttribute(
+                       org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
+                        mergedWebXml);
+                if (context.getLogEffectiveWebXml()) {
+                    log.info("web.xml:\n" + mergedWebXml);
+                }
             }
             
-            processResourceJARs(orderedFragments);
+            // Step 8. Look for static resources packaged in JARs
+            if (ok) {
+                processResourceJARs(orderedFragments);
+            }
+            
+            // Step 9. Apply the ServletContainerInitializer config to the
+            // context
+            if (ok) {
+                for (Map.Entry<ServletContainerInitializer,Set<Class<?>>> entry :
+                        initializerClassMap.entrySet()) {
+                    if (entry.getValue().isEmpty()) {
+                        context.addServletContainerInitializer(entry.getKey(),
+                                null);
+                    } else {
+                        context.addServletContainerInitializer(entry.getKey(),
+                                entry.getValue());
+                    }
+                }
+            }
         } else {
             // Apply unmerged web.xml to Context
             webXml.configureContext(context);
-        }        
+        }
+    }
+
+    
+    /**
+     * Scan JARs for ServletContainerInitializer implementations.
+     * Implementations will be added in web-fragment.xml priority order.
+     */
+    protected boolean processServletContainerInitializers(
+            Set<WebXml> fragments) {
+        
+        for (WebXml fragment : fragments) {
+            URL jarUrl = fragment.getURL();
+            JarFile jarFile = null;
+            InputStream is = null;
+            ServletContainerInitializer sci = null;
+            try {
+                JarURLConnection conn =
+                    (JarURLConnection) jarUrl.openConnection();
+                jarFile = conn.getJarFile();   
+                ZipEntry entry = jarFile.getEntry(
+                        "META-INF/services/javax.servlet.ServletContainerInitializer");
+                if (entry != null) {
+                    is = jarFile.getInputStream(entry);
+                    sci = getServletContainerInitializer(is);
+                }
+            } catch (IOException ioe) {
+                log.error(sm.getString(
+                        "contextConfig.servletContainerInitializerFail", jarUrl,
+                        context.getPath()));
+                return false;
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+                if (jarFile != null) {
+                    try {
+                        jarFile.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            }
+            
+            if (sci == null) {
+                break;
+            }
+
+            initializerClassMap.put(sci, new HashSet<Class<?>>());
+            
+            HandlesTypes ht =
+                sci.getClass().getAnnotation(HandlesTypes.class);
+            if (ht != null) {
+                Class<?>[] types = ht.value();
+                if (types != null) {
+                    for (Class<?> type : types) {
+                        Set<ServletContainerInitializer> scis =
+                            typeInitializerMap.get(type.getCanonicalName());
+                        if (scis == null) {
+                            scis = new HashSet<ServletContainerInitializer>();
+                            typeInitializerMap.put(type, scis);
+                        }
+                        scis.add(sci);
+                    }
+                }
+            }
+
+        }
+        return true;
+    }
+    
+    
+    /**
+     * Extract the name of the ServletContainerInitializer.
+     * 
+     * @param is    The resource where the name is defined 
+     * @return      The class name
+     * @throws IOException
+     */
+    protected ServletContainerInitializer getServletContainerInitializer(
+            InputStream is) throws IOException {
+
+        String className = null;
+        
+        if (is != null) {
+            String line = null;
+            try {
+                BufferedReader br =
+                    new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                line = br.readLine();
+                if (line != null && line.trim().length() > 0) {
+                    className = line.trim();
+                }
+            } catch (UnsupportedEncodingException e) {
+                // Should never happen with UTF-8
+                // If it does - ignore & return null
+            }
+        }
+        
+        ServletContainerInitializer sci = null;
+        try {
+            Class<?> clazz = Class.forName(className,true,
+                    context.getLoader().getClassLoader());
+             sci = (ServletContainerInitializer) clazz.newInstance();
+        } catch (ClassNotFoundException e) {
+            log.error(sm.getString("contextConfig.invalidSci", className), e);
+            throw new IOException(e);
+        } catch (InstantiationException e) {
+            log.error(sm.getString("contextConfig.invalidSci", className), e);
+            throw new IOException(e);
+        } catch (IllegalAccessException e) {
+            log.error(sm.getString("contextConfig.invalidSci", className), e);
+            throw new IOException(e);
+        }
+        
+        return sci;
     }
 
     
@@ -1661,9 +1833,13 @@ public class ContextConfig
         
         ClassParser parser = new ClassParser(is, null);
         JavaClass clazz = parser.parse();
-        String className = clazz.getClassName();
-        AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
         
+        checkHandlesTypes(clazz);
+        
+        String className = clazz.getClassName();
+        
+        AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
+
         for (AnnotationEntry ae : annotationsEntries) {
             String type = ae.getAnnotationType();
             if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
@@ -1674,6 +1850,39 @@ public class ContextConfig
                 fragment.addListener(className);
             } else {
                 // Unknown annotation - ignore
+            }
+        }
+    }
+
+    /**
+     * For classes packaged with the web application, the class and each
+     * super class needs to be checked for a match with {@Link HandlesTypes}.
+     * @param javaClass
+     */
+    protected void checkHandlesTypes(JavaClass javaClass) {
+        
+        // Skip this if we can
+        if (typeInitializerMap.size() == 0)
+            return;
+        
+        // No choice but to load the class
+        String className = javaClass.getClassName();
+        
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(className, true,
+                    context.getLoader().getClassLoader());
+        } catch (ClassNotFoundException e) {
+            log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
+                    className), e);
+        }
+
+        for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
+                typeInitializerMap.entrySet()) {
+            if (entry.getKey().isAssignableFrom(clazz)) {
+                for (ServletContainerInitializer sci : entry.getValue()) {
+                    initializerClassMap.get(sci).add(clazz);
+                }
             }
         }
     }
