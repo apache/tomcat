@@ -92,7 +92,7 @@ public class TagSupport implements IterationTag, Serializable {
             }
 
             if ((isInterface && klass.isInstance(tag)) ||
-                klass.isAssignableFrom(tag.getClass())) {
+                    ((Class<?>)klass).isAssignableFrom(tag.getClass())) {
                 return tag;
             }
             from = tag;
