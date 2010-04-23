@@ -29,6 +29,9 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.ChannelException;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestOrderInterceptor extends TestCase {
@@ -91,6 +94,7 @@ public class TestOrderInterceptor extends TestCase {
     public void testOrder2() throws Exception {
         final Member[] dest = channels[0].getMembers();
         final AtomicInteger value = new AtomicInteger(0);
+        final Queue<Exception> exceptionQueue = new ConcurrentLinkedQueue<Exception>();
         Runnable run = new Runnable() {
             public void run() {
                 for (int i = 0; i < 100; i++) {
@@ -99,8 +103,7 @@ public class TestOrderInterceptor extends TestCase {
                             channels[0].send(dest, new Integer(value.getAndAdd(1)), 0);
                         }
                     }catch ( Exception x ) {
-                        x.printStackTrace();
-                        assertEquals(true,false);
+                        exceptionQueue.add(x);
                     }
                 }
             }
@@ -114,6 +117,10 @@ public class TestOrderInterceptor extends TestCase {
         }
         for (int i=0;i<threads.length;i++) {
             threads[i].join();
+        }
+        if (!exceptionQueue.isEmpty()) {
+        	fail("Exception while sending in threads: " 
+        			+ exceptionQueue.remove().toString());
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
