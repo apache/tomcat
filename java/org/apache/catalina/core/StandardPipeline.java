@@ -34,6 +34,7 @@ import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 
 
@@ -315,7 +316,7 @@ public class StandardPipeline extends LifecycleBase
                 try {
                     ((Contained) oldBasic).setContainer(null);
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }
