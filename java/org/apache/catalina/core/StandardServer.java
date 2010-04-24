@@ -654,6 +654,7 @@ public final class StandardServer extends LifecycleBase
     @Override
     protected void startInternal() throws LifecycleException {
 
+        fireLifecycleEvent(CONFIGURE_START_EVENT, null);
         setState(LifecycleState.STARTING);
 
         // Start our defined Services
@@ -676,7 +677,8 @@ public final class StandardServer extends LifecycleBase
     protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
-
+        fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
+        
         // Stop our defined Services
         for (int i = 0; i < services.length; i++) {
             services[i].stop();
