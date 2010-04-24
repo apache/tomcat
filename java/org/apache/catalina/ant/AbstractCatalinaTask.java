@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import org.apache.catalina.util.Base64;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -272,7 +273,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 try {
                     reader.close();
                 } catch (Throwable u) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(u);
                 }
                 reader = null;
             }
@@ -280,7 +281,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 try {
                     istream.close();
                 } catch (Throwable u) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(u);
                 }
                 istream = null;
             }

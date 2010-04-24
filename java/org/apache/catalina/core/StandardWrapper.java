@@ -60,6 +60,7 @@ import org.apache.catalina.util.InstanceSupport;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.PeriodicEventListener;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 
@@ -585,7 +586,7 @@ public class StandardWrapper
         try {
             loadServlet();
         } catch (Throwable t) {
-            // Ignore
+            ExceptionUtils.handleThrowable(t);
         }
         return (singleThreadModel);
 

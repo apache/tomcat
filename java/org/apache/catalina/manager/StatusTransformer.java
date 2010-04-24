@@ -33,6 +33,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * This is a refactoring of the servlet to externalize
@@ -158,7 +159,7 @@ public class StatusTransformer {
             method.invoke(null, paramValues);
             ok = true;
         } catch (Throwable t) {
-            // Ignore
+            ExceptionUtils.handleThrowable(t);
         }
         
         if (ok) {

@@ -43,6 +43,7 @@ import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.ha.ClusterManager;
 
@@ -978,8 +979,8 @@ public class DeltaManager extends ClusterManagerBase{
                 continue;
             try {
                 session.expire(true, isExpireSessionsOnShutdown());
-            } catch (Throwable ignore) {
-                // Ignore
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
             } 
         }
 

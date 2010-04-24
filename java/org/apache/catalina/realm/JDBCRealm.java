@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
@@ -450,7 +451,7 @@ public class JDBCRealm
         try {
             preparedCredentials.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedCredentials = null;
 
@@ -458,7 +459,7 @@ public class JDBCRealm
         try {
             preparedRoles.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedRoles = null;
 

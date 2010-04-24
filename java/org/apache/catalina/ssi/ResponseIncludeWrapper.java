@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.tomcat.util.ExceptionUtils;
+
 /**
  * A HttpServletResponseWrapper, used from
  * <code>SSIServletExternalResolver</code>
@@ -228,7 +230,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
                     lastModified = RFC1123_FORMAT.parse(value).getTime();
                 }
             } catch (Throwable ignore) {
-                // Ignore
+                ExceptionUtils.handleThrowable(ignore);
             }
         } else if (lname.equals(CONTENT_TYPE)) {
             contentType = value;
@@ -254,7 +256,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
                     lastModified = RFC1123_FORMAT.parse(value).getTime();
                 }
             } catch (Throwable ignore) {
-                // Ignore
+                ExceptionUtils.handleThrowable(ignore);
             }
         }
         else if (lname.equals(CONTENT_TYPE))

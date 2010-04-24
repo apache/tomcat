@@ -50,6 +50,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -402,7 +403,7 @@ public abstract class ManagerBase extends LifecycleBase
                 method.invoke(null, paramValues);
                 apr = true;
             } catch (Throwable t) {
-                // Ignore
+                ExceptionUtils.handleThrowable(t);
             }
             if (apr) {
                 setEntropy(new String(result));
