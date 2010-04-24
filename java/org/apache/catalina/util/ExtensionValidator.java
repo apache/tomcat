@@ -35,6 +35,7 @@ import javax.naming.directory.DirContext;
 
 import org.apache.catalina.Context;
 import org.apache.naming.resources.Resource;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -168,7 +169,7 @@ public final class ExtensionValidator {
                 try {
                     inputStream.close();
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }
@@ -207,7 +208,7 @@ public final class ExtensionValidator {
                 try {
                     inputStream.close();
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }
@@ -398,7 +399,7 @@ public final class ExtensionValidator {
                 try {
                     jin.close();
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }

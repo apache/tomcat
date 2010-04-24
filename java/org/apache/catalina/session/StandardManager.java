@@ -47,6 +47,7 @@ import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 /**
  * Standard implementation of the <b>Manager</b> interface that provides
  * simple session persistence across restarts of this component (such as
@@ -547,7 +548,7 @@ public class StandardManager extends ManagerBase
             try {
                 session.expire(false);
             } catch (Throwable t) {
-                // Ignore
+                ExceptionUtils.handleThrowable(t);
             } finally {
                 session.recycle();
             }
@@ -621,7 +622,7 @@ public class StandardManager extends ManagerBase
                     session.expire();
                 }
             } catch (Throwable t) {
-                // Ignore
+                ExceptionUtils.handleThrowable(t);
             } finally {
                 // Measure against memory leaking if references to the session
                 // object are kept in a shared field somewhere

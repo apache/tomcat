@@ -34,6 +34,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -575,7 +576,7 @@ public final class JDBCAccessLogValve extends ValveBase {
         try {
             ps.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.ps = null;
 

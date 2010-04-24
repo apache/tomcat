@@ -49,6 +49,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.Registry;
@@ -872,7 +873,7 @@ public class HostConfig
                     try {
                         ostream.close();
                     } catch (Throwable t) {
-                        // Ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                     ostream = null;
                 }
@@ -880,7 +881,7 @@ public class HostConfig
                     try {
                         istream.close();
                     } catch (Throwable t) {
-                        // Ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                     istream = null;
                 }
@@ -890,7 +891,7 @@ public class HostConfig
                     try {
                         jar.close();
                     } catch (Throwable t) {
-                        // Ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                     jar = null;
                 }
@@ -942,7 +943,7 @@ public class HostConfig
                             try {
                                 istream.close();
                             } catch (Throwable t) {
-                                // Ignore
+                                ExceptionUtils.handleThrowable(t);
                             }
                             istream = null;
                         }
@@ -952,7 +953,7 @@ public class HostConfig
                             try {
                                 jar.close();
                             } catch (Throwable t) {
-                                // Ignore
+                                ExceptionUtils.handleThrowable(t);
                             }
                             jar = null;
                         }

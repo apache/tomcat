@@ -32,6 +32,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.catalina.Host;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -153,7 +154,7 @@ public class ExpandWar {
                 try {
                     input.close();
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
                 input = null;
             }
@@ -161,7 +162,7 @@ public class ExpandWar {
                 try {
                     jarFile.close();
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
                 jarFile = null;
             }
@@ -228,7 +229,7 @@ public class ExpandWar {
                 try {
                     jarFile.close();
                 } catch (Throwable t) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
                 jarFile = null;
             }

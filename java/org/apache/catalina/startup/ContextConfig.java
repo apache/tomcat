@@ -48,6 +48,7 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.HandlesTypes;
 
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.bcel.classfile.AnnotationElementValue;
 import org.apache.tomcat.util.bcel.classfile.AnnotationEntry;
 import org.apache.tomcat.util.bcel.classfile.ArrayElementValue;
@@ -1730,7 +1731,7 @@ public class ContextConfig
                             try {
                                 is.close();
                             } catch (Throwable t) {
-                                // ignore
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
@@ -1743,7 +1744,7 @@ public class ContextConfig
                 try {
                     jarFile.close();
                 } catch (Throwable t) {
-                    // ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }
@@ -1788,7 +1789,7 @@ public class ContextConfig
                             try {
                                 is.close();
                             } catch (Throwable t) {
-                                // ignore
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
@@ -1820,7 +1821,7 @@ public class ContextConfig
                     try {
                         fis.close();
                     } catch (Throwable t) {
-                        // ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                 }
             }
@@ -2087,14 +2088,14 @@ public class ContextConfig
                     try {
                         jarFile.close();
                     } catch (Throwable t) {
-                        // ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                 }
                 if (stream != null) {
                     try {
                         stream.close();
                     } catch (Throwable t) {
-                        // ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                 }
                 fragment.setURL(urlConn.getURL());
@@ -2126,7 +2127,7 @@ public class ContextConfig
                     try {
                         stream.close();
                     } catch (Throwable t) {
-                        // ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                 }
                 if (fragment == null) {

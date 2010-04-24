@@ -44,6 +44,8 @@ import javax.servlet.SessionTrackingMode;
 import javax.servlet.FilterRegistration.Dynamic;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.jasper.util.ExceptionUtils;
+
 
 /**
  * Simple <code>ServletContext</code> implementation without
@@ -267,7 +269,7 @@ public class JspCServletContext implements ServletContext {
                 try {
                     is.close();
                 } catch (Throwable t2) {
-                    // Ignore
+                    ExceptionUtils.handleThrowable(t2);
                 }
             }
         }

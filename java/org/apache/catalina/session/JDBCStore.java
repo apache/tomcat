@@ -23,6 +23,7 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.tomcat.util.ExceptionUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -901,41 +902,41 @@ public class JDBCStore extends StoreBase {
         try {
             preparedSizeSql.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedSizeSql = null;
 
         try {
             preparedKeysSql.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedKeysSql = null;
 
         try {
             preparedSaveSql.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedSaveSql = null;
 
         try {
             preparedClearSql.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
          
 		try {
             preparedRemoveSql.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedRemoveSql = null;
 
         try {
             preparedLoadSql.close();
         } catch (Throwable f) {
-            // Ignore
+            ExceptionUtils.handleThrowable(f);
         }
         this.preparedLoadSql = null;
 
