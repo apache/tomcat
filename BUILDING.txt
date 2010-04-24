@@ -133,7 +133,7 @@ The documentation can be easly built:
     cd ${tomcat.source}
     ant extras
 
-(7) Building a release running tests:
+(7) Building a full release (as provided via the ASF download pages):
 
     cd ${tomcat.source}
     ant release
