@@ -45,8 +45,11 @@ maven.asf.release.deploy.version=7.0.0
 #Where do we load the libraries from
 tomcat.lib.path=../../output/build/lib
 tomcat.bin.path=../../output/build/bin
+tomcat.src.path=../../output/src-jars
 tomcat.embed.path=../../output/embed
+tomcat.embed.src.path=../../output/embed-src-jars
 tomcat.extras.path=../../output/extras
+tomcat.extras.src.path=../../output/extras-src-jars
 
 #Where do we find the POM files
 tomcat.pom.path=../../res/maven
