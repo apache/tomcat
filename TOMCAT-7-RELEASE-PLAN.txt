@@ -27,16 +27,7 @@
 
 3. Implement all the new Servlet 3 features
    NOTE: Status is based on a review of the specification, not the TCK tests
-   - Sections 1 to 3 - Compliant
-   - Sections 4.1 to 4.3 - Compliant
-   - Section 4.4 - TODO - ServletContainerInitializer
-   - Section 4.5 to 4.8 - Compliant
-   - Sections 5 to 7 - Compliant
-   - Section 8 - in progress
-     8.1 - Compliant
-     8.2 - TODO - ServletContainerInitializer
-     8.3 to 8.4 - Compliant
-   - Sections 9 to 15 - Compliant
+   - Sections 1 to 15
    - Strict spec compliance requires deployment descriptor validation
 
 4. Do an initial release (from trunk)
