@@ -30,6 +30,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -139,7 +140,7 @@ public class ErrorReportValve extends ValveBase {
         try {
             report(request, response, throwable);
         } catch (Throwable tt) {
-            // Ignore
+            ExceptionUtils.handleThrowable(tt);
         }
 
     }
@@ -176,7 +177,7 @@ public class ErrorReportValve extends ValveBase {
         try {
             report = sm.getString("http." + statusCode, message);
         } catch (Throwable t) {
-            // Ignore
+            ExceptionUtils.handleThrowable(t);
         }
         if (report == null)
             return;

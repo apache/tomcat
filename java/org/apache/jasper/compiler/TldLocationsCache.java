@@ -34,6 +34,7 @@ import java.util.jar.JarFile;
 import javax.servlet.ServletContext;
 
 import org.apache.jasper.JasperException;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.tomcat.JarScanner;
@@ -388,7 +389,7 @@ public class TldLocationsCache {
                 try {
                     jarFile.close();
                 } catch (Throwable t) {
-                    // ignore
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }

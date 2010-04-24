@@ -54,6 +54,7 @@ import org.apache.coyote.ajp.AjpProtocol;
 import org.apache.coyote.http11.Http11AprProtocol;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http11.Http11Protocol;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
@@ -1617,7 +1618,7 @@ public class MBeanUtils {
         try {
             ((Contained)valve).setContainer(null);
         } catch (Throwable t) {
-            // Ignore
+            ExceptionUtils.handleThrowable(t);
         }
         if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
