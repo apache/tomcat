@@ -53,10 +53,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper-jdt</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>ecj</artifactId>
+      <version>3.5.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>

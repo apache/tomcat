@@ -111,7 +111,8 @@
     <attribute name="groupId" default="org.apache.tomcat" />
     <attribute name="file" default="${tomcat.lib.path}/@{jarFileName}" />
     <attribute name="pom" default="@{artifactId}.pom" />
-    <attribute name="src" default="${basedir}/TODO-currently-empty-src.jar" />
+    <attribute name="srcJarFileName" default="@{artifactId}-src.jar" />
+    <attribute name="src" default="${tomcat.src.path}/@{srcJarFileName}" />
     <sequential>
       <antcall target="maven-deploy">
         <param name="file" value="@{file}"/>
@@ -119,74 +120,156 @@
         <param name="artifactId" value="@{artifactId}"/>
         <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
         <param name="src" value="@{src}"/>
+        <param name="src.skip" value="@{src.skip}"/>
       </antcall>
     </sequential>
   </macrodef>
-  
+
+  <target name="maven-deploy-nosrc" depends="init-maven">
+    <!--cleanup-->
+    <delete file="${pom}.tmp"/>
+    <delete file="${file}.asc"/>
+
+    <!--replace the version in the pom-->
+    <copy file="${pom}" tofile="${pom}.tmp">
+      <filterset>
+        <filter token="MAVEN.DEPLOY.VERSION" value="${maven.deploy.version}"/>
+      </filterset>
+    </copy>
+	    
+    <!--sign the jar-->
+    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="${file}"/>
+    </exec>
+	    
+    <!--deploy it-->
+    <artifact:deploy file="${file}">
+      <pom file="${pom}.tmp"/>
+      <remoteRepository url="${maven.repo.url}" layout="default">
+        <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
+      </remoteRepository>
+	  <attach file="${file}.asc" type="jar.asc"/>
+    </artifact:deploy>
+
+    <delete file="${pom}.tmp"/>
+    <delete file="${file}.asc"/>
+  </target>
+
+  <macrodef name="doMavenDeployNoSrc">
+    <attribute name="artifactId"/>
+    <attribute name="jarFileName" default="@{artifactId}.jar" />
+    <attribute name="groupId" default="org.apache.tomcat" />
+    <attribute name="file" default="${tomcat.lib.path}/@{jarFileName}" />
+    <attribute name="pom" default="@{artifactId}.pom" />
+    <sequential>
+      <antcall target="maven-deploy-nosrc">
+        <param name="file" value="@{file}"/>
+        <param name="groupId" value="@{groupId}"/>
+        <param name="artifactId" value="@{artifactId}"/>
+        <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
+      </antcall>
+    </sequential>
+  </macrodef>
+
   <target name="generic-deploy" depends="init-maven">
   	<!-- Standard jars in bin directory -->
   	<!-- Skip bootstrap.jar - it is just a subset of catalina.jar -->
-  	<doMavenDeploy artifactId="tomcat-juli" file="${tomcat.bin.path}/tomcat-juli.jar"/>
-    <!-- TODO source JAR -->
-  	
+  	<doMavenDeploy artifactId="tomcat-juli"
+  		                 file="${tomcat.bin.path}/tomcat-juli.jar"/>
+
   	<!-- Standard jars in lib directory -->
-  	<doMavenDeploy artifactId="tomcat-annotations-api" jarFileName="annotations-api.jar"/>
-  	<doMavenDeploy artifactId="tomcat-catalina" jarFileName="catalina.jar"/>
-    <doMavenDeploy artifactId="tomcat-catalina-ant" jarFileName="catalina-ant.jar"/>
-    <doMavenDeploy artifactId="tomcat-catalina-ha" jarFileName="catalina-ha.jar"/>
-    <doMavenDeploy artifactId="tomcat-tribes" jarFileName="catalina-tribes.jar"/>
-    <doMavenDeploy artifactId="tomcat-el-api" jarFileName="el-api.jar"/>
-    <doMavenDeploy artifactId="tomcat-jasper" jarFileName="jasper.jar"/>
-    <doMavenDeploy artifactId="tomcat-jasper-el" jarFileName="jasper-el.jar"/>
-    <doMavenDeploy artifactId="tomcat-jasper-jdt" jarFileName="jasper-jdt.jar"/>
-    <doMavenDeploy artifactId="tomcat-jsp-api" jarFileName="jsp-api.jar"/>
-    <doMavenDeploy artifactId="tomcat-servlet-api" jarFileName="servlet-api.jar"/>
+  	<doMavenDeploy artifactId="tomcat-annotations-api"
+  		          jarFileName="annotations-api.jar"
+  		       srcJarFileName="annotations-api-src.jar"/>
+
+  	<doMavenDeploy artifactId="tomcat-catalina"
+  		          jarFileName="catalina.jar"
+               srcJarFileName="catalina-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-catalina-ant"
+                  jarFileName="catalina-ant.jar"
+               srcJarFileName="catalina-ant-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-catalina-ha"
+                  jarFileName="catalina-ha.jar"
+               srcJarFileName="catalina-ha-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-tribes"
+                  jarFileName="catalina-tribes.jar"
+               srcJarFileName="catalina-tribes-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-el-api"
+                  jarFileName="el-api.jar"
+               srcJarFileName="el-api-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-jasper"
+                  jarFileName="jasper.jar"
+               srcJarFileName="jasper-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-jasper-el"
+                  jarFileName="jasper-el.jar"
+               srcJarFileName="jasper-el-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-jsp-api"
+                  jarFileName="jsp-api.jar"
+               srcJarFileName="jsp-api-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-servlet-api"
+                  jarFileName="servlet-api.jar"
+               srcJarFileName="servlet-api-src.jar"/>
+
     <doMavenDeploy artifactId="tomcat-api"/>
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
-    <doMavenDeploy artifactId="tomcat-i18n-es"/>
-    <doMavenDeploy artifactId="tomcat-i18n-fr"/>
-    <doMavenDeploy artifactId="tomcat-i18n-ja"/>
-    <!-- TODO source JARs -->
+    <doMavenDeployNoSrc artifactId="tomcat-i18n-es"/>
+    <doMavenDeployNoSrc artifactId="tomcat-i18n-fr"/>
+    <doMavenDeployNoSrc artifactId="tomcat-i18n-ja"/>
 
     <!-- Extras jars -->
     <doMavenDeploy artifactId="tomcat-extras-juli"
         groupId="org.apache.tomcat.extras"
-    	file="${tomcat.extras.path}/tomcat-juli.jar" />
+    	file="${tomcat.extras.path}/tomcat-juli.jar"
+        src="${tomcat.extras.src.path}/tomcat-juli-src.jar" />
     <doMavenDeploy artifactId="tomcat-extras-juli-adapters"
     	groupId="org.apache.tomcat.extras"
-        file="${tomcat.extras.path}/tomcat-juli-adapters.jar" />
+        file="${tomcat.extras.path}/tomcat-juli-adapters.jar"
+        src="${tomcat.extras.src.path}/tomcat-juli-adapters-src.jar" />
     <doMavenDeploy artifactId="tomcat-catalina-jmx-remote"
     	groupId="org.apache.tomcat.extras"
-        file="${tomcat.extras.path}/catalina-jmx-remote.jar" />
+        file="${tomcat.extras.path}/catalina-jmx-remote.jar"
+        src="${tomcat.extras.src.path}/catalina-jmx-remote-src.jar" />
     <doMavenDeploy artifactId="tomcat-catalina-ws"
     	groupId="org.apache.tomcat.extras"
-        file="${tomcat.extras.path}/catalina-ws.jar" />
-    <!-- TODO source JARs -->
+        file="${tomcat.extras.path}/catalina-ws.jar"
+        src="${tomcat.extras.src.path}/catalina-ws-src.jar" />
 
   	<!-- Emedded jars -->
-  	<!-- Skip DBCP & Jasper-JDT - optional and can use standard ones above -->
+  	<!-- Skip DBCP - optional and can use standard ones above -->
     <doMavenDeploy artifactId="tomcat-embed-core"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-core.jar"
     	pom="tomcat-embed-core.pom"
-        src="${tomcat.embed.path}/tomcat-embed-core-src.jar"/>
+        src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-jasper"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
     	pom="tomcat-embed-jasper.pom"
-        src="${tomcat.embed.path}/tomcat-embed-jasper-src.jar"/>
+        src="${tomcat.embed.src.path}/tomcat-embed-jasper-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-logging-juli"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
         pom="tomcat-embed-logging-juli.pom"
-        src="${tomcat.embed.path}/tomcat-embed-logging-juli-src.jar"/>
+        src="${tomcat.embed.src.path}/tomcat-embed-logging-juli-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-logging-log4j"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-logging-log4j.jar"
-        pom="tomcat-embed-logging-log4j.pom" />
-    <!-- TODO source JAR -->
+        pom="tomcat-embed-logging-log4j.pom"
+        src="${tomcat.embed.src.path}/tomcat-embed-logging-log4j-src.jar"/>
   	
   </target>
 
