@@ -31,6 +31,7 @@ import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -412,7 +413,7 @@ public class MemoryUserDatabase implements UserDatabase {
                     try {
                         fis.close();
                     } catch (Throwable t) {
-                        // Ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                     throw e;
                 }

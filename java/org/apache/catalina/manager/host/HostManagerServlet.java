@@ -42,6 +42,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.catalina.core.ContainerBase;
@@ -316,7 +317,7 @@ public class HostManagerServlet
             value = getServletConfig().getInitParameter("debug");
             debug = Integer.parseInt(value);
         } catch (Throwable t) {
-            // Ignore
+            ExceptionUtils.handleThrowable(t);
         }
 
     }

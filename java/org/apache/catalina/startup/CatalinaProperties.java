@@ -25,6 +25,8 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.apache.tomcat.util.ExceptionUtils;
+
 
 /**
  * Utility class to read the bootstrap Catalina configuration.
@@ -91,7 +93,7 @@ public class CatalinaProperties {
                 is = (new URL(configUrl)).openStream();
             }
         } catch (Throwable t) {
-            // Ignore
+            ExceptionUtils.handleThrowable(t);
         }
 
         if (is == null) {
@@ -101,7 +103,7 @@ public class CatalinaProperties {
                 File properties = new File(conf, "catalina.properties");
                 is = new FileInputStream(properties);
             } catch (Throwable t) {
-                // Ignore
+                ExceptionUtils.handleThrowable(t);
             }
         }
 
@@ -110,7 +112,7 @@ public class CatalinaProperties {
                 is = CatalinaProperties.class.getResourceAsStream
                     ("/org/apache/catalina/startup/catalina.properties");
             } catch (Throwable t) {
-                // Ignore
+                ExceptionUtils.handleThrowable(t);
             }
         }
 
