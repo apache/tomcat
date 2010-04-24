@@ -1256,23 +1256,28 @@ public class ApplicationContext
         // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
         // method of a {@link ServletContextListener} that was not declared
         // in web.xml, a web-fragment or annotated with {@link WebListener}.
-
+        
+        boolean match = false;
         if (t instanceof ServletContextAttributeListener ||
                 t instanceof ServletRequestListener ||
                 t instanceof ServletRequestAttributeListener ||
                 t instanceof HttpSessionAttributeListener) {
             context.addApplicationEventListener(t);
-            return;
+            match = true;
         }
         
         if (t instanceof HttpSessionListener) {
             context.addApplicationLifecycleListener(t);
+            match = true;
         }
         
         if (t instanceof ServletContextListener) {
             // TODO SERVLET3 - also need to check caller? spec isn't clear
             context.addApplicationLifecycleListener(t);
+            match = true;
         }
+        
+        if (match) return;
         
         throw new IllegalArgumentException(sm.getString(
                 "applicationContext.addListener.iae.wrongType",
