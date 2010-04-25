@@ -1271,7 +1271,7 @@ class JspDocumentParser
                 isPlainUri = true;
             }
 
-            String[] location = ctxt.getTldLocation(uri);
+            TldLocation location = ctxt.getTldLocation(uri);
             if (location != null || !isPlainUri) {
                 if (ctxt.getOptions().isCaching()) {
                     result = ctxt.getOptions().getCache().get(uri);

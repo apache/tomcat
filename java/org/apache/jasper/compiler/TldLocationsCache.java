@@ -97,7 +97,7 @@ public class TldLocationsCache {
      *    [0] The location
      *    [1] If the location is a jar file, this is the location of the tld.
      */
-    private Hashtable<String, String[]> mappings;
+    private Hashtable<String, TldLocation> mappings;
 
     private boolean initialized;
     private ServletContext ctxt;
@@ -109,7 +109,7 @@ public class TldLocationsCache {
      */
     public TldLocationsCache(ServletContext ctxt) {
         this.ctxt = ctxt;
-        mappings = new Hashtable<String, String[]>();
+        mappings = new Hashtable<String, TldLocation>();
         initialized = false;
     }
 
@@ -151,7 +151,7 @@ public class TldLocationsCache {
      * Returns null if the uri is not associated with any tag library 'exposed'
      * in the web application.
      */
-    public String[] getLocation(String uri) throws JasperException {
+    public TldLocation getLocation(String uri) throws JasperException {
         if (!initialized) {
             init();
         }
@@ -263,12 +263,13 @@ public class TldLocationsCache {
                     continue;
                 if (uriType(tagLoc) == NOROOT_REL_URI)
                     tagLoc = "/WEB-INF/" + tagLoc;
-                String tagLoc2 = null;
+                TldLocation location;
                 if (tagLoc.endsWith(JAR_EXT)) {
-                    tagLoc = ctxt.getResource(tagLoc).toString();
-                    tagLoc2 = "META-INF/taglib.tld";
+                    location = new TldLocation("META-INF/taglib.tld", ctxt.getResource(tagLoc).toString());
+                } else {
+                    location = new TldLocation(tagLoc);
                 }
-                mappings.put(tagUri, new String[] { tagLoc, tagLoc2 });
+                mappings.put(tagUri, location);
             }
         } finally {
             if (webXml != null) {
@@ -423,7 +424,13 @@ public class TldLocationsCache {
             // Add implicit map entry only if its uri is not already
             // present in the map
             if (uri != null && mappings.get(uri) == null) {
-                mappings.put(uri, new String[]{ resourcePath, entryName });
+                TldLocation location;
+                if (entryName == null) {
+                    location = new TldLocation(resourcePath);
+                } else {
+                    location = new TldLocation(entryName, resourcePath);
+                }
+                mappings.put(uri, location);
             }
         } catch (JasperException e) {
             // Hack - makes exception handling simpler
