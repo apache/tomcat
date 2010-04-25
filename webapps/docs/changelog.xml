@@ -158,6 +158,11 @@
         <bug>48358</bug>: Add support for limiting the number of JSPs that are
         loaded at any one time. Based on a patch by Isabel Drost. (markt)
       </add>
+      <add>
+        <bug>48689</bug>: Access TLD files through a new JarResource interface
+        to make extending Jasper simpler, particularly in OSGi environments.
+        Patch provided by Jarek Gawor. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="High Availability">

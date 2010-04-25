@@ -60,7 +60,7 @@ class Parser implements TagConstants {
 
     private boolean directivesOnly;
 
-    private URL jarFileUrl;
+    private JarResource jarResource;
 
     private PageInfo pageInfo;
 
@@ -79,7 +79,7 @@ class Parser implements TagConstants {
      * The constructor
      */
     private Parser(ParserController pc, JspReader reader, boolean isTagFile,
-            boolean directivesOnly, URL jarFileUrl) {
+            boolean directivesOnly, JarResource jarResource) {
         this.parserController = pc;
         this.ctxt = pc.getJspCompilationContext();
         this.pageInfo = pc.getCompiler().getPageInfo();
@@ -88,7 +88,7 @@ class Parser implements TagConstants {
         this.scriptlessCount = 0;
         this.isTagFile = isTagFile;
         this.directivesOnly = directivesOnly;
-        this.jarFileUrl = jarFileUrl;
+        this.jarResource = jarResource;
         start = reader.mark();
     }
 
@@ -106,12 +106,12 @@ class Parser implements TagConstants {
      */
     public static Node.Nodes parse(ParserController pc, JspReader reader,
             Node parent, boolean isTagFile, boolean directivesOnly,
-            URL jarFileUrl, String pageEnc, String jspConfigPageEnc,
+            JarResource jarResource, String pageEnc, String jspConfigPageEnc,
             boolean isDefaultPageEncoding, boolean isBomPresent)
             throws JasperException {
 
         Parser parser = new Parser(pc, reader, isTagFile, directivesOnly,
-                jarFileUrl);
+                jarResource);
 
         Node.Root root = new Node.Root(reader.mark(), parent, false);
         root.setPageEncoding(pageEnc);
@@ -295,7 +295,7 @@ class Parser implements TagConstants {
         }
 
         try {
-            parserController.parse(file, parent, jarFileUrl);
+            parserController.parse(file, parent, jarResource);
         } catch (FileNotFoundException ex) {
             err.jspError(start, "jsp.error.file.not.found", file);
         } catch (Exception ex) {
@@ -384,7 +384,7 @@ class Parser implements TagConstants {
                                 .getCache().get(uri);
                     }
                     if (impl == null) {
-                        String[] location = ctxt.getTldLocation(uri);
+                        TldLocation location = ctxt.getTldLocation(uri);
                         impl = new TagLibraryInfoImpl(ctxt, parserController,
                                 pageInfo, prefix, uri, location, err);
                         if (ctxt.getOptions().isCaching()) {
@@ -394,8 +394,8 @@ class Parser implements TagConstants {
                         // Current compilation context needs location of cached
                         // tag files
                         for (TagFileInfo info : impl.getTagFiles()) {
-                            ctxt.setTagFileJarUrl(info.getPath(),
-                                    ctxt.getTagFileJarUrl());
+                            ctxt.setTagFileJarResource(info.getPath(),
+                                    ctxt.getTagFileJarResource());
                         }
                     }
                     pageInfo.addTaglib(uri, impl);

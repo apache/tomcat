@@ -35,6 +35,7 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
 import org.apache.jasper.compiler.ErrorDispatcher;
+import org.apache.jasper.compiler.JarResource;
 import org.apache.jasper.compiler.JavacErrorDetail;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
@@ -107,7 +108,7 @@ public class JspServletWrapper {
                              String tagFilePath,
                              TagInfo tagInfo,
                              JspRuntimeContext rctxt,
-                             URL tagFileJarUrl) {
+                             JarResource tagJarResource) {
 
         this.isTagFile = true;
         this.config = null;        // not used
@@ -116,7 +117,7 @@ public class JspServletWrapper {
         this.tripCount = 0;
         ctxt = new JspCompilationContext(jspUri, tagInfo, options,
                                          servletContext, this, rctxt,
-                                         tagFileJarUrl);
+                                         tagJarResource);
     }
 
     public JspCompilationContext getJspEngineContext() {
