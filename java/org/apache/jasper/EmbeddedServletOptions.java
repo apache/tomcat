@@ -186,6 +186,12 @@ public final class EmbeddedServletOptions implements Options {
     private boolean displaySourceFragment = true;
 
     
+    /**
+     * The maxim number of loaded jsps per web-application. If there are more
+     * jsps loaded, they will be unloaded.
+     */
+    private int maxLoadedJsps = -1;
+
     public String getProperty(String name ) {
         return settings.getProperty( name );
     }
@@ -380,6 +386,14 @@ public final class EmbeddedServletOptions implements Options {
      */
     public boolean getDisplaySourceFragment() {
         return displaySourceFragment;
+    }
+
+    /**
+     * Should any jsps be unloaded? If set to a value greater than 0 eviction of jsps
+     * is started. Default: -1
+     * */
+    public int getMaxLoadedJsps() {
+        return maxLoadedJsps;
     }
 
     /**
@@ -663,6 +677,17 @@ public final class EmbeddedServletOptions implements Options {
             }
         }
         
+        String maxLoadedJsps = config.getInitParameter("maxLoadedJsps");
+        if (maxLoadedJsps != null) {
+            try {
+                this.maxLoadedJsps = Integer.parseInt(maxLoadedJsps);
+            } catch(NumberFormatException ex) {
+                if (log.isWarnEnabled()) {
+                    log.warn(Localizer.getMessage("jsp.warning.maxLoadedJsps", ""+this.maxLoadedJsps));
+                }
+            }
+        }
+
         // Setup the global Tag Libraries location cache for this
         // web-application.
         tldLocationsCache = new TldLocationsCache(context);
