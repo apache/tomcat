@@ -40,8 +40,10 @@ import org.apache.jasper.Options;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.jasper.util.JspQueue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+
 
 /**
  * Class for tracking JSP compile time file dependencies when the
@@ -171,7 +173,11 @@ public final class JspRuntimeContext {
      * Maps JSP pages to their JspServletWrapper's
      */
     private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<String, JspServletWrapper>();
- 
+
+    /**
+     * Keeps JSP pages ordered by last access. 
+     */
+    private JspQueue<JspServletWrapper> jspQueue = new JspQueue<JspServletWrapper>();
 
     // ------------------------------------------------------ Public Methods
 
@@ -204,6 +210,30 @@ public final class JspRuntimeContext {
         jsps.remove(jspUri);
     }
 
+    /**
+     * Push a newly compiled JspServletWrapper into the queue at first
+     * execution of jsp.
+     *
+     * @param jsw Servlet wrapper for jsp.
+     * @return a ticket that can be pushed to front of queue at later execution times.
+     * */
+    public org.apache.jasper.util.Entry<JspServletWrapper> push(JspServletWrapper jsw) {
+        synchronized (jspQueue) {
+            return jspQueue.push(jsw);
+        }
+    }
+    
+    /**
+     * Push ticket for JspServletWrapper to front of the queue.
+     *
+     * @param ticket the ticket for the jsp.
+     * */
+    public void makeFirst(org.apache.jasper.util.Entry<JspServletWrapper> ticket) {
+        synchronized( jspQueue ) {
+            jspQueue.makeYoungest(ticket);
+        }
+    }
+    
     /**
      * Returns the number of JSPs for which JspServletWrappers exist, i.e.,
      * the number of JSPs that have been loaded into the webapp.
@@ -468,5 +498,48 @@ public final class JspRuntimeContext {
         return new SecurityHolder(source, permissions);
     }
 
+    /** Returns a JspServletWrapper that should be destroyed. Default strategy: Least recently used. */
+    public JspServletWrapper getJspForUnload(final int maxLoadedJsps) {
+        if( jsps.size() > maxLoadedJsps ) {
+            synchronized( jsps ) {
+                JspServletWrapper oldest;
+                synchronized( jspQueue) {
+                    oldest = jspQueue.pop();
+                }
+                if (oldest != null) {
+                    removeWrapper(oldest.getJspUri());
+                    return oldest;
+                }
+            }
+        }
+        return null;
+    }
 
+    /**
+     * Method used by background thread to check if any JSP's should be destroyed.
+     * If JSP's to be unloaded are found, they will be destroyed.
+     * Uses the lastCheck time from background compiler to determine if it is time to unload JSP's.
+     */
+    public void checkUnload() {    	
+        if (options.getMaxLoadedJsps() > 0) {
+            long now = System.currentTimeMillis();
+            if (now > (lastCheck + (options.getCheckInterval() * 1000L))) {
+                while (unloadJsp());
+            }
+        }
+    }
+    
+    /**
+     * Checks whether there is a jsp to unload, if one is found, it is destroyed. 
+     * */
+    public boolean unloadJsp() {
+        JspServletWrapper jsw = getJspForUnload(options.getMaxLoadedJsps());
+        if( null != jsw ) {
+            synchronized(jsw) {
+                jsw.destroy();
+                return true;
+            }
+        }
+        return false;
+    }
 }

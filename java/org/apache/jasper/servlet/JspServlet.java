@@ -286,6 +286,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
 
     public void periodicEvent() {
+        rctxt.checkUnload();
         rctxt.checkCompile();
     }
 

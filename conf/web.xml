@@ -185,6 +185,14 @@
   <!--                       print statement per input line, to ease        -->
   <!--                       debugging?  [true]                             -->
   <!--                                                                      -->
+  <!--   maxLoadedJsps       The maximum number of JSPs that will be loaded -->
+  <!--                       for a web application. If more than this       -->
+  <!--                       number of JSPs are loaded, the least recently  -->
+  <!--                       used JSPs will be unloaded so that the number  -->
+  <!--                       of JSPs loaded at any one time does not exceed -->
+  <!--                       this limit. A value of zero or less indicates  -->
+  <!--                       no limit. [-1]                                 -->
+  <!--                                                                      -->
   <!--   modificationTestInterval                                           -->
   <!--                       Causes a JSP (and its dependent files) to not  -->
   <!--                       be checked for modification during the         -->

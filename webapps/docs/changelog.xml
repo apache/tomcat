@@ -154,6 +154,10 @@
         <rev>787978</rev> Use "1.6" as the default value for compilerSourceVM and compilerTargetVM
         options of Jasper. (kkolinko)
       </update>
+      <add>
+        <bug>48358</bug>: Add support for limiting the number of JSPs that are
+        loaded at any one time. Based on a patch by Isabel Drost. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="High Availability">

@@ -40,6 +40,7 @@ import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.runtime.InstanceManagerFactory;
 import org.apache.jasper.runtime.JspSourceDependent;
+import org.apache.jasper.util.Entry;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -81,6 +82,7 @@ public class JspServletWrapper {
     private JasperException compileException;
     private long servletClassLastModifiedTime;
     private long lastModificationTest = 0L;
+    private Entry<JspServletWrapper> ticket;
 
     /*
      * JspServletWrapper for JSP pages.
@@ -273,6 +275,10 @@ public class JspServletWrapper {
         return tripCount--;
     }
 
+    public String getJspUri() {
+        return jspUri;
+    }
+
     public void service(HttpServletRequest request, 
                         HttpServletResponse response,
                         boolean precompile)
@@ -306,6 +312,10 @@ public class JspServletWrapper {
 
                     // The following sets reload to true, if necessary
                     ctxt.compile();
+                    
+                    if (options.getMaxLoadedJsps() > 0) {
+                        ctxt.getRuntimeContext().unloadJsp();
+                    }
                 }
             } else {
                 if (compileException != null) {
@@ -367,7 +377,14 @@ public class JspServletWrapper {
             } else {
                 theServlet.service(request, response);
             }
-
+            if (options.getMaxLoadedJsps() > 0) {
+                synchronized(this) {
+                    if (ticket == null)
+                        ticket = ctxt.getRuntimeContext().push(this);
+                    else
+                        ctxt.getRuntimeContext().makeFirst(ticket);
+                }
+            }
         } catch (UnavailableException ex) {
             String includeRequestUri = (String)
                 request.getAttribute("javax.servlet.include.request_uri");
