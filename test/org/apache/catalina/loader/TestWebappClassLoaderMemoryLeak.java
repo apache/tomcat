@@ -50,6 +50,11 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         ctx.stop();
         
         // If the thread still exists, we have a thread/memory leak
+        try {
+	    Thread.sleep(10);
+        } catch(InterruptedException ie) {
+	    // ignore
+        }
         Thread[] threads = getThreads();
         for (Thread thread : threads) {
             if (thread != null &&
