@@ -1358,7 +1358,7 @@ public class ContextConfig
                 if (types != null) {
                     for (Class<?> type : types) {
                         Set<ServletContainerInitializer> scis =
-                            typeInitializerMap.get(type.getCanonicalName());
+                            typeInitializerMap.get(type);
                         if (scis == null) {
                             scis = new HashSet<ServletContainerInitializer>();
                             typeInitializerMap.put(type, scis);
