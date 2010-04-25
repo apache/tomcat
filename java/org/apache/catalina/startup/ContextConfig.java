@@ -1346,7 +1346,7 @@ public class ContextConfig
             }
             
             if (sci == null) {
-                break;
+                continue;
             }
 
             initializerClassMap.put(sci, new HashSet<Class<?>>());
