@@ -221,4 +221,10 @@ public interface Options {
      */
     public Map<String, TagLibraryInfo> getCache();
     
+    /**
+     * The maxim number of loaded jsps per web-application. If there are more
+     * jsps loaded, they will be unloaded. If unset or less than 0, no jsps
+     * are unloaded.
+     */
+    public int getMaxLoadedJsps();
 }

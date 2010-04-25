@@ -444,6 +444,10 @@ public class JspC implements Options {
         return true;
     }
 
+    public int getMaxLoadedJsps() {
+        return -1;
+    }
+
     /**
      * {@inheritDoc}
      */
