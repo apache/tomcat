@@ -100,7 +100,7 @@ class ParserController implements TagConstants {
         // respectively.
         isTagFile = ctxt.isTagFile();
         directiveOnly = false;
-        return doParse(inFileName, null, ctxt.getTagFileJarUrl());
+        return doParse(inFileName, null, ctxt.getTagFileJarResource());
     }
 
     /**
@@ -117,7 +117,7 @@ class ParserController implements TagConstants {
         // respectively.
         isTagFile = ctxt.isTagFile();
         directiveOnly = true;
-        return doParse(inFileName, null, ctxt.getTagFileJarUrl());
+        return doParse(inFileName, null, ctxt.getTagFileJarResource());
     }
 
 
@@ -130,11 +130,11 @@ class ParserController implements TagConstants {
      * or null of the included resource is to be read from the filesystem
      */
     public Node.Nodes parse(String inFileName, Node parent,
-            URL jarFileUrl)
+            JarResource jarResource)
     throws FileNotFoundException, JasperException, IOException {
         // For files that are statically included, isTagfile and directiveOnly
         // remain unchanged.
-        return doParse(inFileName, parent, jarFileUrl);
+        return doParse(inFileName, parent, jarResource);
     }
 
     /**
@@ -146,13 +146,13 @@ class ParserController implements TagConstants {
      * @param tagFileJarUrl The location of the tag file.
      */
     public Node.Nodes parseTagFileDirectives(String inFileName,
-            URL tagFileJarUrl)
+            JarResource jarResource)
             throws FileNotFoundException, JasperException, IOException {
         boolean isTagFileSave = isTagFile;
         boolean directiveOnlySave = directiveOnly;
         isTagFile = true;
         directiveOnly = true;
-        Node.Nodes page = doParse(inFileName, null, tagFileJarUrl);
+        Node.Nodes page = doParse(inFileName, null, jarResource);
         directiveOnly = directiveOnlySave;
         isTagFile = isTagFileSave;
         return page;
@@ -174,7 +174,7 @@ class ParserController implements TagConstants {
      */
     private Node.Nodes doParse(String inFileName,
             Node parent,
-            URL jarFileUrl)
+            JarResource jarResource)
     throws FileNotFoundException, JasperException, IOException {
 
         Node.Nodes parsedPage = null;
@@ -182,7 +182,7 @@ class ParserController implements TagConstants {
         isBomPresent = false;
         isDefaultPageEncoding = false;
 
-        JarFile jarFile = getJarFile(jarFileUrl);
+        JarFile jarFile = (jarResource == null) ? null : jarResource.getJarFile();
         String absFileName = resolveFileName(inFileName);
         String jspConfigPageEnc = getJspConfigPageEncoding(absFileName);
 
@@ -196,7 +196,8 @@ class ParserController implements TagConstants {
                 compiler.getPageInfo().addDependant(absFileName);
             } else {
                 compiler.getPageInfo().addDependant(
-                        jarFileUrl.toExternalForm() + absFileName.substring(1));
+                        jarResource.getEntry(absFileName.substring(1)).toString());
+                        
             }
         }
 
@@ -237,7 +238,7 @@ class ParserController implements TagConstants {
                         sourceEnc, inStreamReader,
                         err);
                 parsedPage = Parser.parse(this, jspReader, parent, isTagFile,
-                        directiveOnly, jarFileUrl,
+                        directiveOnly, jarResource,
                         sourceEnc, jspConfigPageEnc,
                         isDefaultPageEncoding, isBomPresent);
             } finally {

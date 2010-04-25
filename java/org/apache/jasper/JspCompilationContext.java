@@ -30,10 +30,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.TagInfo;
 
 import org.apache.jasper.compiler.Compiler;
+import org.apache.jasper.compiler.JarResource;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.ServletWriter;
+import org.apache.jasper.compiler.TldLocation;
 import org.apache.jasper.servlet.JasperLoader;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
@@ -57,7 +59,7 @@ public class JspCompilationContext {
 
     private final Log log = LogFactory.getLog(JspCompilationContext.class); // must not be static
 
-    protected Map<String, URL> tagFileJarUrls;
+    protected Map<String, JarResource> tagFileJarUrls;
     protected boolean isPackagedTagFile;
 
     protected String className;
@@ -91,7 +93,7 @@ public class JspCompilationContext {
     protected boolean isTagFile;
     protected boolean protoTypeMode;
     protected TagInfo tagInfo;
-    protected URL tagFileJarUrl;
+    protected JarResource tagJarResource;
 
     // jspURI _must_ be relative to the context
     public JspCompilationContext(String jspUri,
@@ -121,7 +123,7 @@ public class JspCompilationContext {
         }
 
         this.rctxt = rctxt;
-        this.tagFileJarUrls = new HashMap<String, URL>();
+        this.tagFileJarUrls = new HashMap<String, JarResource>();
         this.basePackageName = Constants.JSP_PACKAGE_NAME;
     }
 
@@ -131,12 +133,12 @@ public class JspCompilationContext {
                                  ServletContext context,
                                  JspServletWrapper jsw,
                                  JspRuntimeContext rctxt,
-                                 URL tagFileJarUrl) {
+                                 JarResource tagJarResource) {
         this(tagfile, false, options, context, jsw, rctxt);
         this.isTagFile = true;
         this.tagInfo = tagInfo;
-        this.tagFileJarUrl = tagFileJarUrl;
-        if (tagFileJarUrl != null) {
+        this.tagJarResource = tagJarResource;
+        if (tagJarResource != null) {
             isPackagedTagFile = true;
         }
     }
@@ -288,12 +290,12 @@ public class JspCompilationContext {
 
         if (res.startsWith("/META-INF/")) {
             // This is a tag file packaged in a jar that is being compiled
-            URL jarUrl = tagFileJarUrls.get(res);
-            if (jarUrl == null) {
-                jarUrl = tagFileJarUrl;
+            JarResource jarResource = tagFileJarUrls.get(res);
+            if (jarResource == null) {
+                jarResource = tagJarResource;
             }
-            if (jarUrl != null) {
-                result = new URL(jarUrl.toExternalForm() + res.substring(1));
+            if (jarResource != null) {
+                result = jarResource.getEntry(res.substring(1));
             } else {
                 // May not be in a JAR in some IDE environments
                 result = context.getResource(canonicalURI(res));
@@ -333,12 +335,12 @@ public class JspCompilationContext {
      * The map is populated when parsing the tag-file elements of the TLDs
      * of any imported taglibs. 
      */
-    public URL getTagFileJarUrl(String tagFile) {
+    public JarResource getTagFileJarResource(String tagFile) {
         return this.tagFileJarUrls.get(tagFile);
     }
 
-    public void setTagFileJarUrl(String tagFile, URL tagFileURL) {
-        this.tagFileJarUrls.put(tagFile, tagFileURL);
+    public void setTagFileJarResource(String tagFile, JarResource jarResource) {
+        this.tagFileJarUrls.put(tagFile, jarResource);
     }
 
     /**
@@ -347,8 +349,8 @@ public class JspCompilationContext {
      * JspCompilationContext does not correspond to a tag file, or if the
      * corresponding tag file is not packaged in a JAR.
      */
-    public URL getTagFileJarUrl() {
-        return this.tagFileJarUrl;
+    public JarResource getTagFileJarResource() {
+        return this.tagJarResource;
     }
 
     /* ==================== Common implementation ==================== */
@@ -549,8 +551,8 @@ public class JspCompilationContext {
      * Returns null if the given uri is not associated with any tag library
      * 'exposed' in the web application.
      */
-    public String[] getTldLocation(String uri) throws JasperException {
-        String[] location = 
+    public TldLocation getTldLocation(String uri) throws JasperException {
+        TldLocation location = 
             getOptions().getTldLocationsCache().getLocation(uri);
         return location;
     }

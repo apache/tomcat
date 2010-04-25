@@ -489,7 +489,7 @@ class TagFileProcessor {
      * @return a TagInfo object assembled from the directives in the tag file.
      */
     public static TagInfo parseTagFileDirectives(ParserController pc,
-            String name, String path, URL tagFileJarUrl, TagLibraryInfo tagLibInfo)
+            String name, String path, JarResource jarResource, TagLibraryInfo tagLibInfo)
             throws JasperException {
 
 
@@ -497,7 +497,7 @@ class TagFileProcessor {
 
         Node.Nodes page = null;
         try {
-            page = pc.parseTagFileDirectives(path, tagFileJarUrl);
+            page = pc.parseTagFileDirectives(path, jarResource);
         } catch (FileNotFoundException e) {
             err.jspError("jsp.error.file.not.found", path);
         } catch (IOException e) {
@@ -518,33 +518,28 @@ class TagFileProcessor {
     private Class<?> loadTagFile(Compiler compiler, String tagFilePath,
             TagInfo tagInfo, PageInfo parentPageInfo) throws JasperException {
 
-        URL tagFileJarUrl = null;
+        JarResource tagJarResouce = null;
         if (tagFilePath.startsWith("/META-INF/")) {
-            try { 
-                tagFileJarUrl = new URL("jar:" +
-                        compiler.getCompilationContext().getTldLocation(
-                        tagInfo.getTagLibrary().getURI())[0] + "!/");
-            } catch (MalformedURLException e) {
-                // Ignore - tagFileJarUrl will be null
-            }
+            tagJarResouce = 
+                compiler.getCompilationContext().getTldLocation(
+                        tagInfo.getTagLibrary().getURI()).getJarResource();
         }
-        String tagFileJarPath;
-        if (tagFileJarUrl == null) {
-            tagFileJarPath = "";
+        String wrapperUri;
+        if (tagJarResouce == null) {
+            wrapperUri = tagFilePath;
         } else {
-            tagFileJarPath = tagFileJarUrl.toString();
+            wrapperUri = tagJarResouce.getEntry(tagFilePath).toString();
         }
 
         JspCompilationContext ctxt = compiler.getCompilationContext();
         JspRuntimeContext rctxt = ctxt.getRuntimeContext();
-        String wrapperUri = tagFileJarPath + tagFilePath;
         JspServletWrapper wrapper = rctxt.getWrapper(wrapperUri);
 
         synchronized (rctxt) {
             if (wrapper == null) {
                 wrapper = new JspServletWrapper(ctxt.getServletContext(), ctxt
                         .getOptions(), tagFilePath, tagInfo, ctxt
-                        .getRuntimeContext(), tagFileJarUrl);
+                        .getRuntimeContext(), tagJarResouce);
                 rctxt.addWrapper(wrapperUri, wrapper);
 
                 // Use same classloader and classpath for compiling tag files
@@ -571,7 +566,7 @@ class TagFileProcessor {
                     JspServletWrapper tempWrapper = new JspServletWrapper(ctxt
                             .getServletContext(), ctxt.getOptions(),
                             tagFilePath, tagInfo, ctxt.getRuntimeContext(),
-                            ctxt.getTagFileJarUrl(tagFilePath));
+                            ctxt.getTagFileJarResource(tagFilePath));
                     tagClazz = tempWrapper.loadTagFilePrototype();
                     tempVector.add(tempWrapper.getJspEngineContext()
                             .getCompiler());
@@ -625,15 +620,14 @@ class TagFileProcessor {
                 String tagFilePath = tagFileInfo.getPath();
                 if (tagFilePath.startsWith("/META-INF/")) {
                     // For tags in JARs, add the TLD and the tag as a dependency
-                    String[] location =
+                    TldLocation location =
                         compiler.getCompilationContext().getTldLocation(
                             tagFileInfo.getTagInfo().getTagLibrary().getURI());
+                    JarResource jarResource = location.getJarResource();
                     // Add TLD
-                    pageInfo.addDependant("jar:" + location[0] + "!/" +
-                            location[1]);
+                    pageInfo.addDependant(jarResource.getEntry(location.getName()).toString());
                     // Add Tag
-                    pageInfo.addDependant("jar:" + location[0] + "!" +
-                            tagFilePath);
+                    pageInfo.addDependant(jarResource.getEntry(tagFilePath.substring(1)).toString());
                 } else {
                     pageInfo.addDependant(tagFilePath);
                 }
