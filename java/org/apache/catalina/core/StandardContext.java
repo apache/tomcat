@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1096,9 +1097,8 @@ public class StandardContext
      */
     public void addApplicationEventListener(Object listener) {
         int len = applicationEventListenersObjects.length;
-        Object[] newListeners = new Object[len + 1];
-        System.arraycopy(applicationEventListenersObjects, 0,
-                newListeners, 0, len);
+        Object[] newListeners = Arrays.copyOf(applicationEventListenersObjects,
+                len + 1);
         newListeners[len] = listener;
         applicationEventListenersObjects = newListeners;
     }
@@ -1135,9 +1135,8 @@ public class StandardContext
      */
     public void addApplicationLifecycleListener(Object listener) {
         int len = applicationLifecycleListenersObjects.length;
-        Object[] newListeners = new Object[len + 1];
-        System.arraycopy(applicationLifecycleListenersObjects, 0,
-                newListeners, 0, len);
+        Object[] newListeners = Arrays.copyOf(
+                applicationLifecycleListenersObjects, len + 1);
         newListeners[len] = listener;
         applicationLifecycleListenersObjects = newListeners;
     }
@@ -2410,15 +2409,12 @@ public class StandardContext
 
         synchronized (applicationParametersLock) {
             String newName = parameter.getName();
-            for (int i = 0; i < applicationParameters.length; i++) {
-                if (newName.equals(applicationParameters[i].getName()) &&
-                    !applicationParameters[i].getOverride())
+            for (ApplicationParameter p : applicationParameters) {
+                if (newName.equals(p.getName()) && !p.getOverride())
                     return;
             }
-            ApplicationParameter results[] =
-                new ApplicationParameter[applicationParameters.length + 1];
-            System.arraycopy(applicationParameters, 0, results, 0,
-                             applicationParameters.length);
+            ApplicationParameter results[] = Arrays.copyOf(
+                    applicationParameters, applicationParameters.length + 1);
             results[applicationParameters.length] = parameter;
             applicationParameters = results;
         }
@@ -2598,8 +2594,8 @@ public class StandardContext
         validateFilterMap(filterMap);
         // Add this filter mapping to our registered set
         synchronized (filterMapsLock) {
-            FilterMap results[] =new FilterMap[filterMaps.length + 1];
-            System.arraycopy(filterMaps, 0, results, 0, filterMaps.length);
+            FilterMap results[] = Arrays.copyOf(filterMaps,
+                    filterMaps.length + 1);
             results[filterMaps.length] = filterMap;
             filterMaps = results;
         }
