@@ -1266,13 +1266,9 @@ public class ApplicationContext
             match = true;
         }
         
-        if (t instanceof HttpSessionListener) {
-            context.addApplicationLifecycleListener(t);
-            match = true;
-        }
-        
-        if (t instanceof ServletContextListener) {
-            // TODO SERVLET3 - also need to check caller? spec isn't clear
+        if (t instanceof HttpSessionListener
+                || t instanceof ServletContextListener) {
+            // TODO SERVLET3 - if ServletContextListener then also need to check caller? spec isn't clear
             context.addApplicationLifecycleListener(t);
             match = true;
         }
