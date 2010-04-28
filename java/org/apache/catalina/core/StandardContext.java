@@ -660,7 +660,7 @@ public class StandardContext
     /**
      * List of resource aliases.
      */
-    protected String aliases = null;
+    private String aliases = null;
 
 
     /**
