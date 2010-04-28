@@ -86,7 +86,9 @@ public class ApplicationFilterRegistration
             String... urlPatterns) {
 
         FilterMap filterMap = new FilterMap();
-        
+
+        filterMap.setFilterName(filterDef.getFilterName());
+
         if (dispatcherTypes != null) {
             for (DispatcherType dispatcherType : dispatcherTypes) {
                 filterMap.setDispatcher(dispatcherType.name());
