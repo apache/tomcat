@@ -42,7 +42,7 @@ Tomcat. The following is a step by step TODO list.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) release (version 1.5.x or later)">
+<section name="Download a Java Development Kit (JDK) release (version 1.6.x or later)">
 
 <p>
 The Sun JDK can be downloaded <a href="http://java.sun.com/j2se/">here</a>.
@@ -178,7 +178,7 @@ Variables to add two new Classpath variables:
 <p>
 <table border="1">
  <tr><td>TOMCAT_LIBS_BASE</td><td>the base path where the binary dependencies have been downloaded</td></tr>
- <tr><td>ANT_HOME</td><td>the base path of Ant 1.6.2 or later</td></tr>
+ <tr><td>ANT_HOME</td><td>the base path of Ant 1.6.5 or later</td></tr>
 </table>
 </p>
 
