@@ -94,7 +94,7 @@ public class DeltaManager extends ClusterManagerBase{
     /**
      * cached replication valve cluster container!
      */
-    private ReplicationValve replicationValve = null ;
+    private volatile ReplicationValve replicationValve = null ;
     
     /**
      * The maximum number of active Sessions allowed, or -1 for no limit.
@@ -882,9 +882,9 @@ public class DeltaManager extends ClusterManagerBase{
     protected void registerSessionAtReplicationValve(DeltaSession session) {
         if(replicationValve == null) {
             if(container instanceof StandardContext && ((StandardContext)container).getCrossContext()) {
-                Cluster cluster = getCluster() ;
+                CatalinaCluster cluster = getCluster() ;
                 if(cluster != null) {
-                    Valve[] valves = ((CatalinaCluster)cluster).getValves();
+                    Valve[] valves = cluster.getValves();
                     if(valves != null && valves.length > 0) {
                         for(int i=0; replicationValve == null && i < valves.length ; i++ ){
                             if(valves[i] instanceof ReplicationValve) replicationValve = (ReplicationValve)valves[i] ;
