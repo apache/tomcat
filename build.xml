@@ -73,6 +73,7 @@
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
+  <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
 
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
@@ -914,6 +915,9 @@
 
     <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
       <classpath refid="tomcat.test.classpath" />
+
+      <sysproperty key="tomcat.test.temp" value="${test.temp}" />
+      <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
 
       <formatter type="plain" usefile="true" />
 

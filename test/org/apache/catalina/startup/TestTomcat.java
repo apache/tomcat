@@ -185,8 +185,7 @@ public class TestTomcat extends TomcatBaseTest {
     public void testSingleWebapp() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
-            new File("output/build/webapps/examples");
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
@@ -200,8 +199,7 @@ public class TestTomcat extends TomcatBaseTest {
     public void testJsps() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
-            new File("output/build/webapps/examples");
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
@@ -296,7 +294,7 @@ public class TestTomcat extends TomcatBaseTest {
         
         String contextPath = "/examples";
         
-        File appDir = new File("output/build/webapps" + contextPath);
+        File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
         org.apache.catalina.Context ctx =
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
