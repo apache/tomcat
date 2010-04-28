@@ -1890,17 +1890,31 @@ public class ContextConfig
 
     protected void processAnnotationWebServlet(String className,
             AnnotationEntry ae, WebXml fragment) {
-        if (fragment.getServlets().containsKey(className)) {
-            // Skip this annotation. Entry in web.xml takes priority
-            return;
+        String servletName = null;
+        // must search for name s. Spec Servlet API 3.0 - 8.2.3.3.n.ii page 81
+        ElementValuePair[] evps = ae.getElementValuePairs();
+        for (ElementValuePair evp : evps) {
+            String name = evp.getNameString();
+            if ("name".equals(name)) {
+                servletName = evp.getValue().stringifyValue();
+                break;
+            }
+        }
+        if(servletName == null) {
+        	// classname is default servletName as annotation has no name!
+            servletName = className;
+        }
+        ServletDef servletDef = fragment.getServlets().get(servletName);
+        boolean isWebXMLservletDef = servletDef != null;
+        if(!isWebXMLservletDef) {
+            servletDef = new ServletDef();
+            servletDef.setServletName(servletName);
+            servletDef.setServletClass(className);
         }
         boolean urlPatternsSet = false;
-        ServletDef servletDef = new ServletDef();
-        servletDef.setServletName(className);
-        servletDef.setServletClass(className);
         String[] urlPatterns = null;
 
-        ElementValuePair[] evps = ae.getElementValuePairs();
+        //ElementValuePair[] evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("value".equals(name) || "urlPatterns".equals(name)) {
@@ -1910,38 +1924,64 @@ public class ContextConfig
                 }
                 urlPatternsSet = true;
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
-            } else if ("name".equals(name)) {
-                servletDef.setServletName(evp.getValue().stringifyValue());
             } else if ("description".equals(name)) {
-                servletDef.setDescription(evp.getValue().stringifyValue());
+            	if(servletDef.getDescription() == null) {
+            		servletDef.setDescription(evp.getValue().stringifyValue());
+            	}
             } else if ("displayName".equals(name)) {
-                servletDef.setDisplayName(evp.getValue().stringifyValue());
+            	if(servletDef.getDisplayName() == null) {
+            		servletDef.setDisplayName(evp.getValue().stringifyValue());
+            	}
             } else if ("largeIcon".equals(name)) {
-                servletDef.setLargeIcon(evp.getValue().stringifyValue());
+            	if(servletDef.getLargeIcon() == null) {
+            		servletDef.setLargeIcon(evp.getValue().stringifyValue());
+            	}
             } else if ("smallIcon".equals(name)) {
-                servletDef.setSmallIcon(evp.getValue().stringifyValue());
+            	if(servletDef.getSmallIcon() == null) {
+            		servletDef.setSmallIcon(evp.getValue().stringifyValue());
+            	}
             } else if ("asyncSupported".equals(name)) {
-                servletDef.setAsyncSupported(evp.getValue().stringifyValue());
-            } else if ("loadOnStartup".equals(name)) {
-                servletDef.setLoadOnStartup(evp.getValue().stringifyValue());
+            	if(servletDef.getAsyncSupported() == null) {
+            		servletDef.setAsyncSupported(evp.getValue().stringifyValue());
+            	}
+           } else if ("loadOnStartup".equals(name)) {
+            	if(servletDef.getLoadOnStartup() == null) {
+            		servletDef.setLoadOnStartup(evp.getValue().stringifyValue());
+            	}
             } else if ("initParams".equals(name)) {
                 Map<String,String> initParams =
                     processAnnotationWebInitParams(evp.getValue());
-                for (Map.Entry<String, String> entry : initParams.entrySet()) {
-                    servletDef.addInitParameter(entry.getKey(),
-                            entry.getValue());
+                if(isWebXMLservletDef) {
+	                Map<String,String> webXMLInitParams = servletDef.getParameterMap();
+	                for (Map.Entry<String, String> entry : initParams.entrySet()) {
+	                	if (webXMLInitParams.get(entry.getKey()) == null) {
+	                		servletDef.addInitParameter(entry.getKey(),
+	                            entry.getValue());
+	                	}
+	                }
+                } 
+                else {
+					for (Map.Entry<String, String> entry : initParams
+					        .entrySet()) {
+						servletDef.addInitParameter(entry.getKey(), entry
+						        .getValue());
+	                }
                 }
             } else {
                 // Ignore
             }
         }
-        if (urlPatterns != null) {
-            fragment.addServlet(servletDef);
-            for (String urlPattern : urlPatterns) {
-                fragment.addServletMapping(urlPattern,
-                        servletDef.getServletName());
-            }
-        }
+       	if(!isWebXMLservletDef && urlPatterns != null) {
+        	fragment.addServlet(servletDef);
+       	}
+       	if(urlPatternsSet) {
+       		if (!fragment.getServletMappings().containsValue(servletName)) {
+       			for (String urlPattern : urlPatterns) {
+       				fragment.addServletMapping(urlPattern, servletName);
+       			}
+       		}
+       	}
+
     }
 
     protected void processAnnotationWebFilter(String className,
