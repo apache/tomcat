@@ -28,6 +28,7 @@
     <author email="fhanik@apache.org">Filip Hanik</author>
     <author email="rjung@apache.org">Rainer Jung</author>
     <author email="kkolinko@apache.org">Konstantin Kolinko</author>
+    <author email="pero@apache.org">Peter Rossbach</author>
     <title>Changelog</title>
   </properties>
 
@@ -35,6 +36,13 @@
 <section name="Tomcat 7.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <rev>939114</rev>: Provide web.xml and fragments overwrite annotation parameters
+        (s. Servlet API 3.0 Spec at Nov 2009 Section 8.2.3.3 pages 80-84).
+        Check source at <code>ContextConfig.processAnnotationsFile(File,WebXml)</code>
+        and testcase <code>TestContextConfigAnnotation</code>.
+        --not yet complete-- (pero) 
+      </fix>
       <update>
         Improve and document VirtualWebappLoader. (rjung)
       </update>
