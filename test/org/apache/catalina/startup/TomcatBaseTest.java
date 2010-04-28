@@ -67,7 +67,17 @@ public abstract class TomcatBaseTest extends TestCase {
         port++;
         return getPort();
     }
-    
+
+    /**
+     * Helper method that returns the directory where Tomcat build resides. It
+     * is used to access resources that are part of default Tomcat deployment.
+     * E.g. the examples webapp.
+     */
+    public File getBuildDirectory() {
+        return new File(System.getProperty("tomcat.test.tomcatbuild",
+                "output/build"));
+    }
+
     @Override
     public void setUp() throws Exception {
         // Need to use JULI and to configure a ConsoleHandler so log messages
@@ -77,7 +87,7 @@ public abstract class TomcatBaseTest extends TestCase {
         LogManager.getLogManager().getLogger("").addHandler(
             new ConsoleHandler());
 
-        tempDir = new File("output/tmp");
+        tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         tempDir.mkdir();
         File appBase = new File(tempDir, "webapps");
         appBase.mkdir();

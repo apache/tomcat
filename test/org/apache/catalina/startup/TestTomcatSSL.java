@@ -70,9 +70,11 @@ public class TestTomcatSSL extends TomcatBaseTest {
         tomcat.getConnector().setProperty("SSLEnabled", "true");
         tomcat.getConnector().setProperty("sslProtocol",
             "tls");
-        // test runs in output/tmp
-        tomcat.getConnector().setAttribute("keystoreFile", 
-            "../../test/org/apache/catalina/startup/test.keystore");
+
+        File keystoreFile = new File(
+                "test/org/apache/catalina/startup/test.keystore");
+        tomcat.getConnector().setAttribute("keystoreFile",
+                keystoreFile.getAbsolutePath());
     }
     
     public void testSimpleSsl() throws Exception {
@@ -98,8 +100,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
-            new File("output/build/webapps/examples");
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
         initSsl(tomcat, nio);
@@ -119,8 +120,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
     public void renegotiateFail(boolean nio) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
-            new File("output/build/webapps/examples");
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
@@ -198,8 +198,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
     public void renegotiateWorks(boolean nio) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
-            new File("output/build/webapps/examples");
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
