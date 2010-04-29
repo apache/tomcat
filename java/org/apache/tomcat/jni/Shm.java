@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 /** Shm
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class Shm {

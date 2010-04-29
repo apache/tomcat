@@ -31,7 +31,7 @@ import javax.management.MBeanFeatureInfo;
  * <code>ModelMBean</code> beans exposed for management.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class FeatureInfo implements Serializable {

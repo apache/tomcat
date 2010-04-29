@@ -27,7 +27,7 @@ import javax.management.MBeanNotificationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class NotificationInfo extends FeatureInfo {
