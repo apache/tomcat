@@ -37,7 +37,7 @@ import org.apache.el.util.ReflectionUtil;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Change: 181177 $$Date$$Author$
+ * @version $Id$
  */
 public final class AstValue extends SimpleNode {
 

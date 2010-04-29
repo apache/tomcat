@@ -23,7 +23,7 @@ package org.apache.naming;
  * Represents a binding in a NamingContext.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class NamingEntry {

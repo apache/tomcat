@@ -25,7 +25,7 @@ import javax.naming.Reference;
  * Represents a reference address to a resource environment.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ResourceEnvRef
