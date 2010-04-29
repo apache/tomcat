@@ -27,22 +27,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * 
  * @author Peter Rossbach
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-04-29 00:16:49 +0200 (Thu, 29 Apr
+ *          2010) $
  */
-@WebServlet(value = "/annotation/overwrite", name= "param", initParams = {
+@WebServlet(value = "/annotation/overwrite", name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
-        @WebInitParam(name = "bar", value = "World!") },
-        displayName="param", description="param", 
-        largeIcon="paramLarge.png",smallIcon="paramSmall.png",
-        loadOnStartup= 0, asyncSupported= false)
+        @WebInitParam(name = "bar", value = "World!") }, displayName = "param", description = "param", largeIcon = "paramLarge.png", smallIcon = "paramSmall.png", loadOnStartup = 0, asyncSupported = false)
 public class ParamServlet extends HttpServlet {
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-	    throws IOException, ServletException
-	  {
-	    PrintWriter out = res.getWriter();
-	    out.print("<p>" + getInitParameter("foo") + " " + getInitParameter("bar") + "</p>");
-	  }
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException, ServletException {
+        PrintWriter out = res.getWriter();
+        out.print("<p>" + getInitParameter("foo") + " "
+                + getInitParameter("bar") + "</p>");
+    }
 }
