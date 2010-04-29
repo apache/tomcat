@@ -49,7 +49,7 @@ import org.apache.tomcat.lite.io.IOWriter;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision: 793797 $ $Date: 2009-07-13 22:38:02 -0700 (Mon, 13 Jul 2009) $
+ * @version $Id$
  */
 
 public class ServletResponseImpl
