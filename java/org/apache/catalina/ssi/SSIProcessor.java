@@ -31,7 +31,7 @@ import org.apache.catalina.util.IOTools;
  * 
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SSIProcessor {
     /** The start pattern */

@@ -70,7 +70,7 @@ import org.apache.juli.logging.LogFactory;
  * requests.  Requests of any other type will simply be passed through.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 

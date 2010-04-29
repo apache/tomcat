@@ -36,7 +36,7 @@ import org.xml.sax.InputSource;
  * schema validation.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 5.0
  */
 

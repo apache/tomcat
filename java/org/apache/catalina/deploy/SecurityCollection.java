@@ -36,7 +36,7 @@ import java.io.Serializable;
  * this class is synchronized.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class SecurityCollection implements Serializable {

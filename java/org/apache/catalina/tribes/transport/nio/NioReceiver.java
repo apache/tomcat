@@ -43,7 +43,7 @@ import java.nio.channels.ClosedSelectorException;
 
 /**
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public class NioReceiver extends ReceiverBase implements Runnable {
 

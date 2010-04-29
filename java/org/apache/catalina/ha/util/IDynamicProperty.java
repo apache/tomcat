@@ -21,7 +21,7 @@ import java.util.Iterator;
 
 /**
  * @author Peter Rossbach
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public interface IDynamicProperty {

@@ -44,11 +44,9 @@ import org.apache.catalina.Loader;
  *               A full description of this implementation can be found under
  *               <href="http://www.filip.net/tomcat/">Filip's Tomcat Page</a><BR>
  *
- * Copyright:    See apache license
- * Company:      www.filip.net
- * @author  <a href="mailto:mail@filip.net">Filip Hanik</a>
- * @author Bela Ban (modifications for synchronous replication)
- * @version 1.0 for TC 4.0
+ * Copyright:    See apache license<BR>
+ * Company:      www.filip.net<BR>
+ * 
  * Description: The InMemoryReplicationManager is a session manager that replicated
  * session information in memory. 
  * <BR><BR>
@@ -59,6 +57,10 @@ import org.apache.catalina.Loader;
  * all defined in the SessionMessage class.<BR>
  * When a session is replicated (not an attribute added/removed) the session is serialized into
  * a byte array using the StandardSession.readObjectData, StandardSession.writeObjectData methods.
+ * 
+ * @author  <a href="mailto:mail@filip.net">Filip Hanik</a>
+ * @author Bela Ban (modifications for synchronous replication)
+ * @version 1.0 for TC 4.0
  */
 public class SimpleTcpReplicationManager extends StandardManager implements ClusterManager
 {

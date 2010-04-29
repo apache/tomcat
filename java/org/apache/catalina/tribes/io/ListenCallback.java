@@ -28,7 +28,7 @@ import org.apache.catalina.tribes.ChannelMessage;
  * when data has been received. The interface does not care about
  * objects and marshalling and just passes the bytes straight through.
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public interface ListenCallback
 {

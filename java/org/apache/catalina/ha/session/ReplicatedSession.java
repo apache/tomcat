@@ -18,6 +18,12 @@
 
 package org.apache.catalina.ha.session;
 
+import org.apache.catalina.Manager;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.security.Principal;
+
 /**
  * Title:        Tomcat Session Replication for Tomcat 4.0 <BR>
  * Description:  A very simple straight forward implementation of
@@ -29,9 +35,8 @@ package org.apache.catalina.ha.session;
  *               A full description of this implementation can be found under
  *               <href="http://www.filip.net/tomcat/">Filip's Tomcat Page</a><BR>
  *
- * Copyright:    See apache license
- * @author  Filip Hanik
- * @version $Revision$ $Date$
+ * Copyright:    See apache license<BR>
+ *
  * Description:<BR>
  * The ReplicatedSession class is a simple extension of the StandardSession class
  * It overrides a few methods (setAttribute, removeAttribute, expire, access) and has
@@ -39,13 +44,9 @@ package org.apache.catalina.ha.session;
  * This class inherits the readObjectData and writeObject data methods from the StandardSession
  * and does not contain any serializable elements in addition to the inherited ones from the StandardSession
  *
+ * @author  Filip Hanik
+ * @version $Id$
  */
-import org.apache.catalina.Manager;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.security.Principal;
-
 public class ReplicatedSession extends org.apache.catalina.session.StandardSession
 implements org.apache.catalina.ha.ClusterSession{
 

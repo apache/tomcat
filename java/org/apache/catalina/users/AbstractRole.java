@@ -27,7 +27,7 @@ import org.apache.catalina.UserDatabase;
  * <p>Convenience base class for {@link Role} implementations.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

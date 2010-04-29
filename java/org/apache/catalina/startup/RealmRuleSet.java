@@ -28,7 +28,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * element.  This <code>RuleSet</code> supports Realms such as the
  * <code>CombinedRealm</code> that used nested Realms.</p>
  *
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class RealmRuleSet extends RuleSetBase {

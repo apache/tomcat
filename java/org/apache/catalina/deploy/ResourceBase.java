@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * Representation of an Context element
  *
  * @author Peter Rossbach (pero@apache.org)
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ResourceBase implements Serializable, Injectable {

@@ -34,7 +34,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  * qualified class name of the managed object as its value.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ClassNameMBean extends BaseModelMBean {

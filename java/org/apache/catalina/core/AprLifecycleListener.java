@@ -38,7 +38,7 @@ import org.apache.tomcat.jni.Library;
  * 
  * @author Remy Maucherat
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

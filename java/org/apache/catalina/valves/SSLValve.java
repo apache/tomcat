@@ -42,7 +42,7 @@ import org.apache.catalina.connector.Response;
  * </IfModule>
  *
  * @author Jean-Frederic Clere
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class SSLValve

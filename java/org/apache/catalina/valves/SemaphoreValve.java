@@ -38,7 +38,7 @@ import org.apache.catalina.util.LifecycleBase;
  * of the concurrency control you wish to perform.</p>
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class SemaphoreValve extends ValveBase {

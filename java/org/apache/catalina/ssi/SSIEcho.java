@@ -25,7 +25,7 @@ import java.io.PrintWriter;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SSIEcho implements SSICommand {
     protected final static String DEFAULT_ENCODING = "entity";

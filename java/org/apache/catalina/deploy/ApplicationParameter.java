@@ -29,7 +29,7 @@ import java.io.Serializable;
  * to modify the application deployment descriptor itself.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ApplicationParameter implements Serializable {

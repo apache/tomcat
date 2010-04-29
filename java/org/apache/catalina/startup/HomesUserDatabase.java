@@ -30,7 +30,7 @@ import java.util.Enumeration;
  * to our constructor to be "home" directories for those users.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class HomesUserDatabase

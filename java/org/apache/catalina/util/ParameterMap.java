@@ -33,7 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>ParmaeterMap</code> instance is not locked.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class ParameterMap<K,V> extends HashMap<K,V> {

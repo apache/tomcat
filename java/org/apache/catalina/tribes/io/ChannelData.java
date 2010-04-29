@@ -32,7 +32,7 @@ import java.sql.Timestamp;
  * interceptors, the message data can be manipulated as each interceptor seems appropriate.
  * @author Peter Rossbach
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  * 
  */
 public class ChannelData implements ChannelMessage {

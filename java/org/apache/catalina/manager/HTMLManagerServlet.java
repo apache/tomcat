@@ -71,7 +71,7 @@ import org.apache.tomcat.util.http.fileupload.ParameterParser;
 * @author Bip Thelin
 * @author Malcolm Edgar
 * @author Glenn L. Nielsen
-* @version $Revision$, $Date$
+* @version $Id$
 * @see ManagerServlet
 */
 

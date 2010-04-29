@@ -29,7 +29,7 @@ import org.apache.catalina.User;
  * <p>Convenience base class for {@link User} implementations.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

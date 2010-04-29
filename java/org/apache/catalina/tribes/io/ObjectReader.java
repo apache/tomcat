@@ -35,7 +35,7 @@ import org.apache.juli.logging.LogFactory;
  * for message encoding and decoding.
  *
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class ObjectReader {
 
