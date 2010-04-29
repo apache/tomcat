@@ -26,7 +26,7 @@ import org.apache.el.lang.EvaluationContext;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Change: 181177 $$Date$$Author$
+ * @version $Id$
  */
 public final class AstMod extends ArithmeticNode {
     public AstMod(int id) {
