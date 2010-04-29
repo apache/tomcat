@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** Procattr
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class Procattr {
