@@ -27,7 +27,7 @@ import javax.naming.CompositeName;
  * Parses names.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class NameParserImpl 

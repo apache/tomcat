@@ -34,7 +34,7 @@ import java.util.Properties;
  * 
  * @author Jacek Laskowski
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public class OpenEjbFactory implements ObjectFactory {
 
