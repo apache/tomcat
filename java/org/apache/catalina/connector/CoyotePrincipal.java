@@ -18,6 +18,7 @@
 
 package org.apache.catalina.connector;
 
+import java.io.Serializable;
 import java.security.Principal;
 
 /**
@@ -29,7 +30,7 @@ import java.security.Principal;
  */
 
 public class CoyotePrincipal 
-    implements Principal {
+    implements Principal, Serializable {
 
 
     // ----------------------------------------------------------- Constructors
