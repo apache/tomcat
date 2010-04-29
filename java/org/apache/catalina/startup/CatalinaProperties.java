@@ -32,7 +32,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * Utility class to read the bootstrap Catalina configuration.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class CatalinaProperties {

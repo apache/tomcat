@@ -29,7 +29,7 @@ import java.util.Iterator;
  * inherits the {@link Role}s assigned to the group.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

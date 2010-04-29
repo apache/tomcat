@@ -42,7 +42,7 @@ import org.apache.catalina.deploy.NamingResources;
  * class in its constructor(s).
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public interface Server extends Lifecycle {

@@ -30,7 +30,7 @@ import org.apache.catalina.util.IOTools;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SSIExec implements SSICommand {
     protected SSIInclude ssiInclude = new SSIInclude();

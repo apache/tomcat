@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
  * <code>Container</code>).</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class CopyParentClassLoaderRule extends Rule {

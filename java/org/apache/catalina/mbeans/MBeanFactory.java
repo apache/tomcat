@@ -57,7 +57,7 @@ import org.apache.catalina.valves.ValveBase;
  * <code>org.apache.catalina.core.StandardServer</code> component.</p>
  *
  * @author Amy Roh
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class MBeanFactory {

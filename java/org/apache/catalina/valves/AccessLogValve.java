@@ -115,7 +115,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Takayuki Kaneko
  * @author Peter Rossbach
  * 
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class AccessLogValve extends ValveBase {

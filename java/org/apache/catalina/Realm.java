@@ -34,7 +34,7 @@ import org.apache.catalina.deploy.SecurityConstraint;
  * Container.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public interface Realm {

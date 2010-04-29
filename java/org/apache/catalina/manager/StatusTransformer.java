@@ -41,7 +41,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * use XSLT, that is unnecessarily complex.
  *
  * @author Peter Lin
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class StatusTransformer {

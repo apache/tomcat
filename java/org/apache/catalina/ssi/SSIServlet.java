@@ -39,7 +39,7 @@ import org.apache.catalina.Globals;
  * @author Amy Roh
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SSIServlet extends HttpServlet {
     /** Debug level for this servlet. */

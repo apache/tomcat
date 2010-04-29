@@ -31,7 +31,7 @@ import javax.servlet.Filter;
  * in a <code>&lt;filter&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class FilterDef implements Serializable {

@@ -32,7 +32,7 @@ import org.apache.catalina.util.RequestUtil;
  * {@link MemoryUserDatabase} implementation of {@link UserDatabase}.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

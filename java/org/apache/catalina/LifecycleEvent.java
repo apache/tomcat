@@ -29,7 +29,7 @@ import java.util.EventObject;
  * Tomcat 3.x.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class LifecycleEvent

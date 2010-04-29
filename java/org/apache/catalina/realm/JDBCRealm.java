@@ -48,7 +48,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 * @author Craig R. McClanahan
 * @author Carson McDonald
 * @author Ignacio Ortega
-* @version $Revision$ $Date$
+* @version $Id$
 */
 
 public class JDBCRealm

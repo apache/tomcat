@@ -24,7 +24,7 @@ package org.apache.catalina.ssi;
  * 
  * @author Paul Speed
  * @author Dan Sandberg
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SSIStopProcessingException extends Exception {
     // No specific functionality for this class

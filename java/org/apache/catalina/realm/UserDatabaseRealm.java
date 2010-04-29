@@ -43,7 +43,7 @@ import org.apache.catalina.util.LifecycleBase;
  * of <code>UserDatabase</code> that we should consult.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

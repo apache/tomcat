@@ -27,7 +27,7 @@ import java.security.Principal;
  * environments like JAAS that want to deal with <code>Principals</code>.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

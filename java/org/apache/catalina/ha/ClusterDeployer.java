@@ -22,7 +22,7 @@ package org.apache.catalina.ha;
  * different deployment implementations
  *
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 import org.apache.catalina.LifecycleException;
 import java.io.IOException;
