@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * This class is used by XML Schema binary format validation
  *
  * @author Jeffrey Rodriguez
- * @version $Revision: 467222 $ $Date: 2006-10-23 20:17:11 -0700 (Mon, 23 Oct 2006) $
+ * @version $Id$
  */
 
 public final class Base64 {

@@ -79,7 +79,7 @@ import org.apache.tomcat.servlets.util.RequestUtil;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 793797 $ $Date: 2009-07-13 22:38:02 -0700 (Mon, 13 Jul 2009) $
+ * @version $Id$
  */
 
 public abstract class ServletContextImpl implements ServletContext {
