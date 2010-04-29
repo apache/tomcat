@@ -28,8 +28,7 @@ import org.apache.catalina.deploy.WebXml;
  * fragment.
  * 
  * @author Peter Rossbach
- * @version $Revision$ $Date: 2010-04-29 00:16:49 +0200 (Thu, 29 Apr
- *          2010) $
+ * @version $Id$
  */
 public class TestContextConfigAnnotation extends TestCase {
 
