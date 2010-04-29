@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.util.Arrays;
  * package.
  *
  * @author Peter Rossbach
- * @version $Revision$ $Date$
+ * @version $Id$
  * @author Filip Hanik
  */
 

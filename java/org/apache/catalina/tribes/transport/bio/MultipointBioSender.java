@@ -33,7 +33,7 @@ import org.apache.catalina.tribes.Channel;
 /**
  *
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  *
  */
 public class MultipointBioSender extends AbstractSender implements MultiPointSender {

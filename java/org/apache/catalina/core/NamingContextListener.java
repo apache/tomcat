@@ -75,7 +75,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * with each context and server.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class NamingContextListener

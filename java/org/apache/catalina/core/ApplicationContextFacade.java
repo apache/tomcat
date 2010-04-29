@@ -55,7 +55,7 @@ import org.apache.catalina.security.SecurityUtil;
  *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class ApplicationContextFacade

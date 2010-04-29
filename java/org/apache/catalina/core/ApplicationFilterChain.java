@@ -50,7 +50,7 @@ import org.apache.tomcat.util.res.StringManager;
  * method itself.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 final class ApplicationFilterChain implements FilterChain, CometFilterChain {

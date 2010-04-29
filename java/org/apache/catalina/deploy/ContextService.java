@@ -27,7 +27,7 @@ import java.util.HashMap;
  * deployment descriptor.
  *
  * @author Fabien Carrion
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ContextService extends ResourceBase {

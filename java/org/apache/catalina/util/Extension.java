@@ -41,7 +41,7 @@ import java.util.StringTokenizer;
  * @author Craig McClanahan
  * @author Justyna Horwat
  * @author Greg Murray
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class Extension {

@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * the application can retrieve what recipients failed by using the <code>getFaultyMembers()</code>
  * method. This way, an application will always know if a message was delivered successfully or not.
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class ChannelException extends Exception {

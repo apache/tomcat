@@ -39,7 +39,7 @@ import org.apache.catalina.deploy.MessageDestinationRef;
  * classes (<code>/WEB-INF/classes</code> and <code>/WEB-INF/lib</code>).</p>
  *
  * @author Fabien Carrion
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class WebAnnotationSet {

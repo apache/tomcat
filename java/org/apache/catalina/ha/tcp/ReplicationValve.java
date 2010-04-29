@@ -57,7 +57,7 @@ import org.apache.catalina.valves.ValveBase;
  * @author Craig R. McClanahan
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ReplicationValve

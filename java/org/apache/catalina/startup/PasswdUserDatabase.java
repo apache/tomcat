@@ -31,7 +31,7 @@ import java.util.Enumeration;
  * that processes the <code>/etc/passwd</code> file on a Unix system.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class PasswdUserDatabase

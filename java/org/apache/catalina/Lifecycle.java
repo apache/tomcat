@@ -72,7 +72,7 @@ package org.apache.catalina;
  * TODO: Not all components may transition from STOPPED to STARTING_PREP
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public interface Lifecycle {
 

@@ -44,7 +44,7 @@ import org.apache.tomcat.util.res.StringManager;
  *                              per session at any one time.
  *
  * @author Jean-Frederic Clere
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class PersistentValve extends ValveBase {

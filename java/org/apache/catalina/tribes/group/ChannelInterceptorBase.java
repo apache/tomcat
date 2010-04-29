@@ -26,7 +26,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Abstract class for the interceptor base class.
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public abstract class ChannelInterceptorBase implements ChannelInterceptor {

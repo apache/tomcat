@@ -52,7 +52,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * is first started.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class ApplicationFilterConfig implements FilterConfig, Serializable {

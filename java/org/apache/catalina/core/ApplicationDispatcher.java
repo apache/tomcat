@@ -62,7 +62,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>javax.servlet.ServletResponseWrapper</code>.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 final class ApplicationDispatcher
