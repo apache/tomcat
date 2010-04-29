@@ -64,7 +64,7 @@ import java.util.logging.LogManager;
  * @author Craig R. McClanahan
  * @author Costin Manolache
  * @author Richard A. Sitze
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public /* abstract */ class LogFactory {
 

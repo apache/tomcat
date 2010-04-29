@@ -88,7 +88,7 @@ import org.apache.el.util.ReflectionUtil;
  * @see javax.el.ValueExpression
  * 
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Change: 181177 $$Date$$Author$
+ * @version $Id$
  */
 public final class ValueExpressionImpl extends ValueExpression implements
         Externalizable {

@@ -32,7 +32,7 @@ import org.apache.el.util.MessageFactory;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Change: 181177 $$Date$$Author$
+ * @version $Id$
  */
 public abstract class SimpleNode extends ELSupport implements Node {
     protected Node parent;
