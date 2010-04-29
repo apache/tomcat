@@ -1900,13 +1900,13 @@ public class ContextConfig
                 break;
             }
         }
-        if(servletName == null) {
-        	// classname is default servletName as annotation has no name!
+        if (servletName == null) {
+            // classname is default servletName as annotation has no name!
             servletName = className;
         }
         ServletDef servletDef = fragment.getServlets().get(servletName);
         boolean isWebXMLservletDef = servletDef != null;
-        if(!isWebXMLservletDef) {
+        if (!isWebXMLservletDef) {
             servletDef = new ServletDef();
             servletDef.setServletName(servletName);
             servletDef.setServletClass(className);
@@ -1914,7 +1914,7 @@ public class ContextConfig
         boolean urlPatternsSet = false;
         String[] urlPatterns = null;
 
-        //ElementValuePair[] evps = ae.getElementValuePairs();
+        // ElementValuePair[] evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("value".equals(name) || "urlPatterns".equals(name)) {
@@ -1925,62 +1925,65 @@ public class ContextConfig
                 urlPatternsSet = true;
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
             } else if ("description".equals(name)) {
-            	if(servletDef.getDescription() == null) {
-            		servletDef.setDescription(evp.getValue().stringifyValue());
-            	}
+                if (servletDef.getDescription() == null) {
+                    servletDef.setDescription(evp.getValue().stringifyValue());
+                }
             } else if ("displayName".equals(name)) {
-            	if(servletDef.getDisplayName() == null) {
-            		servletDef.setDisplayName(evp.getValue().stringifyValue());
-            	}
+                if (servletDef.getDisplayName() == null) {
+                    servletDef.setDisplayName(evp.getValue().stringifyValue());
+                }
             } else if ("largeIcon".equals(name)) {
-            	if(servletDef.getLargeIcon() == null) {
-            		servletDef.setLargeIcon(evp.getValue().stringifyValue());
-            	}
+                if (servletDef.getLargeIcon() == null) {
+                    servletDef.setLargeIcon(evp.getValue().stringifyValue());
+                }
             } else if ("smallIcon".equals(name)) {
-            	if(servletDef.getSmallIcon() == null) {
-            		servletDef.setSmallIcon(evp.getValue().stringifyValue());
-            	}
+                if (servletDef.getSmallIcon() == null) {
+                    servletDef.setSmallIcon(evp.getValue().stringifyValue());
+                }
             } else if ("asyncSupported".equals(name)) {
-            	if(servletDef.getAsyncSupported() == null) {
-            		servletDef.setAsyncSupported(evp.getValue().stringifyValue());
-            	}
-           } else if ("loadOnStartup".equals(name)) {
-            	if(servletDef.getLoadOnStartup() == null) {
-            		servletDef.setLoadOnStartup(evp.getValue().stringifyValue());
-            	}
+                if (servletDef.getAsyncSupported() == null) {
+                    servletDef.setAsyncSupported(evp.getValue()
+                            .stringifyValue());
+                }
+            } else if ("loadOnStartup".equals(name)) {
+                if (servletDef.getLoadOnStartup() == null) {
+                    servletDef
+                            .setLoadOnStartup(evp.getValue().stringifyValue());
+                }
             } else if ("initParams".equals(name)) {
-                Map<String,String> initParams =
-                    processAnnotationWebInitParams(evp.getValue());
-                if(isWebXMLservletDef) {
-	                Map<String,String> webXMLInitParams = servletDef.getParameterMap();
-	                for (Map.Entry<String, String> entry : initParams.entrySet()) {
-	                	if (webXMLInitParams.get(entry.getKey()) == null) {
-	                		servletDef.addInitParameter(entry.getKey(),
-	                            entry.getValue());
-	                	}
-	                }
-                } 
-                else {
-					for (Map.Entry<String, String> entry : initParams
-					        .entrySet()) {
-						servletDef.addInitParameter(entry.getKey(), entry
-						        .getValue());
-	                }
+                Map<String, String> initParams = processAnnotationWebInitParams(evp
+                        .getValue());
+                if (isWebXMLservletDef) {
+                    Map<String, String> webXMLInitParams = servletDef
+                            .getParameterMap();
+                    for (Map.Entry<String, String> entry : initParams
+                            .entrySet()) {
+                        if (webXMLInitParams.get(entry.getKey()) == null) {
+                            servletDef.addInitParameter(entry.getKey(), entry
+                                    .getValue());
+                        }
+                    }
+                } else {
+                    for (Map.Entry<String, String> entry : initParams
+                            .entrySet()) {
+                        servletDef.addInitParameter(entry.getKey(), entry
+                                .getValue());
+                    }
                 }
             } else {
                 // Ignore
             }
         }
-       	if(!isWebXMLservletDef && urlPatterns != null) {
-        	fragment.addServlet(servletDef);
-       	}
-       	if(urlPatternsSet) {
-       		if (!fragment.getServletMappings().containsValue(servletName)) {
-       			for (String urlPattern : urlPatterns) {
-       				fragment.addServletMapping(urlPattern, servletName);
-       			}
-       		}
-       	}
+        if (!isWebXMLservletDef && urlPatterns != null) {
+            fragment.addServlet(servletDef);
+        }
+        if (urlPatternsSet) {
+            if (!fragment.getServletMappings().containsValue(servletName)) {
+                for (String urlPattern : urlPatterns) {
+                    fragment.addServletMapping(urlPattern, servletName);
+                }
+            }
+        }
 
     }
 
