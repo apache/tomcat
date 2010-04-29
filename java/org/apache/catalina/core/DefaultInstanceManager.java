@@ -52,7 +52,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.InstanceManager;
 
 /**
- * @version $Rev$ $Date$
+ * @version $Id$
  */
 public class DefaultInstanceManager implements InstanceManager {
 

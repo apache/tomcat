@@ -28,7 +28,7 @@ import java.util.Iterator;
  * an <code>&lt;res-env-refy&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ContextTransaction implements Serializable {

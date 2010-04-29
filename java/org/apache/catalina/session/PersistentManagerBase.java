@@ -50,7 +50,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public abstract class PersistentManagerBase extends ManagerBase

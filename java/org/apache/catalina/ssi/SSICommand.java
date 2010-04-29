@@ -25,7 +25,7 @@ import java.io.PrintWriter;
  * @author Bip Thelin
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public interface SSICommand {
     /**

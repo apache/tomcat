@@ -40,7 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
  * keep these two classes in synchronization when making changes!
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 class ApplicationResponse extends ServletResponseWrapper {

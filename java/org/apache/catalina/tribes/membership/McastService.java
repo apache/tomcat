@@ -41,7 +41,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * If a node fails to send out a heartbeat, the node will be dismissed.
  *
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 

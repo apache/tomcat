@@ -25,7 +25,7 @@ import java.util.Iterator;
  * 
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SSIPrintenv implements SSICommand {
     /**

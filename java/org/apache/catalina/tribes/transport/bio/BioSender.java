@@ -38,7 +38,7 @@ import org.apache.catalina.tribes.util.StringManager;
  * 
  * @author Peter Rossbach
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 5.5.16
  */
 public class BioSender extends AbstractSender {

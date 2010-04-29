@@ -30,7 +30,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * @author Rainer Jung
  * @author Peter Rossbach
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
 
  */
 

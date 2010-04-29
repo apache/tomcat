@@ -27,7 +27,7 @@ import java.text.DecimalFormat;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public final class SSIFsize implements SSICommand {
     protected final static int ONE_KILOBYTE = 1024;

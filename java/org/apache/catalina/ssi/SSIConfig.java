@@ -25,7 +25,7 @@ import java.io.PrintWriter;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public final class SSIConfig implements SSICommand {
     /**

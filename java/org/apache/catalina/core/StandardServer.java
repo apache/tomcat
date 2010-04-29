@@ -54,7 +54,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * (but not required) when deploying and starting Catalina.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public final class StandardServer extends LifecycleBase
         implements Server, MBeanRegistration {

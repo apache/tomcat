@@ -30,7 +30,7 @@ import javax.servlet.http.HttpSessionContext;
  * Facade for the StandardSession object.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class StandardSessionFacade

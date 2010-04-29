@@ -29,7 +29,7 @@ import java.util.Iterator;
  * referenced by a {@link Realm} for authentication and access control.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

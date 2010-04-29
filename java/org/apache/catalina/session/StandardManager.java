@@ -60,7 +60,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class StandardManager extends ManagerBase

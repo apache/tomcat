@@ -24,7 +24,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
 
 /**
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public abstract class AbstractRxTask implements Runnable
 { 

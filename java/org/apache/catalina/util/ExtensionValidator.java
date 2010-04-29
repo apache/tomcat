@@ -49,7 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Greg Murray
  * @author Justyna Horwat
- * @version $Revision$ $Date$
+ * @version $Id$
  *
  */
 public final class ExtensionValidator {
