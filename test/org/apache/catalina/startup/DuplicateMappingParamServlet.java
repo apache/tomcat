@@ -27,19 +27,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
-*
-* @author Peter Rossbach
-* @version $Revision$ $Date$
-*/
-@WebServlet(value = "/annotation/overwrite", urlPatterns = {"/param2"}, name= "param", initParams = {
+ * 
+ * @author Peter Rossbach
+ * @version $Revision$ $Date: 2010-04-29 00:16:49 +0200 (Thu, 29 Apr
+ *          2010) $
+ */
+@WebServlet(value = "/annotation/overwrite", urlPatterns = { "/param2" }, name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
         @WebInitParam(name = "bar", value = "World!") })
 public class DuplicateMappingParamServlet extends HttpServlet {
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-	    throws IOException, ServletException
-	  {
-	    PrintWriter out = res.getWriter();
-	    out.print("<p>" + getInitParameter("foo") + " " + getInitParameter("bar") + "</p>");
-	  }
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException, ServletException {
+        PrintWriter out = res.getWriter();
+        out.print("<p>" + getInitParameter("foo") + " "
+                + getInitParameter("bar") + "</p>");
+    }
 }
