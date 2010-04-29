@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.naming.resources;
+package org.apache.catalina.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestBaseDirContext extends TomcatBaseTest {
+public class TestStandardContextAliases extends TomcatBaseTest {
 
     public void testDirContextAliases() throws Exception {
         Tomcat tomcat = getTomcatInstance();
