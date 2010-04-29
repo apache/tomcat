@@ -30,7 +30,7 @@ import javax.naming.Context;
  * </ul>
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ContextBindings {

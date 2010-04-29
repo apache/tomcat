@@ -31,7 +31,7 @@ import org.apache.naming.ResourceRef;
  * Object factory for Resources.
  * 
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class ResourceFactory

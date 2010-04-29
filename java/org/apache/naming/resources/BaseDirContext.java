@@ -52,7 +52,7 @@ import org.apache.naming.StringManager;
  * Directory Context implementation helper class.
  *
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public abstract class BaseDirContext implements DirContext {
