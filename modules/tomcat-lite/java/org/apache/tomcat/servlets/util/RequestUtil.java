@@ -32,7 +32,7 @@ import javax.servlet.http.Cookie;
  *
  * @author Craig R. McClanahan
  * @author Tim Tye
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class RequestUtil {
