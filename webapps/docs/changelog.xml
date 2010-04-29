@@ -36,23 +36,15 @@
 <section name="Tomcat 7.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <fix>
-        <rev>939114</rev>: Provide web.xml and fragments overwrite annotation parameters
-        (s. Servlet API 3.0 Spec at Nov 2009 Section 8.2.3.3 pages 80-84).
-        Check source at <code>ContextConfig.processAnnotationsFile(File,WebXml)</code>
-        and testcase <code>TestContextConfigAnnotation</code>.
-        --not yet complete-- (pero) 
-      </fix>
+      <update>
+        Update Servlet support to the Servlet 3.0 specification. (all)
+      </update>
       <update>
         Improve and document VirtualWebappLoader. (rjung)
       </update>
       <add>
         <bug>43642</bug>: Add prestartminSpareThreads attribute for Executor. (jfclere)
       </add>
-      <update>
-        Update Servlet support to the Servlet 3.0 specification. Note
-        asynchronous support is not yet complete. (markt/fhanik)
-      </update>
       <update>
         Switch from AnnotationProcessor to InstanceManager. Patch provided by
         David Jecks with modifications by Remy. (remm/fhanik)
