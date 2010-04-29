@@ -37,7 +37,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * <code>org.apache.catalina.deploy.NamingResources</code> component.</p>
  *
  * @author Amy Roh
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class NamingResourcesMBean extends BaseModelMBean {

@@ -115,7 +115,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 public class WebappClassLoader
     extends URLClassLoader

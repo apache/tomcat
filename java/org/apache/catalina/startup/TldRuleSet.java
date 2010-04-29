@@ -29,7 +29,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * descriptor resource.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class TldRuleSet extends RuleSetBase {

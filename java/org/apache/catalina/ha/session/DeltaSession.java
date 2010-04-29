@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * track of deltas during a request.
  *
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class DeltaSession extends StandardSession implements Externalizable,ClusterSession,ReplicatedMapEntry {

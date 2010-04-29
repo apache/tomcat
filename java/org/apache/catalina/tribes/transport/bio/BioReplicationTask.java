@@ -42,7 +42,7 @@ import org.apache.juli.logging.LogFactory;
  * 
  * @author Filip Hanik
  * 
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class BioReplicationTask extends AbstractRxTask {
 

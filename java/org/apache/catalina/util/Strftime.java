@@ -40,7 +40,7 @@ import java.util.TimeZone;
  *
  * @author Bip Thelin
  * @author Dan Sandberg
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class Strftime {
     protected static Properties translate;

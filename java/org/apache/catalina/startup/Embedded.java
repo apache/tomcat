@@ -100,7 +100,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  * of how Tomcat is set up and launched as an Embedded application.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class Embedded  extends StandardService {

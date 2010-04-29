@@ -23,7 +23,7 @@ package org.apache.catalina.tribes;
  * when a member has joined the group and when a member has disappeared (crashed)
  *
  * @author Filip Hanik
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 

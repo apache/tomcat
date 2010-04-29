@@ -23,7 +23,7 @@ package org.apache.catalina.ha.tcp;
  * package.
  *
  * @author Peter Rossbach
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class Constants {

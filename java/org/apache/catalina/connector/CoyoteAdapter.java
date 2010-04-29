@@ -53,7 +53,7 @@ import org.apache.tomcat.util.net.SocketStatus;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public class CoyoteAdapter implements Adapter {

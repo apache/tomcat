@@ -30,7 +30,7 @@ import java.util.Iterator;
  * of specific {@link Role}s.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  * @since 4.1
  */
 

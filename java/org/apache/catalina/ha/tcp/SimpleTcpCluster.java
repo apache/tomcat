@@ -70,7 +70,7 @@ import org.apache.catalina.ha.jmx.ClusterJmxHelper;
  * @author Filip Hanik
  * @author Remy Maucherat
  * @author Peter Rossbach
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 public class SimpleTcpCluster extends LifecycleBase
     implements CatalinaCluster, LifecycleListener, IDynamicProperty,

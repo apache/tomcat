@@ -30,7 +30,7 @@ import org.apache.catalina.Container;
 /**
  * 
  * @author Filip Hanik
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public abstract class ClusterManagerBase extends ManagerBase implements Lifecycle, PropertyChangeListener, ClusterManager{

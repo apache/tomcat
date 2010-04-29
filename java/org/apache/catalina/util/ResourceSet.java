@@ -33,7 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
  * is not locked.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class ResourceSet<T> extends HashSet<T> {
