@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.naming.NamingException;
 
 /**
- * @version $Rev$ $Date$
+ * @version $Id$
  */
 public interface InstanceManager {
 
