@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Amy Roh
  * @author Dmitri Valdin
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class CompressionResponseStream

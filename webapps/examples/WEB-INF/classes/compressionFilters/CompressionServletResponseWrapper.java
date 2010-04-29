@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
  *
  * @author Amy Roh
  * @author Dmitri Valdin
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class CompressionServletResponseWrapper extends HttpServletResponseWrapper {

@@ -32,7 +32,7 @@ import javax.servlet.ServletContextListener;
  * associated with our servlet context.
  *
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
+ * @version $Id$
  */
 
 public final class ContextListener
