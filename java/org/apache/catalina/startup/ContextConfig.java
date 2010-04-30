@@ -1970,8 +1970,6 @@ public class ContextConfig
                                 .getValue());
                     }
                 }
-            } else {
-                // Ignore
             }
         }
         if (!isWebXMLservletDef && urlPatterns != null) {
@@ -1987,20 +1985,43 @@ public class ContextConfig
 
     }
 
+    /**
+     * process filter annotation and merge with existing one!
+     * FIXME: refactoring method to long and has redundant subroutines with processAnnotationWebServlet!
+     * @param className
+     * @param ae
+     * @param fragment
+     */
     protected void processAnnotationWebFilter(String className,
             AnnotationEntry ae, WebXml fragment) {
-        if (fragment.getFilters().containsKey(className)) {
-            // Skip this annotation. Entry in web.xml takes priority
-            return;
+        String filterName = null;
+        // must search for name s. Spec Servlet API 3.0 - 8.2.3.3.n.ii page 81
+        ElementValuePair[] evps = ae.getElementValuePairs();
+        for (ElementValuePair evp : evps) {
+            String name = evp.getNameString();
+            if ("filterName".equals(name)) {
+                filterName = evp.getValue().stringifyValue();
+                break;
+            }
         }
-        boolean urlPatternsSet = false;
-        FilterDef filterDef = new FilterDef();
+        if (filterName == null) {
+            // classname is default filterName as annotation has no name!
+            filterName = className;
+        }
+        FilterDef filterDef = fragment.getFilters().get(filterName);
         FilterMap filterMap = new FilterMap();
-        filterDef.setFilterName(className);
-        filterDef.setFilterClass(className);
+
+        boolean isWebXMLfilterDef = filterDef != null;
+        if (!isWebXMLfilterDef) {
+            filterDef = new FilterDef();
+            filterDef.setFilterName(filterName);
+            filterDef.setFilterClass(className);
+        }
+
+        boolean urlPatternsSet = false;
+        boolean dispatchTypesSet = false;
         String[] urlPatterns = null;
 
-        ElementValuePair[] evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("value".equals(name) || "urlPatterns".equals(name)) {
@@ -2008,49 +2029,101 @@ public class ContextConfig
                     throw new IllegalArgumentException(sm.getString(
                             "contextConfig.urlPatternValue", className));
                 }
-                urlPatternsSet = true;
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
+                urlPatternsSet = urlPatterns != null && urlPatterns.length > 0;
                 for (String urlPattern : urlPatterns) {
                     filterMap.addURLPattern(urlPattern);
                 }
-            } else if ("filterName".equals(name)) {
-                filterDef.setFilterName(evp.getValue().stringifyValue());
             } else if ("servletNames".equals(name)) {
-                String[] servletNames =
-                    processAnnotationsStringArray(evp.getValue());
+                String[] servletNames = processAnnotationsStringArray(evp
+                        .getValue());
                 for (String servletName : servletNames) {
                     filterMap.addServletName(servletName);
                 }
             } else if ("dispatcherTypes".equals(name)) {
-                String[] dispatcherTypes =
-                    processAnnotationsStringArray(evp.getValue());
+                String[] dispatcherTypes = processAnnotationsStringArray(evp
+                        .getValue());
+                dispatchTypesSet = dispatcherTypes != null
+                        && dispatcherTypes.length > 0;
                 for (String dispatcherType : dispatcherTypes) {
                     filterMap.setDispatcher(dispatcherType);
                 }
             } else if ("description".equals(name)) {
-                filterDef.setDescription(evp.getValue().stringifyValue());
-            } else if ("displayName".equals(name)) {
-                filterDef.setDisplayName(evp.getValue().stringifyValue());
-            } else if ("largeIcon".equals(name)) {
-                filterDef.setLargeIcon(evp.getValue().stringifyValue());
-            } else if ("smallIcon".equals(name)) {
-                filterDef.setSmallIcon(evp.getValue().stringifyValue());
-            } else if ("asyncSupported".equals(name)) {
-                filterDef.setAsyncSupported(evp.getValue().stringifyValue());
-            } else if ("initParams".equals(name)) {
-                Map<String,String> initParams =
-                    processAnnotationWebInitParams(evp.getValue());
-                for (Map.Entry<String, String> entry : initParams.entrySet()) {
-                    filterDef.addInitParameter(entry.getKey(),
-                            entry.getValue());
+                if (filterDef.getDescription() == null) {
+                    filterDef.setDescription(evp.getValue().stringifyValue());
                 }
-            } else {
-                // Ignore
+            } else if ("displayName".equals(name)) {
+                if (filterDef.getDisplayName() == null) {
+                    filterDef.setDisplayName(evp.getValue().stringifyValue());
+                }
+            } else if ("largeIcon".equals(name)) {
+                if (filterDef.getLargeIcon() == null) {
+                    filterDef.setLargeIcon(evp.getValue().stringifyValue());
+                }
+            } else if ("smallIcon".equals(name)) {
+                if (filterDef.getSmallIcon() == null) {
+                    filterDef.setSmallIcon(evp.getValue().stringifyValue());
+                }
+            } else if ("asyncSupported".equals(name)) {
+                if (filterDef.getAsyncSupported() == null) {
+                    filterDef
+                            .setAsyncSupported(evp.getValue().stringifyValue());
+                }
+            } else if ("initParams".equals(name)) {
+                Map<String, String> initParams = processAnnotationWebInitParams(evp
+                        .getValue());
+                if (isWebXMLfilterDef) {
+                    Map<String, String> webXMLInitParams = filterDef
+                            .getParameterMap();
+                    for (Map.Entry<String, String> entry : initParams
+                            .entrySet()) {
+                        if (webXMLInitParams.get(entry.getKey()) == null) {
+                            filterDef.addInitParameter(entry.getKey(), entry
+                                    .getValue());
+                        }
+                    }
+                } else {
+                    for (Map.Entry<String, String> entry : initParams
+                            .entrySet()) {
+                        filterDef.addInitParameter(entry.getKey(), entry
+                                .getValue());
+                    }
+                }
+
             }
         }
-        fragment.addFilter(filterDef);
-        filterMap.setFilterName(filterDef.getFilterName());
-        fragment.addFilterMapping(filterMap);
+        if (!isWebXMLfilterDef) {
+            fragment.addFilter(filterDef);
+            filterMap.setFilterName(filterName);
+            fragment.addFilterMapping(filterMap);
+        }
+        if (urlPatternsSet || dispatchTypesSet) {
+            Set<FilterMap> fmap = fragment.getFilterMappings();
+            FilterMap descMap = null;
+            for (FilterMap map : fmap) {
+                if (filterName.equals(map.getFilterName())) {
+                    descMap = map;
+                    break;
+                }
+            }
+            if (descMap != null) {
+                String[] urlsPatterns = descMap.getURLPatterns();
+                if (urlPatternsSet
+                        && (urlsPatterns == null || urlsPatterns.length == 0)) {
+                    for (String urlPattern : filterMap.getURLPatterns()) {
+                        descMap.addURLPattern(urlPattern);
+                    }
+                }
+                String[] dispatcherNames = descMap.getDispatcherNames();
+                if (dispatchTypesSet
+                        && (dispatcherNames == null || dispatcherNames.length == 0)) {
+                    for (String dis : filterMap.getDispatcherNames()) {
+                        descMap.setDispatcher(dis);
+                    }
+                }
+            }
+        }
+
     }
 
     protected String[] processAnnotationsStringArray(ElementValue ev) {

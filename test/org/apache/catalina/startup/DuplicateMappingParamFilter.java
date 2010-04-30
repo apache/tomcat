@@ -17,31 +17,37 @@
 package org.apache.catalina.startup;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebInitParam;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 
 /**
  * Test Mock with wrong Annotation!
  * 
  * @author Peter Rossbach
- * @version $Id: DuplicateMappingParamServlet.java 939221 2010-04-29 07:30:29Z
- *          kkolinko $
+ * @version $Id$
+ * 
  */
-@WebServlet(value = "/annotation/overwrite", urlPatterns = { "/param2" }, name = "param", initParams = {
-        @WebInitParam(name = "foo", value = "Hello"),
-        @WebInitParam(name = "bar", value = "World!") })
-public class DuplicateMappingParamServlet extends HttpServlet {
+@WebFilter(value = "/param", filterName="paramDFilter", 
+        urlPatterns = { "/param1" , "/param2" })
+public class DuplicateMappingParamFilter implements Filter {
 
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws IOException, ServletException {
-        PrintWriter out = res.getWriter();
-        out.print("<p>" + getInitParameter("foo") + " "
-                + getInitParameter("bar") + "</p>");
+    
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
+
+    public void doFilter(ServletRequest req, ServletResponse res,
+            FilterChain chain) throws ServletException, IOException {
+        chain.doFilter(req, res);
+    }
+
+    public void destroy() {
+        // destroy
     }
 }
+
