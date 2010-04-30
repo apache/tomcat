@@ -35,6 +35,20 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardContextResources extends TomcatBaseTest {
 
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // BZ 49218: The test fails if JreMemoryLeakPreventionListener is not
+        // present. The listener affects the JVM, and thus not only the current,
+        // but also the subsequent tests that are run in the same JVM. So it is
+        // fair to add it in every test.
+        tomcat.getServer().addLifecycleListener(
+                new JreMemoryLeakPreventionListener());
+    }
+
     public void testResources() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -44,9 +58,6 @@ public class TestStandardContextResources extends TomcatBaseTest {
 
         tomcat.start();
 
-        if (false) {
-            // FIXME: These tests are currently failing. See comment in testResources2() below.
-            
         assertPageContains("/test/resourceA.jsp",
                 "<p>resourceA.jsp in the web application</p>");
         assertPageContains("/test/resourceB.jsp",
@@ -57,7 +68,6 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceD.jsp in resources.jar</p>");
         assertPageContains("/test/folder/resourceE.jsp",
                 "<p>resourceE.jsp in the web application</p>");
-        }
     }
 
     public void testResources2() throws Exception {
@@ -73,26 +83,6 @@ public class TestStandardContextResources extends TomcatBaseTest {
 
         tomcat.start();
 
-        // FIXME: These tests are currently failing.
-        //
-        // I do not have a fix yet, but I know the following:
-        // when trying to get "/resourceB.jsp" in ApplicationContext#getResource()
-        // an Exception is caught and silently swallowed. That exception is
-        //
-        // java.lang.IllegalStateException: zip file closed
-        // at java.util.jar.JarFile.getMetaInfEntryNames(Native Method)
-        // at java.util.jar.JarFile.maybeInstantiateVerifier(JarFile.java:277)
-        // at java.util.jar.JarFile.getInputStream(JarFile.java:381)
-        // at org.apache.naming.resources.WARDirContext$WARResource.streamContent(WARDirContext.java:951)
-        // at org.apache.naming.resources.ProxyDirContext.cacheLoad(ProxyDirContext.java:1578)
-        // at org.apache.naming.resources.ProxyDirContext.cacheLookup(ProxyDirContext.java:1458)
-        // at org.apache.naming.resources.ProxyDirContext.lookup(ProxyDirContext.java:292)
-        // at org.apache.catalina.core.ApplicationContext.getResource(ApplicationContext.java:506)
-        // at org.apache.catalina.core.ApplicationContextFacade.getResource(ApplicationContextFacade.java:196)
-        // at org.apache.catalina.core.TestStandardContextResources$GetResourceServlet.doGet(TestStandardContextResources.java:126)
-        //
-        if (false) {
-        
         assertPageContains("/test/getresource?path=/resourceA.jsp",
                 "<p>resourceA.jsp in the web application</p>");
         assertPageContains("/test/getresource?path=/resourceB.jsp",
@@ -103,7 +93,6 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceD.jsp in resources.jar</p>");
         assertPageContains("/test/getresource?path=/folder/resourceE.jsp",
                 "<p>resourceE.jsp in the web application</p>");
-        }
     }
 
     /**
