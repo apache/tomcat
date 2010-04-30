@@ -2513,9 +2513,13 @@ public class Request
                 parts.add(part);
                 if (part.getFilename() == null) {
                     try {
-                        parameters.addParameterValues(part.getName(),
+                        String encoding = parameters.getEncoding();
+                        if(encoding == null) {
+                        	encoding = Parameters.DEFAULT_ENCODING;
+                        }
+ 						parameters.addParameterValues(part.getName(),
                                 new String[] {part.getString(
-                                        parameters.getEncoding())});
+                                        encoding)});
                     } catch (UnsupportedEncodingException uee) {
                         try {
                             parameters.addParameterValues(part.getName(),
@@ -2533,7 +2537,7 @@ public class Request
         } catch (FileUploadBase.SizeException e) {
             partsParseException = new IllegalStateException(e);
         } catch (FileUploadException e) {
-            partsParseException = new IOException();
+            partsParseException = new IOException(e);
         }
         
         return;
