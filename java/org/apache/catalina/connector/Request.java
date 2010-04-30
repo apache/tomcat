@@ -2514,12 +2514,11 @@ public class Request
                 if (part.getFilename() == null) {
                     try {
                         String encoding = parameters.getEncoding();
-                        if(encoding == null) {
-                        	encoding = Parameters.DEFAULT_ENCODING;
+                        if (encoding == null) {
+                            encoding = Parameters.DEFAULT_ENCODING;
                         }
- 						parameters.addParameterValues(part.getName(),
-                                new String[] {part.getString(
-                                        encoding)});
+                        parameters.addParameterValues(part.getName(),
+                                new String[] { part.getString(encoding) });
                     } catch (UnsupportedEncodingException uee) {
                         try {
                             parameters.addParameterValues(part.getName(),
