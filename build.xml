@@ -2077,7 +2077,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <attribute name="license" description="the NOTICE file to use"
                default="${tomcat.manifests}/default.license" />
     <sequential>
-      <jar jarfile="@{jarfile}" manifest="@{manifest}" index="yes">
+      <jar jarfile="@{jarfile}" manifest="@{manifest}">
         <fileset dir="@{filesDir}">
           <patternset refid="@{filesId}"/>
           <!-- Javadoc and i18n exclusions -->
