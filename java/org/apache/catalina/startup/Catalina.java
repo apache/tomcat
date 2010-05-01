@@ -778,16 +778,19 @@ public class Catalina {
 
         @Override
         public void run() {
-
-            if (getServer() != null) {
-                Catalina.this.stop();
-            }
-            
-            // If JULI is used, shut JULI down *after* the server shuts down
-            // so log messages aren't lost
-            LogManager logManager = LogManager.getLogManager();
-            if (logManager instanceof ClassLoaderLogManager) {
-                ((ClassLoaderLogManager) logManager).shutdown();
+            try {
+                if (getServer() != null) {
+                    Catalina.this.stop();
+                }
+            } catch (Throwable ex) {
+                log.error(sm.getString("catalina.shutdownHookFail"), ex);
+            } finally {
+                // If JULI is used, shut JULI down *after* the server shuts down
+                // so log messages aren't lost
+                LogManager logManager = LogManager.getLogManager();
+                if (logManager instanceof ClassLoaderLogManager) {
+                    ((ClassLoaderLogManager) logManager).shutdown();
+                }
             }
         }
     }
