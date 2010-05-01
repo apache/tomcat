@@ -112,7 +112,7 @@ public abstract class RealmBase extends LifecycleBase
     /**
      * The MessageDigest object for digesting user credentials (passwords).
      */
-    protected MessageDigest md = null;
+    protected volatile MessageDigest md = null;
 
 
     /**
