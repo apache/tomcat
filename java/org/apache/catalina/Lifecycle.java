@@ -27,29 +27,36 @@ package org.apache.catalina;
  * <br>
  * The valid state transitions for components that support Lifecycle are:
  * <pre>
- *                            --------------------<--------------------------
- *                            |                                             |
- *               start()      |        auto          auto         stop()    |       
- * NEW ------------->--- STARTING_PREP -->- STARTING -->- STARTED -->---    |
- *  |                                                        |         |    |
- *  |                                            auto        |         |    |
- *  |stop()       ---------<----- MUST_STOP --<---------------         |    |
- *  |             |                                                    |    |
- *  |             ---------------------------<--------------------------    ^
- *  |             |                                                         |
- *  |             |        auto          auto                start()        |
- *  |        STOPPING_PREP -->- STOPPING -->- STOPPED -------------->--------
- *  |             ^                              ^
- *  |             |stop()                        |
- *  |             |                              |
- *  |          FAILED                            |
- *  |                                            |
- *  --->------------------------------>-----------
+ *                                  --------------------<-----------------------
+ *                                  |                                          |
+ *    init()           start()      |        auto          auto         stop() |
+ * NEW ->-- INITIALIZED -->-- STARTING_PREP -->- STARTING -->- STARTED -->---  |
+ * | |                              ^                             |         |  |
+ * | |        start()               |                             |         |  |
+ * | ----------->--------------------                             |         |  |
+ * |                                                              |         |  |
+ * |                   auto                    auto               |         |  |
+ * |stop()       ---------<----- MUST_STOP ---------------------<--         |  |
+ * |             |                                                          |  |
+ * |             ---------------------------<--------------------------------  ^
+ * |             |                                                             |
+ * |             |         auto            auto                 start()        |
+ * |        STOPPING_PREP --->-- STOPPING --->-- STOPPED ---------->------------
+ * |             ^                                |   ^
+ * |             |stop()                          |   |
+ * |             |                       destroy()|   |
+ * |             |    destroy()                   |   |
+ * |          FAILED ---->------ DESTROYED ----<---   |
+ * |                                                  |
+ * --->------------------------------>-----------------
  *   
  * Any state can transition to FAILED.
  * 
  * Calling start() while a component is in states STARTING_PREP, STARTING or
  * STARTED has no effect.
+ * 
+ * Calling start() while a component is in state NEW will cause init() to be
+ * called immediately the start() method is entered.
  * 
  * Calling stop() while a component is in states STOPPING_PREP, STOPPING or
  * STOPPED has no effect.
@@ -60,7 +67,12 @@ package org.apache.catalina;
  * try to stop all sub-components - even those it didn't start.
  * 
  * MUST_STOP is used to indicate that the {@link #stop()} should be called on
- * the component as soon as {@link #start()} exits.
+ * the component as soon as {@link #start()} exits. It is typically used when a
+ * component has failed to start.
+ * 
+ * MUST_DESTROY is used to indicate that the {@link #stop()} should be called on
+ * the component as soon as {@link #stop()} exits. It is typically used when a
+ * component is not designed to be restarted.
  * 
  * Attempting any other transition will throw {@link LifecycleException}.
  * 
@@ -179,6 +191,20 @@ public interface Lifecycle {
 
 
     /**
+     * Prepare the component for starting. This method should perform any
+     * initialization required post object creation. The following
+     * {@link LifecycleEvent}s will be fired in the following order:
+     * <ol>
+     *   <li>INIT_EVENT: On the successful completion of component
+     *                   initialization.</li>
+     * </ol>
+     * 
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    public void init() throws LifecycleException;
+
+    /**
      * Prepare for the beginning of active use of the public methods of this
      * component.  This method should be called before any of the public
      * methods of this component are utilized. The following
@@ -226,6 +252,19 @@ public interface Lifecycle {
      *  that needs to be reported
      */
     public void stop() throws LifecycleException;
+
+    /**
+     * Prepare to discard the object. The following {@link LifecycleEvent}s will
+     * be fired in the following order:
+     * <ol>
+     *   <li>DESTROY_EVENT: On the successful completion of component
+     *                      destruction.</li>
+     * </ol>
+     * 
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    public void destroy() throws LifecycleException;
 
 
     /**

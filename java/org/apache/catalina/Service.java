@@ -110,14 +110,6 @@ public interface Service extends Lifecycle {
     public void removeConnector(Connector connector);
 
     /**
-     * Invoke a pre-startup initialization. This is used to allow connectors
-     * to bind to restricted ports under Unix operating environments.
-     *
-     * @exception LifecycleException If this server was already initialized.
-     */
-    public void initialize() throws LifecycleException;
-
-    /**
      * Adds a named executor to the service
      * @param ex Executor
      */

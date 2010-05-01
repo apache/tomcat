@@ -227,6 +227,10 @@ public abstract class ValveBase extends LifecycleBase
     }
 
 
+    protected void initInternal() {
+        // NOOP
+    }
+
     /**
      * Start this component and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -255,6 +259,12 @@ public abstract class ValveBase extends LifecycleBase
     }
     
     
+    @Override
+    protected void destroyInternal() {
+        // NOOP
+    }
+
+
     /**
      * Return a String rendering of this object.
      */

@@ -29,10 +29,13 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
@@ -246,11 +249,6 @@ public abstract class ContainerBase extends LifecycleBase
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-
-    /**
-     * Has this component been initialized?
-     */
-    protected boolean initialized=false;
 
     /**
      * Will children be started automatically when they are added.
@@ -1061,32 +1059,40 @@ public abstract class ContainerBase extends LifecycleBase
      * 
      * @throws Exception
      */ 
-    public void init() throws Exception {
+    @Override
+    protected void initInternal() throws LifecycleException{
 
-        if( this.getParent() == null ) {
-            // "Life" update
-            ObjectName parentName=getParentName();
-
-            //log.info("Register " + parentName );
-            if( parentName != null && 
-                    mserver.isRegistered(parentName)) 
-            {
-                mserver.invoke(parentName, "addChild", new Object[] { this },
-                        new String[] {"org.apache.catalina.Container"});
+        try {
+            if( this.getParent() == null ) {
+                // "Life" update
+                ObjectName parentName;
+                    parentName = getParentName();
+    
+                //log.info("Register " + parentName );
+                if( parentName != null && 
+                        mserver.isRegistered(parentName)) 
+                {
+                    mserver.invoke(parentName, "addChild", new Object[] { this },
+                            new String[] {"org.apache.catalina.Container"});
+                }
             }
+        } catch (MalformedObjectNameException e) {
+            throw new LifecycleException(e);
+        } catch (InstanceNotFoundException e) {
+            throw new LifecycleException(e);
+        } catch (ReflectionException e) {
+            throw new LifecycleException(e);
+        } catch (MBeanException e) {
+            throw new LifecycleException(e);
         }
-        initialized=true;
     }
     
     public ObjectName getParentName() throws MalformedObjectNameException {
         return null;
     }
     
-    public void destroy() throws Exception {
-        if (getState().isAvailable()) {
-            stop();
-        }
-        initialized=false;
+    @Override
+    protected void destroyInternal() throws LifecycleException {
 
         // unregister this component
         if ( oname != null ) {
@@ -1106,12 +1112,6 @@ public abstract class ContainerBase extends LifecycleBase
             parent.removeChild(this);
         }
 
-        // Stop our child containers, if any
-        Container children[] = findChildren();
-        for (int i = 0; i < children.length; i++) {
-            removeChild(children[i]);
-        }
-                
     }
 
     // ------------------------------------------------------- Pipeline Methods

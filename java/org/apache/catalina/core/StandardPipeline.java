@@ -157,6 +157,12 @@ public class StandardPipeline extends LifecycleBase
     }
 
 
+    @Override
+    protected void initInternal() {
+        // NOOP
+    }
+
+    
     /**
      * Start {@link Valve}s) in this pipeline and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -206,6 +212,12 @@ public class StandardPipeline extends LifecycleBase
             unregisterValve(current);
         	current = current.getNext();
         }
+    }
+
+    
+    @Override
+    protected void destroyInternal() {
+        // NOOP
     }
 
     

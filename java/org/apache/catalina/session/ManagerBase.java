@@ -191,8 +191,6 @@ public abstract class ManagerBase extends LifecycleBase
     // number of duplicated session ids - anything >0 means we have problems
     protected int duplicates=0;
 
-    protected boolean initialized=false;
-    
     /**
      * Processing time during session expiration.
      */
@@ -712,7 +710,8 @@ public abstract class ManagerBase extends LifecycleBase
 
     }
 
-    public void destroy() {
+    @Override
+    protected void destroyInternal() {
         if( oname != null )
             Registry.getRegistry(null, null).unregisterComponent(oname);
         if (randomIS!=null) {
@@ -724,13 +723,11 @@ public abstract class ManagerBase extends LifecycleBase
             randomIS=null;
         }
 
-        initialized=false;
         oname = null;
     }
     
-    public void init() {
-        if( initialized ) return;
-        initialized=true;        
+    @Override
+    protected void initInternal() {
         
         if( oname==null ) {
             try {
