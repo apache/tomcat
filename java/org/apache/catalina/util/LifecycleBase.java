@@ -90,40 +90,51 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     
+    public synchronized final void init() throws LifecycleException {
+        if (!state.equals(LifecycleState.NEW)) {
+            invalidTransition(Lifecycle.INIT_EVENT);
+        }
+
+        // TODO - Check for JMX support and register if required
+        
+        initInternal();
+        
+        setState(LifecycleState.INITIALIZED);
+    }
+    
+    
+    protected abstract void initInternal() throws LifecycleException;
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void start() throws LifecycleException {
+    public synchronized final void start() throws LifecycleException {
         
-        synchronized (this) {
-            if (LifecycleState.STARTING_PREP.equals(state) ||
-                    LifecycleState.STARTING.equals(state) ||
-                    LifecycleState.STARTED.equals(state)) {
-                
-                if (log.isDebugEnabled()) {
-                    Exception e = new LifecycleException();
-                    log.debug(sm.getString("lifecycleBase.alreadyStarted",
-                            toString()), e);
-                } else if (log.isInfoEnabled()) {
-                    log.info(sm.getString("lifecycleBase.alreadyStarted",
-                            toString()));
-                }
-                
-                return;
+        if (LifecycleState.STARTING_PREP.equals(state) ||
+                LifecycleState.STARTING.equals(state) ||
+                LifecycleState.STARTED.equals(state)) {
+            
+            if (log.isDebugEnabled()) {
+                Exception e = new LifecycleException();
+                log.debug(sm.getString("lifecycleBase.alreadyStarted",
+                        toString()), e);
+            } else if (log.isInfoEnabled()) {
+                log.info(sm.getString("lifecycleBase.alreadyStarted",
+                        toString()));
             }
             
-            if (!state.equals(LifecycleState.NEW) &&
-                    !state.equals(LifecycleState.STOPPED)) {
-                invalidTransition(Lifecycle.BEFORE_START_EVENT);
-            }
-
-            // Set state and fire event separately rather than via setState()
-            // so event fires outside of sync boundary
-            state = LifecycleState.STARTING_PREP;
+            return;
         }
         
-        lifecycle.fireLifecycleEvent(Lifecycle.BEFORE_START_EVENT, null);
+        if (state.equals(LifecycleState.NEW)) {
+            init();
+        } else if (!state.equals(LifecycleState.INITIALIZED) &&
+                !state.equals(LifecycleState.STOPPED)) {
+            invalidTransition(Lifecycle.BEFORE_START_EVENT);
+        }
+
+        setState(LifecycleState.STARTING_PREP);
 
         startInternal();
 
@@ -166,52 +177,53 @@ public abstract class LifecycleBase implements Lifecycle {
      * {@inheritDoc}
      */
     @Override
-    public final void stop() throws LifecycleException {
+    public synchronized final void stop() throws LifecycleException {
 
-        synchronized (this) {
-            if (LifecycleState.STOPPING_PREP.equals(state) ||
-                    LifecycleState.STOPPING.equals(state) ||
-                    LifecycleState.STOPPED.equals(state)) {
-    
-                if (log.isDebugEnabled()) {
-                    Exception e = new LifecycleException();
-                    log.debug(sm.getString("lifecycleBase.alreadyStopped",
-                            toString()), e);
-                } else if (log.isInfoEnabled()) {
-                    log.info(sm.getString("lifecycleBase.alreadyStopped",
-                            toString()));
-                }
-                
-                return;
+        if (LifecycleState.STOPPING_PREP.equals(state) ||
+                LifecycleState.STOPPING.equals(state) ||
+                LifecycleState.STOPPED.equals(state)) {
+
+            if (log.isDebugEnabled()) {
+                Exception e = new LifecycleException();
+                log.debug(sm.getString("lifecycleBase.alreadyStopped",
+                        toString()), e);
+            } else if (log.isInfoEnabled()) {
+                log.info(sm.getString("lifecycleBase.alreadyStopped",
+                        toString()));
             }
             
-            if (state.equals(LifecycleState.NEW)) {
-                state = LifecycleState.STOPPED;
-                return;
-            }
-
-            if (!state.equals(LifecycleState.STARTED) &&
-                    !state.equals(LifecycleState.FAILED) &&
-                    !state.equals(LifecycleState.MUST_STOP)) {
-                invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
-            }
-            
-            // Set state and fire event separately rather than via setState()
-            // so event fires outside of sync boundary
-            state = LifecycleState.STOPPING_PREP;
+            return;
         }
         
-        lifecycle.fireLifecycleEvent(Lifecycle.BEFORE_STOP_EVENT, null);
+        if (state.equals(LifecycleState.NEW)) {
+            state = LifecycleState.STOPPED;
+            return;
+        }
+
+        if (!state.equals(LifecycleState.STARTED) &&
+                !state.equals(LifecycleState.FAILED) &&
+                !state.equals(LifecycleState.MUST_STOP)) {
+            invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
+        }
+        
+        setState(LifecycleState.STOPPING_PREP);
 
         stopInternal();
 
-        // Shouldn't be necessary but acts as a check that sub-classes are doing
-        // what they are supposed to.
-        if (!state.equals(LifecycleState.STOPPING)) {
-            invalidTransition(Lifecycle.AFTER_STOP_EVENT);
-        }
+        if (state.equals(LifecycleState.MUST_DESTROY)) {
+            // Complete stop process first
+            setState(LifecycleState.STOPPED);
 
-        setState(LifecycleState.STOPPED);
+            destroy();
+        } else {
+            // Shouldn't be necessary but acts as a check that sub-classes are doing
+            // what they are supposed to.
+            if (!state.equals(LifecycleState.STOPPING)) {
+                invalidTransition(Lifecycle.AFTER_STOP_EVENT);
+            }
+
+            setState(LifecycleState.STOPPED);
+        }
     }
 
 
@@ -229,6 +241,22 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void stopInternal() throws LifecycleException;
 
 
+    public synchronized final void destroy() throws LifecycleException {
+        if (!state.equals(LifecycleState.STOPPED) &&
+                !state.equals(LifecycleState.FAILED)) {
+            invalidTransition(Lifecycle.DESTROY_EVENT);
+        }
+
+        // TODO - Check for JMX support and de-register if required
+        
+        destroyInternal();
+        
+        setState(LifecycleState.DESTROYED);
+    }
+    
+    
+    protected abstract void destroyInternal() throws LifecycleException;
+    
     /**
      * {@inheritDoc}
      */
@@ -244,7 +272,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * 
      * @param state The new state for this component
      */
-    protected void setState(LifecycleState state) {
+    protected synchronized void setState(LifecycleState state) {
         setState(state, null);
     }
     

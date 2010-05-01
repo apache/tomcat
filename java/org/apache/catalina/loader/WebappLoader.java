@@ -526,10 +526,8 @@ public class WebappLoader extends LifecycleBase
     }
 
 
-    private boolean initialized=false;
-
-    public void init() {
-        initialized=true;
+    @Override
+    protected void initInternal() {
 
         if( oname==null ) {
             // not registered yet - standalone or API
@@ -558,14 +556,13 @@ public class WebappLoader extends LifecycleBase
         }
     }
 
-    public void destroy() {
+    @Override
+    protected void destroyInternal() {
         if( controller==oname ) {
             // Self-registration, undo it
             Registry.getRegistry(null, null).unregisterComponent(oname);
             oname = null;
         }
-        initialized = false;
-
     }
 
     /**
@@ -577,8 +574,6 @@ public class WebappLoader extends LifecycleBase
      */
     @Override
     protected void startInternal() throws LifecycleException {
-
-        if( ! initialized ) init();
 
         if (log.isDebugEnabled())
             log.debug(sm.getString("webappLoader.starting"));
@@ -702,7 +697,7 @@ public class WebappLoader extends LifecycleBase
 
         classLoader = null;
 
-        destroy();
+        setState(LifecycleState.MUST_DESTROY);
     }
 
 

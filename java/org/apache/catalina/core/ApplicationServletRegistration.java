@@ -28,6 +28,7 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.ServletSecurityElement;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
@@ -151,7 +152,7 @@ public class ApplicationServletRegistration
                     getName(), context.getPath()));
         }
         
-        if (context.isInitialized()) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(sm.getString(
                     "applicationServletRegistration.setServletSecurity.ise",
                     getName(), context.getPath()));

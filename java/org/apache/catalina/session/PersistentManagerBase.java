@@ -909,9 +909,6 @@ public abstract class PersistentManagerBase extends ManagerBase
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        if( ! initialized )
-            init();
-        
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
             log.debug("Force random number initialization starting");
@@ -962,8 +959,7 @@ public abstract class PersistentManagerBase extends ManagerBase
         // Require a new random number generator if we are restarted
         this.random = null;
 
-        if( initialized )
-            destroy();
+        setState(LifecycleState.MUST_DESTROY);
 
     }
 

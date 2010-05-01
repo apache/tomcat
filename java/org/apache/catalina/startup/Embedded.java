@@ -813,7 +813,6 @@ public class Embedded  extends StandardService {
 
         setState(LifecycleState.STARTING);
         lifecycle.fireLifecycleEvent(START_EVENT, null);
-        initialized = true;
 
         // Start our defined Engines first
         for (int i = 0; i < engines.length; i++) {
@@ -822,7 +821,6 @@ public class Embedded  extends StandardService {
 
         // Start our defined Connectors second
         for (int i = 0; i < connectors.length; i++) {
-            connectors[i].initialize();
             ((Lifecycle) connectors[i]).start();
         }
 

@@ -200,8 +200,6 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         
-        if (!initialized) init();
-
         // Force initialization of the random number generator
         generateSessionId();
 
@@ -256,9 +254,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
         cluster.removeManager(this);
         this.random = null;
 
-        if( initialized ) {
-            destroy();
-        }
+        setState(LifecycleState.MUST_DESTROY);
     }
 
     @Override
