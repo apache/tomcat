@@ -101,8 +101,11 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  *
  * @author Craig R. McClanahan
  * @version $Id$
+ * 
+ * @deprecated Use {@link Tomcat} instead.
  */
 
+@Deprecated
 public class Embedded  extends StandardService {
     private static final Log log = LogFactory.getLog(Embedded.class);
 
@@ -812,7 +815,6 @@ public class Embedded  extends StandardService {
         initNaming();
 
         setState(LifecycleState.STARTING);
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
 
         // Start our defined Engines first
         for (int i = 0; i < engines.length; i++) {

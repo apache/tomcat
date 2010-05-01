@@ -33,10 +33,15 @@ import java.util.logging.LogManager;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.ClassLoaderLogManager;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
+import org.apache.tomcat.util.log.SystemLogHandler;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
@@ -62,11 +67,22 @@ import org.xml.sax.InputSource;
  * @version $Id$
  */
 
-public class Catalina extends Embedded {
+public class Catalina extends LifecycleBase {
+
+
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
 
     // ----------------------------------------------------- Instance Variables
 
+    /**
+     * Use await.
+     */
+    protected boolean await = false;
 
     /**
      * Pathname to the server configuration file.
@@ -104,6 +120,17 @@ public class Catalina extends Embedded {
      */
     protected Thread shutdownHook = null;
 
+
+    /**
+     * The Server object for this Tomcat instance
+     */
+    protected Server server = null;
+
+    
+    /**
+     * Is naming enabled ?
+     */
+    protected boolean useNaming = true;
 
     // ------------------------------------------------------------- Properties
 
@@ -145,41 +172,40 @@ public class Catalina extends Embedded {
     }
 
 
-    // ----------------------------------------------------------- Main Program
+    public void setServer(Server server) {
+        this.server = server;
+    }
 
-    /**
-     * The application main program.
-     *
-     * @param args Command line arguments
-     */
-    public static void main(String args[]) {
-        (new Catalina()).process(args);
+
+    public Server getServer() {
+        return server;
     }
 
 
     /**
-     * The instance main program.
-     *
-     * @param args Command line arguments
+     * Return true if naming is enabled.
      */
-    public void process(String args[]) {
-
-        setAwait(true);
-        initDirs();
-        try {
-            if (arguments(args)) {
-                if (starting) {
-                    load(args);
-                    start();
-                } else if (stopping) {
-                    stopServer();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace(System.out);
-        }
+    public boolean isUseNaming() {
+        return (this.useNaming);
     }
 
+
+    /**
+     * Enables or disables naming support.
+     *
+     * @param useNaming The new use naming value
+     */
+    public void setUseNaming(boolean useNaming) {
+        this.useNaming = useNaming;
+    }
+
+    public void setAwait(boolean b) {
+        await = b;
+    }
+
+    public boolean isAwait() {
+        return await;
+    }
 
     // ------------------------------------------------------ Protected Methods
 
@@ -530,12 +556,9 @@ public class Catalina extends Embedded {
         }
     }
 
-    public void create() {
-
-    }
 
     @Override
-    protected void destroyInternal() {
+    protected void initInternal() {
         // NOOP
     }
 
@@ -557,7 +580,6 @@ public class Catalina extends Embedded {
         long t1 = System.nanoTime();
 
         setState(LifecycleState.STARTING);
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
 
         // Start the new server
         try {
@@ -640,6 +662,11 @@ public class Catalina extends Embedded {
     }
 
 
+    @Override
+    protected void destroyInternal() {
+        // NOOP
+    }
+
     /**
      * Await and shutdown.
      */
@@ -664,6 +691,104 @@ public class Catalina extends Embedded {
     }
 
 
+    protected void initDirs() {
+
+        String catalinaHome = System.getProperty("catalina.home");
+        if (catalinaHome == null) {
+            // Backwards compatibility patch for J2EE RI 1.3
+            String j2eeHome = System.getProperty("com.sun.enterprise.home");
+            if (j2eeHome != null) {
+                catalinaHome=System.getProperty("com.sun.enterprise.home");
+            } else if (System.getProperty("catalina.base") != null) {
+                catalinaHome = System.getProperty("catalina.base");
+            } else {
+                // Use IntrospectionUtils and guess the dir
+                catalinaHome = IntrospectionUtils.guessInstall
+                    ("catalina.home", "catalina.base", "catalina.jar");
+                if (catalinaHome == null) {
+                    catalinaHome = IntrospectionUtils.guessInstall
+                        ("tomcat.install", "catalina.home", "tomcat.jar");
+                }
+            }
+        }
+        // last resort - for minimal/embedded cases. 
+        if(catalinaHome==null) {
+            catalinaHome=System.getProperty("user.dir");
+        }
+        if (catalinaHome != null) {
+            File home = new File(catalinaHome);
+            if (!home.isAbsolute()) {
+                try {
+                    catalinaHome = home.getCanonicalPath();
+                } catch (IOException e) {
+                    catalinaHome = home.getAbsolutePath();
+                }
+            }
+            System.setProperty("catalina.home", catalinaHome);
+        }
+
+        if (System.getProperty("catalina.base") == null) {
+            System.setProperty("catalina.base",
+                               catalinaHome);
+        } else {
+            String catalinaBase = System.getProperty("catalina.base");
+            File base = new File(catalinaBase);
+            if (!base.isAbsolute()) {
+                try {
+                    catalinaBase = base.getCanonicalPath();
+                } catch (IOException e) {
+                    catalinaBase = base.getAbsolutePath();
+                }
+            }
+            System.setProperty("catalina.base", catalinaBase);
+        }
+        
+        String temp = System.getProperty("java.io.tmpdir");
+        if (temp == null || (!(new File(temp)).exists())
+                || (!(new File(temp)).isDirectory())) {
+            log.error(sm.getString("embedded.notmp", temp));
+        }
+
+    }
+
+    
+    protected void initStreams() {
+        // Replace System.out and System.err with a custom PrintStream
+        SystemLogHandler systemlog = new SystemLogHandler(System.out);
+        System.setOut(systemlog);
+        System.setErr(systemlog);
+    }
+
+    
+    protected void initNaming() {
+        // Setting additional variables
+        if (!useNaming) {
+            log.info( "Catalina naming disabled");
+            System.setProperty("catalina.useNaming", "false");
+        } else {
+            System.setProperty("catalina.useNaming", "true");
+            String value = "org.apache.naming";
+            String oldValue =
+                System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
+            if (oldValue != null) {
+                value = value + ":" + oldValue;
+            }
+            System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
+            if( log.isDebugEnabled() )
+                log.debug("Setting naming prefix=" + value);
+            value = System.getProperty
+                (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
+            if (value == null) {
+                System.setProperty
+                    (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
+                     "org.apache.naming.java.javaURLContextFactory");
+            } else {
+                log.debug( "INITIAL_CONTEXT_FACTORY alread set " + value );
+            }
+        }
+    }
+
+    
     // --------------------------------------- CatalinaShutdownHook Inner Class
 
     // XXX Should be moved to embedded !
