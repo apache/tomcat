@@ -32,10 +32,8 @@ import java.util.logging.LogManager;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
@@ -67,7 +65,7 @@ import org.xml.sax.InputSource;
  * @version $Id$
  */
 
-public class Catalina extends LifecycleBase {
+public class Catalina {
 
 
     /**
@@ -557,16 +555,10 @@ public class Catalina extends LifecycleBase {
     }
 
 
-    @Override
-    protected void initInternal() {
-        // NOOP
-    }
-
     /**
      * Start a new server instance.
      */
-    @Override
-    protected void startInternal() {
+    public void start() {
 
         if (getServer() == null) {
             load();
@@ -578,8 +570,6 @@ public class Catalina extends LifecycleBase {
         }
 
         long t1 = System.nanoTime();
-
-        setState(LifecycleState.STARTING);
 
         // Start the new server
         try {
@@ -615,10 +605,8 @@ public class Catalina extends LifecycleBase {
         }
 
         if (await) {
-            setState(LifecycleState.STARTED);
-            fireLifecycleEvent(AFTER_START_EVENT, null);
             await();
-            setState(LifecycleState.MUST_STOP);
+            stop();
         }
 
     }
@@ -627,11 +615,7 @@ public class Catalina extends LifecycleBase {
     /**
      * Stop an existing server instance.
      */
-    @Override
-    protected void stopInternal() {
-
-        fireLifecycleEvent(STOP_EVENT, null);
-        setState(LifecycleState.STOPPING);
+    public void stop() {
 
         try {
             // Remove the ShutdownHook first so that server.stop() 
@@ -661,11 +645,6 @@ public class Catalina extends LifecycleBase {
 
     }
 
-
-    @Override
-    protected void destroyInternal() {
-        // NOOP
-    }
 
     /**
      * Await and shutdown.
@@ -803,7 +782,7 @@ public class Catalina extends LifecycleBase {
             if (getServer() != null) {
                 try {
                     Catalina.this.stop();
-                } catch (LifecycleException e) {
+                } catch (Exception e) {
                     log.error(sm.getString("catalina.shutdownHookFail"), e);
                 }
             }
@@ -814,9 +793,7 @@ public class Catalina extends LifecycleBase {
             if (logManager instanceof ClassLoaderLogManager) {
                 ((ClassLoaderLogManager) logManager).shutdown();
             }
-
         }
-
     }
     
     
