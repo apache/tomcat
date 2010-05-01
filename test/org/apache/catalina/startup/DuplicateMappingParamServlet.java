@@ -30,8 +30,7 @@ import javax.servlet.http.HttpServletResponse;
  * Test Mock with wrong Annotation!
  * 
  * @author Peter Rossbach
- * @version $Id: DuplicateMappingParamServlet.java 939221 2010-04-29 07:30:29Z
- *          kkolinko $
+ * @version $Revision$
  */
 @WebServlet(value = "/annotation/overwrite", urlPatterns = { "/param2" }, name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
