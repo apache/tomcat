@@ -271,8 +271,8 @@ public class WebappLoader extends LifecycleBase
 
         boolean oldDelegate = this.delegate;
         this.delegate = delegate;
-        support.firePropertyChange("delegate", new Boolean(oldDelegate),
-                                   new Boolean(this.delegate));
+        support.firePropertyChange("delegate", Boolean.valueOf(oldDelegate),
+                                   Boolean.valueOf(this.delegate));
 
     }
 
@@ -332,8 +332,8 @@ public class WebappLoader extends LifecycleBase
         boolean oldReloadable = this.reloadable;
         this.reloadable = reloadable;
         support.firePropertyChange("reloadable",
-                                   new Boolean(oldReloadable),
-                                   new Boolean(this.reloadable));
+                                   Boolean.valueOf(oldReloadable),
+                                   Boolean.valueOf(this.reloadable));
 
     }
 
@@ -542,7 +542,6 @@ public class WebappLoader extends LifecycleBase
                     oname=new ObjectName(ctx.getEngineName() + ":type=Loader,path=" +
                                 path + ",host=" + ctx.getParent().getName());
                     Registry.getRegistry(null, null).registerComponent(this, oname, null);
-                    controller=oname;
                 } catch (Exception e) {
                     log.error("Error registering loader", e );
                 }
@@ -558,11 +557,8 @@ public class WebappLoader extends LifecycleBase
 
     @Override
     protected void destroyInternal() {
-        if( controller==oname ) {
-            // Self-registration, undo it
-            Registry.getRegistry(null, null).unregisterComponent(oname);
-            oname = null;
-        }
+        Registry.getRegistry(null, null).unregisterComponent(oname);
+        oname = null;
     }
 
     /**
@@ -813,6 +809,7 @@ public class WebappLoader extends LifecycleBase
                         String path = libDir.getCanonicalPath();
                         classLoader.addPermission(path);
                     } catch (IOException e) {
+                        // Ignore
                     }
                 }
 
@@ -825,6 +822,7 @@ public class WebappLoader extends LifecycleBase
                             String path = libDir.getCanonicalPath();
                             classLoader.addPermission(path);
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                     if (classesURL != null) {
@@ -833,6 +831,7 @@ public class WebappLoader extends LifecycleBase
                             String path = classesDir.getCanonicalPath();
                             classLoader.addPermission(path);
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                 }
@@ -840,6 +839,7 @@ public class WebappLoader extends LifecycleBase
             }
 
         } catch (MalformedURLException e) {
+            // Ignore
         }
 
     }
@@ -903,7 +903,9 @@ public class WebappLoader extends LifecycleBase
             } else {
 
                 classRepository = new File(workDir, classesPath);
-                classRepository.mkdirs();
+                if (!classRepository.mkdirs())
+                    throw new IOException(
+                            sm.getString("webappLoader.mkdirFailure"));
                 if (!copyDir(classes, classRepository)) {
                     throw new IOException(
                             sm.getString("webappLoader.copyFailure"));
@@ -951,7 +953,9 @@ public class WebappLoader extends LifecycleBase
             } else {
                 copyJars = true;
                 destDir = new File(workDir, libPath);
-                destDir.mkdirs();
+                if (!destDir.mkdirs())
+                    throw new IOException(
+                            sm.getString("webappLoader.mkdirFailure"));
             }
 
             // Looking up directory /WEB-INF/lib in the context
@@ -1056,7 +1060,6 @@ public class WebappLoader extends LifecycleBase
                 String cp=getClasspath( loader );
                 if( cp==null ) {
                     log.info( "Unknown loader " + loader + " " + loader.getClass());
-                    break;
                 } else {
                     if (n > 0) 
                         classpath.append(File.pathSeparator);
@@ -1141,7 +1144,8 @@ public class WebappLoader extends LifecycleBase
                     if (!copy((InputStream) object, os))
                         return false;
                 } else if (object instanceof DirContext) {
-                    currentFile.mkdir();
+                    if (!currentFile.mkdir())
+                        return false;
                     if (!copyDir((DirContext) object, currentFile))
                         return false;
                 }
@@ -1187,7 +1191,6 @@ public class WebappLoader extends LifecycleBase
         org.apache.juli.logging.LogFactory.getLog( WebappLoader.class );
 
     private ObjectName oname;
-    private ObjectName controller;
 
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
@@ -1196,20 +1199,14 @@ public class WebappLoader extends LifecycleBase
     }
 
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
     public void postDeregister() {
+        // NOOP
     }
-
-    public ObjectName getController() {
-        return controller;
-    }
-
-    public void setController(ObjectName controller) {
-        this.controller = controller;
-    }
-
 }
