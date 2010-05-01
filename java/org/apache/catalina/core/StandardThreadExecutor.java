@@ -93,6 +93,12 @@ public class StandardThreadExecutor extends LifecycleBase
     
     // ---------------------------------------------- Public Methods
     
+    @Override
+    protected void initInternal() {
+        // NOOP
+    }
+
+    
     /**
      * Start the component and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -130,6 +136,13 @@ public class StandardThreadExecutor extends LifecycleBase
         executor = null;
         taskqueue = null;
     }
+
+    
+    @Override
+    protected void destroyInternal() {
+        // NOOP
+    }
+
     
     public void execute(Runnable command, long timeout, TimeUnit unit) {
         if ( executor != null ) {

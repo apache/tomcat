@@ -501,7 +501,7 @@ public class Catalina extends Embedded {
 
         // Start the new server
         try {
-            getServer().initialize();
+            getServer().init();
         } catch (LifecycleException e) {
             if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
                 throw new java.lang.Error(e);
@@ -535,8 +535,8 @@ public class Catalina extends Embedded {
     }
 
     @Override
-    public void destroy() {
-
+    protected void destroyInternal() {
+        // NOOP
     }
 
     /**

@@ -288,7 +288,6 @@ public class Tomcat {
     public void start() throws LifecycleException {
         getServer();
         getConnector();
-        server.initialize();
         server.start();
     }
 

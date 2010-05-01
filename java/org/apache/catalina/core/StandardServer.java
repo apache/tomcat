@@ -151,12 +151,6 @@ public final class StandardServer extends LifecycleBase
 
 
     /**
-     * Has this component been initialized?
-     */
-    private boolean initialized = false;
-
-
-    /**
      * The property change support for this component.
      */
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -320,14 +314,6 @@ public final class StandardServer extends LifecycleBase
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
             services = results;
-
-            if (initialized) {
-                try {
-                    service.initialize();
-                } catch (LifecycleException e) {
-                    log.error(e);
-                }
-            }
 
             if (getState().isAvailable()) {
                 try {
@@ -689,23 +675,12 @@ public final class StandardServer extends LifecycleBase
 
     }
 
-    public void init() throws Exception {
-        initialize();
-    }
-    
     /**
      * Invoke a pre-startup initialization. This is used to allow connectors
      * to bind to restricted ports under Unix operating environments.
      */
-    public void initialize()
-        throws LifecycleException 
-    {
-        if (initialized) {
-                log.info(sm.getString("standardServer.initialize.initialized"));
-            return;
-        }
-        fireLifecycleEvent(INIT_EVENT, null);
-        initialized = true;
+    @Override
+    protected void initInternal() throws LifecycleException {
 
         if( oname==null ) {
             try {
@@ -729,10 +704,14 @@ public final class StandardServer extends LifecycleBase
 
         // Initialize our defined Services
         for (int i = 0; i < services.length; i++) {
-            services[i].initialize();
+            services[i].init();
         }
     }
     
+    protected void destroyInternal() {
+        // NOOP
+    }
+
     protected String type;
     protected String domain;
     protected String suffix;

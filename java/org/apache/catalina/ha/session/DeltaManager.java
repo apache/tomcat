@@ -761,7 +761,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        if (!initialized) init();
 
         // Force initialization of the random number generator
         generateSessionId();
@@ -988,9 +987,8 @@ public class DeltaManager extends ClusterManagerBase{
         this.random = null;
         getCluster().removeManager(this);
         replicationValve = null;
-        if (initialized) {
-            destroy();
-        }
+        
+        setState(LifecycleState.MUST_DESTROY);
     }
 
     // ----------------------------------------- PropertyChangeListener Methods

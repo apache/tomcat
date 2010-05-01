@@ -613,6 +613,12 @@ public class SimpleTcpCluster extends LifecycleBase
 
     // ------------------------------------------------------ public
 
+    @Override
+    protected void initInternal() {
+        // NOOP
+    }
+    
+    
     /**
      * Start Cluster and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -729,6 +735,12 @@ public class SimpleTcpCluster extends LifecycleBase
         } catch (Exception x) {
             log.error("Unable to stop cluster valve.", x);
         }
+    }
+
+    
+    @Override
+    protected void destroyInternal() {
+        // NOOP
     }
 
     

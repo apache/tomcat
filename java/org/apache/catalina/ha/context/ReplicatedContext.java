@@ -54,14 +54,6 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        if( !initialized ) { 
-            try {
-                init();
-            } catch( Exception ex ) {
-                throw new LifecycleException("Error initializaing ", ex);
-            }
-        }
-
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
             if (this.context == null) this.context = new ReplApplContext(this);

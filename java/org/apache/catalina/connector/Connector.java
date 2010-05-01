@@ -189,12 +189,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
 
 
     /**
-     * Has this component been initialized yet?
-     */
-    protected boolean initialized = false;
-
-
-    /**
      * The shutdown signal to our background thread
      */
     protected boolean stopped = false;
@@ -857,51 +851,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
         return _oname;
     }
 
-    /**
-     * Initialize this connector (create ServerSocket here!)
-     */
-    public void initialize()
-        throws LifecycleException
-    {
-        if (initialized) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("coyoteConnector.alreadyInitialized"));
-           return;
-        }
-
-        this.initialized = true;
-
-        if (oname == null) {
-            try {
-                // we are loaded directly, via API - and no name was given to us
-                // Engine name is used as domain name for MBeans
-                oname = createObjectName(container.getName(), "Connector");
-                Registry.getRegistry(null, null)
-                    .registerComponent(this, oname, null);
-                controller=oname;
-            } catch (Exception e) {
-                log.error( "Error registering connector ", e);
-            }
-            if(log.isDebugEnabled())
-                log.debug("Creating name for connector " + oname);
-        }
-
-        // Initializa adapter
-        adapter = new CoyoteAdapter(this);
-        protocolHandler.setAdapter(adapter);
-
-        IntrospectionUtils.setProperty(protocolHandler, "jkHome",
-                                       System.getProperty("catalina.base"));
-
-        try {
-            protocolHandler.init();
-        } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
-        }
-    }
-
 
     /**
      * Pause the connector.
@@ -938,8 +887,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
      */
     @Override
     protected void startInternal() throws LifecycleException {
-        if( !initialized )
-            initialize();
 
         setState(LifecycleState.STARTING);
 
@@ -1109,9 +1056,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
                       log.debug("Found engine " + obj + " " + obj.getClass());
                 container=(Container)obj;
 
-                // Internal initialize - we now have the Engine
-                initialize();
-
                 if(log.isDebugEnabled())
                     log.debug("Initialized");
                 // As a side effect we'll get the container field set
@@ -1123,19 +1067,47 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
         }
     }
 
-    public void init() throws Exception {
+    @Override
+    protected void initInternal() throws LifecycleException {
 
-        if( this.getService() != null ) {
-            if(log.isDebugEnabled())
-                 log.debug( "Already configured" );
-            return;
-        }
         if( container==null ) {
             findContainer();
         }
+        
+        if (oname == null) {
+            try {
+                // we are loaded directly, via API - and no name was given to us
+                // Engine name is used as domain name for MBeans
+                oname = createObjectName(container.getName(), "Connector");
+                Registry.getRegistry(null, null)
+                    .registerComponent(this, oname, null);
+                controller=oname;
+            } catch (Exception e) {
+                log.error( "Error registering connector ", e);
+            }
+            if(log.isDebugEnabled())
+                log.debug("Creating name for connector " + oname);
+        }
+
+        // Initializa adapter
+        adapter = new CoyoteAdapter(this);
+        protocolHandler.setAdapter(adapter);
+
+        IntrospectionUtils.setProperty(protocolHandler, "jkHome",
+                                       System.getProperty("catalina.base"));
+
+        try {
+            protocolHandler.init();
+        } catch (Exception e) {
+            throw new LifecycleException
+                (sm.getString
+                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
+        }
+
     }
 
-    public void destroy() throws Exception {
+    @Override
+    protected void destroyInternal() {
         if( oname!=null && controller==oname ) {
             if(log.isDebugEnabled())
                  log.debug("Unregister itself " + oname );
