@@ -997,8 +997,6 @@ public abstract class RealmBase extends LifecycleBase
         
         // Clean up allocated resources
         md = null;
-        
-        setState(LifecycleState.MUST_DESTROY);
     }
     
     
