@@ -40,15 +40,17 @@ package org.apache.catalina;
  * |             |                                                          |  |
  * |             ---------------------------<--------------------------------  ^
  * |             |                                                             |
- * |             |         auto            auto                 start()        |
- * |        STOPPING_PREP --->-- STOPPING --->-- STOPPED ---------->------------
- * |             ^                                |   ^
- * |             |stop()                          |   |
- * |             |                       destroy()|   |
- * |             |    destroy()                   |   |
- * |          FAILED ---->------ DESTROYED ----<---   |
- * |                                                  |
- * --->------------------------------>-----------------
+ * |             |             auto                 auto              start()  |
+ * |        STOPPING_PREP ------>----- STOPPING ------>----- STOPPED ---->------
+ * |             ^                                           |  |  ^
+ * |             |                                  auto     |  |  |
+ * |             |stop()            MUST_DESTROY------<-------  |  |
+ * |             |                    |                         |  |
+ * |             |                    |auto                     |  |
+ * |             |    destroy()      \|/              destroy() |  |
+ * |          FAILED ---->------ DESTROYED ----<-----------------  |
+ * |                                                               |
+ * --->------------------------------>------------------------------
  *   
  * Any state can transition to FAILED.
  * 
