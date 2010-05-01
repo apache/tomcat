@@ -96,6 +96,12 @@ public class Catalina {
 
 
     /**
+     * The server component we are starting or stopping.
+     */
+    protected Server server = null;
+
+    
+    /**
      * Are we starting a new server?
      */
     protected boolean starting = false;
@@ -119,12 +125,6 @@ public class Catalina {
     protected Thread shutdownHook = null;
 
 
-    /**
-     * The Server object for this Tomcat instance
-     */
-    protected Server server = null;
-
-    
     /**
      * Is naming enabled ?
      */
@@ -780,11 +780,7 @@ public class Catalina {
         public void run() {
 
             if (getServer() != null) {
-                try {
-                    Catalina.this.stop();
-                } catch (Exception e) {
-                    log.error(sm.getString("catalina.shutdownHookFail"), e);
-                }
+                Catalina.this.stop();
             }
             
             // If JULI is used, shut JULI down *after* the server shuts down
