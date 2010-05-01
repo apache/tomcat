@@ -58,7 +58,7 @@ package org.apache.catalina;
  * STARTED has no effect.
  * 
  * Calling start() while a component is in state NEW will cause init() to be
- * called immediately the start() method is entered.
+ * called immediately after the start() method is entered.
  * 
  * Calling stop() while a component is in states STOPPING_PREP, STOPPING or
  * STOPPED has no effect.
