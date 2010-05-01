@@ -603,11 +603,6 @@ public interface Context extends Container {
      */
     public boolean getLogEffectiveWebXml();
     
-    /**
-     * Has this context been initialized?
-     */
-    public boolean isInitialized();
-
     // --------------------------------------------------------- Public Methods
 
 

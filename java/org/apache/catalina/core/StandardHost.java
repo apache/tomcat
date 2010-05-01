@@ -803,9 +803,6 @@ public class StandardHost
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         
-        if( ! initialized )
-            init();
-
         // Look for a realm - that may have been configured earlier. 
         // If the realm is added after context - it'll set itself.
         if( realm == null ) {
@@ -885,12 +882,8 @@ public class StandardHost
         }
     }
 
-    private boolean initialized=false;
-    
     @Override
-    public void init() {
-        if( initialized ) return;
-        initialized=true;
+    protected void initInternal() {
         
         // already registered.
         if( getParent() == null ) {
@@ -932,10 +925,10 @@ public class StandardHost
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroyInternal() throws LifecycleException {
         // destroy our child containers, if any
         Container children[] = findChildren();
-        super.destroy();
+        super.destroyInternal();
         for (int i = 0; i < children.length; i++) {
             if(children[i] instanceof StandardContext)
                 ((StandardContext)children[i]).destroy();

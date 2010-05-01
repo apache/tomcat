@@ -182,6 +182,12 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
 
+    @Override
+    protected void initInternal() {
+        // NOOP
+    }
+    
+    
     /**
      * Start this component and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -207,6 +213,12 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     protected synchronized void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
+    }
+    
+    
+    @Override
+    protected void destroyInternal() {
+        // NOOP
     }
     
     

@@ -1757,6 +1757,12 @@ public class WebappClassLoader
     }
 
 
+    @Override
+    public void init() {
+        // NOOP
+    }
+
+    
     /**
      * Start the class loader.
      *
@@ -1836,6 +1842,12 @@ public class WebappClassLoader
 
     }
 
+
+    @Override
+    public void destroy() {
+        // NOOP
+    }
+    
 
     /**
      * Used to periodically signal to the classloader to release 

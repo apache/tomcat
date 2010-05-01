@@ -295,12 +295,8 @@ public class StandardEngine
     }
 
 
-    private boolean initialized=false;
-    
     @Override
-    public void init() {
-        if( initialized ) return;
-        initialized=true;
+    protected void initInternal() {
 
         if( oname==null ) {
             // not registered in JMX yet - standalone mode
@@ -360,7 +356,7 @@ public class StandardEngine
             try {
                 service=new StandardService();
                 service.setContainer( this );
-                service.initialize();
+                service.init();
             } catch( Throwable t ) {
                 log.error(t);
             }
@@ -369,9 +365,7 @@ public class StandardEngine
     }
     
     @Override
-    public void destroy() throws LifecycleException {
-        if( ! initialized ) return;
-        initialized=false;
+    protected void destroyInternal() throws LifecycleException {
         
         // if we created it, make sure it's also destroyed
         // this call implizit this.stop()
@@ -402,6 +396,7 @@ public class StandardEngine
         // registry - and stop using the static.
         Registry.getRegistry(null, null).resetMetadata();
         
+        super.destroyInternal();
     }
     
     /**
@@ -414,10 +409,6 @@ public class StandardEngine
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         
-        if( !initialized ) {
-            init();
-        }
-
         // Look for a realm - that may have been configured earlier. 
         // If the realm is added after context - it'll set itself.
         if( realm == null ) {

@@ -968,10 +968,6 @@ public abstract class RealmBase extends LifecycleBase
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if( !initialized ) {
-            init();
-        }
-
         // Create a MessageDigest instance for credentials, if desired
         if (digest != null) {
             try {
@@ -1002,7 +998,7 @@ public abstract class RealmBase extends LifecycleBase
         // Clean up allocated resources
         md = null;
         
-        destroy();
+        setState(LifecycleState.MUST_DESTROY);
     }
     
     
@@ -1018,7 +1014,8 @@ public abstract class RealmBase extends LifecycleBase
     }
     
     
-    public void destroy() {
+    @Override
+    protected void destroyInternal() {
     
         // unregister this realm
         if ( oname!=null ) {   
@@ -1305,17 +1302,14 @@ public abstract class RealmBase extends LifecycleBase
         // NOOP in base class
     }
 
-    protected boolean initialized=false;
-    
-    public void init() {
-        if( initialized && container != null ) return;
+    @Override
+    protected void initInternal() {
 
         // We want logger as soon as possible
         if (container != null) {
             this.containerLog = container.getLogger();
         }
         
-        initialized=true;
         if( container== null ) {
             ObjectName parent=null;
             // Register with the parent

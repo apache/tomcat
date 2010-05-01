@@ -106,12 +106,6 @@ public class StandardService extends LifecycleBase
     protected Container container = null;
 
 
-    /**
-     * Has this component been initialized?
-     */
-    protected boolean initialized = false;
-
-
     // ------------------------------------------------------------- Properties
 
 
@@ -246,14 +240,6 @@ public class StandardService extends LifecycleBase
             System.arraycopy(connectors, 0, results, 0, connectors.length);
             results[connectors.length] = connector;
             connectors = results;
-
-            if (initialized) {
-                try {
-                    connector.initialize();
-                } catch (LifecycleException e) {
-                    log.error("Connector.initialize", e);
-                }
-            }
 
             if (getState().isAvailable()) {
                 try {
@@ -443,9 +429,6 @@ public class StandardService extends LifecycleBase
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if( ! initialized )
-            init(); 
-
         if(log.isInfoEnabled())
             log.info(sm.getString("standardService.start.name", this.name));
         setState(LifecycleState.STARTING);
@@ -544,22 +527,20 @@ public class StandardService extends LifecycleBase
      * Invoke a pre-startup initialization. This is used to allow connectors
      * to bind to restricted ports under Unix operating environments.
      */
-    public void initialize()
-            throws LifecycleException
-    {
-        // Service shouldn't be used with embedded, so it doesn't matter
-        if (initialized) {
-            if(log.isInfoEnabled())
-                log.info(sm.getString("standardService.initialize.initialized"));
-            return;
-        }
-        initialized = true;
+    @Override
+    protected void initInternal() throws LifecycleException {
 
         if( oname==null ) {
             try {
                 // Hack - Server should be deprecated...
                 Container engine=this.getContainer();
-                domain=engine.getName();
+                
+                if (engine == null) {
+                    // TODO - Get this form elsewhere
+                    domain = "Catalina";
+                } else {
+                    domain = engine.getName();
+                }
                 oname=new ObjectName(domain + ":type=Service,serviceName="+name);
                 this.controller=oname;
                 Registry.getRegistry(null, null)
@@ -590,7 +571,7 @@ public class StandardService extends LifecycleBase
         synchronized (connectors) {
                 for (int i = 0; i < connectors.length; i++) {
                     try {
-                        connectors[i].initialize();
+                        connectors[i].init();
                     } catch (Exception e) {
                         log.error(sm.getString(
                                 "standardService.connector.failed",
@@ -600,17 +581,9 @@ public class StandardService extends LifecycleBase
         }
     }
     
-    public void destroy() throws LifecycleException {
-        if(getState().isAvailable()) stop();
+    @Override
+    protected void destroyInternal() {
         // FIXME unregister should be here probably -- stop doing that ?
-    }
-
-    public void init() {
-        try {
-            initialize();
-        } catch( Throwable t ) {
-            log.error(sm.getString("standardService.initialize.failed",domain),t);
-        }
     }
 
     protected String type;

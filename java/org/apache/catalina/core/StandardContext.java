@@ -2348,13 +2348,6 @@ public class StandardContext
     }
 
 
-    /**
-     * Has this context been initialized?
-     */
-    public boolean isInitialized() {
-        return initialized;
-    }
-
     // -------------------------------------------------------- Context Methods
 
 
@@ -4532,13 +4525,6 @@ public class StandardContext
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        if( !initialized ) { 
-            try {
-                init();
-            } catch( Exception ex ) {
-                throw new LifecycleException("Error initializaing ", ex);
-            }
-        }
         if(log.isDebugEnabled())
             log.debug("Starting " + ("".equals(getName()) ? "ROOT" : getName()));
 
@@ -5027,7 +5013,7 @@ public class StandardContext
      * 
      */ 
     @Override
-    public void destroy() throws Exception {
+    protected void destroyInternal() throws LifecycleException {
         if( oname != null ) { 
             // Send j2ee.object.deleted notification 
             Notification notification = 
@@ -5035,7 +5021,7 @@ public class StandardContext
                                 sequenceNumber++);
             broadcaster.sendNotification(notification);
         } 
-        super.destroy();
+        super.destroyInternal();
 
         // Notify our interested LifecycleListeners
         fireLifecycleEvent(DESTROY_EVENT, null);
@@ -5659,10 +5645,15 @@ public class StandardContext
     }
 
     @Override
-    public void init() throws Exception {
+    protected void initInternal() throws LifecycleException {
 
         if( this.getParent() == null ) {
-            ObjectName parentName=getParentName();
+            ObjectName parentName;
+            try {
+                parentName = getParentName();
+            } catch (MalformedObjectNameException e1) {
+                throw new LifecycleException(e1);
+            }
             
             if( ! mserver.isRegistered(parentName)) {
                 if(log.isDebugEnabled())
@@ -5670,8 +5661,12 @@ public class StandardContext
                 StandardHost host=new StandardHost();
                 host.setName(hostName);
                 host.setAutoDeploy(false);
-                Registry.getRegistry(null, null)
-                    .registerComponent(host, parentName, null);
+                try {
+                    Registry.getRegistry(null, null)
+                        .registerComponent(host, parentName, null);
+                } catch (Exception e) {
+                    throw new LifecycleException(e);
+                }
                 // We could do it the hard way...
                 //mserver.invoke(parentName, "init", new Object[] {}, new String[] {} );
                 // or same thing easier:
@@ -5695,7 +5690,7 @@ public class StandardContext
                 }
             } catch (Exception e) {
                 log.warn("Error creating ContextConfig for " + parentName, e);
-                throw e;
+                throw new LifecycleException(e);
             }
             this.addLifecycleListener(config);
 
@@ -5706,19 +5701,14 @@ public class StandardContext
                 mserver.invoke(parentName, "addChild", new Object[] { this },
                         new String[] {"org.apache.catalina.Container"});
             } catch (Exception e) {
-                destroy();
-                throw e;
-            }
-            // It's possible that addChild may have started us
-            if( initialized ) {
-                return;
+                throw new LifecycleException(e);
             }
         }
         if (processTlds) {
             this.addLifecycleListener(new TldConfig());
         }
 
-        super.init();
+        super.initInternal();
         
         // Notify our interested LifecycleListeners
         fireLifecycleEvent(INIT_EVENT, null);
