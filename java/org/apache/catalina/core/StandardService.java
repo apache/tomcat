@@ -504,20 +504,16 @@ public class StandardService extends LifecycleBase
             }
         }
 
-        if( oname==controller ) {
-            // we registered ourself on init().
-            // That should be the typical case - this object is just for
-            // backward compat, nobody should bother to load it explicitly
-            Registry.getRegistry(null, null).unregisterComponent(oname);
-            Executor[] executors = findExecutors();
-            for (int i = 0; i < executors.length; i++) {
-                try {
-                    ObjectName executorObjectName = 
-                        new ObjectName(domain + ":type=Executor,name=" + executors[i].getName());
-                    Registry.getRegistry(null, null).unregisterComponent(executorObjectName);
-                } catch (Exception e) {
-                    // Ignore (invalid ON, which cannot happen)
-                }
+
+        Registry.getRegistry(null, null).unregisterComponent(oname);
+        Executor[] executors = findExecutors();
+        for (int i = 0; i < executors.length; i++) {
+            try {
+                ObjectName executorObjectName = 
+                    new ObjectName(domain + ":type=Executor,name=" + executors[i].getName());
+                Registry.getRegistry(null, null).unregisterComponent(executorObjectName);
+            } catch (Exception e) {
+                // Ignore (invalid ON, which cannot happen)
             }
         }
     }
@@ -534,15 +530,8 @@ public class StandardService extends LifecycleBase
             try {
                 // Hack - Server should be deprecated...
                 Container engine=this.getContainer();
-                
-                if (engine == null) {
-                    // TODO - Get this form elsewhere
-                    domain = "Catalina";
-                } else {
-                    domain = engine.getName();
-                }
-                oname=new ObjectName(domain + ":type=Service,serviceName="+name);
-                this.controller=oname;
+                domain = engine.getName();
+                oname=new ObjectName(domain + ":type=Service");
                 Registry.getRegistry(null, null)
                     .registerComponent(this, oname, null);
                 
@@ -590,7 +579,6 @@ public class StandardService extends LifecycleBase
     protected String domain;
     protected String suffix;
     protected ObjectName oname;
-    protected ObjectName controller;
     protected MBeanServer mserver;
 
     public ObjectName getObjectName() {
