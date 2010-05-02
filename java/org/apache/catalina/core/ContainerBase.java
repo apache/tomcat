@@ -1022,11 +1022,6 @@ public abstract class ContainerBase extends LifecycleBase
         for (int i = 0; i < children.length; i++) {
             children[i].stop();
         }
-        // Remove children - so next start can work
-        children = findChildren();
-        for (int i = 0; i < children.length; i++) {
-            removeChild(children[i]);
-        }
 
         // Stop our subordinate components, if any
         if ((resources != null) && (resources instanceof Lifecycle)) {
@@ -1093,6 +1088,11 @@ public abstract class ContainerBase extends LifecycleBase
     
     @Override
     protected void destroyInternal() throws LifecycleException {
+
+        // Remove children now this container is being destroyed
+        for (Container child : findChildren()) {
+            child.destroy();
+        }
 
         // unregister this component
         if ( oname != null ) {
