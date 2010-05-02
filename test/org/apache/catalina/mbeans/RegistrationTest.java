@@ -77,6 +77,7 @@ public class RegistrationTest extends TomcatBaseTest {
         
         tomcat.start();
         tomcat.stop();
+        tomcat.destroy();
 
         // There should be no Catalina MBeans and no Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
