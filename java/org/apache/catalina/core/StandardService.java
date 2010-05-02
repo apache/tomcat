@@ -143,10 +143,6 @@ public class StandardService extends LifecycleBase
                 // Ignore
             }
         }
-        synchronized (connectors) {
-            for (int i = 0; i < connectors.length; i++)
-                connectors[i].setContainer(this.container);
-        }
         if (getState().isAvailable() && (oldContainer != null)) {
             try {
                 oldContainer.stop();
@@ -236,7 +232,6 @@ public class StandardService extends LifecycleBase
     public void addConnector(Connector connector) {
 
         synchronized (connectors) {
-            connector.setContainer(this.container);
             connector.setService(this);
             Connector results[] = new Connector[connectors.length + 1];
             System.arraycopy(connectors, 0, results, 0, connectors.length);
@@ -314,7 +309,6 @@ public class StandardService extends LifecycleBase
                     log.error("Connector.stop", e);
                 }
             }
-            connectors[j].setContainer(null);
             connector.setService(null);
             int k = 0;
             Connector results[] = new Connector[connectors.length - 1];
