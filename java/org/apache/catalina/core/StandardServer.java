@@ -50,9 +50,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringCache;
 import org.apache.tomcat.util.modeler.Registry;
 
-import com.sun.xml.internal.ws.api.pipe.Engine;
-
-
 
 /**
  * Standard implementation of the <b>Server</b> interface, available for use
