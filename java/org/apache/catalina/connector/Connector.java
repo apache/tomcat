@@ -25,7 +25,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -96,12 +95,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
      * Do we allow TRACE ?
      */
     protected boolean allowTrace = false;
-
-
-    /**
-     * The Container used for processing requests received by this Connector.
-     */
-    protected Container container = null;
 
 
     /**
@@ -330,7 +323,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     public void setService(Service service) {
 
         this.service = service;
-        // FIXME: setProperty("service", service);
 
     }
 
@@ -357,34 +349,7 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
 
     }
 
-
-    /**
-     * Return the Container used for processing requests received by this
-     * Connector.
-     */
-    public Container getContainer() {
-        if( container==null ) {
-            // Lazy - maybe it was added later
-            findContainer();
-        }
-        return (container);
-
-    }
-
-
-    /**
-     * Set the Container used for processing requests received by this
-     * Connector.
-     *
-     * @param container The new Container to use
-     */
-    public void setContainer(Container container) {
-
-        this.container = container;
-
-    }
-
-
+    
     /**
      * Return the "enable DNS lookups" flag.
      */
@@ -1023,53 +988,16 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
         }
     }
 
-    protected void findContainer() {
-        try {
-            // Register to the service
-            ObjectName parentName=new ObjectName( domain + ":" +
-                    "type=Service");
-
-            if(log.isDebugEnabled())
-                log.debug("Adding to " + parentName );
-            if( mserver.isRegistered(parentName )) {
-                mserver.invoke(parentName, "addConnector", new Object[] { this },
-                        new String[] {"org.apache.catalina.connector.Connector"});
-                // As a side effect we'll get the container field set
-                // Also initialize will be called
-                //return;
-            }
-            // XXX Go directly to the Engine
-            // initialize(); - is called by addConnector
-            ObjectName engName=new ObjectName( domain + ":" + "type=Engine");
-            if( mserver.isRegistered(engName )) {
-                Object obj=mserver.getAttribute(engName, "managedResource");
-                if(log.isDebugEnabled())
-                      log.debug("Found engine " + obj + " " + obj.getClass());
-                container=(Container)obj;
-
-                if(log.isDebugEnabled())
-                    log.debug("Initialized");
-                // As a side effect we'll get the container field set
-                // Also initialize will be called
-                return;
-            }
-        } catch( Exception ex ) {
-            log.error( "Error finding container " + ex);
-        }
-    }
 
     @Override
     protected void initInternal() throws LifecycleException {
 
-        if( container==null ) {
-            findContainer();
-        }
-        
         if (oname == null) {
             try {
                 // we are loaded directly, via API - and no name was given to us
                 // Engine name is used as domain name for MBeans
-                oname = createObjectName(container.getName(), "Connector");
+                oname = createObjectName(
+                        getService().getContainer().getName(), "Connector");
                 Registry.getRegistry(null, null)
                     .registerComponent(this, oname, null);
             } catch (Exception e) {
