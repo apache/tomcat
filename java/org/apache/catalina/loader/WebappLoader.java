@@ -692,8 +692,6 @@ public class WebappLoader extends LifecycleBase
         }
 
         classLoader = null;
-
-        setState(LifecycleState.MUST_DESTROY);
     }
 
 
