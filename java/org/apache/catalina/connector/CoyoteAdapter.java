@@ -209,7 +209,7 @@ public class CoyoteAdapter implements Adapter {
                 req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
                 
                 // Calling the container
-                connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+                connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
 
                 if (!error && !response.isClosed() && (request.getAttribute(Globals.EXCEPTION_ATTR) != null)) {
                     // An unexpected exception occurred while processing the event, so
@@ -217,7 +217,7 @@ public class CoyoteAdapter implements Adapter {
                     request.getEvent().setEventType(CometEvent.EventType.ERROR);
                     request.getEvent().setEventSubType(null);
                     error = true;
-                    connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+                    connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                 }
                 if (response.isClosed() || !request.isComet()) {
                     if (status==SocketStatus.OPEN) {
@@ -225,7 +225,7 @@ public class CoyoteAdapter implements Adapter {
                         request.getEvent().setEventType(CometEvent.EventType.END);
                         request.getEvent().setEventSubType(null);
                         error = true;
-                        connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+                        connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                     }
                     res.action(ActionCode.ACTION_COMET_END, null);
                 } else if (!error && read && request.getAvailable()) {
@@ -234,7 +234,7 @@ public class CoyoteAdapter implements Adapter {
                     request.getEvent().setEventType(CometEvent.EventType.ERROR);
                     request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
                     error = true;
-                    connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+                    connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                 }
                 return (!error);
             } catch (Throwable t) {
@@ -289,7 +289,7 @@ public class CoyoteAdapter implements Adapter {
                     // Calling the container
                     try {
                         impl.complete();
-                        connector.getContainer().getPipeline().getFirst().invoke(request, response);
+                        connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
                     } finally {
                         success = false;
                     }
@@ -305,10 +305,10 @@ public class CoyoteAdapter implements Adapter {
                 } else if (impl.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING) {
                     async = false;
                     success = false;
-                    connector.getContainer().getPipeline().getFirst().invoke(request, response);
+                    connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
                 } else {
                     try {
-                        connector.getContainer().getPipeline().getFirst().invoke(request, response);
+                        connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
                     } catch (RuntimeException x) {
                         impl.setErrorState(x);
                     }
@@ -406,9 +406,9 @@ public class CoyoteAdapter implements Adapter {
             req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
             if (postParseRequest(req, request, res, response)) {
                 //check valves if we support async
-                request.setAsyncSupported(connector.getContainer().getPipeline().isAsyncSupported());
+                request.setAsyncSupported(connector.getService().getContainer().getPipeline().isAsyncSupported());
                 // Calling the container
-                connector.getContainer().getPipeline().getFirst().invoke(request, response);
+                connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
 
                 if (request.isComet()) {
                     if (!response.isClosed() && !response.isError()) {
