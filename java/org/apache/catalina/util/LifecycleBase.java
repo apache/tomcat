@@ -258,6 +258,20 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     public synchronized final void destroy() throws LifecycleException {
+        if (LifecycleState.DESTROYED.equals(state)) {
+
+            if (log.isDebugEnabled()) {
+                Exception e = new LifecycleException();
+                log.debug(sm.getString("lifecycleBase.alreadyDestroyed",
+                        toString()), e);
+            } else if (log.isInfoEnabled()) {
+                log.info(sm.getString("lifecycleBase.alreadyDestroyed",
+                        toString()));
+            }
+            
+            return;
+        }
+        
         if (!state.equals(LifecycleState.STOPPED) &&
                 !state.equals(LifecycleState.FAILED)) {
             invalidTransition(Lifecycle.DESTROY_EVENT);
