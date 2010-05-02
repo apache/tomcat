@@ -278,11 +278,22 @@ public class Tomcat {
         return sw;
     }
     
+
+    /**
+     * Initialise the server.
+     * 
+     * @throws LifecycleException
+     */
+    public void init() throws LifecycleException {
+        getServer();
+        getConnector();
+        server.init();
+    }
+    
     
     /**
-     * Initialize and start the server, assuming that the Server implementation
-     * implements {@link Lifecycle} (the standard implementation does). If it
-     * does not, the {@link Server} must be started directly.
+     * Start the server.
+     * 
      * @throws LifecycleException 
      */
     public void start() throws LifecycleException {
@@ -292,9 +303,8 @@ public class Tomcat {
     }
 
     /** 
-     * Stop the server, assuming that the Server implementation implements
-     * {@link Lifecycle} (the standard implementation does). If it does not, the
-     * {@link Server} must be stopped directly.
+     * Stop the server.
+     * 
      * @throws LifecycleException 
      */
     public void stop() throws LifecycleException {
@@ -303,6 +313,16 @@ public class Tomcat {
     }
 
 
+    /**
+     * Destroy the server. This object cannot be used once this method has been
+     * called.
+     */
+    public void destroy() throws LifecycleException {
+        getServer();
+        server.destroy();
+        // Could null out obejcts here
+    }
+    
     /** 
      * Add a user for the in-memory realm. All created apps use this 
      * by default, can be replaced using setRealm().
