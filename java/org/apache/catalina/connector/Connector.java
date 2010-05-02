@@ -855,8 +855,7 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     /**
      * Pause the connector.
      */
-    public void pause()
-        throws LifecycleException {
+    public void pause() {
         try {
             protocolHandler.pause();
         } catch (Exception e) {
@@ -869,8 +868,7 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     /**
      * Pause the connector.
      */
-    public void resume()
-        throws LifecycleException {
+    public void resume() {
         try {
             protocolHandler.resume();
         } catch (Exception e) {
@@ -990,15 +988,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     protected String domain;
     protected ObjectName oname;
     protected MBeanServer mserver;
-    ObjectName controller;
-
-    public ObjectName getController() {
-        return controller;
-    }
-
-    public void setController(ObjectName controller) {
-        this.controller = controller;
-    }
 
     public ObjectName getObjectName() {
         return oname;
@@ -1017,9 +1006,11 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     }
 
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
     public void postDeregister() {
@@ -1081,7 +1072,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
                 oname = createObjectName(container.getName(), "Connector");
                 Registry.getRegistry(null, null)
                     .registerComponent(this, oname, null);
-                controller=oname;
             } catch (Exception e) {
                 log.error( "Error registering connector ", e);
             }
@@ -1108,7 +1098,7 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
 
     @Override
     protected void destroyInternal() {
-        if( oname!=null && controller==oname ) {
+        if (oname!=null) {
             if(log.isDebugEnabled())
                  log.debug("Unregister itself " + oname );
             Registry.getRegistry(null, null).unregisterComponent(oname);
