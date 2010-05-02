@@ -924,6 +924,44 @@ public class Http11AprProcessor implements ActionHook {
         
     }
 
+    /* Copied from the AjpProcessor.java */
+    public SocketState asyncDispatch(SocketStatus status) throws IOException {
+
+        RequestInfo rp = request.getRequestProcessor();
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            error = !adapter.asyncDispatch(request, response, status);
+        } catch (InterruptedIOException e) {
+            error = true;
+        } catch (Throwable t) {
+            log.error(sm.getString("http11processor.request.process"), t);
+            // 500 - Internal Server Error
+            response.setStatus(500);
+            error = true;
+        }
+
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (async) {
+            if (error) {
+                response.setStatus(500);
+                request.updateCounters();
+                recycle();
+                return SocketState.CLOSED;
+            } else {
+                return SocketState.LONG;
+            }
+        } else {
+            if (error) {
+                response.setStatus(500);
+            }
+            request.updateCounters();
+            recycle();
+            return SocketState.CLOSED;
+        }
+        
+    }
+
     
     public void endRequest() {
         
@@ -1223,12 +1261,16 @@ public class Http11AprProcessor implements ActionHook {
             //TODO SERVLET3 - async
             async = true;
         } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
-          //TODO SERVLET3 - async
+          //TODO SERVLET3 - async - that is bit hacky -
             AtomicBoolean dispatch = (AtomicBoolean)param;
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
                 dispatch.set(true);
-                // endpoint.processSocket(this.socket, SocketStatus.STOP);
+                try {
+                    asyncDispatch(SocketStatus.STOP); // What to do with return code ?
+                } catch (IOException ex) {
+                    error = true;
+                }
             } else {
                 dispatch.set(false);
             }
