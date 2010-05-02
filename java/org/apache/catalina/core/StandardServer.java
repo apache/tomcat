@@ -715,7 +715,7 @@ public final class StandardServer extends LifecycleBase
     }
     
     @Override
-    protected void destroyInternal() {
+    protected void destroyInternal() throws LifecycleException {
         Registry registry = Registry.getRegistry(null, null);
         
         if (onameStringCache != null) {
@@ -723,6 +723,11 @@ public final class StandardServer extends LifecycleBase
         }
         if (onameMBeanFactory != null) {
             registry.unregisterComponent(onameMBeanFactory);
+        }
+        
+        // Destroy our defined Services
+        for (int i = 0; i < services.length; i++) {
+            services[i].destroy();
         }
     }
 
