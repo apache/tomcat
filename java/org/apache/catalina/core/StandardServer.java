@@ -42,6 +42,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.util.ServerInfo;
@@ -689,14 +690,24 @@ public final class StandardServer extends LifecycleBase
         // present in the JVM (may happen when embedding) then the same cache
         // will be registered under multiple names
         try {
-            ObjectName oname2 = 
+            onameStringCache = 
                 new ObjectName(oname.getDomain() + ":type=StringCache");
             Registry.getRegistry(null, null)
-                .registerComponent(new StringCache(), oname2, null );
+                .registerComponent(new StringCache(), onameStringCache, null);
         } catch (Exception e) {
             log.error("Error registering ",e);
         }
 
+        // Register the MBeanFactory
+        try {
+            onameMBeanFactory = 
+                new ObjectName(oname.getDomain() + ":type=MBeanFactory");
+            Registry.getRegistry(null, null)
+                .registerComponent(new MBeanFactory(), onameMBeanFactory, null);
+        } catch (Exception e) {
+            log.error("Error registering ",e);
+        }
+        
         // Initialize our defined Services
         for (int i = 0; i < services.length; i++) {
             services[i].init();
@@ -705,13 +716,22 @@ public final class StandardServer extends LifecycleBase
     
     @Override
     protected void destroyInternal() {
-        // NOOP
+        Registry registry = Registry.getRegistry(null, null);
+        
+        if (onameStringCache != null) {
+            registry.unregisterComponent(onameStringCache);
+        }
+        if (onameMBeanFactory != null) {
+            registry.unregisterComponent(onameMBeanFactory);
+        }
     }
 
     protected volatile String domain;
     protected volatile ObjectName oname;
     protected MBeanServer mserver;
-
+    private ObjectName onameStringCache;
+    private ObjectName onameMBeanFactory;
+    
     /**
      * Obtain the MBean domain for this server. The domain is obtained using
      * the following search order:
