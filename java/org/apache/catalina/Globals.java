@@ -334,4 +334,9 @@ public final class Globals {
     public static final String ASYNC_SUPPORTED_ATTR = 
         "org.apache.catalina.ASYNC_SUPPORTED";
 
+    
+    /**
+     * Default domain for MBeans if none can be determined
+     */
+    public static final String DEFAULT_MBEAN_DOMAIN = "Catalina";
 }
