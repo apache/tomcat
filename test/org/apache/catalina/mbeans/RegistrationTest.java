@@ -56,7 +56,7 @@ public class RegistrationTest extends TomcatBaseTest {
 
         // Verify there are some Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
-        assertTrue("No Tomcat MBeans", onames.size() > 0);
+        assertTrue("No Tomcat MBeans", onames.size() >= 20);
 
         tomcat.stop();
 
