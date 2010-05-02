@@ -21,13 +21,15 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleMBeanRegistration;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
@@ -50,7 +52,7 @@ import org.apache.catalina.Executor;
  */
 
 public class StandardService extends LifecycleBase
-        implements Service, MBeanRegistration {
+        implements Service, LifecycleMBeanRegistration {
 
     private static final Log log = LogFactory.getLog(StandardService.class);
    
@@ -503,19 +505,6 @@ public class StandardService extends LifecycleBase
                 executors.get(i).stop();
             }
         }
-
-
-        Registry.getRegistry(null, null).unregisterComponent(oname);
-        Executor[] executors = findExecutors();
-        for (int i = 0; i < executors.length; i++) {
-            try {
-                ObjectName executorObjectName = 
-                    new ObjectName(domain + ":type=Executor,name=" + executors[i].getName());
-                Registry.getRegistry(null, null).unregisterComponent(executorObjectName);
-            } catch (Exception e) {
-                // Ignore (invalid ON, which cannot happen)
-            }
-        }
     }
 
 
@@ -526,84 +515,117 @@ public class StandardService extends LifecycleBase
     @Override
     protected void initInternal() throws LifecycleException {
 
-        if( oname==null ) {
-            try {
-                // Hack - Server should be deprecated...
-                Container engine=this.getContainer();
-                domain = engine.getName();
-                oname=new ObjectName(domain + ":type=Service");
-                Registry.getRegistry(null, null)
-                    .registerComponent(this, oname, null);
-                
-                Executor[] executors = findExecutors();
-                for (int i = 0; i < executors.length; i++) {
-                    ObjectName executorObjectName = 
-                        new ObjectName(domain + ":type=Executor,name=" + executors[i].getName());
-                    Registry.getRegistry(null, null)
-                        .registerComponent(executors[i], executorObjectName, null);
-                }
-                
-            } catch (Exception e) {
-                log.error(sm.getString("standardService.register.failed",domain),e);
-            }
-            
-            
+        if (container != null) {
+            container.init();
         }
-        if( server==null ) {
-            // If no server was defined - create one
-            server = new StandardServer();
-            server.addService(this);
+
+        // Initialize any Executors
+        for (Executor executor : findExecutors()) {
+            executor.init();
         }
-               
 
         // Initialize our defined Connectors
         synchronized (connectors) {
-                for (int i = 0; i < connectors.length; i++) {
-                    try {
-                        connectors[i].init();
-                    } catch (Exception e) {
-                        log.error(sm.getString(
-                                "standardService.connector.failed",
-                                connectors[i]), e);
-                    }
+            for (Connector connector : connectors) {
+                try {
+                    connector.init();
+                } catch (Exception e) {
+                    log.error(sm.getString(
+                            "standardService.connector.initFailed", connector),
+                            e);
                 }
+            }
         }
     }
     
     @Override
-    protected void destroyInternal() {
-        // FIXME unregister should be here probably -- stop doing that ?
+    protected void destroyInternal() throws LifecycleException {
+        Registry.getRegistry(null, null).unregisterComponent(oname);
+        
+        // Destroy our defined Connectors
+        synchronized (connectors) {
+            for (Connector connector : connectors) {
+                try {
+                    connector.destroy();
+                } catch (Exception e) {
+                    log.error(sm.getString(
+                            "standardService.connector.destroyfailed",
+                            connector), e);
+                }
+            }
+        }
+
+        // Destroy any Executors
+        for (Executor executor : findExecutors()) {
+            executor.destroy();
+        }
+
+        if (container != null) {
+            container.destroy();
+        }
+
     }
 
-    protected String type;
-    protected String domain;
-    protected String suffix;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
+    protected volatile String domain;
+    protected volatile ObjectName oname;
 
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
+    /**
+     * Obtain the MBean domain for this server. The domain is obtained using
+     * the following search order:
+     * <ol>
+     * <li>Name of the {@link Engine}.</li>
+     * <li>Name of the {@link Service}.</li>
+     * <li>Global default defined by {@link Globals#DEFAULT_MBEAN_DOMAIN}</li>
+     * </ol>
+     */
     public String getDomain() {
+        if (domain == null) {
+            Container container = getContainer();
+            if (container != null) {
+                domain = container.getName();
+            } else {
+                domain = getName();
+            }
+            if (domain == null) {
+                domain = Globals.DEFAULT_MBEAN_DOMAIN;
+            }
+        }
         return domain;
     }
 
+    public ObjectName getObjectName() {
+        if (oname == null) {
+            StringBuilder name = new StringBuilder(getDomain());
+            name.append(":type=Service");
+            
+            try {
+                oname = new ObjectName(name.toString());
+            } catch (MalformedObjectNameException e) {
+                log.warn(sm.getString("standardService.onameFail", name), e);
+            } catch (NullPointerException e) {
+                // Never going to happen
+            }
+        }
+        
+        return oname;
+    }
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
-        mserver=server;
         domain=name.getDomain();
         return name;
     }
 
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
     public void postDeregister() {
+        // NOOP
     }
 
 }
