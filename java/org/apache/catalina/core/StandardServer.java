@@ -768,6 +768,11 @@ public final class StandardServer extends LifecycleBase
     }
 
     
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+    
+    
     public ObjectName getObjectName() {
         if (oname == null) {
             StringBuilder name = new StringBuilder(getDomain());
