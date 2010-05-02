@@ -655,7 +655,7 @@ public class Embedded  extends StandardService {
         while (true) {
             int n = -1;
             for (int i = 0; i < connectors.length; i++) {
-                if (connectors[i].getContainer() == engine) {
+                if (connectors[i].getService().getContainer() == engine) {
                     n = i;
                     break;
                 }
