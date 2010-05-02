@@ -62,9 +62,9 @@ public class RegistrationTest extends TomcatBaseTest {
 
         tomcat.stop();
 
-        // Verify there are no Tomcat MBeans
-        onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
-        assertEquals("Remaining: " + onames, 0, onames.size());
+        // There should still be some Tomcat MBeans
+        onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
+        assertTrue("No Tomcat MBeans", onames.size() > 0);
 
         // add a new host
         StandardHost host = new StandardHost();
@@ -78,7 +78,10 @@ public class RegistrationTest extends TomcatBaseTest {
         tomcat.start();
         tomcat.stop();
 
+        // There should be no Catalina MBeans and no Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
+        assertEquals("Remaining: " + onames, 0, onames.size());
+        onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
         assertEquals("Remaining: " + onames, 0, onames.size());
 	}
 	
