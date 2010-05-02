@@ -43,4 +43,8 @@ public interface LifecycleMBeanRegistration extends MBeanRegistration {
      */
     public String getDomain();
 
+    /**
+     * Specify the domain under which this component should be registered.
+     */
+    public void setDomain(String domain);
 }
