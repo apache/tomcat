@@ -40,24 +40,24 @@ public class StringCache {
     /**
      * Enabled ?
      */
-    protected static boolean byteEnabled = 
-        ("true".equals(System.getProperty("tomcat.util.buf.StringCache.byte.enabled", "false")));
+    protected static boolean byteEnabled = ("true".equals(System.getProperty(
+            "tomcat.util.buf.StringCache.byte.enabled", "false")));
 
     
-    protected static boolean charEnabled = 
-        ("true".equals(System.getProperty("tomcat.util.buf.StringCache.char.enabled", "false")));
+    protected static boolean charEnabled = ("true".equals(System.getProperty(
+            "tomcat.util.buf.StringCache.char.enabled", "false")));
 
     
-    protected static int trainThreshold = 
-        Integer.parseInt(System.getProperty("tomcat.util.buf.StringCache.trainThreshold", "20000"));
+    protected static int trainThreshold = Integer.parseInt(System.getProperty(
+            "tomcat.util.buf.StringCache.trainThreshold", "20000"));
     
 
-    protected static int cacheSize = 
-        Integer.parseInt(System.getProperty("tomcat.util.buf.StringCache.cacheSize", "200"));
+    protected static int cacheSize = Integer.parseInt(System.getProperty(
+            "tomcat.util.buf.StringCache.cacheSize", "200"));
     
 
-    protected static int maxStringSize = 
-        Integer.parseInt(System.getProperty("tomcat.util.buf.StringCache.maxStringSize", "128"));
+    protected static int maxStringSize = Integer.parseInt(System.getProperty(
+            "tomcat.util.buf.StringCache.maxStringSize", "128"));
     
 
    /**
@@ -220,20 +220,20 @@ public class StringCache {
                 // If training, everything is synced
                 synchronized (bcStats) {
                     // If the cache has been generated on a previous invocation
-                    // while waiting for the lock, just return the toString value
-                    // we just calculated
+                    // while waiting for the lock, just return the toString
+                    // value we just calculated
                     if (bcCache != null) {
                         return value;
                     }
-                    // Two cases: either we just exceeded the train count, in which
-                    // case the cache must be created, or we just update the count for
-                    // the string
+                    // Two cases: either we just exceeded the train count, in
+                    // which case the cache must be created, or we just update
+                    // the count for the string
                     if (bcCount > trainThreshold) {
                         long t1 = System.currentTimeMillis();
                         // Sort the entries according to occurrence
                         TreeMap<Integer,ArrayList<ByteEntry>> tempMap =
                             new TreeMap<Integer,ArrayList<ByteEntry>>();
-                        for (Entry<ByteEntry, int[]> item : bcStats.entrySet()) {
+                        for (Entry<ByteEntry,int[]> item : bcStats.entrySet()) {
                             ByteEntry entry = item.getKey();
                             int[] countA = item.getValue();
                             Integer count = new Integer(countA[0]);
@@ -261,13 +261,16 @@ public class StringCache {
                             ArrayList<ByteEntry> list = tempMap.get(key);
                             for (int i = 0; i < list.size() && n < size; i++) {
                                 ByteEntry entry = list.get(i);
-                                tempChunk.setBytes(entry.name, 0, entry.name.length);
-                                int insertPos = findClosest(tempChunk, tempbcCache, n);
+                                tempChunk.setBytes(entry.name, 0,
+                                        entry.name.length);
+                                int insertPos = findClosest(tempChunk,
+                                        tempbcCache, n);
                                 if (insertPos == n) {
                                     tempbcCache[n + 1] = entry;
                                 } else {
-                                    System.arraycopy(tempbcCache, insertPos + 1, tempbcCache, 
-                                            insertPos + 2, n - insertPos - 1);
+                                    System.arraycopy(tempbcCache, insertPos + 1,
+                                            tempbcCache, insertPos + 2,
+                                            n - insertPos - 1);
                                     tempbcCache[insertPos + 1] = entry;
                                 }
                                 n++;
@@ -279,7 +282,8 @@ public class StringCache {
                         bcCache = tempbcCache;
                         if (log.isDebugEnabled()) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("ByteCache generation time: " + (t2 - t1) + "ms");
+                            log.debug("ByteCache generation time: " +
+                                    (t2 - t1) + "ms");
                         }
                     } else {
                         bcCount++;
@@ -292,7 +296,8 @@ public class StringCache {
                             int start = bc.getStart();
                             // Create byte array and copy bytes
                             entry.name = new byte[bc.getLength()];
-                            System.arraycopy(bc.getBuffer(), start, entry.name, 0, end - start);
+                            System.arraycopy(bc.getBuffer(), start, entry.name,
+                                    0, end - start);
                             // Set encoding
                             entry.enc = bc.getEncoding();
                             // Initialize occurrence count to one 
@@ -332,20 +337,20 @@ public class StringCache {
                 // If training, everything is synced
                 synchronized (ccStats) {
                     // If the cache has been generated on a previous invocation
-                    // while waiting fot the lock, just return the toString value
-                    // we just calculated
+                    // while waiting for the lock, just return the toString
+                    // value we just calculated
                     if (ccCache != null) {
                         return value;
                     }
-                    // Two cases: either we just exceeded the train count, in which
-                    // case the cache must be created, or we just update the count for
-                    // the string
+                    // Two cases: either we just exceeded the train count, in
+                    // which case the cache must be created, or we just update
+                    // the count for the string
                     if (ccCount > trainThreshold) {
                         long t1 = System.currentTimeMillis();
                         // Sort the entries according to occurrence
                         TreeMap<Integer,ArrayList<CharEntry>> tempMap =
                             new TreeMap<Integer,ArrayList<CharEntry>>();
-                        for (Entry<CharEntry, int[]> item : ccStats.entrySet()) {
+                        for (Entry<CharEntry,int[]> item : ccStats.entrySet()) {
                             CharEntry entry = item.getKey();
                             int[] countA = item.getValue();
                             Integer count = new Integer(countA[0]);
@@ -373,13 +378,16 @@ public class StringCache {
                             ArrayList<CharEntry> list = tempMap.get(key);
                             for (int i = 0; i < list.size() && n < size; i++) {
                                 CharEntry entry = list.get(i);
-                                tempChunk.setChars(entry.name, 0, entry.name.length);
-                                int insertPos = findClosest(tempChunk, tempccCache, n);
+                                tempChunk.setChars(entry.name, 0,
+                                        entry.name.length);
+                                int insertPos = findClosest(tempChunk,
+                                        tempccCache, n);
                                 if (insertPos == n) {
                                     tempccCache[n + 1] = entry;
                                 } else {
-                                    System.arraycopy(tempccCache, insertPos + 1, tempccCache, 
-                                            insertPos + 2, n - insertPos - 1);
+                                    System.arraycopy(tempccCache, insertPos + 1,
+                                            tempccCache, insertPos + 2,
+                                            n - insertPos - 1);
                                     tempccCache[insertPos + 1] = entry;
                                 }
                                 n++;
@@ -391,7 +399,8 @@ public class StringCache {
                         ccCache = tempccCache;
                         if (log.isDebugEnabled()) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("CharCache generation time: " + (t2 - t1) + "ms");
+                            log.debug("CharCache generation time: " +
+                                    (t2 - t1) + "ms");
                         }
                     } else {
                         ccCount++;
@@ -404,7 +413,8 @@ public class StringCache {
                             int start = cc.getStart();
                             // Create char array and copy chars
                             entry.name = new char[cc.getLength()];
-                            System.arraycopy(cc.getBuffer(), start, entry.name, 0, end - start);
+                            System.arraycopy(cc.getBuffer(), start, entry.name,
+                                    0, end - start);
                             // Initialize occurrence count to one 
                             count = new int[1];
                             count[0] = 1;
@@ -469,7 +479,8 @@ public class StringCache {
 
     
     /**
-     * Find an entry given its name in the cache and return the associated String.
+     * Find an entry given its name in the cache and return the associated
+     * String.
      */
     protected static final String find(ByteChunk name) {
         int pos = findClosest(name, bcCache, bcCache.length);
@@ -487,7 +498,8 @@ public class StringCache {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    protected static final int findClosest(ByteChunk name, ByteEntry[] array, int len) {
+    protected static final int findClosest(ByteChunk name, ByteEntry[] array,
+            int len) {
 
         int a = 0;
         int b = len - 1;
@@ -562,7 +574,8 @@ public class StringCache {
 
     
     /**
-     * Find an entry given its name in the cache and return the associated String.
+     * Find an entry given its name in the cache and return the associated
+     * String.
      */
     protected static final String find(CharChunk name) {
         int pos = findClosest(name, ccCache, ccCache.length);
@@ -579,7 +592,8 @@ public class StringCache {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    protected static final int findClosest(CharChunk name, CharEntry[] array, int len) {
+    protected static final int findClosest(CharChunk name, CharEntry[] array,
+            int len) {
 
         int a = 0;
         int b = len - 1;
