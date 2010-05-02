@@ -45,8 +45,6 @@ public class RegistrationTest extends TomcatBaseTest {
         assertEquals("Remaining: " + onames, 0, onames.size());
 
         final Tomcat tomcat = getTomcatInstance();
-        // need to register a ServerLifecycleListener otherwise only a few MBeans are registered 
-        tomcat.getServer().addLifecycleListener(new ServerLifecycleListener());
         final File contextDir = new File("output/webappFoo");
         contextDir.mkdir();
         tomcat.addContext("/foo", contextDir.getAbsolutePath());
