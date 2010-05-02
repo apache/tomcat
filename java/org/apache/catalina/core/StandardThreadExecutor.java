@@ -20,18 +20,35 @@ package org.apache.catalina.core;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
 import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleMBeanRegistration;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 public class StandardThreadExecutor extends LifecycleBase
-        implements Executor, ResizableExecutor {
+        implements Executor, ResizableExecutor, LifecycleMBeanRegistration {
     
+    private static final Log log =
+        LogFactory.getLog(StandardThreadExecutor.class);
+    
+    /**
+     * The string manager for this package.
+     */
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
+
     // ---------------------------------------------- Properties
     /**
      * Default thread priority
@@ -290,6 +307,58 @@ public class StandardThreadExecutor extends LifecycleBase
         return false;
     }
     
+
+    protected volatile String domain;
+    protected volatile ObjectName oname;
+
+    /**
+     * Obtain the MBean domain for this server. The domain is set by the
+     * containing Service.
+     */
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
     
+    public ObjectName getObjectName() {
+        if (oname == null) {
+            StringBuilder name = new StringBuilder(getDomain());
+            name.append(":type=Executor,name=");
+            name.append(getName());
+            
+            try {
+                oname = new ObjectName(name.toString());
+            } catch (MalformedObjectNameException e) {
+                log.warn(sm.getString(
+                        "standardThreadExecutor.onameFail", name), e);
+            } catch (NullPointerException e) {
+                // Never going to happen
+            }
+        }
+        
+        return oname;
+    }
+    
+    public ObjectName preRegister(MBeanServer server,
+                                  ObjectName name) throws Exception {
+        oname=name;
+        domain=name.getDomain();
+        return name;
+    }
+
+    public void postRegister(Boolean registrationDone) {
+        // NOOP
+    }
+
+    public void preDeregister() throws Exception {
+        // NOOP
+    }
+
+    public void postDeregister() {
+        // NOOP
+    }
     
 }

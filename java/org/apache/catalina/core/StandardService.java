@@ -521,6 +521,9 @@ public class StandardService extends LifecycleBase
 
         // Initialize any Executors
         for (Executor executor : findExecutors()) {
+            if (executor instanceof LifecycleMBeanRegistration) {
+                ((LifecycleMBeanRegistration) executor).setDomain(getDomain());
+            }
             executor.init();
         }
 
@@ -593,6 +596,10 @@ public class StandardService extends LifecycleBase
         return domain;
     }
 
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+    
     public ObjectName getObjectName() {
         if (oname == null) {
             StringBuilder name = new StringBuilder(getDomain());

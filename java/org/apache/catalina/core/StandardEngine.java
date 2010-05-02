@@ -367,10 +367,6 @@ public class StandardEngine
     @Override
     protected void destroyInternal() throws LifecycleException {
         
-        // if we created it, make sure it's also destroyed
-        // this call implizit this.stop()
-        ((StandardService)service).destroy();
-
         if( mbeans != null ) {
             try {
                 Registry.getRegistry(null, null)
