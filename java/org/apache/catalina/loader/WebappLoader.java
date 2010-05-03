@@ -37,8 +37,6 @@ import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.jar.JarFile;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
@@ -54,7 +52,9 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
@@ -80,8 +80,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @version $Id$
  */
 
-public class WebappLoader extends LifecycleBase
-    implements Loader, PropertyChangeListener, MBeanRegistration  {
+public class WebappLoader extends LifecycleMBeanBase
+    implements Loader, PropertyChangeListener {
 
     // ----------------------------------------------------------- Constructors
 
@@ -525,41 +525,6 @@ public class WebappLoader extends LifecycleBase
 
     }
 
-
-    @Override
-    protected void initInternal() {
-
-        if( oname==null ) {
-            // not registered yet - standalone or API
-            if( container instanceof StandardContext) {
-                // Register ourself. The container must be a webapp
-                try {
-                    StandardContext ctx=(StandardContext)container;
-                    String path = ctx.getPath();
-                    if (path.equals("")) {
-                        path = "/";
-                    }   
-                    oname=new ObjectName(ctx.getEngineName() + ":type=Loader,path=" +
-                                path + ",host=" + ctx.getParent().getName());
-                    Registry.getRegistry(null, null).registerComponent(this, oname, null);
-                } catch (Exception e) {
-                    log.error("Error registering loader", e );
-                }
-            }
-        }
-
-        if( container == null ) {
-            // JMX created the loader
-            // TODO
-
-        }
-    }
-
-    @Override
-    protected void destroyInternal() {
-        Registry.getRegistry(null, null).unregisterComponent(oname);
-        oname = null;
-    }
 
     /**
      * Start associated {@link ClassLoader} and implement the requirements
@@ -1188,23 +1153,37 @@ public class WebappLoader extends LifecycleBase
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WebappLoader.class );
 
-    private ObjectName oname;
 
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        return name;
+    @Override
+    protected String getDomainInternal() {
+        return MBeanUtils.getDomain(container);
     }
 
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
+
+    @Override
+    protected String getObjectNameKeyProperties() {
+        
+        StringBuilder name = new StringBuilder("type=Loader");
+        
+        if (container instanceof Context) {
+            name.append(",path=");
+            Context context = (Context) container;
+            
+            String path = context.getPath();
+            if (path.equals("")) {
+                path = "/";
+            }   
+            name.append(path);
+            
+            name.append(",host=");
+            name.append(context.getParent().getName());
+        } else {
+            // Unlikely / impossible? Handle it to be safe
+            name.append(",container=");
+            name.append(container.getName());
+        }
+        
+        return name.toString();
     }
 
-    public void preDeregister() throws Exception {
-        // NOOP
-    }
-
-    public void postDeregister() {
-        // NOOP
-    }
 }
