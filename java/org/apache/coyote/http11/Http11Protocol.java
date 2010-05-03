@@ -160,6 +160,11 @@ public class Http11Protocol extends AbstractHttp11Protocol {
     }
 
 
+    @Override
+    public void destroy() throws Exception {
+        cHandler.recycledProcessors.clear();
+        super.destroy();
+    }
     // ------------------------------------------------------------- Properties
 
     
