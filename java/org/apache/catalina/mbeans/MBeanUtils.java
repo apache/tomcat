@@ -78,16 +78,6 @@ public class MBeanUtils {
      * is a class name, and the second element is the managed bean name.
      */
     private static String exceptions[][] = {
-        { "org.apache.ajp.tomcat4.Ajp13Connector",
-          "Ajp13Connector" },
-        { "org.apache.coyote.tomcat4.Ajp13Connector",
-          "CoyoteConnector" },
-        { "org.apache.catalina.users.JDBCGroup",
-          "Group" },
-        { "org.apache.catalina.users.JDBCRole",
-          "Role" },
-        { "org.apache.catalina.users.JDBCUser",
-          "User" },
         { "org.apache.catalina.users.MemoryGroup",
           "Group" },
         { "org.apache.catalina.users.MemoryRole",
