@@ -20,16 +20,14 @@ package org.apache.catalina.connector;
 
 import java.util.HashMap;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.mbeans.MBeanUtils;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
@@ -37,7 +35,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.http.mapper.Mapper;
-import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -49,7 +46,7 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 
 
-public class Connector extends LifecycleBase implements MBeanRegistration {
+public class Connector extends LifecycleMBeanBase  {
 
     private static final Log log = LogFactory.getLog(Connector.class);
 
@@ -796,12 +793,11 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     }
 
 
-    protected ObjectName createObjectName(String domain, String type)
-            throws MalformedObjectNameException {
+    protected String createObjectNameKeyProperties(String type) {
+        
         Object addressObj = getProperty("address");
 
-        StringBuilder sb = new StringBuilder(domain);
-        sb.append(":type=");
+        StringBuilder sb = new StringBuilder("type=");
         sb.append(type);
         sb.append(",port=");
         sb.append(getPort());
@@ -812,8 +808,7 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
                 sb.append(ObjectName.quote(address));
             }
         }
-        ObjectName _oname = new ObjectName(sb.toString());
-        return _oname;
+        return sb.toString();
     }
 
 
@@ -843,6 +838,37 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     }
 
 
+    @Override
+    protected void initInternal() throws LifecycleException {
+
+        super.initInternal();
+        
+        // Initialize adapter
+        adapter = new CoyoteAdapter(this);
+        protocolHandler.setAdapter(adapter);
+
+        IntrospectionUtils.setProperty(protocolHandler, "jkHome",
+                                       System.getProperty("catalina.base"));
+
+        try {
+            protocolHandler.init();
+        } catch (Exception e) {
+            throw new LifecycleException
+                (sm.getString
+                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
+        }
+
+        onameProtocolHandler = register(protocolHandler,
+                createObjectNameKeyProperties("ProtocolHandler"));
+        
+        mapperListener.setDomain(getDomain());
+        mapperListener.init();
+
+        onameMapper = register(mapperListener,
+                createObjectNameKeyProperties("Mapper"));
+    }
+
+
     /**
      * Begin processing requests via this Connector.
      *
@@ -852,23 +878,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
     protected void startInternal() throws LifecycleException {
 
         setState(LifecycleState.STARTING);
-
-        // We can't register earlier - the JMX registration of this happens
-        // in Server.start callback
-        if ( this.oname != null ) {
-            // We are registred - register the adapter as well.
-            try {
-                Registry.getRegistry(null, null).registerComponent
-                    (protocolHandler, createObjectName(this.domain,"ProtocolHandler"), null);
-            } catch (Exception ex) {
-                log.error(sm.getString
-                          ("coyoteConnector.protocolRegistrationFailed"), ex);
-            }
-        } else {
-            if(log.isInfoEnabled())
-                log.info(sm.getString
-                     ("coyoteConnector.cannotRegisterProtocol"));
-        }
 
         try {
             protocolHandler.start();
@@ -881,23 +890,6 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
             throw new LifecycleException
                 (errPrefix + " " + sm.getString
                  ("coyoteConnector.protocolHandlerStartFailed", e));
-        }
-
-        if( this.domain != null ) {
-            mapperListener.setDomain( domain );
-            //mapperListener.setEngine( service.getContainer().getName() );
-            mapperListener.init();
-            try {
-                ObjectName mapperOname = createObjectName(this.domain,"Mapper");
-                if (log.isDebugEnabled())
-                    log.debug(sm.getString(
-                            "coyoteConnector.MapperRegistration", mapperOname));
-                Registry.getRegistry(null, null).registerComponent
-                    (mapper, mapperOname, "Mapper");
-            } catch (Exception ex) {
-                log.error(sm.getString
-                        ("coyoteConnector.protocolRegistrationFailed"), ex);
-            }
         }
     }
 
@@ -912,16 +904,15 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
 
         setState(LifecycleState.STOPPING);
 
-        try {
-            mapperListener.destroy();
-            Registry.getRegistry(null, null).unregisterComponent
-                (createObjectName(this.domain,"Mapper"));
-            Registry.getRegistry(null, null).unregisterComponent
-                (createObjectName(this.domain,"ProtocolHandler"));
-        } catch (MalformedObjectNameException e) {
-            log.error( sm.getString
-                    ("coyoteConnector.protocolUnregistrationFailed"), e);
-        }
+    }
+
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        mapperListener.destroy();
+        unregister(onameMapper);
+        unregister(onameProtocolHandler);
+        
         try {
             protocolHandler.destroy();
         } catch (Exception e) {
@@ -930,6 +921,11 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
                  ("coyoteConnector.protocolHandlerDestroyFailed", e));
         }
 
+        if (getService() != null) {
+            getService().removeConnector(this);
+        }
+        
+        super.destroyInternal();
     }
 
 
@@ -948,92 +944,19 @@ public class Connector extends LifecycleBase implements MBeanRegistration {
         return sb.toString();
     }
 
-
     // -------------------- JMX registration  --------------------
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
 
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
-    }
-
-    public void preDeregister() throws Exception {
-        // NOOP
-    }
-
-    public void postDeregister() {
-        try {
-            if(getState().isAvailable()) {
-                stop();
-            }
-        } catch( Throwable t ) {
-            log.error( "Unregistering - can't stop", t);
-        }
-    }
-
-
+    private ObjectName onameProtocolHandler;
+    private ObjectName onameMapper;
+    
     @Override
-    protected void initInternal() throws LifecycleException {
-
-        if (oname == null) {
-            try {
-                // we are loaded directly, via API - and no name was given to us
-                // Engine name is used as domain name for MBeans
-                oname = createObjectName(
-                        getService().getContainer().getName(), "Connector");
-                Registry.getRegistry(null, null)
-                    .registerComponent(this, oname, null);
-            } catch (Exception e) {
-                log.error( "Error registering connector ", e);
-            }
-            if(log.isDebugEnabled())
-                log.debug("Creating name for connector " + oname);
-        }
-
-        // Initializa adapter
-        adapter = new CoyoteAdapter(this);
-        protocolHandler.setAdapter(adapter);
-
-        IntrospectionUtils.setProperty(protocolHandler, "jkHome",
-                                       System.getProperty("catalina.base"));
-
-        try {
-            protocolHandler.init();
-        } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
-        }
-
+    protected String getDomainInternal() {
+        return MBeanUtils.getDomain(getService());
     }
 
     @Override
-    protected void destroyInternal() {
-        if (oname!=null) {
-            if(log.isDebugEnabled())
-                 log.debug("Unregister itself " + oname );
-            Registry.getRegistry(null, null).unregisterComponent(oname);
-        }
-        if( getService() == null)
-            return;
-        getService().removeConnector(this);
+    protected String getObjectNameKeyProperties() {
+        return createObjectNameKeyProperties("Connector");
     }
 
 }

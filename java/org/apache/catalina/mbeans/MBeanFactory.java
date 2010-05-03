@@ -83,11 +83,10 @@ public class MBeanFactory {
      * @exception RuntimeOperationsException if an IllegalArgumentException
      *  occurs
      */
-    public MBeanFactory()
-        throws MBeanException, RuntimeOperationsException {
+    public MBeanFactory() {
 
         super();
-
+        
     }
 
 

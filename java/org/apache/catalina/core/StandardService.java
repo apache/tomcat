@@ -21,24 +21,21 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleMBeanRegistration;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.modeler.Registry;
 import java.util.ArrayList;
 import org.apache.catalina.Executor;
 
@@ -51,8 +48,7 @@ import org.apache.catalina.Executor;
  * @author Craig R. McClanahan
  */
 
-public class StandardService extends LifecycleBase
-        implements Service, LifecycleMBeanRegistration {
+public class StandardService extends LifecycleMBeanBase implements Service {
 
     private static final Log log = LogFactory.getLog(StandardService.class);
    
@@ -509,14 +505,16 @@ public class StandardService extends LifecycleBase
     @Override
     protected void initInternal() throws LifecycleException {
 
+        super.initInternal();
+        
         if (container != null) {
             container.init();
         }
 
         // Initialize any Executors
         for (Executor executor : findExecutors()) {
-            if (executor instanceof LifecycleMBeanRegistration) {
-                ((LifecycleMBeanRegistration) executor).setDomain(getDomain());
+            if (executor instanceof LifecycleMBeanBase) {
+                ((LifecycleMBeanBase) executor).setDomain(getDomain());
             }
             executor.init();
         }
@@ -537,8 +535,6 @@ public class StandardService extends LifecycleBase
     
     @Override
     protected void destroyInternal() throws LifecycleException {
-        Registry.getRegistry(null, null).unregisterComponent(oname);
-        
         // Destroy our defined Connectors
         synchronized (connectors) {
             for (Connector connector : connectors) {
@@ -561,72 +557,17 @@ public class StandardService extends LifecycleBase
             container.destroy();
         }
 
+        super.destroyInternal();
     }
 
-    protected volatile String domain;
-    protected volatile ObjectName oname;
-
-    /**
-     * Obtain the MBean domain for this server. The domain is obtained using
-     * the following search order:
-     * <ol>
-     * <li>Name of the {@link Engine}.</li>
-     * <li>Name of the {@link Service}.</li>
-     * <li>Global default defined by {@link Globals#DEFAULT_MBEAN_DOMAIN}</li>
-     * </ol>
-     */
-    public String getDomain() {
-        if (domain == null) {
-            Container container = getContainer();
-            if (container != null) {
-                domain = container.getName();
-            } else {
-                domain = getName();
-            }
-            if (domain == null) {
-                domain = Globals.DEFAULT_MBEAN_DOMAIN;
-            }
-        }
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-    
-    public ObjectName getObjectName() {
-        if (oname == null) {
-            StringBuilder name = new StringBuilder(getDomain());
-            name.append(":type=Service");
-            
-            try {
-                oname = new ObjectName(name.toString());
-            } catch (MalformedObjectNameException e) {
-                log.warn(sm.getString("standardService.onameFail", name), e);
-            } catch (NullPointerException e) {
-                // Never going to happen
-            }
-        }
+    @Override
+    protected String getDomainInternal() {
         
-        return oname;
-    }
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        domain=name.getDomain();
-        return name;
+        return MBeanUtils.getDomain(this);
     }
 
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
+    @Override
+    public final String getObjectNameKeyProperties() {
+        return "type=Service";
     }
-
-    public void preDeregister() throws Exception {
-        // NOOP
-    }
-
-    public void postDeregister() {
-        // NOOP
-    }
-
 }
