@@ -109,6 +109,8 @@ public class DataSourceFactory implements ObjectFactory {
     protected static final String PROP_DATASOURCE= "dataSource";
     protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
     
+    protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
+    
     
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
     
@@ -451,6 +453,11 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_DATASOURCE_JNDI);
         if (value != null) {
             poolProperties.setDataSourceJNDI(value);
+        }
+
+        value = properties.getProperty(PROP_SUSPECT_TIMEOUT);
+        if (value != null) {
+            poolProperties.setSuspectTimeout(Integer.parseInt(value));
         }
         return poolProperties;
     }
