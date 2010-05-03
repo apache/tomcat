@@ -38,23 +38,19 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.mbeans.MBeanUtils;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -66,8 +62,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @version $Id$
  */
 
-public abstract class ManagerBase extends LifecycleBase
-        implements Manager, MBeanRegistration {
+public abstract class ManagerBase extends LifecycleMBeanBase
+        implements Manager {
 
     private final Log log = LogFactory.getLog(ManagerBase.class); // must not be static
 
@@ -189,7 +185,7 @@ public abstract class ManagerBase extends LifecycleBase
     private final Object maxActiveUpdateLock = new Object();
 
     // number of duplicated session ids - anything >0 means we have problems
-    protected int duplicates=0;
+    protected volatile int duplicates=0;
 
     /**
      * Processing time during session expiration.
@@ -371,9 +367,8 @@ public abstract class ManagerBase extends LifecycleBase
         boolean oldDistributable = this.distributable;
         this.distributable = distributable;
         support.firePropertyChange("distributable",
-                                   new Boolean(oldDistributable),
-                                   new Boolean(this.distributable));
-
+                                   Boolean.valueOf(oldDistributable),
+                                   Boolean.valueOf(this.distributable));
     }
 
 
@@ -395,7 +390,7 @@ public abstract class ManagerBase extends LifecycleBase
                 paramTypes[1] = int.class;
                 Object paramValues[] = new Object[2];
                 paramValues[0] = result;
-                paramValues[1] = new Integer(32);
+                paramValues[1] = Integer.valueOf(32);
                 Method method = Class.forName("org.apache.tomcat.jni.OS")
                     .getMethod(methodName, paramTypes);
                 method.invoke(null, paramValues);
@@ -463,8 +458,8 @@ public abstract class ManagerBase extends LifecycleBase
         int oldMaxInactiveInterval = this.maxInactiveInterval;
         this.maxInactiveInterval = interval;
         support.firePropertyChange("maxInactiveInterval",
-                                   new Integer(oldMaxInactiveInterval),
-                                   new Integer(this.maxInactiveInterval));
+                                   Integer.valueOf(oldMaxInactiveInterval),
+                                   Integer.valueOf(this.maxInactiveInterval));
 
     }
 
@@ -493,8 +488,8 @@ public abstract class ManagerBase extends LifecycleBase
         int oldSessionIdLength = this.sessionIdLength;
         this.sessionIdLength = idLength;
         support.firePropertyChange("sessionIdLength",
-                                   new Integer(oldSessionIdLength),
-                                   new Integer(this.sessionIdLength));
+                                   Integer.valueOf(oldSessionIdLength),
+                                   Integer.valueOf(this.sessionIdLength));
 
     }
 
@@ -671,8 +666,8 @@ public abstract class ManagerBase extends LifecycleBase
         int oldProcessExpiresFrequency = this.processExpiresFrequency;
         this.processExpiresFrequency = processExpiresFrequency;
         support.firePropertyChange("processExpiresFrequency",
-                                   new Integer(oldProcessExpiresFrequency),
-                                   new Integer(this.processExpiresFrequency));
+                                   Integer.valueOf(oldProcessExpiresFrequency),
+                                   Integer.valueOf(this.processExpiresFrequency));
 
     }
     // --------------------------------------------------------- Public Methods
@@ -711,9 +706,8 @@ public abstract class ManagerBase extends LifecycleBase
     }
 
     @Override
-    protected void destroyInternal() {
-        if( oname != null )
-            Registry.getRegistry(null, null).unregisterComponent(oname);
+    protected void destroyInternal() throws LifecycleException {
+
         if (randomIS!=null) {
             try {
                 randomIS.close();
@@ -722,37 +716,19 @@ public abstract class ManagerBase extends LifecycleBase
             }
             randomIS=null;
         }
-
-        oname = null;
+        
+        super.destroyInternal();
     }
     
     @Override
-    protected void initInternal() {
+    protected void initInternal() throws LifecycleException {
         
-        if( oname==null ) {
-            try {
-                StandardContext ctx=(StandardContext)this.getContainer();
-                domain=ctx.getEngineName();
-                distributable = ctx.getDistributable();
-                StandardHost hst=(StandardHost)ctx.getParent();
-                String path = ctx.getPath();
-                if (path.equals("")) {
-                    path = "/";
-                }   
-                oname=new ObjectName(domain + ":type=Manager,path="
-                + path + ",host=" + hst.getName());
-                Registry.getRegistry(null, null).registerComponent(this, oname, null );
-            } catch (Exception e) {
-                log.error("Error registering ",e);
-            }
-        }
+        super.initInternal();
         
+        setDistributable(((Context) getContainer()).getDistributable());
+
         // Initialize random number generation
         getRandomBytes(new byte[16]);
-        
-        if(log.isDebugEnabled())
-            log.debug("Registering " + oname );
-               
     }
 
     /**
@@ -1289,36 +1265,35 @@ public abstract class ManagerBase extends LifecycleBase
     
     
     // -------------------- JMX and Registration  --------------------
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
+    @Override
+    public String getObjectNameKeyProperties() {
+        
+        StringBuilder name = new StringBuilder("type=Manager");
+        
+        if (container instanceof Context) {
+            name.append(",path=");
+            Context context = (Context) container;
+            
+            String path = context.getPath();
+            if (path.equals("")) {
+                path = "/";
+            }   
+            name.append(path);
+            
+            name.append(",host=");
+            name.append(context.getParent().getName());
+        } else {
+            // Unlikely / impossible? Handle it to be safe
+            name.append(",container=");
+            name.append(container.getName());
+        }
 
-    public ObjectName getObjectName() {
-        return oname;
+        return name.toString();
     }
 
-    public String getDomain() {
-        return domain;
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
-    }
-
-    public void preDeregister() throws Exception {
-        // NOOP
-    }
-
-    public void postDeregister() {
-        // NOOP
+    @Override
+    public String getDomainInternal() {
+        return MBeanUtils.getDomain(container);
     }
 
 }
