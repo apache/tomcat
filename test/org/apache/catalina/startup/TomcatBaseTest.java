@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleState;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 import junit.framework.TestCase;
@@ -103,7 +105,12 @@ public abstract class TomcatBaseTest extends TestCase {
     
     @Override
     public void tearDown() throws Exception {
-        tomcat.stop();
+        // Some tests may call tomcat.destroy(). In which case, don't
+        // call stop()
+        if (tomcat.server != null &&
+                tomcat.server.getState() != LifecycleState.DESTROYED) {
+            tomcat.stop();
+        }
         ExpandWar.delete(tempDir);
     }
     
