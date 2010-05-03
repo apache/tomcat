@@ -456,9 +456,13 @@ public abstract class BaseDirContext implements DirContext {
         
         // Check the alternate locations
         for (DirContext altDirContext : altDirContexts) {
-            obj = altDirContext.lookup("META-INF/resources/" + name);
-            if (obj != null)
-                return obj;
+            try {
+                obj = altDirContext.lookup("META-INF/resources/" + name);
+                if (obj != null)
+                    return obj;
+            } catch ( NamingException ex) {
+                // ignore
+            }
         }
         
         // Really not found
