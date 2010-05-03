@@ -5014,6 +5014,23 @@ public class StandardContext
      */ 
     @Override
     protected void destroyInternal() throws LifecycleException {
+        
+        if ((manager != null) && (manager instanceof Lifecycle)) {
+            ((Lifecycle) manager).destroy();
+        }
+        if ((realm != null) && (realm instanceof Lifecycle)) {
+            ((Lifecycle) realm).destroy();
+        }
+        if ((cluster != null) && (cluster instanceof Lifecycle)) {
+            ((Lifecycle) cluster).destroy();
+        }
+        if ((logger != null) && (logger instanceof Lifecycle)) {
+            ((Lifecycle) logger).destroy();
+        }
+        if ((loader != null) && (loader instanceof Lifecycle)) {
+            ((Lifecycle) loader).destroy();
+        }
+
         if( oname != null ) { 
             // Send j2ee.object.deleted notification 
             Notification notification = 
@@ -5029,7 +5046,6 @@ public class StandardContext
         synchronized (instanceListenersLock) {
             instanceListeners = new String[0];
         }
-
     }
     
     private void resetContext() throws Exception {

@@ -17,16 +17,12 @@
 
 package org.apache.catalina.util;
 
-import javax.management.ObjectName;
-
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.LifecycleMBeanRegistration;
 import org.apache.catalina.LifecycleState;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -99,20 +95,6 @@ public abstract class LifecycleBase implements Lifecycle {
             invalidTransition(Lifecycle.INIT_EVENT);
         }
 
-        // Register MBean if required
-        if (this instanceof LifecycleMBeanRegistration) {
-            ObjectName oname =
-                ((LifecycleMBeanRegistration) this).getObjectName();
-            
-            try {
-                Registry.getRegistry(null, null).registerComponent(
-                        this, oname, null);
-            } catch (Exception e) {
-                log.warn(sm.getString("lifecycleBase.initMBeanFail", toString(),
-                        oname), e);
-            }
-        }
-        
         initInternal();
         
         setState(LifecycleState.INITIALIZED);
@@ -279,13 +261,6 @@ public abstract class LifecycleBase implements Lifecycle {
 
         destroyInternal();
         
-        // De-register MBean if required
-        if (this instanceof LifecycleMBeanRegistration) {
-            ObjectName oname =
-                ((LifecycleMBeanRegistration) this).getObjectName();
-            Registry.getRegistry(null, null).unregisterComponent(oname);
-        }
-
         setState(LifecycleState.DESTROYED);
     }
     

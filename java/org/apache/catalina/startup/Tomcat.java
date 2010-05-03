@@ -320,7 +320,7 @@ public class Tomcat {
     public void destroy() throws LifecycleException {
         getServer();
         server.destroy();
-        // Could null out obejcts here
+        // Could null out objects here
     }
     
     /** 

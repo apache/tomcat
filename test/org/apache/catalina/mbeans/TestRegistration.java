@@ -32,7 +32,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * don't necessarily apply to one specific Tomcat class.
  *
  */
-public class RegistrationTest extends TomcatBaseTest {
+public class TestRegistration extends TomcatBaseTest {
 
     /**
      * Test verifying that Tomcat correctly de-registers the MBeans it has
