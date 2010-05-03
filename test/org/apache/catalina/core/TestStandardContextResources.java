@@ -84,7 +84,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         tomcat.start();
 
         assertPageContains("/test/getresource?path=/resourceF.jsp",
-                "<p>resourceF.jsp in the web application</p>");
+                "<p>resourceF.jsp in resources2.jar</p>");
         assertPageContains("/test/getresource?path=/resourceA.jsp",
                 "<p>resourceA.jsp in the web application</p>");
         assertPageContains("/test/getresource?path=/resourceB.jsp",
