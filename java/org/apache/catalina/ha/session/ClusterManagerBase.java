@@ -33,7 +33,7 @@ import org.apache.catalina.Container;
  * @version $Id$
  */
 
-public abstract class ClusterManagerBase extends ManagerBase implements Lifecycle, PropertyChangeListener, ClusterManager{
+public abstract class ClusterManagerBase extends ManagerBase implements PropertyChangeListener, ClusterManager{
     
 
     public static ClassLoader[] getClassLoaders(Container container) {
