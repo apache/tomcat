@@ -21,8 +21,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.servlet.DispatcherType;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -31,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.connector.ClientAbortException;
@@ -570,13 +569,9 @@ final class StandardWrapperValve
     public void setErrorCount(int errorCount) {
         this.errorCount = errorCount;
     }
-
-    // Don't register in JMX
-
+    
     @Override
-    public ObjectName createObjectName(String domain, ObjectName parent)
-            throws MalformedObjectNameException
-    {
-        return null;
+    protected void initInternal() throws LifecycleException {
+        // NOOP - Don't register this Valve in JMX
     }
 }
