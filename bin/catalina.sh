@@ -73,7 +73,7 @@
 #
 #   LOGGING_MANAGER (Optional) Override Tomcat's logging manager 
 #                   Example (all one line)
-#                   LOGGING_CONFIG="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+#                   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 #
 # $Id$
 # -----------------------------------------------------------------------------
