@@ -35,7 +35,6 @@ import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -181,7 +180,6 @@ public class StandardPipeline extends LifecycleBase
         while (current != null) {
             if (current instanceof Lifecycle)
                 ((Lifecycle) current).start();
-            registerValve(current);
         	current = current.getNext();
         }
 
@@ -209,7 +207,6 @@ public class StandardPipeline extends LifecycleBase
         while (current != null) {
             if (current instanceof Lifecycle)
                 ((Lifecycle) current).stop();
-            unregisterValve(current);
         	current = current.getNext();
         }
     }
@@ -217,7 +214,10 @@ public class StandardPipeline extends LifecycleBase
     
     @Override
     protected void destroyInternal() {
-        // NOOP
+        Valve[] valves = getValves();
+        for (Valve valve : valves) {
+            removeValve(valve);
+        }
     }
 
     
@@ -233,55 +233,7 @@ public class StandardPipeline extends LifecycleBase
     }
     
     
-    private void registerValve(Valve valve) {
-
-        if( valve instanceof ValveBase &&
-                ((ValveBase)valve).getObjectName()==null ) {
-            try {
-                
-                String domain=((ContainerBase)container).getDomain();
-                if( container instanceof StandardContext ) {
-                    domain=((StandardContext)container).getEngineName();
-                }
-                if( container instanceof StandardWrapper) {
-                    Container ctx=((StandardWrapper)container).getParent();
-                    domain=((StandardContext)ctx).getEngineName();
-                }
-                ObjectName vname=((ValveBase)valve).createObjectName(
-                        domain,
-                        ((ContainerBase)container).getJmxName());
-                if( vname != null ) {
-                    ((ValveBase)valve).setObjectName(vname);
-                    Registry.getRegistry(null, null).registerComponent
-                        (valve, vname, valve.getClass().getName());
-                    ((ValveBase)valve).setController
-                        (((ContainerBase)container).getJmxName());
-                }
-            } catch( Throwable t ) {
-                log.info( "Can't register valve " + valve , t );
-            }
-        }
-    }
     
-    private void unregisterValve(Valve valve) {
-        if( valve instanceof ValveBase ) {
-            try {
-                ValveBase vb=(ValveBase)valve;
-                if( vb.getController()!=null &&
-                        vb.getController() == 
-                        ((ContainerBase)container).getJmxName() ) {
-                    
-                    ObjectName vname=vb.getObjectName();
-                    Registry.getRegistry(null, null).getMBeanServer()
-                        .unregisterMBean(vname);
-                    ((ValveBase)valve).setObjectName(null);
-                }
-            } catch( Throwable t ) {
-                log.info( "Can't unregister valve " + valve , t );
-            }
-        }
-    }    
-
     // ------------------------------------------------------- Pipeline Methods
 
 
@@ -346,8 +298,6 @@ public class StandardPipeline extends LifecycleBase
                 log.error("StandardPipeline.setBasic: start", e);
                 return;
             }
-            // Register the newly added valve
-            registerValve(valve);
         }
 
         // Update the pipeline
@@ -399,8 +349,6 @@ public class StandardPipeline extends LifecycleBase
                     log.error("StandardPipeline.addValve: start: ", e);
                 }
             }
-            // Register the newly added valve
-            registerValve(valve);
         }
 
         // Add this Valve to the set associated with this Pipeline
@@ -501,10 +449,13 @@ public class StandardPipeline extends LifecycleBase
                     log.error("StandardPipeline.removeValve: stop: ", e);
                 }
             }
-            // Unregister the removed valve
-            unregisterValve(valve);
         }
-    
+        try {
+            ((Lifecycle) valve).destroy();
+        } catch (LifecycleException e) {
+            log.error("StandardPipeline.removeValve: destroy: ", e);
+        }
+        
         container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);
     }
 
