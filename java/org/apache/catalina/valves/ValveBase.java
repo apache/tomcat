@@ -25,13 +25,9 @@ import javax.servlet.ServletException;
 
 import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
-import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
-import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Valve;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -273,34 +269,9 @@ public abstract class ValveBase extends LifecycleMBeanBase
         StringBuilder name = new StringBuilder("type=Valve");
         
         Container container = getContainer();
-        int unknown = 0;
 
-        // Work up container hierarchy, add a component to the name for
-        // each container
-        while (!(container instanceof Engine)) {
-            if (container instanceof Wrapper) {
-                name.append(",servlet=");
-                name.append(container.getName());
-            } else if (container instanceof Context) {
-                String path = ((Context)container).getPath();
-                if (path.length() < 1) {
-                    path = "/";
-                }
-                name.append(",path=");
-                name.append(path);
-            } else if (container instanceof Host) {
-                name.append(",host=");
-                name.append(container.getName());
-            } else {
-                // Should never happen...
-                name.append(",unknown");
-                name.append(unknown++);
-                name.append('=');
-                name.append(container.getName());
-            }
-            container = container.getParent();
-        }
-
+        name.append(MBeanUtils.getContainerKeyProperties(container));
+        
         int seq = 0;
         for (Valve valve : container.getPipeline().getValves()) {
             // Skip null valves
