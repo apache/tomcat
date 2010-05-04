@@ -29,10 +29,6 @@ import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
-import javax.management.Attribute;
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
@@ -47,17 +43,17 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.SecurityCollection;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.HexUtils;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * Simple implementation of <b>Realm</b> that reads an XML file to configure
@@ -68,8 +64,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @version $Id$
  */
 
-public abstract class RealmBase extends LifecycleBase
-    implements Realm, MBeanRegistration {
+public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     private static final Log log = LogFactory.getLog(RealmBase.class);
 
@@ -957,6 +952,17 @@ public abstract class RealmBase extends LifecycleBase
     }
 
 
+    @Override
+    protected void initInternal() throws LifecycleException {
+
+        super.initInternal();
+
+        // We want logger as soon as possible
+        if (container != null) {
+            this.containerLog = container.getLogger();
+        }
+    }
+        
     /**
      * Prepare for the beginning of active use of the public methods of this
      * component and implement the requirements of
@@ -1012,22 +1018,6 @@ public abstract class RealmBase extends LifecycleBase
     }
     
     
-    @Override
-    protected void destroyInternal() {
-    
-        // unregister this realm
-        if ( oname!=null ) {   
-            try {   
-                Registry.getRegistry(null, null).unregisterComponent(oname); 
-                if(log.isDebugEnabled())
-                    log.debug( "unregistering realm " + oname );   
-            } catch( Exception ex ) {   
-                log.error( "Can't unregister realm " + oname, ex);   
-            }      
-        }
-          
-    }
-
     // ------------------------------------------------------ Protected Methods
 
 
@@ -1238,34 +1228,23 @@ public abstract class RealmBase extends LifecycleBase
 
 
     // -------------------- JMX and Registration  --------------------
-    protected String type;
-    protected String domain;
-    protected String host;
-    protected String path;
+
+    @Override
+    public String getObjectNameKeyProperties() {
+        
+        StringBuilder keyProperties = new StringBuilder("type=Realm");
+        keyProperties.append(getRealmSuffix());
+        keyProperties.append(MBeanUtils.getContainerKeyProperties(container));
+
+        return keyProperties.toString();
+    }
+
+    @Override
+    public String getDomainInternal() {
+        return MBeanUtils.getDomain(container);
+    }
+
     protected String realmPath = "/realm0";
-    protected ObjectName oname;
-    protected ObjectName controller;
-    protected MBeanServer mserver;
-
-    public ObjectName getController() {
-        return controller;
-    }
-
-    public void setController(ObjectName controller) {
-        this.controller = controller;
-    }
-
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public String getType() {
-        return type;
-    }
 
     public String getRealmPath() {
         return realmPath;
@@ -1274,80 +1253,6 @@ public abstract class RealmBase extends LifecycleBase
     public void setRealmPath(String theRealmPath) {
         realmPath = theRealmPath;
     }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-
-        type=name.getKeyProperty("type");
-        host=name.getKeyProperty("host");
-        path=name.getKeyProperty("path");
-
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-        // NOOP in base class
-    }
-
-    public void preDeregister() throws Exception {
-        // NOOP in base class
-    }
-
-    public void postDeregister() {
-        // NOOP in base class
-    }
-
-    @Override
-    protected void initInternal() {
-
-        // We want logger as soon as possible
-        if (container != null) {
-            this.containerLog = container.getLogger();
-        }
-        
-        if( container== null ) {
-            ObjectName parent=null;
-            // Register with the parent
-            try {
-                if( host == null ) {
-                    // global
-                    parent=new ObjectName(domain +":type=Engine");
-                } else if( path==null ) {
-                    parent=new ObjectName(domain +
-                            ":type=Host,host=" + host);
-                } else {
-                    parent=new ObjectName(domain +":j2eeType=WebModule,name=//" +
-                            host + path);
-                }
-                if( mserver.isRegistered(parent ))  {
-                    if(log.isDebugEnabled())
-                        log.debug("Register with " + parent);
-                    mserver.setAttribute(parent, new Attribute("realm", this));
-                }
-            } catch (Exception e) {
-                log.error("Parent not available yet: " + parent);  
-            }
-        }
-        
-        if( oname==null ) {
-            // register
-            try {
-                ContainerBase cb=(ContainerBase)container;
-                oname=new ObjectName(cb.getDomain()+":type=Realm" +
-                        getRealmSuffix() + cb.getContainerSuffix());
-                Registry.getRegistry(null, null).registerComponent(this, oname, null );
-                if(log.isDebugEnabled())
-                    log.debug("Register Realm "+oname);
-            } catch (Throwable e) {
-                log.error( "Can't register " + oname, e);
-            }
-        }
-
-    }
-
 
     protected String getRealmSuffix() {
         return ",realmPath=" + getRealmPath();
