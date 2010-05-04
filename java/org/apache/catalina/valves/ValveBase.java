@@ -21,10 +21,6 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.Contained;
@@ -34,17 +30,16 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.ContainerBase;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 
 /**
@@ -58,9 +53,8 @@ import org.apache.juli.logging.LogFactory;
  * @version $Id$
  */
 
-public abstract class ValveBase extends LifecycleBase
-    implements Contained, Valve, MBeanRegistration {
-    private static final Log log = LogFactory.getLog(ValveBase.class);
+public abstract class ValveBase extends LifecycleMBeanBase
+    implements Contained, Valve {
 
     //------------------------------------------------------ Constructor
     
@@ -188,6 +182,7 @@ public abstract class ValveBase extends LifecycleBase
      * throwables will be caught and logged.
      */
     public void backgroundProcess() {
+        // NOOP by default
     }
 
 
@@ -227,10 +222,6 @@ public abstract class ValveBase extends LifecycleBase
     }
 
 
-    protected void initInternal() {
-        // NOOP
-    }
-
     /**
      * Start this component and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -259,12 +250,6 @@ public abstract class ValveBase extends LifecycleBase
     }
     
     
-    @Override
-    protected void destroyInternal() {
-        // NOOP
-    }
-
-
     /**
      * Return a String rendering of this object.
      */
@@ -283,128 +268,74 @@ public abstract class ValveBase extends LifecycleBase
 
 
     // -------------------- JMX and Registration  --------------------
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
-    protected ObjectName controller;
+    @Override
+    public String getObjectNameKeyProperties() {
+        StringBuilder name = new StringBuilder("type=Valve");
+        
+        Container container = getContainer();
+        int unknown = 0;
 
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public void setObjectName(ObjectName oname) {
-        this.oname = oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-
-
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-    }
-
-    public void preDeregister() throws Exception {
-    }
-
-    public void postDeregister() {
-    }
-
-    public ObjectName getController() {
-        return controller;
-    }
-
-    public void setController(ObjectName controller) {
-        this.controller = controller;
-    }
-
-    /** From the name, extract the parent object name
-     *
-     * @param valveName The valve name
-     * @return ObjectName The parent name
-     */
-    public ObjectName getParentName( ObjectName valveName ) {
-
-        return null;
-    }
-
-    public ObjectName createObjectName(String domain, ObjectName parent)
-            throws MalformedObjectNameException
-    {
-        Container container=this.getContainer();
-        if( container == null || ! (container instanceof ContainerBase) )
-            return null;
-        this.containerLog = container.getLogger();
-        ContainerBase containerBase=(ContainerBase)container;
-        Pipeline pipe=containerBase.getPipeline();
-        Valve valves[]=pipe.getValves();
-
-        /* Compute the "parent name" part */
-        String parentName="";
-        if (container instanceof Engine) {
-        } else if (container instanceof Host) {
-            parentName=",host=" +container.getName();
-        } else if (container instanceof Context) {
-                    String path = ((Context)container).getPath();
-                    if (path.length() < 1) {
-                        path = "/";
-                    }
-                    Host host = (Host) container.getParent();
-                    parentName=",path=" + path + ",host=" +
-                            host.getName();
-        } else if (container instanceof Wrapper) {
-            Context ctx = (Context) container.getParent();
-            String path = ctx.getPath();
-            if (path.length() < 1) {
-                path = "/";
+        // Work up container hierarchy, add a component to the name for
+        // each container
+        while (!(container instanceof Engine)) {
+            if (container instanceof Wrapper) {
+                name.append(",servlet=");
+                name.append(container.getName());
+            } else if (container instanceof Context) {
+                String path = ((Context)container).getPath();
+                if (path.length() < 1) {
+                    path = "/";
+                }
+                name.append(",path=");
+                name.append(path);
+            } else if (container instanceof Host) {
+                name.append(",host=");
+                name.append(container.getName());
+            } else {
+                // Should never happen...
+                name.append(",unknown");
+                name.append(unknown++);
+                name.append('=');
+                name.append(container.getName());
             }
-            Host host = (Host) ctx.getParent();
-            parentName=",servlet=" + container.getName() +
-                    ",path=" + path + ",host=" + host.getName();
+            container = container.getParent();
         }
-        log.debug("valve parent=" + parentName + " " + parent);
 
-        String className=this.getClass().getName();
-        int period = className.lastIndexOf('.');
-        if (period >= 0)
-            className = className.substring(period + 1);
-
-        int seq=0;
-        for( int i=0; i<valves.length; i++ ) {
-            // Find other valves with the same name
-            if (valves[i] == this) {
+        int seq = 0;
+        for (Valve valve : container.getPipeline().getValves()) {
+            // Skip null valves
+            if (valve == null) {
+                continue;
+            }
+            // Only compare valves in pipeline until we find this valve
+            if (valve == this) {
                 break;
             }
-            if( valves[i]!=null &&
-                    valves[i].getClass() == this.getClass() ) {
-                log.debug("Duplicate " + valves[i] + " " + this + " " + container);
-                seq++;
+            if (valve.getClass() == this.getClass()) {
+                // Duplicate valve earlier in pipeline
+                // increment sequence number
+                seq ++;
             }
         }
-        String ext="";
-        if( seq > 0 ) {
-            ext=",seq=" + seq;
+        
+        if (seq > 0) {
+            name.append(",seq=");
+            name.append(seq);
         }
 
-        ObjectName objectName = 
-            new ObjectName( domain + ":type=Valve,name=" + className + ext + parentName);
-        log.debug("valve objectname = "+objectName);
-        return objectName;
+        String className = this.getClass().getName();
+        int period = className.lastIndexOf('.');
+        if (period >= 0) {
+            className = className.substring(period + 1);
+        }
+        name.append(",name=");
+        name.append(className);
+        
+        return name.toString();
     }
 
-    // -------------------- JMX data  --------------------
-
-    public ObjectName getContainerName() {
-        if( container== null) return null;
-        return ((ContainerBase)container).getJmxName();
+    @Override
+    public String getDomainInternal() {
+        return MBeanUtils.getDomain(getContainer());
     }
 }

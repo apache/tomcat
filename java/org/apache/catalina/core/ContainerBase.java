@@ -1089,6 +1089,11 @@ public abstract class ContainerBase extends LifecycleBase
     @Override
     protected void destroyInternal() throws LifecycleException {
 
+        // Stop the Valves in our pipeline (including the basic), if any
+        if (pipeline instanceof Lifecycle) {
+            ((Lifecycle) pipeline).destroy();
+        }
+
         // Remove children now this container is being destroyed
         for (Container child : findChildren()) {
             child.destroy();
