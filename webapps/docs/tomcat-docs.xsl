@@ -189,11 +189,15 @@
     <xsl:variable name="name">
       <xsl:value-of select="@name"/>
     </xsl:variable>
+    <xsl:variable name="name2">
+      <xsl:value-of select="translate($name, ' ', '_')"/>
+    </xsl:variable>
     <table border="0" cellspacing="0" cellpadding="2">
       <!-- Section heading -->
       <tr><td bgcolor="{$banner-bg}">
           <font color="{$banner-fg}" face="arial,helvetica.sanserif">
-          <a name="{$name}">
+          <xsl:if test="$name != $name2"><a name="{$name}"><xsl:comment>()</xsl:comment></a></xsl:if>
+          <a name="{$name2}">
           <strong><xsl:value-of select="@name"/></strong></a></font>
         </td>
       <xsl:if test="@rtext">
@@ -226,11 +230,15 @@
       </xsl:if>
       <xsl:value-of select="@name"/>
     </xsl:variable>
+    <xsl:variable name="name2">
+      <xsl:value-of select="translate($name, ' ', '_')"/>
+    </xsl:variable>
     <table border="0" cellspacing="0" cellpadding="2">
       <!-- Subsection heading -->
       <tr><td bgcolor="{$sub-banner-bg}">
           <font color="{$sub-banner-fg}" face="arial,helvetica.sanserif">
-          <a name="{$name}">
+          <xsl:if test="$name != $name2"><a name="{$name}"><xsl:comment>()</xsl:comment></a></xsl:if>
+          <a name="{$name2}">
           <strong><xsl:value-of select="@name"/></strong></a></font>
       </td></tr>
       <!-- Subsection body -->
@@ -255,7 +263,10 @@
       </xsl:if>
       <xsl:value-of select="@name"/>
     </xsl:variable>
-    <li><a href="#{$name}"><xsl:value-of select="@name"/></a>
+    <xsl:variable name="name2">
+      <xsl:value-of select="translate($name, ' ', '_')"/>
+    </xsl:variable>
+    <li><a href="#{$name2}"><xsl:value-of select="@name"/></a>
     <xsl:if test="subsection">
       <ol><xsl:apply-templates mode="toc" select="subsection"/></ol>
     </xsl:if>
