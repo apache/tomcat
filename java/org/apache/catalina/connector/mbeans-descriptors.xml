@@ -116,6 +116,10 @@
     <attribute   name="maxPostSize"
           description="Maximum size in bytes of a POST which will be handled by the servlet API provided features"
                  type="int"/>
+                 
+    <attribute   name="maxSavePostSize"
+          description="Maximum size of a POST which will be saved by the container during authentication"
+                 type="int"/>                
 
     <attribute   name="maxThreads"
           description="The maximum number of request processing threads to be created"
@@ -170,6 +174,11 @@
     <attribute   name="sslProtocols"
           description="Comma-separated list of SSL protocol variants to be enabled"
                  type="java.lang.String"/>
+                 
+    <attribute   name="stopped"
+          description="Has this component been stopped?"
+                 type="boolean"
+            writeable="false"/>
 
     <attribute   name="strategy"
           description="Thread pool strategy"
@@ -205,6 +214,10 @@
 
     <attribute   name="useBodyEncodingForURI"
           description="Should the body encoding be used for URI query parameters"
+                 type="boolean"/>
+                 
+    <attribute   name="useIPVHosts"
+          description="Should IP-based virtual hosting be used? "
                  type="boolean"/>
 
     <attribute    name="xpoweredBy"
