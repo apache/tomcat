@@ -33,15 +33,13 @@
 <toc/>
 </section>
 
-<section name="What is the DefaultServlet">
-<a name="what"></a>
+<section anchor="what" name="What is the DefaultServlet">
 The default servlet is the servlet which serves static resources as well
 as serves the directory listings (if directory listings are enabled).
 
 </section>
 
-<section name="Where is it declared?">
-<a name="where"></a>
+<section anchor="where" name="Where is it declared?">
 It is declared globally in <i>$CATALINA_BASE/conf/web.xml</i>.
 By default here is it's declaration:
 <source>
@@ -74,8 +72,7 @@ So by default, the default servlet is loaded at webapp startup and
 directory listings are enabled and debugging is turned off.
 </section>
 
-<section name="What can I change?">
-<a name="change"></a>
+<section anchor="change" name="What can I change?">
 The DefaultServlet allows the following initParamters:
 
 <table border="1">
@@ -194,8 +191,7 @@ The DefaultServlet allows the following initParamters:
 </table>
 </section>
 
-<section name="How do I customize directory listings?">
-<a name="dir"></a>
+<section anchor="dir" name="How do I customize directory listings?">
 <p>You can override DefaultServlet with you own implementation and use that
 in your web.xml declaration. If you
 can understand what was just said, we will assume you can read the code
@@ -313,8 +309,7 @@ The following is a sample xsl file which mimics the default tomcat behavior:
 
 </section>
 
-<section name="How do I secure directory listings?">
-<a name="secure"></a>
+<section anchor="secure" name="How do I secure directory listings?">
 Use web.xml in each individual webapp. See the security section of the
 Servlet specification.
 
