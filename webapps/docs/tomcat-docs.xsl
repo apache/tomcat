@@ -187,10 +187,17 @@
   <!-- Process a documentation section -->
   <xsl:template match="section">
     <xsl:variable name="name">
-      <xsl:value-of select="@name"/>
+      <xsl:choose>
+        <xsl:when test="@anchor">
+          <xsl:value-of select="@anchor" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="name2">
-      <xsl:value-of select="translate($name, ' ', '_')"/>
+      <xsl:value-of select="translate($name, ' #', '__')"/>
     </xsl:variable>
     <table border="0" cellspacing="0" cellpadding="2">
       <!-- Section heading -->
@@ -223,15 +230,22 @@
   <!-- Process a documentation subsection -->
   <xsl:template match="subsection">
     <xsl:variable name="name">
-      <xsl:if test="
-          count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
-          ">
-        <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
-      </xsl:if>
-      <xsl:value-of select="@name"/>
+      <xsl:choose>
+        <xsl:when test="@anchor">
+          <xsl:value-of select="@anchor" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="
+              count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
+              ">
+            <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
+          </xsl:if>
+          <xsl:value-of select="@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="name2">
-      <xsl:value-of select="translate($name, ' ', '_')"/>
+      <xsl:value-of select="translate($name, ' #', '__')"/>
     </xsl:variable>
     <table border="0" cellspacing="0" cellpadding="2">
       <!-- Subsection heading -->
@@ -256,15 +270,22 @@
 
   <xsl:template mode="toc" match="section|subsection">
     <xsl:variable name="name">
-      <xsl:if test="local-name()='subsection' and 
-          count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
-          ">
-        <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
-      </xsl:if>
-      <xsl:value-of select="@name"/>
+      <xsl:choose>
+        <xsl:when test="@anchor">
+          <xsl:value-of select="@anchor" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="local-name()='subsection' and 
+              count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
+              ">
+            <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
+          </xsl:if>
+          <xsl:value-of select="@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="name2">
-      <xsl:value-of select="translate($name, ' ', '_')"/>
+      <xsl:value-of select="translate($name, ' #', '__')"/>
     </xsl:variable>
     <li><a href="#{$name2}"><xsl:value-of select="@name"/></a>
     <xsl:if test="subsection">
