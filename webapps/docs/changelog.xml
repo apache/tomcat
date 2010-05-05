@@ -104,7 +104,7 @@
         XMl descriptors is now disabled by default. (markt)
       </add>
       <fix>
-        Move comet classes from the org.apache.catalina packages to the
+        Move comet classes from the org.apache.catalina package to the
         org.apache.catalina.comet package to allow comet to work under a
         security manager. (markt)
       </fix>
