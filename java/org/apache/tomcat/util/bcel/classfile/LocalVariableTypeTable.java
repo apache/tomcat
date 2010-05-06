@@ -1,25 +1,20 @@
-/* *******************************************************************
- * Copyright (c) 2004 IBM Corporation
- * 
- * All rights reserved. 
- * This program and the accompanying materials are made available 
- * under the terms of the Common Public License v1.0 
- * which accompanies this distribution and is available at 
- * http://www.eclipse.org/legal/cpl-v10.html 
- *  
- * Contributors: 
- *    Andy Clement     initial implementation 
- *    Heavily based on LocalVariableTable
- * ******************************************************************/
-
-/*
- * Under the terms of the CPL v1.0, the ASF has elected to distribute this
- * file under the Eclipse Public License (EPL) 1.0 which has been designated
- * as the follow-on version of the CPL by the Agreement Steward.
+/**
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
-
 package org.apache.tomcat.util.bcel.classfile;
-
 
 import  org.apache.tomcat.util.bcel.Constants;
 import  java.io.*;
@@ -55,8 +50,6 @@ public class LocalVariableTypeTable extends Attribute {
   private int             local_variable_type_table_length; // Table of local
   private LocalVariable[] local_variable_type_table;        // variables
 
-  
-
   public LocalVariableTypeTable(int name_index, int length,
 			    LocalVariable[] local_variable_table,
 			    ConstantPool    constant_pool)
@@ -83,10 +76,6 @@ public class LocalVariableTypeTable extends Attribute {
       local_variable_type_table[i].dump(file);
   }
 
-      
-
-  
-
   public final void setLocalVariableTable(LocalVariable[] local_variable_table)
   {
     this.local_variable_type_table = local_variable_table;
@@ -98,7 +87,7 @@ public class LocalVariableTypeTable extends Attribute {
    * @return String representation.
    */ 
   public final String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuffer buf = new StringBuffer("");
 
     for(int i=0; i < local_variable_type_table_length; i++) {
       buf.append(local_variable_type_table[i].toString());
@@ -122,6 +111,4 @@ public class LocalVariableTypeTable extends Attribute {
     c.constant_pool = constant_pool;
     return c;
   }
-
-  
 }
