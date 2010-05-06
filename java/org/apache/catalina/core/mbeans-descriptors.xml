@@ -107,13 +107,11 @@
                type="[Ljavax.management.ObjectName;"/>
                
     <attribute name="clearReferenceStatic"
-               description="Should Tomcat attempt to null out any static or final fields from loaded classes when a web application is stopped as a work around 
-               				for apparent garbage collection bugs and application coding errors?"
+               description="Should Tomcat attempt to null out any static or final fields from loaded classes when a web application is stopped as a work around for apparent garbage collection bugs and application coding errors?"
                type="boolean"/>
                
     <attribute name="clearReferenceStopThreads"
-               description="Should Tomcat attempt to terminate threads that have been started by the web application? Advisable to be used only in a development
-               				environment."
+               description="Should Tomcat attempt to terminate threads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
                
     <attribute name="clearReferenceStopThreadLocals"
@@ -127,11 +125,10 @@
     <attribute name="configured"
                description="The correctly configured flag for this Context."
                type="boolean"
-          writeable="false" />
+               writeable="false" />
                
-    <attribute   name="cookies"
-               description="Should we attempt to use cookies for session id
-               communication?"
+    <attribute name="cookies"
+               description="Should we attempt to use cookies for session id communication?"
                type="boolean"/>
       
     <attribute name="compilerClasspath"
@@ -157,7 +154,7 @@
     <attribute name="deploymentDescriptor"
                description="String deployment descriptor "
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="displayName"
                description="The display name of this web application"
@@ -174,7 +171,7 @@
     <attribute name="encodedPath"
                description="The encoded path"
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
       
     <attribute name="engineName"
                description="Name of the engine domain, if different from the context domain"
@@ -184,20 +181,20 @@
                description="Event provider support for this managed object"
                is="true"
                type="boolean"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="hostName"
                description="The host name."
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="ignoreAnnotations"
                description="Ignore annotations flag."
                type="boolean" />
                
     <attribute name="instanceManager"
-                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
-                type="org.apache.catalina.instanceManagement.InstanceManager" />
+               description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
+               type="org.apache.catalina.instanceManagement.InstanceManager" />
                               
     <attribute name="javaVMs"
                description="The Java virtual machines on which this module is running"
@@ -234,7 +231,7 @@
     <attribute name="objectName"
                description="Name of the object"
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="originalDocBase"
                description="The original document root for this web application"
@@ -255,7 +252,7 @@
     <attribute name="paused"
                description="The request processing pause flag (while reloading occurs)"
                type="boolean"
-          writeable="false" />
+               writeable="false" />
                
     <attribute name="privileged"
                description="Access to tomcat internals"
@@ -269,7 +266,7 @@
     <attribute name="publicId"
                description="The public identifier of the DTD for the web application deployment descriptor version that is being parsed"
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
       
     <attribute name="realm"
                description="Associated realm."
@@ -312,7 +309,7 @@
     <attribute name="startTime"
                description="Time (in milliseconds since January 1, 1970, 00:00:00) when this context was started"
                type="long"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="startupTime"
                description="Time (in milliseconds) it took to start this context"
@@ -326,7 +323,7 @@
                description="State management support for this managed object"
                is="true"
                type="boolean"
-          writeable="false" />         
+               writeable="false" />         
           
     <attribute name="staticResources"
                description="Static resources associated with the context."
@@ -337,9 +334,9 @@
                description="Performance statistics support for this managed object"
                is="true"
                type="boolean"
-          writeable="false" />
+               writeable="false" />
                      
-    <attribute   name="swallowOutput"
+    <attribute name="swallowOutput"
                description="Flag to set to cause the system.out and system.err to be redirected to the logger when executing a servlet"
                type="boolean"/>   
                                            
@@ -394,7 +391,7 @@
                description="Should XML namespace validation be turned on?"
                type="boolean"/>
 
-    <operation   name="addValve"
+    <operation name="addValve"
                description="Add a valve to this Context"
                impact="ACTION"
                returnType="void">
@@ -403,7 +400,7 @@
                  type="org.apache.catalina.Valve"/>
     </operation>
     
-    <operation   name="removeValve"
+    <operation name="removeValve"
                description="Remove a valve from this Context"
                impact="ACTION"
                returnType="void">
@@ -412,7 +409,7 @@
                  type="org.apache.catalina.Valve"/>
     </operation>
     
-    <operation   name="addLifecycleListener"
+    <operation name="addLifecycleListener"
                description="Add a lifecycle listener to this Context"
                impact="ACTION"
                returnType="void">
@@ -421,7 +418,7 @@
                  type="org.apache.catalina.LifecycleListener"/>
     </operation>
     
-    <operation   name="removeLifecycleListener"
+    <operation name="removeLifecycleListener"
                description="Remove a lifecycle listener from this Context"
                impact="ACTION"
                returnType="void">
@@ -430,19 +427,19 @@
                  type="org.apache.catalina.LifecycleListener"/>
     </operation>
     
-    <operation   name="reload"
+    <operation name="reload"
                description="Reload the webapplication"
                impact="ACTION"
                returnType="void">
     </operation>
     
-    <operation   name="init"
+    <operation name="init"
                description="Register the context into the running server"
                impact="ACTION"
                returnType="void">
     </operation>
     
-    <operation   name="start"
+    <operation name="start"
                description="Start the context"
                impact="ACTION"
                returnType="void">
@@ -498,11 +495,11 @@
          domain="Catalina"
          group="Engine">
     
-    <attribute   name="backgroundProcessorDelay"
+    <attribute name="backgroundProcessorDelay"
                description="The processor delay for this component."
                type="int"/>  
          
-    <attribute   name="baseDir"
+    <attribute name="baseDir"
                description="Base dir for this engine, typically same as catalina.base system property"
                type="java.lang.String"/>
     
@@ -510,19 +507,19 @@
                description="Name of the default Host for this Engine"
                type="java.lang.String"/>
                
-    <attribute   name="jvmRoute"
+    <attribute name="jvmRoute"
                description="Route used for load balancing"
                type="java.lang.String"/>
       
-    <attribute   name="managedResource"
+    <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
                type="java.lang.Object"/>
                
-    <attribute   name="mbeansFile"
+    <attribute name="mbeansFile"
                description="Optional mbeans config file."
                type="java.lang.String"/>
       
-    <attribute   name="name"
+    <attribute name="name"
                description="Unique name of this Engine"
                type="java.lang.String"/>          
       
@@ -530,7 +527,7 @@
                description="Associated realm."
                type="org.apache.catalina.Realm" />    
                
-    <attribute   name="startChildren"
+    <attribute name="startChildren"
                description="Will children be started automatically when they are added."
                type="boolean"/>  
                
@@ -565,7 +562,7 @@
                description="Does this valve support async reporting?"
                type="boolean"/>
     
-    <attribute   name="className"
+    <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
@@ -605,7 +602,7 @@
     <attribute name="contextClass"
                description="The Java class name of the default Context implementation class for deployed web applications."
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="copyXML"
                description="Should XML files be copied to $CATALINA_BASE/conf/{engine}/{host} by default when a web application is deployed?"
@@ -627,7 +624,7 @@
     <attribute name="errorReportValveClass"
                description="The Java class name of the default error reporter implementation class for deployed web applications."
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
       
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
@@ -696,7 +693,7 @@
                  type="org.apache.catalina.Container"/>
     </operation>
       
-    <operation   name="removeAlias"
+    <operation name="removeAlias"
                description="Remove the specified alias name from the aliases for this  Host"
                impact="ACTION"
                returnType="void">
@@ -761,7 +758,7 @@
     <attribute name="serviceNames"
                description="Object names of all services we know about"
                type="[Ljavax.management.ObjectName;"
-          writeable="false" />
+               writeable="false" />
       
     <attribute name="shutdown"
                description="Shutdown password"
@@ -832,17 +829,17 @@
     <attribute name="activeCount"
                description="Number of threads currently processing a task"
                type="int"
-          writeable="false" /> 
+               writeable="false" /> 
                
     <attribute name="completedTaskCount"
                description="Number of tasks completed by the executor"
                type="int"
-          writeable="false" />
+               writeable="false" />
 
     <attribute name="corePoolSize"
                description="Core size of the thread pool"
                type="int"
-          writeable="false" /> 
+               writeable="false" /> 
           
     <attribute name="daemon"
                description="Run threads in daemon or non-daemon state?"
@@ -851,7 +848,7 @@
     <attribute name="largestPoolSize"
                description="Peak number of threads"
                type="int"
-          writeable="false" />            
+               writeable="false" />            
                
     <attribute name="maxIdleTime"
                description="Max number of milliseconds a thread can be idle before it can be shutdown"
@@ -880,7 +877,7 @@
     <attribute name="poolSize"
                description="Number of threads in the pool"
                type="int"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="prestartminSpareThreads"
                description="Prestart threads?"
@@ -907,8 +904,7 @@
                type="boolean"/>  
                
     <attribute name="available"
-               description="The date and time at which this servlet will become available (in milliseconds since the epoch), or zero if the servlet 
-               				is available. If this value equals Long.MAX_VALUE, the unavailability of this servlet is considered permanent."
+               description="The date and time at which this servlet will become available (in milliseconds since the epoch), or zero if the servlet is available. If this value equals Long.MAX_VALUE, the unavailability of this servlet is considered permanent."
                type="long"/>  
                
     <attribute name="backgroundProcessorDelay"
@@ -939,7 +935,7 @@
                description="Event provider support for this managed object"
                is="true"
                type="boolean"
-          writeable="false"/>
+               writeable="false"/>
           
     <attribute name="jspFile"
                description="The context-relative URI of the JSP file for this servlet."
@@ -990,12 +986,12 @@
     <attribute name="servletClass"
                description="The run-as identity for this servlet."
                type="java.lang.String"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="singleThreadModel"
                description="Does this servlet implement the SingleThreadModel interface?"
                type="boolean"
-          writeable="false" />
+               writeable="false" />
           
     <attribute name="startChildern"
                description="Will children be started automatically when they are added?"
@@ -1005,13 +1001,13 @@
                description="State management support for this managed object"
                is="true"
                type="boolean"
-          writeable="false"/>
+               writeable="false"/>
 
     <attribute name="statisticsProvider"
                description="Performance statistics support for this managed object"
                is="true"
                type="boolean"
-          writeable="false"/>
+               writeable="false"/>
 
     <operation name="findMappings"
                description="Return the mappings associated with this wrapper"
@@ -1028,8 +1024,7 @@
   </mbean>
   
   <mbean name="StandardWrapperValve"
-         description="Valve that implements the default basic behavior for the
-         StandardWrapper container implementation"
+         description="Valve that implements the default basic behavior for the StandardWrapper container implementation"
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.core.StandardWrapperValve">
