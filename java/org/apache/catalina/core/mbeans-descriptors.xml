@@ -50,7 +50,12 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-      
+
+    <attribute name="name"
+               description="Name of the associated naming context"
+               type="java.lang.String"
+               writeable="false"/> 
+               
   </mbean>
 
   <mbean name="StandardContext"
@@ -64,13 +69,13 @@
                is="true"
                type="boolean"/>
       
-    <attribute name="instanceManager"
-                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
-                type="org.apache.catalina.instanceManagement.InstanceManager" />
-
     <attribute name="aliases"
                description="List of resource aliases"
                type="java.lang.String" />
+  
+    <attribute name="altDDName"
+               description="The alternate deployment descriptor name."
+               type="java.lang.String" />             
 
     <attribute name="antiJARLocking"
                description="Take care to not lock jar files"
@@ -101,9 +106,28 @@
                description="Object names of all children"
                type="[Ljavax.management.ObjectName;"/>
                
-    <attribute name="configFile"
+    <attribute name="clearReferenceStatic"
+               description="Should Tomcat attempt to null out any static or final fields from loaded classes when a web application is stopped as a work around 
+               				for apparent garbage collection bugs and application coding errors?"
+               type="boolean"/>
+               
+    <attribute name="clearReferenceStopThreads"
+               description="Should Tomcat attempt to terminate threads that have been started by the web application? Advisable to be used only in a development
+               				environment."
+               type="boolean"/>
+               
+    <attribute name="clearReferenceStopThreadLocals"
+               description="Should Tomcat attempt to clear any ThreadLocal objects that are instances of classes loaded by this class loader. "
+               type="boolean"/>
+               
+    <attribute name="configFilePath"
                description="Location of the context.xml resource or file"
                type="java.lang.String"/>
+               
+    <attribute name="configured"
+               description="The correctly configured flag for this Context."
+               type="boolean"
+          writeable="false" />
                
     <attribute   name="cookies"
                description="Should we attempt to use cookies for session id
@@ -132,11 +156,25 @@
                
     <attribute name="deploymentDescriptor"
                description="String deployment descriptor "
+               type="java.lang.String"
+          writeable="false" />
+          
+    <attribute name="displayName"
+               description="The display name of this web application"
+               type="java.lang.String"/>
+               
+    <attribute name="distributable"
+               description="The distributable flag for this web application."
                type="java.lang.String"/>
                      
     <attribute name="docBase"
                description="The document root for this web application"
                type="java.lang.String"/>
+               
+    <attribute name="encodedPath"
+               description="The encoded path"
+               type="java.lang.String"
+          writeable="false" />
       
     <attribute name="engineName"
                description="Name of the engine domain, if different from the context domain"
@@ -145,7 +183,21 @@
     <attribute name="eventProvider"
                description="Event provider support for this managed object"
                is="true"
-               type="boolean"/>
+               type="boolean"
+          writeable="false" />
+          
+    <attribute name="hostName"
+               description="The host name."
+               type="java.lang.String"
+          writeable="false" />
+          
+    <attribute name="ignoreAnnotations"
+               description="Ignore annotations flag."
+               type="boolean" />
+               
+    <attribute name="instanceManager"
+                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
+                type="org.apache.catalina.instanceManagement.InstanceManager" />
                               
     <attribute name="javaVMs"
                description="The Java virtual machines on which this module is running"
@@ -154,6 +206,10 @@
     <attribute name="loader"
                description="Associated loader."
                type="org.apache.catalina.Loader" />
+               
+    <attribute name="logEffectiveWebxml"
+               description="Should the effective web.xml be logged when the context starts?"
+               type="boolean" />
       
     <attribute name="logger"
                description="Associated logger."
@@ -177,7 +233,12 @@
       
     <attribute name="objectName"
                description="Name of the object"
-               type="java.lang.String"/>
+               type="java.lang.String"
+          writeable="false" />
+          
+    <attribute name="originalDocBase"
+               description="The original document root for this web application"
+               type="java.lang.String" />
       
     <attribute name="override"
                description="The default context.xml override flag for this web application"
@@ -191,9 +252,24 @@
                description="The context path for this Context"
                type="java.lang.String"/>
                
+    <attribute name="paused"
+               description="The request processing pause flag (while reloading occurs)"
+               type="boolean"
+          writeable="false" />
+               
     <attribute name="privileged"
                description="Access to tomcat internals"
                type="boolean"/>
+               
+    <attribute name="processingTime"
+               description="Cumulative execution times of all servlets in this context"
+               type="long"
+               writeable="false" />
+               
+    <attribute name="publicId"
+               description="The public identifier of the DTD for the web application deployment descriptor version that is being parsed"
+               type="java.lang.String"
+          writeable="false" />
       
     <attribute name="realm"
                description="Associated realm."
@@ -215,21 +291,33 @@
     <attribute name="servlets"
                description="JSR77 list of servlets"
                type="[Ljava.lang.String;"
-               writeable="false"/>
+               writeable="false"/>               
+                 
+    <attribute name="sessionCookieName"
+               description="The name to use for session cookies.'null' indicates that the name is controlled by the application."
+               type="java.lang.String"/>
                
-    <attribute name="startupTime"
-               description="Time (in milliseconds) it took to start this context"
-               type="long"/>
+    <attribute name="sessionCookieDomain"
+               description="The domain to use for session cookies.'null' indicates that the domain is controlled by the application."
+               type="java.lang.String"/>               
+               
+    <attribute name="sessionCookiePath"
+               description="The path to use for session cookies.'null' indicates that the path is controlled by the application."
+               type="java.lang.String"/> 
+               
+    <attribute name="sessionTimeout"
+               description="The session timeout (in minutes) for this web application"
+               type="int"/>                                            
 
     <attribute name="startTime"
                description="Time (in milliseconds since January 1, 1970, 00:00:00) when this context was started"
-               type="long"/>
-               
-    <attribute name="processingTime"
-               description="Cumulative execution times of all servlets in this context"
                type="long"
-               writeable="false" />
-
+          writeable="false" />
+          
+    <attribute name="startupTime"
+               description="Time (in milliseconds) it took to start this context"
+               type="long"/>
+          
     <attribute name="state"
                description="Current state of this component"
                type="int"/>
@@ -237,29 +325,47 @@
     <attribute name="stateManageable"
                description="State management support for this managed object"
                is="true"
-               type="boolean"/>
-               
-    <attribute name="statisticsProvider"
-               description="Performance statistics support for this managed object"
-               is="true"
-               type="boolean"/>
-               
+               type="boolean"
+          writeable="false" />         
+          
     <attribute name="staticResources"
                description="Static resources associated with the context."
                type="javax.naming.directory.DirContext"
                writeable="false"/>
-      
+               
+    <attribute name="statisticsProvider"
+               description="Performance statistics support for this managed object"
+               is="true"
+               type="boolean"
+          writeable="false" />
+                     
     <attribute   name="swallowOutput"
                description="Flag to set to cause the system.out and system.err to be redirected to the logger when executing a servlet"
+               type="boolean"/>   
+                                           
+    <attribute name="tldNamespaceAware"
+               description="Should TLD XML namespace validation be turned on?"
+               type="boolean"/>
+               
+    <attribute name="tldScanTime"
+               description="Time spend scanning jars for TLDs for this context"
+               type="long"/>
+               
+    <attribute name="tldValidation"
+               description="Should TLD XML validation be turned on?"
                type="boolean"/>
                
     <attribute name="unloadDelay"
                description="Amount of ms that the container will wait for servlets to unload"
                type="long"/>
                
-    <attribute name="tldScanTime"
-               description="Time spend scanning jars for TLDs for this context"
-               type="long"/>
+    <attribute name="unpackWAR"
+               description="Unpack WAR property"
+               type="boolean"/>
+               
+    <attribute name="useHttpOnly"
+               description="Indicates that session cookies should use HttpOnly"
+               type="boolean"/>
 
     <attribute name="useNaming"
                description="Create a JNDI naming context for this application?"
@@ -279,6 +385,14 @@
     <attribute name="workDir"
                description="The pathname to the work directory for this context"
                type="java.lang.String"/>
+               
+    <attribute name="xmlValidation"
+               description="Should XML validation be turned on?"
+               type="boolean"/>
+               
+    <attribute name="xmlNamespaceAware"
+               description="Should XML namespace validation be turned on?"
+               type="boolean"/>
 
     <operation   name="addValve"
                description="Add a valve to this Context"
@@ -367,10 +481,14 @@
          group="Valve"
          type="org.apache.catalina.core.StandardContextValve">
     
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting?"
+               type="boolean"/>
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
-               writeable="false"/>
+               writeable="false"/>               
       
   </mbean>
   
@@ -380,34 +498,46 @@
          domain="Catalina"
          group="Engine">
     
+    <attribute   name="backgroundProcessorDelay"
+               description="The processor delay for this component."
+               type="int"/>  
+         
+    <attribute   name="baseDir"
+               description="Base dir for this engine, typically same as catalina.base system property"
+               type="java.lang.String"/>
+    
     <attribute name="defaultHost"
                description="Name of the default Host for this Engine"
+               type="java.lang.String"/>
+               
+    <attribute   name="jvmRoute"
+               description="Route used for load balancing"
                type="java.lang.String"/>
       
     <attribute   name="managedResource"
                description="The managed resource this MBean is associated with"
                type="java.lang.Object"/>
+               
+    <attribute   name="mbeansFile"
+               description="Optional mbeans config file."
+               type="java.lang.String"/>
       
     <attribute   name="name"
                description="Unique name of this Engine"
-               type="java.lang.String"/>
-      
-    <attribute   name="baseDir"
-               description="Base dir for this engine, typically same as catalina.base system property"
-               type="java.lang.String"/>
-      
-    <attribute   name="jvmRoute"
-               description="Route used for load balancing"
-               type="java.lang.String"/>
+               type="java.lang.String"/>          
       
     <attribute name="realm"
                description="Associated realm."
-               type="org.apache.catalina.Realm" />
-      
+               type="org.apache.catalina.Realm" />    
+               
+    <attribute   name="startChildren"
+               description="Will children be started automatically when they are added."
+               type="boolean"/>  
+               
     <attribute name="valveObjectNames"
                description="ObjectNames for the valves associated with this container"
                type="[Ljavax.management.ObjectName;"
-               writeable="false"/>
+               writeable="false"/>           
 
     <operation name="addChild"
                description="Add a virtual host"
@@ -431,6 +561,10 @@
          group="Valve"
          type="org.apache.catalina.core.StandardEngineValve">
     
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting?"
+               type="boolean"/>
+    
     <attribute   name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
@@ -444,6 +578,10 @@
          group="Host"
          type="org.apache.catalina.core.StandardHost">
     
+    <attribute name="aliases"
+               description="Host aliases"
+               type="[Ljava.lang.String;"/>
+    
     <attribute name="appBase"
                description="The application root for this Host"
                type="java.lang.String"/>
@@ -451,10 +589,31 @@
     <attribute name="autoDeploy"
                description="The auto deploy flag for this Host"
                type="boolean"/>
+               
+    <attribute name="backgroundProcessorDelay"
+               description="The processor delay for this component."
+               type="int"/>
+               
+    <attribute name="children"
+               description="Object names of all children"
+               type="[Ljavax.management.ObjectName;"/> 
                  
     <attribute name="configClass"
                description="The configuration class for contexts"
                type="java.lang.String"/>
+               
+    <attribute name="contextClass"
+               description="The Java class name of the default Context implementation class for deployed web applications."
+               type="java.lang.String"
+          writeable="false" />
+          
+    <attribute name="copyXML"
+               description="Should XML files be copied to $CATALINA_BASE/conf/{engine}/{host} by default when a web application is deployed?"
+               type="boolean"/>
+               
+    <attribute name="createDirs"
+               description="Should we create directories upon startup for appBase and xmlBase? "
+               type="boolean"/>
       
     <attribute name="deployOnStartup"
                description="The deploy on startup flag for this Host"
@@ -464,6 +623,11 @@
                description="deploy Context XML config files property"
                is="true"
                type="boolean"/>
+               
+    <attribute name="errorReportValveClass"
+               description="The Java class name of the default error reporter implementation class for deployed web applications."
+               type="java.lang.String"
+          writeable="false" />
       
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
@@ -472,32 +636,20 @@
     <attribute name="name"
                description="Unique name of this Host"
                type="java.lang.String"/>
+               
+    <attribute name="realm"
+               description="Associated realm."
+               type="org.apache.catalina.Realm" />
+               
+    <attribute name="startChildren"
+               description="Will children be started automatically when they are added?"
+               type="boolean"/>            
       
     <attribute name="unpackWARs"
                description="Unpack WARs property"
                is="true"
                type="boolean"/>
-      
-    <attribute name="xmlNamespaceAware"
-               description="Attribute value used to turn on/off XML namespace awareness"
-               type="boolean"/>
-      
-    <attribute name="xmlValidation"
-               description="Attribute value used to turn on/off XML validation"
-               type="boolean"/>
-
-    <attribute name="children"
-               description="Object names of all children"
-               type="[Ljavax.management.ObjectName;"/>
-      
-    <attribute name="aliases"
-               description="Host aliases"
-               type="[Ljava.lang.String;"/>
-      
-    <attribute name="realm"
-               description="Associated realm."
-               type="org.apache.catalina.Realm" />
-      
+               
     <attribute name="valveNames"
                description="Return the MBean Names of the Valves associated with this Host"
                type="[Ljava.lang.String;"/>
@@ -505,6 +657,22 @@
     <attribute name="valveObjectNames"
                description="Return the MBean ObjectNames of the Valves associated with this Host"
                type="[Ljavax.management.ObjectName;"/>
+               
+    <attribute name="workDir"
+               description="Work Directory base for applications"
+               type="java.lang.String"/>
+               
+    <attribute name="xmlBase"
+               description="The XML root for this Host."
+               type="java.lang.String"/>   
+      
+    <attribute name="xmlNamespaceAware"
+               description="Attribute value used to turn on/off XML namespace awareness"
+               type="boolean"/>
+      
+    <attribute name="xmlValidation"
+               description="Attribute value used to turn on/off XML validation"
+               type="boolean"/>   
       
     <operation name="addAlias"
                description="Add an alias name that should be mapped to this Host"
@@ -555,6 +723,10 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.core.StandardHostValve">
+         
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting?"
+               type="boolean"/>
     
     <attribute name="className"
                description="Fully qualified class name of the managed object"
@@ -569,6 +741,10 @@
          group="Server"
          type="org.apache.catalina.core.StandardServer">
     
+    <attribute name="address"
+               description="The address on which we wait for shutdown commands."
+               type="java.lang.String"/>
+    
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
                type="java.lang.Object"/>
@@ -576,20 +752,21 @@
     <attribute name="port"
                description="TCP port for shutdown messages"
                type="int"/>
-      
-    <attribute name="shutdown"
-               description="Shutdown password"
-               type="java.lang.String"/>
-      
-    <attribute name="serviceNames"
-               description="Object names of all services we know about"
-               type="[Ljavax.management.ObjectName;"/>
-
+               
     <attribute name="serverInfo"
                description="Tomcat server release identifier"
                type="java.lang.String"
                writeable="false"/>
+               
+    <attribute name="serviceNames"
+               description="Object names of all services we know about"
+               type="[Ljavax.management.ObjectName;"
+          writeable="false" />
       
+    <attribute name="shutdown"
+               description="Shutdown password"
+               type="java.lang.String"/>
+   
     <operation name="await"
                description="Wait for the shutdown message"
                impact="ACTION"
@@ -652,9 +829,45 @@
          group="Executor"
          type="org.apache.catalina.core.StandardThreadExecutor">
     
-    <attribute name="threadPriority"
-               description="The thread priority for threads in this thread pool"
+    <attribute name="activeCount"
+               description="Number of threads currently processing a task"
+               type="int"
+          writeable="false" /> 
+               
+    <attribute name="completedTaskCount"
+               description="Number of tasks completed by the executor"
+               type="int"
+          writeable="false" />
+
+    <attribute name="corePoolSize"
+               description="Core size of the thread pool"
+               type="int"
+          writeable="false" /> 
+          
+    <attribute name="daemon"
+               description="Run threads in daemon or non-daemon state?"
+               type="boolean"/>
+
+    <attribute name="largestPoolSize"
+               description="Peak number of threads"
+               type="int"
+          writeable="false" />            
+               
+    <attribute name="maxIdleTime"
+               description="Max number of milliseconds a thread can be idle before it can be shutdown"
                type="int"/>
+               
+    <attribute name="maxQueueSize"
+               description="Maximum number of tasks for the pending task queue"
+               type="int"/>
+               
+    <attribute name="maxThreads"
+               description="Maximum number of allocated threads"
+               type="int"/>
+               
+    <attribute name="minSpareThreads"
+               description="Minimum number of allocated threads"
+               type="int"/> 
       
     <attribute name="name"
                description="Unique name of this Executor"
@@ -662,46 +875,24 @@
       
     <attribute name="namePrefix"
                description="Name prefix for thread names created by this executor"
-               type="java.lang.String"/>
-               
-    <attribute name="maxThreads"
-               description="Maximum number of allocated threads"
-               type="int"/>
-
-    <attribute name="minSpareThreads"
-               description="Minimum number of allocated threads"
-               type="int"/>
-               
-    <attribute name="maxIdleTime"
-               description="Max number of milliseconds a thread can be idle before it can be shutdown"
-               type="int"/>
-
-    <attribute name="maxQueueSize"
-               description="Maximum number of tasks for the pending task queue"
-               type="int"/>
-
-    <attribute name="activeCount"
-               description="Number of threads currently processing a task"
-               type="int"/>
-
-    <attribute name="completedTaskCount"
-               description="Number of tasks completed by the executor"
-               type="int"/>
-
-    <attribute name="corePoolSize"
-               description="Core size of the thread pool"
-               type="int"/>
-
-    <attribute name="largestPoolSize"
-               description="Peak number of threads"
-               type="int"/>
+               type="java.lang.String"/>            
 
     <attribute name="poolSize"
                description="Number of threads in the pool"
-               type="int"/>
+               type="int"
+          writeable="false" />
+          
+    <attribute name="prestartminSpareThreads"
+               description="Prestart threads?"
+               type="boolean"/>
 
     <attribute name="queueSize"
                description="Number of tasks waiting to be processed"
+               type="int"
+          writeable="false" />
+               
+    <attribute name="threadPriority"
+               description="The thread priority for threads in this thread pool"
                type="int"/>
   </mbean>
 
@@ -710,33 +901,57 @@
          domain="Catalina"
          group="Wrapper"
          type="org.apache.catalina.core.StandardWrapper">
+         
+    <attribute name="asyncSupported"
+               description="Async support"
+               type="boolean"/>  
                
+    <attribute name="available"
+               description="The date and time at which this servlet will become available (in milliseconds since the epoch), or zero if the servlet 
+               				is available. If this value equals Long.MAX_VALUE, the unavailability of this servlet is considered permanent."
+               type="long"/>  
+               
+    <attribute name="backgroundProcessorDelay"
+               description="The processor delay for this component."
+               type="int" />      
+    
+    <attribute name="classLoadTime"
+               description="Time taken to load the Servlet class"
+               type="int"
+               writeable="false" />  
+               
+    <attribute name="countAllocated"
+               description="The count of allocations that are currently active (even if they  are for the same instance, as will be true on a non-STM servlet)."
+               type="int"
+               writeable="false" />             
+           
     <attribute name="engineName"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
                
+    <attribute name="errorCount"
+               description="Error count"
+               type="int"
+               writeable="false" />
+               
     <attribute name="eventProvider"
                description="Event provider support for this managed object"
                is="true"
-               type="boolean"/>
-
-    <attribute name="objectName"
-               description="Name of the object"
-               type="java.lang.String"/>
-
-    <attribute name="stateManageable"
-               description="State management support for this managed object"
-               is="true"
-               type="boolean"/>
-
-    <attribute name="statisticsProvider"
-               description="Performance statistics support for this managed object"
-               is="true"
-               type="boolean"/>
-
-    <attribute name="processingTime"
-               description="Total execution time of the servlet's service method"
+               type="boolean"
+          writeable="false"/>
+          
+    <attribute name="jspFile"
+               description="The context-relative URI of the JSP file for this servlet."
+               type="java.lang.String"
+               writeable="false"/>
+               
+    <attribute name="loadOnStartup"
+               description="The load-on-startup order value (negative value means load on first call) for this servlet."
+               type="int"/>
+          
+    <attribute name="loadTime"
+               description="Time taken to load and initialise the Servlet"
                type="long"
                writeable="false" />
 
@@ -744,9 +959,22 @@
                description="Maximum processing time of a request"
                type="long"
                writeable="false" />
+               
+    <attribute name="maxInstances"
+               description="Maximum number of STM instances."
+               type="long" />               
 
     <attribute name="minTime"
                description="Minimum processing time of a request"
+               type="long"
+               writeable="false" />
+
+    <attribute name="objectName"
+               description="Name of the object"
+               type="java.lang.String"/>
+
+    <attribute name="processingTime"
+               description="Total execution time of the servlet's service method"
                type="long"
                writeable="false" />
 
@@ -754,21 +982,36 @@
                description="Number of requests processed by this wrapper"
                type="int"
                writeable="false" />
+               
+    <attribute name="runAs"
+               description="The run-as identity for this servlet."
+               type="java.lang.String"/>
+               
+    <attribute name="servletClass"
+               description="The run-as identity for this servlet."
+               type="java.lang.String"
+          writeable="false" />
+          
+    <attribute name="singleThreadModel"
+               description="Does this servlet implement the SingleThreadModel interface?"
+               type="boolean"
+          writeable="false" />
+          
+    <attribute name="startChildern"
+               description="Will children be started automatically when they are added?"
+               type="boolean" />
 
-    <attribute name="errorCount"
-               description="Error count"
-               type="int"
-               writeable="false" />
+    <attribute name="stateManageable"
+               description="State management support for this managed object"
+               is="true"
+               type="boolean"
+          writeable="false"/>
 
-    <attribute name="loadTime"
-               description="Time taken to load and initialise the Servlet"
-               type="long"
-               writeable="false" />
-
-    <attribute name="classLoadTime"
-               description="Time taken to load the Servlet class"
-               type="int"
-               writeable="false" />
+    <attribute name="statisticsProvider"
+               description="Performance statistics support for this managed object"
+               is="true"
+               type="boolean"
+          writeable="false"/>
 
     <operation name="findMappings"
                description="Return the mappings associated with this wrapper"
@@ -790,6 +1033,10 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.core.StandardWrapperValve">
+     
+     <attribute name="asyncSupported"
+                description="Does this valve support async reporting?"
+                type="boolean"/>
          
      <attribute name="className"
                 description="Fully qualified class name of the managed object"
