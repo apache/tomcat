@@ -81,7 +81,8 @@
 
     <attribute   name="rolename"
           description="Role name of this role"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+            writeable="false"/>
 
   </mbean>
 
@@ -98,7 +99,8 @@
 
     <attribute   name="groups"
           description="MBean Names of groups this user is a member of"
-                 type="[Ljava.lang.String;"/>
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
 
     <attribute   name="password"
           description="Password of this user"
