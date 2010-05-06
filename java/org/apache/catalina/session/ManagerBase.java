@@ -47,6 +47,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
@@ -399,7 +400,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 ExceptionUtils.handleThrowable(t);
             }
             if (apr) {
-                setEntropy(new String(result));
+                setEntropy(new String(Base64.encode(result)));
             } else {
                 setEntropy(this.toString());
             }
