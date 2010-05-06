@@ -535,9 +535,7 @@
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-coyote"
-      notice="${tomcat.manifests}/tomcat-coyote.jar.notice"
-      license="${tomcat.manifests}/tomcat-coyote.license" />
+      filesId="files.tomcat-coyote" />
 
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper.jar}"
@@ -856,9 +854,7 @@
 
     <jarIt jarfile="${tomcat-embed-core.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-core"
-           notice="${tomcat.manifests}/tomcat-embed-core.jar.notice"
-           license="${tomcat.manifests}/tomcat-embed-core.jar.license"/>
+           filesId="files.tomcat-embed-core"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"/>
