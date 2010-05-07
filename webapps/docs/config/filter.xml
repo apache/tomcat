@@ -87,6 +87,41 @@
 </section>
 
 
+<section name="CSRF Prevention Filter">
+
+  <subsection name="Introduction">
+
+    <p>This filter provides basic CSRF protection for a web application. The
+    filter assumes that it is mapped to <code>/*</code> and that all URLs
+    returned to the client are encoded via a call to
+    <code>HttpServletResponse#encodeRedirectURL(String)</code> or
+    <code>HttpServletResponse#encodeURL(String)</code>.</p>
+    
+    <p>This filter prevents CSRF by generating a nonce and storing it in the
+    session. URLs are also encoded with the same nonce. When the next request is
+    received the nonce in the request is compared to the nonce in the session
+    and only if they are the same is the request allowed to continue.</p>
+    
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the CSRF Prevention Filter is
+    <strong><code>org.apache.catalina.filters.CsrfPreventionFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The CSRF Prevention Filter does not support any initialization
+    parameters.</p>
+
+  </subsection>
+
+</section>
+
+
 <section name="Remote Address Filter">
 
   <subsection name="Introduction">
