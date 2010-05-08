@@ -84,12 +84,12 @@ public abstract class TomcatBaseTest extends TestCase {
                 "org.apache.juli.ClassLoaderLogManager");
 
         tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        if (!tempDir.mkdir()) {
+        if (!tempDir.exists() && !tempDir.mkdir()) {
             fail("Unable to create temporary directory for test");
         }
         
         File appBase = new File(tempDir, "webapps");
-        if (!appBase.mkdir()) {
+        if (!appBase.exists() && !appBase.mkdir()) {
             fail("Unable to create appBase for test");
         }
         
