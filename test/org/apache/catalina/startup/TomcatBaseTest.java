@@ -25,15 +25,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.LogManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleState;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -82,17 +79,19 @@ public abstract class TomcatBaseTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        // Need to use JULI and to configure a ConsoleHandler so log messages
-        // from the tests are visible
-        System.setProperty("java.util.logging.config.class",
+        // Need to use JULI so log messages from the tests are visible
+        System.setProperty("java.util.logging.manager",
                 "org.apache.juli.ClassLoaderLogManager");
-        LogManager.getLogManager().getLogger("").addHandler(
-            new ConsoleHandler());
 
         tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        tempDir.mkdir();
+        if (!tempDir.mkdir()) {
+            fail("Unable to create temporary directory for test");
+        }
+        
         File appBase = new File(tempDir, "webapps");
-        appBase.mkdir();
+        if (!appBase.mkdir()) {
+            fail("Unable to create appBase for test");
+        }
         
         tomcat = new Tomcat();
         tomcat.setBaseDir(tempDir.getAbsolutePath());
@@ -139,9 +138,9 @@ public abstract class TomcatBaseTest extends TestCase {
         return out;
     }
 
-    public static int getUrl(String path, 
-                             ByteChunk out, 
-                             Map<String, List<String>> resHead) throws IOException {
+    public static int getUrl(String path, ByteChunk out,
+            Map<String, List<String>> resHead) throws IOException {
+
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();
@@ -153,11 +152,22 @@ public abstract class TomcatBaseTest extends TestCase {
             resHead.putAll(head);
         }
         InputStream is = connection.getInputStream();
-        BufferedInputStream bis = new BufferedInputStream(is);
-        byte[] buf = new byte[2048];
-        int rd = 0;
-        while((rd = bis.read(buf)) > 0) {
-            out.append(buf, 0, rd);
+        BufferedInputStream bis = null;
+        try {
+            bis = new BufferedInputStream(is);
+            byte[] buf = new byte[2048];
+            int rd = 0;
+            while((rd = bis.read(buf)) > 0) {
+                out.append(buf, 0, rd);
+            }
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
         return rc;
     }
