@@ -14,13 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
-
-import java.io.File;
-import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -38,7 +32,6 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.modeler.modules.MbeansSource;
 
 /**
  * Standard implementation of the <b>Engine</b> interface.  Each
@@ -104,20 +97,6 @@ public class StandardEngine
      * otherwise we loose some flexibility.
      */
     private String baseDir = null;
-
-    /** Optional mbeans config file. This will replace the "hacks" in
-     * jk and ServerListener. The mbeans file will support (transparent) 
-     * persistence - soon. It'll probably replace jk2.properties and could
-     * replace server.xml. Of course - the same beans could be loaded and 
-     * managed by an external entity - like the embedding app - which
-     *  can use a different persistence mechanism.
-     */ 
-    private String mbeansFile = null;
-    
-    /** Mbeans loaded by the engine.  
-     */ 
-    private List<ObjectName> mbeans;
-    
 
     /**
      * The JVM Route ID for this Tomcat instance. All Route ID's must be unique
@@ -226,14 +205,6 @@ public class StandardEngine
         this.service = service;
     }
 
-    public String getMbeansFile() {
-        return mbeansFile;
-    }
-
-    public void setMbeansFile(String mbeansFile) {
-        this.mbeansFile = mbeansFile;
-    }
-
     public String getBaseDir() {
         if( baseDir==null ) {
             baseDir=System.getProperty("catalina.base");
@@ -315,42 +286,6 @@ public class StandardEngine
             }
         }
 
-        if( mbeansFile == null ) {
-            String defaultMBeansFile=getBaseDir() + "/conf/tomcat5-mbeans.xml";
-            File f=new File( defaultMBeansFile );
-            if( f.exists() ) mbeansFile=f.getAbsolutePath();
-        }
-        if( mbeansFile != null ) {
-            readEngineMbeans();
-        }
-        if( mbeans != null ) {
-            try {
-                Registry.getRegistry(null, null).invoke(mbeans, "init", false);
-            } catch (Exception e) {
-                log.error("Error in init() for " + mbeansFile, e);
-            }
-        }
-        
-        // not needed since the following if statement does the same thing the right way
-        // remove later after checking
-        //if( service==null ) {
-        //    try {
-        //        ObjectName serviceName=getParentName();        
-        //        if( mserver.isRegistered( serviceName )) {
-        //            log.info("Registering with the service ");
-        //            try {
-        //                mserver.invoke( serviceName, "setContainer",
-        //                        new Object[] { this },
-        //                        new String[] { "org.apache.catalina.Container" } );
-        //            } catch( Exception ex ) {
-        //               ex.printStackTrace();
-        //            }
-        //        }
-        //    } catch( Exception ex ) {
-        //        log.error("Error registering with service ");
-        //    }
-        //}
-        
         if( service==null ) {
             // for consistency...: we are probably in embedded mode
             try {
@@ -362,37 +297,6 @@ public class StandardEngine
             }
         }
         
-    }
-    
-    @Override
-    protected void destroyInternal() throws LifecycleException {
-        
-        if( mbeans != null ) {
-            try {
-                Registry.getRegistry(null, null)
-                    .invoke(mbeans, "destroy", false);
-            } catch (Exception e) {
-                log.error(sm.getString("standardEngine.unregister.mbeans.failed" ,mbeansFile), e);
-            }
-        }
-        // 
-        if( mbeans != null ) {
-            try {
-                for( int i=0; i<mbeans.size() ; i++ ) {
-                    Registry.getRegistry(null, null)
-                            .unregisterComponent(mbeans.get(i));
-                }
-            } catch (Exception e) {
-                log.error(sm.getString("standardEngine.unregister.mbeans.failed", mbeansFile), e);
-            }
-        }
-        
-        // force all metadata to be reloaded.
-        // That doesn't affect existing beans. We should make it per
-        // registry - and stop using the static.
-        Registry.getRegistry(null, null).resetMetadata();
-        
-        super.destroyInternal();
     }
     
     /**
@@ -423,45 +327,14 @@ public class StandardEngine
         }
             
         // Log our server identification information
-        //System.out.println(ServerInfo.getServerInfo());
         if(log.isInfoEnabled())
             log.info( "Starting Servlet Engine: " + ServerInfo.getServerInfo());
-        if( mbeans != null ) {
-            try {
-                Registry.getRegistry(null, null)
-                    .invoke(mbeans, "start", false);
-            } catch (Exception e) {
-                log.error("Error in start() for " + mbeansFile, e);
-            }
-        }
 
         // Standard container startup
         super.startInternal();
     }
 
     
-    /**
-     * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
-     */
-    @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-        
-        super.stopInternal();
-
-        if( mbeans != null ) {
-            try {
-                Registry.getRegistry(null, null).invoke(mbeans, "stop", false);
-            } catch (Exception e) {
-                log.error("Error in stop() for " + mbeansFile, e);
-            }
-        }
-    }
-
-
     /**
      * Return a String representation of this component.
      */
@@ -492,7 +365,6 @@ public class StandardEngine
         return name;
     }
 
-    // FIXME Remove -- not used 
     @Override
     public ObjectName getParentName() throws MalformedObjectNameException {
         if (getService()==null) {
@@ -513,25 +385,6 @@ public class StandardEngine
         return new ObjectName( domain + ":type=Engine");
     }
 
-    
-    private void readEngineMbeans() {
-        try {
-            MbeansSource mbeansMB=new MbeansSource();
-            File mbeansF=new File( mbeansFile );
-            mbeansMB.setSource(mbeansF);
-            
-            Registry.getRegistry(null, null).registerComponent
-                (mbeansMB, domain + ":type=MbeansFile", null);
-            mbeansMB.load();
-            mbeansMB.init();
-            mbeansMB.setRegistry(Registry.getRegistry(null, null));
-            mbeans=mbeansMB.getMBeans();
-            
-        } catch( Throwable t ) {
-            log.error( "Error loading " + mbeansFile, t );
-        }
-        
-    }
     
     @Override
     public String getDomain() {
