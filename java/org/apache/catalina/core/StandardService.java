@@ -152,13 +152,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     }
 
-    public ObjectName getContainerName() {
-        if( container instanceof ContainerBase ) {
-            return ((ContainerBase)container).getJmxName();
-        }
-        return null;
-    }
-
 
     /**
      * Return descriptive information about this Service implementation and
