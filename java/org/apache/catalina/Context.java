@@ -1198,5 +1198,13 @@ public interface Context extends Container {
      */
     public void addServletContainerInitializer(
             ServletContainerInitializer sci, Set<Class<?>> classes);
+    
+    /**
+     * Is this Context paused whilst it is reloaded?
+     * 
+     * @return
+     */
+    public boolean getPaused();
+
 }
 

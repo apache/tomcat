@@ -624,9 +624,7 @@ public class MBeanFactory {
         }
 
         // Return the corresponding MBean name
-        ObjectName oname = context.getJmxName();
-
-        return (oname.toString());
+        return context.getObjectName().toString();
 
     }
 
@@ -711,7 +709,7 @@ public class MBeanFactory {
         
         ((Server) container).addService(service);
         
-        return engine.getJmxName().toString();
+        return engine.getObjectName().toString();
     }
     
     

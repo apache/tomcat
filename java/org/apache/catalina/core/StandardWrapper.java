@@ -54,6 +54,7 @@ import org.apache.catalina.InstanceEvent;
 import org.apache.catalina.InstanceListener;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
@@ -76,8 +77,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Remy Maucherat
  * @version $Id$
  */
-public class StandardWrapper
-    extends ContainerBase
+public class StandardWrapper extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
     private static final Log log = LogFactory.getLog( StandardWrapper.class );
@@ -343,11 +343,6 @@ public class StandardWrapper
 
         return (this.countAllocated.get());
 
-    }
-
-
-    public String getEngineName() {
-        return ((StandardContext)getParent()).getEngineName();
     }
 
 
@@ -1008,6 +1003,25 @@ public class StandardWrapper
      */
     public synchronized void load() throws ServletException {
         instance = loadServlet();
+        
+        if (isJspServlet) {
+            StringBuilder oname =
+                new StringBuilder(MBeanUtils.getDomain(getParent()));
+            
+            oname.append(":type=JspMonitor,name=");
+            oname.append(getName());
+            
+            oname.append(getWebModuleKeyProperties());
+            
+            try {
+                jspMonitorON = new ObjectName(oname.toString());
+                Registry.getRegistry(null, null)
+                    .registerComponent(instance, jspMonitorON, null);
+            } catch( Exception ex ) {
+                log.info("Error registering JSP monitoring with jmx " +
+                         instance);
+            }
+        }
     }
 
 
@@ -1385,6 +1399,10 @@ public class StandardWrapper
         // Deregister the destroyed instance
         instance = null;
 
+        if (isJspServlet && jspMonitorON != null ) {
+            Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);
+        }
+
         if (singleThreadModel && (instancePool != null)) {
             try {
                 while (!instancePool.isEmpty()) {
@@ -1654,14 +1672,8 @@ public class StandardWrapper
         // Start up this component
         super.startInternal();
 
-        if( oname != null )
-            registerJMX((StandardContext)getParent());
-        
-        // Load and initialize an instance of this servlet if requested
-        // MOVED TO StandardContext START() METHOD
-
         setAvailable(0L);
-        
+
         // Send j2ee.state.running notification 
         if (this.getObjectName() != null) {
             Notification notification = 
@@ -1712,73 +1724,68 @@ public class StandardWrapper
             broadcaster.sendNotification(notification);
         }
         
-        if( oname != null ) {
-            Registry.getRegistry(null, null).unregisterComponent(oname);
-            
-            // Send j2ee.object.deleted notification 
-            Notification notification = 
-                new Notification("j2ee.object.deleted", this.getObjectName(), 
-                                sequenceNumber++);
-            broadcaster.sendNotification(notification);
-        }
-
-        if (isJspServlet && jspMonitorON != null ) {
-            Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);
-        }
+        // Send j2ee.object.deleted notification 
+        Notification notification = 
+            new Notification("j2ee.object.deleted", this.getObjectName(), 
+                            sequenceNumber++);
+        broadcaster.sendNotification(notification);
 
     }
 
-    protected void registerJMX(StandardContext ctx) {
+    
+    @Override
+    protected String getObjectNameKeyProperties() {
 
-        String parentName = ctx.getName();
-        parentName = ("".equals(parentName)) ? "/" : parentName;
+        StringBuilder keyProperties =
+            new StringBuilder("j2eeType=Servlet,name=");
+        
+        keyProperties.append(getName());
+        
+        keyProperties.append(getWebModuleKeyProperties());
 
-        String hostName = ctx.getParent().getName();
-        hostName = (hostName==null) ? "DEFAULT" : hostName;
+        return keyProperties.toString();
+    }
+        
 
-        String domain = ctx.getDomain();
-
-        String webMod= "//" + hostName + parentName;
-        String onameStr = domain + ":j2eeType=Servlet,name=" + getName() +
-                          ",WebModule=" + webMod + ",J2EEApplication=" +
-                          ctx.getJ2EEApplication() + ",J2EEServer=" +
-                          ctx.getJ2EEServer();
-        try {
-            oname=new ObjectName(onameStr);
-            controller=oname;
-            Registry.getRegistry(null, null)
-                .registerComponent(this, oname, null );
-            
-            // Send j2ee.object.created notification 
-            if (this.getObjectName() != null) {
-                Notification notification = new Notification(
-                                                "j2ee.object.created", 
-                                                this.getObjectName(), 
-                                                sequenceNumber++);
-                broadcaster.sendNotification(notification);
-            }
-        } catch( Exception ex ) {
-            log.info("Error registering servlet with jmx " + this);
+    private String getWebModuleKeyProperties() {
+        
+        StringBuilder keyProperties = new StringBuilder(",WebModule=");
+        String hostName = getParent().getParent().getName();
+        if (hostName == null) {
+            keyProperties.append("DEFAULT");
+        } else {
+            keyProperties.append(hostName);
+        }
+        
+        String pathName = ((Context) getParent()).getPath();
+        if ("".equals(pathName)) {
+            keyProperties.append('/');
+        } else {
+            keyProperties.append(pathName);
         }
 
-        if (isJspServlet) {
-            // Register JSP monitoring mbean
-            onameStr = domain + ":type=JspMonitor,name=" + getName()
-                       + ",WebModule=" + webMod
-                       + ",J2EEApplication=" + ctx.getJ2EEApplication()
-                       + ",J2EEServer=" + ctx.getJ2EEServer();
-            try {
-                jspMonitorON = new ObjectName(onameStr);
-                Registry.getRegistry(null, null)
-                    .registerComponent(instance, jspMonitorON, null);
-            } catch( Exception ex ) {
-                log.info("Error registering JSP monitoring with jmx " +
-                         instance);
-            }
+        StandardContext ctx = null;
+        if (parent instanceof StandardContext) {
+            ctx = (StandardContext) getParent();
         }
+        
+        keyProperties.append(",J2EEApplication=");
+        if (ctx == null) {
+            keyProperties.append("none");
+        } else {
+            keyProperties.append(ctx.getJ2EEApplication());
+        }
+        keyProperties.append(",J2EEServer=");
+        if (ctx == null) {
+            keyProperties.append("none");
+        } else {
+            keyProperties.append(ctx.getJ2EEServer());
+        }
+        
+        return keyProperties.toString();
     }
     
-
+    
     /* Remove a JMX notficationListener 
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
@@ -1870,6 +1877,4 @@ public class StandardWrapper
     public boolean isStatisticsProvider() {
         return false;
     }
-        
-        
 }
