@@ -271,7 +271,7 @@ public abstract class AuthenticatorBase extends ValveBase
     @Override
     public void setContainer(Container container) {
 
-        if (!(container instanceof Context))
+        if (container != null && !(container instanceof Context))
             throw new IllegalArgumentException
                 (sm.getString("authenticator.notContext"));
 

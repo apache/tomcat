@@ -1369,7 +1369,7 @@ public class HostConfig
             log.debug(sm.getString("hostConfig.start"));
 
         try {
-            ObjectName hostON = new ObjectName(host.getObjectName());
+            ObjectName hostON = host.getObjectName();
             oname = new ObjectName
                 (hostON.getDomain() + ":type=Deployer,host=" + host.getName());
             Registry.getRegistry(null, null).registerComponent

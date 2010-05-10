@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
@@ -23,9 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -36,10 +31,10 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoader;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -52,11 +47,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @version $Id$
  */
 
-public class StandardHost
-    extends ContainerBase
-    implements Host  
- {
-    /* Why do we implement deployer and delegate to deployer ??? */
+public class StandardHost extends ContainerBase implements Host {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( StandardHost.class );
@@ -803,23 +794,6 @@ public class StandardHost
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         
-        // Look for a realm - that may have been configured earlier. 
-        // If the realm is added after context - it'll set itself.
-        if( realm == null ) {
-            ObjectName realmName=null;
-            try {
-                realmName=new ObjectName( domain + ":type=Realm,host=" + getName());
-                if( mserver.isRegistered(realmName ) ) {
-                    mserver.invoke(realmName, "init", 
-                            new Object[] {},
-                            new String[] {}
-                    );            
-                }
-            } catch( Throwable t ) {
-                log.debug("No realm for this host " + realmName);
-            }
-        }
-            
         // Set error report valve
         if ((errorReportValveClass != null)
             && (!errorReportValveClass.equals(""))) {
@@ -883,77 +857,22 @@ public class StandardHost
     }
 
     @Override
-    protected void initInternal() {
-        
-        // already registered.
-        if( getParent() == null ) {
-            try {
-                // Register with the Engine
-                ObjectName serviceName=new ObjectName(domain + 
-                                        ":type=Engine");
+    protected void initInternal() throws LifecycleException {
 
-                HostConfig deployer = new HostConfig();
-                addLifecycleListener(deployer);                
-                if( mserver.isRegistered( serviceName )) {
-                    if(log.isDebugEnabled())
-                        log.debug("Registering "+ serviceName +" with the Engine");
-                    mserver.invoke( serviceName, "addChild",
-                            new Object[] { this },
-                            new String[] { "org.apache.catalina.Container" } );
-                }
-            } catch( Exception ex ) {
-                log.error("Host registering failed!",ex);
-            }
-        }
-        
-        if( oname==null ) {
-            // not registered in JMX yet - standalone mode
-            try {
-                StandardEngine engine=(StandardEngine)parent;
-                domain=engine.getName();
-                if(log.isDebugEnabled())
-                    log.debug( "Register host " + getName() + " with domain "+ domain );
-                oname=new ObjectName(domain + ":type=Host,host=" +
-                        this.getName());
-                controller = oname;
-                Registry.getRegistry(null, null)
-                    .registerComponent(this, oname, null);
-            } catch( Throwable t ) {
-                log.error("Host registering failed!", t );
-            }
-        }
+        super.initInternal();
+
+        HostConfig deployer = new HostConfig();
+        addLifecycleListener(deployer);                
     }
 
-    @Override
-    public void destroyInternal() throws LifecycleException {
-        // destroy our child containers, if any
-        Container children[] = findChildren();
-        super.destroyInternal();
-        for (int i = 0; i < children.length; i++) {
-            if(children[i] instanceof StandardContext)
-                ((StandardContext)children[i]).destroy();
-        }
-      
-    }
     
     @Override
-    public ObjectName preRegister(MBeanServer server, ObjectName oname ) 
-        throws Exception
-    {
-        ObjectName res=super.preRegister(server, oname);
-        String name=oname.getKeyProperty("host");
-        if( name != null )
-            setName( name );
-        return res;        
+    protected String getObjectNameKeyProperties() {
+
+        StringBuilder keyProperties = new StringBuilder("type=Host");
+        keyProperties.append(MBeanUtils.getContainerKeyProperties(this));
+
+        return keyProperties.toString();
     }
     
-    @Override
-    public ObjectName createObjectName(String domain, ObjectName parent)
-        throws Exception
-    {
-        if( log.isDebugEnabled())
-            log.debug("Create ObjectName " + domain + " " + parent );
-        return new ObjectName( domain + ":type=Host,host=" + getName());
-    }
-
 }
