@@ -602,7 +602,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 path = "/";
             }   
             ObjectName cloname = new ObjectName
-                (ctx.getEngineName() + ":type=WebappClassLoader,path="
+                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,path="
                  + path + ",host=" + ctx.getParent().getName());
             Registry.getRegistry(null, null)
                 .registerComponent(classLoader, cloname, null);
@@ -649,7 +649,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 path = "/";
             }
             ObjectName cloname = new ObjectName
-                (ctx.getEngineName() + ":type=WebappClassLoader,path="
+                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,path="
                  + path + ",host=" + ctx.getParent().getName());
             Registry.getRegistry(null, null).unregisterComponent(cloname);
         } catch (Throwable t) {

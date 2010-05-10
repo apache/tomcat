@@ -59,8 +59,9 @@ import org.apache.juli.logging.LogFactory;
  * @author Craig R. McClanahan
  * @author Amy Roh
  * @version $Id$
+ * 
+ * TODO: Is this still required? Possibly for resources. Need to check.
  */
-
 public class ServerLifecycleListener
     implements ContainerListener, LifecycleListener, PropertyChangeListener {
 

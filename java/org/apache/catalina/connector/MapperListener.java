@@ -16,27 +16,31 @@
  */ 
 package org.apache.catalina.connector;
 
-import java.util.Iterator;
-import java.util.Set;
-
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerNotification;
+import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
 import javax.management.NotificationListener;
-import javax.management.ObjectInstance;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
+import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Wrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 
-import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.mapper.Mapper;
-import org.apache.tomcat.util.http.mapper.MappingData;
 import org.apache.tomcat.util.modeler.Registry;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -60,17 +64,17 @@ public class MapperListener
     /**
      * Associated mapper.
      */
-    protected Mapper mapper = null;
+    private Mapper mapper = null;
     
     /**
      * Associated connector
      */
-    protected Connector connector = null;
+    private Connector connector = null;
 
     /**
      * MBean server.
      */
-    protected MBeanServer mBeanServer = null;
+    private MBeanServer mBeanServer = null;
 
 
     /**
@@ -79,8 +83,10 @@ public class MapperListener
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    // It should be null - and fail if not set
-    private String domain="*";
+    /**
+     * The domain (effectively the engine) this mapper is associated with
+     */
+    private String domain = null;
 
     // ----------------------------------------------------------- Constructors
 
@@ -91,6 +97,12 @@ public class MapperListener
     public MapperListener(Mapper mapper, Connector connector) {
         this.mapper = mapper;
         this.connector = connector;
+        
+        // Cache MBean server
+        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        
+        // TODO - Switch to container listener events for add/remove child and
+        // remove dependency on MBean server entirely.
     }
 
 
@@ -109,51 +121,52 @@ public class MapperListener
      */
     public void init() {
 
-        try {
-
-            mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
-
-            registerEngine();
-
-            // Query hosts
-            String onStr = domain + ":type=Host,*";
-            ObjectName objectName = new ObjectName(onStr);
-            Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
-            Iterator<ObjectInstance> iterator = set.iterator();
-            while (iterator.hasNext()) {
-                ObjectInstance oi = iterator.next();
-                registerHost(oi.getObjectName());
+        // Find any components that have already been initialized since the
+        // MBean listener won't be notified as those components will have
+        // already registered their MBeans
+        findDefaultHost();
+        
+        Engine engine = (Engine) connector.getService().getContainer();
+        
+        Container[] conHosts = engine.findChildren();
+        for (Container conHost : conHosts) {
+            Host host = (Host) conHost;
+            if (!LifecycleState.NEW.equals(host.getState())) {
+                registerHost(host);
+                    
+                Container[] conContexts = host.findChildren();
+                for (Container conContext : conContexts) {
+                    Context context = (Context) conContext;
+                    if (!LifecycleState.NEW.equals(context.getState())) {
+                        registerContext(context);
+                        
+                        Container[] conWrappers = context.findChildren();
+                        for (Container conWrapper : conWrappers) {
+                            Wrapper wrapper = (Wrapper) conWrapper;
+                            if (!LifecycleState.NEW.equals(wrapper.getState())) {
+                                registerWrapper(wrapper);
+                            }
+                        }
+                    }
+                }
             }
-
-
-            // Query contexts
-            onStr = "*:j2eeType=WebModule,*";
-            objectName = new ObjectName(onStr);
-            set = mBeanServer.queryMBeans(objectName, null);
-            iterator = set.iterator();
-            while (iterator.hasNext()) {
-                ObjectInstance oi = iterator.next();
-                registerContext(oi.getObjectName());
-            }
-
-            // Query wrappers
-            onStr = "*:j2eeType=Servlet,*";
-            objectName = new ObjectName(onStr);
-            set = mBeanServer.queryMBeans(objectName, null);
-            iterator = set.iterator();
-            while (iterator.hasNext()) {
-                ObjectInstance oi = iterator.next();
-                registerWrapper(oi.getObjectName());
-            }
-
-            onStr = "JMImplementation:type=MBeanServerDelegate";
-            objectName = new ObjectName(onStr);
-            mBeanServer.addNotificationListener(objectName, this, null, null);
-
-        } catch (Exception e) {
-            log.warn("Error registering contexts",e);
         }
-
+        
+        ObjectName objectName;
+        try {
+            objectName = new ObjectName(
+                    "JMImplementation:type=MBeanServerDelegate");
+            mBeanServer.addNotificationListener(objectName, this, null, null);
+        } catch (MalformedObjectNameException e) {
+            log.error(sm.getString("mapperListener.addMBeanListenerFail",
+                    connector, domain), e);
+        } catch (NullPointerException e) {
+            log.error(sm.getString("mapperListener.addMBeanListenerFail",
+                    connector, domain), e);
+        } catch (InstanceNotFoundException e) {
+            log.error(sm.getString("mapperListener.addMBeanListenerFail",
+                    connector, domain), e);
+        }
     }
 
     /**
@@ -165,8 +178,18 @@ public class MapperListener
             ObjectName objectName = new ObjectName(
                     "JMImplementation:type=MBeanServerDelegate");
             mBeanServer.removeNotificationListener(objectName, this);
-        } catch (Exception e) {
-            log.warn("Error unregistering MBeanServerDelegate", e);
+        } catch (InstanceNotFoundException e) {
+            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
+                    connector, domain), e);
+        } catch (ListenerNotFoundException e) {
+            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
+                    connector, domain), e);
+        } catch (MalformedObjectNameException e) {
+            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
+                    connector, domain), e);
+        } catch (NullPointerException e) {
+            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
+                    connector, domain), e);
         }
     }
 
@@ -176,83 +199,54 @@ public class MapperListener
     public void handleNotification(Notification notification,
                                    java.lang.Object handback) {
 
-        if (notification instanceof MBeanServerNotification) {
-            ObjectName objectName = 
-                ((MBeanServerNotification) notification).getMBeanName();
-            String j2eeType = objectName.getKeyProperty("j2eeType");
-            String engineName = null;
-            if (j2eeType != null) {
-                if ((j2eeType.equals("WebModule")) || 
-                    (j2eeType.equals("Servlet"))) {
-                    if (mBeanServer.isRegistered(objectName)) {
-                        try {
-                            engineName = (String)
-                                mBeanServer.getAttribute(objectName, "engineName");
-                        } catch (Exception e) {
-                            // Ignore  
-                        }
-                    }
-                }
-            }
-
-            // At deployment time, engineName is always = null.
-            if ( (!"*".equals(domain)) &&
-                 ( !domain.equals(objectName.getDomain()) ) &&
-                 ( (!domain.equals(engineName) ) &&
-                   (engineName != null) ) )  {
-                return;
-            }
-            if(log.isDebugEnabled())
-                log.debug( "Handle " + objectName  + " type : " + notification.getType());    
-            if (notification.getType().equals
+        if (!(notification instanceof MBeanServerNotification)) {
+            return;
+        }
+        
+        String methodName = null;
+        if (notification.getType().equals
                 (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
-                String type=objectName.getKeyProperty("type");
-                if( "Host".equals( type ) && domain.equals(objectName.getDomain())) {
-                    try {
-                        registerHost(objectName);
-                    } catch (Exception e) {
-                        log.warn("Error registering Host " + objectName, e);  
-                    }
-                }
-    
-                if (j2eeType != null) {
-                    if (j2eeType.equals("WebModule")) {
-                        try {
-                            registerContext(objectName);
-                        } catch (Throwable t) {
-                            log.warn("Error registering Context " + objectName,t);
-                        }
-                    } else if (j2eeType.equals("Servlet")) {
-                        try {
-                            registerWrapper(objectName);
-                        } catch (Throwable t) {
-                            log.warn("Error registering Wrapper " + objectName,t);
-                        }
-                    }
-                }
-            } else if (notification.getType().equals
-                       (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
-                String type=objectName.getKeyProperty("type");
-                if( "Host".equals( type )&& domain.equals(objectName.getDomain())) {
-                    try {
-                        unregisterHost(objectName);
-                    } catch (Exception e) {
-                        log.warn("Error unregistering Host " + objectName,e);  
-                    }
-                }
- 
-                if (j2eeType != null) {
-                    if (j2eeType.equals("WebModule")) {
-                        try {
-                            unregisterContext(objectName);
-                        } catch (Throwable t) {
-                            log.warn("Error unregistering webapp " + objectName,t);
-                        }
-                    }
+            methodName = "addContainerListener";
+        } else if (notification.getType().equals
+                (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
+            methodName = "removeContainerListener";
+        } else {
+            return;
+        }
+        
+        ObjectName objectName = 
+            ((MBeanServerNotification) notification).getMBeanName();
+        
+        // Check the domains match
+        if (domain.equals(objectName.getDomain())) {
+            // Only interested in Hosts, Contexts and Wrappers
+            
+            String type = objectName.getKeyProperty("type");
+            if (type == null) {
+                type = objectName.getKeyProperty("j2eeType");
+            }
+                
+            if ("Servlet".equals(type) || "WebModule".equals(type) ||
+                    "Host".equals(type)) {
+                try {
+                    mBeanServer.invoke(objectName, methodName,
+                            new Object[] {this},
+                            new String[] {"org.apache.catalinaContainerListener"});
+                } catch (ReflectionException e) {
+                    log.error(sm.getString(
+                            "mapperLister.containerListenerFail", methodName,
+                            objectName, connector, domain), e);
+                } catch (MBeanException e) {
+                    log.error(sm.getString(
+                            "mapperLister.containerListenerFail", methodName,
+                            objectName, connector, domain), e);
+                } catch (InstanceNotFoundException e) {
+                    log.error(sm.getString(
+                            "mapperLister.containerListenerFail", methodName,
+                            objectName, connector, domain), e);
                 }
             }
         }
-
     }
 
 
@@ -260,7 +254,25 @@ public class MapperListener
 
     public void containerEvent(ContainerEvent event) {
 
-        if (event.getType() == Host.ADD_ALIAS_EVENT) {
+        if (event.getType() == Lifecycle.AFTER_START_EVENT) {
+            Object obj = event.getSource();
+            if (obj instanceof Wrapper) {
+                registerWrapper((Wrapper) obj);
+            } else if (obj instanceof Context) {
+                registerContext((Context) obj);
+            } else if (obj instanceof Host) {
+                registerHost((Host) obj);
+            }
+        } else if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
+            Object obj = event.getSource();
+            if (obj instanceof Wrapper) {
+                unregisterWrapper((Wrapper) obj);
+            } else if (obj instanceof Context) {
+                unregisterContext((Context) obj);
+            } else if (obj instanceof Host) {
+                unregisterHost((Host) obj);
+            }
+        } else if (event.getType() == Host.ADD_ALIAS_EVENT) {
             mapper.addHostAlias(((Host) event.getSource()).getName(),
                     event.getData().toString());
         } else if (event.getType() == Host.REMOVE_ALIAS_EVENT) {
@@ -271,68 +283,52 @@ public class MapperListener
     
     // ------------------------------------------------------ Protected Methods
 
-    private void registerEngine()
-        throws Exception
-    {
-        ObjectName engineName = new ObjectName
-            (domain + ":type=Engine");
-        if ( ! mBeanServer.isRegistered(engineName)) return;
-        String defaultHost = 
-            (String) mBeanServer.getAttribute(engineName, "defaultHost");
-        ObjectName hostName = new ObjectName
-            (domain + ":type=Host," + "host=" + defaultHost);
-        if (!mBeanServer.isRegistered(hostName)) {
+    private void findDefaultHost() {
 
-            // Get the hosts' list
-            String onStr = domain + ":type=Host,*";
-            ObjectName objectName = new ObjectName(onStr);
-            Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
-            Iterator<ObjectInstance> iterator = set.iterator();
-            String[] aliases;
-            boolean isRegisteredWithAlias = false;
+        Engine engine = (Engine) connector.getService().getContainer();
+        String defaultHost = engine.getDefaultHost();
+
+        boolean found = false;
+
+        if (defaultHost != null && defaultHost.length() >0) {
+            Container[] containers = engine.findChildren();
             
-            while (iterator.hasNext()) {
-
-                if (isRegisteredWithAlias) break;
-            
-                ObjectInstance oi = iterator.next();
-                hostName = oi.getObjectName();
-                aliases = (String[])
-                    mBeanServer.invoke(hostName, "findAliases", null, null);
-
-                for (int i=0; i < aliases.length; i++){
-                    if (aliases[i].equalsIgnoreCase(defaultHost)){
-                        isRegisteredWithAlias = true;
+            for (Container container : containers) {
+                Host host = (Host) container;
+                if (defaultHost.equalsIgnoreCase(host.getName())) {
+                    found = true;
+                    break;
+                }
+                
+                String[] aliases = host.findAliases();
+                for (String alias : aliases) {
+                    if (defaultHost.equalsIgnoreCase(alias)) {
+                        found = true;
                         break;
                     }
                 }
             }
-            
-            if (!isRegisteredWithAlias && log.isWarnEnabled())
-                log.warn(sm.getString("mapperListener.unknownDefaultHost", defaultHost));
         }
-        // This should probably be called later 
-        if( defaultHost != null ) {
+
+        if(found) {
             mapper.setDefaultHostName(defaultHost);
+        } else {
+            log.warn(sm.getString("mapperListener.unknownDefaultHost",
+                    defaultHost));
         }
     }
 
+    
     /**
      * Register host.
      */
-    private void registerHost(ObjectName objectName)
-        throws Exception {
-        String name=objectName.getKeyProperty("host");
-        if( name != null ) {        
-
-            Host host =
-                (Host) connector.getService().getContainer().findChild(name);
-            String[] aliases = host.findAliases();
-            mapper.addHost(name, aliases, objectName);
-            host.addContainerListener(this);
-            if(log.isDebugEnabled())
-                log.debug(sm.getString
-                     ("mapperListener.registerHost", name, domain));
+    private void registerHost(Host host) {
+        
+        String[] aliases = host.findAliases();
+        mapper.addHost(host.getName(), aliases, host.getObjectName());
+        if(log.isDebugEnabled()) {
+            log.debug(sm.getString
+                 ("mapperListener.registerHost", host.getName(), domain));
         }
     }
 
@@ -340,207 +336,109 @@ public class MapperListener
     /**
      * Unregister host.
      */
-    private void unregisterHost(ObjectName objectName)
-        throws Exception {
-        String name=objectName.getKeyProperty("host");
-        if( name != null ) { 
-            Host host =
-                (Host) connector.getService().getContainer().findChild(name);
+    private void unregisterHost(Host host) {
+
+        String hostname = host.getName();
         
-            mapper.removeHost(name);
-            if (host != null) {
-                host.removeContainerListener(this);
-            }
-            if(log.isDebugEnabled())
-                log.debug(sm.getString
-                        ("mapperListener.unregisterHost", name, domain));
+        mapper.removeHost(hostname);
+
+        if(log.isDebugEnabled())
+            log.debug(sm.getString("mapperListener.unregisterHost", hostname,
+                    domain));
+    }
+
+    
+    /**
+     * Unregister wrapper.
+     */
+    private void unregisterWrapper(Wrapper wrapper) {
+
+        String contextName = wrapper.getParent().getName();
+        if ("/".equals(contextName)) {
+            contextName = "";
+        }
+        String hostName = wrapper.getParent().getParent().getName();
+
+        String[] mappings = wrapper.findMappings();
+        
+        for (String mapping : mappings) {
+            mapper.removeWrapper(hostName, contextName, mapping);
         }
     }
 
-
+    
     /**
      * Register context.
      */
-    private void registerContext(ObjectName objectName)
-        throws Exception {
+    private void registerContext(Context context) {
 
-        String name = objectName.getKeyProperty("name");
-        
-        // If the domain is the same with ours or the engine 
-        // name attribute is the same... - then it's ours
-        String targetDomain=objectName.getDomain();
-        if( ! domain.equals( targetDomain )) {
-            try {
-                targetDomain = (String) mBeanServer.getAttribute
-                    (objectName, "engineName");
-            } catch (Exception e) {
-                // Ignore
-            }
-            if( ! domain.equals( targetDomain )) {
-                // not ours
-                return;
-            }
-        }
-
-        String hostName = null;
-        String contextName = null;
-        if (name.startsWith("//")) {
-            name = name.substring(2);
-        }
-        int slash = name.indexOf("/");
-        if (slash != -1) {
-            hostName = name.substring(0, slash);
-            contextName = name.substring(slash);
-        } else {
-            return;
-        }
-        // Special case for the root context
-        if (contextName.equals("/")) {
+        String contextName = context.getName();
+        if ("/".equals(contextName)) {
             contextName = "";
         }
+        String hostName = context.getParent().getName();
+        
+        javax.naming.Context resources = context.getResources();
+        String[] welcomeFiles = context.findWelcomeFiles();
 
-        if(log.isDebugEnabled())
-             log.debug(sm.getString
-                  ("mapperListener.registerContext", contextName));
+        mapper.addContext(hostName, contextName, context, welcomeFiles,
+                resources);
 
-        Object context = 
-            mBeanServer.invoke(objectName, "findMappingObject", null, null);
-            //mBeanServer.getAttribute(objectName, "mappingObject");
-        javax.naming.Context resources = (javax.naming.Context)
-            mBeanServer.invoke(objectName, "findStaticResources", null, null);
-            //mBeanServer.getAttribute(objectName, "staticResources");
-        String[] welcomeFiles = (String[])
-            mBeanServer.getAttribute(objectName, "welcomeFiles");
-
-        mapper.addContext(hostName, contextName, context, 
-                          welcomeFiles, resources);
-
+        if(log.isDebugEnabled()) {
+            log.debug(sm.getString
+                 ("mapperListener.registerContext", contextName));
+        }
     }
 
 
     /**
      * Unregister context.
      */
-    private void unregisterContext(ObjectName objectName)
-        throws Exception {
-
-        String name = objectName.getKeyProperty("name");
-
-        // If the domain is the same with ours or the engine 
-        // name attribute is the same... - then it's ours
-        String targetDomain=objectName.getDomain();
-        if( ! domain.equals( targetDomain )) {
-            try {
-                targetDomain = (String) mBeanServer.getAttribute
-                    (objectName, "engineName");
-            } catch (Exception e) {
-                // Ignore
-            }
-            if( ! domain.equals( targetDomain )) {
-                // not ours
-                return;
-            }
-        }
-
-        String hostName = null;
-        String contextName = null;
-        if (name.startsWith("//")) {
-            name = name.substring(2);
-        }
-        int slash = name.indexOf("/");
-        if (slash != -1) {
-            hostName = name.substring(0, slash);
-            contextName = name.substring(slash);
-        } else {
-            return;
-        }
-        // Special case for the root context
-        if (contextName.equals("/")) {
-            contextName = "";
-        }
+    private void unregisterContext(Context context) {
 
         // Don't un-map a context that is paused
-        MessageBytes hostMB = MessageBytes.newInstance();
-        hostMB.setString(hostName);
-        MessageBytes contextMB = MessageBytes.newInstance();
-        contextMB.setString(contextName);
-        MappingData mappingData = new MappingData();
-        mapper.map(hostMB, contextMB, mappingData);
-        if (mappingData.context instanceof StandardContext &&
-                ((StandardContext)mappingData.context).getPaused()) {
+        if (context.getPaused()){
             return;
-        } 
+        }
+        
+        String contextName = context.getName();
+        if ("/".equals(contextName)) {
+            contextName = "";
+        }
+        String hostName = context.getParent().getName();
 
         if(log.isDebugEnabled())
             log.debug(sm.getString
                   ("mapperListener.unregisterContext", contextName));
 
         mapper.removeContext(hostName, contextName);
-
     }
 
 
     /**
      * Register wrapper.
      */
-    private void registerWrapper(ObjectName objectName)
-        throws Exception {
-    
-        // If the domain is the same with ours or the engine 
-        // name attribute is the same... - then it's ours
-        String targetDomain=objectName.getDomain();
-        if( ! domain.equals( targetDomain )) {
-            try {
-                targetDomain=(String) mBeanServer.getAttribute(objectName, "engineName");
-            } catch (Exception e) {
-                // Ignore
-            }
-            if( ! domain.equals( targetDomain )) {
-                // not ours
-                return;
-            }
-            
-        }
+    private void registerWrapper(Wrapper wrapper) {
 
-        String wrapperName = objectName.getKeyProperty("name");
-        String name = objectName.getKeyProperty("WebModule");
-
-        String hostName = null;
-        String contextName = null;
-        if (name.startsWith("//")) {
-            name = name.substring(2);
-        }
-        int slash = name.indexOf("/");
-        if (slash != -1) {
-            hostName = name.substring(0, slash);
-            contextName = name.substring(slash);
-        } else {
-            return;
-        }
-        // Special case for the root context
-        if (contextName.equals("/")) {
+        String wrapperName = wrapper.getName();
+        String contextName = wrapper.getParent().getName();
+        if ("/".equals(contextName)) {
             contextName = "";
         }
-        if(log.isDebugEnabled())
-            log.debug(sm.getString
-                  ("mapperListener.registerWrapper", 
-                   wrapperName, contextName));
+        String hostName = wrapper.getParent().getParent().getName();
+        
+        String[] mappings = wrapper.findMappings();
 
-        String[] mappings = (String[])
-            mBeanServer.invoke(objectName, "findMappings", null, null);
-        Object wrapper = 
-            mBeanServer.invoke(objectName, "findMappingObject", null, null);
-
-        for (int i = 0; i < mappings.length; i++) {
+        for (String mapping : mappings) {
             boolean jspWildCard = (wrapperName.equals("jsp")
-                                   && mappings[i].endsWith("/*"));
-            mapper.addWrapper(hostName, contextName, mappings[i], wrapper,
+                                   && mapping.endsWith("/*"));
+            mapper.addWrapper(hostName, contextName, mapping, wrapper,
                               jspWildCard);
         }
 
+        if(log.isDebugEnabled()) {
+            log.debug(sm.getString("mapperListener.registerWrapper",
+                    wrapperName, contextName));
+        }
     }
-
-
-
-
 }
