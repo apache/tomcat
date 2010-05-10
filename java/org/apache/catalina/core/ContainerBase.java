@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
@@ -31,8 +29,6 @@ import java.util.Iterator;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -55,12 +51,13 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.ProxyDirContext;
-import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -124,9 +121,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * 
  * @author Craig R. McClanahan
  */
-
-public abstract class ContainerBase extends LifecycleBase
-    implements Container, MBeanRegistration {
+public abstract class ContainerBase extends LifecycleMBeanBase
+        implements Container {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
@@ -1044,48 +1040,6 @@ public abstract class ContainerBase extends LifecycleBase
         }
     }
 
-    /** Init method, part of the MBean lifecycle.
-     *  If the container was added via JMX, it'll register itself with the 
-     * parent, using the ObjectName conventions to locate the parent.
-     * 
-     *  If the container was added directly and it doesn't have an ObjectName,
-     * it'll create a name and register itself with the JMX console. On destroy(), 
-     * the object will unregister.
-     * 
-     * @throws Exception
-     */ 
-    @Override
-    protected void initInternal() throws LifecycleException{
-
-        try {
-            if( this.getParent() == null ) {
-                // "Life" update
-                ObjectName parentName;
-                    parentName = getParentName();
-    
-                //log.info("Register " + parentName );
-                if( parentName != null && 
-                        mserver.isRegistered(parentName)) 
-                {
-                    mserver.invoke(parentName, "addChild", new Object[] { this },
-                            new String[] {"org.apache.catalina.Container"});
-                }
-            }
-        } catch (MalformedObjectNameException e) {
-            throw new LifecycleException(e);
-        } catch (InstanceNotFoundException e) {
-            throw new LifecycleException(e);
-        } catch (ReflectionException e) {
-            throw new LifecycleException(e);
-        } catch (MBeanException e) {
-            throw new LifecycleException(e);
-        }
-    }
-    
-    public ObjectName getParentName() throws MalformedObjectNameException {
-        return null;
-    }
-    
     @Override
     protected void destroyInternal() throws LifecycleException {
 
@@ -1099,24 +1053,11 @@ public abstract class ContainerBase extends LifecycleBase
             child.destroy();
         }
 
-        // unregister this component
-        if ( oname != null ) {
-            try {
-                if( controller == oname ) {
-                    Registry.getRegistry(null, null)
-                        .unregisterComponent(oname);
-                    if(log.isDebugEnabled())
-                        log.debug("unregistering " + oname);
-                }
-            } catch( Throwable t ) {
-                log.error("Error unregistering ", t );
-            }
-        }
-
         if (parent != null) {
             parent.removeChild(this);
         }
 
+        super.destroyInternal();
     }
 
     // ------------------------------------------------------- Pipeline Methods
@@ -1248,83 +1189,10 @@ public abstract class ContainerBase extends LifecycleBase
 
     
     // -------------------- JMX and Registration  --------------------
-    protected String type;
-    protected String domain;
-    protected String suffix;
-    protected ObjectName oname;
-    protected ObjectName controller;
-    protected MBeanServer mserver;
 
-    public ObjectName getJmxName() {
-        return oname;
-    }
-    
-    public String getObjectName() {
-        if (oname != null) {
-            return oname.toString();
-        } else return null;
-    }
-
-    public String getDomain() {
-        if( domain==null ) {
-            Container parent=this;
-            while( parent != null &&
-                    !( parent instanceof StandardEngine) ) {
-                parent=parent.getParent();
-            }
-            if( parent instanceof StandardEngine ) {
-                domain=((StandardEngine)parent).getDomain();
-            } 
-        }
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain=domain;
-    }
-    
-    public String getType() {
-        return type;
-    }
-
-    protected String getJSR77Suffix() {
-        return suffix;
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        if (name == null ){
-            return null;
-        }
-
-        domain=name.getDomain();
-
-        type=name.getKeyProperty("type");
-        if( type==null ) {
-            type=name.getKeyProperty("j2eeType");
-        }
-
-        String j2eeApp=name.getKeyProperty("J2EEApplication");
-        String j2eeServer=name.getKeyProperty("J2EEServer");
-        if( j2eeApp==null ) {
-            j2eeApp="none";
-        }
-        if( j2eeServer==null ) {
-            j2eeServer="none";
-        }
-        suffix=",J2EEApplication=" + j2eeApp + ",J2EEServer=" + j2eeServer;
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-    }
-
-    public void preDeregister() throws Exception {
-    }
-
-    public void postDeregister() {
+    @Override
+    protected String getDomainInternal() {
+        return MBeanUtils.getDomain(this);
     }
 
     public ObjectName[] getChildren() {
@@ -1334,51 +1202,14 @@ public abstract class ContainerBase extends LifecycleBase
         while( it.hasNext() ) {
             Object next=it.next();
             if( next instanceof ContainerBase ) {
-                result[i++]=((ContainerBase)next).getJmxName();
+                result[i++]=((ContainerBase)next).getObjectName();
             }
         }
         return result;
     }
 
-    public ObjectName createObjectName(String domain, ObjectName parent)
-        throws Exception
-    {
-        if( log.isDebugEnabled())
-            log.debug("Create ObjectName " + domain + " " + parent );
-        return null;
-    }
-
-    public String getContainerSuffix() {
-        Container container=this;
-        Container context=null;
-        Container host=null;
-        Container servlet=null;
-        
-        StringBuilder suffix=new StringBuilder();
-        
-        if( container instanceof StandardHost ) {
-            host=container;
-        } else if( container instanceof StandardContext ) {
-            host=container.getParent();
-            context=container;
-        } else if( container instanceof StandardWrapper ) {
-            context=container.getParent();
-            host=context.getParent();
-            servlet=container;
-        }
-        if( context!=null ) {
-            String path=((StandardContext)context).getPath();
-            suffix.append(",path=").append((path.equals("")) ? "/" : path);
-        } 
-        if( host!=null ) suffix.append(",host=").append( host.getName() );
-        if( servlet != null ) {
-            String name=container.getName();
-            suffix.append(",servlet=");
-            suffix.append((name=="") ? "/" : name);
-        }
-        return suffix.toString();
-    }
-
+    
+    // -------------------- Background Thread --------------------
 
     /**
      * Start the background thread that will periodically check for

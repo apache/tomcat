@@ -16,10 +16,6 @@
  */
 package org.apache.catalina.core;
 
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -31,7 +27,6 @@ import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * Standard implementation of the <b>Engine</b> interface.  Each
@@ -43,9 +38,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @version $Id$
  */
 
-public class StandardEngine
-    extends ContainerBase
-    implements Engine {
+public class StandardEngine extends ContainerBase implements Engine {
 
     private static final Log log = LogFactory.getLog(StandardEngine.class);
 
@@ -152,19 +145,6 @@ public class StandardEngine
 
     }
     
-    @Override
-    public void setName(String name ) {
-        if( domain != null ) {
-            // keep name==domain, ignore override
-            // we are already registered
-            super.setName( domain );
-            return;
-        }
-        // The engine name is used as domain
-        domain=name; // XXX should we set it in init() ? It shouldn't matter
-        super.setName( name );
-    }
-
 
     /**
      * Set the cluster-wide unique identifier for this Engine.
@@ -266,39 +246,6 @@ public class StandardEngine
     }
 
 
-    @Override
-    protected void initInternal() {
-
-        if( oname==null ) {
-            // not registered in JMX yet - standalone mode
-            try {
-                if (domain==null) {
-                    domain=getName();
-                }
-                if(log.isDebugEnabled())
-                    log.debug( "Register " + domain );
-                oname=new ObjectName(domain + ":type=Engine");
-                controller=oname;
-                Registry.getRegistry(null, null)
-                    .registerComponent(this, oname, null);
-            } catch( Throwable t ) {
-                log.info("Error registering ", t );
-            }
-        }
-
-        if( service==null ) {
-            // for consistency...: we are probably in embedded mode
-            try {
-                service=new StandardService();
-                service.setContainer( this );
-                service.init();
-            } catch( Throwable t ) {
-                log.error(t);
-            }
-        }
-        
-    }
-    
     /**
      * Start this component and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -309,23 +256,6 @@ public class StandardEngine
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         
-        // Look for a realm - that may have been configured earlier. 
-        // If the realm is added after context - it'll set itself.
-        if( realm == null ) {
-            ObjectName realmName=null;
-            try {
-                realmName=new ObjectName( domain + ":type=Realm");
-                if( mserver.isRegistered(realmName ) ) {
-                    mserver.invoke(realmName, "init", 
-                            new Object[] {},
-                            new String[] {}
-                    );            
-                }
-            } catch( Throwable t ) {
-                log.debug("No realm for this engine " + realmName);
-            }
-        }
-            
         // Log our server identification information
         if(log.isInfoEnabled())
             log.info( "Starting Servlet Engine: " + ServerInfo.getServerInfo());
@@ -349,55 +279,11 @@ public class StandardEngine
     }
 
 
-    // ------------------------------------------------------ Protected Methods
-
-
     // -------------------- JMX registration  --------------------
 
     @Override
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception
-    {
-        super.preRegister(server,name);
-
-        this.setName( name.getDomain());
-
-        return name;
+    protected String getObjectNameKeyProperties() {
+        return "type=Engine";
     }
 
-    @Override
-    public ObjectName getParentName() throws MalformedObjectNameException {
-        if (getService()==null) {
-            return null;
-        }
-        String name = getService().getName();
-        ObjectName serviceName=new ObjectName(domain +
-                        ":type=Service,serviceName="+name);
-        return serviceName;                
-    }
-    
-    @Override
-    public ObjectName createObjectName(String domain, ObjectName parent)
-        throws Exception
-    {
-        if( log.isDebugEnabled())
-            log.debug("Create ObjectName " + domain + " " + parent );
-        return new ObjectName( domain + ":type=Engine");
-    }
-
-    
-    @Override
-    public String getDomain() {
-        if (domain!=null) {
-            return domain;
-        } else { 
-            return getName();
-        }
-    }
-    
-    @Override
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-    
 }

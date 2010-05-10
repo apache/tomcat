@@ -88,7 +88,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * Obtain the domain under which this component will be / has been
      * registered.
      */
-    public String getDomain() {
+    public final String getDomain() {
         if (domain == null) {
             domain = getDomainInternal();
         }

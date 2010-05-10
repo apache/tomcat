@@ -22,6 +22,7 @@ package org.apache.catalina;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
 
 import org.apache.catalina.connector.Request;
@@ -189,7 +190,7 @@ public interface Container extends Lifecycle {
     /**
      * Return the JMX name associated with this container.
      */
-    public String getObjectName();    
+    public ObjectName getObjectName();    
 
     /**
      * Return the Pipeline object that manages the Valves associated with
