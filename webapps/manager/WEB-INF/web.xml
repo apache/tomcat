@@ -105,7 +105,7 @@
       <url-pattern>/html/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
-       <role-name>manager</role-name>
+       <role-name>manager-gui</role-name>
     </auth-constraint>
   </security-constraint>
   <security-constraint>
@@ -132,7 +132,7 @@
       <url-pattern>/status/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
-       <role-name>manager</role-name>
+       <role-name>manager-gui</role-name>
        <role-name>manager-script</role-name>
        <role-name>manager-jmx</role-name>
        <role-name>manager-status</role-name>
@@ -150,7 +150,7 @@
     <description>
       The role that is required to access the HTML Manager pages
     </description>
-    <role-name>manager</role-name>
+    <role-name>manager-gui</role-name>
   </security-role>
   <security-role>
     <description>

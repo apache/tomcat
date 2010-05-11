@@ -39,13 +39,13 @@
     file must contain the credentials to let you use this webapp.
    </p>
    <p>
-    For example, to add the <tt>manager</tt> role to a user named
+    For example, to add the <tt>manager-gui</tt> role to a user named
     <tt>tomcat</tt> with a password of <tt>s3cret</tt>, add the following to the
     config file listed above.
    </p>
 <pre>
-&lt;role rolename="manager"/&gt;
-&lt;user username="tomcat" password="s3cret" roles="manager"/&gt;
+&lt;role rolename="manager-gui"/&gt;
+&lt;user username="tomcat" password="s3cret" roles="manager-gui"/&gt;
 </pre>
    <p>
     Note that for Tomcat 7 onwards, the roles required to use the manager
@@ -54,7 +54,7 @@
     the functionality you wish to access.
    </p>
     <ul>
-      <li><tt>manager</tt> - allows access to the HTML GUI and the status
+      <li><tt>manager-gui</tt> - allows access to the HTML GUI and the status
           pages</li>
       <li><tt>manager-script</tt> - allows access to the text interface and the
           status pages</li>
