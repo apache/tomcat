@@ -204,14 +204,8 @@ public class MapperListener
             return;
         }
         
-        String methodName = null;
-        if (notification.getType().equals
+        if (!notification.getType().equals
                 (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
-            methodName = "addLifecycleListener";
-        } else if (notification.getType().equals
-                (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
-            methodName = "removeLifecycleListener";
-        } else {
             return;
         }
         
@@ -230,21 +224,21 @@ public class MapperListener
             if ("Servlet".equals(type) || "WebModule".equals(type) ||
                     "Host".equals(type)) {
                 try {
-                    mBeanServer.invoke(objectName, methodName,
+                    mBeanServer.invoke(objectName, "addLifecycleListener",
                             new Object[] {this},
                             new String[] {"org.apache.catalina.LifecycleListener"});
                 } catch (ReflectionException e) {
                     log.error(sm.getString(
-                            "mapperLister.lifecycleListenerFail", methodName,
-                            objectName, connector, domain), e);
+                            "mapperLister.lifecycleListenerFail", objectName,
+                            connector, domain), e);
                 } catch (MBeanException e) {
                     log.error(sm.getString(
-                            "mapperLister.lifecycleListenerFail", methodName,
-                            objectName, connector, domain), e);
+                            "mapperLister.lifecycleListenerFail", objectName,
+                            connector, domain), e);
                 } catch (InstanceNotFoundException e) {
                     log.error(sm.getString(
-                            "mapperLister.lifecycleListenerFail", methodName,
-                            objectName, connector, domain), e);
+                            "mapperLister.lifecycleListenerFail", objectName,
+                            connector, domain), e);
                 }
             }
         }
