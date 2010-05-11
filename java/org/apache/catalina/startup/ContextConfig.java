@@ -38,6 +38,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -698,7 +699,7 @@ public class ContextConfig
             // Context path must start with '/'
             pathName = pathName.substring(1).replace('/', '#');
         }
-        if (docBase.toLowerCase().endsWith(".war") && !file.isDirectory() && unpackWARs) {
+        if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
             URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
             docBase = ExpandWar.expand(host, war, pathName);
             file = new File(docBase);
@@ -706,7 +707,7 @@ public class ContextConfig
             if (context instanceof StandardContext) {
                 ((StandardContext) context).setOriginalDocBase(origDocBase);
             }
-        } else if (docBase.toLowerCase().endsWith(".war") &&
+        } else if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") &&
                 !file.isDirectory() && !unpackWARs) {
             URL war =
                 new URL("jar:" + (new File (docBase)).toURI().toURL() + "!/");
@@ -787,7 +788,7 @@ public class ContextConfig
             }
 
             File file = null;
-            if (docBase.toLowerCase().endsWith(".war")) {
+            if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 file = new File(System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase + ".war");
             } else {

@@ -1065,7 +1065,7 @@ public final class CGIServlet extends HttpServlet {
             String header = null;
             while (headers.hasMoreElements()) {
                 header = null;
-                header = headers.nextElement().toUpperCase();
+                header = headers.nextElement().toUpperCase(Locale.ENGLISH);
                 //REMIND: rewrite multiple headers as if received as single
                 //REMIND: change character set
                 //REMIND: I forgot what the previous REMIND means
