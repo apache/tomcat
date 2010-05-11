@@ -119,7 +119,7 @@ public class Util {
     public static String getContentTypeAttribute(String input, String name) {
         int begin;
         int end;
-        int index = input.toUpperCase().indexOf(name.toUpperCase());
+        int index = input.toUpperCase(Locale.ENGLISH).indexOf(name.toUpperCase(Locale.ENGLISH));
         if (index == -1) return null;
         index = index + name.length(); // positioned after the attribute name
         index = input.indexOf('=', index); // positioned at the '='
