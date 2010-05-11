@@ -1871,11 +1871,15 @@ public class ContextConfig
         
         Class<?> clazz = null;
         try {
-            clazz = Class.forName(className, true,
-                    context.getLoader().getClassLoader());
+            clazz = context.getLoader().getClassLoader().loadClass(className);
+        } catch (NoClassDefFoundError e) {
+            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
+                    className), e);
+            return;
         } catch (ClassNotFoundException e) {
             log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
+            return;
         }
 
         for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
