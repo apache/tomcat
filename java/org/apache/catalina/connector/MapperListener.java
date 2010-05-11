@@ -229,15 +229,15 @@ public class MapperListener
                             new String[] {"org.apache.catalina.LifecycleListener"});
                 } catch (ReflectionException e) {
                     log.error(sm.getString(
-                            "mapperLister.lifecycleListenerFail", objectName,
+                            "mapperListener.lifecycleListenerFail", objectName,
                             connector, domain), e);
                 } catch (MBeanException e) {
                     log.error(sm.getString(
-                            "mapperLister.lifecycleListenerFail", objectName,
+                            "mapperListener.lifecycleListenerFail", objectName,
                             connector, domain), e);
                 } catch (InstanceNotFoundException e) {
                     log.error(sm.getString(
-                            "mapperLister.lifecycleListenerFail", objectName,
+                            "mapperListener.lifecycleListenerFail", objectName,
                             connector, domain), e);
                 }
             }
