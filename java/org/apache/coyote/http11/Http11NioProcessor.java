@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
@@ -933,7 +934,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             String encodingName = null;
             while (commaPos != -1) {
                 encodingName = transferEncodingValue.substring
-                    (startPos, commaPos).toLowerCase().trim();
+                    (startPos, commaPos).toLowerCase(Locale.ENGLISH).trim();
                 if (!addInputFilter(inputFilters, encodingName)) {
                     // Unsupported transfer encoding
                     error = true;
@@ -944,7 +945,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                 commaPos = transferEncodingValue.indexOf(',', startPos);
             }
             encodingName = transferEncodingValue.substring(startPos)
-                .toLowerCase().trim();
+                .toLowerCase(Locale.ENGLISH).trim();
             if (!addInputFilter(inputFilters, encodingName)) {
                 // Unsupported transfer encoding
                 error = true;
