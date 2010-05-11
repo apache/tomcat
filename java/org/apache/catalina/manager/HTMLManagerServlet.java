@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -288,7 +289,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
                 filename =
                     extractFilename(warPart.getHeader("Content-Disposition"));
-                if (!filename.toLowerCase().endsWith(".war")) {
+                if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     message = sm.getString(
                             "htmlManagerServlet.deployUploadNotWar", filename);
                     break;
@@ -305,7 +306,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 // Identify the appBase of the owning Host of this Context
                 // (if any)
                 basename = filename.substring(0,
-                        filename.toLowerCase().indexOf(".war"));
+                        filename.toLowerCase(Locale.ENGLISH).indexOf(".war"));
                 File file = new File(getAppBase(), filename);
                 if (file.exists()) {
                     message = sm.getString(
@@ -358,7 +359,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private String extractFilename(String cd) {
         String fileName = null;
         if (cd != null) {
-            String cdl = cd.toLowerCase();
+            String cdl = cd.toLowerCase(Locale.ENGLISH);
             if (cdl.startsWith("form-data") || cdl.startsWith("attachment")) {
                 ParameterParser parser = new ParameterParser();
                 parser.setLowerCaseNames(true);

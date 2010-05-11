@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.http.fileupload;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -319,7 +320,7 @@ public class ParameterParser {
             }
             if ((paramName != null) && (paramName.length() > 0)) {
                 if (this.lowerCaseNames) {
-                    paramName = paramName.toLowerCase();
+                    paramName = paramName.toLowerCase(Locale.ENGLISH);
                 }
                 params.put(paramName, paramValue);
             }

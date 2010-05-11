@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -76,7 +77,7 @@ public abstract class FileUploadBase {
         if (contentType == null) {
             return false;
         }
-        if (contentType.toLowerCase().startsWith(MULTIPART)) {
+        if (contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART)) {
             return true;
         }
         return false;
@@ -382,7 +383,7 @@ public abstract class FileUploadBase {
     private String getFileName(String pContentDisposition) {
         String fileName = null;
         if (pContentDisposition != null) {
-            String cdl = pContentDisposition.toLowerCase();
+            String cdl = pContentDisposition.toLowerCase(Locale.ENGLISH);
             if (cdl.startsWith(FORM_DATA) || cdl.startsWith(ATTACHMENT)) {
                 ParameterParser parser = new ParameterParser();
                 parser.setLowerCaseNames(true);
@@ -427,7 +428,7 @@ public abstract class FileUploadBase {
     private String getFieldName(String pContentDisposition) {
         String fieldName = null;
         if (pContentDisposition != null
-                && pContentDisposition.toLowerCase().startsWith(FORM_DATA)) {
+                && pContentDisposition.toLowerCase(Locale.ENGLISH).startsWith(FORM_DATA)) {
             ParameterParser parser = new ParameterParser();
             parser.setLowerCaseNames(true);
             // Parameter parser can handle null input
@@ -738,7 +739,7 @@ public abstract class FileUploadBase {
 
             String contentType = ctx.getContentType();
             if ((null == contentType)
-                    || (!contentType.toLowerCase().startsWith(MULTIPART))) {
+                    || (!contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART))) {
                 throw new InvalidContentTypeException(
                         "the request doesn't contain a "
                         + MULTIPART_FORM_DATA
@@ -838,7 +839,7 @@ public abstract class FileUploadBase {
                     if (fieldName != null) {
                         String subContentType = headers.getHeader(CONTENT_TYPE);
                         if (subContentType != null
-                                &&  subContentType.toLowerCase()
+                                &&  subContentType.toLowerCase(Locale.ENGLISH)
                                         .startsWith(MULTIPART_MIXED)) {
                             currentFieldName = fieldName;
                             // Multiple files associated with this field name

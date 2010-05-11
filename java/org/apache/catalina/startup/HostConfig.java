@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -583,7 +584,7 @@ public class HostConfig
         for (int i = 0; i < files.length; i++) {
 
             File contextXml = new File(configBase, files[i]);
-            if (files[i].toLowerCase().endsWith(".xml")) {
+            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
 
                 // Calculate the context path and make sure it is unique
                 String nameTmp = files[i].substring(0, files[i].length() - 4);
@@ -662,7 +663,7 @@ public class HostConfig
                         (contextXml.getAbsolutePath(), new Long(contextXml.lastModified()));
                     deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         new Long(docBase.lastModified()));
-                    if (docBase.getAbsolutePath().toLowerCase().endsWith(".war")) {
+                    if (docBase.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                         isExternalWar = true;
                     }
                 } else {
@@ -752,7 +753,7 @@ public class HostConfig
             if (files[i].equalsIgnoreCase("WEB-INF"))
                 continue;
             File dir = new File(appBase, files[i]);
-            if (files[i].toLowerCase().endsWith(".war") && dir.isFile()
+            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && dir.isFile()
                     && !invalidWars.contains(files[i]) ) {
                 
                 // Calculate the context path and make sure it is unique
@@ -1496,7 +1497,7 @@ public class HostConfig
             }
             deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                                           new Long(docBase.lastModified()));
-            if (docBase.getAbsolutePath().toLowerCase().endsWith(".war")) {
+            if (docBase.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 isWar = true;
             }
         }
