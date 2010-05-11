@@ -88,12 +88,12 @@ public class SessionUtils {
                     locale = (Locale) obj;
                     break;
                 }
-                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toLowerCase());
+                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
                 if (null != obj && obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
-                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toUpperCase());
+                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
                 if (null != obj && obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
@@ -183,12 +183,12 @@ public class SessionUtils {
                     user = obj;
                     break;
                 }
-                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toLowerCase());
+                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
                 if (null != obj) {
                     user = obj;
                     break;
                 }
-                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toUpperCase());
+                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
                 if (null != obj) {
                     user = obj;
                     break;

@@ -39,6 +39,7 @@ import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
@@ -533,7 +534,7 @@ public class JSSESocketFactory
         if (keyAlias != null) {
             String alias = keyAlias;
             if (JSSESocketFactory.defaultKeystoreType.equals(keystoreType)) {
-                alias = alias.toLowerCase();
+                alias = alias.toLowerCase(Locale.ENGLISH);
             }
             for(int i=0; i<kms.length; i++) {
                 kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);

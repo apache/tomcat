@@ -25,6 +25,8 @@ import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -150,7 +152,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
     protected String getCGIVariable(String name) {
         String retVal = null;
-        String[] nameParts = name.toUpperCase().split("_");
+        String[] nameParts = name.toUpperCase(Locale.ENGLISH).split("_");
         int requiredParts = 2;
         if (nameParts.length == 1) {
             if (nameParts[0].equals("PATH")) {
