@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -1857,7 +1858,8 @@ public class ContextConfig
 
     /**
      * For classes packaged with the web application, the class and each
-     * super class needs to be checked for a match with {@Link HandlesTypes}.
+     * super class needs to be checked for a match with {@Link HandlesTypes} or
+     * for an annotation that matches {@Link HandlesTypes}.
      * @param javaClass
      */
     protected void checkHandlesTypes(JavaClass javaClass) {
@@ -1882,14 +1884,43 @@ public class ContextConfig
             return;
         }
 
+        if (clazz.isAnnotation()) {
+            // Skip
+            return;
+        }
+        
+        boolean match = false;
+        
         for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
                 typeInitializerMap.entrySet()) {
-            if (entry.getKey().isAssignableFrom(clazz)) {
+            if (entry.getKey().isAnnotation()) {
+                AnnotationEntry[] annotationEntries = javaClass.getAnnotationEntries();
+                for (AnnotationEntry annotationEntry : annotationEntries) {
+                    if (entry.getKey().getName().equals(
+                        getClassName(annotationEntry.getAnnotationType()))) {
+                        match = true;
+                        break;
+                    }
+                }
+            } else if (entry.getKey().isAssignableFrom(clazz)) {
+                match = true;
+            }
+            if (match) {
                 for (ServletContainerInitializer sci : entry.getValue()) {
                     initializerClassMap.get(sci).add(clazz);
                 }
             }
         }
+    }
+
+    private static final String getClassName(String internalForm) {
+        if (!internalForm.startsWith("L")) {
+            return internalForm;
+        }
+        
+        // Assume starts with L, ends with ; and uses / rather than .
+        return internalForm.substring(1,
+                internalForm.length() - 1).replace('/', '.');
     }
 
     protected void processAnnotationWebServlet(String className,
