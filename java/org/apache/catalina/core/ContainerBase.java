@@ -899,6 +899,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     public void removeChild(Container child) {
 
+        if (child == null) {
+            return;
+        }
+        
         synchronized(children) {
             if (children.get(child.getName()) == null)
                 return;
