@@ -34,6 +34,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.juli.logging.Log;
@@ -53,8 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Costin Manolache
  */
 public class MapperListener
-    implements NotificationListener, ContainerListener
- {
+        implements NotificationListener, ContainerListener, LifecycleListener {
 
 
     private static final Log log = LogFactory.getLog(MapperListener.class);
@@ -206,10 +207,10 @@ public class MapperListener
         String methodName = null;
         if (notification.getType().equals
                 (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
-            methodName = "addContainerListener";
+            methodName = "addLifecycleListener";
         } else if (notification.getType().equals
                 (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
-            methodName = "removeContainerListener";
+            methodName = "removeLifecycleListener";
         } else {
             return;
         }
@@ -231,18 +232,18 @@ public class MapperListener
                 try {
                     mBeanServer.invoke(objectName, methodName,
                             new Object[] {this},
-                            new String[] {"org.apache.catalinaContainerListener"});
+                            new String[] {"org.apache.catalina.LifecycleListener"});
                 } catch (ReflectionException e) {
                     log.error(sm.getString(
-                            "mapperLister.containerListenerFail", methodName,
+                            "mapperLister.lifecycleListenerFail", methodName,
                             objectName, connector, domain), e);
                 } catch (MBeanException e) {
                     log.error(sm.getString(
-                            "mapperLister.containerListenerFail", methodName,
+                            "mapperLister.lifecycleListenerFail", methodName,
                             objectName, connector, domain), e);
                 } catch (InstanceNotFoundException e) {
                     log.error(sm.getString(
-                            "mapperLister.containerListenerFail", methodName,
+                            "mapperLister.lifecycleListenerFail", methodName,
                             objectName, connector, domain), e);
                 }
             }
@@ -254,25 +255,7 @@ public class MapperListener
 
     public void containerEvent(ContainerEvent event) {
 
-        if (event.getType() == Lifecycle.AFTER_START_EVENT) {
-            Object obj = event.getSource();
-            if (obj instanceof Wrapper) {
-                registerWrapper((Wrapper) obj);
-            } else if (obj instanceof Context) {
-                registerContext((Context) obj);
-            } else if (obj instanceof Host) {
-                registerHost((Host) obj);
-            }
-        } else if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
-            Object obj = event.getSource();
-            if (obj instanceof Wrapper) {
-                unregisterWrapper((Wrapper) obj);
-            } else if (obj instanceof Context) {
-                unregisterContext((Context) obj);
-            } else if (obj instanceof Host) {
-                unregisterHost((Host) obj);
-            }
-        } else if (event.getType() == Host.ADD_ALIAS_EVENT) {
+        if (event.getType() == Host.ADD_ALIAS_EVENT) {
             mapper.addHostAlias(((Host) event.getSource()).getName(),
                     event.getData().toString());
         } else if (event.getType() == Host.REMOVE_ALIAS_EVENT) {
@@ -439,6 +422,30 @@ public class MapperListener
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerWrapper",
                     wrapperName, contextName));
+        }
+    }
+
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getType() == Lifecycle.AFTER_START_EVENT) {
+            Object obj = event.getSource();
+            if (obj instanceof Wrapper) {
+                registerWrapper((Wrapper) obj);
+            } else if (obj instanceof Context) {
+                registerContext((Context) obj);
+            } else if (obj instanceof Host) {
+                registerHost((Host) obj);
+            }
+        } else if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
+            Object obj = event.getSource();
+            if (obj instanceof Wrapper) {
+                unregisterWrapper((Wrapper) obj);
+            } else if (obj instanceof Context) {
+                unregisterContext((Context) obj);
+            } else if (obj instanceof Host) {
+                unregisterHost((Host) obj);
+            }
         }
     }
 }

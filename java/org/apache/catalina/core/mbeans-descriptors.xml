@@ -1021,6 +1021,23 @@
                returnType="org.apache.catalina.Wrapper">
     </operation>
     
+        <operation name="addLifecycleListener"
+               description="Add a lifecycle listener to this Context"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="listener"
+                 description="New lifecycle listener to be added"
+                 type="org.apache.catalina.LifecycleListener"/>
+    </operation>
+    
+    <operation name="removeLifecycleListener"
+               description="Remove a lifecycle listener from this Context"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="listener"
+                 description="New lifecycle listener to be removed"
+                 type="org.apache.catalina.LifecycleListener"/>
+    </operation>
   </mbean>
   
   <mbean name="StandardWrapperValve"
