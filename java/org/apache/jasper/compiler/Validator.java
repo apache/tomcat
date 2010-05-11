@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
@@ -330,7 +331,7 @@ class Validator {
 
             Node.Root root = pageDir.getRoot();
             String configEnc = root.getJspConfigPageEncoding();
-            String pageDirEnc = thePageDirEnc.toUpperCase();
+            String pageDirEnc = thePageDirEnc.toUpperCase(Locale.ENGLISH);
 
             /*
              * Compare the 'pageEncoding' attribute of the page directive with
@@ -339,7 +340,7 @@ class Validator {
              * "UTF-16LE" as identical.
              */
             if (configEnc != null) {
-                configEnc = configEnc.toUpperCase();
+                configEnc = configEnc.toUpperCase(Locale.ENGLISH);
                 if (!pageDirEnc.equals(configEnc)
                         && (!pageDirEnc.startsWith("UTF-16") || !configEnc
                                 .startsWith("UTF-16"))) {
@@ -359,7 +360,7 @@ class Validator {
              * identical.
              */
             if ((root.isXmlSyntax() && root.isEncodingSpecifiedInProlog()) || root.isBomPresent()) {
-                String pageEnc = root.getPageEncoding().toUpperCase();
+                String pageEnc = root.getPageEncoding().toUpperCase(Locale.ENGLISH);
                 if (!pageDirEnc.equals(pageEnc)
                         && (!pageDirEnc.startsWith("UTF-16") || !pageEnc
                                 .startsWith("UTF-16"))) {
@@ -387,7 +388,7 @@ class Validator {
                 Node.TagDirective pageDir) throws JasperException {
 
             Node.Root root = pageDir.getRoot();
-            String pageDirEnc = thePageDirEnc.toUpperCase();
+            String pageDirEnc = thePageDirEnc.toUpperCase(Locale.ENGLISH);
             /*
              * Compare the 'pageEncoding' attribute of the page directive with
              * the encoding specified in the XML prolog (only for XML syntax,
@@ -396,7 +397,7 @@ class Validator {
              * identical.
              */
             if ((root.isXmlSyntax() && root.isEncodingSpecifiedInProlog()) || root.isBomPresent()) {
-                String pageEnc = root.getPageEncoding().toUpperCase();
+                String pageEnc = root.getPageEncoding().toUpperCase(Locale.ENGLISH);
                 if (!pageDirEnc.equals(pageEnc)
                         && (!pageDirEnc.startsWith("UTF-16") || !pageEnc
                                 .startsWith("UTF-16"))) {
