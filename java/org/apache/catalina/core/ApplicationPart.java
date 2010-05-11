@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.MultipartConfigElement;
@@ -134,7 +135,7 @@ public class ApplicationPart implements Part {
         String fileName = null;
         String cd = getHeader("Content-Disposition");
         if (cd != null) {
-            String cdl = cd.toLowerCase();
+            String cdl = cd.toLowerCase(Locale.ENGLISH);
             if (cdl.startsWith("form-data") || cdl.startsWith("attachment")) {
                 ParameterParser paramParser = new ParameterParser();
                 paramParser.setLowerCaseNames(true);

@@ -16,6 +16,8 @@
 */
 package jsp2.examples.el;
 
+import java.util.Locale;
+
 /**
  * Defines the functions for the jsp2 example tag library.
  * 
@@ -38,6 +40,6 @@ public class Functions {
     }
 
     public static String caps( String text ) {
-        return text.toUpperCase();
+        return text.toUpperCase(Locale.ENGLISH);
     }
 }

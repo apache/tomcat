@@ -19,6 +19,7 @@ package org.apache.tomcat.util.buf;
 
 import java.io.Serializable;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * This class is used to represent a subarray of bytes in an HTTP message.
@@ -450,8 +451,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     
     public int indexOfIgnoreCase(String s, int starting) {
 	toString();
-	String upper=strValue.toUpperCase();
-	String sU=s.toUpperCase();
+	String upper=strValue.toUpperCase(Locale.ENGLISH);
+	String sU=s.toUpperCase(Locale.ENGLISH);
 	return upper.indexOf( sU, starting );
     }
     

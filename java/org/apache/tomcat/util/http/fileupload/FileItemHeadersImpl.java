@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -49,7 +50,7 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
     private final List<String> headerNameList = new ArrayList<String>();
 
     public String getHeader(String name) {
-        String nameLower = name.toLowerCase();
+        String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
             return null;
@@ -62,7 +63,7 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
     }
 
     public Iterator<String> getHeaders(String name) {
-        String nameLower = name.toLowerCase();
+        String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
             return Collections.<String>emptyList().iterator();
