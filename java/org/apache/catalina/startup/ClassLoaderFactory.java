@@ -22,6 +22,7 @@ package org.apache.catalina.startup;
 import java.io.File;
 import java.net.URL;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.catalina.loader.StandardClassLoader;
@@ -110,7 +111,7 @@ public final class ClassLoaderFactory {
                     continue;
                 String filenames[] = directory.list();
                 for (int j = 0; j < filenames.length; j++) {
-                    String filename = filenames[j].toLowerCase();
+                    String filename = filenames[j].toLowerCase(Locale.ENGLISH);
                     if (!filename.endsWith(".jar"))
                         continue;
                     File file = new File(directory, filenames[j]);
@@ -197,7 +198,7 @@ public final class ClassLoaderFactory {
                             + directory.getAbsolutePath());
                     String filenames[] = directory.list();
                     for (int j = 0; j < filenames.length; j++) {
-                        String filename = filenames[j].toLowerCase();
+                        String filename = filenames[j].toLowerCase(Locale.ENGLISH);
                         if (!filename.endsWith(".jar"))
                             continue;
                         File file = new File(directory, filenames[j]);

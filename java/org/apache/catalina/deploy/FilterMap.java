@@ -22,6 +22,7 @@ package org.apache.catalina.deploy;
 import org.apache.catalina.util.RequestUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.servlet.DispatcherType;
 
@@ -139,7 +140,7 @@ public class FilterMap implements Serializable {
      * representing the state of when filters should be applied.
      */
     public void setDispatcher(String dispatcherString) {
-        String dispatcher = dispatcherString.toUpperCase();
+        String dispatcher = dispatcherString.toUpperCase(Locale.ENGLISH);
         
         if (dispatcher.equals(DispatcherType.FORWARD.name())) {
             // apply FORWARD to the global dispatcherMapping.

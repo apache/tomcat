@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.core;
 
+import java.util.Locale;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -138,7 +140,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         if (host == null) {
             this.defaultHost = null;
         } else {
-            this.defaultHost = host.toLowerCase();
+            this.defaultHost = host.toLowerCase(Locale.ENGLISH);
         }
         support.firePropertyChange("defaultHost", oldDefaultHost,
                                    this.defaultHost);

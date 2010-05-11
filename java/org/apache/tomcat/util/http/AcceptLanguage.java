@@ -94,7 +94,7 @@ public class AcceptLanguage {
                     qIndex < equalIndex) {
                     String qValueStr = language.substring(qValueIndex + 1);
                 language = language.substring(0, qValueIndex);
-                qValueStr = qValueStr.trim().toLowerCase();
+                qValueStr = qValueStr.trim().toLowerCase(Locale.ENGLISH);
                 qValueIndex = qValueStr.indexOf('=');
                 qValue = new Double(0);
                 if (qValueStr.startsWith("q") &&

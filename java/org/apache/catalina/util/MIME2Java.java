@@ -580,7 +580,7 @@ public class MIME2Java {
      * @see #reverse
      */
     public static String convert(String mimeCharsetName) {
-        return s_enchash.get(mimeCharsetName.toUpperCase());
+        return s_enchash.get(mimeCharsetName.toUpperCase(Locale.ENGLISH));
     }
 
     /**
@@ -598,6 +598,6 @@ public class MIME2Java {
      * @see #convert
      */
     public static String reverse(String encoding) {
-        return s_revhash.get(encoding.toUpperCase());
+        return s_revhash.get(encoding.toUpperCase(Locale.ENGLISH));
     }
 }

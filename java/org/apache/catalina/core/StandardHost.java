@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -474,7 +475,7 @@ public class StandardHost extends ContainerBase implements Host {
             throw new IllegalArgumentException
                 (sm.getString("standardHost.nullName"));
 
-        name = name.toLowerCase();      // Internally all names are lower case
+        name = name.toLowerCase(Locale.ENGLISH);      // Internally all names are lower case
 
         String oldName = this.name;
         this.name = name;
@@ -569,7 +570,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public void addAlias(String alias) {
 
-        alias = alias.toLowerCase();
+        alias = alias.toLowerCase(Locale.ENGLISH);
 
         synchronized (aliasesLock) {
             // Skip duplicate aliases
@@ -734,7 +735,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public void removeAlias(String alias) {
 
-        alias = alias.toLowerCase();
+        alias = alias.toLowerCase(Locale.ENGLISH);
 
         synchronized (aliasesLock) {
 
