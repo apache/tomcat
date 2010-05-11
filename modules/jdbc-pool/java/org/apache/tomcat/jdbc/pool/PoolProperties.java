@@ -47,7 +47,7 @@ public class PoolProperties implements PoolConfiguration {
     protected String connectionProperties;
     protected int initialSize = 10;
     protected int maxActive = 100;
-    protected int maxIdle = Integer.MAX_VALUE;
+    protected int maxIdle = maxActive;
     protected int minIdle = initialSize;
     protected int maxWait = 30000;
     protected String validationQuery;
