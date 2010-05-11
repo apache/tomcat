@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
@@ -771,7 +772,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             String encodingName = null;
             while (commaPos != -1) {
                 encodingName = transferEncodingValue.substring
-                    (startPos, commaPos).toLowerCase().trim();
+                    (startPos, commaPos).toLowerCase(Locale.ENGLISH).trim();
                 if (!addInputFilter(inputFilters, encodingName)) {
                     // Unsupported transfer encoding
                     error = true;
@@ -782,7 +783,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 commaPos = transferEncodingValue.indexOf(',', startPos);
             }
             encodingName = transferEncodingValue.substring(startPos)
-                .toLowerCase().trim();
+                .toLowerCase(Locale.ENGLISH).trim();
             if (!addInputFilter(inputFilters, encodingName)) {
                 // Unsupported transfer encoding
                 error = true;
