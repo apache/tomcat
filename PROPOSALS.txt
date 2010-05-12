@@ -75,19 +75,10 @@ Membership
 
 * Include tomcat-juli and tomcat-juli-adapters as an add on package when doing a release
 
-* Generate source jars for each maven jar posted
-
 Session Replication
 ===================
 - New feature - only replicate upon demand
   Runtime tomcat doesn't do live session replication
   but you can move the sessions upon demand before shutting down a tomcat instance
   and draining sessions
-  
-* Make it easier to embed tomcat, run it without config files and special layout:
-  - add a helper class to allow tomcat to be run without any external config 
-  files.
-  - add unit test as example
-  - add a target to generate a 'fat' jar with all dependencies and 
-  a minimal 'main'
   
