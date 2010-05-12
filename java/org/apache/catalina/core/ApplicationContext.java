@@ -184,6 +184,13 @@ public class ApplicationContext
     private Set<SessionTrackingMode> defaultSessionTrackingModes = null;
     private Set<SessionTrackingMode> supportedSessionTrackingModes = null;
 
+    /**
+     * Flag that indicates if a new {@link ServletContextListener} may be added
+     * to the application. Once the first {@link ServletContextListener} is
+     * called, not more may be added.
+     */
+    private boolean newServletContextListenerAllowed = true;
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -1275,8 +1282,8 @@ public class ApplicationContext
         }
         
         if (t instanceof HttpSessionListener
-                || t instanceof ServletContextListener) {
-            // TODO SERVLET3 - if ServletContextListener then also need to check caller? spec isn't clear
+                || (t instanceof ServletContextListener &&
+                        newServletContextListenerAllowed)) {
             context.addApplicationLifecycleListener(t);
             match = true;
         }
@@ -1471,6 +1478,10 @@ public class ApplicationContext
     }
 
 
+    protected void setNewServletContextListenerAllowed(boolean allowed) {
+        this.newServletContextListenerAllowed = allowed;
+    }
+    
     // -------------------------------------------------------- Private Methods
 
 
