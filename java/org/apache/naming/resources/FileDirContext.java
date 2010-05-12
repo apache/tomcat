@@ -193,11 +193,9 @@ public class FileDirContext extends BaseDirContext {
      *
      * @param name the name of the object to look up
      * @return the object bound to name
-     * @exception NamingException if a naming exception is encountered
      */
     @Override
-    protected Object doLookup(String name)
-        throws NamingException {
+    protected Object doLookup(String name) {
         Object result = null;
         File file = file(name);
 
