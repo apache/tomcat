@@ -27,11 +27,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
