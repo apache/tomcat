@@ -32,6 +32,7 @@ import java.util.zip.ZipFile;
 
 import javax.naming.Binding;
 import javax.naming.CompositeName;
+import javax.naming.InvalidNameException;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
@@ -190,13 +191,17 @@ public class WARDirContext extends BaseDirContext {
      * 
      * @param strName the name of the object to look up
      * @return the object bound to name
-     * @exception NamingException if a naming exception is encountered
      */
     @Override
-    protected Object doLookup(String strName)
-        throws NamingException {
+    protected Object doLookup(String strName) {
 
-        Name name = new CompositeName(strName);
+        Name name;
+        try {
+            name = new CompositeName(strName);
+        } catch (InvalidNameException e) {
+            log.info(sm.getString("resources.invalidName", strName), e);
+            return null;
+        }
 
         if (name.isEmpty())
             return this;
