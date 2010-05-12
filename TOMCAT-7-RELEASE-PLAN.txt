@@ -44,7 +44,6 @@
 
 8. Nice to haves in first Tomcat 7 stable release
    - Refactor Jasper integration as suggested in SRV.8.3
-   - Lifecycle clean-up for init()/destroy() inc. MBeans
    - Remove old, unused code
      - Clean up internal API (eg remove unused params from methods)
    - JSR 115/196 implementations - Copy from Geronimo?
