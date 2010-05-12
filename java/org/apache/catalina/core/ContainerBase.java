@@ -773,7 +773,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             children.put(child.getName(), child);
 
             // Start child
-            if (getState().isAvailable() && startChildren) {
+            if ((getState().isAvailable() ||
+                    LifecycleState.STARTING_PREP.equals(getState())) &&
+                    startChildren) {
                 boolean success = false;
                 try {
                     child.start();
