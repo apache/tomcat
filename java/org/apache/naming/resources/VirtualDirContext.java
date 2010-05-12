@@ -159,7 +159,7 @@ public class VirtualDirContext extends FileDirContext {
     }
 
     @Override
-    protected Object doLookup(String name) throws NamingException {
+    protected Object doLookup(String name) {
 
         // handle "virtual" tlds
         if (name.startsWith("/WEB-INF/") && name.endsWith(".tld")) {
@@ -178,7 +178,7 @@ public class VirtualDirContext extends FileDirContext {
             }
         }
 
-        return super.lookup(name);
+        return super.doLookup(name);
     }
 
     /**

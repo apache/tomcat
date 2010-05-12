@@ -1501,7 +1501,7 @@ public abstract class BaseDirContext implements DirContext {
     protected abstract Attributes doGetAttributes(String name, String[] attrIds)
         throws NamingException;
 
-    protected abstract Object doLookup(String name) throws NamingException;
+    protected abstract Object doLookup(String name);
 
     protected abstract NamingEnumeration<Binding> doListBindings(String name)
         throws NamingException;
