@@ -215,8 +215,13 @@ public class PooledConnection {
         String driverURL = poolProperties.getUrl();
         String usr = poolProperties.getUsername();
         String pwd = poolProperties.getPassword();
-        poolProperties.getDbProperties().setProperty("user", usr);
-        poolProperties.getDbProperties().setProperty("password", pwd);
+        if (usr != null) {
+            poolProperties.getDbProperties().setProperty("user", usr);
+        }
+        if (pwd != null) {
+            poolProperties.getDbProperties().setProperty("password", pwd);
+        }
+        
         try {
             connection = driver.connect(driverURL, poolProperties.getDbProperties());
         } catch (Exception x) {
