@@ -4630,12 +4630,6 @@ public class StandardContext extends ContainerBase
                 // Notify our interested LifecycleListeners
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
                 
-                // Start our child containers, if any
-                Container children[] = findChildren();
-                for (int i = 0; i < children.length; i++) {
-                    children[i].start();
-                }
-
                 // Start the Valves in our pipeline (including the basic),
                 // if any
                 if (pipeline instanceof Lifecycle) {
