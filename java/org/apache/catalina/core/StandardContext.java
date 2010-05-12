@@ -4266,6 +4266,10 @@ public class StandardContext extends ContainerBase
         if (getLogger().isDebugEnabled())
             getLogger().debug("Sending application start events");
 
+        // Ensure context is not null
+        getServletContext();
+        context.setNewServletContextListenerAllowed(false);
+        
         Object instances[] = getApplicationLifecycleListeners();
         if (instances == null)
             return (ok);
