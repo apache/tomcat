@@ -218,6 +218,14 @@ public abstract class ValveBase extends LifecycleMBeanBase
     }
 
 
+    @Override
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        
+        containerLog = getContainer().getLogger();
+    }
+    
+    
     /**
      * Start this component and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
