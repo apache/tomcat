@@ -47,8 +47,10 @@ import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 /**
@@ -344,6 +346,43 @@ public final class TldConfig  implements LifecycleListener {
         }
     }
 
+    private static class TldErrorHandler implements ErrorHandler {
+        
+        private Set<SAXParseException> errors =
+            new HashSet<SAXParseException>();
+        
+        private Set<SAXParseException> warnings =
+            new HashSet<SAXParseException>();
+
+        @Override
+        public void error(SAXParseException exception) throws SAXException {
+            // Collect non-fatal errors
+            errors.add(exception);
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXException {
+            // Re-throw fatal errors
+            throw exception;
+        }
+
+        @Override
+        public void warning(SAXParseException exception) throws SAXException {
+            // Collect warnings
+            warnings.add(exception);
+        }
+        
+        public Set<SAXParseException> getErrors() {
+            // Internal use only - don't worry about immutability
+            return errors;
+        }
+        
+        public Set<SAXParseException> getWarnings() {
+            // Internal use only - don't worry about immutability
+            return warnings;
+        }
+    }
+    
     // -------------------------------------------------------- Private Methods
 
 
@@ -383,7 +422,8 @@ public final class TldConfig  implements LifecycleListener {
                 try {
                     InputStream stream = context.getServletContext(
                             ).getResourceAsStream(resourcePath);
-                    tldScanStream(stream);
+                    TldErrorHandler handler = tldScanStream(stream);
+                    processErrorHandler(handler, resourcePath);
                     taglibUris.add(descriptor.getTaglibURI());
                     webxmlTaglibUris.add(descriptor.getTaglibURI());
                 } catch (IOException ioe) {
@@ -429,7 +469,8 @@ public final class TldConfig  implements LifecycleListener {
                     }
                     InputStream stream = ctxt.getResourceAsStream(path);
                     try {
-                        tldScanStream(stream);
+                        TldErrorHandler handler = tldScanStream(stream);
+                        processErrorHandler(handler, path);
                     } catch (IOException ioe) {
                         log.warn(sm.getString("tldConfig.webinfFail", path),
                                 ioe);
@@ -471,7 +512,9 @@ public final class TldConfig  implements LifecycleListener {
                     InputStream stream = null;
                     try {
                         stream = new FileInputStream(fileList[i]);
-                        tldScanStream(stream);
+                        TldErrorHandler handler = tldScanStream(stream);
+                        processErrorHandler(handler,
+                                fileList[i].getAbsolutePath());
                     } catch (IOException ioe) {
                         log.warn(sm.getString("tldConfig.dirFail",
                                 fileList[i].getAbsolutePath()),
@@ -498,21 +541,26 @@ public final class TldConfig  implements LifecycleListener {
      * 
      * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
-    private void tldScanJar(JarURLConnection conn) throws IOException {
+    private void tldScanJar(JarURLConnection conn) {
 
         JarFile jarFile = null;
+        String name = null;
         try {
             conn.setUseCaches(false);
             jarFile = conn.getJarFile();
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
-                String name = entry.getName();
+                name = entry.getName();
                 if (!name.startsWith("META-INF/")) continue;
                 if (!name.endsWith(".tld")) continue;
                 InputStream stream = jarFile.getInputStream(entry);
-                tldScanStream(stream);
+                TldErrorHandler handler = tldScanStream(stream);
+                processErrorHandler(handler, conn.getURL() + name);
             }
+        } catch (IOException ioe) {
+            log.warn(sm.getString("tldConfig.jarFail", conn.getURL() + name),
+                    ioe);
         } finally {
             if (jarFile != null) {
                 try {
@@ -526,6 +574,21 @@ public final class TldConfig  implements LifecycleListener {
 
 
     /*
+     * Log the non-fatal errors and warnings
+     */
+    private void processErrorHandler(TldErrorHandler handler, String source) {
+       for (SAXParseException e : handler.getWarnings()) {
+           log.warn(sm.getString(
+                   "tldConfig.handlerWarning", e.getMessage(), source));
+       }
+       for (SAXParseException e : handler.getErrors()) {
+           log.warn(sm.getString(
+                   "tldConfig.handlerError", e.getMessage(), source));
+       }
+    }
+    
+    
+    /*
      * Scan the TLD contents in the specified input stream, and register
      * any application event listeners found there.  <b>NOTE</b> - This 
      * method ensure that the InputStream is correctly closed.
@@ -534,12 +597,16 @@ public final class TldConfig  implements LifecycleListener {
      *
      * @throws IOException  If the file cannot be read
      */
-    private void tldScanStream(InputStream resourceStream) throws IOException {
+    private TldErrorHandler tldScanStream(InputStream resourceStream)
+            throws IOException {
         
         InputSource source = new InputSource(resourceStream);
         
+        TldErrorHandler result = new TldErrorHandler();
+        
         synchronized (tldDigester) {
             try {
+                tldDigester.setErrorHandler(result);
                 tldDigester.push(this);
                 tldDigester.parse(source);
             } catch (SAXException s) {
@@ -555,6 +622,7 @@ public final class TldConfig  implements LifecycleListener {
                     }
                 }
             }
+            return result;
         }
     }
 
