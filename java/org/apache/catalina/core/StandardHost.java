@@ -156,17 +156,6 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Attribute value used to turn on/off XML validation
-     */
-     private boolean xmlValidation = false;
-
-
-    /**
-     * Attribute value used to turn on/off XML namespace awareness.
-     */
-     private boolean xmlNamespaceAware = false;
-     
-    /**
      * Should we create directories upon startup for appBase and xmlBase
      */
      private boolean createDirs = true;
@@ -503,45 +492,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     }
 
-     /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlValidation true to enable xml instance validation
-     */
-    public void setXmlValidation(boolean xmlValidation){
-        
-        this.xmlValidation = xmlValidation;
 
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    public boolean getXmlValidation(){
-        return xmlValidation;
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
-     *
-     */
-    public boolean getXmlNamespaceAware(){
-        return xmlNamespaceAware;
-    }
-
-
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlNamespaceAware true to enable namespace awareness
-     */
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware){
-        this.xmlNamespaceAware=xmlNamespaceAware;
-    }    
-    
     /**
      * Host work directory base.
      */
@@ -819,13 +770,6 @@ public class StandardHost extends ContainerBase implements Host {
                      errorReportValveClass), t);
             }
         }
-        if(log.isDebugEnabled()) {
-            if (xmlValidation)
-                log.debug(sm.getString("standardHost.validationEnabled"));
-            else
-                log.debug(sm.getString("standardHost.validationDisabled"));
-        }
-        
         super.startInternal();
     }
 

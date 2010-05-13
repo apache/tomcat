@@ -237,10 +237,20 @@
         if set to false, code like <code>getResource("myfolder/myresource.txt")</code> will work
       </li>
       <li>
-        The default value will be changed for
-        <code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.
-        <code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.
-        <code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.
+        The default value will be changed for:
+        <ul>
+        <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
+        <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
+        <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
+        <li>The <code>tldNamespaceAware</code> attribute of any
+            <a href="context.html">Context</a> element</li>.
+        <li>The <code>tldValidation</code> attribute of any
+            <a href="context.html">Context</a> element</li>.
+        <li>The <code>xmlNamespaceAware</code> attribute of any
+            <a href="context.html">Context</a> element</li>.
+        <li>The <code>xmlValidation</code> attribute of any
+            <a href="context.html">Context</a> element</li>.
+        </ul>
       </li>
       </ul>
       </p>
@@ -250,7 +260,8 @@
       specifications. Defaults, regardless of whether or not they have been
       changed by setting
       <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> can always be
-      overridden by explicitly setting the appropriate system property.</p>
+      overridden by explicitly setting the appropriate system property or element
+      attribute.</p>
     </property>
 
     <property name="org.apache.catalina.connector. Response.ENFORCE_ENCODING_IN_GET_WRITER">
