@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -858,36 +857,14 @@ public class ContextConfig
         if (log.isDebugEnabled())
             log.debug(sm.getString("contextConfig.start"));
 
-        // Process the default and application web.xml files
-        // Set properties based on default context
-        boolean useXmlValidation = context.getXmlValidation();
-        boolean useXmlNamespaceAware = context.getXmlNamespaceAware();
-
-        Container container = context.getParent();
-        // Use the value from the host if:
-        // - override is false on the context
-        // - value has been set to false / not set on the context
-        if( !context.getOverride() ) {
-            if( container instanceof Host ) {
-                if (!useXmlValidation) {
-                    useXmlValidation = ((Host)container).getXmlValidation();
-                }
-                
-                if (!useXmlNamespaceAware){
-                    useXmlNamespaceAware 
-                                = ((Host)container).getXmlNamespaceAware();
-                }
-
-            }
-        }
-        
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.xmlSettings",
-                    context.getName(), Boolean.valueOf(useXmlValidation),
-                    Boolean.valueOf(useXmlNamespaceAware)));
+                    context.getName(),
+                    Boolean.valueOf(context.getXmlValidation()),
+                    Boolean.valueOf(context.getXmlNamespaceAware())));
         }
         
-        createWebXmlDigester(useXmlNamespaceAware, useXmlValidation);
+        createWebXmlDigester(context.getXmlNamespaceAware(), context.getXmlValidation());
         
         webConfig();
 

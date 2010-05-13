@@ -42,7 +42,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardHost;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -586,24 +585,8 @@ public final class TldConfig  implements LifecycleListener {
     
     private void init() {
         if (tldDigester == null){
-            // (1)  check if the attribute has been defined
-            //      on the context element.
             setTldValidation(context.getTldValidation());
             setTldNamespaceAware(context.getTldNamespaceAware());
-    
-            // (2) if the attribute wasn't defined on the context
-            //     and override is not set on the context try the host.
-            if (!context.getOverride()) {
-                if (!tldValidation) {
-                    setTldValidation(
-                            ((StandardHost) context.getParent()).getXmlValidation());
-                }
-    
-                if (!tldNamespaceAware) {
-                    setTldNamespaceAware(
-                      ((StandardHost) context.getParent()).getXmlNamespaceAware());
-                }
-            }
             tldDigester = createTldDigester(tldNamespaceAware, tldValidation);
         }
     }

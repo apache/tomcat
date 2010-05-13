@@ -649,9 +649,7 @@ public class MBeanFactory {
                                      boolean autoDeploy,
                                      boolean deployOnStartup,
                                      boolean deployXML,                                       
-                                     boolean unpackWARs,
-                                     boolean xmlNamespaceAware,
-                                     boolean xmlValidation)
+                                     boolean unpackWARs)
         throws Exception {
 
         // Create a new StandardHost instance
@@ -662,8 +660,6 @@ public class MBeanFactory {
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);
-        host.setXmlNamespaceAware(xmlNamespaceAware);
-        host.setXmlValidation(xmlValidation);
 	
         // add HostConfig for active reloading
         HostConfig hostConfig = new HostConfig();
