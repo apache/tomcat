@@ -258,15 +258,11 @@ public class HostManagerServlet
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
-        boolean xmlNamespaceAware = booleanParameter(request, "xmlNamespaceAware", false, htmlMode);
-        boolean xmlValidation = booleanParameter(request, "xmlValidation", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
             deployOnStartup,
             deployXML,                                       
-            unpackWARs,
-            xmlNamespaceAware,
-            xmlValidation);
+            unpackWARs);
     }
 
 
@@ -342,9 +338,7 @@ public class HostManagerServlet
          boolean autoDeploy,
          boolean deployOnStartup,
          boolean deployXML,                                       
-         boolean unpackWARs,
-         boolean xmlNamespaceAware,
-         boolean xmlValidation) {
+         boolean unpackWARs) {
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.add", name));
         }
@@ -438,8 +432,6 @@ public class HostManagerServlet
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);
-        host.setXmlNamespaceAware(xmlNamespaceAware);
-        host.setXmlValidation(xmlValidation);
         
         // Add new host
         try {

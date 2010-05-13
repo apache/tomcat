@@ -677,13 +677,13 @@ public class StandardContext extends ContainerBase
     /**
      * Attribute value used to turn on/off XML validation
      */
-     private boolean webXmlValidation = false;
+     private boolean webXmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
      * Attribute value used to turn on/off XML namespace validation
      */
-     private boolean webXmlNamespaceAware = false;
+     private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
 
     /**
      * Attribute value used to turn on/off TLD processing
@@ -693,13 +693,13 @@ public class StandardContext extends ContainerBase
     /**
      * Attribute value used to turn on/off XML validation
      */
-    private boolean tldValidation = false;
+    private boolean tldValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
      * Attribute value used to turn on/off TLD XML namespace validation
      */
-    private boolean tldNamespaceAware = false;
+    private boolean tldNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
