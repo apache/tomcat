@@ -344,8 +344,6 @@ public class HostConfig
                 setCopyXML(((StandardHost) host).isCopyXML());
                 setDeployXML(((StandardHost) host).isDeployXML());
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
-                setXmlNamespaceAware(((StandardHost) host).getXmlNamespaceAware());
-                setXmlValidation(((StandardHost) host).getXmlValidation());
             }
         } catch (ClassCastException e) {
             log.error(sm.getString("hostConfig.cce", event.getLifecycle()), e);

@@ -191,10 +191,10 @@
       </attribute>
 
       <attribute name="override" required="false">
-        <p>Set to <code>true</code> to have explicit settings in this
-        Context element override any corresponding settings in either the global
+        <p>Set to <code>true</code> to ignore any settings in both the global
         or <a href="host.html">Host</a> default contexts.  By default, settings
-        from a default context will be used.</p>
+        from a default context will be used but may be overridden by a setting
+        the same attribute explicitly for the Context.</p>
         <p>If a symbolic link is used for docBase then changes to the
         symbolic link will only be effective after a Tomcat restart or
         by undeploying and redeploying the context. A context reload is not
@@ -255,6 +255,29 @@
         file.</p>
       </attribute>
       
+      <attribute name="tldNamespaceAware" required="false">
+        <p>If the value of this flag is <code>true</code>, the TLD files
+        XML validation will be namespace-aware.  If you turn this flag on,
+        you should probably also turn <code>tldValidation</code> on. If the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <a href="systemprops.html">system property</a> is set to
+        <code>true</code>, the default value of this attribute will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        Setting this attribute to <code>true</code> will incur a performance
+        penalty.</p>
+      </attribute>
+
+      <attribute name="tldValidation" required="false">
+        <p>If the value of this flag is <code>true</code>, the TLD files
+        will be XML validated on context startup. If the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <a href="systemprops.html">system property</a> is set to
+        <code>true</code>, the default value of this attribute will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        Setting this attribute to <code>true</code> will incur a performance
+        penalty.</p>
+      </attribute>
+
       <attribute name="wrapperClass" required="false">
         <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
         implementation class that will be used for servlets managed by this
@@ -267,7 +290,31 @@
           <code>true</code>.</p>
       </attribute>
       
+      <attribute name="xmlNamespaceAware" required="false">
+        <p>If the value of this flag is <code>true</code>, the validation of
+        XML files will be namespace-aware.  If you turn this flag on,
+        you should probably also turn <code>xmlValidation</code> on. If
+        the <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <a href="systemprops.html">system property</a> is set to
+        <code>true</code>, the default value of this attribute will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        Setting this attribute to <code>true</code> will incur a performance
+        penalty.</p>
+      </attribute>
 
+      <attribute name="xmlValidation" required="false">
+        <p>If the value of this flag is <code>true</code>, the XML files
+        will be validated on context startup. If the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <a href="systemprops.html">system property</a> is set to
+        <code>true</code>, the default value of this attribute will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        Setting this attribute to <code>true</code> will incur a performance
+        penalty.</p>
+      </attribute>
+
+
+      
     </attributes>
 
   </subsection>
@@ -407,22 +454,6 @@
         System.out and System.err by the web application will be redirected to
         the web application logger. If not specified, the default value
         of the flag is <code>false</code>.</p>
-      </attribute>
-
-      <attribute name="tldNamespaceAware" required="false">
-        <p>If the value of this flag is <code>true</code>, the TLD files
-        XML validation will be namespace-aware.  If you turn this flag on,
-        you should probably also turn <code>tldValidation</code> on.  The
-        default value for this flag is <code>false</code>, and setting it
-        to true will incur a performance penalty.
-        </p>
-      </attribute>
-
-      <attribute name="tldValidation" required="false">
-        <p>If the value of this flag is <code>true</code>, the TLD files
-        will be XML validated on context startup.  The default value for
-        this flag is <code>false</code>, and setting it to true will incur
-        a performance penalty.</p>
       </attribute>
 
       <attribute name="unloadDelay" required="false">
