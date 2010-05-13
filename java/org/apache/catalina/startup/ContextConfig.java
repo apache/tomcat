@@ -482,6 +482,7 @@ public class ContextConfig
             }
             webDigester = webDigesters[1];
             webFragmentDigester = webFragmentDigesters[1];
+            
         } else if (namespaceAware && !validation) {
             if (webDigesters[2] == null) {
                 webDigesters[2] = DigesterFactory.newDigester(validation,
@@ -491,12 +492,13 @@ public class ContextConfig
             }
             webDigester = webDigesters[2];
             webFragmentDigester = webFragmentDigesters[2];
+            
         } else {
             if (webDigesters[3] == null) {
                 webDigesters[3] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webFragmentRuleSet);
-                webFragmentDigesters[3] = DigesterFactory.newDigester(validation,
                         namespaceAware, webRuleSet);
+                webFragmentDigesters[3] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
             }
             webDigester = webDigesters[3];
             webFragmentDigester = webFragmentDigesters[3];
