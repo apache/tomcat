@@ -58,7 +58,9 @@ public class SessionUtils {
     private static final String[] LOCALE_TEST_ATTRIBUTES = new String[] {
         STRUTS_LOCALE_KEY, SPRING_LOCALE_KEY, JSTL_LOCALE_KEY, "Locale", "java.util.Locale" };
     /**
-     * Lower and upper-case strings will be dynamically generated. Put mid-capitalised strings here!
+     * For efficient operation, list the attributes here with the typically used
+     * capitalisation. This will be tried first and then the auto-generated
+     * upper and lower case versions will be tried.
      */
     private static final String[] USER_TEST_ATTRIBUTES = new String[] {
         "Login", "User", "userName", "UserName", "Utilisateur",
