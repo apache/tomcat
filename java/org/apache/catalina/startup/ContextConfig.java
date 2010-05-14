@@ -1171,7 +1171,7 @@ public class ContextConfig
      * web.xml file.
      */
     protected void webConfig() {
-        WebXml webXml = new WebXml();
+        WebXml webXml = createWebXml();
 
         // Parse global web.xml if present
         InputSource globalWebXml = getGlobalWebXmlSource();
@@ -1281,7 +1281,10 @@ public class ContextConfig
         }
     }
 
-    
+    protected WebXml createWebXml() {
+        return new WebXml();
+    }
+
     /**
      * Scan JARs for ServletContainerInitializer implementations.
      * Implementations will be added in web-fragment.xml priority order.
