@@ -2101,6 +2101,8 @@ public class WebXml {
                     WebXml fragment = fragments.get(requestedName);
                     if (fragment != null) {
                         orderedFragments.add(fragment);
+                    } else {
+                        log.warn(sm.getString("webXml.wrongFragmentName",requestedName));
                     }
                 }
             }

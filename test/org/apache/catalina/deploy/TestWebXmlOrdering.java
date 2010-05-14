@@ -144,6 +144,14 @@ public class TestWebXmlOrdering extends TestCase {
         assertFalse(iter.hasNext());
     }
 
+    public void testWebFragmentsAbsoluteWrongFragmentName() {
+        app.addAbsoluteOrdering("a");
+        app.addAbsoluteOrdering("z");
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        assertEquals(1,ordered.size());
+        assertEquals(fragments.get("a"),ordered.toArray()[0]);
+    }
+    
     public void testOrderWebFragmentsAbsoluteOthersEnd() {
         app.addAbsoluteOrdering("b");
         app.addAbsoluteOrdering("d");
