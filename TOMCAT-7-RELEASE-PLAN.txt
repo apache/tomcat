@@ -27,8 +27,7 @@
 
 3. Implement all the new Servlet 3 features
    NOTE: Status is based on a review of the specification, not the TCK tests
-   - Sections 1 to 15
-   - Strict spec compliance requires deployment descriptor validation
+   - Done
 
 4. Do an initial release (from trunk)
    - Create tc7.0.x\tags to hold release tags - Done

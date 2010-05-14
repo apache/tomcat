@@ -17,10 +17,13 @@
 
 package org.apache.tomcat.util.net;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
@@ -35,6 +38,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
+
 
 /**
  * APR tailored thread pool, providing the following services:
@@ -759,7 +763,29 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(long socket, SocketStatus status) {
         try {
-            getExecutor().execute(new SocketEventProcessor(socket, status));
+            if (status == SocketStatus.OPEN || status == SocketStatus.STOP ||
+                    status == SocketStatus.TIMEOUT) {
+                SocketEventProcessor proc =
+                    new SocketEventProcessor(socket, status);
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                try {
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                getClass().getClassLoader());
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(
+                                getClass().getClassLoader());
+                    }                
+                    getExecutor().execute(proc);
+                } finally {
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(loader);
+                    }
+                }            }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -1481,5 +1507,17 @@ public class AprEndpoint extends AbstractEndpoint {
         
     }
     
-    
+    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }    
 }
