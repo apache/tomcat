@@ -66,6 +66,19 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void setAppContextProtection(boolean appContextProtection) {
         this.appContextProtection = appContextProtection;
     }
+    
+    /**
+     * Protect against the memory leak caused when the first call to
+     * <code>sun.misc.GC.requestLatency(long)</code> is triggered by a web
+     * application. This first call will start a GC Daemon thread with the
+     * thread's context class loader configured to be the web application class
+     * loader. Defaults to <code>true</code>.
+     */
+    private boolean gcDaemonProtection = true;
+    public boolean isGcDaemonProtection() { return gcDaemonProtection; }
+    public void setGcDaemonProtection(boolean gcDaemonProtection) {
+        this.gcDaemonProtection = gcDaemonProtection;
+    }
 
     /**
      * Protect against resources being read for JAR files and, as a side-effect,
@@ -92,19 +105,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         this.xmlParsingProtection = xmlParsingProtection;
     }
     
-    /**
-     * Protect against the memory leak caused when the first call to
-     * <code>sun.misc.GC.requestLatency(long)</code> is triggered by a web
-     * application. This first call will start a GC Daemon thread with the
-     * thread's context class loader configured to be the web application class
-     * loader. Defaults to <code>true</code>.
-     */
-    private boolean gcDaemonProtection = true;
-    public boolean isGcDaemonProtection() { return gcDaemonProtection; }
-    public void setGcDaemonProtection(boolean gcDaemonProtection) {
-        this.gcDaemonProtection = gcDaemonProtection;
-    }
-    
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
@@ -126,6 +126,41 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
             // issue.
             if (appContextProtection) {
                 ImageIO.getCacheDirectory();
+            }
+            
+            /*
+             * Several components end up calling:
+             * sun.misc.GC.requestLatency(long)
+             * 
+             * Those libraries / components known to trigger memory leaks due to
+             * eventual calls to requestLatency(long) are:
+             * - javax.management.remote.rmi.RMIConnectorServer.start()
+             */
+            if (gcDaemonProtection) {
+                try {
+                    Class<?> clazz = Class.forName("sun.misc.GC");
+                    Method method = clazz.getDeclaredMethod("requestLatency",
+                            new Class[] {long.class});
+                    method.invoke(null, Long.valueOf(3600000));
+                } catch (ClassNotFoundException e) {
+                    if (System.getProperty("java.vendor").startsWith("Sun")) {
+                        log.error(sm.getString(
+                                "jreLeakListener.gcDaemonFail"), e);
+                    } else {
+                        log.debug(sm.getString(
+                                "jreLeakListener.gcDaemonFail"), e);
+                    }
+                } catch (SecurityException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (NoSuchMethodException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (IllegalArgumentException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (IllegalAccessException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                } catch (InvocationTargetException e) {
+                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                }
             }
             
             /*
@@ -168,41 +203,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                     factory.newDocumentBuilder();
                 } catch (ParserConfigurationException e) {
                     log.error(sm.getString("jreLeakListener.xmlParseFail"), e);
-                }
-            }
-            
-            /*
-             * Several components end up calling:
-             * sun.misc.GC.requestLatency(long)
-             * 
-             * Those libraries / components known to trigger memory leaks due to
-             * eventual calls to requestLatency(long) are:
-             * - javax.management.remote.rmi.RMIConnectorServer.start()
-             */
-            if (gcDaemonProtection) {
-                try {
-                    Class<?> clazz = Class.forName("sun.misc.GC");
-                    Method method = clazz.getDeclaredMethod("requestLatency",
-                            new Class[] {long.class});
-                    method.invoke(null, Long.valueOf(3600000));
-                } catch (ClassNotFoundException e) {
-                    if (System.getProperty("java.vendor").startsWith("Sun")) {
-                        log.error(sm.getString(
-                                "jreLeakListener.gcDaemonFail"), e);
-                    } else {
-                        log.debug(sm.getString(
-                                "jreLeakListener.gcDaemonFail"), e);
-                    }
-                } catch (SecurityException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (NoSuchMethodException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (IllegalArgumentException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (IllegalAccessException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (InvocationTargetException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
                 }
             }
         }
