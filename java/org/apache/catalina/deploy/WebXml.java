@@ -168,7 +168,6 @@ public class WebXml {
     private String publicId = null;
     public String getPublicId() { return publicId; }
     public void setPublicId(String publicId) {
-        this.publicId = publicId;
         // Update major and minor version
         if (publicId == null) {
             // skip
@@ -178,22 +177,30 @@ public class WebXml {
                 equalsIgnoreCase(publicId)) {
             majorVersion = 3;
             minorVersion = 0;
+            this.publicId = publicId;
         } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_25.
                 equalsIgnoreCase(publicId)) {
             majorVersion = 2;
             minorVersion = 5;
+            this.publicId = publicId;
         } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_24.
                 equalsIgnoreCase(publicId)) {
             majorVersion = 2;
             minorVersion = 4;
+            this.publicId = publicId;
         } else if (org.apache.catalina.startup.Constants.WebDtdPublicId_23.
                 equalsIgnoreCase(publicId)) {
             majorVersion = 2;
             minorVersion = 3;
+            this.publicId = publicId;
         } else if (org.apache.catalina.startup.Constants.WebDtdPublicId_22.
                 equalsIgnoreCase(publicId)) {
             majorVersion = 2;
             minorVersion = 2;
+            this.publicId = publicId;
+        } else if ("datatypes".equals(publicId)) {
+            // Will occur when validation is enabled and dependencies are
+            // traced back. Ignore it.
         } else {
             // Unrecognised publicId
             log.warn(sm.getString("webxml.unrecognisedPublicId", publicId));
