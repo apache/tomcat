@@ -20,6 +20,8 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
@@ -126,8 +128,14 @@ final class StandardHostValve
         if( context.getLoader() != null ) {
             // Not started - it should check for availability first
             // This should eventually move to Engine, it's generic.
-            Thread.currentThread().setContextClassLoader
-                    (context.getLoader().getClassLoader());
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                        context.getLoader().getClassLoader());
+                AccessController.doPrivileged(pa);                
+            } else {
+                Thread.currentThread().setContextClassLoader
+                        (context.getLoader().getClassLoader());
+            }
         }
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(context.getPipeline().isAsyncSupported());
@@ -155,8 +163,14 @@ final class StandardHostValve
         }
 
         // Restore the context classloader
-        Thread.currentThread().setContextClassLoader
-            (StandardHostValve.class.getClassLoader());
+        if (Globals.IS_SECURITY_ENABLED) {
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                    StandardHostValve.class.getClassLoader());
+            AccessController.doPrivileged(pa);                
+        } else {
+            Thread.currentThread().setContextClassLoader
+                    (StandardHostValve.class.getClassLoader());
+        }
 
     }
 
@@ -449,5 +463,18 @@ final class StandardHostValve
 
     }
 
+    
+    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
 }
