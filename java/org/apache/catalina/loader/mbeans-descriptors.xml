@@ -132,6 +132,11 @@
                  type="java.lang.String"
             writeable="false"/>
 
+    <attribute   name="contextName"
+          description="Name of the webapp context"
+                 type="java.lang.String"
+            writeable="false"/>
+
     <attribute   name="delegate"
           description="The 'follow standard delegation model' flag that will be
                        used to configure our ClassLoader"
