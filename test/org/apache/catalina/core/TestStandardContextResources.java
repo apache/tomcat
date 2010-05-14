@@ -29,8 +29,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.deploy.WebXml;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardContextResources extends TomcatBaseTest {
@@ -70,6 +74,61 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceE.jsp in the web application</p>");
     }
 
+    public void testResourcesAbsoluteOrdering() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0-fragments");
+        // app dir is relative to server home
+        StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
+                appDir.getAbsolutePath());
+        LifecycleListener[] listener = ctx.findLifecycleListeners();
+        assertEquals(3,listener.length);
+        assertTrue(listener[1] instanceof ContextConfig);
+        ContextConfig config = new ContextConfig() {
+            protected WebXml createWebXml() {
+                WebXml wxml = new WebXml();
+                wxml.addAbsoluteOrdering("resources");
+                wxml.addAbsoluteOrdering("resources2");
+                return wxml;
+            }
+        };
+        // prevent it from looking ( if it finds one - it'll have dup error )
+        config.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
+        listener[1] = config;
+        Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
+        ctx.addServletMapping("/getresource", "getresource");
+
+        tomcat.start();
+        assertPageContains("/test/getresource?path=/resourceF.jsp",
+        "<p>resourceF.jsp in resources2.jar</p>");
+        assertPageContains("/test/getresource?path=/resourceB.jsp",
+        "<p>resourceB.jsp in resources.jar</p>");
+
+        ctx.stop();
+        
+        LifecycleListener[] listener1 = ctx.findLifecycleListeners();
+        // change ordering and reload
+        ContextConfig config1 = new ContextConfig() {
+            protected WebXml createWebXml() {
+                WebXml wxml = new WebXml();
+                wxml.addAbsoluteOrdering("resources2");
+                wxml.addAbsoluteOrdering("resources");
+                return wxml;
+            }
+        };
+        // prevent it from looking ( if it finds one - it'll have dup error )
+        config1.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
+        listener1[1] = config1;
+
+        ctx.start();
+        
+        assertPageContains("/test/getresource?path=/resourceF.jsp",
+        "<p>resourceF.jsp in resources2.jar</p>");
+        assertPageContains("/test/getresource?path=/resourceB.jsp",
+        "<p>resourceB.jsp in resources2.jar</p>");
+ 
+    }
+    
     public void testResources2() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -77,7 +136,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
-
+        
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
         ctx.addServletMapping("/getresource", "getresource");
 
