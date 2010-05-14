@@ -81,6 +81,21 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
 
     /**
+     * Protect against the memory leak, when the initialization of the
+     * Java Cryptography Architecture is triggered by initializing
+     * a MessageDigest during web application deployment.
+     * This will occasionally start a Token Poller thread with the thread's
+     * context class loader equal to the web application class loader.
+     * Instead we initialize JCA early.
+     * Defaults to <code>true</code>.
+     */
+    private boolean tokenPollerProtection = true;
+    public boolean isTokenPollerProtection() { return tokenPollerProtection; }
+    public void setTokenPollerProtection(boolean tokenPollerProtection) {
+        this.tokenPollerProtection = tokenPollerProtection;
+    }
+
+    /**
      * Protect against resources being read for JAR files and, as a side-effect,
      * the JAR file becoming locked. Note this disables caching for all
      * {@link URLConnection}s, regardless of type. Defaults to
@@ -161,6 +176,18 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 } catch (InvocationTargetException e) {
                     log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
                 }
+            }
+            
+            /*
+             * Creating a MessageDigest during web application startup
+             * initializes the Java Cryptography Architecture. Under certain
+             * conditions this starts a Token poller thread with TCCL equal
+             * to the web application class loader.
+             * 
+             * Instead we initialize JCA right now.
+             */
+            if (tokenPollerProtection) {
+                java.security.Security.getProviders();
             }
             
             /*
