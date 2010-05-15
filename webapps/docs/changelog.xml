@@ -213,6 +213,10 @@
         CSRF protection was added to the Manager and Host Manager applications.
         (markt)
       </add>
+      <add>
+        List array elements in the JMX proxy output of the Manager application.
+        (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Extras">
