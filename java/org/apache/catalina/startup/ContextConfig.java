@@ -107,6 +107,9 @@ public class ContextConfig
     implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog( ContextConfig.class );
+    
+    private static final String SCI_LOCATION =
+        "META-INF/services/javax.servlet.ServletContainerInitializer";
 
     // ----------------------------------------------------- Instance Variables
 
@@ -1293,23 +1296,32 @@ public class ContextConfig
             Set<WebXml> fragments) {
         
         for (WebXml fragment : fragments) {
-            URL jarUrl = fragment.getURL();
+            URL url = fragment.getURL();
             JarFile jarFile = null;
             InputStream is = null;
             ServletContainerInitializer sci = null;
             try {
-                JarURLConnection conn =
-                    (JarURLConnection) jarUrl.openConnection();
-                jarFile = conn.getJarFile();   
-                ZipEntry entry = jarFile.getEntry(
-                        "META-INF/services/javax.servlet.ServletContainerInitializer");
-                if (entry != null) {
-                    is = jarFile.getInputStream(entry);
+                if ("jar".equals(url.getProtocol())) {
+                    JarURLConnection conn =
+                        (JarURLConnection) url.openConnection();
+                    jarFile = conn.getJarFile();
+                    ZipEntry entry = jarFile.getEntry(SCI_LOCATION);
+                    if (entry != null) {
+                        is = jarFile.getInputStream(entry);
+                    }
+                } else if ("file".equals(url.getProtocol())) {
+                    String path = url.getPath();
+                    File file = new File(path, SCI_LOCATION);
+                    if (file.exists()) {
+                        is = new FileInputStream(file);
+                    }
+                }
+                if (is != null) {
                     sci = getServletContainerInitializer(is);
                 }
             } catch (IOException ioe) {
                 log.error(sm.getString(
-                        "contextConfig.servletContainerInitializerFail", jarUrl,
+                        "contextConfig.servletContainerInitializerFail", url,
                         context.getPath()));
                 return false;
             } finally {
@@ -1412,18 +1424,21 @@ public class ContextConfig
      */
     protected void processResourceJARs(Set<WebXml> fragments) {
         for (WebXml fragment : fragments) {
-            URL jarUrl = fragment.getURL();
+            URL url = fragment.getURL();
             JarFile jarFile = null;
             try {
-                JarURLConnection conn =
-                    (JarURLConnection) jarUrl.openConnection();
-                jarFile = conn.getJarFile();   
-                ZipEntry entry = jarFile.getEntry("META-INF/resources/");
-                if (entry != null) {
-                    context.addResourceJarUrl(jarUrl);
+                // Note: Ignore file URLs for now since only jar URLs will be accepted
+                if ("jar".equals(url.getProtocol())) {
+                    JarURLConnection conn =
+                        (JarURLConnection) url.openConnection();
+                    jarFile = conn.getJarFile();   
+                    ZipEntry entry = jarFile.getEntry("META-INF/resources/");
+                    if (entry != null) {
+                        context.addResourceJarUrl(url);
+                    }
                 }
             } catch (IOException ioe) {
-                log.error(sm.getString("contextConfig.resourceJarFail", jarUrl,
+                log.error(sm.getString("contextConfig.resourceJarFail", url,
                         context.getPath()));
             } finally {
                 if (jarFile != null) {
