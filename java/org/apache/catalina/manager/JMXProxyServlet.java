@@ -21,6 +21,7 @@ package org.apache.catalina.manager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Set;
 import javax.management.MBeanServer;
@@ -169,6 +170,7 @@ public class JMXProxyServlet extends HttpServlet  {
                     if( ! attrs[i].isReadable() ) continue;
                     if( ! isSupported( attrs[i].getType() )) continue;
                     String attName=attrs[i].getName();
+                    if( "modelerType".equals( attName)) continue;
                     if( attName.indexOf( "=") >=0 ||
                             attName.indexOf( ":") >=0 ||
                             attName.indexOf( " ") >=0 ) {
@@ -183,9 +185,43 @@ public class JMXProxyServlet extends HttpServlet  {
                         continue;
                     }
                     if( value==null ) continue;
-                    if( "modelerType".equals( attName)) continue;
-                    String valueString=value.toString();
-                    writer.println( attName + ": " + escape(valueString));
+                    String valueString;
+                    try {
+                        Class c = value.getClass();
+                        if (c.isArray()) {
+                            int len = Array.getLength(value);
+                            StringBuilder sb = new StringBuilder("Array[" +
+                                    c.getComponentType().getName() + "] of length " + len);
+                            if (len > 0) {
+                                sb.append("\r\n");
+                            }
+                            for (int j = 0; j < len; j++) {
+                                sb.append("\t");
+                                Object item = Array.get(value, j);
+                                if (item == null) {
+                                    sb.append("NULL VALUE");
+                                } else {
+                                    try {
+                                        sb.append(escape(item.toString()));
+                                    }
+                                    catch (Throwable t) {
+                                        sb.append("NON-STRINGABLE VALUE");
+                                    }
+                                }
+                                if (j < len - 1) {
+                                    sb.append("\r\n");
+                                }
+                            }
+                            valueString = sb.toString();
+                        }
+                        else {
+                            valueString = escape(value.toString());
+                        }
+                        writer.println( attName + ": " + valueString);
+                    }
+                    catch (Throwable t) {
+                        // Ignore
+                    }
                 }
             } catch (Exception e) {
                 // Ignore
