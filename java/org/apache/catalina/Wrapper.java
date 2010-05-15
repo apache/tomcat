@@ -50,6 +50,15 @@ import javax.servlet.UnavailableException;
 
 public interface Wrapper extends Container {
 
+    /**
+     * Container event for adding a wrapper.
+     */
+    public static final String ADD_MAPPING_EVENT = "addMapping";
+    
+    /**
+     * Container event for removing a wrapper.
+     */
+    public static final String REMOVE_MAPPING_EVENT = "removeMapping";
 
     // ------------------------------------------------------------- Properties
 
