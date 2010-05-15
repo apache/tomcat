@@ -759,7 +759,7 @@ public class StandardWrapper extends ContainerBase
         synchronized (mappings) {
             mappings.add(mapping);
         }
-        fireContainerEvent("addMapping", mapping);
+        fireContainerEvent(ADD_MAPPING_EVENT, mapping);
 
     }
 
@@ -1246,7 +1246,7 @@ public class StandardWrapper extends ContainerBase
         synchronized (mappings) {
             mappings.remove(mapping);
         }
-        fireContainerEvent("removeMapping", mapping);
+        fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
 
     }
 
