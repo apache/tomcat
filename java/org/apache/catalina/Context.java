@@ -70,6 +70,20 @@ public interface Context extends Container {
      */
     public static final String RELOAD_EVENT = "reload";
 
+    /**
+     * Container event for adding a welcome file.
+     */
+    public static final String ADD_WELCOME_FILE_EVENT = "addWelcomeFile";
+    
+    /**
+     * Container event for removing a wrapper.
+     */
+    public static final String REMOVE_WELCOME_FILE_EVENT = "removeWelcomeFile";
+
+    /**
+     * Container event for clearing welcome files.
+     */
+    public static final String  CLEAR_WELCOME_FILES_EVENT = "clearWelcomeFiles";
 
     // ------------------------------------------------------------- Properties
 
