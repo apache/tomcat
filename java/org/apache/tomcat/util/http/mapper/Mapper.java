@@ -547,7 +547,116 @@ public final class Mapper {
     }
 
 
-
+    /**
+     * Add a welcome file to the given context.
+     * 
+     * @param hostName
+     * @param contextPath
+     * @param welcomeFile
+     */
+    public void addWelcomeFile(String hostName, String contextPath,
+            String welcomeFile) {
+        Host[] hosts = this.hosts;
+        int pos = find(hosts, hostName);
+        if (pos < 0) {
+            return;
+        }
+        Host host = hosts[pos];
+        if (host.name.equals(hostName)) {
+            Context[] contexts = host.contextList.contexts;
+            int pos2 = find(contexts, contextPath);
+            if( pos2<0 ) {
+                log.error("No context found: " + contextPath );
+                return;
+            }
+            Context context = contexts[pos2];
+            if (context.name.equals(contextPath)) {
+                int len = context.welcomeResources.length + 1;
+                String[] newWelcomeResources = new String[len];
+                System.arraycopy(context.welcomeResources, 0,
+                        newWelcomeResources, 0, len - 1);
+                newWelcomeResources[len - 1] = welcomeFile;
+                context.welcomeResources = newWelcomeResources;
+            }
+        }
+    }
+    
+    
+    /**
+     * Remove a welcome file from the given context.
+     * 
+     * @param hostName
+     * @param contextPath
+     * @param welcomeFile
+     */
+    public void removeWelcomeFile(String hostName, String contextPath,
+            String welcomeFile) {
+        Host[] hosts = this.hosts;
+        int pos = find(hosts, hostName);
+        if (pos < 0) {
+            return;
+        }
+        Host host = hosts[pos];
+        if (host.name.equals(hostName)) {
+            Context[] contexts = host.contextList.contexts;
+            int pos2 = find(contexts, contextPath);
+            if( pos2<0 ) {
+                log.error("No context found: " + contextPath );
+                return;
+            }
+            Context context = contexts[pos2];
+            if (context.name.equals(contextPath)) {
+                int match = -1;
+                for (int i = 0; i < context.welcomeResources.length; i++) {
+                    if (welcomeFile.equals(context.welcomeResources[i])) {
+                        match = i;
+                        break;
+                    }
+                }
+                if (match > -1) {
+                    int len = context.welcomeResources.length - 1;
+                    String[] newWelcomeResources = new String[len];
+                    System.arraycopy(context.welcomeResources, 0,
+                            newWelcomeResources, 0, match);
+                    if (match < len) {
+                        System.arraycopy(context.welcomeResources, match + 1,
+                                newWelcomeResources, match, len - match);
+                    }
+                    context.welcomeResources = newWelcomeResources;
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Clear the welcome files for the given context.
+     * 
+     * @param hostName
+     * @param contextPath
+     */
+    public void clearWelcomeFiles(String hostName, String contextPath) {
+        Host[] hosts = this.hosts;
+        int pos = find(hosts, hostName);
+        if (pos < 0) {
+            return;
+        }
+        Host host = hosts[pos];
+        if (host.name.equals(hostName)) {
+            Context[] contexts = host.contextList.contexts;
+            int pos2 = find(contexts, contextPath);
+            if( pos2<0 ) {
+                log.error("No context found: " + contextPath );
+                return;
+            }
+            Context context = contexts[pos2];
+            if (context.name.equals(contextPath)) {
+                context.welcomeResources = new String[0];
+            }
+        }
+    }
+    
+    
     /**
      * Map the specified host name and URI, mutating the given mapping data.
      *

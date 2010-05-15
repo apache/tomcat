@@ -2840,6 +2840,7 @@ public class StandardContext extends ContainerBase
             // Welcome files from the application deployment descriptor
             // completely replace those from the default conf/web.xml file
             if (replaceWelcomeFiles) {
+                fireContainerEvent(CLEAR_WELCOME_FILES_EVENT, null);
                 welcomeFiles = new String[0];
                 setReplaceWelcomeFiles(false);
             }
@@ -2850,7 +2851,7 @@ public class StandardContext extends ContainerBase
             welcomeFiles = results;
         }
         postWelcomeFiles();
-        fireContainerEvent("addWelcomeFile", name);
+        fireContainerEvent(ADD_WELCOME_FILE_EVENT, name);
 
     }
 
@@ -3903,7 +3904,7 @@ public class StandardContext extends ContainerBase
 
         // Inform interested listeners
         postWelcomeFiles();
-        fireContainerEvent("removeWelcomeFile", name);
+        fireContainerEvent(REMOVE_WELCOME_FILE_EVENT, name);
 
     }
 
