@@ -753,13 +753,7 @@ public class CoyoteAdapter implements Adapter {
 
         for (int i = 0; i < count; i++) {
             ServerCookie scookie = serverCookies.getCookie(i);
-            String scName;
-            if (context == null) {
-                scName = Globals.SESSION_COOKIE_NAME;
-            } else {
-                scName = context.getSessionCookieName();
-            }
-            if (scookie.getName().equals(scName)) {
+            if (scookie.getName().equals(sessionCookieName)) {
                 // Override anything requested in the URL
                 if (!request.isRequestedSessionIdFromCookie()) {
                     // Accept only the first session id cookie
