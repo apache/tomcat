@@ -294,15 +294,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * remove a configured property.
-     */
-    public void removeProperty(String name) {
-        // FIXME !
-        //protocolHandler.removeAttribute(name);
-    }
-
-
-    /**
      * Return the <code>Service</code> with which we are associated (if any).
      */
     public Service getService() {
@@ -573,7 +564,6 @@ public class Connector extends LifecycleMBeanBase  {
             setProperty("proxyName", proxyName);
         } else {
             this.proxyName = null;
-            removeProperty("proxyName");
         }
 
     }

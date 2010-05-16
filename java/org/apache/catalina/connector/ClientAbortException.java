@@ -30,9 +30,10 @@ import java.io.IOException;
 
 public final class ClientAbortException extends IOException {
 
+    private static final long serialVersionUID = 1L;
 
+    
     //------------------------------------------------------------ Constructors
-
 
     /**
      * Construct a new ClientAbortException with no other information.
