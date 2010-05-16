@@ -265,22 +265,6 @@ public final class Globals {
 
     
     /**
-     * The name of the cookie used to pass the session identifier back
-     * and forth with the client.
-     */
-    public static final String SESSION_COOKIE_NAME = "JSESSIONID";
-
-
-    /**
-     * The name of the path parameter used to pass the session identifier
-     * back and forth with the client.
-     */
-    public static final String SESSION_PARAMETER_NAME =
-        System.getProperty("org.apache.catalina.SESSION_PARAMETER_NAME",
-                "jsessionid");
-
-
-    /**
      * The servlet context attribute under which we store a flag used
      * to mark this request as having been processed by the SSIServlet.
      * We do this because of the pathInfo mangling happening when using

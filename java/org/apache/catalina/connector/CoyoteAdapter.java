@@ -103,13 +103,6 @@ public class CoyoteAdapter implements Adapter {
 
 
     /**
-     * The match string for identifying a session ID parameter.
-     */
-    private static final String match =
-        ";" + Globals.SESSION_PARAMETER_NAME + "=";
-
-
-    /**
      * The string manager for this package.
      */
     protected static final StringManager sm =
@@ -503,55 +496,37 @@ public class CoyoteAdapter implements Adapter {
             req.serverName().setString(proxyName);
         }
 
-        // Parse session Id before decoding / removal of path params
-        parseSessionId(req, request);
-
-        // URI decoding
+        // Copy the raw URI to the decodedURI
         MessageBytes decodedURI = req.decodedURI();
         decodedURI.duplicate(req.requestURI());
-
-        if (decodedURI.getType() == MessageBytes.T_BYTES) {
-            // Remove any path parameters
-            ByteChunk uriBB = decodedURI.getByteChunk();
-            int semicolon = uriBB.indexOf(';', 0);
-            if (semicolon > 0) {
-                decodedURI.setBytes
-                    (uriBB.getBuffer(), uriBB.getStart(), semicolon);
-            }
-            // %xx decoding of the URL
-            try {
-                req.getURLDecoder().convert(decodedURI, false);
-            } catch (IOException ioe) {
-                res.setStatus(400);
-                res.setMessage("Invalid URI: " + ioe.getMessage());
-                return false;
-            }
-            // Normalization
-            if (!normalize(req.decodedURI())) {
-                res.setStatus(400);
-                res.setMessage("Invalid URI");
-                return false;
-            }
-            // Character decoding
-            convertURI(decodedURI, request);
-            // Check that the URI is still normalized
-            if (!checkNormalize(req.decodedURI())) {
-                res.setStatus(400);
-                res.setMessage("Invalid URI character encoding");
-                return false;
-            }
-        } else {
-            // The URL is chars or String, and has been sent using an in-memory
-            // protocol handler, we have to assume the URL has been properly
-            // decoded already
-            decodedURI.toChars();
-            // Remove any path parameters
-            CharChunk uriCC = decodedURI.getCharChunk();
-            int semicolon = uriCC.indexOf(';');
-            if (semicolon > 0) {
-                decodedURI.setChars
-                    (uriCC.getBuffer(), uriCC.getStart(), semicolon);
-            }
+        
+        // Parse the path parameters. This will:
+        //   - strip out the path parameters
+        //   - convert the decodedURI to bytes
+        parsePathParameters(req, request);
+        
+        // URI decoding
+        // %xx decoding of the URL
+        try {
+            req.getURLDecoder().convert(decodedURI, false);
+        } catch (IOException ioe) {
+            res.setStatus(400);
+            res.setMessage("Invalid URI: " + ioe.getMessage());
+            return false;
+        }
+        // Normalization
+        if (!normalize(req.decodedURI())) {
+            res.setStatus(400);
+            res.setMessage("Invalid URI");
+            return false;
+        }
+        // Character decoding
+        convertURI(decodedURI, request);
+        // Check that the URI is still normalized
+        if (!checkNormalize(req.decodedURI())) {
+            res.setStatus(400);
+            res.setMessage("Invalid URI character encoding");
+            return false;
         }
 
         // Set the remote principal
@@ -621,8 +596,10 @@ public class CoyoteAdapter implements Adapter {
             if (request.isRequestedSessionIdFromURL()) {
                 // This is not optimal, but as this is not very common, it
                 // shouldn't matter
-                redirectPath = redirectPath + ";" + Globals.SESSION_PARAMETER_NAME + "=" 
-                    + request.getRequestedSessionId();
+                redirectPath = redirectPath + ";" +
+                    ApplicationSessionCookieConfig.getSessionUriParamName(
+                            request.getContext()) +
+                    "=" + request.getRequestedSessionId();
             }
             if (query != null) {
                 // This is not optimal, but as this is not very common, it
@@ -634,15 +611,17 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Parse session Id
-        if (!request.getServletContext().getEffectiveSessionTrackingModes()
+        if (request.getServletContext().getEffectiveSessionTrackingModes()
                 .contains(SessionTrackingMode.URL)) {
-            /* 
-             * If we saw an ID in the URL but this is disabled - remove it
-             * Can't handle it when we parse the URL as we don't have the
-             * context at that point
-             */
-            request.setRequestedSessionId(null);
-            request.setRequestedSessionURL(false);
+            
+            // Get the session ID if there was one
+            String sessionID = request.getPathParameter(
+                    ApplicationSessionCookieConfig.getSessionUriParamName(
+                            request.getContext()));
+            if (sessionID != null) {
+                request.setRequestedSessionId(sessionID);
+                request.setRequestedSessionURL(true);
+            }
         }
         parseSessionCookiesId(req, request);
         parseSessionSslId(request);
@@ -650,6 +629,93 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    /**
+     * Extract the path parameters from the request. This assumes parameters are
+     * of the form /path;name=value;name2=value2/ etc. Currently only really
+     * interested in the session ID that will be in this form. Other parameters
+     * can safely be ignored.
+     * 
+     * @param req
+     * @param request
+     */
+    protected void parsePathParameters(org.apache.coyote.Request req,
+            Request request) {
+        
+        // Process in bytes (this is default format so this is normally a NO-OP
+        req.decodedURI().toBytes();
+        
+        ByteChunk uriBC = req.decodedURI().getByteChunk();
+        int semicolon = uriBC.indexOf(';', 0);
+        String enc = null;
+        
+        while (semicolon > -1) {
+            if (enc == null) {
+                // What encoding to use? Some platforms, eg z/os, use a default
+                // encoding that doesn't give the expected result so be explicit
+                enc = connector.getURIEncoding();
+                if (enc == null) {
+                    enc = "ISO-8859-1";
+                }
+            }
+            
+            // Parse path param, and extract it from the decoded request URI
+            int start = uriBC.getStart();
+            int end = uriBC.getEnd();
+
+            int pathParamStart = semicolon + 1;
+            int pathParamEnd = ByteChunk.findChars(uriBC.getBuffer(),
+                    uriBC.getStart() + pathParamStart, uriBC.getEnd(),
+                    new byte[] {';', '/'});
+            
+            String pv = null;
+            boolean warnedEncoding = false;
+            
+            if (pathParamEnd >= 0) {
+                try {
+                    pv = (new String(uriBC.getBuffer(), start + pathParamStart,
+                                pathParamEnd - pathParamStart, enc));
+                } catch (UnsupportedEncodingException e) {
+                    if (!warnedEncoding) {
+                        log.warn(sm.getString("coyoteAdapter.parsePathParam",
+                                enc));
+                        warnedEncoding = true;
+                    }
+                }
+                // Extract path param from decoded request URI
+                byte[] buf = uriBC.getBuffer();
+                for (int i = 0; i < end - start - pathParamEnd; i++) {
+                    buf[start + semicolon + i] 
+                        = buf[start + i + pathParamEnd];
+                }
+                uriBC.setBytes(buf, start,
+                        end - start - pathParamEnd + semicolon);
+            } else {
+                try {
+                    pv = (new String(uriBC.getBuffer(), start + pathParamStart, 
+                                (end - start) - pathParamStart, enc));
+                } catch (UnsupportedEncodingException e) {
+                    if (!warnedEncoding) {
+                        log.warn(sm.getString("coyoteAdapter.parsePathParam",
+                                enc));
+                        warnedEncoding = true;
+                    }
+                }
+                uriBC.setEnd(start + semicolon);
+            }
+            
+            if (pv != null) {
+                int equals = pv.indexOf('=');
+                if (equals > -1) {
+                    request.addPathParameter(pv.substring(0, equals),
+                            pv.substring(equals + 1));
+                }
+            }
+            
+            semicolon = uriBC.indexOf(';', semicolon);
+        }
+    }
+    
+    
     /**
      * Look for SSL session ID if required. Only look for SSL Session ID if it
      * is the only tracking method enabled.
@@ -669,62 +735,6 @@ public class CoyoteAdapter implements Adapter {
     }
     
     
-    /**
-     * Parse session id in URL.
-     */
-    protected void parseSessionId(org.apache.coyote.Request req, Request request) {
-
-        ByteChunk uriBC = req.requestURI().getByteChunk();
-        int semicolon = uriBC.indexOf(match, 0, match.length(), 0);
-
-        if (semicolon > 0) {
-            // What encoding to use? Some platforms, eg z/os, use a default
-            // encoding that doesn't give the expected result so be explicit 
-            String enc = connector.getURIEncoding();
-            if (enc == null) {
-                enc = "ISO-8859-1";
-            }
-
-            // Parse session ID, and extract it from the decoded request URI
-            int start = uriBC.getStart();
-            int end = uriBC.getEnd();
-
-            int sessionIdStart = semicolon + match.length();
-            int semicolon2 = uriBC.indexOf(';', sessionIdStart);
-            try {
-                if (semicolon2 >= 0) {
-                    request.setRequestedSessionId
-                        (new String(uriBC.getBuffer(), start + sessionIdStart,
-                                semicolon2 - sessionIdStart, enc));
-                    // Extract session ID from request URI
-                    byte[] buf = uriBC.getBuffer();
-                    for (int i = 0; i < end - start - semicolon2; i++) {
-                        buf[start + semicolon + i] 
-                            = buf[start + i + semicolon2];
-                    }
-                    uriBC.setBytes(buf, start,
-                            end - start - semicolon2 + semicolon);
-                } else {
-                    request.setRequestedSessionId
-                        (new String(uriBC.getBuffer(), start + sessionIdStart, 
-                                (end - start) - sessionIdStart, enc));
-                    uriBC.setEnd(start + semicolon);
-                }
-                request.setRequestedSessionURL(true);
-            } catch (UnsupportedEncodingException uee) {
-                // Make sure no session ID is returned
-                request.setRequestedSessionId(null);
-                request.setRequestedSessionURL(false);
-                log.warn(sm.getString("coyoteAdapter.parseSession", enc), uee);
-            }
-        } else {
-            request.setRequestedSessionId(null);
-            request.setRequestedSessionURL(false);
-        }
-
-    }
-
-
     /**
      * Parse session id in URL.
      */
