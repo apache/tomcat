@@ -418,10 +418,21 @@ public class Request
     protected Boolean asyncSupported = null;
     
     
+    /**
+     * Path parameters
+     */
+    protected Map<String,String> pathParameters = new HashMap<String, String>();
 
     // --------------------------------------------------------- Public Methods
 
     
+    protected void addPathParameter(String name, String value) {
+        pathParameters.put(name, value);
+    }
+
+    protected String getPathParameter(String name) {
+        return pathParameters.get(name);
+    }
 
     public void setAsyncSupported(boolean asyncSupported) {
         this.asyncSupported = Boolean.valueOf(asyncSupported);
@@ -506,6 +517,7 @@ public class Request
         if (asyncContext!=null) asyncContext.recycle();
         asyncContext = null;
 
+        pathParameters.clear();
     }
 
     protected boolean isProcessing() {

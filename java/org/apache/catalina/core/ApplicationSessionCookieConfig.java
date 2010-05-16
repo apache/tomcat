@@ -21,10 +21,12 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.Cookie;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 
 public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
+    private static final String DEFAULT_SESSION_COOKIE_NAME = "JSESSIONID";
+    private static final String DEFAULT_SESSION_PARAMETER_NAME = "jsessionid";
+    
     private boolean httpOnly;
     private boolean secure;
     private int maxAge = -1;
@@ -160,12 +162,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     }
     
     
-    /**
-     * Determine the name to use for the session cookie for the provided
-     * context.
-     * @param context
-     */
-    public static String getSessionCookieName(Context context) {
+    private static String getConfiguredSessionCookieName(Context context) {
         
         // Priority is:
         // 1. Cookie name defined in context
@@ -184,7 +181,40 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
                 return cookieName;
             }
         }
+
+        return null;
+    }
+    
+    
+    /**
+     * Determine the name to use for the session cookie for the provided
+     * context.
+     * @param context
+     */
+    public static String getSessionCookieName(Context context) {
+    
+        String result = getConfiguredSessionCookieName(context);
         
-        return Globals.SESSION_COOKIE_NAME;
+        if (result == null) {
+            result = DEFAULT_SESSION_COOKIE_NAME; 
+        }
+        
+        return result; 
+    }
+    
+    /**
+     * Determine the name to use for the session cookie for the provided
+     * context.
+     * @param context
+     */
+    public static String getSessionUriParamName(Context context) {
+        
+        String result = getConfiguredSessionCookieName(context);
+        
+        if (result == null) {
+            result = DEFAULT_SESSION_PARAMETER_NAME; 
+        }
+        
+        return result; 
     }
 }
