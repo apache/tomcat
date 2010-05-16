@@ -540,7 +540,7 @@ public class Request
      * Return the Connector through which this Request was received.
      */
     public Connector getConnector() {
-        return (this.connector);
+        return this.connector;
     }
 
     /**
@@ -562,7 +562,7 @@ public class Request
      * Return the Context within which this Request is being processed.
      */
     public Context getContext() {
-        return (this.context);
+        return this.context;
     }
 
 
@@ -588,7 +588,7 @@ public class Request
      * Get filter chain associated with the request.
      */
     public FilterChain getFilterChain() {
-        return (this.filterChain);
+        return this.filterChain;
     }
 
     /**
@@ -636,7 +636,7 @@ public class Request
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     public String getInfo() {
-        return (info);
+        return info;
     }
 
 
@@ -649,7 +649,7 @@ public class Request
      * Return mapping data.
      */
     public MappingData getMappingData() {
-        return (mappingData);
+        return mappingData;
     }
 
 
@@ -666,7 +666,7 @@ public class Request
         if (facade == null) {
             facade = new RequestFacade(this);
         } 
-        return (facade);
+        return facade;
     }
 
 
@@ -679,7 +679,7 @@ public class Request
      * Return the Response with which this Request is associated.
      */
     public org.apache.catalina.connector.Response getResponse() {
-        return (this.response);
+        return this.response;
     }
 
     /**
@@ -732,7 +732,7 @@ public class Request
      * Return the Wrapper within which this Request is being processed.
      */
     public Wrapper getWrapper() {
-        return (this.wrapper);
+        return this.wrapper;
     }
 
 
@@ -783,7 +783,7 @@ public class Request
      * @param name Name of the note to be returned
      */
     public Object getNote(String name) {
-        return (notes.get(name));
+        return notes.get(name);
     }
 
 
@@ -792,7 +792,7 @@ public class Request
      * that exist for this request.
      */
     public Iterator<String> getNoteNames() {
-        return (notes.keySet().iterator());
+        return notes.keySet().iterator();
     }
 
 
@@ -983,7 +983,7 @@ public class Request
      * Return the character encoding for this Request.
      */
     public String getCharacterEncoding() {
-      return (coyoteRequest.getCharacterEncoding());
+      return coyoteRequest.getCharacterEncoding();
     }
 
 
@@ -991,7 +991,7 @@ public class Request
      * Return the content length for this Request.
      */
     public int getContentLength() {
-        return (coyoteRequest.getContentLength());
+        return coyoteRequest.getContentLength();
     }
 
 
@@ -999,7 +999,7 @@ public class Request
      * Return the content type for this Request.
      */
     public String getContentType() {
-        return (coyoteRequest.getContentType());
+        return coyoteRequest.getContentType();
     }
 
 
@@ -1040,10 +1040,9 @@ public class Request
 
         if (locales.size() > 0) {
             return locales.get(0);
-        } else {
-            return (defaultLocale);
         }
 
+        return defaultLocale;
     }
 
 
@@ -1062,7 +1061,7 @@ public class Request
             return (new Enumerator<Locale>(locales));
         ArrayList<Locale> results = new ArrayList<Locale>();
         results.add(defaultLocale);
-        return (new Enumerator<Locale>(results));
+        return new Enumerator<Locale>(results);
 
     }
 
@@ -1187,18 +1186,17 @@ public class Request
     public String getRealPath(String path) {
 
         if (context == null)
-            return (null);
+            return null;
         ServletContext servletContext = context.getServletContext();
-        if (servletContext == null)
-            return (null);
-        else {
-            try {
-                return (servletContext.getRealPath(path));
-            } catch (IllegalArgumentException e) {
-                return (null);
-            }
+        if (servletContext == null) {
+            return null;
         }
 
+        try {
+            return (servletContext.getRealPath(path));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
 
@@ -1293,11 +1291,11 @@ public class Request
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (context == null)
-            return (null);
+            return null;
 
         // If the path is already context-relative, just pass it through
         if (path == null)
-            return (null);
+            return null;
         else if (path.startsWith("/"))
             return (context.getServletContext().getRequestDispatcher(path));
 
@@ -1324,7 +1322,7 @@ public class Request
             relative = requestPath + path;
         }
 
-        return (context.getServletContext().getRequestDispatcher(relative));
+        return context.getServletContext().getRequestDispatcher(relative);
 
     }
 
@@ -1333,7 +1331,7 @@ public class Request
      * Return the scheme used to make this Request.
      */
     public String getScheme() {
-        return (coyoteRequest.scheme().toString());
+        return coyoteRequest.scheme().toString();
     }
 
 
@@ -1341,7 +1339,7 @@ public class Request
      * Return the server name responding to this Request.
      */
     public String getServerName() {
-        return (coyoteRequest.serverName().toString());
+        return coyoteRequest.serverName().toString();
     }
 
 
@@ -1349,7 +1347,7 @@ public class Request
      * Return the server port responding to this Request.
      */
     public int getServerPort() {
-        return (coyoteRequest.getServerPort());
+        return coyoteRequest.getServerPort();
     }
 
 
@@ -1357,7 +1355,7 @@ public class Request
      * Was this request received on a secure connection?
      */
     public boolean isSecure() {
-        return (secure);
+        return secure;
     }
 
 
@@ -1536,10 +1534,18 @@ public class Request
         return startAsync(getRequest(),response.getResponse());
     }
 
-    public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
-        if (!isAsyncSupported()) throw new IllegalStateException("Not supported.");
-        if (asyncContext==null) asyncContext = new AsyncContextImpl(this);
-        else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
+    public AsyncContext startAsync(ServletRequest request,
+            ServletResponse response) {
+        if (!isAsyncSupported()) {
+            throw new IllegalStateException("Not supported.");
+        }
+        
+        if (asyncContext==null) {
+            asyncContext = new AsyncContextImpl(this);
+        } else if (asyncContext.isStarted()) {
+            throw new IllegalStateException("Already started.");
+        }
+        
         asyncContext.setStarted(getContext());
         asyncContext.init(request,response);
         //TODO SERVLET3 - async - need to retrieve the ServletContext here
@@ -1550,26 +1556,31 @@ public class Request
     }
 
     public boolean isAsyncStarted() {
-        if (asyncContext==null) return false;
-        else return asyncContext.isStarted();
+        if (asyncContext == null) {
+            return false;
+        }
+        
+        return asyncContext.isStarted();
     }
 
     public boolean isAsyncDispatching() {
-        if (asyncContext==null) return false;
-        else return (asyncContext.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
-                     asyncContext.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
-                     asyncContext.getState()==AsyncContextImpl.AsyncState.STARTED     ||
-                     asyncContext.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING ||
-                     asyncContext.getState()==AsyncContextImpl.AsyncState.COMPLETING);
+        if (asyncContext == null) {
+            return false;
+        }
+        
+        return (asyncContext.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
+                asyncContext.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
+                asyncContext.getState()==AsyncContextImpl.AsyncState.STARTED     ||
+                asyncContext.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING ||
+                asyncContext.getState()==AsyncContextImpl.AsyncState.COMPLETING);
     }
 
     public boolean isAsyncSupported() {
-        // TODO SERVLET3 - async
-        if (this.asyncSupported==null) { 
+        if (this.asyncSupported == null) { 
             return true;
-        } else {
-            return asyncSupported.booleanValue();
         }
+
+        return asyncSupported.booleanValue();
     }
 
     public AsyncContext getAsyncContext() {
@@ -1577,12 +1588,11 @@ public class Request
     }
 
     public DispatcherType getDispatcherType() {
-        // TODO SERVLET3 - dispatcher
-        if (internalDispatcherType==null) { 
+        if (internalDispatcherType == null) { 
             return DispatcherType.REQUEST;
-        } else {
-            return this.internalDispatcherType;
         }
+
+        return this.internalDispatcherType;
     }
 
     // ---------------------------------------------------- HttpRequest Methods
@@ -1774,7 +1784,7 @@ public class Request
      * @return the URL decoded request URI
      */
     public String getDecodedRequestURI() {
-        return (coyoteRequest.decodedURI().toString());
+        return coyoteRequest.decodedURI().toString();
     }
 
 
@@ -1784,7 +1794,7 @@ public class Request
      * @return the URL decoded request URI
      */
     public MessageBytes getDecodedRequestURIMB() {
-        return (coyoteRequest.decodedURI());
+        return coyoteRequest.decodedURI();
     }
 
 
@@ -1836,7 +1846,7 @@ public class Request
      * Return the authentication type used for this Request.
      */
     public String getAuthType() {
-        return (authType);
+        return authType;
     }
 
 
@@ -1845,7 +1855,7 @@ public class Request
      * of the Request.
      */
     public String getContextPath() {
-        return (mappingData.contextPath.toString());
+        return mappingData.contextPath.toString();
     }
 
 
@@ -1855,7 +1865,7 @@ public class Request
      * @return the context path
      */
     public MessageBytes getContextPathMB() {
-        return (mappingData.contextPath);
+        return mappingData.contextPath;
     }
 
 
@@ -1951,10 +1961,9 @@ public class Request
         String value = getHeader(name);
         if (value == null) {
             return (-1);
-        } else {
-            return (Integer.parseInt(value));
         }
 
+        return Integer.parseInt(value);
     }
 
 
@@ -1970,7 +1979,7 @@ public class Request
      * Return the path information associated with this Request.
      */
     public String getPathInfo() {
-        return (mappingData.pathInfo.toString());
+        return mappingData.pathInfo.toString();
     }
 
 
@@ -1980,7 +1989,7 @@ public class Request
      * @return the path info
      */
     public MessageBytes getPathInfoMB() {
-        return (mappingData.pathInfo);
+        return mappingData.pathInfo;
     }
 
 
@@ -1991,14 +2000,13 @@ public class Request
     public String getPathTranslated() {
 
         if (context == null)
-            return (null);
+            return null;
 
         if (getPathInfo() == null) {
-            return (null);
-        } else {
-            return (context.getServletContext().getRealPath(getPathInfo()));
+            return null;
         }
 
+        return context.getServletContext().getRealPath(getPathInfo());
     }
 
 
@@ -2008,10 +2016,10 @@ public class Request
     public String getQueryString() {
         String queryString = coyoteRequest.queryString().toString();
         if (queryString == null || queryString.equals("")) {
-            return (null);
-        } else {
-            return queryString;
+            return null;
         }
+
+        return queryString;
     }
 
 
@@ -2021,12 +2029,11 @@ public class Request
      */
     public String getRemoteUser() {
 
-        if (userPrincipal != null) {
-            return (userPrincipal.getName());
-        } else {
-            return (null);
+        if (userPrincipal == null) {
+            return null;
         }
-
+     
+        return userPrincipal.getName();
     }
 
 
@@ -2036,7 +2043,7 @@ public class Request
      * @return the request path
      */
     public MessageBytes getRequestPathMB() {
-        return (mappingData.requestPath);
+        return mappingData.requestPath;
     }
 
 
@@ -2044,7 +2051,7 @@ public class Request
      * Return the session identifier included in this request, if any.
      */
     public String getRequestedSessionId() {
-        return (requestedSessionId);
+        return requestedSessionId;
     }
 
 
@@ -2090,8 +2097,7 @@ public class Request
         }
         url.append(getRequestURI());
 
-        return (url);
-
+        return url;
     }
 
 
@@ -2110,7 +2116,7 @@ public class Request
      * @return the servlet path
      */
     public MessageBytes getServletPathMB() {
-        return (mappingData.wrapperPath);
+        return mappingData.wrapperPath;
     }
 
 
@@ -2120,11 +2126,11 @@ public class Request
      */
     public HttpSession getSession() {
         Session session = doGetSession(true);
-        if (session != null) {
-            return session.getSession();
-        } else {
+        if (session == null) {
             return null;
         }
+     
+        return session.getSession();
     }
 
 
@@ -2136,11 +2142,11 @@ public class Request
      */
     public HttpSession getSession(boolean create) {
         Session session = doGetSession(create);
-        if (session != null) {
-            return session.getSession();
-        } else {
+        if (session == null) {
             return null;
         }
+        
+        return session.getSession();
     }
 
 
@@ -2150,11 +2156,11 @@ public class Request
      */
     public boolean isRequestedSessionIdFromCookie() {
 
-        if (requestedSessionId != null)
-            return (requestedSessionCookie);
-        else
-            return (false);
-
+        if (requestedSessionId == null) {
+            return false;
+        }
+            
+        return requestedSessionCookie;
     }
 
 
@@ -2164,11 +2170,11 @@ public class Request
      */
     public boolean isRequestedSessionIdFromURL() {
 
-        if (requestedSessionId != null)
-            return (requestedSessionURL);
-        else
-            return (false);
-
+        if (requestedSessionId == null) {
+            return false;
+        }
+        
+        return requestedSessionURL;
     }
 
 
@@ -2191,24 +2197,31 @@ public class Request
      */
     public boolean isRequestedSessionIdValid() {
 
-        if (requestedSessionId == null)
-            return (false);
-        if (context == null)
-            return (false);
+        if (requestedSessionId == null) {
+            return false;
+        }
+        
+        if (context == null) {
+            return false;
+        }
+        
         Manager manager = context.getManager();
-        if (manager == null)
-            return (false);
+        if (manager == null) {
+            return false;
+        }
+        
         Session session = null;
         try {
             session = manager.findSession(requestedSessionId);
         } catch (IOException e) {
             // Can't find the session 
         }
-        if ((session != null) && session.isValid())
-            return (true);
-        else
-            return (false);
+        
+        if ((session == null) || !session.isValid()) {
+            return false;
+        }
 
+        return true;
     }
 
 
@@ -2222,26 +2235,25 @@ public class Request
 
         // Have we got an authenticated principal at all?
         if (userPrincipal == null)
-            return (false);
+            return false;
 
         // Identify the Realm we will use for checking role assignments
         if (context == null)
-            return (false);
+            return false;
+        
         Realm realm = context.getRealm();
         if (realm == null)
-            return (false);
+            return false;
 
         // Check for a role alias defined in a <security-role-ref> element
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
-            if ((realRole != null) &&
-                realm.hasRole(userPrincipal, realRole))
-                return (true);
+            if ((realRole != null) && realm.hasRole(userPrincipal, realRole))
+                return true;
         }
 
         // Check for a role defined directly as a <security-role>
         return (realm.hasRole(userPrincipal, role));
-
     }
 
 
@@ -2249,7 +2261,7 @@ public class Request
      * Return the principal that has been authenticated for this Request.
      */
     public Principal getPrincipal() {
-        return (userPrincipal);
+        return userPrincipal;
     }
 
 
@@ -2259,9 +2271,9 @@ public class Request
     public Principal getUserPrincipal() {
         if (userPrincipal instanceof GenericPrincipal) {
             return ((GenericPrincipal) userPrincipal).getUserPrincipal();
-        } else {
-            return (userPrincipal);
         }
+
+        return userPrincipal;
     }
 
 
@@ -2628,13 +2640,12 @@ public class Request
             response.addSessionCookieInternal(cookie);
         }
 
-        if (session != null) {
-            session.access();
-            return (session);
-        } else {
-            return (null);
+        if (session == null) {
+            return null;
         }
-
+        
+        session.access();
+        return session;
     }
 
     protected String unescape(String s) {
@@ -2846,9 +2857,9 @@ public class Request
             byte[] result = new byte[length];
             System.arraycopy(body.getBuffer(), 0, result, 0, length);
             return result;
-        } else {
-            return body.getBuffer();
         }
+        
+        return body.getBuffer();
     }
     
     
@@ -2892,11 +2903,12 @@ public class Request
                 if ((ch != ' ') && (ch != '\t'))
                     sb.append(ch);
             }
-            value = sb.toString();
+            parser.setString(sb.toString());
+        } else {
+            parser.setString(value);
         }
 
         // Process each comma-delimited language specification
-        parser.setString(value);        // ASSERT: parser is available to us
         int length = parser.getLength();
         while (true) {
 
