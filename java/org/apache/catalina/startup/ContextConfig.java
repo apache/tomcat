@@ -90,7 +90,6 @@ import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
@@ -611,10 +610,12 @@ public class ContextConfig
                 contextDigester.setUseContextClassLoader(false);
                 contextDigester.push(context.getParent());
                 contextDigester.push(context);
-                ContextErrorHandler errorHandler = new ContextErrorHandler();
+                XmlErrorHandler errorHandler = new XmlErrorHandler();
                 contextDigester.setErrorHandler(errorHandler);
                 contextDigester.parse(source);
-                if (errorHandler.parseException != null) {
+                if (errorHandler.getWarnings().size() > 0 ||
+                        errorHandler.getErrors().size() > 0) {
+                    errorHandler.logFindings(log, contextXml.toString());
                     ok = false;
                 }
                 if (log.isDebugEnabled())
@@ -1590,7 +1591,7 @@ public class ContextConfig
         
         if (source == null) return;
 
-        ContextErrorHandler handler = new ContextErrorHandler();
+        XmlErrorHandler handler = new XmlErrorHandler();
 
         // Web digesters and rulesets are shared between contexts but are not
         // thread safe. Whilst there should only be one thread at a time
@@ -1615,8 +1616,10 @@ public class ContextConfig
             try {
                 digester.parse(source);
 
-                if (handler.getParseException() != null) {
+                if (handler.getWarnings().size() > 0 ||
+                        handler.getErrors().size() > 0) {
                     ok = false;
+                    handler.logFindings(log, source.getSystemId());
                 }
             } catch (SAXParseException e) {
                 log.error(sm.getString("contextConfig.applicationParse",
@@ -2228,7 +2231,7 @@ public class ContextConfig
                     stream = jarFile.getInputStream(fragmentEntry);
                     InputSource source = new InputSource(
                             urlConn.getJarFileURL().toString() +
-                            File.separatorChar + FRAGMENT_LOCATION);
+                            "!/" + FRAGMENT_LOCATION);
                     source.setByteStream(stream);
                     parseWebXml(source, fragment, true);
                 }
@@ -2295,29 +2298,4 @@ public class ContextConfig
             return fragments;
         }
     }
-
-
-    protected static class ContextErrorHandler
-        implements ErrorHandler {
-
-        private SAXParseException parseException = null;
-
-        public void error(SAXParseException exception) {
-            parseException = exception;
-        }
-
-        public void fatalError(SAXParseException exception) {
-            parseException = exception;
-        }
-
-        public void warning(SAXParseException exception) {
-            parseException = exception;
-        }
-
-        public SAXParseException getParseException() {
-            return parseException;
-        }
-    }
-
-
 }
