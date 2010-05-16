@@ -45,6 +45,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.DateTool;
@@ -1517,7 +1518,10 @@ public class Response
             String file = url.getFile();
             if ((file == null) || !file.startsWith(contextPath))
                 return (false);
-            String tok = ";" + Globals.SESSION_PARAMETER_NAME + "=" + session.getIdInternal();
+            String tok = ";" +
+                    ApplicationSessionCookieConfig.getSessionUriParamName(
+                                request.getContext()) +
+                    "=" + session.getIdInternal();
             if( file.indexOf(tok, contextPath.length()) >= 0 )
                 return (false);
         }
@@ -1653,7 +1657,8 @@ public class Response
         StringBuilder sb = new StringBuilder(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
             sb.append(";");
-            sb.append(Globals.SESSION_PARAMETER_NAME);
+            sb.append(ApplicationSessionCookieConfig.getSessionUriParamName(
+                    request.getContext()));
             sb.append("=");
             sb.append(sessionId);
         }

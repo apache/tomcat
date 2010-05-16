@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -43,6 +42,7 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.SecurityCollection;
@@ -367,10 +367,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     + " Server digest:" + serverDigest);
         }
         
-        if (serverDigest.equals(clientDigest))
+        if (serverDigest.equals(clientDigest)) {
             return getPrincipal(username);
-        else
-            return null;
+        }
+
+        return null;
     }
 
 
@@ -754,11 +755,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     status = false; // No listed roles means no access at all
                     denyfromall = true;
                     break;
-                } else {
-                    if(log.isDebugEnabled())
-                        log.debug("Passing all access");
-                    status = true;
                 }
+                
+                if(log.isDebugEnabled())
+                    log.debug("Passing all access");
+                status = true;
             } else if (principal == null) {
                 if (log.isDebugEnabled())
                     log.debug("  No user authenticated, cannot grant access");
@@ -923,7 +924,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if ((requestedSessionId != null) &&
             request.isRequestedSessionIdFromURL()) {
             file.append(";");
-            file.append(Globals.SESSION_PARAMETER_NAME);
+            file.append(ApplicationSessionCookieConfig.getSessionUriParamName(
+                    request.getContext()));
             file.append("=");
             file.append(requestedSessionId);
         }
