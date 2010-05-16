@@ -152,109 +152,107 @@ public class CoyoteAdapter implements Adapter {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
-        if (request.getWrapper() != null) {
+        if (request.getWrapper() == null) {
+            return false;
+        }
             
-            boolean error = false;
-            boolean read = false;
-            try {
-                if (status == SocketStatus.OPEN) {
-                    if (response.isClosed()) {
-                        // The event has been closed asynchronously, so call end instead of
-                        // read to cleanup the pipeline
-                        request.getEvent().setEventType(CometEvent.EventType.END);
-                        request.getEvent().setEventSubType(null);
-                    } else {
-                        try {
-                            // Fill the read buffer of the servlet layer
-                            if (request.read()) {
-                                read = true;
-                            }
-                        } catch (IOException e) {
-                            error = true;
-                        }
-                        if (read) {
-                            request.getEvent().setEventType(CometEvent.EventType.READ);
-                            request.getEvent().setEventSubType(null);
-                        } else if (error) {
-                            request.getEvent().setEventType(CometEvent.EventType.ERROR);
-                            request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
-                        } else {
-                            request.getEvent().setEventType(CometEvent.EventType.END);
-                            request.getEvent().setEventSubType(null);
-                        }
-                    }
-                } else if (status == SocketStatus.DISCONNECT) {
-                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
-                    request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
-                    error = true;
-                } else if (status == SocketStatus.ERROR) {
-                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
-                    request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
-                    error = true;
-                } else if (status == SocketStatus.STOP) {
+        boolean error = false;
+        boolean read = false;
+        try {
+            if (status == SocketStatus.OPEN) {
+                if (response.isClosed()) {
+                    // The event has been closed asynchronously, so call end instead of
+                    // read to cleanup the pipeline
                     request.getEvent().setEventType(CometEvent.EventType.END);
-                    request.getEvent().setEventSubType(CometEvent.EventSubType.SERVER_SHUTDOWN);
-                } else if (status == SocketStatus.TIMEOUT) {
-                    if (response.isClosed()) {
-                        // The event has been closed asynchronously, so call end instead of
-                        // read to cleanup the pipeline
+                    request.getEvent().setEventSubType(null);
+                } else {
+                    try {
+                        // Fill the read buffer of the servlet layer
+                        if (request.read()) {
+                            read = true;
+                        }
+                    } catch (IOException e) {
+                        error = true;
+                    }
+                    if (read) {
+                        request.getEvent().setEventType(CometEvent.EventType.READ);
+                        request.getEvent().setEventSubType(null);
+                    } else if (error) {
+                        request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                        request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
+                    } else {
                         request.getEvent().setEventType(CometEvent.EventType.END);
                         request.getEvent().setEventSubType(null);
-                    } else {
-                        request.getEvent().setEventType(CometEvent.EventType.ERROR);
-                        request.getEvent().setEventSubType(CometEvent.EventSubType.TIMEOUT);
                     }
                 }
-
-                req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
-                
-                // Calling the container
-                connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
-
-                if (!error && !response.isClosed() && (request.getAttribute(Globals.EXCEPTION_ATTR) != null)) {
-                    // An unexpected exception occurred while processing the event, so
-                    // error should be called
+            } else if (status == SocketStatus.DISCONNECT) {
+                request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
+                error = true;
+            } else if (status == SocketStatus.ERROR) {
+                request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
+                error = true;
+            } else if (status == SocketStatus.STOP) {
+                request.getEvent().setEventType(CometEvent.EventType.END);
+                request.getEvent().setEventSubType(CometEvent.EventSubType.SERVER_SHUTDOWN);
+            } else if (status == SocketStatus.TIMEOUT) {
+                if (response.isClosed()) {
+                    // The event has been closed asynchronously, so call end instead of
+                    // read to cleanup the pipeline
+                    request.getEvent().setEventType(CometEvent.EventType.END);
+                    request.getEvent().setEventSubType(null);
+                } else {
                     request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                    request.getEvent().setEventSubType(CometEvent.EventSubType.TIMEOUT);
+                }
+            }
+
+            req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
+            
+            // Calling the container
+            connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+
+            if (!error && !response.isClosed() && (request.getAttribute(Globals.EXCEPTION_ATTR) != null)) {
+                // An unexpected exception occurred while processing the event, so
+                // error should be called
+                request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                request.getEvent().setEventSubType(null);
+                error = true;
+                connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+            }
+            if (response.isClosed() || !request.isComet()) {
+                if (status==SocketStatus.OPEN) {
+                    //CometEvent.close was called during an event.
+                    request.getEvent().setEventType(CometEvent.EventType.END);
                     request.getEvent().setEventSubType(null);
                     error = true;
                     connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                 }
-                if (response.isClosed() || !request.isComet()) {
-                    if (status==SocketStatus.OPEN) {
-                        //CometEvent.close was called during an event.
-                        request.getEvent().setEventType(CometEvent.EventType.END);
-                        request.getEvent().setEventSubType(null);
-                        error = true;
-                        connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
-                    }
-                    res.action(ActionCode.ACTION_COMET_END, null);
-                } else if (!error && read && request.getAvailable()) {
-                    // If this was a read and not all bytes have been read, or if no data
-                    // was read from the connector, then it is an error
-                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
-                    request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
-                    error = true;
-                    connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
-                }
-                return (!error);
-            } catch (Throwable t) {
-                if (!(t instanceof IOException)) {
-                    log.error(sm.getString("coyoteAdapter.service"), t);
-                }
+                res.action(ActionCode.ACTION_COMET_END, null);
+            } else if (!error && read && request.getAvailable()) {
+                // If this was a read and not all bytes have been read, or if no data
+                // was read from the connector, then it is an error
+                request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
                 error = true;
-                return false;
-            } finally {
-                req.getRequestProcessor().setWorkerThreadName(null);
-                // Recycle the wrapper request and response
-                if (error || response.isClosed() || !request.isComet()) {
-                    request.recycle();
-                    request.setFilterChain(null);
-                    response.recycle();
-                }
+                connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
             }
-            
-        } else {
+            return (!error);
+        } catch (Throwable t) {
+            if (!(t instanceof IOException)) {
+                log.error(sm.getString("coyoteAdapter.service"), t);
+            }
+            error = true;
             return false;
+        } finally {
+            req.getRequestProcessor().setWorkerThreadName(null);
+            // Recycle the wrapper request and response
+            if (error || response.isClosed() || !request.isComet()) {
+                request.recycle();
+                request.setFilterChain(null);
+                response.recycle();
+            }
         }
     }
     
@@ -299,9 +297,9 @@ public class CoyoteAdapter implements Adapter {
                     async = true;
                     break;
                 } else if (impl.getState()==AsyncContextImpl.AsyncState.NOT_STARTED){
-                        //TODO SERVLET3 - async
-                        async = false;
-                        break;
+                    //TODO SERVLET3 - async
+                    async = false;
+                    break;
                 } else if (impl.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING) {
                     async = false;
                     success = false;
