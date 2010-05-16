@@ -64,6 +64,8 @@ import java.io.Serializable;
  */
 public final class ByteChunk implements Cloneable, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /** Input interface, used when the buffer is empty
      *
      * Same as java.nio.channel.ReadableByteChannel
@@ -119,6 +121,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Creates a new, uninitialized ByteChunk object.
      */
     public ByteChunk() {
+        // NO-OP
     }
 
     public ByteChunk( int initial ) {
@@ -735,30 +738,29 @@ public final class ByteChunk implements Cloneable, Serializable {
      * @param starting The start position
      */
     public int indexOf(char c, int starting) {
-        int ret = indexOf( buff, start+starting, end, c);
+        int ret = indexOf(buff, start+starting, end, c);
         return (ret >= start) ? ret - start : -1;
     }
 
-    public static int  indexOf( byte bytes[], int off, int end, char qq )
-    {
-        // Works only for UTF 
-        while( off < end ) {
-            byte b=bytes[off];
-            if( b==qq )
-                return off;
-            off++;
-        }
-        return -1;
+    /**
+     * Find a character, no side effects. Only works for single-byte character
+     * sets.
+     * @return index of char if found, -1 if not
+     */
+    public static int indexOf(byte bytes[], int start, int end, char c) {
+        return findChar(bytes, start, end, c);
     }
 
-    /** Find a character, no side effects.
-     *  @return index of char if found, -1 if not
+    /**
+     * Find a character, no side effects. Only works for single-byte character
+     * sets.
+     * @return index of char if found, -1 if not
      */
-    public static int findChar( byte buf[], int start, int end, char c ) {
-        byte b=(byte)c;
+    public static int findChar( byte buf[], int start, int end, char c) {
+        // Works only for single byte character sets
         int offset = start;
         while (offset < end) {
-            if (buf[offset] == b) {
+            if (buf[offset] == c) {
                 return offset;
             }
             offset++;
@@ -766,8 +768,10 @@ public final class ByteChunk implements Cloneable, Serializable {
         return -1;
     }
 
-    /** Find a character, no side effects.
-     *  @return index of char if found, -1 if not
+    /**
+     * Find any one of an array of characters. No side effects. Only works for
+     * single-byte character sets.
+     * @return index of char if found, -1 if not
      */
     public static int findChars( byte buf[], int start, int end, byte c[] ) {
         int clen=c.length;
@@ -782,15 +786,15 @@ public final class ByteChunk implements Cloneable, Serializable {
         return -1;
     }
 
-    /** Find the first character != c 
-     *  @return index of char if found, -1 if not
+    /**
+     * Find the first character not in an array of characters. No side effects.
+     * Only works for single-byte character sets.
+     * @return index of char if found, -1 if not
      */
-    public static int findNotChars( byte buf[], int start, int end, byte c[] )
-    {
+    public static int findNotChars(byte buf[], int start, int end, byte c[]) {
         int clen=c.length;
         int offset = start;
         boolean found;
-                
         while (offset < end) {
             found=true;
             for( int i=0; i<clen; i++ ) {
