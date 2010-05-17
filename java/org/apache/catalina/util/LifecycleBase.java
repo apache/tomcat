@@ -297,6 +297,8 @@ public abstract class LifecycleBase implements Lifecycle {
      * @param data  The data to pass to the associated {@link Lifecycle} event
      */
     protected void setState(LifecycleState state, Object data) {
+        
+        log.debug(sm.getString("lifecycleBase.setState", this, state));
         this.state = state;
         String lifecycleEvent = state.getLifecycleEvent();
         if (lifecycleEvent != null) {
