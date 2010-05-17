@@ -471,6 +471,9 @@ public final class Mapper {
                 // Wildcard wrapper
                 String name = path.substring(0, path.length() - 2);
                 Wrapper[] oldWrappers = context.wildcardWrappers;
+                if (oldWrappers.length == 0) {
+                    return;
+                }
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length - 1];
                 if (removeMap(oldWrappers, newWrappers, name)) {
@@ -488,6 +491,9 @@ public final class Mapper {
                 // Extension wrapper
                 String name = path.substring(2);
                 Wrapper[] oldWrappers = context.extensionWrappers;
+                if (oldWrappers.length == 0) {
+                    return;
+                }
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length - 1];
                 if (removeMap(oldWrappers, newWrappers, name)) {
@@ -500,6 +506,9 @@ public final class Mapper {
                 // Exact wrapper
                 String name = path;
                 Wrapper[] oldWrappers = context.exactWrappers;
+                if (oldWrappers.length == 0) {
+                    return;
+                }
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length - 1];
                 if (removeMap(oldWrappers, newWrappers, name)) {
