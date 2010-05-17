@@ -298,7 +298,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     protected void setState(LifecycleState state, Object data) {
         
-        if ((log.isDebugEnabled())) {
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("lifecycleBase.setState", this, state));
         }
         this.state = state;
