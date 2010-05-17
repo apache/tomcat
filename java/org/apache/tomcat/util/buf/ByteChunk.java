@@ -737,7 +737,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * starting at the specified byte. If the character is not found, -1 is
      * returned.
      * <br/>
-     * NOTE: This only works for single byte characters.
+     * NOTE: This only works for characters in the range 0-127.
      * 
      * @param c         The character
      * @param starting  The start position
@@ -753,7 +753,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Returns the first instance of the given character in the given byte array
      * between the specified start and end.
      * <br/>
-     * NOTE: This only works for single byte characters.
+     * NOTE: This only works for characters in the range 0-127.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
@@ -778,7 +778,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Returns the first instance of the given character in the given byte array
      * between the specified start and end.
      * <br/>
-     * NOTE: This only works for single byte characters.
+     * NOTE: This only works for characters in the range 0-127.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
@@ -795,7 +795,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Returns the first instance of any of the given characters in the given
      * byte array between the specified start and end.
      * <br/>
-     * NOTE: This only works for single byte characters.
+     * NOTE: This only works for characters in the range 0-127.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
@@ -822,7 +822,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * character array in the specified byte array between the specified start
      * and end.
      * <br/>
-     * NOTE: This only works for single byte characters.
+     * NOTE: This only works for characters in the range 0-127.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
