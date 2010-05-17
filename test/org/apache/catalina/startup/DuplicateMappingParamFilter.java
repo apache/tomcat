@@ -39,6 +39,7 @@ public class DuplicateMappingParamFilter implements Filter {
 
     
     public void init(FilterConfig filterConfig) throws ServletException {
+        // NO-OP
     }
 
     public void doFilter(ServletRequest req, ServletResponse res,
