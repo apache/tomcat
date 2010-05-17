@@ -36,6 +36,9 @@ import javax.servlet.http.HttpServletResponse;
         @WebInitParam(name = "bar", value = "World!") }, displayName = "param", description = "param", largeIcon = "paramLarge.png", smallIcon = "paramSmall.png", loadOnStartup = 0, asyncSupported = false)
 public class ParamServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws IOException, ServletException {
         PrintWriter out = res.getWriter();
