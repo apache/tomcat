@@ -119,6 +119,8 @@ public class TestStandardContextResources extends TomcatBaseTest {
         // prevent it from looking ( if it finds one - it'll have dup error )
         config1.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
         listener1[1] = config1;
+        Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
+        ctx.addServletMapping("/getresource", "getresource");
 
         ctx.start();
         
