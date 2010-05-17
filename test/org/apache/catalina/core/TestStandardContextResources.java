@@ -34,7 +34,6 @@ import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardContextResources extends TomcatBaseTest {
@@ -85,6 +84,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         assertEquals(3,listener.length);
         assertTrue(listener[1] instanceof ContextConfig);
         ContextConfig config = new ContextConfig() {
+            @Override
             protected WebXml createWebXml() {
                 WebXml wxml = new WebXml();
                 wxml.addAbsoluteOrdering("resources");
@@ -109,6 +109,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         LifecycleListener[] listener1 = ctx.findLifecycleListeners();
         // change ordering and reload
         ContextConfig config1 = new ContextConfig() {
+            @Override
             protected WebXml createWebXml() {
                 WebXml wxml = new WebXml();
                 wxml.addAbsoluteOrdering("resources2");
