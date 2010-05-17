@@ -254,7 +254,9 @@ public class TestContextConfigAnnotation extends TestCase {
                 if (antFile.lastModified() >= eclipseFile.lastModified()) {
                     return antFile;
                 }
+                return eclipseFile;
             }
+            return antFile;
         }
         return eclipseFile;
     }
