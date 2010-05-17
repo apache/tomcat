@@ -50,11 +50,8 @@ public class TestBug49158 extends CookiesBaseTest {
         ByteChunk res = new ByteChunk(); 
         getUrl("http://localhost:" + getPort() + "/"+path, res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
-        int count = 0;
-        for (String cookieHeader : cookieHeaders) {
-            count++;
-        }
-        assertEquals("There should only be one Set-Cookie header in this test",1, count);
+        assertEquals("There should only be one Set-Cookie header in this test",
+                1, cookieHeaders.size());
     }
     
     public static void addServlets(Tomcat tomcat) {
