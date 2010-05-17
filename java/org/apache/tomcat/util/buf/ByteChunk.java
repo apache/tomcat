@@ -745,7 +745,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      *                      -1 if the character is not found.
      */
     public int indexOf(char c, int starting) {
-        int ret = indexOf(buff, start+starting, end, c);
+        int ret = indexOf(buff, start + starting, end, c);
         return (ret >= start) ? ret - start : -1;
     }
 
@@ -763,53 +763,56 @@ public final class ByteChunk implements Cloneable, Serializable {
      *                  if the character is not found.
      */
     public static int indexOf(byte bytes[], int start, int end, char c) {
-        int i = start;
+        int offset = start;
         
-        while (i < end) {
-            byte b=bytes[i];
-            if (b==c)
-                return i;
-            i++;
+        while (offset < end) {
+            byte b=bytes[offset];
+            if (b == c)
+                return offset;
+            offset++;
         }
         return -1;
     }
 
     /**
-     * Returns the first instance of the given character in the given byte array
-     * between the specified start and end.
-     * <br/>
-     * NOTE: This only works for characters in the range 0-127.
+     * Returns the first instance of the given byte in the byte array between
+     * the specified start and end.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
      * @param end   The point to stop searching in the byte array
-     * @param c     The character to search for 
-     * @return      The position of the first instance of the character or -1
-     *                  if the character is not found.
+     * @param b     The byte to search for 
+     * @return      The position of the first instance of the byte or -1 if the
+     *                  byte is not found.
      */
-    public static int findChar(byte bytes[], int start, int end, char c) {
-        return indexOf(bytes, start, end, c);
+    public static int findByte(byte bytes[], int start, int end, byte b) {
+        int offset = start;
+        while (offset < end) {
+            if (bytes[offset] == b) {
+                return offset;
+            }
+            offset++;
+        }
+        return -1;
     }
 
     /**
-     * Returns the first instance of any of the given characters in the given
-     * byte array between the specified start and end.
-     * <br/>
-     * NOTE: This only works for characters in the range 0-127.
+     * Returns the first instance of any of the given bytes in the byte array
+     * between the specified start and end.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
      * @param end   The point to stop searching in the byte array
-     * @param c     The array of characters to search for 
-     * @return      The position of the first instance of the character or -1
-     *                  if the character is not found.
+     * @param b     The array of bytes to search for 
+     * @return      The position of the first instance of the byte or -1 if the
+     *                  byte is not found.
      */
-    public static int findChars(byte bytes[], int start, int end, byte c[]) {
-        int clen=c.length;
+    public static int findBytes(byte bytes[], int start, int end, byte b[]) {
+        int blen = b.length;
         int offset = start;
         while (offset < end) {
-            for (int i=0; i<clen; i++) 
-                if (bytes[offset] == c[i]) {
+            for (int i = 0;  i < blen; i++) 
+                if (bytes[offset] == b[i]) {
                     return offset;
                 }
             offset++;
@@ -818,34 +821,31 @@ public final class ByteChunk implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the first instance of any character that is not in the given
-     * character array in the specified byte array between the specified start
-     * and end.
-     * <br/>
-     * NOTE: This only works for characters in the range 0-127.
+     * Returns the first instance of any byte that is not one of the given bytes
+     * in the byte array between the specified start and end.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
      * @param end   The point to stop searching in the byte array
-     * @param c     The array of characters to search for 
-     * @return      The position of the first instance a character that is not
-     *                  in the specified start array or -1 if the character is
-     *                  not found.
+     * @param c     The list of bytes to search for 
+     * @return      The position of the first instance a byte that is not
+     *                  in the list of bytes to search for or -1 if no such byte
+     *                  is found.
      */
-    public static int findNotChars(byte bytes[], int start, int end, byte c[]) {
-        int clen=c.length;
+    public static int findNotBytes(byte bytes[], int start, int end, byte b[]) {
+        int blen = b.length;
         int offset = start;
         boolean found;
                 
         while (offset < end) {
-            found=true;
-            for (int i=0; i<clen; i++) {
-                if (bytes[offset] == c[i]) {
+            found = true;
+            for (int i = 0; i < blen; i++) {
+                if (bytes[offset] == b[i]) {
                     found=false;
                     break;
                 }
             }
-            if (found) { // buf[offset] != c[0..len]
+            if (found) {
                 return offset;
             }
             offset++;
