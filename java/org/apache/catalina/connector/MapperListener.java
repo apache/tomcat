@@ -16,17 +16,6 @@
  */ 
 package org.apache.catalina.connector;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.ListenerNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerNotification;
-import javax.management.MalformedObjectNameException;
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
@@ -41,9 +30,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
 import org.apache.tomcat.util.http.mapper.Mapper;
-import org.apache.tomcat.util.modeler.Registry;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -54,8 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class MapperListener
-        implements NotificationListener, ContainerListener, LifecycleListener {
+public class MapperListener implements ContainerListener, LifecycleListener {
 
 
     private static final Log log = LogFactory.getLog(MapperListener.class);
@@ -71,11 +57,6 @@ public class MapperListener
      * Associated connector
      */
     private Connector connector = null;
-
-    /**
-     * MBean server.
-     */
-    private MBeanServer mBeanServer = null;
 
 
     /**
@@ -98,12 +79,6 @@ public class MapperListener
     public MapperListener(Mapper mapper, Connector connector) {
         this.mapper = mapper;
         this.connector = connector;
-        
-        // Cache MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
-        
-        // TODO - Switch to container listener events for add/remove child and
-        // remove dependency on MBean server entirely.
     }
 
 
@@ -128,23 +103,27 @@ public class MapperListener
         findDefaultHost();
         
         Engine engine = (Engine) connector.getService().getContainer();
+        engine.addContainerListener(this);
         
         Container[] conHosts = engine.findChildren();
         for (Container conHost : conHosts) {
             Host host = (Host) conHost;
             if (!LifecycleState.NEW.equals(host.getState())) {
+                host.addLifecycleListener(this);
                 registerHost(host);
                     
                 Container[] conContexts = host.findChildren();
                 for (Container conContext : conContexts) {
                     Context context = (Context) conContext;
                     if (!LifecycleState.NEW.equals(context.getState())) {
+                        context.addLifecycleListener(this);
                         registerContext(context);
                         
                         Container[] conWrappers = context.findChildren();
                         for (Container conWrapper : conWrappers) {
                             Wrapper wrapper = (Wrapper) conWrapper;
                             if (!LifecycleState.NEW.equals(wrapper.getState())) {
+                                wrapper.addLifecycleListener(this);
                                 registerWrapper(wrapper);
                             }
                         }
@@ -152,96 +131,14 @@ public class MapperListener
                 }
             }
         }
-        
-        ObjectName objectName;
-        try {
-            objectName = new ObjectName(
-                    "JMImplementation:type=MBeanServerDelegate");
-            mBeanServer.addNotificationListener(objectName, this, null, null);
-        } catch (MalformedObjectNameException e) {
-            log.error(sm.getString("mapperListener.addMBeanListenerFail",
-                    connector, domain), e);
-        } catch (NullPointerException e) {
-            log.error(sm.getString("mapperListener.addMBeanListenerFail",
-                    connector, domain), e);
-        } catch (InstanceNotFoundException e) {
-            log.error(sm.getString("mapperListener.addMBeanListenerFail",
-                    connector, domain), e);
-        }
     }
+        
 
     /**
-     * unregister this from JMImplementation:type=MBeanServerDelegate
+     * Clean-up.
      */
     public void destroy() {
-        try {
-
-            ObjectName objectName = new ObjectName(
-                    "JMImplementation:type=MBeanServerDelegate");
-            mBeanServer.removeNotificationListener(objectName, this);
-        } catch (InstanceNotFoundException e) {
-            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
-                    connector, domain), e);
-        } catch (ListenerNotFoundException e) {
-            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
-                    connector, domain), e);
-        } catch (MalformedObjectNameException e) {
-            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
-                    connector, domain), e);
-        } catch (NullPointerException e) {
-            log.error(sm.getString("mapperListener.removeMBeanListenerFail",
-                    connector, domain), e);
-        }
-    }
-
-    // ------------------------------------------- NotificationListener Methods
-
-
-    public void handleNotification(Notification notification,
-                                   java.lang.Object handback) {
-
-        if (!(notification instanceof MBeanServerNotification)) {
-            return;
-        }
-        
-        if (!notification.getType().equals
-                (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
-            return;
-        }
-        
-        ObjectName objectName = 
-            ((MBeanServerNotification) notification).getMBeanName();
-        
-        // Check the domains match
-        if (domain.equals(objectName.getDomain())) {
-            // Only interested in Hosts, Contexts and Wrappers
-            
-            String type = objectName.getKeyProperty("type");
-            if (type == null) {
-                type = objectName.getKeyProperty("j2eeType");
-            }
-                
-            if ("Servlet".equals(type) || "WebModule".equals(type) ||
-                    "Host".equals(type)) {
-                try {
-                    mBeanServer.invoke(objectName, "addLifecycleListener",
-                            new Object[] {this},
-                            new String[] {"org.apache.catalina.LifecycleListener"});
-                } catch (ReflectionException e) {
-                    log.error(sm.getString(
-                            "mapperListener.lifecycleListenerFail", objectName,
-                            connector, domain), e);
-                } catch (MBeanException e) {
-                    log.error(sm.getString(
-                            "mapperListener.lifecycleListenerFail", objectName,
-                            connector, domain), e);
-                } catch (InstanceNotFoundException e) {
-                    log.error(sm.getString(
-                            "mapperListener.lifecycleListenerFail", objectName,
-                            connector, domain), e);
-                }
-            }
-        }
+        // NO-OP?
     }
 
 
@@ -249,12 +146,35 @@ public class MapperListener
 
     public void containerEvent(ContainerEvent event) {
 
-        if (event.getType() == Host.ADD_ALIAS_EVENT) {
+        if (event.getType() == Container.ADD_CHILD_EVENT) {
+            Container child = (Container) event.getData();
+            child.addLifecycleListener(this);
+            if (child instanceof Host) {
+                registerHost((Host) child);
+            } else if (child instanceof Context) {
+                registerContext((Context) child);
+            } else if (child instanceof Wrapper) {
+                registerWrapper((Wrapper) child);
+            }
+        } else if (event.getType() == Container.REMOVE_CHILD_EVENT) {
+            Container child = (Container) event.getData();
+            child.removeLifecycleListener(this);
+            if (child instanceof Host) {
+                unregisterHost((Host) child);
+            } else if (child instanceof Context) {
+                unregisterContext((Context) child);
+            } else if (child instanceof Wrapper) {
+                unregisterWrapper((Wrapper) child);
+            }
+        } else if (event.getType() == Host.ADD_ALIAS_EVENT) {
+            // Handle dynamically adding host aliases
             mapper.addHostAlias(((Host) event.getSource()).getName(),
                     event.getData().toString());
         } else if (event.getType() == Host.REMOVE_ALIAS_EVENT) {
+            // Handle dynamically removing host aliases
             mapper.removeHostAlias(event.getData().toString());
         } else if (event.getType() == Wrapper.ADD_MAPPING_EVENT) {
+            // Handle dynamically adding wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
 
             String contextName = wrapper.getParent().getName();
@@ -269,6 +189,7 @@ public class MapperListener
             mapper.addWrapper(hostName, contextName, mapping, wrapper,
                     jspWildCard);
         } else if (event.getType() == Wrapper.REMOVE_MAPPING_EVENT) {
+            // Handle dynamically removing wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
 
             String contextName = wrapper.getParent().getName();
@@ -281,6 +202,7 @@ public class MapperListener
             
             mapper.removeWrapper(hostName, contextName, mapping);
         } else if (event.getType() == Context.ADD_WELCOME_FILE_EVENT) {
+            // Handle dynamically adding welcome files
             Context context = (Context) event.getSource();
             
             String hostName = context.getParent().getName();
@@ -294,6 +216,7 @@ public class MapperListener
             
             mapper.addWelcomeFile(hostName, contextName, welcomeFile);
         } else if (event.getType() == Context.REMOVE_WELCOME_FILE_EVENT) {
+            // Handle dynamically removing welcome files
             Context context = (Context) event.getSource();
             
             String hostName = context.getParent().getName();
@@ -307,6 +230,7 @@ public class MapperListener
             
             mapper.removeWelcomeFile(hostName, contextName, welcomeFile);
         } else if (event.getType() == Context.CLEAR_WELCOME_FILES_EVENT) {
+            // Handle dynamically clearing welcome files
             Context context = (Context) event.getSource();
             
             String hostName = context.getParent().getName();
@@ -369,6 +293,9 @@ public class MapperListener
         
         host.addContainerListener(this);
         
+        for (Container container : host.findChildren()) {
+            registerContext((Context) container);
+        }
         if(log.isDebugEnabled()) {
             log.debug(sm.getString
                  ("mapperListener.registerHost", host.getName(), domain));
@@ -432,7 +359,11 @@ public class MapperListener
                 resources);
 
         context.addContainerListener(this);
-        
+       
+        for (Container container : context.findChildren()) {
+            registerWrapper((Wrapper) container);
+        }
+
         if(log.isDebugEnabled()) {
             log.debug(sm.getString
                  ("mapperListener.registerContext", contextName));
@@ -487,19 +418,17 @@ public class MapperListener
                               jspWildCard);
         }
 
-        // Also want to watch for any changes to the mappings for this wrapper
         wrapper.addContainerListener(this);
-        
+
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerWrapper",
                     wrapperName, contextName));
         }
     }
 
-
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
-        if (event.getType() == Lifecycle.BEFORE_START_EVENT) {
+        if (event.getType() == Lifecycle.AFTER_START_EVENT) {
             Object obj = event.getSource();
             if (obj instanceof Wrapper) {
                 registerWrapper((Wrapper) obj);
@@ -508,7 +437,7 @@ public class MapperListener
             } else if (obj instanceof Host) {
                 registerHost((Host) obj);
             }
-        } else if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
+        } else if (event.getType() == Lifecycle.BEFORE_STOP_EVENT) {
             Object obj = event.getSource();
             if (obj instanceof Wrapper) {
                 unregisterWrapper((Wrapper) obj);
