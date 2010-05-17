@@ -157,9 +157,9 @@ public class Stockticker implements Runnable {
         public boolean equals(Object other) {
             if (other instanceof Stock) {
                 return this.symbol.equals(((Stock) other).symbol);
-            } else {
-                return false;
             }
+            
+            return false;
         }
 
         @Override
