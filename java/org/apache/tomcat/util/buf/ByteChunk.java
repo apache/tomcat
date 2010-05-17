@@ -778,7 +778,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Returns the first instance of the given character in the given byte array
      * between the specified start and end.
      * <br/>
-     * NOTE: This only works for characters in the range 0-127.
+     * NOTE: This only works for single byte characters.
      * 
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
@@ -788,15 +788,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      *                  if the character is not found.
      */
     public static int findChar(byte bytes[], int start, int end, char c) {
-        byte b = (byte)c;
-        int offset = start;
-        while (offset < end) {
-            if (bytes[offset] == b) {
-                return offset;
-            }
-            offset++;
-        }
-        return -1;
+        return indexOf(bytes, start, end, c);
     }
 
     /**
