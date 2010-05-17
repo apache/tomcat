@@ -40,7 +40,8 @@ public class TestContextConfigAnnotation extends TestCase {
     public void testAnnotation() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
-        File pFile = paramClassResource("org/apache/catalina/startup/ParamServlet");
+        File pFile = paramClassResource(
+                "org/apache/catalina/startup/ParamServlet");
         assertTrue(pFile.exists());
         config.processAnnotationsFile(pFile, webxml);
         ServletDef servletDef = webxml.getServlets().get("param");
@@ -77,7 +78,8 @@ public class TestContextConfigAnnotation extends TestCase {
         webxml.addServlet(servletDef);
         webxml.addServletMapping("/param", "param");
         ContextConfig config = new ContextConfig();
-        File pFile = paramClassResource("org/apache/catalina/startup/ParamServlet");
+        File pFile = paramClassResource(
+                "org/apache/catalina/startup/ParamServlet");
         assertTrue(pFile.exists());
         config.processAnnotationsFile(pFile, webxml);
 
@@ -102,7 +104,8 @@ public class TestContextConfigAnnotation extends TestCase {
     public void testNoMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
-        File pFile = paramClassResource("org/apache/catalina/startup/NoMappingParamServlet");
+        File pFile = paramClassResource(
+                "org/apache/catalina/startup/NoMappingParamServlet");
         assertTrue(pFile.exists());
         config.processAnnotationsFile(pFile, webxml);
         ServletDef servletDef = webxml.getServlets().get("param1");
@@ -119,14 +122,15 @@ public class TestContextConfigAnnotation extends TestCase {
         WebXml webxml = new WebXml();
         ServletDef servletDef = new ServletDef();
         servletDef.setServletName("param1");
-        servletDef
-                .setServletClass("org.apache.catalina.startup.NoMappingParamServlet");
+        servletDef.setServletClass(
+                "org.apache.catalina.startup.NoMappingParamServlet");
         servletDef.addInitParameter("foo", "tomcat");
 
         webxml.addServlet(servletDef);
         webxml.addServletMapping("/param", "param1");
         ContextConfig config = new ContextConfig();
-        File pFile = paramClassResource("org/apache/catalina/startup/NoMappingParamServlet");
+        File pFile = paramClassResource(
+                "org/apache/catalina/startup/NoMappingParamServlet");
         assertTrue(pFile.exists());
         config.processAnnotationsFile(pFile, webxml);
         assertEquals("tomcat", servletDef.getParameterMap().get("foo"));
@@ -139,7 +143,8 @@ public class TestContextConfigAnnotation extends TestCase {
     public void testDuplicateMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
-        File pFile = paramClassResource("org/apache/catalina/startup/DuplicateMappingParamServlet");
+        File pFile = paramClassResource(
+                "org/apache/catalina/startup/DuplicateMappingParamServlet");
         assertTrue(pFile.exists());
         try {
             config.processAnnotationsFile(pFile, webxml);
@@ -154,9 +159,11 @@ public class TestContextConfigAnnotation extends TestCase {
     public void testFilterMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
-        File sFile = paramClassResource("org/apache/catalina/startup/ParamServlet");
+        File sFile = paramClassResource(
+                "org/apache/catalina/startup/ParamServlet");
         config.processAnnotationsFile(sFile, webxml);
-        File fFile = paramClassResource("org/apache/catalina/startup/ParamFilter");
+        File fFile = paramClassResource(
+                "org/apache/catalina/startup/ParamFilter");
         config.processAnnotationsFile(fFile, webxml);
         FilterDef fdef = webxml.getFilters().get("paramFilter");
         assertNotNull(fdef);
@@ -183,9 +190,11 @@ public class TestContextConfigAnnotation extends TestCase {
         webxml.addFilterMapping(filterMap);
  
         ContextConfig config = new ContextConfig();
-        File sFile = paramClassResource("org/apache/catalina/startup/ParamServlet");
+        File sFile = paramClassResource(
+                "org/apache/catalina/startup/ParamServlet");
         config.processAnnotationsFile(sFile, webxml);
-        File fFile = paramClassResource("org/apache/catalina/startup/ParamFilter");
+        File fFile = paramClassResource(
+                "org/apache/catalina/startup/ParamFilter");
         config.processAnnotationsFile(fFile, webxml);
         FilterDef fdef = webxml.getFilters().get("paramFilter");
         assertNotNull(fdef);
@@ -218,7 +227,8 @@ public class TestContextConfigAnnotation extends TestCase {
     public void testDuplicateFilterMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
-        File pFile = paramClassResource("org/apache/catalina/startup/DuplicateMappingParamFilter");
+        File pFile = paramClassResource(
+                "org/apache/catalina/startup/DuplicateMappingParamFilter");
         assertTrue(pFile.exists());
         try {
             config.processAnnotationsFile(pFile, webxml);
@@ -243,14 +253,9 @@ public class TestContextConfigAnnotation extends TestCase {
             if (eclipseFile.exists()) {
                 if (antFile.lastModified() >= eclipseFile.lastModified()) {
                     return antFile;
-                } else {
-                    return eclipseFile;
                 }
-            } else {
-                return antFile;
             }
-        } else {
-            return eclipseFile;
         }
+        return eclipseFile;
     }
 }
