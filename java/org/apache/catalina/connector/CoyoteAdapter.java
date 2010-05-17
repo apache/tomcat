@@ -663,7 +663,7 @@ public class CoyoteAdapter implements Adapter {
             int end = uriBC.getEnd();
 
             int pathParamStart = semicolon + 1;
-            int pathParamEnd = ByteChunk.findChars(uriBC.getBuffer(),
+            int pathParamEnd = ByteChunk.findBytes(uriBC.getBuffer(),
                     uriBC.getStart() + pathParamStart, uriBC.getEnd(),
                     new byte[] {';', '/'});
             
