@@ -110,25 +110,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             Host host = (Host) conHost;
             if (!LifecycleState.NEW.equals(host.getState())) {
                 host.addLifecycleListener(this);
+                // Registering the host will register the context and wrappers
                 registerHost(host);
-                    
-                Container[] conContexts = host.findChildren();
-                for (Container conContext : conContexts) {
-                    Context context = (Context) conContext;
-                    if (!LifecycleState.NEW.equals(context.getState())) {
-                        context.addLifecycleListener(this);
-                        registerContext(context);
-                        
-                        Container[] conWrappers = context.findChildren();
-                        for (Container conWrapper : conWrappers) {
-                            Wrapper wrapper = (Wrapper) conWrapper;
-                            if (!LifecycleState.NEW.equals(wrapper.getState())) {
-                                wrapper.addLifecycleListener(this);
-                                registerWrapper(wrapper);
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -308,7 +291,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
      */
     private void unregisterHost(Host host) {
 
-        host.removeContainerListener(this);
+        removeListeners(host);
         
         String hostname = host.getName();
         
@@ -325,7 +308,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
      */
     private void unregisterWrapper(Wrapper wrapper) {
 
-        wrapper.removeContainerListener(this);
+        removeListeners(wrapper);
         
         String contextName = wrapper.getParent().getName();
         if ("/".equals(contextName)) {
@@ -381,7 +364,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             return;
         }
 
-        context.removeContainerListener(this);
+        removeListeners(context);
         
         String contextName = context.getName();
         if ("/".equals(contextName)) {
@@ -446,6 +429,19 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             } else if (obj instanceof Host) {
                 unregisterHost((Host) obj);
             }
+        }
+    }
+
+    /**
+     * Remove this mapper from the container and all child containers
+     * 
+     * @param container
+     */
+    private void removeListeners(Container container) {
+        container.removeContainerListener(this);
+        container.removeLifecycleListener(this);
+        for (Container child : container.findChildren()) {
+            removeListeners(child);
         }
     }
 }
