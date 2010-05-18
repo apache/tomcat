@@ -169,6 +169,11 @@ files) to not be checked for modification during the specified time interval
 0 will cause the JSP to be checked on every access. Used in development mode
 only. Default is <code>4</code> seconds.</li>
 
+<li><strong>recompileOnFail</strong> - If a JSP compilation fails should the
+modificationTestInterval be ignored and the next access trigger a re-compilation
+attempt? Used in development mode only and is disabled by default as compilation
+may be expensive and could lead to excessive resource usage.</li>
+
 <li><strong>scratchdir</strong> - What scratch directory should we use when
 compiling JSP pages? Default is the work directory for the current web
 application.</li>
