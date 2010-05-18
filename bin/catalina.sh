@@ -105,7 +105,7 @@ done
 PRGDIR=`dirname "$PRG"`
 
 # Only set CATALINA_HOME if not already set
-[ -z "$CATALINA_HOME" ] && CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null 2>&1 ; pwd`
+[ -z "$CATALINA_HOME" ] && CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
 # Ensure that any user defined CLASSPATH variables are not used on startup,
 # but allow them to be specified in setenv.sh, in rare case when it is needed.
