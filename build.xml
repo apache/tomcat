@@ -919,7 +919,9 @@
 
       <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
       <test todir="${tomcat.build}/logs" name="${test.entry}" if="test.entry"/>
-      <batchtest todir="${tomcat.build}/logs" haltonerror="true" haltonfailure="true" unless="test.entry">
+      <batchtest todir="${tomcat.build}/logs" unless="test.entry"
+        errorproperty="test.result.error" failureproperty="test.result.failure" 
+        >
         <fileset dir="test" >
           <!-- Include all by default -->
           <include name="**/Test*.java" />
@@ -930,6 +932,9 @@
         </fileset>
       </batchtest>
     </junit>
+
+    <fail if="test.result.error" message="Some tests completed with an Error. See ${tomcat.build}/logs for details." />
+    <fail if="test.result.failure" message="Some tests completed with a Failure. See ${tomcat.build}/logs for details." />
   </target>
 
   <target name="extras-prepare" >
