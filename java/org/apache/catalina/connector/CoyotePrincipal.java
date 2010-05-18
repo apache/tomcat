@@ -29,12 +29,12 @@ import java.security.Principal;
  * @version $Id$
  */
 
-public class CoyotePrincipal 
-    implements Principal, Serializable {
+public class CoyotePrincipal implements Principal, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
 
     // ----------------------------------------------------------- Constructors
-
 
     public CoyotePrincipal(String name) {
 
