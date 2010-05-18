@@ -31,7 +31,40 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteAdaptor extends TomcatBaseTest {
 
-    public void testPathParams() throws Exception {
+    public void testPathParmsRootNone() throws Exception {
+        pathParamTest("/", "none");
+    }
+
+    public void testPathParmsFooNone() throws Exception {
+        pathParamTest("/foo", "none");
+    }
+
+    public void testPathParmsRootSessionOnly() throws Exception {
+        pathParamTest("/;jsessionid=1234", "1234");
+    }
+
+    public void testPathParmsFooSessionOnly() throws Exception {
+        pathParamTest("/foo;jsessionid=1234", "1234");
+    }
+
+    public void testPathParmsFooSessionDummy() throws Exception {
+        pathParamTest("/foo;jsessionid=1234;dummy", "1234");
+    }
+
+    public void testPathParmsFooSessionDummyValue() throws Exception {
+        pathParamTest("/foo;jsessionid=1234;dummy=5678", "1234");
+    }
+
+    public void testPathParmsFooSessionValue() throws Exception {
+        pathParamTest("/foo;jsessionid=1234;=5678", "1234");
+    }
+
+    public void testPathParmsFooSessionBar() throws Exception {
+        pathParamTest("/foo;jsessionid=1234/bar", "1234");
+
+    }
+
+    public void pathParamTest(String path, String expected) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
         
@@ -43,17 +76,7 @@ public class TestCoyoteAdaptor extends TomcatBaseTest {
         ctx.addServletMapping("/", "servlet");
         
         tomcat.start();
-        
-        testPath("/", "none");
-        testPath("/;jsessionid=1234", "1234");
-        testPath("/foo;jsessionid=1234", "1234");
-        testPath("/foo;jsessionid=1234;dummy", "1234");
-        testPath("/foo;jsessionid=1234;dummy=5678", "1234");
-        testPath("/foo;jsessionid=1234;=5678", "1234");
-        testPath("/foo;jsessionid=1234/bar", "1234");
-    }
 
-    private void testPath(String path, String expected) throws Exception {
         ByteChunk res = getUrl("http://localhost:" + getPort() + path);
         assertEquals(expected, res.toString());
     }
