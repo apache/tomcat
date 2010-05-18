@@ -1067,6 +1067,10 @@ public class ContextConfig
             ExpandWar.delete(docBaseFile, false);
         }
         
+        // Reset ServletContextInitializer scanning
+        initializerClassMap.clear();
+        typeInitializerMap.clear();
+        
         ok = true;
 
     }
