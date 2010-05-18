@@ -24,6 +24,7 @@ import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1618,9 +1619,10 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  getRoles(" + dn + ")");
 
         // Start with roles retrieved from the user entry
-        List<String> list = user.getRoles();
-        if (list == null) {
-            list = new ArrayList<String>();
+        List<String> list = new ArrayList<String>(); 
+        List<String> userRoles = user.getRoles();
+        if (userRoles != null) {
+            list.addAll(userRoles); 
         }
         if (commonRole != null)
             list.add(commonRole);
@@ -2228,15 +2230,17 @@ public class JNDIRealm extends RealmBase {
          final private String username;
          final private String dn;
          final private String password;
-         final private List<String> roles = new ArrayList<String>();
+         final private List<String> roles;
 
          public User(String username, String dn, String password,
                  List<String> roles) {
              this.username = username;
              this.dn = dn;
              this.password = password;
-             if (roles != null) {
-                 this.roles.addAll(roles);
+             if (roles == null) {
+                 this.roles = Collections.emptyList();
+             } else {
+                 this.roles = Collections.unmodifiableList(roles);
              }
          }
     
