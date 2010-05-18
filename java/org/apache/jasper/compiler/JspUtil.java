@@ -56,8 +56,8 @@ public class JspUtil {
             "implements", "import", "instanceof", "int", "interface", "long",
             "native", "new", "package", "private", "protected", "public",
             "return", "short", "static", "strictfp", "super", "switch",
-            "synchronized", "this", "throws", "transient", "try", "void",
-            "volatile", "while" };
+            "synchronized", "this", "throw", "throws", "transient", "try",
+            "void", "volatile", "while" };
 
     public static final int CHUNKSIZE = 1024;
 
