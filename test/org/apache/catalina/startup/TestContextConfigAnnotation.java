@@ -17,6 +17,7 @@
 package org.apache.catalina.startup;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Set;
 
 import javax.servlet.DispatcherType;
@@ -33,7 +34,7 @@ import org.apache.catalina.deploy.WebXml;
  * fragment.
  * 
  * @author Peter Rossbach
- * @version $Id$
+ * @version $Revision$
  */
 public class TestContextConfigAnnotation extends TestCase {
 
@@ -239,25 +240,18 @@ public class TestContextConfigAnnotation extends TestCase {
         FilterDef filterDef = webxml.getFilters().get("paramD");
         assertNull(filterDef);
     }
-    
+
     /**
-     * Find newest class resource at eclipse and ant standard class output dirs!
+     * Find compiled test class
      * 
      * @param className
      * @return File Resource
      */
     private File paramClassResource(String className) {
-        File antFile = new File("output/testclasses/" + className + ".class");
-        File eclipseFile = new File(".settings/output/" + className + ".class");
-        if (antFile.exists()) {
-            if (eclipseFile.exists()) {
-                if (antFile.lastModified() >= eclipseFile.lastModified()) {
-                    return antFile;
-                }
-                return eclipseFile;
-            }
-            return antFile;
-        }
-        return eclipseFile;
+        URL url = getClass().getClassLoader().getResource(className + ".class");
+        assertNotNull(url);
+
+        File file = new File(url.getPath());
+        return file;
     }
 }
