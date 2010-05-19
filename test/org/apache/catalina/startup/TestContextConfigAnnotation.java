@@ -151,7 +151,7 @@ public class TestContextConfigAnnotation extends TestCase {
             config.processAnnotationsFile(pFile, webxml);
             fail();
         } catch (IllegalArgumentException ex) {
-            // ingore
+            // ignore
         }
         ServletDef servletDef = webxml.getServlets().get("param");
         assertNull(servletDef);
@@ -235,7 +235,7 @@ public class TestContextConfigAnnotation extends TestCase {
             config.processAnnotationsFile(pFile, webxml);
             fail();
         } catch (IllegalArgumentException ex) {
-            // ingore
+            // ignore
         }
         FilterDef filterDef = webxml.getFilters().get("paramD");
         assertNull(filterDef);
