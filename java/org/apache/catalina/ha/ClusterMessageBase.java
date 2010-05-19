@@ -32,10 +32,13 @@ import org.apache.catalina.tribes.Member;
  */
 public class ClusterMessageBase implements ClusterMessage {
     
+    private static final long serialVersionUID = 1L;
+
     protected transient Member address;
     private String uniqueId;
     private long timestamp;
     public ClusterMessageBase() {
+        // NO-OP
     }
 
     /**
