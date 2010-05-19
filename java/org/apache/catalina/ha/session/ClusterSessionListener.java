@@ -19,7 +19,11 @@ package org.apache.catalina.ha.session;
 
 import java.util.Map;
 
-import org.apache.catalina.ha.*;
+import org.apache.catalina.ha.ClusterListener;
+import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.ha.ClusterMessage;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Receive replicated SessionMessage form other cluster node.
@@ -28,7 +32,10 @@ import org.apache.catalina.ha.*;
  * @version $Id$
  */
 public class ClusterSessionListener extends ClusterListener {
- 
+
+    private static final Log log =
+        LogFactory.getLog(ClusterSessionListener.class);
+    
     /**
      * The descriptive information about this implementation.
      */
@@ -37,6 +44,7 @@ public class ClusterSessionListener extends ClusterListener {
     //--Constructor---------------------------------------------
 
     public ClusterSessionListener() {
+        // NO-OP
     }
 
     //--Logic---------------------------------------------------
