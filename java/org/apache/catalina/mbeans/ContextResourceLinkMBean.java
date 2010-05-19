@@ -67,6 +67,58 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
 
     // ------------------------------------------------------------- Attributes
 
+    /**
+     * Obtain and return the value of a specific attribute of this MBean.
+     *
+     * @param name Name of the requested attribute
+     *
+     * @exception AttributeNotFoundException if this attribute is not
+     *  supported by this MBean
+     * @exception MBeanException if the initializer of an object
+     *  throws an exception
+     * @exception ReflectionException if a Java reflection exception
+     *  occurs when invoking the getter
+     */
+    @Override
+    public Object getAttribute(String name)
+        throws AttributeNotFoundException, MBeanException,
+        ReflectionException {
+ 
+        // Validate the input parameters
+        if (name == null)
+            throw new RuntimeOperationsException
+                (new IllegalArgumentException("Attribute name is null"),
+                 "Attribute name is null");
+
+        ContextResourceLink cl = null;
+        try {
+            cl = (ContextResourceLink) getManagedResource();
+        } catch (InstanceNotFoundException e) {
+            throw new MBeanException(e);
+        } catch (InvalidTargetObjectTypeException e) {
+             throw new MBeanException(e);
+        }
+        
+        String value = null;
+        if ("global".equals(name)) {
+            return (cl.getGlobal());
+        } else if ("description".equals(name)) {
+            return (cl.getDescription());
+        } else if ("name".equals(name)) {
+            return (cl.getName());              
+        } else if ("type".equals(name)) {
+            return (cl.getType());
+        } else {
+            value = (String) cl.getProperty(name);
+            if (value == null) {
+                throw new AttributeNotFoundException
+                    ("Cannot find attribute "+name);
+            }
+        }
+        
+        return value;
+        
+    }
     
     /**
      * Set the value of a specific attribute of this MBean.
@@ -85,9 +137,20 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
     public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
         ReflectionException {
-
-        super.setAttribute(attribute);
+       
+        // Validate the input parameters
+        if (attribute == null)
+            throw new RuntimeOperationsException
+                (new IllegalArgumentException("Attribute is null"),
+                 "Attribute is null");
         
+        String name = attribute.getName();
+        Object value = attribute.getValue();
+        if (name == null)
+            throw new RuntimeOperationsException
+                (new IllegalArgumentException("Attribute name is null"),
+                 "Attribute name is null"); 
+         
         ContextResourceLink crl = null;
         try {
             crl = (ContextResourceLink) getManagedResource();
@@ -95,6 +158,18 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
             throw new MBeanException(e);
         } catch (InvalidTargetObjectTypeException e) {
              throw new MBeanException(e);
+        }
+        
+        if ("global".equals(name)) {
+            crl.setGlobal((String)value);
+        } else if ("description".equals(name)) {
+            crl.setDescription((String)value);
+        } else if ("name".equals(name)) {
+            crl.setName((String)value);              
+        } else if ("type".equals(name)) {
+            crl.setType((String)value);
+        } else {
+            crl.setProperty(name, ""+value);
         }
         
         // cannot use side-effects.  It's removed and added back each time 
