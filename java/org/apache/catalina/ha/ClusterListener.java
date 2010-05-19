@@ -37,17 +37,14 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class ClusterListener implements ChannelListener {
 
-    public static final org.apache.juli.logging.Log log =
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(ClusterListener.class);
-
 
     //--Instance Variables--------------------------------------
 
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
     protected CatalinaCluster cluster = null;
 
