@@ -653,7 +653,15 @@ public class CoyoteAdapter implements Adapter {
         if (enc == null) {
             enc = "ISO-8859-1";
         }
-        
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("coyoteAdapter.debug", "uriBC",
+                    uriBC.toString()));
+            log.debug(sm.getString("coyoteAdapter.debug", "semicolon",
+                    Integer.valueOf(semicolon)));
+            log.debug(sm.getString("coyoteAdapter.debug", "enc", enc));
+        }
+
         while (semicolon > -1) {
             // Parse path param, and extract it from the decoded request URI
             int start = uriBC.getStart();
@@ -700,11 +708,28 @@ public class CoyoteAdapter implements Adapter {
                 uriBC.setEnd(start + semicolon);
             }
             
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("coyoteAdapter.debug", "pathParamStart",
+                        Integer.valueOf(pathParamStart)));
+                log.debug(sm.getString("coyoteAdapter.debug", "pathParamEnd",
+                        Integer.valueOf(pathParamEnd)));
+                log.debug(sm.getString("coyoteAdapter.debug", "pv", pv));
+            }
+
             if (pv != null) {
                 int equals = pv.indexOf('=');
                 if (equals > -1) {
-                    request.addPathParameter(pv.substring(0, equals),
-                            pv.substring(equals + 1));
+                    String name = pv.substring(0, equals);
+                    String value = pv.substring(equals + 1); 
+                    request.addPathParameter(name, value);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("coyoteAdapter.debug", "equals",
+                                Integer.valueOf(equals)));
+                        log.debug(sm.getString("coyoteAdapter.debug", "name",
+                                name));
+                        log.debug(sm.getString("coyoteAdapter.debug", "value",
+                                value));
+                    }
                 }
             }
             
