@@ -105,7 +105,7 @@ public abstract class TomcatBaseTest extends TestCase {
     @Override
     public void tearDown() throws Exception {
         // Some tests may call tomcat.destroy(), some tests may just call
-        // tomcat.stop(), smoe not call either method. Make sure that stop() &
+        // tomcat.stop(), some not call either method. Make sure that stop() &
         // destroy() are called as necessary.
         if (tomcat.server != null &&
                 tomcat.server.getState() != LifecycleState.DESTROYED) {
