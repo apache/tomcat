@@ -95,6 +95,10 @@
     <attribute   name="name"
                description="The name of this resource"
                type="java.lang.String"/>
+               
+    <attribute   name="description"
+               description="The description of this resource"
+               type="java.lang.String"/>
       
     <attribute   name="type"
                description="The type of this resource"
