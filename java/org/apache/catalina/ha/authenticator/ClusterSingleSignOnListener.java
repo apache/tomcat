@@ -24,6 +24,8 @@ import org.apache.catalina.Session;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterListener;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Receive replicated SingleSignOnMessage form other cluster node.
@@ -32,6 +34,9 @@ import org.apache.catalina.ha.ClusterListener;
  */
 public class ClusterSingleSignOnListener extends ClusterListener {
  
+    private static final Log log =
+        LogFactory.getLog(ClusterSingleSignOnListener.class);
+
     /**
      * The descriptive information about this implementation.
      */
@@ -45,6 +50,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
     //--Constructor---------------------------------------------
 
     public ClusterSingleSignOnListener() {
+        // NO-OP
     }
 
     //--Logic---------------------------------------------------
@@ -152,13 +158,12 @@ public class ClusterSingleSignOnListener extends ClusterListener {
                         log.error("Session doesn't exist:" + io);
                     }
                     return session;
-                } else {
-                    //this happens a lot before the system has started
-                    // up
-                    if (log.isDebugEnabled())
-                        log.debug("Context manager doesn't exist:"
-                                  + entry.getKey());
                 }
+                //this happens a lot before the system has started
+                // up
+                if (log.isDebugEnabled())
+                    log.debug("Context manager doesn't exist:"
+                              + entry.getKey());
             }
         } else {
             ClusterManager mgr = managers.get(ctxname);
