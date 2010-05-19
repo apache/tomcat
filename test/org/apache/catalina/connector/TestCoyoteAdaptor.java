@@ -61,10 +61,9 @@ public class TestCoyoteAdaptor extends TomcatBaseTest {
 
     public void testPathParmsFooSessionBar() throws Exception {
         pathParamTest("/foo;jsessionid=1234/bar", "1234");
-
     }
 
-    public void pathParamTest(String path, String expected) throws Exception {
+    public void testPathParams() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
         
@@ -74,9 +73,36 @@ public class TestCoyoteAdaptor extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("/", "servlet");
-        
+
         tomcat.start();
 
+        testPath("/", "none");
+        testPath("/;jsessionid=1234", "1234");
+        testPath("/foo;jsessionid=1234", "1234");
+        testPath("/foo;jsessionid=1234;dummy", "1234");
+        testPath("/foo;jsessionid=1234;dummy=5678", "1234");
+        testPath("/foo;jsessionid=1234;=5678", "1234");
+        testPath("/foo;jsessionid=1234/bar", "1234");
+    }
+
+    private void pathParamTest(String path, String expected) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + path);
+        assertEquals(expected, res.toString());
+    }
+
+    private void testPath(String path, String expected) throws Exception {
         ByteChunk res = getUrl("http://localhost:" + getPort() + path);
         assertEquals(expected, res.toString());
     }
