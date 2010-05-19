@@ -40,13 +40,6 @@
       <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
       -->        
 
-      <!-- The request dumper valve dumps useful debugging information about
-           the request and response data received and sent by Tomcat.
-           Documentation at: /docs/config/valve.html -->
-      <!--
-      <Valve className="org.apache.catalina.valves.RequestDumperValve"/>
-      -->
-
       <!-- This Realm uses the UserDatabase configured in the global JNDI
            resources under the key "UserDatabase".  Any edits
            that are performed against this UserDatabase are immediately
@@ -58,8 +51,7 @@
            Note: XML Schema validation will not work with Xerces 2.2.
        -->
       <Host name="localhost"  appBase="webapps"
-            unpackWARs="true" autoDeploy="true"
-            xmlValidation="false" xmlNamespaceAware="false">
+            unpackWARs="true" autoDeploy="true">
 
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
