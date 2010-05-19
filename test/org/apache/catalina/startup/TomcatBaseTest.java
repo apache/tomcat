@@ -68,6 +68,15 @@ public abstract class TomcatBaseTest extends TestCase {
     }
 
     /**
+     * Helper method that returns the path of the temporary directory used by
+     * the test runs. The directory is configured during {@link #setUp()} and is
+     * deleted at {@link #tearDown()}.
+     */
+    public File getTemporaryDirectory() {
+        return tempDir;
+    }
+
+    /**
      * Helper method that returns the directory where Tomcat build resides. It
      * is used to access resources that are part of default Tomcat deployment.
      * E.g. the examples webapp.
@@ -84,7 +93,7 @@ public abstract class TomcatBaseTest extends TestCase {
                 "org.apache.juli.ClassLoaderLogManager");
 
         tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        if (!tempDir.exists() && !tempDir.mkdir()) {
+        if (!tempDir.exists() && !tempDir.mkdirs()) {
             fail("Unable to create temporary directory for test");
         }
         

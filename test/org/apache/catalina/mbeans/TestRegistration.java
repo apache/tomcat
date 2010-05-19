@@ -45,7 +45,7 @@ public class TestRegistration extends TomcatBaseTest {
         assertEquals("Remaining: " + onames, 0, onames.size());
 
         final Tomcat tomcat = getTomcatInstance();
-        final File contextDir = new File("output/webappFoo");
+        final File contextDir = new File(getTemporaryDirectory(), "webappFoo");
         contextDir.mkdir();
         tomcat.addContext("/foo", contextDir.getAbsolutePath());
         tomcat.start();
@@ -69,7 +69,7 @@ public class TestRegistration extends TomcatBaseTest {
         host.setName("otherhost");
         tomcat.getEngine().addChild(host);
 
-        final File contextDir2 = new File("output/webappFoo2");
+        final File contextDir2 = new File(getTemporaryDirectory(), "webappFoo2");
         contextDir2.mkdir();
         tomcat.addContext(host, "/foo2", contextDir2.getAbsolutePath());
         
