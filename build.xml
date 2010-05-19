@@ -910,6 +910,9 @@
     depends="test-compile,deploy" >
 
     <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
+
+      <jvmarg value="-Dsun.security.ssl.allowUnsafeRenegotiation=true" />
+
       <classpath refid="tomcat.test.classpath" />
 
       <sysproperty key="tomcat.test.temp" value="${test.temp}" />
