@@ -646,18 +646,15 @@ public class CoyoteAdapter implements Adapter {
         
         ByteChunk uriBC = req.decodedURI().getByteChunk();
         int semicolon = uriBC.indexOf(';', 0);
-        String enc = null;
+
+        // What encoding to use? Some platforms, eg z/os, use a default
+        // encoding that doesn't give the expected result so be explicit
+        String enc = connector.getURIEncoding();
+        if (enc == null) {
+            enc = "ISO-8859-1";
+        }
         
         while (semicolon > -1) {
-            if (enc == null) {
-                // What encoding to use? Some platforms, eg z/os, use a default
-                // encoding that doesn't give the expected result so be explicit
-                enc = connector.getURIEncoding();
-                if (enc == null) {
-                    enc = "ISO-8859-1";
-                }
-            }
-            
             // Parse path param, and extract it from the decoded request URI
             int start = uriBC.getStart();
             int end = uriBC.getEnd();
