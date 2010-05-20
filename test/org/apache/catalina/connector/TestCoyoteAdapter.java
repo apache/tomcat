@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -65,13 +66,20 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         pathParamTest("/foo;jsessionid=1234/bar", "1234");
     }
 
-    public void testPathParams() throws Exception {
+    public void testPathParamsRedirect() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
         
         // Must have a real docBase - just use temp
-        Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        // Create the folder that will trigger the redirect
+        File foo = new File(docBase, "foo");
+        if (!foo.exists() && !foo.mkdirs()) {
+            fail("Unable to create foo directory in docBase");
+        }
+        
+        Context ctx = tomcat.addContext("/", docBase.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("/", "servlet");
