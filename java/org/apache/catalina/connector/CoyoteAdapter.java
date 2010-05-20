@@ -588,6 +588,22 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
+        // Now we have the context, we can parse the session ID from the URL
+        // (if any). Need to do this before we redirect in case we need to
+        // include the session id in the redirect
+        if (request.getServletContext().getEffectiveSessionTrackingModes()
+                .contains(SessionTrackingMode.URL)) {
+            
+            // Get the session ID if there was one
+            String sessionID = request.getPathParameter(
+                    ApplicationSessionCookieConfig.getSessionUriParamName(
+                            request.getContext()));
+            if (sessionID != null) {
+                request.setRequestedSessionId(sessionID);
+                request.setRequestedSessionURL(true);
+            }
+        }
+
         // Possible redirect
         MessageBytes redirectPathMB = request.getMappingData().redirectPath;
         if (!redirectPathMB.isNull()) {
@@ -610,19 +626,7 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // Parse session Id
-        if (request.getServletContext().getEffectiveSessionTrackingModes()
-                .contains(SessionTrackingMode.URL)) {
-            
-            // Get the session ID if there was one
-            String sessionID = request.getPathParameter(
-                    ApplicationSessionCookieConfig.getSessionUriParamName(
-                            request.getContext()));
-            if (sessionID != null) {
-                request.setRequestedSessionId(sessionID);
-                request.setRequestedSessionURL(true);
-            }
-        }
+        // Finally look for session ID in cookies and SSL session
         parseSessionCookiesId(req, request);
         parseSessionSslId(request);
         return true;
