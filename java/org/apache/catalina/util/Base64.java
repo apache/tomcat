@@ -17,6 +17,8 @@
 
 package org.apache.catalina.util;
 
+import java.io.UnsupportedEncodingException;
+
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 
@@ -112,8 +114,7 @@ public final class  Base64
      * @param binaryData Array containing binary data to encode.
      * @return Base64-encoded data.
      */
-    public static byte[] encode( byte[] binaryData )
-    {
+    public static String encode(byte[] binaryData) {
         int      lengthDataBits    = binaryData.length*EIGHTBIT;
         int      fewerThan24bits   = lengthDataBits%TWENTYFOURBITGROUP;
         int      numberTriplets    = lengthDataBits/TWENTYFOURBITGROUP;
@@ -198,7 +199,14 @@ public final class  Base64
             encodedData[encodedIndex + 3] = PAD;
         }
 
-        return encodedData;
+        String result;
+        try {
+            result = new String(encodedData, "ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            // Should never happen but in case it does...
+            result = new String(encodedData);
+        }
+        return result;
     }
 
     /**
