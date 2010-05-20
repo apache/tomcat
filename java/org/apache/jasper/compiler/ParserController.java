@@ -20,8 +20,6 @@ package org.apache.jasper.compiler;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.JarURLConnection;
-import java.net.URL;
 import java.util.Stack;
 import java.util.jar.JarFile;
 
@@ -606,18 +604,4 @@ class ParserController implements TagConstants {
 
         return false;
     }
-
-    private JarFile getJarFile(URL jarFileUrl) throws IOException {
-        JarFile jarFile = null;
-
-        if (jarFileUrl != null) {
-            JarURLConnection conn = (JarURLConnection) jarFileUrl.openConnection();
-            conn.setUseCaches(false);
-            conn.connect();
-            jarFile = conn.getJarFile();
-        }
-
-        return jarFile;
-    }
-
 }
