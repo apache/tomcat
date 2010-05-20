@@ -72,9 +72,15 @@ public class AprLifecycleListener
     protected static boolean sslAvailable = false;
     protected static boolean aprAvailable = false;
 
+    protected static String lock = "";
+
     public static boolean isAprAvailable() {
         //https://issues.apache.org/bugzilla/show_bug.cgi?id=48613
-        if (instanceCreated) init();
+        if (instanceCreated) {
+            synchronized (lock) {
+                init();
+            }
+        }
         return aprAvailable;
     }
     
@@ -92,28 +98,32 @@ public class AprLifecycleListener
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.INIT_EVENT.equals(event.getType())) {
-            init();
-            if (aprAvailable) {
-                try {
-                    initializeSSL();
-                } catch (Throwable t) {
-                    log.info(sm.getString("aprListener.sslInit"));
+            synchronized (lock) {
+                init();
+                if (aprAvailable) {
+                    try {
+                        initializeSSL();
+                    } catch (Throwable t) {
+                        log.info(sm.getString("aprListener.sslInit"));
+                    }
                 }
             }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
-            if (!aprAvailable) {
-                return;
-            }
-            try {
-                terminateAPR();
-            } catch (Throwable t) {
-                log.info(sm.getString("aprListener.aprDestroy"));
+            synchronized (lock) {
+                if (!aprAvailable) {
+                    return;
+                }
+                try {
+                    terminateAPR();
+                } catch (Throwable t) {
+                    log.info(sm.getString("aprListener.aprDestroy"));
+                }
             }
         }
 
     }
 
-    private static synchronized void terminateAPR()
+    private static void terminateAPR()
         throws ClassNotFoundException, NoSuchMethodException,
                IllegalAccessException, InvocationTargetException
     {
@@ -121,6 +131,8 @@ public class AprLifecycleListener
         Method method = Class.forName("org.apache.tomcat.jni.Library")
             .getMethod(methodName, (Class [])null);
         method.invoke(null, (Object []) null);
+        aprAvailable = false;
+        aprInitialized = false;
     }
 
     private static void init()
@@ -188,7 +200,7 @@ public class AprLifecycleListener
         aprAvailable = true;
     }
 
-    private static synchronized void initializeSSL()
+    private static void initializeSSL()
         throws ClassNotFoundException, NoSuchMethodException,
                IllegalAccessException, InvocationTargetException
     {
