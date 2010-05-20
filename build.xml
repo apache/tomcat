@@ -912,6 +912,7 @@
     <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
 
       <jvmarg value="-Dsun.security.ssl.allowUnsafeRenegotiation=true" />
+      <jvmarg value="-Djava.library.path=${tomcat.build}/bin/native"/>
 
       <classpath refid="tomcat.test.classpath" />
 
