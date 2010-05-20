@@ -926,7 +926,12 @@ public class Http11AprProcessor implements ActionHook {
     }
 
     /* Copied from the AjpProcessor.java */
-    public SocketState asyncDispatch(SocketStatus status) throws IOException {
+    public SocketState asyncDispatch(long socket, SocketStatus status) throws IOException {
+
+        // Setting up the socket
+        this.socket = socket;
+        inputBuffer.setSocket(socket);
+        outputBuffer.setSocket(socket);
 
         RequestInfo rp = request.getRequestProcessor();
         try {
@@ -1267,11 +1272,7 @@ public class Http11AprProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
                 dispatch.set(true);
-                try {
-                    asyncDispatch(SocketStatus.STOP); // What to do with return code ?
-                } catch (IOException ex) {
-                    error = true;
-                }
+                endpoint.getHandler().asyncDispatch(this.socket, SocketStatus.STOP);
             } else {
                 dispatch.set(false);
             }
