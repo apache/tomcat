@@ -416,6 +416,11 @@ public class AjpAprProtocol
             return SocketState.CLOSED;
         }
 
+        // FIXME: Support for this could be added in AJP as well
+        public SocketState asyncDispatch(long socket, SocketStatus status) {
+            return SocketState.CLOSED;
+        }
+        
         protected AjpAprProcessor createProcessor() {
             AjpAprProcessor processor = new AjpAprProcessor(proto.packetSize, proto.endpoint);
             processor.setAdapter(proto.adapter);
