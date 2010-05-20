@@ -199,7 +199,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Set up an authorization header with our credentials
             String input = username + ":" + password;
-            String output = new String(Base64.encode(input.getBytes()));
+            String output = Base64.encode(input.getBytes());
             hconn.setRequestProperty("Authorization",
                                      "Basic " + output);
 
