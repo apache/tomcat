@@ -63,18 +63,28 @@ public class TestTomcatSSL extends TomcatBaseTest {
             connector.setPort(getPort());
             tomcat.getService().addConnector(connector);
             tomcat.setConnector(connector);
-            tomcat.getConnector().setSecure(true);            
-        } else {
-            tomcat.getConnector().setSecure(true);
+            tomcat.getConnector().setProperty("sslProtocol", "tls");
         }
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.indexOf("Apr") == -1) {
+            tomcat.getConnector().setProperty("sslProtocol", "tls");
+            File keystoreFile = new File(
+                    "test/org/apache/catalina/startup/test.keystore");
+            tomcat.getConnector().setAttribute("keystoreFile",
+                    keystoreFile.getAbsolutePath());
+        } else {
+            File keystoreFile = new File(
+                    "test/org/apache/catalina/startup/test-cert.pem");
+            tomcat.getConnector().setAttribute("SSLCertificateFile",
+                    keystoreFile.getAbsolutePath());
+            keystoreFile = new File(
+                    "test/org/apache/catalina/startup/test-key.pem");
+            tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
+                    keystoreFile.getAbsolutePath());
+        }
+        tomcat.getConnector().setSecure(true);            
         tomcat.getConnector().setProperty("SSLEnabled", "true");
-        tomcat.getConnector().setProperty("sslProtocol",
-            "tls");
 
-        File keystoreFile = new File(
-                "test/org/apache/catalina/startup/test.keystore");
-        tomcat.getConnector().setAttribute("keystoreFile",
-                keystoreFile.getAbsolutePath());
     }
     
     public void testSimpleSsl() throws Exception {
