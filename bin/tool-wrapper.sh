@@ -54,7 +54,7 @@ done
 
 # Get standard environment variables
 PRGDIR=`dirname "$PRG"`
-CATALINA_HOME=`cd "$PRGDIR/.." ; pwd`
+CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
 # Ensure that any user defined CLASSPATH variables are not used on startup,
 # but allow them to be specified in setenv.sh, in rare case when it is needed.
