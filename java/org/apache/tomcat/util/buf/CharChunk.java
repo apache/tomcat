@@ -48,9 +48,9 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      *  grow the buffer ( up to the limit ) or send it to a channel.
      */
     public static interface CharOutputChannel {
-	/** Send the bytes ( usually the internal conversion buffer ).
-	 *  Expect 8k output if the buffer is full.
-	 */
+        /** Send the bytes ( usually the internal conversion buffer ).
+         *  Expect 8k output if the buffer is full.
+         */
         public void realWriteChars(char cbuf[], int off, int len)
             throws IOException;
     }
@@ -80,48 +80,48 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
     public CharChunk(int size) {
-	allocate( size, -1 );
+        allocate( size, -1 );
     }
 
     // --------------------
     
     public CharChunk getClone() {
-	try {
-	    return (CharChunk)this.clone();
-	} catch( Exception ex) {
-	    return null;
-	}
+        try {
+            return (CharChunk)this.clone();
+        } catch( Exception ex) {
+            return null;
+        }
     }
 
     public boolean isNull() {
-	if( end > 0 ) return false;
-	return !isSet; //XXX 
+        if( end > 0 ) return false;
+        return !isSet; //XXX 
     }
     
     /**
      * Resets the message bytes to an uninitialized state.
      */
     public void recycle() {
-	//	buff=null;
-	isSet=false; // XXX
-	start=0;
-	end=0;
+        //        buff=null;
+        isSet=false; // XXX
+        start=0;
+        end=0;
     }
 
     public void reset() {
-	buff=null;
+        buff=null;
     }
 
     // -------------------- Setup --------------------
 
     public void allocate( int initial, int limit  ) {
-	if( buff==null || buff.length < initial ) {
-	    buff=new char[initial];
-	}
-	this.limit=limit;
-	start=0;
-	end=0;
-	isSet=true;
+        if( buff==null || buff.length < initial ) {
+            buff=new char[initial];
+        }
+        this.limit=limit;
+        start=0;
+        end=0;
+        isSet=true;
     }
 
 
@@ -144,11 +144,11 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      *  or throw exception.
      */
     public void setLimit(int limit) {
-	this.limit=limit;
+        this.limit=limit;
     }
     
     public int getLimit() {
-	return limit;
+        return limit;
     }
 
     /**
@@ -159,23 +159,23 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
     /** When the buffer is full, write the data to the output channel.
-     * 	Also used when large amount of data is appended.
+     *         Also used when large amount of data is appended.
      *
      *  If not set, the buffer will grow to the limit.
      */
     public void setCharOutputChannel(CharOutputChannel out) {
-	this.out=out;
+        this.out=out;
     }
 
     // compat 
     public char[] getChars()
     {
-	return getBuffer();
+        return getBuffer();
     }
     
     public char[] getBuffer()
     {
-	return buff;
+        return buff;
     }
     
     /**
@@ -183,71 +183,71 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      * For output this is the end of the buffer.
      */
     public int getStart() {
-	return start;
+        return start;
     }
     
     public int getOffset() {
-	return start;
+        return start;
     }
 
     /**
      * Returns the start offset of the bytes.
      */
     public void setOffset(int off) {
-	start=off;
+        start=off;
     }
 
     /**
      * Returns the length of the bytes.
      */
     public int getLength() {
-	return end-start;
+        return end-start;
     }
 
 
     public int getEnd() {
-	return end;
+        return end;
     }
 
     public void setEnd( int i ) {
-	end=i;
+        end=i;
     }
 
     // -------------------- Adding data --------------------
     
     public void append( char b )
-	throws IOException
+        throws IOException
     {
-	makeSpace( 1 );
+        makeSpace( 1 );
 
-	// couldn't make space
-	if( limit >0 && end >= limit ) {
-	    flushBuffer();
-	}
-	buff[end++]=b;
+        // couldn't make space
+        if( limit >0 && end >= limit ) {
+            flushBuffer();
+        }
+        buff[end++]=b;
     }
     
     public void append( CharChunk src )
-	throws IOException
+        throws IOException
     {
-	append( src.getBuffer(), src.getOffset(), src.getLength());
+        append( src.getBuffer(), src.getOffset(), src.getLength());
     }
 
     /** Add data to the buffer
      */
     public void append( char src[], int off, int len )
-	throws IOException
+        throws IOException
     {
-	// will grow, up to limit
-	makeSpace( len );
+        // will grow, up to limit
+        makeSpace( len );
 
-	// if we don't have limit: makeSpace can grow as it wants
-	if( limit < 0 ) {
-	    // assert: makeSpace made enough space
-	    System.arraycopy( src, off, buff, end, len );
-	    end+=len;
-	    return;
-	}
+        // if we don't have limit: makeSpace can grow as it wants
+        if( limit < 0 ) {
+            // assert: makeSpace made enough space
+            System.arraycopy( src, off, buff, end, len );
+            end+=len;
+            return;
+        }
 
         // Optimize on a common case.
         // If the source is going to fill up all the space in buffer, may
@@ -256,82 +256,82 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
             out.realWriteChars( src, off, len );
             return;
         }
-	
-	// if we have limit and we're below
-	if( len <= limit - end ) {
-	    // makeSpace will grow the buffer to the limit,
-	    // so we have space
-	    System.arraycopy( src, off, buff, end, len );
+        
+        // if we have limit and we're below
+        if( len <= limit - end ) {
+            // makeSpace will grow the buffer to the limit,
+            // so we have space
+            System.arraycopy( src, off, buff, end, len );
             
-	    end+=len;
-	    return;
-	}
+            end+=len;
+            return;
+        }
 
-	// need more space than we can afford, need to flush
-	// buffer
+        // need more space than we can afford, need to flush
+        // buffer
 
-	// the buffer is already at ( or bigger than ) limit
-	
-	// Optimization:
-	// If len-avail < length ( i.e. after we fill the buffer with
-	// what we can, the remaining will fit in the buffer ) we'll just
-	// copy the first part, flush, then copy the second part - 1 write
-	// and still have some space for more. We'll still have 2 writes, but
-	// we write more on the first.
+        // the buffer is already at ( or bigger than ) limit
+        
+        // Optimization:
+        // If len-avail < length ( i.e. after we fill the buffer with
+        // what we can, the remaining will fit in the buffer ) we'll just
+        // copy the first part, flush, then copy the second part - 1 write
+        // and still have some space for more. We'll still have 2 writes, but
+        // we write more on the first.
 
-	if( len + end < 2 * limit ) {
-	    /* If the request length exceeds the size of the output buffer,
-	       flush the output buffer and then write the data directly.
-	       We can't avoid 2 writes, but we can write more on the second
-	    */
-	    int avail=limit-end;
-	    System.arraycopy(src, off, buff, end, avail);
-	    end += avail;
-	    
-	    flushBuffer();
-	    
-	    System.arraycopy(src, off+avail, buff, end, len - avail);
-	    end+= len - avail;
-	    
-	} else {	// len > buf.length + avail
-	    // long write - flush the buffer and write the rest
-	    // directly from source
-	    flushBuffer();
-	    
-	    out.realWriteChars( src, off, len );
-	}
+        if( len + end < 2 * limit ) {
+            /* If the request length exceeds the size of the output buffer,
+               flush the output buffer and then write the data directly.
+               We can't avoid 2 writes, but we can write more on the second
+            */
+            int avail=limit-end;
+            System.arraycopy(src, off, buff, end, avail);
+            end += avail;
+            
+            flushBuffer();
+            
+            System.arraycopy(src, off+avail, buff, end, len - avail);
+            end+= len - avail;
+            
+        } else {        // len > buf.length + avail
+            // long write - flush the buffer and write the rest
+            // directly from source
+            flushBuffer();
+            
+            out.realWriteChars( src, off, len );
+        }
     }
 
 
     /** Add data to the buffer
      */
     public void append( StringBuilder sb )
-	throws IOException
+        throws IOException
     {
-	int len=sb.length();
+        int len=sb.length();
 
-	// will grow, up to limit
-	makeSpace( len );
+        // will grow, up to limit
+        makeSpace( len );
 
-	// if we don't have limit: makeSpace can grow as it wants
-	if( limit < 0 ) {
-	    // assert: makeSpace made enough space
-	    sb.getChars(0, len, buff, end );
-	    end+=len;
-	    return;
-	}
+        // if we don't have limit: makeSpace can grow as it wants
+        if( limit < 0 ) {
+            // assert: makeSpace made enough space
+            sb.getChars(0, len, buff, end );
+            end+=len;
+            return;
+        }
 
-	int off=0;
-	int sbOff = off;
-	int sbEnd = off + len;
-	while (sbOff < sbEnd) {
-	    int d = min(limit - end, sbEnd - sbOff);
-	    sb.getChars( sbOff, sbOff+d, buff, end);
-	    sbOff += d;
-	    end += d;
-	    if (end >= limit)
-		flushBuffer();
-	}
+        int off=0;
+        int sbOff = off;
+        int sbEnd = off + len;
+        while (sbOff < sbEnd) {
+            int d = min(limit - end, sbEnd - sbOff);
+            sb.getChars( sbOff, sbOff+d, buff, end);
+            sbOff += d;
+            end += d;
+            if (end >= limit)
+                flushBuffer();
+        }
     }
 
     /** Append a string to the buffer
@@ -343,29 +343,29 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     /** Append a string to the buffer
      */
     public void append(String s, int off, int len) throws IOException {
-	if (s==null) return;
-	
-	// will grow, up to limit
-	makeSpace( len );
+        if (s==null) return;
+        
+        // will grow, up to limit
+        makeSpace( len );
 
-	// if we don't have limit: makeSpace can grow as it wants
-	if( limit < 0 ) {
-	    // assert: makeSpace made enough space
-	    s.getChars(off, off+len, buff, end );
-	    end+=len;
-	    return;
-	}
+        // if we don't have limit: makeSpace can grow as it wants
+        if( limit < 0 ) {
+            // assert: makeSpace made enough space
+            s.getChars(off, off+len, buff, end );
+            end+=len;
+            return;
+        }
 
-	int sOff = off;
-	int sEnd = off + len;
-	while (sOff < sEnd) {
-	    int d = min(limit - end, sEnd - sOff);
-	    s.getChars( sOff, sOff+d, buff, end);
-	    sOff += d;
-	    end += d;
-	    if (end >= limit)
-		flushBuffer();
-	}
+        int sOff = off;
+        int sEnd = off + len;
+        while (sOff < sEnd) {
+            int d = min(limit - end, sEnd - sOff);
+            s.getChars( sOff, sOff+d, buff, end);
+            sOff += d;
+            end += d;
+            if (end >= limit)
+                flushBuffer();
+        }
     }
     
     // -------------------- Removing data from the buffer --------------------
@@ -426,59 +426,59 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
 
     public void flushBuffer()
-	throws IOException
+        throws IOException
     {
-	//assert out!=null
-	if( out==null ) {
-	    throw new IOException( "Buffer overflow, no sink " + limit + " " +
-				   buff.length  );
-	}
-	out.realWriteChars( buff, start, end - start );
-	end=start;
+        //assert out!=null
+        if( out==null ) {
+            throw new IOException( "Buffer overflow, no sink " + limit + " " +
+                                   buff.length  );
+        }
+        out.realWriteChars( buff, start, end - start );
+        end=start;
     }
 
     /** Make space for len chars. If len is small, allocate
-     *	a reserve space too. Never grow bigger than limit.
+     *        a reserve space too. Never grow bigger than limit.
      */
     private void makeSpace(int count)
     {
-	char[] tmp = null;
+        char[] tmp = null;
 
-	int newSize;
-	int desiredSize=end + count;
+        int newSize;
+        int desiredSize=end + count;
 
-	// Can't grow above the limit
-	if( limit > 0 &&
-	    desiredSize > limit) {
-	    desiredSize=limit;
-	}
+        // Can't grow above the limit
+        if( limit > 0 &&
+            desiredSize > limit) {
+            desiredSize=limit;
+        }
 
-	if( buff==null ) {
-	    if( desiredSize < 256 ) desiredSize=256; // take a minimum
-	    buff=new char[desiredSize];
-	}
+        if( buff==null ) {
+            if( desiredSize < 256 ) desiredSize=256; // take a minimum
+            buff=new char[desiredSize];
+        }
 
-	// limit < buf.length ( the buffer is already big )
-	// or we already have space XXX
-	if( desiredSize <= buff.length) {
-	    return;
-	}
-	// grow in larger chunks
-	if( desiredSize < 2 * buff.length ) {
-	    newSize= buff.length * 2;
-	    if( limit >0 &&
-		newSize > limit ) newSize=limit;
-	    tmp=new char[newSize];
-	} else {
-	    newSize= buff.length * 2 + count ;
-	    if( limit > 0 &&
-		newSize > limit ) newSize=limit;
-	    tmp=new char[newSize];
-	}
-	
-	System.arraycopy(buff, 0, tmp, 0, end);
-	buff = tmp;
-	tmp = null;
+        // limit < buf.length ( the buffer is already big )
+        // or we already have space XXX
+        if( desiredSize <= buff.length) {
+            return;
+        }
+        // grow in larger chunks
+        if( desiredSize < 2 * buff.length ) {
+            newSize= buff.length * 2;
+            if( limit >0 &&
+                newSize > limit ) newSize=limit;
+            tmp=new char[newSize];
+        } else {
+            newSize= buff.length * 2 + count ;
+            if( limit > 0 &&
+                newSize > limit ) newSize=limit;
+            tmp=new char[newSize];
+        }
+        
+        System.arraycopy(buff, 0, tmp, 0, end);
+        buff = tmp;
+        tmp = null;
     }
     
     // -------------------- Conversion and getters --------------------
@@ -499,8 +499,8 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     public int getInt()
     {
-	return Ascii.parseInt(buff, start,
-				end-start);
+        return Ascii.parseInt(buff, start,
+                                end-start);
     }
     
     // -------------------- equals --------------------
@@ -511,18 +511,18 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      * @return true if the comparison succeeded, false otherwise
      */
     public boolean equals(String s) {
-	char[] c = buff;
-	int len = end-start;
-	if (c == null || len != s.length()) {
-	    return false;
-	}
-	int off = start;
-	for (int i = 0; i < len; i++) {
-	    if (c[off++] != s.charAt(i)) {
-		return false;
-	    }
-	}
-	return true;
+        char[] c = buff;
+        int len = end-start;
+        if (c == null || len != s.length()) {
+            return false;
+        }
+        int off = start;
+        for (int i = 0; i < len; i++) {
+            if (c[off++] != s.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -531,57 +531,57 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      * @return true if the comparison succeeded, false otherwise
      */
     public boolean equalsIgnoreCase(String s) {
-	char[] c = buff;
-	int len = end-start;
-	if (c == null || len != s.length()) {
-	    return false;
-	}
-	int off = start;
-	for (int i = 0; i < len; i++) {
-	    if (Ascii.toLower( c[off++] ) != Ascii.toLower( s.charAt(i))) {
-		return false;
-	    }
-	}
-	return true;
+        char[] c = buff;
+        int len = end-start;
+        if (c == null || len != s.length()) {
+            return false;
+        }
+        int off = start;
+        for (int i = 0; i < len; i++) {
+            if (Ascii.toLower( c[off++] ) != Ascii.toLower( s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean equals(CharChunk cc) {
-	return equals( cc.getChars(), cc.getOffset(), cc.getLength());
+        return equals( cc.getChars(), cc.getOffset(), cc.getLength());
     }
 
     public boolean equals(char b2[], int off2, int len2) {
-	char b1[]=buff;
-	if( b1==null && b2==null ) return true;
-	
-	if (b1== null || b2==null || end-start != len2) {
-	    return false;
-	}
-	int off1 = start;
-	int len=end-start;
-	while ( len-- > 0) {
-	    if (b1[off1++] != b2[off2++]) {
-		return false;
-	    }
-	}
-	return true;
+        char b1[]=buff;
+        if( b1==null && b2==null ) return true;
+        
+        if (b1== null || b2==null || end-start != len2) {
+            return false;
+        }
+        int off1 = start;
+        int len=end-start;
+        while ( len-- > 0) {
+            if (b1[off1++] != b2[off2++]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean equals(byte b2[], int off2, int len2) {
-	char b1[]=buff;
-	if( b2==null && b1==null ) return true;
+        char b1[]=buff;
+        if( b2==null && b1==null ) return true;
 
-	if (b1== null || b2==null || end-start != len2) {
-	    return false;
-	}
-	int off1 = start;
-	int len=end-start;
-	
-	while ( len-- > 0) {
-	    if ( b1[off1++] != (char)b2[off2++]) {
-		return false;
-	    }
-	}
-	return true;
+        if (b1== null || b2==null || end-start != len2) {
+            return false;
+        }
+        int off1 = start;
+        int len=end-start;
+        
+        while ( len-- > 0) {
+            if ( b1[off1++] != (char)b2[off2++]) {
+                return false;
+            }
+        }
+        return true;
     }
     
     /**
@@ -589,18 +589,18 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      * @param s the string
      */
     public boolean startsWith(String s) {
-	char[] c = buff;
-	int len = s.length();
-	if (c == null || len > end-start) {
-	    return false;
-	}
-	int off = start;
-	for (int i = 0; i < len; i++) {
-	    if (c[off++] != s.charAt(i)) {
-		return false;
-	    }
-	}
-	return true;
+        char[] c = buff;
+        int len = s.length();
+        if (c == null || len > end-start) {
+            return false;
+        }
+        int off = start;
+        for (int i = 0; i < len; i++) {
+            if (c[off++] != s.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
     }
     
     /**
@@ -608,18 +608,18 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      * @param s the string
      */
     public boolean startsWithIgnoreCase(String s, int pos) {
-	char[] c = buff;
-	int len = s.length();
-	if (c == null || len+pos > end-start) {
-	    return false;
-	}
-	int off = start+pos;
-	for (int i = 0; i < len; i++) {
-	    if (Ascii.toLower( c[off++] ) != Ascii.toLower( s.charAt(i))) {
-		return false;
-	    }
-	}
-	return true;
+        char[] c = buff;
+        int len = s.length();
+        if (c == null || len+pos > end-start) {
+            return false;
+        }
+        int off = start+pos;
+        for (int i = 0; i < len; i++) {
+            if (Ascii.toLower( c[off++] ) != Ascii.toLower( s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
     
 
@@ -627,24 +627,24 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     // normal hash. 
     public int hash() {
-	int code=0;
-	for (int i = start; i < start + end-start; i++) {
-	    code = code * 37 + buff[i];
-	}
-	return code;
+        int code=0;
+        for (int i = start; i < start + end-start; i++) {
+            code = code * 37 + buff[i];
+        }
+        return code;
     }
 
     // hash ignoring case
     public int hashIgnoreCase() {
-	int code=0;
-	for (int i = start; i < end; i++) {
-	    code = code * 37 + Ascii.toLower(buff[i]);
-	}
-	return code;
+        int code=0;
+        for (int i = start; i < end; i++) {
+            code = code * 37 + Ascii.toLower(buff[i]);
+        }
+        return code;
     }
 
     public int indexOf(char c) {
-	return indexOf( c, start);
+        return indexOf( c, start);
     }
     
     /**
@@ -652,45 +652,45 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      * @param c the character
      */
     public int indexOf(char c, int starting) {
-	int ret = indexOf( buff, start+starting, end, c );
-	return (ret >= start) ? ret - start : -1;
+        int ret = indexOf( buff, start+starting, end, c );
+        return (ret >= start) ? ret - start : -1;
     }
 
     public static int indexOf( char chars[], int off, int cend, char qq )
     {
-	while( off < cend ) {
-	    char b=chars[off];
-	    if( b==qq )
-		return off;
-	    off++;
-	}
-	return -1;
+        while( off < cend ) {
+            char b=chars[off];
+            if( b==qq )
+                return off;
+            off++;
+        }
+        return -1;
     }
     
 
     public int indexOf( String src, int srcOff, int srcLen, int myOff ) {
-	char first=src.charAt( srcOff );
+        char first=src.charAt( srcOff );
 
-	// Look for first char 
-	int srcEnd = srcOff + srcLen;
+        // Look for first char 
+        int srcEnd = srcOff + srcLen;
         
-	for( int i=myOff+start; i <= (end - srcLen); i++ ) {
-	    if( buff[i] != first ) continue;
-	    // found first char, now look for a match
+        for( int i=myOff+start; i <= (end - srcLen); i++ ) {
+            if( buff[i] != first ) continue;
+            // found first char, now look for a match
             int myPos=i+1;
-	    for( int srcPos=srcOff + 1; srcPos< srcEnd; ) {
+            for( int srcPos=srcOff + 1; srcPos< srcEnd; ) {
                 if( buff[myPos++] != src.charAt( srcPos++ ))
-		    break;
+                    break;
                 if( srcPos==srcEnd ) return i-start; // found it
-	    }
-	}
-	return -1;
+            }
+        }
+        return -1;
     }
 
     // -------------------- utils
     private int min(int a, int b) {
-	if (a < b) return a;
-	return b;
+        if (a < b) return a;
+        return b;
     }
 
     // Char sequence impl
