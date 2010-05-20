@@ -133,6 +133,7 @@ public class AprLifecycleListener
         method.invoke(null, (Object []) null);
         aprAvailable = false;
         aprInitialized = false;
+        sslInitialized = false; // Well we cleaned the pool in terminate.
     }
 
     private static void init()
