@@ -400,7 +400,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 ExceptionUtils.handleThrowable(t);
             }
             if (apr) {
-                setEntropy(new String(Base64.encode(result)));
+                setEntropy(Base64.encode(result));
             } else {
                 setEntropy(this.toString());
             }
