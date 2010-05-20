@@ -72,7 +72,7 @@ public class AprLifecycleListener
     protected static boolean sslAvailable = false;
     protected static boolean aprAvailable = false;
 
-    protected static Object lock = new Object();
+    protected static final Object lock = new Object();
 
     public static boolean isAprAvailable() {
         //https://issues.apache.org/bugzilla/show_bug.cgi?id=48613
