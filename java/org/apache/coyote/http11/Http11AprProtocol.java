@@ -609,6 +609,47 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             return SocketState.CLOSED;
         }
 
+        public SocketState asyncDispatch(long socket, SocketStatus status) {
+            Http11AprProcessor result = connections.get(Long.valueOf(socket));
+            
+            SocketState state = SocketState.CLOSED; 
+            if (result != null) {
+                // Call the appropriate event
+                try {
+                    state = result.asyncDispatch(socket, status);
+                } catch (java.net.SocketException e) {
+                    // SocketExceptions are normal
+                    Http11AprProtocol.log.debug
+                        (sm.getString
+                            ("http11protocol.proto.socketexception.debug"), e);
+                } catch (java.io.IOException e) {
+                    // IOExceptions are normal
+                    Http11AprProtocol.log.debug
+                        (sm.getString
+                            ("http11protocol.proto.ioexception.debug"), e);
+                }
+                // Future developers: if you discover any other
+                // rare-but-nonfatal exceptions, catch them here, and log as
+                // above.
+                catch (Throwable e) {
+                    // any other exception or error is odd. Here we log it
+                    // with "ERROR" level, so it will show up even on
+                    // less-than-verbose logs.
+                    Http11AprProtocol.log.error
+                        (sm.getString("http11protocol.proto.error"), e);
+                } finally {
+                    if (state != SocketState.LONG) {
+                        connections.remove(Long.valueOf(socket));
+                        recycledProcessors.offer(result);
+                        if (state == SocketState.OPEN) {
+                            proto.endpoint.getPoller().add(socket);
+                        }
+                    }
+                }
+            }
+            return state;
+        }
+
         protected Http11AprProcessor createProcessor() {
             Http11AprProcessor processor =
                 new Http11AprProcessor(proto.maxHttpHeaderSize, proto.endpoint);
