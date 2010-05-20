@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -31,8 +30,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 
 import javax.servlet.jsp.tagext.FunctionInfo;
 import javax.servlet.jsp.tagext.PageData;
