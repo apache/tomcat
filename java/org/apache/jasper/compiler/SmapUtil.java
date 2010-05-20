@@ -192,39 +192,6 @@ public class SmapUtil {
 
         int sdeIndex;
 
-        public static void main(String[] args) throws IOException {
-            if (args.length == 2) {
-                install(new File(args[0]), new File(args[1]));
-            } else if (args.length == 3) {
-                install(
-                    new File(args[0]),
-                    new File(args[1]),
-                    new File(args[2]));
-            } else {
-                System.err.println(
-                    "Usage: <command> <input class file> "
-                        + "<attribute file> <output class file name>\n"
-                        + "<command> <input/output class file> <attribute file>");
-            }
-        }
-
-        static void install(File inClassFile, File attrFile, File outClassFile)
-            throws IOException {
-            new SDEInstaller(inClassFile, attrFile, outClassFile);
-        }
-
-        static void install(File inOutClassFile, File attrFile)
-            throws IOException {
-            File tmpFile = new File(inOutClassFile.getPath() + "tmp");
-            new SDEInstaller(inOutClassFile, attrFile, tmpFile);
-            if (!inOutClassFile.delete()) {
-                throw new IOException("inOutClassFile.delete() failed");
-            }
-            if (!tmpFile.renameTo(inOutClassFile)) {
-                throw new IOException("tmpFile.renameTo(inOutClassFile) failed");
-            }
-        }
-
         static void install(File classFile, byte[] smap) throws IOException {
             File tmpFile = new File(classFile.getPath() + "tmp");
             new SDEInstaller(classFile, smap, tmpFile);
@@ -254,11 +221,6 @@ public class SmapUtil {
             FileOutputStream outStream = new FileOutputStream(outClassFile);
             outStream.write(gen, 0, genPos);
             outStream.close();
-        }
-
-        SDEInstaller(File inClassFile, File attrFile, File outClassFile)
-            throws IOException {
-            this(inClassFile, readWhole(attrFile), outClassFile);
         }
 
         static byte[] readWhole(File input) throws IOException {
