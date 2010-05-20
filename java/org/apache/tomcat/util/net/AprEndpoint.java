@@ -370,7 +370,7 @@ public class AprEndpoint extends AbstractEndpoint {
         if (initialized)
             return;
         if (!AprLifecycleListener.isAprAvailable()) {
-            throw new Exception(sm.getString("endpoint.init.notavail");
+            throw new Exception(sm.getString("endpoint.init.notavail"));
         }
         
         // Create the root APR memory pool
