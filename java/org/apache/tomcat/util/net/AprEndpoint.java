@@ -38,6 +38,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
+import org.apache.catalina.core.AprLifecycleListener;
 
 
 /**
@@ -368,6 +369,9 @@ public class AprEndpoint extends AbstractEndpoint {
 
         if (initialized)
             return;
+        if (!AprLifecycleListener.isAprAvailable()) {
+            throw new Exception(sm.getString("endpoint.init.notavail");
+        }
         
         // Create the root APR memory pool
         rootPool = Pool.create(0);
@@ -1403,6 +1407,7 @@ public class AprEndpoint extends AbstractEndpoint {
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(long socket);
         public SocketState event(long socket, SocketStatus status);
+        public SocketState asyncDispatch(long socket, SocketStatus status);
     }
 
 
@@ -1458,15 +1463,24 @@ public class AprEndpoint extends AbstractEndpoint {
     protected class SocketProcessor implements Runnable {
         
         protected long socket = 0;
+        protected boolean async = false;
+        protected SocketStatus status = SocketStatus.ERROR;
         
         public SocketProcessor(long socket) {
             this.socket = socket;
+            this.async = false;
+        }
+        public SocketProcessor(long socket, boolean asyn, SocketStatus status) {
+            this.socket = socket;
+            this.async = asyn;
+            this.status = status;
         }
 
         public void run() {
 
             // Process the request from this socket
-            if (handler.process(socket) == Handler.SocketState.CLOSED) {
+            Handler.SocketState state = async?handler.asyncDispatch(socket, status):handler.process(socket);
+            if (state == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 Socket.destroy(socket);
                 socket = 0;
