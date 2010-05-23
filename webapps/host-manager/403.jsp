@@ -20,7 +20,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
  <head>
-  <title>401 Unauthorized</title>
+  <title>403 Access Denied</title>
   <style type="text/css">
     <!--
     BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px;}
@@ -31,7 +31,7 @@
   </style>
  </head>
  <body>
-   <h1>401 Unauthorized</h1>
+   <h1>403 Access Denied</h1>
    <p>
     You are not authorized to view this page. If you have not changed
     any configuration files, please examine the file
@@ -54,7 +54,7 @@
     the functionality you wish to access.
    </p>
     <ul>
-      <li><tt>admin</tt> - allows access to the HTML GUI</li>
+      <li><tt>admin-gui</tt> - allows access to the HTML GUI</li>
       <li><tt>admin-script</tt> - allows access to the text interface</li>
     </ul>
  </body>
