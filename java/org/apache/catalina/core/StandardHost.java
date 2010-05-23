@@ -33,7 +33,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
 
@@ -801,16 +800,6 @@ public class StandardHost extends ContainerBase implements Host {
         }
     }
 
-    @Override
-    protected void initInternal() throws LifecycleException {
-
-        super.initInternal();
-
-        HostConfig deployer = new HostConfig();
-        addLifecycleListener(deployer);                
-    }
-
-    
     @Override
     protected String getObjectNameKeyProperties() {
 
