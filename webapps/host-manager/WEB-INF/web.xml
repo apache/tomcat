@@ -80,7 +80,7 @@
     </web-resource-collection>
     <auth-constraint>
        <!-- NOTE:  This role is not present in the default users file -->
-       <role-name>admin</role-name>
+       <role-name>admin-gui</role-name>
     </auth-constraint>
   </security-constraint>
 
@@ -96,7 +96,7 @@
       The role that is required to log in to the Host Manager Application HTML
       interface
     </description>
-    <role-name>admin</role-name>
+    <role-name>admin-gui</role-name>
   </security-role>
   <security-role>
     <description>
@@ -109,6 +109,10 @@
   <error-page>
     <error-code>401</error-code>
     <location>/401.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>403</error-code>
+    <location>/403.jsp</location>
   </error-page>
   <error-page>
     <error-code>404</error-code>
