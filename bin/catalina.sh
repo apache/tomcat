@@ -46,6 +46,12 @@
 #   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 #                   "stop", or "run" command is executed.
 #
+#   JAVA_ENDORSED_DIRS (Optional) Lists of of semi-comma separated directories
+#                   containing some jars in order to allow replacement of APIs 
+#                   created outside of the JCP (i.e. DOM and SAX from W3C). 
+#                   It can also be used to update the XML parser implementation.
+#                   Defaults to $CATALINA_HOME/endorsed.
+#
 #   JPDA_TRANSPORT  (Optional) JPDA transport used when the "jpda start"
 #                   command is executed. The default is "dt_socket".
 #
