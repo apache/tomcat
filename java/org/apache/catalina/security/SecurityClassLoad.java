@@ -129,9 +129,9 @@ public final class SecurityClassLoad {
     
     private final static void loadUtilPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.";
-        loader.loadClass(basePackage + "util.Enumerator");
-        loader.loadClass(basePackage + "util.ParameterMap");
+        String basePackage = "org.apache.catalina.util.";
+        loader.loadClass(basePackage + "Enumerator");
+        loader.loadClass(basePackage + "ParameterMap");
     }
     
     
@@ -237,6 +237,10 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         loader.loadClass
             (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
+        // Make sure system property is read at this point
+        Class<?> clazz = loader.loadClass(
+                basePackage + "util.http.FastHttpDateFormat");
+        clazz.newInstance();
     }
 }
 
