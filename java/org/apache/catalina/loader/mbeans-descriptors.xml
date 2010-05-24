@@ -18,8 +18,7 @@
 <mbeans-descriptors>
 
   <mbean         name="WebappLoader"
-          description="Classloader implementation which is specialized for
-                       handling web applications"
+          description="Classloader implementation which is specialized for handling web applications"
                domain="Catalina"
                 group="Loader"
                  type="org.apache.catalina.loader.WebappLoader">
@@ -30,8 +29,7 @@
             writeable="false"/>
 
     <attribute   name="delegate"
-          description="The 'follow standard delegation model' flag that will be
-                       used to configure our ClassLoader"
+          description="The 'follow standard delegation model' flag that will be used to configure our ClassLoader"
                  type="boolean"/>
 
     <attribute   name="reloadable"
@@ -81,8 +79,7 @@
             writeable="false"/>
 
     <attribute   name="delegate"
-          description="The 'follow standard delegation model' flag that will be
-                       used to configure our ClassLoader"
+          description="The 'follow standard delegation model' flag that will be used to configure our ClassLoader"
                  type="boolean"/>
 
     <attribute   name="reloadable"
@@ -121,8 +118,7 @@
 
 
   <mbean         name="WebappClassLoader"
-          description="Classloader implementation which is specialized for
-                       handling web applications"
+          description="Classloader implementation which is specialized for handling web applications"
                domain="Catalina"
                 group="Loader"
                  type="org.apache.catalina.loader.WebappClassLoader">
@@ -138,8 +134,7 @@
             writeable="false"/>
 
     <attribute   name="delegate"
-          description="The 'follow standard delegation model' flag that will be
-                       used to configure our ClassLoader"
+          description="The 'follow standard delegation model' flag that will be used to configure our ClassLoader"
                  type="boolean"/>
 
     <attribute   name="antiJARLocking"
@@ -150,7 +145,7 @@
           description="The searchExternalFirst flag for this Loader"
                  type="boolean"/>
 
-    <attribute   name="uRLs"
+    <attribute   name="URLs"
           description="The URLs of this loader"
                  type="[Ljava.net.URL;"/>
 
