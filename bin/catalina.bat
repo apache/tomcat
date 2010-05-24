@@ -42,7 +42,7 @@ rem
 rem   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 rem                   "stop", or "run" command is executed.
 rem
-rem   JAVA_ENDORSED_DIRS (Optional) Lists of of semi-comma separated directories
+rem   JAVA_ENDORSED_DIRS (Optional) Lists of of semi-colon separated directories
 rem                   containing some jars in order to allow replacement of APIs 
 rem                   created outside of the JCP (i.e. DOM and SAX from W3C). 
 rem                   It can also be used to update the XML parser implementation.
