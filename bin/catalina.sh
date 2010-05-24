@@ -46,7 +46,7 @@
 #   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 #                   "stop", or "run" command is executed.
 #
-#   JAVA_ENDORSED_DIRS (Optional) Lists of of semi-comma separated directories
+#   JAVA_ENDORSED_DIRS (Optional) Lists of of colon separated directories
 #                   containing some jars in order to allow replacement of APIs 
 #                   created outside of the JCP (i.e. DOM and SAX from W3C). 
 #                   It can also be used to update the XML parser implementation.
