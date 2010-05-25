@@ -1,9 +1,9 @@
 package org.apache.coyote.lite;
 
-
-
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
@@ -13,17 +13,27 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
+import org.apache.tomcat.lite.http.HttpClient;
+import org.apache.tomcat.lite.http.HttpChannel;
+import org.apache.tomcat.lite.http.HttpConnectionPool;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
+import org.apache.tomcat.lite.http.HttpServer;
 import org.apache.tomcat.lite.http.MultiMap;
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
+import org.apache.tomcat.lite.http.HttpConnectionPool.RemoteServer;
+import org.apache.tomcat.lite.http.HttpConnector.HttpChannelEvents;
+import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.http.MultiMap.Entry;
 import org.apache.tomcat.lite.io.CBuffer;
+import org.apache.tomcat.lite.io.IOConnector;
 import org.apache.tomcat.lite.io.SocketConnector;
+import org.apache.tomcat.lite.io.SslProvider;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * Work in progress - use the refactored http as a coyote connector.
@@ -36,6 +46,17 @@ import org.apache.tomcat.util.http.MimeHeaders;
 public class LiteProtocolHandler implements ProtocolHandler {
 
     Adapter adapter;
+    Map<String, Object> attributes = new HashMap<String, Object>();
+    
+    
+    HttpConnector httpConnServer;
+    int port = 8999;
+    
+    // Tomcat JMX integration
+    Registry registry;
+    
+    public LiteProtocolHandler() {
+    }
     
     @Override
     public void destroy() throws Exception {
@@ -48,16 +69,93 @@ public class LiteProtocolHandler implements ProtocolHandler {
 
     @Override
     public Object getAttribute(String name) {
-        return null;
+        // TODO: dynamic
+        return attributes.get(name);
     }
 
     @Override
     public Iterator<String> getAttributeNames() {
-        return null;
+        return attributes.keySet().iterator();
     }
 
     @Override
     public void init() throws Exception {
+        registry = Registry.getRegistry(null, null);
+        httpConnServer = HttpServer.newServer(port);
+
+        httpConnServer.getDispatcher().setDefaultService(new HttpService() {
+            @Override
+            public void service(HttpRequest httpReq, HttpResponse httpRes)
+                    throws IOException {
+                coyoteService(httpReq, httpRes);
+            }
+
+        });
+        final String base = "" + port;
+        bind("Httpconnector-" + port, httpConnServer);
+        bind("HttpconnectorPool-" + port, httpConnServer.cpool);
+        IOConnector io = httpConnServer.getIOConnector();
+        int ioLevel = 0;
+        while (io != null) {
+            bind("IOConnector-" + (ioLevel++) + "-" + base, io);
+            if (io instanceof SocketConnector) {
+                bind("NioThread-" + base, 
+                        ((SocketConnector) io).getSelector());
+                
+            }
+            io = io.getNet();
+        }
+        httpConnServer.cpool.setEvents(new HttpConnectionPool.HttpConnectionPoolEvents() {
+
+            @Override
+            public void closedConnection(RemoteServer host, HttpConnection con) {
+                unbind("HttpConnection-" + base + "-" + con.getId());
+            }
+
+            @Override
+            public void newConnection(RemoteServer host, HttpConnection con) {
+                bind("HttpConnection-" + base + "-" + con.getId(), con);
+            }
+
+            @Override
+            public void newTarget(RemoteServer host) {
+                bind("AsyncHttp-" + base + "-" + host.target, host);
+            }
+
+            @Override
+            public void targetRemoved(RemoteServer host) {
+                unbind("AsyncHttp-" + base + "-" + host.target);
+            }
+            
+        });
+        
+        httpConnServer.setOnCreate(new HttpChannelEvents() {
+            @Override
+            public void onCreate(HttpChannel data, HttpConnector extraData)
+                    throws IOException {
+                bind("AsyncHttp-" + base + "-" + data.getId(), data);
+            }
+            @Override
+            public void onDestroy(HttpChannel data, HttpConnector extraData)
+                    throws IOException {
+                unbind("AsyncHttp-" + base + "-" + data.getId());
+            }
+        });
+        
+        // TODO: process attributes via registry !!
+        
+    }
+    
+    private void bind(String name, Object o) {
+        try {
+            registry.registerComponent(o, "name=" + name, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void unbind(String name) {
+        registry.unregisterComponent("name=" + name);
     }
 
     @Override
@@ -73,43 +171,34 @@ public class LiteProtocolHandler implements ProtocolHandler {
         this.adapter = adapter;
         
     }
-
-    int port = 8999;
+    
+    @Override
+    public void setAttribute(String name, Object value) {
+        attributes.put(name, value);
+    }
+    
+    @Override
+    public void start() throws Exception {
+        httpConnServer.start();
+    }
     
     public void setPort(int port) {
         this.port = port;
     }
-    
-    @Override
-    public void setAttribute(String name, Object value) {
-        System.err.println("setAttribute " + name + " " + value);
-    }
 
-    @Override
-    public void start() throws Exception {
-        HttpConnector c = new HttpConnector(new SocketConnector());
-        c.setPort(port);
-        
-//        c.setDebug(true);
-//        c.setDebugHttp(true);
-        
-        c.getDispatcher().setDefaultService(new HttpService() {
-            @Override
-            public void service(HttpRequest httpReq, HttpResponse httpRes)
-                    throws IOException {
-                coyoteService(httpReq, httpRes);
-            }
-
-        });
-        c.start();
-    }
-    
+    /**
+     * Wrap old tomcat buffer to lite buffer.
+     */
     private void wrap(MessageBytes dest, CBuffer buffer) {
         dest.setChars(buffer.array(), buffer.position(), 
                 buffer.length());
     }
 
+    /**
+     * Main lite service method, will wrap to coyote request
+     */
     private void coyoteService(final HttpRequest httpReq, final HttpResponse httpRes) {
+        // TODO: reuse, per req
         RequestData rc = new RequestData();
         rc.init(httpReq, httpRes);
         
@@ -122,7 +211,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
     }
     
     /** 
-     * Per request data.
+     * ActionHook implementation, include coyote request/response objects.
      */
     public class RequestData implements ActionHook {
         private final class LiteOutputBuffer implements OutputBuffer {
@@ -142,6 +231,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
         Response res = new Response();
         HttpResponse httpRes;
         HttpRequest httpReq;
+        
         InputBuffer inputBuffer = new InputBuffer() {
             @Override
             public int doRead(ByteChunk bchunk, Request request)
@@ -198,43 +288,10 @@ public class LiteProtocolHandler implements ProtocolHandler {
          */
         public void action(ActionCode actionCode, Object param) {
 
-            if (actionCode == ActionCode.ACTION_COMMIT) {
-                if (res.isCommitted())
-                    return;
-                
-                // TODO: copy headers, fields
-                httpRes.setStatus(res.getStatus());
-                httpRes.setMessage(res.getMessage());
-                MultiMap mimeHeaders = httpRes.getMimeHeaders();
-                MimeHeaders coyoteHeaders = res.getMimeHeaders();
-                for (int i = 0; i < coyoteHeaders.size(); i++ ) {
-                    MessageBytes name = coyoteHeaders.getName(i);
-                    MessageBytes val = coyoteHeaders.getValue(i);
-                    Entry entry = mimeHeaders.addEntry(name.toString());
-                    entry.getValue().set(val.toString());
-                }
-                String contentType = res.getContentType();
-                if (contentType != null) {
-                    mimeHeaders.addEntry("Content-Type").getValue().set(contentType);
-                }
-                String contentLang = res.getContentType();
-                if (contentLang != null) {
-                    mimeHeaders.addEntry("Content-Language").getValue().set(contentLang);
-                }
-                long contentLength = res.getContentLengthLong();
-                if (contentLength != -1) {
-                    httpRes.setContentLength(contentLength);
-                }
-                String lang = res.getContentLanguage();
-                if (lang != null) {
-                    httpRes.setHeader("Content-Language", lang);
-                }
-                
-                try {
-                    httpReq.send();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if (actionCode == ActionCode.ACTION_POST_REQUEST) {
+                commit(); // make sure it's sent - on errors 
+            } else if (actionCode == ActionCode.ACTION_COMMIT) {
+                commit();
             } else if (actionCode == ActionCode.ACTION_ACK) {
                 // Done automatically by http connector
             } else if (actionCode == ActionCode.ACTION_CLIENT_FLUSH) {
@@ -282,93 +339,28 @@ public class LiteProtocolHandler implements ProtocolHandler {
                 req.setLocalPort(httpReq.getLocalPort());
             } else if (actionCode == ActionCode.ACTION_REQ_SSL_ATTRIBUTE ) {
 
-//                if (ssl && (socket != 0)) {
-//                    try {
-//                        // Cipher suite
-//                        Object sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_CIPHER);
-//                        if (sslO != null) {
-//                            request.setAttribute(AprEndpoint.CIPHER_SUITE_KEY, sslO);
-//                        }
-//                        // Get client certificate and the certificate chain if present
-//                        // certLength == -1 indicates an error
-//                        int certLength = SSLSocket.getInfoI(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-//                        byte[] clientCert = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
-//                        X509Certificate[] certs = null;
-//                        if (clientCert != null  && certLength > -1) {
-//                            certs = new X509Certificate[certLength + 1];
-//                            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-//                            certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
-//                            for (int i = 0; i < certLength; i++) {
-//                                byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-//                                certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
-//                            }
-//                        }
-//                        if (certs != null) {
-//                            request.setAttribute(AprEndpoint.CERTIFICATE_KEY, certs);
-//                        }
-//                        // User key size
-//                        sslO = new Integer(SSLSocket.getInfoI(socket, SSL.SSL_INFO_CIPHER_USEKEYSIZE));
-//                        request.setAttribute(AprEndpoint.KEY_SIZE_KEY, sslO);
-//
-//                        // SSL session ID
-//                        sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_SESSION_ID);
-//                        if (sslO != null) {
-//                            request.setAttribute(AprEndpoint.SESSION_ID_KEY, sslO);
-//                        }
-//                        //TODO provide a hook to enable the SSL session to be
-//                        // invalidated. Set AprEndpoint.SESSION_MGR req attr
-//                    } catch (Exception e) {
-//                        log.warn(sm.getString("http11processor.socket.ssl"), e);
-//                    }
-//                }
+                Object sslAtt = httpReq.getHttpChannel().getNet().getAttribute(SslProvider.ATT_SSL_CIPHER);
+                req.setAttribute("javax.servlet.request.cipher_suite", sslAtt);
+                
+                sslAtt = httpReq.getHttpChannel().getNet().getAttribute(SslProvider.ATT_SSL_KEY_SIZE);
+                req.setAttribute("javax.servlet.request.key_size", sslAtt);
+
+                sslAtt = httpReq.getHttpChannel().getNet().getAttribute(SslProvider.ATT_SSL_SESSION_ID);
+                req.setAttribute("javax.servlet.request.ssl_session", sslAtt);
 
             } else if (actionCode == ActionCode.ACTION_REQ_SSL_CERTIFICATE) {
 
-//                if (ssl && (socket != 0)) {
-//                    // Consume and buffer the request body, so that it does not
-//                    // interfere with the client's handshake messages
-//                    InputFilter[] inputFilters = inputBuffer.getFilters();
-//                    ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(maxSavePostSize);
-//                    inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
-//                    try {
-//                        // Configure connection to require a certificate
-//                        SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE,
-//                                endpoint.getSSLVerifyDepth());
-//                        // Renegotiate certificates
-//                        if (SSLSocket.renegotiate(socket) == 0) {
-//                            // Don't look for certs unless we know renegotiation worked.
-//                            // Get client certificate and the certificate chain if present
-//                            // certLength == -1 indicates an error 
-//                            int certLength = SSLSocket.getInfoI(socket,SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-//                            byte[] clientCert = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
-//                            X509Certificate[] certs = null;
-//                            if (clientCert != null && certLength > -1) {
-//                                certs = new X509Certificate[certLength + 1];
-//                                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-//                                certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
-//                                for (int i = 0; i < certLength; i++) {
-//                                    byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-//                                    certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
-//                                }
-//                            }
-//                            if (certs != null) {
-//                                request.setAttribute(AprEndpoint.CERTIFICATE_KEY, certs);
-//                            }
-//                        }
-//                    } catch (Exception e) {
-//                        log.warn(sm.getString("http11processor.socket.ssl"), e);
-//                    }
-//                }
+                Object cert = httpReq.getHttpChannel().getNet().getAttribute(SslProvider.ATT_SSL_CERT);
+                req.setAttribute("javax.servlet.request.X509Certificate", cert);
 
             } else if (actionCode == ActionCode.ACTION_REQ_SET_BODY_REPLAY) {
-//                ByteChunk body = (ByteChunk) param;
-//
-//                InputFilter savedBody = new SavedRequestInputFilter(body);
-//                savedBody.setRequest(request);
-//
-//                InternalAprInputBuffer internalBuffer = (InternalAprInputBuffer)
-//                request.getInputBuffer();
-//                internalBuffer.addActiveFilter(savedBody);
+                ByteChunk body = (ByteChunk) param;
+                httpReq.getBody().clear();
+                try {
+                    httpReq.getBody().append(body.getBuffer(), body.getStart(), body.getLength());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             } else if (actionCode == ActionCode.ACTION_AVAILABLE) {
                 req.setAvailable(httpReq.getBody().available());
@@ -389,6 +381,45 @@ public class LiteProtocolHandler implements ProtocolHandler {
             }
 
 
+        }
+
+        private void commit() {
+            if (res.isCommitted())
+                return;
+            
+            // TODO: copy headers, fields
+            httpRes.setStatus(res.getStatus());
+            httpRes.setMessage(res.getMessage());
+            MultiMap mimeHeaders = httpRes.getMimeHeaders();
+            MimeHeaders coyoteHeaders = res.getMimeHeaders();
+            for (int i = 0; i < coyoteHeaders.size(); i++ ) {
+                MessageBytes name = coyoteHeaders.getName(i);
+                MessageBytes val = coyoteHeaders.getValue(i);
+                Entry entry = mimeHeaders.addEntry(name.toString());
+                entry.getValue().set(val.toString());
+            }
+            String contentType = res.getContentType();
+            if (contentType != null) {
+                mimeHeaders.addEntry("Content-Type").getValue().set(contentType);
+            }
+            String contentLang = res.getContentType();
+            if (contentLang != null) {
+                mimeHeaders.addEntry("Content-Language").getValue().set(contentLang);
+            }
+            long contentLength = res.getContentLengthLong();
+            if (contentLength != -1) {
+                httpRes.setContentLength(contentLength);
+            }
+            String lang = res.getContentLanguage();
+            if (lang != null) {
+                httpRes.setHeader("Content-Language", lang);
+            }
+            
+            try {
+                httpReq.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
