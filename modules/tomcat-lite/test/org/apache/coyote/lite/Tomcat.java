@@ -43,10 +43,11 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.core.StandardWrapper;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
+
+// This class is here for compat with Tomcat6.
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or 
 // get temp dir is called we need to create it. This will avoid the 
@@ -89,7 +90,8 @@ public class Tomcat {
     protected StandardService service;
     protected StandardEngine engine;
     protected Connector connector; // for more - customize the classes
-    
+
+    boolean started = false;
     // To make it a bit easier to config for the common case
     // ( one host, one context ). 
     protected StandardHost host;
@@ -281,9 +283,12 @@ public class Tomcat {
      * @throws LifecycleException 
      */
     public void start() throws LifecycleException {
+        if (started) {
+            return;
+        }
+        started = true;
         getServer();
         getConnector();
-        server.initialize();
         server.start();
     }
 
@@ -472,7 +477,7 @@ public class Tomcat {
         } else {
             host.addChild(ctx);
         }
-
+        
         return ctx;
     }
 

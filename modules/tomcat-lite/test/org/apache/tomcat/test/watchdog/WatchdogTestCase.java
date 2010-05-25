@@ -8,8 +8,6 @@ import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestResult;
 
-import org.apache.tomcat.integration.DynamicObject;
-import org.apache.tomcat.integration.simple.AntProperties;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
