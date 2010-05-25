@@ -114,6 +114,11 @@
                domain="Catalina"
                 group="Resources"
                  type="org.apache.catalina.deploy.NamingResources">
+                 
+    <attribute   name="container"
+          description="The container with which the naming resources are associated."
+                 type="java.lang.Object"
+            writeable="false"/>
 
     <attribute   name="environments"
           description="MBean Names of the set of defined environment entries
