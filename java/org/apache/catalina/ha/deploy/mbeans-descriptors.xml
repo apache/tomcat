@@ -21,4 +21,20 @@
     domain="Catalina"
     group="Cluster"
     type="org.apache.catalina.ha.deploy.FarmWarDeployer"/>
+    <attribute
+      name="deployDir"
+      description="Deployment directory."
+      type="java.lang.String"/>
+    <attribute
+      name="tempDir"
+      description="The temporaryDirectory to store binary data when downloading a war from the cluster"
+      type="java.lang.String"/>
+    <attribute
+      name="watchDir"
+      description="The directory where we watch for changes"
+      type="java.lang.String"/>
+    <attribute
+      name="watchEnabled"
+      description="Is watching enabled?"
+      type="boolean"/>
 </mbeans-descriptors>
