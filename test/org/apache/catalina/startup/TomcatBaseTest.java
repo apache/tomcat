@@ -100,6 +100,8 @@ public abstract class TomcatBaseTest extends TestCase {
             fail("Unable to create temporary directory for test");
         }
         
+        System.setProperty("catalina.base", tempDir.getAbsolutePath());
+        
         File appBase = new File(tempDir, "webapps");
         if (!appBase.exists() && !appBase.mkdir()) {
             fail("Unable to create appBase for test");
