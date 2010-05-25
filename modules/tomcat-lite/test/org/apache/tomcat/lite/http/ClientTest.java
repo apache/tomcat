@@ -22,7 +22,7 @@ public class ClientTest extends TestCase {
      * 
      * Since I want to test keep-alive works, I use a static one
      */
-    static HttpConnector httpCon = DefaultHttpConnector.get();
+    static HttpConnector httpCon = HttpClient.newClient();
 
     /** 
      * Start a http server, runs on 8802 - shared by all tests.

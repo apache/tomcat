@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.TestCase;
 
 import org.apache.tomcat.lite.TestMain;
+import org.apache.tomcat.lite.http.HttpClient;
 import org.apache.tomcat.lite.http.HttpChannel;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
@@ -63,13 +64,13 @@ public class LiveHttpThreadedTest extends TestCase {
     HttpConnector serverCon = TestMain.shared().getTestServer();
     
     HttpConnector spdyClient = 
-        new HttpConnector(new SocketConnector()).setCompression(false);
+        HttpClient.newClient().setCompression(false);
     
-    HttpConnector spdyClientCompress = 
-        new HttpConnector(new SocketConnector());
+    HttpConnector spdyClientCompress =
+        HttpClient.newClient();
     
     HttpConnector spdyClientCompressSsl = 
-        new HttpConnector(new SocketConnector());
+        HttpClient.newClient();
     
     ThreadRunner tr;
     static boolean dumpHeap = true;
@@ -121,15 +122,15 @@ public class LiveHttpThreadedTest extends TestCase {
         asyncRequest(20, 500, true, false, spdyClientCompress, "AsyncSpdyComp");
     }
 
-    public void test1000AsyncSpdySsl() throws Exception {
+    public void xtest1000AsyncSpdySsl() throws Exception {
         asyncRequest(10, 100, true, true, spdyClient, "AsyncSpdySsl");
     }
 
-    public void test1000AsyncSpdyCompSsl() throws Exception {
+    public void xtest1000AsyncSpdyCompSsl() throws Exception {
         asyncRequest(10, 100, true, true, spdyClientCompress, "AsyncSpdyCompSsl");
     }
 
-    public void test10000AsyncSpdyCompSsl() throws Exception {
+    public void xtest10000AsyncSpdyCompSsl() throws Exception {
         asyncRequest(20, 500, true, true, spdyClientCompress, "AsyncSpdyCompSsl");
     }
 

@@ -140,9 +140,7 @@ public class JsseSslProvider implements SslProvider {
     @Override
     public IOChannel channel(IOChannel net, String host, int port) throws IOException {
       if (debug) {
-          DumpChannel dch = new DumpChannel("S-ENC-" + id, net);
-          net.setHead(dch);
-          net = dch;
+          net = DumpChannel.wrap("S-ENC-" + id, net);
         }
         SslChannel ch = new SslChannel()
             .setTarget(host, port)
@@ -168,9 +166,7 @@ public class JsseSslProvider implements SslProvider {
             public void handleConnected(IOChannel ch) throws IOException {
                 IOChannel first = ch;
                 if (debug) {
-                    DumpChannel dch = new DumpChannel("S-ENC-" + id, ch);
-                    ch.setHead(dch);
-                    first = dch;
+                    first = DumpChannel.wrap("S-ENC-" + id, ch);
                 }
                 
                 IOChannel sslch = serverChannel(first);
@@ -178,9 +174,7 @@ public class JsseSslProvider implements SslProvider {
                 first.setHead(sslch);
 
                 if (debug) {
-                    DumpChannel dch2 = new DumpChannel("S-CLR-" + id, sslch);
-                    sslch.setHead(dch2);
-                    sslch = dch2;
+                    sslch = DumpChannel.wrap("S-CLR-" + id, sslch);
                     id++;
                 }
                 
@@ -197,18 +191,14 @@ public class JsseSslProvider implements SslProvider {
             public void handleConnected(IOChannel ch) throws IOException {
                 IOChannel first = ch;
                 if (debug) {
-                    DumpChannel dch = new DumpChannel("ENC-" + id);
-                    ch.setHead(dch);
-                    first = dch;
+                    first = DumpChannel.wrap("ENC-" + id, first);
                 }
                 
                 IOChannel sslch = channel(first, host, port);
 //                first.setHead(sslch);
 
                 if (debug) {
-                    DumpChannel dch2 = new DumpChannel("CLR-" + id);
-                    sslch.setHead(dch2);
-                    sslch = dch2;
+                    sslch = DumpChannel.wrap("CLR-" + id, sslch);
                     id++;
                 }
                 

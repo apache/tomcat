@@ -148,7 +148,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
     
     private void bind(String name, Object o) {
         try {
-            registry.registerComponent(o, "name=" + name, null);
+            registry.registerComponent(o, "TomcatLite:name=" + name, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
