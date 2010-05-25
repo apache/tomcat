@@ -41,6 +41,10 @@ public abstract class IOConnector {
         return timer;
     }
     
+    /**
+     * If the connector is layered on top of a different connector,
+     * return the lower layer ( for example the socket connector) 
+     */
     public IOConnector getNet() {
         return null;
     }

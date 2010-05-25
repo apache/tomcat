@@ -51,8 +51,7 @@ import org.apache.tomcat.lite.io.NioChannel.NioChannelCallback;
  * SelectorThread provides non-blocking methods for read/write and generates 
  * callbacks using SelectorCallback. It has no buffers of its own. 
  *
- * Additional requirements: 
- *  - support timers ( setTimer() in SelectorChannel )
+ * This is non-blocking, non-buffering and uses callbacks. 
  * 
  * @author Costin Manolache
  */

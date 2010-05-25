@@ -29,7 +29,7 @@ public class MappingData {
 
     public Object context = null; // ServletContextImpl
     
-    public BaseMapper.ContextMapping contextMap;
+    public BaseMapper.Context contextMap;
 
     public BaseMapper.ServiceMapping service = null;
 
