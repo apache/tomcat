@@ -513,10 +513,18 @@ abstract public class PageContext
      * @since 2.0
      */
     public ErrorData getErrorData() {
+        int status = 0;
+        
+        Integer status_code = (Integer)getRequest().getAttribute( 
+                "javax.servlet.error.status_code");
+        // Avoid NPE if attribute is not set
+        if (status_code != null) {
+            status = status_code.intValue();
+        }
+
         return new ErrorData( 
             (Throwable)getRequest().getAttribute( "javax.servlet.error.exception" ),
-            ((Integer)getRequest().getAttribute( 
-                "javax.servlet.error.status_code" )).intValue(),
+            status,
             (String)getRequest().getAttribute( "javax.servlet.error.request_uri" ),
             (String)getRequest().getAttribute( "javax.servlet.error.servlet_name" ) );
     }
