@@ -35,8 +35,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.sql.XAConnection;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

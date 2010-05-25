@@ -18,15 +18,12 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
