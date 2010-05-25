@@ -20,7 +20,33 @@
     description="Tcp Cluster implementation"
     domain="Catalina"
     group="Cluster"
-    type="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+    type="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+    <attribute
+      name="className"
+      description="Fully qualified class name of the managed object"
+      type="java.lang.String"
+      writeable="false"/>
+    <attribute
+      name="channelSendOptions"
+      description="Flag to indicate trigger behaviour when message is being sent through the channel"
+      type="int"/>
+    <attribute
+      name="channelStartOptions"
+      description="This flag indicates desired start and stop sequences of the channel"
+      type="int"/>
+    <attribute
+      name="clusterName"
+      description="The name of the cluster that this Server is currently configured to operate within."
+      type="java.lang.String"/>
+    <attribute
+      name="heartbeatBackgroundEnabled"
+      description="Heartbeat enable flag (default false)"
+      type="boolean"/>
+    <attribute
+      name="notifyLifecycleListenerOnFailure"
+      description="Whether to notify LifecycleListener on faliure?"
+      type="boolean"/>
+  </mbean>
   <mbean
     name="SimpleTcpReplicationManager"
     className="org.apache.catalina.mbeans.ClassNameMBean"
@@ -83,13 +109,41 @@
     group="Valve"
     type="org.apache.catalina.ha.tcp.ReplicationValve">
     <attribute
+      name="asyncSupported"
+      description="Does this valve support async reporting? "
+      type="boolean"/>
+    <attribute
       name="className"
       description="Fully qualified class name of the managed object"
       type="java.lang.String"
       writeable="false"/>
     <attribute
-      name="debug"
-      description="The debugging detail level for this component"
-      type="int"/>
+      name="nrOfCrossContextSendRequests"
+      description="The number of cross context send requests."
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="nrOfFilterRequests"
+      description="The number of filter requests. "
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="primaryIndicator"
+      description="Is this the primary indicator? "
+      type="boolean"/>
+    <attribute
+      name="primaryIndicatorName"
+      description="The primary indicator name."
+      type="java.lang.String"/>
+    <attribute
+      name="totalRequestTime"
+      description="The total request time."
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="totalSendTime"
+      description="The total send time."
+      type="long"
+      writeable="false"/>
   </mbean>
 </mbeans-descriptors>
