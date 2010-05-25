@@ -172,7 +172,7 @@ public abstract class HttpMessage {
     public HttpMessage(HttpChannel httpCh) {
         this.httpCh = httpCh;
         
-        out = new IOOutputStream(httpCh.getOut(), this);
+        out = new IOOutputStream(httpCh.getOut(), httpCh);
         conv = new IOWriter(httpCh);
         writer = new HttpWriter(this, out, conv);
 
@@ -462,6 +462,10 @@ public abstract class HttpMessage {
 
     public void setCompletedCallback(RequestCompleted doneAllCallback) throws IOException {
         httpCh.setCompletedCallback(doneAllCallback);
+    }
+    
+    public void setReadTimeout(long to) {
+        reader.setTimeout(to);
     }
     
     /** 

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.BBuffer;
+import org.apache.tomcat.lite.io.FutureCallbacks;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
@@ -180,7 +181,6 @@ public class HttpChannel extends IOChannel {
         try {
             checkRelease();
             trace("abort " + t);
-            log.info("Abort connection " + t);
             if (conn != null) {
                 conn.abort(this, t);
             }
@@ -667,6 +667,7 @@ public class HttpChannel extends IOChannel {
         }
     }
  
+    @Override
     public void waitFlush(long timeMs) throws IOException {
         if (getOut().getBufferCount() == 0) {
             return;

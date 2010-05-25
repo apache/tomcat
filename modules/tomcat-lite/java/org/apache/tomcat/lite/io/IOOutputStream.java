@@ -8,9 +8,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.text.MessageFormat;
 
-import org.apache.tomcat.lite.http.HttpMessage;
-import org.apache.tomcat.lite.http.HttpWriter;
-
 /**
  * Same methods with ServletOutputStream.
  * 
@@ -33,19 +30,19 @@ import org.apache.tomcat.lite.http.HttpWriter;
 public class IOOutputStream extends OutputStream {
 
     IOBuffer bb;
-    HttpMessage message;
-    int bufferSize = HttpWriter.DEFAULT_BUFFER_SIZE;
+    IOChannel ch;
+    int bufferSize = 8 * 1024;
     
     int wSinceFlush = 0;
     
-    public IOOutputStream(IOBuffer out, HttpMessage httpMessage) {
+    public IOOutputStream(IOBuffer out, IOChannel httpMessage) {
         this.bb = out;
-        message = httpMessage;
+        ch = httpMessage;
     }
 
     public void recycle() {
         wSinceFlush = 0;
-        bufferSize = HttpWriter.DEFAULT_BUFFER_SIZE;
+        bufferSize = 8 * 1024;
     }
     
     public void reset() {
@@ -93,10 +90,10 @@ public class IOOutputStream extends OutputStream {
     }    
     
     public void flush() throws IOException {
-        if (message.getHttpChannel() != null) {
-            message.getHttpChannel().startSending();
+        if (ch != null) {
+            ch.startSending();
             
-            message.getHttpChannel().waitFlush(Long.MAX_VALUE);
+            ch.waitFlush(Long.MAX_VALUE);
         }
         wSinceFlush = 0;
     }

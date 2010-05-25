@@ -21,6 +21,7 @@ package org.apache.tomcat.lite.http;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.apache.tomcat.lite.http.HttpChannel.HttpService;
 import org.apache.tomcat.lite.io.CBuffer;
 import org.apache.tomcat.lite.io.FileConnector;
 import org.apache.tomcat.lite.io.BBucket;
@@ -56,7 +57,7 @@ public class BaseMapper {
         /**
          * Context associated with this wrapper, used for wrapper mapping.
          */
-        public BaseMapper.ContextMapping contextMapElement = new BaseMapper.ContextMapping();
+        public BaseMapper.Context contextMapElement = new BaseMapper.Context(this);
 
         /**
          * Set context, used for wrapper mapping (request dispatcher).
@@ -238,7 +239,7 @@ public class BaseMapper {
      * @param resources Static resources of the context
      * @param ctxService 
      */
-    public BaseMapper.ContextMapping addContext(String hostName, String path, Object context,
+    public BaseMapper.Context addContext(String hostName, String path, Object context,
             String[] welcomeResources, FileConnector resources, 
             HttpChannel.HttpService ctxService) {
 
@@ -250,13 +251,18 @@ public class BaseMapper {
         
         int slashCount = slashCount(path);
         synchronized (host) {
-            BaseMapper.ContextMapping[] contexts = host.contextList.contexts;
+            BaseMapper.Context[] contexts = host.contextList.contexts;
             // Update nesting
             if (slashCount > host.contextList.nesting) {
                 host.contextList.nesting = slashCount;
             }
-            BaseMapper.ContextMapping[] newContexts = new BaseMapper.ContextMapping[contexts.length + 1];
-            BaseMapper.ContextMapping newContext = new BaseMapper.ContextMapping();
+            for (int i = 0; i < contexts.length; i++) {
+                if (path.equals(contexts[i].name)) {
+                    return contexts[i];
+                }
+            }
+            BaseMapper.Context[] newContexts = new BaseMapper.Context[contexts.length + 1];
+            BaseMapper.Context newContext = new BaseMapper.Context(this);
             newContext.name = path;
             newContext.object = context;
             if (welcomeResources != null) {
@@ -286,11 +292,11 @@ public class BaseMapper {
     public void removeContext(String hostName, String path) {
         Host host = getHost(hostName);
         synchronized (host) {
-            BaseMapper.ContextMapping[] contexts = host.contextList.contexts;
+            BaseMapper.Context[] contexts = host.contextList.contexts;
             if( contexts.length == 0 ){
                 return;
             }
-            BaseMapper.ContextMapping[] newContexts = new BaseMapper.ContextMapping[contexts.length - 1];
+            BaseMapper.Context[] newContexts = new BaseMapper.Context[contexts.length - 1];
             if (removeMap(contexts, newContexts, path)) {
                 host.contextList.contexts = newContexts;
                 // Recalculate nesting
@@ -323,20 +329,20 @@ public class BaseMapper {
     public void addWrapper(String hostName, String contextPath, String path,
                            Object wrapper, boolean jspWildCard) {
         Host host = getHost(hostName);
-        BaseMapper.ContextMapping[] contexts = host.contextList.contexts;
+        BaseMapper.Context[] contexts = host.contextList.contexts;
         int pos2 = find(contexts, contextPath);
         if( pos2<0 ) {
             logger.severe("No context found: " + contextPath );
             return;
         }
-        BaseMapper.ContextMapping context = contexts[pos2];
+        BaseMapper.Context context = contexts[pos2];
         if (context.name.equals(contextPath)) {
             addWrapper(context, path, wrapper, jspWildCard);
         }
     }
 
 
-    public void addWrapper(BaseMapper.ContextMapping context, String path, Object wrapper) {
+    public void addWrapper(BaseMapper.Context context, String path, Object wrapper) {
         addWrapper(context, path, wrapper, false);
     }
 
@@ -350,7 +356,7 @@ public class BaseMapper {
      * @param jspWildCard true if the wrapper corresponds to the JspServlet
      * and the mapping path contains a wildcard; false otherwise
      */
-    protected void addWrapper(BaseMapper.ContextMapping context, String path, Object wrapper,
+    protected void addWrapper(BaseMapper.Context context, String path, Object wrapper,
                               boolean jspWildCard) {
 
         synchronized (context) {
@@ -406,18 +412,18 @@ public class BaseMapper {
     public void removeWrapper(String hostName, String contextPath, 
                               String path) {
         Host host = getHost(hostName);
-        BaseMapper.ContextMapping[] contexts = host.contextList.contexts;
+        BaseMapper.Context[] contexts = host.contextList.contexts;
         int pos2 = find(contexts, contextPath);
         if (pos2 < 0) {
             return;
         }
-        BaseMapper.ContextMapping context = contexts[pos2];
+        BaseMapper.Context context = contexts[pos2];
         if (context.name.equals(contextPath)) {
             removeWrapper(context, path);
         }
     }
 
-    protected void removeWrapper(BaseMapper.ContextMapping context, String path) {
+    protected void removeWrapper(BaseMapper.Context context, String path) {
         synchronized (context) {
             if (path.endsWith("/*")) {
                 // Wildcard wrapper
@@ -488,8 +494,8 @@ public class BaseMapper {
     private final void internalMap(CBuffer host, CBuffer uri,
                                    MappingData mappingData)
         throws Exception {
-        BaseMapper.ContextMapping[] contexts = null;
-        BaseMapper.ContextMapping context = null;
+        BaseMapper.Context[] contexts = null;
+        BaseMapper.Context context = null;
         int nesting = 0;
 
         // Virtual host mapping
@@ -577,10 +583,10 @@ public class BaseMapper {
      * Wrapper mapping, using servlet rules.
      */
     protected final void internalMapWrapper(
-            BaseMapper.ContextMapping context, 
+            BaseMapper.Context context, 
             CBuffer url,
             MappingData mappingData)
-        throws Exception {
+                throws Exception {
 
         boolean noServletPath = false;
         if (url.length() < context.name.length()) {
@@ -589,23 +595,27 @@ public class BaseMapper {
         }
 
         try {
-            
-        mappingData.tmpServletPath.set(url, 
-                context.name.length(),
-                url.length() - context.name.length());
-        if (mappingData.tmpServletPath.length() == 0) {
-            mappingData.tmpServletPath.append('/');
-            noServletPath = true;
-        }
+            // Set the servlet path.
+            mappingData.tmpServletPath.set(url, 
+                    context.name.length(),
+                    url.length() - context.name.length());
 
-        mapAfterContext(context, url, mappingData.tmpServletPath, mappingData, 
-                noServletPath);
+            if (mappingData.tmpServletPath.length() == 0) {
+                mappingData.tmpServletPath.append('/');
+                // This is just the context /example or /
+                if (!context.name.equals("/")) {
+                    noServletPath = true;
+                }
+            }
+
+            mapAfterContext(context, url, mappingData.tmpServletPath, mappingData, 
+                    noServletPath);
         } catch (ArrayIndexOutOfBoundsException ex) {
             System.err.println(1);
         }
     }
 
-    void mapAfterContext(BaseMapper.ContextMapping context, 
+    void mapAfterContext(BaseMapper.Context context, 
             CBuffer url, CBuffer urlNoContext, 
             MappingData mappingData, boolean noServletPath) 
         throws Exception {
@@ -719,7 +729,7 @@ public class BaseMapper {
      *  if pathStr corresponds to a directory, we'll need to redirect with / 
      *  at end. 
      */
-    protected void mapDefaultServlet(BaseMapper.ContextMapping context, 
+    protected void mapDefaultServlet(BaseMapper.Context context, 
             CBuffer path,
             MappingData mappingData, 
             CBuffer url,
@@ -740,7 +750,7 @@ public class BaseMapper {
      * Filesystem dependent method: 
      *  check if a resource exists in filesystem. 
      */
-    protected void mapWelcomResource(BaseMapper.ContextMapping context, CBuffer path,
+    protected void mapWelcomResource(BaseMapper.Context context, CBuffer path,
                                MappingData mappingData,
                                BaseMapper.ServiceMapping[] extensionWrappers, String pathStr) {
         
@@ -1046,14 +1056,18 @@ public class BaseMapper {
     // Shared among host aliases.
     protected static final class ContextList {
 
-        public BaseMapper.ContextMapping[] contexts = new BaseMapper.ContextMapping[0];
+        public BaseMapper.Context[] contexts = new BaseMapper.Context[0];
         public int nesting = 0;
 
     }
 
 
-    public static final class ContextMapping extends BaseMapper.Mapping {
+    public static final class Context extends BaseMapper.Mapping {
     
+        Context(BaseMapper mapper) {
+            this.mapper = mapper;
+        }
+        public BaseMapper mapper;
         public String[] welcomeResources = new String[0];
         public FileConnector resources = null;
         
@@ -1064,6 +1078,10 @@ public class BaseMapper {
         public BaseMapper.ServiceMapping[] extensionWrappers = new BaseMapper.ServiceMapping[0];
         public int nesting = 0;
     
+        public void addWrapper(String path, HttpService service) {
+            mapper.addWrapper(this, path, service);
+        }
+
     }
 
 
@@ -1081,6 +1099,9 @@ public class BaseMapper {
         public Object object = null;
     
         public String toString() {
+            if (name == null || "".equals(name)) {
+                return "DEFAULT";
+            }
             return name;
         }
     }

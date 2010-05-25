@@ -190,7 +190,7 @@ public class SocksServer implements Runnable, IOConnector.ConnectedCallback {
                 headResBuffer.put((byte) 1); // ip
                 
                 headResBuffer.put(hostB);
-                int port2 = clientCh.getPort(true);
+                int port2 = (Integer) clientCh.getAttribute(IOChannel.ATT_REMOTE_PORT);
                 headResBuffer.putShort((short) port2);
             }
             
