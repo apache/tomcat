@@ -31,7 +31,6 @@ import java.util.Random;
 
 import javax.management.ObjectName;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
