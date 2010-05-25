@@ -102,16 +102,6 @@ public class AprEndpoint extends AbstractEndpoint {
     
 
     /**
-     * Priority of the acceptor and poller threads.
-     */
-    protected int threadPriority = Thread.NORM_PRIORITY;
-    @Override
-    public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
-    @Override
-    public int getThreadPriority() { return threadPriority; }
-
-
-    /**
      * Size of the socket poller.
      */
     protected int pollerSize = 8 * 1024;
