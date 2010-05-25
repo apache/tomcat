@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.AprLifecycleListener;
 
@@ -111,7 +110,7 @@ public abstract class TomcatBaseTest extends TestCase {
         // Add AprLifecycleListener
         StandardServer server = (StandardServer) tomcat.getServer();
         AprLifecycleListener listener = new AprLifecycleListener();
-        server.addLifecycleListener((LifecycleListener) listener);
+        server.addLifecycleListener(listener);
         
         tomcat.setBaseDir(tempDir.getAbsolutePath());
         tomcat.getHost().setAppBase(appBase.getAbsolutePath());
