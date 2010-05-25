@@ -109,7 +109,7 @@ abstract public class PageContext
      * invocation.
      */
 
-    public static final int PAGE_SCOPE		= 1;
+    public static final int PAGE_SCOPE = 1;
 
     /**
      * Request scope: the named reference remains available from the 
@@ -117,7 +117,7 @@ abstract public class PageContext
      * is completed.
      */
 
-    public static final int REQUEST_SCOPE	= 2;
+    public static final int REQUEST_SCOPE = 2;
 
     /**
      * Session scope (only valid if this page participates in a session):
@@ -125,14 +125,14 @@ abstract public class PageContext
      * associated with the Servlet until the HttpSession is invalidated.
      */
 
-    public static final int SESSION_SCOPE	= 3;
+    public static final int SESSION_SCOPE = 3;
 
     /**
      * Application scope: named reference remains available in the 
      * ServletContext until it is reclaimed.
      */
 
-    public static final int APPLICATION_SCOPE	= 4;
+    public static final int APPLICATION_SCOPE = 4;
 
     /**
      * Name used to store the Servlet in this PageContext's nametables.
@@ -410,7 +410,7 @@ abstract public class PageContext
      * @since 2.0
      */
     abstract public void include(String relativeUrlPath, boolean flush) 
-	throws ServletException, IOException;
+        throws ServletException, IOException;
 
     /**
      * <p>
@@ -513,12 +513,12 @@ abstract public class PageContext
      * @since 2.0
      */
     public ErrorData getErrorData() {
-	return new ErrorData( 
-	    (Throwable)getRequest().getAttribute( "javax.servlet.error.exception" ),
-	    ((Integer)getRequest().getAttribute( 
-		"javax.servlet.error.status_code" )).intValue(),
-	    (String)getRequest().getAttribute( "javax.servlet.error.request_uri" ),
-	    (String)getRequest().getAttribute( "javax.servlet.error.servlet_name" ) );
+        return new ErrorData( 
+            (Throwable)getRequest().getAttribute( "javax.servlet.error.exception" ),
+            ((Integer)getRequest().getAttribute( 
+                "javax.servlet.error.status_code" )).intValue(),
+            (String)getRequest().getAttribute( "javax.servlet.error.request_uri" ),
+            (String)getRequest().getAttribute( "javax.servlet.error.servlet_name" ) );
     }
     
 }
