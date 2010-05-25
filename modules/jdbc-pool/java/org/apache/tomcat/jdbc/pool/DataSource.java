@@ -24,7 +24,6 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.sql.XADataSource;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;

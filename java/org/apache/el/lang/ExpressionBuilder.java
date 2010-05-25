@@ -30,7 +30,6 @@ import javax.el.VariableMapper;
 import org.apache.el.MethodExpressionImpl;
 import org.apache.el.MethodExpressionLiteral;
 import org.apache.el.ValueExpressionImpl;
-import org.apache.el.parser.AstCompositeExpression;
 import org.apache.el.parser.AstDeferredExpression;
 import org.apache.el.parser.AstDynamicExpression;
 import org.apache.el.parser.AstFunction;

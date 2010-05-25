@@ -19,7 +19,6 @@ package org.apache.catalina.ha.session;
 
 import org.apache.catalina.ha.ClusterManager;
 import java.beans.PropertyChangeListener;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.Loader;
 import java.io.ByteArrayInputStream;
