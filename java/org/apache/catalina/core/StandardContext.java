@@ -418,7 +418,7 @@ public class StandardContext extends ContainerBase
      * The naming resources for this web application.
      */
     private NamingResources namingResources = null;
-
+    private ObjectName onameNamingResoucres;
 
     /**
      * The message destinations for this web application.
@@ -1745,7 +1745,10 @@ public class StandardContext extends ContainerBase
         namingResources.setContainer(this);
         support.firePropertyChange("namingResources",
                                    oldNamingResources, this.namingResources);
-
+        
+        unregister(onameNamingResoucres);
+        onameNamingResoucres = register(namingResources,
+                "type=NamingResources," + getObjectNameKeyProperties());
     }
 
 
@@ -4992,6 +4995,8 @@ public class StandardContext extends ContainerBase
                             sequenceNumber++);
         broadcaster.sendNotification(notification);
 
+        unregister(onameNamingResoucres);
+
         synchronized (instanceListenersLock) {
             instanceListeners = new String[0];
         }
@@ -5540,6 +5545,12 @@ public class StandardContext extends ContainerBase
         
         if (processTlds) {
             this.addLifecycleListener(new TldConfig());
+        }
+
+        // Register the naming resources
+        if (namingResources != null) {
+            onameNamingResoucres = register(namingResources,
+                    "type=NamingResources," + getObjectNameKeyProperties());
         }
 
         // Send j2ee.object.created notification 
