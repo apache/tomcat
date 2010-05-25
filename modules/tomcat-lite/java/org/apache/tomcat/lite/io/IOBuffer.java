@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import org.apache.tomcat.lite.http.FutureCallbacks;
 
 // TODO: append() will trigger callbacks - do it explicitely !!!
 // TODO: queue() shouldn't modify the buffer 
@@ -231,24 +230,13 @@ public class IOBuffer {
         if (timeMs == 0) {
             timeMs = defaultTimeout;
         }
-        long exp = (timeMs == Long.MAX_VALUE) ?
-                Long.MAX_VALUE : System.currentTimeMillis() + timeMs;
         synchronized (hasDataLock) {
             if (hasData()) {
                 return;
             }
             hasDataLock.reset();
         }
-        if (timeMs == 0) {
-            timeMs = Long.MAX_VALUE;
-        }
-        long wait = (timeMs == Long.MAX_VALUE) ? Long.MAX_VALUE : 
-            exp - System.currentTimeMillis();
-
-        hasDataLock.waitSignal(wait);
-        if (exp < System.currentTimeMillis()) {
-            throw new IOException("Timeout");
-        }
+        hasDataLock.waitSignal(timeMs);
     }
     
 

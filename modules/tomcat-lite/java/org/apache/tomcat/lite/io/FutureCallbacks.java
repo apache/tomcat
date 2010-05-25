@@ -1,6 +1,6 @@
 /*
  */
-package org.apache.tomcat.lite.http;
+package org.apache.tomcat.lite.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+
 
 
 /**
@@ -102,11 +103,11 @@ public class FutureCallbacks<V> implements Future<V> {
         try {
             get(to, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e1) {
-            throw new IOException(e1.getMessage());
+            throw new WrappedException(e1);
         } catch (TimeoutException e1) {
-            throw new IOException(e1.getMessage());
+            throw new WrappedException(e1);
         } catch (ExecutionException e) {
-            throw new IOException(e.getMessage());
+            throw new WrappedException(e);
         }                
     }
 
@@ -120,7 +121,7 @@ public class FutureCallbacks<V> implements Future<V> {
     public V get(long timeout, TimeUnit unit) throws InterruptedException,
             ExecutionException, TimeoutException {
         if (!sync.tryAcquireSharedNanos(0, unit.toNanos(timeout))) {
-            throw new TimeoutException();
+            throw new TimeoutException("Waiting " + timeout);
         }
         return value;
     }

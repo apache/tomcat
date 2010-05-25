@@ -19,7 +19,6 @@ import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
-import org.apache.tomcat.lite.io.SslChannel;
 
 /*
  * TODO: expectations ? 
@@ -783,26 +782,22 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         synchronized (remoteHost) {
             httpCh = remoteHost.pending.peek();
         }
-        secure = httpCh.getRequest().isSecure();
-        if (secure) {
-            if (httpConnector.debugHttp) {
-                IOChannel ch1 = new DumpChannel("NET-IN");
-                net.addFilterAfter(ch1);
+        if (httpCh != null) {
+            secure = httpCh.getRequest().isSecure();
+            if (secure) {
+                if (httpConnector.debugHttp) {
+                    net = DumpChannel.wrap("SPDY-SSL", net);
+                }
+                String[] hostPort = httpCh.getTarget().split(":");
+
+                IOChannel ch1 = httpConnector.sslProvider.channel(net, 
+                        hostPort[0], Integer.parseInt(hostPort[1]));
+                //net.setHead(ch1);
                 net = ch1;
             }
-            String[] hostPort = httpCh.getTarget().split(":");
-            
-            SslChannel ch1 = httpConnector.sslConnector.channel(
-                    hostPort[0], Integer.parseInt(hostPort[1]));
-            ch1.setSink(net);
-            net.addFilterAfter(ch1);
-            net = ch1;
-        }
-        
+        }        
         if (httpConnector.debugHttp) {
-            IOChannel ch1 = new DumpChannel("");
-            net.addFilterAfter(ch1);
-            net = ch1;                        
+            net = DumpChannel.wrap("SPDY", net);
         }
         
         setSink(net);

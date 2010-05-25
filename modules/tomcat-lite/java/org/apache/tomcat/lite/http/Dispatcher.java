@@ -20,13 +20,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import org.apache.tomcat.lite.http.BaseMapper.ContextMapping;
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
 import org.apache.tomcat.lite.http.HttpChannel.RequestCompleted;
 import org.apache.tomcat.lite.io.CBuffer;
 import org.apache.tomcat.lite.io.FileConnector;
-import org.apache.tomcat.lite.io.CBuffer;
-import org.apache.tomcat.lite.io.UrlEncoding;
 
 /**
  * This class has several functions:
@@ -34,7 +31,7 @@ import org.apache.tomcat.lite.io.UrlEncoding;
  * - decide if the request should be run in the selector thread
  * or in a thread pool
  * - finalizes the request ( close / flush )
- * - detectsif the request is complete or set callbacks 
+ * - detects if the request is complete or set callbacks 
  * for receive/flush/done.
  *  
  */
@@ -61,7 +58,6 @@ public class Dispatcher implements HttpService {
         MappingData mapRes = ch.getRequest().getMappingData();
         HttpService h = (HttpService) mapRes.getServiceObject();
         try {
-            //log.info("Service ");
             h.service(ch.getRequest(), ch.getResponse());
             if (!ch.getRequest().isAsyncStarted()) {
                 ch.complete();
@@ -156,11 +152,16 @@ public class Dispatcher implements HttpService {
         }
     };
     
-    public BaseMapper.ContextMapping addContext(String hostname, String ctxPath,
+    public BaseMapper.Context addContext(String hostname, String ctxPath,
             Object ctx, String[] welcomeResources, FileConnector resources,
             HttpService ctxService) {
         return mapper.addContext(hostname, ctxPath, ctx, welcomeResources, resources, 
                 ctxService);
+    }
+
+    public BaseMapper.Context addContext(String ctxPath) {
+        return mapper.addContext(null, ctxPath, null, null, null, 
+                null);
     }
     
     public void map(CBuffer hostMB, CBuffer urlMB, MappingData md) {
@@ -172,7 +173,7 @@ public class Dispatcher implements HttpService {
         }
     }
 
-    public void map(BaseMapper.ContextMapping ctx,
+    public void map(BaseMapper.Context ctx,
             CBuffer uri, MappingData md) {
         try {
             mapper.internalMapWrapper(ctx, uri, md);
@@ -182,14 +183,14 @@ public class Dispatcher implements HttpService {
         }
     }
 
-    public void addWrapper(BaseMapper.ContextMapping ctx, String path,
+    public void addWrapper(BaseMapper.Context ctx, String path,
             HttpService service) {
         mapper.addWrapper(ctx, path, service);
     }
     
     
     public void setDefaultService(HttpService service) {
-        BaseMapper.ContextMapping mCtx = 
+        BaseMapper.Context mCtx = 
             mapper.addContext(null, "/", null, null, null, null);
         mapper.addWrapper(mCtx, "/", service);
     }
