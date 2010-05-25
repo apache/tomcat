@@ -9,8 +9,12 @@ import java.nio.channels.ByteChannel;
 
 
 /**
- * Buffered ByteChannel, backed by a buffer brigade to allow
- * some zero-copy operations.
+ * Buffered, non-blocking ByteChannel.  
+ * 
+ * write() data will be added to the buffer. Call startSending() to 
+ * flush. 
+ * 
+ *  
  * 
  * - you can use it as a normal non-blocking ByteChannel.
  * - you can call getRead
@@ -23,23 +27,60 @@ import java.nio.channels.ByteChannel;
 public abstract class IOChannel implements ByteChannel, IOConnector.DataReceivedCallback, 
         IOConnector.DataFlushedCallback {  
     
+    /**
+     * If this channel wraps another channel - for example a socket.
+     * Will be null if this is the 'root' channel - a socket, memory.
+     */
     protected IOChannel net;
-    protected IOChannel app;
+    
+    /** 
+     * Set with another channel layered on top of the current channel.
+     */
+    protected IOChannel head;
     
     protected String id;
+    
+    /**
+     * A string that can be parsed to extract the target.
+     * host:port for normal sockets
+     */
     protected CharSequence target;    
 
+    /**
+     * Connector that created the channel.
+     */
     protected IOConnector connector;
 
+    /**
+     * Callbacks. Will be moved if a new head is inserted.
+     */
     protected IOConnector.ConnectedCallback connectedCallback;
+    
+    /** 
+     * Will be called if any data is received.
+     * Will also be called on close. Close with lastException set indicates
+     * an error condition.
+     */
     protected IOConnector.DataReceivedCallback dataReceivedCallback;
+    
+    /**
+     * Out data is buffered, then sent with startSending. 
+     * This callback indicates the data has been sent. Can be used
+     * to implement blocking flush.
+     */
     protected IOConnector.DataFlushedCallback dataFlushedCallback;
 
     // Last activity timestamp.
-    // TODO: update, etc
+    // TODO: update and use it ( placeholder )
     public long ts;
     
+    /**
+     * If an async exception happens. 
+     */
     protected Throwable lastException;
+    
+    protected IOChannel() {
+    }
     
     public void setConnectedCallback(IOConnector.ConnectedCallback connectedCallback) {
         this.connectedCallback = connectedCallback;
@@ -58,9 +99,6 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
         this.dataFlushedCallback = dataFlushedCallback;
     }
 
-    protected IOChannel() {
-    }
-    
     // Input
     public abstract IOBuffer getIn();
 
@@ -89,13 +127,13 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
         sendHandleFlushedCallback();
     }
     
-    public void sendHandleFlushedCallback() throws IOException {
+    private void sendHandleFlushedCallback() throws IOException {
         try {
             if (dataFlushedCallback != null) {
                 dataFlushedCallback.handleFlushed(this);
             }
-            if (app != null) {
-                app.handleFlushed(this);
+            if (head != null) {
+                head.handleFlushed(this);
             }
         } catch (Throwable t) {
             close();
@@ -109,15 +147,20 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     
     
     /**
-     * Notify next channel that data has been received.  
+     * Notify next channel or callback that data has been received.
+     * Called after a lower channel gets more data ( in the IOThread
+     * for example ).
+     * 
+     * Also called when closed stream is detected. Can be called
+     * to just force upper layers to check for data.
      */
     public void sendHandleReceivedCallback() throws IOException {
         try {
             if (dataReceivedCallback != null) {
                 dataReceivedCallback.handleReceived(this);
             }
-            if (app != null) {
-                app.handleReceived(this);
+            if (head != null) {
+                head.handleReceived(this);
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -184,23 +227,28 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     // Chaining/filtering
     
     /** 
-     * Called to add an filter _after_ the current channel.
+     * Called to add an filter after the current channel, for 
+     * example set SSL on top of a socket channel.
+     * 
+     * The 'next' channel will have the received/flushed callbacks
+     * of the current channel. The current channel's callbacks will
+     * be reset.
+     * 
+     * "Head" is from STREAMS.
+     * 
      * @throws IOException 
      */
-    public IOChannel addFilterAfter(IOChannel next) throws IOException {
-        this.app = next;
-        app.setSink(this);
+    public IOChannel setHead(IOChannel head) throws IOException {
+        this.head = head;
+        head.setSink(this);
 
         // TODO: do we want to migrate them automatically ?
-        app.setDataReceivedCallback(dataReceivedCallback);
-        app.setDataFlushedCallback(dataFlushedCallback);
+        head.setDataReceivedCallback(dataReceivedCallback);
+        head.setDataFlushedCallback(dataFlushedCallback);
         // app.setClosedCallback(closedCallback);
 
         dataReceivedCallback = null;
         dataFlushedCallback = null;
-        
-        // we may have data in our buffers
-        next.handleReceived(this);
         return this;
     }
 
@@ -221,13 +269,6 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     
     // Socket support
     
-    public int getPort(boolean remote) {
-        if (net != null) {
-            return net.getPort(remote);
-        }
-        return 80;
-    }
-    
     public void readInterest(boolean b) throws IOException {
         if (net != null) {
             net.readInterest(b);
@@ -244,6 +285,10 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
         return getIn().read(bb);
     }
 
+    public void waitFlush(long timeMs) throws IOException {
+        return;
+    }
+    
     public int readBlocking(ByteBuffer bb, long timeMs) throws IOException {
         getIn().waitData(timeMs);
         return getIn().read(bb);
@@ -307,6 +352,20 @@ public abstract class IOChannel implements ByteChannel, IOConnector.DataReceived
     
     public void setTarget(CharSequence target) {
         this.target = target;
+    }
+
+    public static final String ATT_REMOTE_HOSTNAME = "RemoteHostname";
+    public static final String ATT_LOCAL_HOSTNAME = "LocalHostname";
+    public static final String ATT_REMOTE_PORT = "RemotePort";
+    public static final String ATT_LOCAL_PORT = "LocalPort";
+    public static final String ATT_LOCAL_ADDRESS = "LocalAddress";
+    public static final String ATT_REMOTE_ADDRESS = "RemoteAddress";
+    
+    public Object getAttribute(String name) {
+        if (net != null) {
+            return net.getAttribute(name);
+        }
+        return null;        
     }
     
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 // TODO: dump to a file, hex, etc.
+
 /**
  * For debug - will print all bytes that go trough the channel
  */
@@ -15,9 +16,19 @@ public class DumpChannel extends IOChannel {
     IOBuffer in = new IOBuffer(this);
     IOBuffer out = new IOBuffer(this);
     static final boolean dumpToFile = false;
+    static int idCnt = 0;
     
-    public DumpChannel(String id) {
-        this.id = id;
+    DumpChannel(String id) {
+        this.id = id + idCnt++;
+    }
+    
+    public static IOChannel wrap(String id, IOChannel net) throws IOException {
+        if (id == null) { 
+            id = "";
+        }
+        DumpChannel dmp = new DumpChannel(id + idCnt++);
+        net.setHead(dmp);
+        return dmp;
     }
     
     public String toString() {

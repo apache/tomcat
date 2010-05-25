@@ -35,9 +35,14 @@ public class IOReader extends Reader {
     String enc;
     private boolean closed;
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
+    long timeout = 0;
     
     public IOReader(IOBuffer iob) {
         this.iob = iob;
+    }
+    
+    public void setTimeout(long to) {
+        timeout = to;
     }
     
     public void setEncoding(String charset) {
@@ -187,7 +192,7 @@ public class IOReader extends Reader {
                 }
                 bucket = null;
                 while (bucket == null) {
-                    iob.waitData(0);
+                    iob.waitData(timeout);
                     bucket = iob.peekFirst();
                     if (bucket == null && iob.isClosedAndEmpty()) {
                         // EOF, we couldn't decode anything

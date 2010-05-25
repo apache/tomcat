@@ -8,7 +8,8 @@ import java.nio.ByteBuffer;
 
 /** 
  * Holds raw data. Similar interface with a ByteBuffer in 'channel write'
- * or 'read mode'. Data is between position and limit - allways.
+ * or 'read mode'. Data is between position and limit - there is no 
+ * switching.
  * 
  * TODO: FileBucket, DirectBufferBucket, CharBucket, ...
  * 
