@@ -14,13 +14,12 @@ import org.apache.tomcat.lite.http.HttpMessage.HttpMessageBytes;
 import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBuffer;
-import org.apache.tomcat.lite.io.IOConnector;
 import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.FastHttpDateFormat;
 import org.apache.tomcat.lite.io.Hex;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
-import org.apache.tomcat.lite.io.SslChannel;
+import org.apache.tomcat.lite.io.IOConnector;
 
 public class Http11Connection extends HttpConnection 
         implements IOConnector.ConnectedCallback {
@@ -1238,9 +1237,11 @@ public class Http11Connection extends HttpConnection
         }
 
         if (body.isClosedAndEmpty()) {
-            if (!endSent) {
-                out.append(chunk.endChunk());
-                endSent = true;
+            synchronized(this) {
+                if (!endSent) {
+                    out.append(chunk.endChunk());
+                    endSent = true;
+                }
             }
             return true;
         } else {
@@ -1432,27 +1433,24 @@ public class Http11Connection extends HttpConnection
 
     @Override
     public void handleConnected(IOChannel net) throws IOException {
-
         HttpChannel httpCh = activeHttp; 
-        boolean ssl = httpCh.getRequest().isSecure();
-        if (ssl) {
-            String[] hostPort = httpCh.getTarget().split(":");
-            
-            SslChannel ch1 = httpConnector.sslConnector.channel(
-                    hostPort[0], Integer.parseInt(hostPort[1]));
-            ch1.setSink(net);
-            net.addFilterAfter(ch1);
-            net = ch1;
-        }
-        if (httpConnector.debugHttp) {
-            IOChannel ch1 = new DumpChannel("");
-            net.addFilterAfter(ch1);
-            net = ch1;                        
-        }
 
         if (!net.isOpen()) {
             httpCh.abort(net.lastException());
             return;
+        }
+
+        boolean ssl = httpCh.getRequest().isSecure();
+        if (ssl) {
+            String[] hostPort = httpCh.getTarget().split(":");
+            
+            IOChannel ch1 = httpConnector.sslProvider.channel(net, 
+                    hostPort[0], Integer.parseInt(hostPort[1]));
+            //net.setHead(ch1);
+            net = ch1;
+        }
+        if (httpConnector.debugHttp) {
+            net = DumpChannel.wrap("Http-Client-", net);
         }
         
         setSink(net);

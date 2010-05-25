@@ -213,18 +213,23 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
         return ch.getAddress(remote);
     }
 
-    public int getPort(boolean remote) {
-        return ch.getPort(remote);
+    @Override
+    public Object getAttribute(String name) {
+        if (ATT_REMOTE_HOSTNAME.equals(name)) {
+            return getAddress(true).getHostName();                        
+        } else if (ATT_LOCAL_HOSTNAME.equals(name)) {
+            return getAddress(false).getHostName();                        
+        } else if (ATT_REMOTE_ADDRESS.equals(name)) {
+            return getAddress(true).getHostAddress();                        
+        } else if (ATT_LOCAL_ADDRESS.equals(name)) {
+            return getAddress(false).getHostAddress();                        
+        } else if (ATT_REMOTE_PORT.equals(name)) {
+            return ch.getPort(true);
+        } else if (ATT_LOCAL_PORT.equals(name)) {
+            return ch.getPort(false);
+        }
+        return null;        
     }
-
-    public String getRemoteAddress() {
-        return getAddress(true).toString();
-    }
-
-    public int getRemotePort() {
-        return getPort(true);
-    }
-
 
     public void startSending() throws IOException {
         flush(ch);

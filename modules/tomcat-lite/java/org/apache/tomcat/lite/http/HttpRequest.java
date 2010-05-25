@@ -16,7 +16,6 @@ import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOReader;
 import org.apache.tomcat.lite.io.IOWriter;
-import org.apache.tomcat.lite.io.SocketIOChannel;
 import org.apache.tomcat.lite.io.UrlEncoding;
 
 public class HttpRequest extends HttpMessage {
@@ -408,15 +407,8 @@ public class HttpRequest extends HttpMessage {
         if (remoteAddrMB.length() == 0) {
             HttpChannel asyncHttp = getHttpChannel();
             IOChannel iochannel = asyncHttp.getNet().getFirst();
-            if (iochannel instanceof SocketIOChannel) {
-                SocketIOChannel channel = (SocketIOChannel) iochannel;
-
-                String addr = (channel == null) ?
-                        "127.0.0.1" : 
-                            channel.getAddress(true).getHostAddress();
-
-                remoteAddrMB.set(addr);
-            }
+            remoteAddrMB.set((String) 
+                    iochannel.getAttribute(IOChannel.ATT_REMOTE_ADDRESS));
         }
         return remoteAddrMB;
     }
@@ -425,14 +417,8 @@ public class HttpRequest extends HttpMessage {
         if (remoteHostMB.length() == 0) {
             HttpChannel asyncHttp = getHttpChannel();
             IOChannel iochannel = asyncHttp.getNet().getFirst();
-            if (iochannel instanceof SocketIOChannel) {
-                SocketIOChannel channel = (SocketIOChannel) iochannel;
-                String addr = (channel == null) ?
-                        "127.0.0.1" : 
-                            channel.getAddress(true).getCanonicalHostName();
-
-                remoteHostMB.set(addr);
-            }
+            remoteHostMB.set((String) 
+                    iochannel.getAttribute(IOChannel.ATT_REMOTE_HOSTNAME));
         }
         return remoteHostMB;
     }
@@ -449,11 +435,7 @@ public class HttpRequest extends HttpMessage {
         if (remotePort == -1) {
             HttpChannel asyncHttp = getHttpChannel();
             IOChannel iochannel = asyncHttp.getNet().getFirst();
-            if (iochannel instanceof SocketIOChannel) {
-                SocketIOChannel channel = (SocketIOChannel) iochannel;
-                remotePort = (channel == null) ?
-                            0 : channel.getPort(true);
-            }
+            remotePort = (Integer) iochannel.getAttribute(IOChannel.ATT_REMOTE_PORT);
         }
         return remotePort;
     }
@@ -466,11 +448,7 @@ public class HttpRequest extends HttpMessage {
         if (localPort == -1) {
             HttpChannel asyncHttp = getHttpChannel();
             IOChannel iochannel = asyncHttp.getNet().getFirst();
-            if (iochannel instanceof SocketIOChannel) {
-                SocketIOChannel channel = (SocketIOChannel) iochannel;
-                localPort = (channel == null) ?
-                            0 : channel.getPort(false);
-            }
+            localPort = (Integer) iochannel.getAttribute(IOChannel.ATT_LOCAL_PORT);
         }
         return localPort;
     }

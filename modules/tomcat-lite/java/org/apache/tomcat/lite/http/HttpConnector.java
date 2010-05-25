@@ -5,10 +5,7 @@ package org.apache.tomcat.lite.http;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -19,8 +16,7 @@ import org.apache.tomcat.lite.io.DumpChannel;
 import org.apache.tomcat.lite.io.IOBuffer;
 import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
-import org.apache.tomcat.lite.io.SslChannel;
-import org.apache.tomcat.lite.io.SslConnector;
+import org.apache.tomcat.lite.io.SslProvider;
 import org.apache.tomcat.lite.io.IOConnector.DataReceivedCallback;
 
 /**
@@ -65,7 +61,7 @@ public class HttpConnector {
     protected IOConnector ioConnector;
     
     // for https connections
-    protected SslConnector sslConnector = new SslConnector();
+    protected SslProvider sslProvider;
     
     boolean debugHttp = false;
     boolean debug = false;
@@ -92,6 +88,8 @@ public class HttpConnector {
     private Timer timer;
 
     boolean compression = true;
+    
+    boolean serverSSL = false;
 
     private static Timer defaultTimer = new Timer(true);
     
@@ -130,6 +128,20 @@ public class HttpConnector {
 
     public void setDebugHttp(boolean b) {
         this.debugHttp  = b;
+    }
+    
+    public HttpConnector withSsl(SslProvider ssl) {
+        sslProvider = ssl;
+        return this;
+    }
+    
+    HttpConnector setServerSsl(boolean b) {
+        serverSSL = b;
+        return this;
+    }
+    
+    public SslProvider getSslProvider() {
+        return sslProvider;
     }
     
     /** 
@@ -356,20 +368,31 @@ public class HttpConnector {
         // TODO: reuse
         HttpConnection shttp = cpool.accepted(accepted);
         shttp.serverMode = true;
-
+        
+        IOChannel head = accepted;
+        IOChannel ch;
+        
+        String id = null;
         if (debugHttp) {
-            log.info("Accepted " + accepted.getFirst().getPort(true));
-            IOChannel ch = new DumpChannel("");
-            accepted.addFilterAfter(ch);
-            shttp.setSink(ch);
-        } else {
-            shttp.setSink(accepted);
+            id = port + "-" + accepted.getFirst().getAttribute(IOChannel.ATT_REMOTE_PORT);
+            log.info("Accepted " + id);
+            head = DumpChannel.wrap("SSL-" + id, head);
         }
-        // TODO: JSSE filter
-        
 
-        // Will read any data in the channel.
+        // TODO: seems cleaner this way...
+        if (serverSSL) {
+            ch = sslProvider.serverChannel(head);
+            head.setHead(ch);
+            head = ch;
+            
+            if (debugHttp) {
+                head = DumpChannel.wrap("CLEAR-" + id, head);
+            }
+        }
         
+        shttp.setSink(head);
+        
+        // Will read any data in the channel, notify data available up
         accepted.handleReceived(accepted);
         return shttp;
     }

@@ -18,7 +18,6 @@
 package org.apache.tomcat.lite.io;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.CharBuffer;
 
 
