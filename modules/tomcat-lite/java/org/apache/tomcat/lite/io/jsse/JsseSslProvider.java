@@ -1,6 +1,6 @@
 /*
  */
-package org.apache.tomcat.lite.io;
+package org.apache.tomcat.lite.io.jsse;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyManagementException;
@@ -24,23 +23,34 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.tomcat.lite.io.BBuffer;
+import org.apache.tomcat.lite.io.DumpChannel;
+import org.apache.tomcat.lite.io.IOChannel;
+import org.apache.tomcat.lite.io.IOConnector;
+import org.apache.tomcat.lite.io.SocketConnector;
+import org.apache.tomcat.lite.io.SslProvider;
+import org.apache.tomcat.lite.io.WrappedException;
+import org.apache.tomcat.lite.io.IOConnector.ConnectedCallback;
 
-public class SslConnector extends IOConnector {
+
+public class JsseSslProvider implements SslProvider {
 
     /**
      * TODO: option to require validation.
@@ -70,6 +80,7 @@ public class SslConnector extends IOConnector {
     public static TrustManager[] trustAllCerts = new TrustManager[] { 
         new BasicTrustManager() }; 
 
+    static String[] enabledCiphers;
 
     static final boolean debug = false;
     
@@ -87,14 +98,18 @@ public class SslConnector extends IOConnector {
     Executor handshakeExecutor = Executors.newCachedThreadPool();
     static int id = 0;
     
-    public SslConnector() {
+    public JsseSslProvider() {
+    }
+    
+    public static void setEnabledCiphers(String[] enabled) {
+        enabledCiphers = enabled;
     }
     
     public void start() {
         
     }
     
-    public SSLContext getSSLContext() {
+    SSLContext getSSLContext() {
         if (sslCtx == null) {
             try {
                 sslCtx = SSLContext.getInstance("TLS");
@@ -122,20 +137,30 @@ public class SslConnector extends IOConnector {
         return net;
     }
     
-    public SslChannel channel(String host, int port) {
-        return new SslChannel()
+    @Override
+    public IOChannel channel(IOChannel net, String host, int port) throws IOException {
+      if (debug) {
+          DumpChannel dch = new DumpChannel("S-ENC-" + id, net);
+          net.setHead(dch);
+          net = dch;
+        }
+        SslChannel ch = new SslChannel()
             .setTarget(host, port)
             .setSslContext(getSSLContext())
-            .setSslConnector(this);
+            .setSslProvider(this);
+        net.setHead(ch);
+        return ch;
     }
 
-    public SslChannel serverChannel() {
-        return new SslChannel()
+    @Override
+    public SslChannel serverChannel(IOChannel net) throws IOException {
+        SslChannel ch = new SslChannel()
             .setSslContext(getSSLContext())
-            .setSslConnector(this).withServer();
+            .setSslProvider(this).withServer();
+        ch.setSink(net);
+        return ch;
     }
     
-    @Override
     public void acceptor(final ConnectedCallback sc, CharSequence port, Object extra) 
             throws IOException {
         getNet().acceptor(new ConnectedCallback() {
@@ -143,18 +168,18 @@ public class SslConnector extends IOConnector {
             public void handleConnected(IOChannel ch) throws IOException {
                 IOChannel first = ch;
                 if (debug) {
-                    DumpChannel dch = new DumpChannel("S-ENC-" + id );
-                    ch.addFilterAfter(dch);
+                    DumpChannel dch = new DumpChannel("S-ENC-" + id, ch);
+                    ch.setHead(dch);
                     first = dch;
                 }
                 
-                IOChannel sslch = serverChannel();
+                IOChannel sslch = serverChannel(first);
                 sslch.setSink(first);
-                first.addFilterAfter(sslch);
+                first.setHead(sslch);
 
                 if (debug) {
-                    DumpChannel dch2 = new DumpChannel("S-CLR-" + id);
-                    sslch.addFilterAfter(dch2);
+                    DumpChannel dch2 = new DumpChannel("S-CLR-" + id, sslch);
+                    sslch.setHead(dch2);
                     sslch = dch2;
                     id++;
                 }
@@ -164,7 +189,6 @@ public class SslConnector extends IOConnector {
         }, port, extra);
     }
     
-    @Override
     public void connect(final String host, final int port, final ConnectedCallback sc)
             throws IOException {
         getNet().connect(host, port, new ConnectedCallback() {
@@ -174,17 +198,16 @@ public class SslConnector extends IOConnector {
                 IOChannel first = ch;
                 if (debug) {
                     DumpChannel dch = new DumpChannel("ENC-" + id);
-                    ch.addFilterAfter(dch);
+                    ch.setHead(dch);
                     first = dch;
                 }
                 
-                IOChannel sslch = channel(host, port);
-                sslch.setSink(first);
-                first.addFilterAfter(sslch);
+                IOChannel sslch = channel(first, host, port);
+//                first.setHead(sslch);
 
                 if (debug) {
                     DumpChannel dch2 = new DumpChannel("CLR-" + id);
-                    sslch.addFilterAfter(dch2);
+                    sslch.setHead(dch2);
                     sslch = dch2;
                     id++;
                 }
@@ -195,25 +218,29 @@ public class SslConnector extends IOConnector {
         });
     }
 
-    public SslConnector withKeyManager(KeyManager[] kms) {
+    public JsseSslProvider withKeyManager(KeyManager[] kms) {
         this.keyManager = kms;
         return this;
     }
     
-    public SslConnector setKeysFile(String file, String pass) throws IOException {
-        return setKeys(new FileInputStream(file), pass);
+    public JsseSslProvider setKeystoreFile(String file, String pass) throws IOException {
+        return setKeystore(new FileInputStream(file), pass);
     }
 
-    public SslConnector setKeysResource(String res, String pass) throws IOException {
-        return setKeys(this.getClass().getClassLoader().getResourceAsStream(res), 
+    public JsseSslProvider setKeystoreResource(String res, String pass) throws IOException {
+        return setKeystore(this.getClass().getClassLoader().getResourceAsStream(res), 
                 pass);
     }
     
-    public SslConnector setKeys(InputStream file, String pass) {
+    public JsseSslProvider setKeystore(InputStream file, String pass) {
         char[] passphrase = pass.toCharArray();
         KeyStore ks;
         try {
-            ks = KeyStore.getInstance("JKS");
+            String type = KeyStore.getDefaultType();
+            System.err.println("Keystore: " + type);
+            // Java: JKS
+            // Android: BKS
+            ks = KeyStore.getInstance(type);
             ks.load(file, passphrase);
             KeyManagerFactory kmf = 
                 KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
@@ -226,6 +253,7 @@ public class SslConnector extends IOConnector {
             keyManager = kmf.getKeyManagers();
             trustManagers = tmf.getTrustManagers();
         } catch (KeyStoreException e) {
+            // No JKS keystore ?
             // TODO Auto-generated catch block
         }catch (NoSuchAlgorithmException e) {
             // TODO Auto-generated catch block
@@ -247,41 +275,67 @@ public class SslConnector extends IOConnector {
         return this;
     }
     
-    public SslConnector setKeys(X509Certificate cert, PrivateKey privKey) {
+    public JsseSslProvider setKeys(X509Certificate cert, PrivateKey privKey) {
         keyManager = new KeyManager[] {
                 new TestKeyManager(cert, privKey)
         };
         return this;
     }
     
+    public JsseSslProvider setKeyFiles(String certPem, String keyFile) 
+            throws IOException {
+        
+
+        return this;
+    }
+    
+    public JsseSslProvider setKeyRes(String certPem, String keyFile) 
+            throws IOException {
+        setKeys(this.getClass().getClassLoader().getResourceAsStream(certPem),
+                this.getClass().getClassLoader().getResourceAsStream(keyFile));
+        return this;
+    }
+    
+    private void setKeys(InputStream certPem,
+            InputStream keyDer) throws IOException {
+        BBuffer keyB = BBuffer.allocate(2048);
+        keyB.readAll(keyDer);
+        byte[] key = new byte[keyB.remaining()];
+        keyB.getByteBuffer().get(key);
+        
+        setKeys(certPem, key);
+    }
+
+    public JsseSslProvider setKeys(String certPem, byte[] keyBytes) throws IOException{
+        InputStream is = new ByteArrayInputStream(certPem.getBytes());
+        return setKeys(is, keyBytes);
+    }
+    
     /**
      * Initialize using a PEM certificate and key bytes.
      * ( TODO: base64 dep to set the key as PEM )
      * 
-     * 
-     * Key was generated with 
-     *   keytool -genkey -alias server -keyalg RSA -storepass changeit
-     *   keytool -selfcert -storepass changeit -alias server
-     *    
-     * Then the bytes printed with printPrivateKey()
-     * 
-     * I found no way to generate the self-signed keys from jsse 
-     * except CLI. 
+     *  openssl genrsa 1024 > host.key
+     *  openssl pkcs8 -topk8 -nocrypt -in host.key -inform PEM 
+     *     -out host.der -outform DER
+     *  openssl req -new -x509 -nodes -sha1 -days 365 -key host.key > host.cert
      * 
      */
-    public SslConnector setKeys(String certPem, byte[] keyBytes) throws NoSuchAlgorithmException, InvalidKeySpecException, GeneralSecurityException {
+    public JsseSslProvider setKeys(InputStream certPem, byte[] keyBytes) throws IOException{
         // convert key 
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(keyBytes);
-        PrivateKey priv = kf.generatePrivate (keysp);
+        try {
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(keyBytes);
+            PrivateKey priv = kf.generatePrivate (keysp);
 
-        // Convert cert pem to certificate
-        InputStream is = new ByteArrayInputStream(certPem.getBytes());
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        final X509Certificate cert =  (X509Certificate) cf.generateCertificate(is);
-        
-        setKeys(cert, priv);
-        
+            // Convert cert pem to certificate
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            final X509Certificate cert =  (X509Certificate) cf.generateCertificate(certPem);
+
+            setKeys(cert, priv);
+        } catch (Throwable t) {
+            throw new WrappedException(t);
+        }
         return this;
     }
 
@@ -332,12 +386,37 @@ public class SslConnector extends IOConnector {
         }
     }
 
-    public static void fixUrlConnection() {
+    // TODO: add a mode that trust a defined list of certs, like SSH
+    
+    /** 
+     * Make URLConnection accept all certificates.
+     * Use only for testing !
+     */
+    public static void testModeURLConnection() {
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, SslConnector.trustAllCerts, null);
+            sc.init(null, JsseSslProvider.trustAllCerts, null);
+            
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
                     sc.getSocketFactory());
+            javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+                    new HostnameVerifier() {
+
+                        @Override
+                        public boolean verify(String hostname,
+                                SSLSession session) {
+                            try {
+                                Certificate[] certs = session.getPeerCertificates();
+                                // TODO...
+                                // see org/apache/http/conn/ssl/AbstractVerifier
+                            } catch (SSLPeerUnverifiedException e) {
+                                e.printStackTrace();
+                            }
+                            return true;
+                        }
+                        
+                    });
+            
         } catch (Exception e) {
             e.printStackTrace();
         } 

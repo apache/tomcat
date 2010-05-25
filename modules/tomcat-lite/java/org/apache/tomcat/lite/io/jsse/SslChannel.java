@@ -1,6 +1,6 @@
 /*
  */
-package org.apache.tomcat.lite.io;
+package org.apache.tomcat.lite.io.jsse;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,14 +13,21 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 
+import org.apache.tomcat.lite.io.IOBuffer;
+import org.apache.tomcat.lite.io.IOChannel;
+import org.apache.tomcat.lite.io.SslProvider;
 
-public class SslChannel extends IOChannel implements Runnable {
+class SslChannel extends IOChannel implements Runnable {
 
     static Logger log = Logger.getLogger("SSL");
+
+    static ByteBuffer EMPTY = ByteBuffer.allocate(0);
+    
 
     SSLEngine sslEngine;
     // Last result
@@ -28,21 +35,20 @@ public class SslChannel extends IOChannel implements Runnable {
     
     boolean handshakeDone = false;
     boolean handshakeInProgress = false;
+    Object handshakeSync = new Object();
     boolean flushing = false;
     
     IOBuffer in = new IOBuffer(this);
     IOBuffer out = new IOBuffer(this);
 
-    long handshakeTimeout = 10000;
+    long handshakeTimeout = 20000;
     // Used for session reuse
     String host;
     int port;
     
-    public SslChannel() {
-    }
-    
     ByteBuffer myAppOutData;
     ByteBuffer myNetOutData; 
+    private static boolean debugWrap = false;
 
     /*
      * Special: SSL works in packet mode, and we may receive an incomplete
@@ -50,13 +56,15 @@ public class SslChannel extends IOChannel implements Runnable {
      * limit at end )  
      */
     ByteBuffer myNetInData;
-    
     ByteBuffer myAppInData;
     boolean client = true;
 
     private SSLContext sslCtx;
 
     private boolean closeHandshake = false;
+    
+    public SslChannel() {
+    }
     
     /**
      * Setting the host/port enables clients to reuse SSL session - 
@@ -73,6 +81,7 @@ public class SslChannel extends IOChannel implements Runnable {
     
     private synchronized void initSsl() throws GeneralSecurityException {
         if (sslEngine != null) {
+            log.severe("Double initSsl");
             return;
         }
         
@@ -86,23 +95,25 @@ public class SslChannel extends IOChannel implements Runnable {
         } else {
             sslEngine = sslCtx.createSSLEngine();
             sslEngine.setUseClientMode(false);
-            String[] cs = sslEngine.getEnabledCipherSuites();
-            cs =sslEngine.getSupportedCipherSuites();
             
         }
+
+        // Some VMs have broken ciphers.
+        if (JsseSslProvider.enabledCiphers != null) {
+            sslEngine.setEnabledCipherSuites(JsseSslProvider.enabledCiphers);
+        }
+        
         SSLSession session = sslEngine.getSession();
     
+        int packetBuffer = session.getPacketBufferSize();
         myAppOutData = ByteBuffer.allocate(session.getApplicationBufferSize());
-        myNetOutData = ByteBuffer.allocate(session.getPacketBufferSize());
+        myNetOutData = ByteBuffer.allocate(packetBuffer);
         myAppInData = ByteBuffer.allocate(session.getApplicationBufferSize());
-        myNetInData = ByteBuffer.allocate(session.getPacketBufferSize());
+        myNetInData = ByteBuffer.allocate(packetBuffer);
         myNetInData.flip();
         myNetOutData.flip();
         myAppInData.flip();
         myAppOutData.flip();
-        
-        // TODO: enable anon suites
-        //sslEngine.setEnabledCipherSuites(sslEngine.getSupportedCipherSuites());
     }
     
     public SslChannel withServer() {
@@ -114,7 +125,9 @@ public class SslChannel extends IOChannel implements Runnable {
     @Override
     public synchronized void setSink(IOChannel net) throws IOException {
         try {
-            initSsl();
+            if (sslEngine == null) {
+                initSsl();
+            }
             super.setSink(net);
         } catch (GeneralSecurityException e) {
             log.log(Level.SEVERE, "Error initializing ", e);
@@ -143,13 +156,15 @@ public class SslChannel extends IOChannel implements Runnable {
         if (log.isLoggable(Level.FINEST)) {
             log.info("JSSE: processInput " + handshakeInProgress + " " + netIn.getBufferCount());
         }
-        if (!handshakeDone && !handshakeInProgress) {
-            handshakeInProgress = true;
-            handleHandshking();
-            return 0; 
-        }
-        if (handshakeInProgress) {
-            return 0; // leave it there
+        synchronized(handshakeSync) {
+            if (!handshakeDone && !handshakeInProgress) {
+                handshakeInProgress = true;
+                handleHandshking();
+                return 0; 
+            }            
+            if (handshakeInProgress) {
+                return 0; // leave it there
+            }
         }
         return processRealInput(netIn, appIn);
     }
@@ -201,8 +216,10 @@ public class SslChannel extends IOChannel implements Runnable {
                     in.close();
                     if (unwrapR.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
                         // TODO: send/receive one more packet ( handshake mode ? )
-                        handshakeInProgress = true;
-                        closeHandshake  = true;
+                        synchronized(handshakeSync) {
+                            handshakeInProgress = true;
+                            closeHandshake  = true;
+                        }
                         handleHandshking();
                         
                         startSending();
@@ -234,21 +251,24 @@ public class SslChannel extends IOChannel implements Runnable {
         return sslEngine.getHandshakeStatus();
     }
 
-    static ByteBuffer EMPTY = ByteBuffer.allocate(0);
-    
     public void startSending() throws IOException {
         
         flushing = true;
-
-        if (handshakeInProgress) {
-            return; // don't bother me.
+        boolean needHandshake = false;
+        synchronized(handshakeSync) {
+            if (handshakeInProgress) {
+                return; // don't bother me.
+            }
+            if (!handshakeDone) {
+                handshakeInProgress = true;
+                needHandshake = true;
+            }
+        }
+        if (needHandshake) {
+            handleHandshking();
+            return; // can't write yet.            
         }
         
-        if (!handshakeDone) {
-            handshakeInProgress = true;
-            handleHandshking();
-            return; // can't write yet.
-        }
         startRealSending();
     }
     
@@ -281,6 +301,8 @@ public class SslChannel extends IOChannel implements Runnable {
     }
     
     private Object sendLock = new Object();
+
+    private JsseSslProvider sslProvider;
     
     private void startRealSending() throws IOException {
         // Only one thread at a time
@@ -342,17 +364,21 @@ public class SslChannel extends IOChannel implements Runnable {
         if (log.isLoggable(Level.FINEST)) {
             log.info("Starting handshake");
         }
-        handshakeInProgress = true;
+        synchronized(handshakeSync) {
+            handshakeInProgress = true;            
+        }
 
-        ((SslConnector) connector).handshakeExecutor.execute(this);
+        sslProvider.handshakeExecutor.execute(this);
     }
     
     private void endHandshake() throws IOException {
         if (log.isLoggable(Level.FINEST)) {
             log.info("Handshake done " + net.getIn().available());
         }
-        handshakeDone = true;
-        handshakeInProgress = false;
+        synchronized(handshakeSync) {
+            handshakeDone = true;
+            handshakeInProgress = false;            
+        }
         if (flushing) {
             flushing = false;
             startSending();
@@ -398,38 +424,37 @@ public class SslChannel extends IOChannel implements Runnable {
                     // || initial - for client
                     initial = false;
                     synchronized(myNetOutData) {
-                        myNetOutData.compact();
-
-                        try {
-                            wrap = sslEngine.wrap(myAppOutData, myNetOutData);
-                        } catch (Throwable t) {
-                            t.printStackTrace();
-                            close();
-                            return;
-                        } finally {
-                            myNetOutData.flip();
-                        }
-
-                        hstatus = wrap.getHandshakeStatus();
-                        if (myNetOutData.remaining() > 0) {
-                            net.getOut().write(myNetOutData);
+                        while (hstatus == HandshakeStatus.NEED_WRAP) {
+                            myNetOutData.compact();
+                            try {
+                                wrap = sslEngine.wrap(myAppOutData, myNetOutData);
+                            } catch (Throwable t) {
+                                log.log(Level.SEVERE, "Wrap error", t);
+                                close();
+                                return;
+                            } finally {
+                                myNetOutData.flip();
+                            }
+                            if (myNetOutData.remaining() > 0) {
+                                net.getOut().write(myNetOutData);
+                            }
+                            hstatus = wrap.getHandshakeStatus();
                         }
                     }
                     net.startSending();
-
-                    
                 } else if (hstatus == HandshakeStatus.NEED_UNWRAP) {
-
                     while (hstatus == HandshakeStatus.NEED_UNWRAP) {
                         // If we have few remaining bytes - process them
                         if (myNetInData.remaining() > 0) {
                             myAppInData.clear();
+                            if (debugWrap) {
+                                log.info("UNWRAP: rem=" + myNetInData.remaining());
+                            }
                             wrap = sslEngine.unwrap(myNetInData, myAppInData);
                             hstatus = wrap.getHandshakeStatus();
-
                             myAppInData.flip();
                             if (myAppInData.remaining() > 0) {
-                                throw new IOException("Unexpected data");
+                                log.severe("Unexpected data after unwrap");
                             }
                             if (wrap.getStatus() == Status.CLOSED) {
                                 break;
@@ -444,13 +469,21 @@ public class SslChannel extends IOChannel implements Runnable {
                             int rd;
                             try {
                                 rd = net.getIn().read(myNetInData);
+                                if (debugWrap) {
+                                    log.info("Read: " + rd);
+                                }
                             } finally {
                                 myNetInData.flip();
                             }
                             if (rd == 0) {
-                                net.getIn().waitData(handshakeTimeout - 
-                                        (System.currentTimeMillis() - t0));
+                                if (debugWrap) {
+                                    log.info("Wait: " + handshakeTimeout);
+                                }
+                                net.getIn().waitData(handshakeTimeout);
                                 rd = net.getIn().read(myNetInData);
+                                if (debugWrap) {
+                                    log.info("Read after wait: " + rd);
+                                }
                             }
                             if (rd < 0) {
                                 // in closed
@@ -506,13 +539,95 @@ public class SslChannel extends IOChannel implements Runnable {
         sendHandleReceivedCallback();
     }
 
-    public SslChannel setSslContext(SSLContext sslCtx) {
+    SslChannel setSslContext(SSLContext sslCtx) {
         this.sslCtx = sslCtx;
         return this;
     }
     
-    public SslChannel setSslConnector(SslConnector con) {
-        this.connector = con;
+    SslChannel setSslProvider(JsseSslProvider con) {
+        this.sslProvider = con;
         return this;
     }
+    
+    public Object getAttribute(String name) {
+        if (SslProvider.ATT_SSL_CERT.equals(name)) {
+            try {
+                return sslEngine.getSession().getPeerCertificateChain();
+            } catch (SSLPeerUnverifiedException e) {
+                return null; // no re-negotiation
+            }
+        } else if (SslProvider.ATT_SSL_CIPHER.equals(name)) {
+            return sslEngine.getSession().getCipherSuite();
+        } else if (SslProvider.ATT_SSL_KEY_SIZE.equals(name)) {
+            // looks like we need to get it from the string cipher
+            CipherData c_aux[] = ciphers;
+
+            int size = 0;
+            String cipherSuite = sslEngine.getSession().getCipherSuite();
+            for (int i = 0; i < c_aux.length; i++) {
+                if (cipherSuite.indexOf(c_aux[i].phrase) >= 0) {
+                    size = c_aux[i].keySize;
+                    break;
+                }
+            }
+            return size;
+        } else if (SslProvider.ATT_SSL_SESSION_ID.equals(name)) {
+            byte [] ssl_session = sslEngine.getSession().getId();
+            if ( ssl_session == null) 
+                return null;
+            StringBuilder buf=new StringBuilder();
+            for(int x=0; x<ssl_session.length; x++) {
+                String digit=Integer.toHexString(ssl_session[x]);
+                if (digit.length()<2) buf.append('0');
+                if (digit.length()>2) digit=digit.substring(digit.length()-2);
+                buf.append(digit);
+            }
+            return buf.toString();
+        }
+        
+        if (net != null) {
+            return net.getAttribute(name);
+        }
+        return null;        
+    }
+    
+    
+     /**
+      * Simple data class that represents the cipher being used, along with the
+      * corresponding effective key size.  The specified phrase must appear in the
+      * name of the cipher suite to be recognized.
+      */
+
+     static final class CipherData {
+
+         public String phrase = null;
+
+         public int keySize = 0;
+
+         public CipherData(String phrase, int keySize) {
+             this.phrase = phrase;
+             this.keySize = keySize;
+         }
+
+     }
+     
+    
+     /**
+      * A mapping table to determine the number of effective bits in the key
+      * when using a cipher suite containing the specified cipher name.  The
+      * underlying data came from the TLS Specification (RFC 2246), Appendix C.
+      */
+      static final CipherData ciphers[] = {
+         new CipherData("_WITH_NULL_", 0),
+         new CipherData("_WITH_IDEA_CBC_", 128),
+         new CipherData("_WITH_RC2_CBC_40_", 40),
+         new CipherData("_WITH_RC4_40_", 40),
+         new CipherData("_WITH_RC4_128_", 128),
+         new CipherData("_WITH_DES40_CBC_", 40),
+         new CipherData("_WITH_DES_CBC_", 56),
+         new CipherData("_WITH_3DES_EDE_CBC_", 168),
+         new CipherData("_WITH_AES_128_CBC_", 128),
+         new CipherData("_WITH_AES_256_CBC_", 256)
+     };
+          
 }
