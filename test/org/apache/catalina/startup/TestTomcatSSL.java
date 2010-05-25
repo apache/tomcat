@@ -217,6 +217,12 @@ public class TestTomcatSSL extends TomcatBaseTest {
         tomcat.getConnector().setAttribute("allowUnsafeLegacyRenegotiation", "true");
 
         tomcat.start();
+
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.indexOf("Apr") != -1) {
+            return; // Not supported yet (10/05/25)
+        }
+
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
