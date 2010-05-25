@@ -76,7 +76,7 @@
          </javac>
         <copy todir="${http.test-classes}">
             <fileset dir="${tomcat.lite.src}/test" 
-                includes="**/*.properties **/*.xml  **/*.bin **/*.keystore" />
+                includes="**/*.properties **/*.xml  **/*.bin **/*.keystore **/*.cert **/*.der" />
         </copy>
    </target>
         
