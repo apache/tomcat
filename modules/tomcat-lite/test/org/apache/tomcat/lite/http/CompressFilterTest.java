@@ -57,8 +57,8 @@ public class CompressFilterTest extends TestCase {
         check(sb.toString(), null);
     }
 
-    public void testLarge100() throws Exception {
-        for (int i = 0; i < 100; i++) {
+    public void testLarge10() throws Exception {
+        for (int i = 0; i < 10; i++) {
             testLargeIn();
             cf.recycle();
         }

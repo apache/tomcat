@@ -230,9 +230,13 @@ class SslChannel extends IOChannel implements Runnable {
                 if (unwrapR.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                     tasks();                    
                 }
-                if (unwrapR.getStatus() == Status.BUFFER_OVERFLOW ||
-                        unwrapR.getStatus() == Status.BUFFER_UNDERFLOW) {
-                    log.severe("Unhandled overflow");
+                if (unwrapR.getStatus() == Status.BUFFER_OVERFLOW) {
+                    log.severe("Unhandled overflow " + unwrapR);
+                    break;
+                }
+                if (unwrapR.getStatus() == Status.BUFFER_UNDERFLOW) {
+                    // harmless
+                    //log.severe("Unhandled underflow " + unwrapR);
                     break;
                 }
             }

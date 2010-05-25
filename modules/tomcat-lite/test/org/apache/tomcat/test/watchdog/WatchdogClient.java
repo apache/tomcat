@@ -19,18 +19,23 @@ package org.apache.tomcat.test.watchdog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Properties;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.apache.tomcat.servlets.config.deploy.DomUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class WatchdogClient {
@@ -60,6 +65,31 @@ public class WatchdogClient {
       return getSuite(port);
   }
   
+  public static class NullResolver implements EntityResolver {
+      public InputSource resolveEntity (String publicId,
+                                                 String systemId)
+          throws SAXException, IOException
+      {
+          return new InputSource(new StringReader(""));
+      }
+  }
+  
+  /** Read XML as DOM.
+   */
+  public static Document readXml(InputStream is)
+      throws SAXException, IOException, ParserConfigurationException
+  {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setValidating(false);
+      dbf.setIgnoringComments(false);
+      dbf.setIgnoringElementContentWhitespace(true);
+      DocumentBuilder db = null;
+      db = dbf.newDocumentBuilder();
+      db.setEntityResolver( new NullResolver() );
+      Document doc = db.parse(is);
+      return doc;
+  }
+  
   /** 
    * Return a test suite for running a watchdog-like 
    * test file. 
@@ -79,7 +109,7 @@ public class WatchdogClient {
     
     
     try {
-      Document doc = DomUtil.readXml(new FileInputStream(file));
+      Document doc = readXml(new FileInputStream(file));
       Element docE = doc.getDocumentElement();
       NodeList targetsL = docE.getElementsByTagName("target");
       for (int i = 0; i < targetsL.getLength(); i++) {

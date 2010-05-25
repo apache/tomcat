@@ -271,7 +271,7 @@ public class Http11Connection extends HttpConnection
                 return true;
             }
             log.warning("Unexpected message from server in client keep alive " 
-                    + net.getIn());
+                    + net.getIn() + ": " + net.getIn().readAll(null));
             if (net.isOpen()) {
                 net.close();
             }

@@ -22,13 +22,12 @@ import junit.framework.TestCase;
 
 import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.SocketConnector;
 
 public class LiveHttp1Test extends TestCase {
     // Proxy tests extend this class, run same tests via proxy on 8903 
     protected int clientPort = 8802;
 
-    HttpRequest httpClient;
+    HttpRequest httpReq;
 
     BBuffer bodyRecvBuffer = BBuffer.allocate(1024);
 
@@ -39,38 +38,38 @@ public class LiveHttp1Test extends TestCase {
         // DefaultHttpConnector.get().setDebugHttp(true);
         TestMain.getTestServer();
 
-        httpClient = DefaultHttpConnector.get().request("localhost", 
+        httpReq = HttpClient.newClient().request("localhost", 
                 clientPort);
 
         bodyRecvBuffer.recycle();
     }
 
     public void tearDown() throws Exception {
-        if (httpClient != null) {
-            httpClient.release(); // async
-            httpClient = null;
+        if (httpReq != null) {
+            httpReq.release(); // async
+            httpReq = null;
         }
     }
 
     public void testSimpleRequest() throws Exception {
-        httpClient.requestURI().set("/hello");
+        httpReq.requestURI().set("/hello");
 
-        httpClient.send();
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.send();
+        httpReq.readAll(bodyRecvBuffer, to);
         assertEquals("Hello world", bodyRecvBuffer.toString());
     }
 
     public void testSimpleRequestClose() throws Exception {
-        httpClient.requestURI().set("/hello");
-        httpClient.setHeader("Connection", "close");
+        httpReq.requestURI().set("/hello");
+        httpReq.setHeader("Connection", "close");
 
-        httpClient.send();
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.send();
+        httpReq.readAll(bodyRecvBuffer, to);
         assertEquals("Hello world", bodyRecvBuffer.toString());
     }
 
     public void testPoolGetRelease() throws Exception {
-        HttpConnector con = new HttpConnector(new SocketConnector());
+        HttpConnector con = HttpClient.newClient();
         con.setMaxHttpPoolSize(10);
         HttpChannel httpCh = con.get("localhost", clientPort);
         httpCh.release();
@@ -84,20 +83,20 @@ public class LiveHttp1Test extends TestCase {
     }
 
     public void testSimpleChunkedRequest() throws Exception {
-        httpClient.requestURI().set("/chunked/foo");
-        httpClient.send();
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.requestURI().set("/chunked/foo");
+        httpReq.send();
+        httpReq.readAll(bodyRecvBuffer, to);
         assertTrue(bodyRecvBuffer.toString(), bodyRecvBuffer.toString().indexOf("AAA") >= 0);
     }
 
     // Check waitResponseHead()
     public void testRequestHead() throws Exception {
-        httpClient.requestURI().set("/echo/foo");
+        httpReq.requestURI().set("/echo/foo");
 
         // Send the request, wait response
-        httpClient.send();
+        httpReq.send();
 
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.readAll(bodyRecvBuffer, to);
         assertTrue(bodyRecvBuffer.toString().indexOf("GET /echo/foo") > 0);
     }
 
@@ -118,36 +117,36 @@ public class LiveHttp1Test extends TestCase {
     }
 
     public void notFound() throws Exception {
-        httpClient.requestURI().set("/foo");
-        httpClient.send();
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.requestURI().set("/foo");
+        httpReq.send();
+        httpReq.readAll(bodyRecvBuffer, to);
     }
 
     // compression not implemented
     public void testGzipRequest() throws Exception {
-        httpClient.requestURI().set("/hello");
-        httpClient.setHeader("accept-encoding",
+        httpReq.requestURI().set("/hello");
+        httpReq.setHeader("accept-encoding",
             "gzip");
 
         // Send the request, wait response
-        httpClient.send();
+        httpReq.send();
         // cstate.waitResponseHead(10000); // headers are received
         // ByteChunk data = new ByteChunk(1024);
         // acstate.serializeResponse(acstate.res, data);
 
         // System.err.println(bodyRecvBuffer.toString());
 
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.readAll(bodyRecvBuffer, to);
         // Done
     }
 
     public void testWrongPort() throws Exception {
-        httpClient = DefaultHttpConnector.get().request("localhost", 18904);
-        httpClient.requestURI().set("/hello");
+        httpReq = HttpClient.newClient().request("localhost", 18904);
+        httpReq.requestURI().set("/hello");
 
-        httpClient.send();
+        httpReq.send();
         
-        httpClient.readAll(bodyRecvBuffer, to);
+        httpReq.readAll(bodyRecvBuffer, to);
         assertEquals(0, bodyRecvBuffer.remaining());
     }
 }
