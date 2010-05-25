@@ -692,6 +692,10 @@ public final class StandardServer extends LifecycleMBeanBase
         // Register the MBeanFactory
         onameMBeanFactory = register(new MBeanFactory(), "type=MBeanFactory");
         
+        // Register the naming resources
+        onameNamingResoucres = register(globalNamingResources,
+                "type=NamingResources");
+        
         // Initialize our defined Services
         for (int i = 0; i < services.length; i++) {
             services[i].init();
@@ -709,11 +713,14 @@ public final class StandardServer extends LifecycleMBeanBase
         
         unregister(onameStringCache);
         
+        unregister(onameNamingResoucres);
+        
         super.destroyInternal();
     }
 
     private ObjectName onameStringCache;
     private ObjectName onameMBeanFactory;
+    private ObjectName onameNamingResoucres;
     
     /**
      * Obtain the MBean domain for this server. The domain is obtained using
