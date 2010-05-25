@@ -3,41 +3,33 @@
 package org.apache.tomcat.lite;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.tomcat.integration.jmx.UJmxHandler;
-import org.apache.tomcat.integration.jmx.UJmxObjectManagerSpi;
-import org.apache.tomcat.integration.simple.Main;
-import org.apache.tomcat.integration.simple.SimpleObjectManager;
 import org.apache.tomcat.lite.http.BaseMapper;
-import org.apache.tomcat.lite.http.DefaultHttpConnector;
+import org.apache.tomcat.lite.http.HttpClient;
 import org.apache.tomcat.lite.http.Dispatcher;
-import org.apache.tomcat.lite.http.HttpChannel;
-import org.apache.tomcat.lite.http.HttpConnectionPool;
 import org.apache.tomcat.lite.http.HttpConnector;
 import org.apache.tomcat.lite.http.HttpRequest;
 import org.apache.tomcat.lite.http.HttpResponse;
+import org.apache.tomcat.lite.http.HttpServer;
 import org.apache.tomcat.lite.http.HttpChannel.HttpService;
-import org.apache.tomcat.lite.http.HttpConnectionPool.RemoteServer;
-import org.apache.tomcat.lite.http.HttpConnector.HttpChannelEvents;
-import org.apache.tomcat.lite.http.HttpConnector.HttpConnection;
 import org.apache.tomcat.lite.http.services.EchoCallback;
 import org.apache.tomcat.lite.http.services.SleepCallback;
 import org.apache.tomcat.lite.io.BBuffer;
-import org.apache.tomcat.lite.io.IOConnector;
-import org.apache.tomcat.lite.io.SocketConnector;
-import org.apache.tomcat.lite.io.SslConnector;
+import org.apache.tomcat.lite.io.jsse.JsseSslProvider;
 import org.apache.tomcat.lite.proxy.HttpProxyService;
 import org.apache.tomcat.lite.proxy.StaticContentService;
 import org.apache.tomcat.lite.service.IOStatus;
 
 /**
- * Server with lost of test servlets.
+ * Laucher for tomcat-lite standalone, configured with test handlers.
  * 
  * Used in tests - one is running for the entire suite.
  * 
@@ -46,28 +38,30 @@ import org.apache.tomcat.lite.service.IOStatus;
 public class TestMain {
 
     static {
-        SslConnector.fixUrlConnection();
+        JsseSslProvider.testModeURLConnection();
     }
 
     static TestMain defaultServer;
     
-    private SimpleObjectManager om;
-
     private boolean init = false;
     
-    private SocketConnector serverCon = new SocketConnector();
-    
-    private HttpConnector testClient = DefaultHttpConnector.get();
-    private HttpConnector testServer = new HttpConnector(serverCon);
-    private HttpConnector testProxy = new HttpConnector(serverCon);
-    private HttpConnector sslServer;
-    
-    private HttpProxyService proxy;
+    HttpConnector testClient;
+    HttpConnector testServer;
+    HttpConnector testProxy;
+    HttpConnector sslServer;
+    HttpProxyService proxy;
 
-    UJmxObjectManagerSpi jmx = new UJmxObjectManagerSpi();
+    public TestMain() {
+        init();
+    }
 
-    private IOConnector sslCon;
-        
+    protected void init() {
+        testClient = HttpClient.newClient();
+    }
+    
+    /**
+     * A single instance used for all tests.
+     */
     public static TestMain shared() {
         if (defaultServer == null) {
             defaultServer = new TestMain();
@@ -84,35 +78,30 @@ public class TestMain {
         return shared().testClient;
     }
 
-    public void initTestCallback(Dispatcher d) throws IOException {
-        BaseMapper.ContextMapping mCtx = d.addContext(null, "", null, null, null, null);
+    public static BaseMapper.Context initTestContext(Dispatcher d) throws IOException {
+        BaseMapper.Context mCtx = d.addContext(null, "", null, null, null, null);
         
-        d.addWrapper(mCtx, "/", new StaticContentService()
+        mCtx.addWrapper("/", new StaticContentService()
             .setContentType("text/html")
             .setData("<a href='/proc/cpool/client'>Client pool</a><br/>" +
                     "<a href='/proc/cpool/server'>Server pool</a><br/>" +
                     "<a href='/proc/cpool/proxy'>Proxy pool</a><br/>" +
                     ""));
 
-        d.addWrapper(mCtx, "/favicon.ico", 
+        mCtx.addWrapper("/favicon.ico", 
                 new StaticContentService().setStatus(404).setData("Not found"));
 
-        d.addWrapper(mCtx, "/hello", new StaticContentService().setData("Hello world"));
-        d.addWrapper(mCtx, "/2nd", new StaticContentService().setData("Hello world2"));
-        d.addWrapper(mCtx, "/echo/*", new EchoCallback());
+        mCtx.addWrapper("/hello", new StaticContentService().setData("Hello world"));
+        mCtx.addWrapper("/2nd", new StaticContentService().setData("Hello world2"));
+        mCtx.addWrapper("/echo/*", new EchoCallback());
 
-        d.addWrapper(mCtx, "/sleep/1", new SleepCallback().setData("sleep 1"));
-        d.addWrapper(mCtx, "/sleep/10", new SleepCallback().sleep(10000).setData(
+        mCtx.addWrapper("/sleep/1", new SleepCallback().setData("sleep 1"));
+        mCtx.addWrapper("/sleep/10", new SleepCallback().sleep(10000).setData(
                 "sleep 1"));
 
-        d.addWrapper(mCtx, "/chunked/*", new StaticContentService().setData("AAAA")
+        mCtx.addWrapper("/chunked/*", new StaticContentService().setData("AAAA")
                 .chunked());
-        
-        d.addWrapper(mCtx, "/proc/cpool/client", new IOStatus(testClient.cpool));
-        d.addWrapper(mCtx, "/proc/cpool/proxy", new IOStatus(testProxy.cpool));
-        d.addWrapper(mCtx, "/proc/cpool/server", new IOStatus(testServer.cpool));
-
-        d.addWrapper(mCtx, "/helloClose", new HttpService() {
+        mCtx.addWrapper("/helloClose", new HttpService() {
             @Override
             public void service(HttpRequest httpReq, HttpResponse httpRes)
                     throws IOException {
@@ -120,17 +109,48 @@ public class TestMain {
                 httpRes.getBodyWriter().write("Hello");
             }
         });
-
-        d.addWrapper(mCtx, "/ujmx", new UJmxHandler(jmx));
+        return mCtx;
     }
 
+    public void initTestCallback(Dispatcher d) throws IOException {
+        BaseMapper.Context mCtx = initTestContext(d);
+        mCtx.addWrapper("/proc/cpool/client", new IOStatus(testClient.cpool));
+        mCtx.addWrapper("/proc/cpool/proxy", new IOStatus(testProxy.cpool));
+        mCtx.addWrapper("/proc/cpool/server", new IOStatus(testServer.cpool));
+    }
+    
     public void run() {
         try {
-            startAll(8000);
+            startAll();
+            // TODO(costin): clean up
+            // Hook in JMX and debug properties
+            try {
+                Class c = Class.forName("org.apache.tomcat.lite.TomcatLiteJmx");
+                Constructor constructor = c.getConstructor(TestMain.class);
+                constructor.newInstance(this);
+            } catch (Throwable t) {
+                // ignore
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
     } 
+    
+    public static String findDir(String dir) {
+        String path = ".";
+        for (int i = 0; i < 5; i++) {
+            File f = new File(path + dir);
+            if (f.exists()) {
+                try {
+                    return f.getCanonicalPath();
+                } catch (IOException e) {
+                    return f.getAbsolutePath();
+                }
+            }
+            path = path + "/..";
+        }
+        return null;
+    }
     
     public int getServerPort() {
         return 8802;
@@ -144,57 +164,99 @@ public class TestMain {
         return 8443;
     }
     
-    protected synchronized void startAll(int basePort) throws IOException {
-        int port = basePort + 903;
-        if (!init) {
+    static String PRIVATE_KEY = 
+    "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALsz2milZGHliWte61TfMTSwpAdq" +
+"9uJkMTqgpSVtwxxOe8kT84QtIzhdAsQYjRz9ZtQn9DYWhJQs/cs/R3wWsjWwgiFHLzGalvsmMYJ3" +
+"vBO8VMj762fAWu7GjUApIXcxMJoK4sQUpZKbqTuXpwzVUeeqBcspsIDgOLCo233G7/fBAgMBAAEC" +
+"gYAWEaDX4VeaKuMuYzw+/yjf20sbDMMaIVGkZbfSV8Q+nAn/xHhaxq92P5DJ6VMJbd4neKZTkggD" +
+"J+KriUQ2Hr7XXd/nM+sllaDWGmUnMYFI4txaNkikMA3ZyE/Xa79eDpTnSst8Nm11vrX9oF/hDNo4" +
+"dhbU1krjAwVl/WijzSk4gQJBANvSmsmdjPlzvGNE11Aq3Ffb9/SqAOdE8NevMFeVKtBEKHIe1WlO" +
+"ThRyWv3I8bUKTQMNULruSFVghTh6Hkt/CBkCQQDaAuxaXjv2voYozkOviXMpt0X5LZJMQu2gFc2x" +
+"6UgBqYP2pNGDdRVWpbxF65PpXcLNKllCss2WB8i8kdeixYHpAkEAnIrzfia7sR2RiCQLLWUIe20D" +
+"vHGgqRG4bfCtfYGV9rDDGNoKYq7H/dmeIOML9kA6rbS6zBRK4LoWxSx6DIuPaQJAL2c3USbwTuR6" +
+"c2D2IrL2UXnCQz3/c4mR9Z8IDMk2mPXs9bI8xCKvMxnyaBmjHbj/ZHDy26fZP+gNY8MqagAcEQJA" +
+"SidPwFV6cO8LCIA43wSVHlKZt4yU5wa9EWfzqVZxj7VSav7431kuxktW/YlwwxO4Pn8hgpPqD+W1" +
+"E+Ssocxi8A==";
+		
+    static String CERTIFICATE = "-----BEGIN CERTIFICATE-----\n" +
+"MIIC5DCCAk2gAwIBAgIJAMa8ioWQMpEZMA0GCSqGSIb3DQEBBQUAMFYxCzAJBgNV" +
+"BAYTAlVTMQswCQYDVQQIEwJDQTESMBAGA1UEChMJbG9jYWxob3N0MRIwEAYDVQQL" +
+"Ewlsb2NhbGhvc3QxEjAQBgNVBAMTCWxvY2FsaG9zdDAeFw0xMDAyMjYyMzIxNDBa" +
+"Fw0xMTAyMjYyMzIxNDBaMFYxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTESMBAG" +
+"A1UEChMJbG9jYWxob3N0MRIwEAYDVQQLEwlsb2NhbGhvc3QxEjAQBgNVBAMTCWxv" +
+"Y2FsaG9zdDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAuzPaaKVkYeWJa17r" +
+"VN8xNLCkB2r24mQxOqClJW3DHE57yRPzhC0jOF0CxBiNHP1m1Cf0NhaElCz9yz9H" +
+"fBayNbCCIUcvMZqW+yYxgne8E7xUyPvrZ8Ba7saNQCkhdzEwmgrixBSlkpupO5en" +
+"DNVR56oFyymwgOA4sKjbfcbv98ECAwEAAaOBuTCBtjAdBgNVHQ4EFgQUj3OnBK8R" +
+"UN2CcmPvfQ1/IBeFwn8wgYYGA1UdIwR/MH2AFI9zpwSvEVDdgnJj730NfyAXhcJ/" +
+"oVqkWDBWMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExEjAQBgNVBAoTCWxvY2Fs" +
+"aG9zdDESMBAGA1UECxMJbG9jYWxob3N0MRIwEAYDVQQDEwlsb2NhbGhvc3SCCQDG" +
+"vIqFkDKRGTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAKcJWWZbHRuG" +
+"77ir1ETltxNIsAFvuhDD6E68eBwpviWfKhFxiOdD1vmAGqWWDYpmgORBGxFMZxTq" +
+"c82iSbM0LseFeHwxAfeNXosSShMFtQzKt2wKZLLQB/Oqrea32m4hU//NP8rNbTux" +
+"dcAHeNQEDB5EUUSewAlh+fUE6HB6c8j0\n" +
+"-----END CERTIFICATE-----\n\n";
+    
+    protected synchronized void startAll() throws IOException {
+        if (init) {
+            System.err.println("2x init ???");
+        } else {
             init = true;
+            boolean debug = false;
+            if (debug) {
+                System.setProperty("javax.net.debug", "ssl");            
+                System.setProperty("jsse", "conn_state,alert,engine,record,ssocket,socket,prf");            
+                Logger.getLogger("SSL").setLevel(Level.FINEST);
+                testClient.setDebug(true);
+                testClient.setDebugHttp(true);
+            }
             
             proxy = new HttpProxyService()
                 .withHttpClient(testClient);
-            testProxy.setPort(port);
+            testProxy = HttpServer.newServer(getProxyPort());
 
+            if (debug) {
+                testProxy.setDebugHttp(true);
+                testProxy.setDebug(true);
+            }
+            
             // dispatcher rejects 'http://'
             testProxy.setHttpService(proxy);
             try {
                 testProxy.start();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             
-            port = basePort + 802;
+            testServer = HttpServer.newServer(getServerPort());
+            if (debug) {
+                testServer.setDebugHttp(true);
+                testServer.setDebug(true);
+            }
             initTestCallback(testServer.getDispatcher());
-            testServer.setPort(port);
             try {
                 testServer.start();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
+//            Base64 b64 = new Base64();
+//            byte[] keyBytes = b64.decode(PRIVATE_KEY);
+
+            sslServer = HttpServer.newSslServer(getSslServerPort());
             
-            sslCon = new SslConnector()
-                .setKeysResource("org/apache/tomcat/lite/http/test.keystore", 
-                    "changeit");
-            sslServer = new HttpConnector(sslCon);
+            if (debug) {
+                sslServer.setDebug(true);
+                sslServer.setDebugHttp(true);
+            }
+            JsseSslProvider sslCon = (JsseSslProvider) sslServer.getSslProvider();
+            
+            sslCon = sslCon
+                .setKeyRes("org/apache/tomcat/lite/http/genrsa_512.cert", 
+                        "org/apache/tomcat/lite/http/genrsa_512.der");
             initTestCallback(sslServer.getDispatcher());            
-            sslServer.setPort(basePort + 443);
             sslServer.start();
-
-//            System.setProperty("javax.net.debug", "ssl");
-            
-//            Logger.getLogger("SSL").setLevel(Level.FINEST);
-//            testProxy.setDebugHttp(true);
-//            testProxy.setDebug(true);
-//            testClient.setDebug(true);
-//            testClient.setDebugHttp(true);
-//            testServer.setDebugHttp(true);
-//            testServer.setDebug(true);
-//            sslServer.setDebug(true);
-//            sslServer.setDebugHttp(true);
-
-            // Bind the objects, make them visible in JMX
-            // additional settings from config
-            initObjectManager("org/apache/tomcat/lite/test.properties");
         }   
         
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -207,88 +269,6 @@ public class TestMain {
         });
     }
     
-    public void bindConnector(HttpConnector con, final String base) {
-        om.bind("HttpConnector-" + base, con);
-        om.bind("HttpConnectionPool-" + base, con.cpool);
-        IOConnector io = con.getIOConnector();
-        int ioLevel = 0;
-        while (io != null) {
-            om.bind("IOConnector-" + (ioLevel++) + "-" + base, io);
-            if (io instanceof SocketConnector) {
-                om.bind("NioThread-" + base, 
-                        ((SocketConnector) io).getSelector());
-                
-            }
-            io = io.getNet();
-        }
-        con.cpool.setEvents(new HttpConnectionPool.HttpConnectionPoolEvents() {
-
-            @Override
-            public void closedConnection(RemoteServer host, HttpConnection con) {
-                om.unbind("HttpConnection-" + base + "-" + con.getId());
-            }
-
-            @Override
-            public void newConnection(RemoteServer host, HttpConnection con) {
-                om.bind("HttpConnection-" + base + "-" + con.getId(), con);
-            }
-
-            @Override
-            public void newTarget(RemoteServer host) {
-                om.bind("AsyncHttp-" + base + "-" + host.target, host);
-            }
-
-            @Override
-            public void targetRemoved(RemoteServer host) {
-                om.unbind("AsyncHttp-" + base + "-" + host.target);
-            }
-            
-        });
-        
-        con.setOnCreate(new HttpChannelEvents() {
-            @Override
-            public void onCreate(HttpChannel data, HttpConnector extraData)
-                    throws IOException {
-                om.bind("AsyncHttp-" + base + "-" + data.getId(), data);
-            }
-            @Override
-            public void onDestroy(HttpChannel data, HttpConnector extraData)
-                    throws IOException {
-                om.unbind("AsyncHttp-" + base + "-" + data.getId());
-            }
-        });
-    
-        
-    }
-    
-    private void initObjectManager(String cfgFile) {
-        if (om == null) {
-            om = new SimpleObjectManager();
-        }
-        om.register(jmx);
-        
-        // Additional settings, via spring-like config file
-        om.loadResource(cfgFile);
-        
-        // initialization - using runnables
-        String run = (String) om.getProperty("RUN");
-        String[] runNames = run == null ? new String[] {} : run.split(",");
-        for (String name: runNames) {
-            Object main = om.get(name);
-            
-            if (main instanceof Runnable) {
-                ((Runnable) main).run();
-            }
-        }
-
-        bindConnector(testServer, "TestServer");
-        bindConnector(testClient, "Client");
-        bindConnector(testProxy, "Proxy");
-        bindConnector(sslServer, "Https");
-        
-    }
-    
-
     /**
      * Blocking get, returns when the body has been read.
      */
@@ -296,7 +276,7 @@ public class TestMain {
 
         BBuffer out = BBuffer.allocate();
 
-        HttpRequest aclient = DefaultHttpConnector.get().request(url);
+        HttpRequest aclient = HttpClient.newClient().request(url);
         aclient.send();
         aclient.readAll(out, 
                 //Long.MAX_VALUE);//
@@ -329,14 +309,5 @@ public class TestMain {
         return connection;
     }
     
-    
-    public static void main(String[] args) throws Exception, IOException {
-        TestMain testMain = new TestMain();
-        TestMain.defaultServer = testMain;
-        testMain.om = new SimpleObjectManager(args);
-        testMain.run();
-        Main.waitStop();
-    }
-
     
 }

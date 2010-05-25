@@ -5,8 +5,6 @@ package org.apache.tomcat.lite.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -18,11 +16,9 @@ import org.apache.tomcat.lite.io.SocketConnector;
 public class SpdyTest extends TestCase {
     HttpConnector http11Con = TestMain.shared().getClient();
     
-    static HttpConnector spdyCon = 
-        new HttpConnector(new SocketConnector());
+    static HttpConnector spdyCon = HttpClient.newClient();
 
-    static HttpConnector spdyConSsl = 
-        new HttpConnector(new SocketConnector());
+    static HttpConnector spdyConSsl = HttpClient.newClient(); 
     
     HttpConnector memSpdyCon = new HttpConnector(null);
     
@@ -59,6 +55,7 @@ public class SpdyTest extends TestCase {
         assertEquals(200, res.getStatus());
         //assertEquals("", res.getHeader(""));
         
+        res.setReadTimeout(2000);
         BufferedReader reader = res.getReader();
         String line1 = reader.readLine();
         //assertEquals("", line1);        
