@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -44,6 +45,8 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
+import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -183,6 +186,10 @@ public class AjpAprProcessor implements ActionHook {
      */
     protected boolean error = false;
 
+    /**
+      * Async used
+      */
+    protected boolean async = false;
 
     /**
      * Socket associated with the current connection.
@@ -366,6 +373,7 @@ public class AjpAprProcessor implements ActionHook {
 
         // Error flag
         error = false;
+        async = false;
 
         boolean openSocket = true;
         boolean keptAlive = false;
@@ -437,6 +445,10 @@ public class AjpAprProcessor implements ActionHook {
                 }
             }
 
+            if (async && !error) {
+                break;
+            }
+
             // Finish the response if not done yet
             if (!finished) {
                 try {
@@ -466,12 +478,53 @@ public class AjpAprProcessor implements ActionHook {
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        recycle();
+        if (!async || error)
+             recycle();
 
         return openSocket;
 
     }
 
+    /* Copied from the AjpProcessor.java */
+    public SocketState asyncDispatch(long socket, SocketStatus status) throws IOException {
+
+        // Setting up the socket
+        this.socket = socket;
+
+        RequestInfo rp = request.getRequestProcessor();
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            error = !adapter.asyncDispatch(request, response, status);
+        } catch (InterruptedIOException e) {
+            error = true;
+        } catch (Throwable t) {
+            log.error(sm.getString("http11processor.request.process"), t);
+            // 500 - Internal Server Error
+            response.setStatus(500);
+            error = true;
+        }
+
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (async) {
+            if (error) {
+                response.setStatus(500);
+                request.updateCounters();
+                recycle();
+                return SocketState.CLOSED;
+            } else {
+                return SocketState.LONG;
+            }
+        } else {
+            if (error) {
+                response.setStatus(500);
+            }
+            request.updateCounters();
+            recycle();
+            return SocketState.CLOSED;
+        }
+        
+    }
 
     // ----------------------------------------------------- ActionHook Methods
 
@@ -524,6 +577,7 @@ public class AjpAprProcessor implements ActionHook {
 
         } else if (actionCode == ActionCode.ACTION_CLOSE) {
             // Close
+            async = false;
 
             // End the processing of the current request, and stop any further
             // transactions with the client
@@ -604,6 +658,31 @@ public class AjpAprProcessor implements ActionHook {
             empty = false;
             replay = true;
 
+        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
+            async = true;
+        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+            AtomicBoolean dispatch = (AtomicBoolean)param;
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
+                dispatch.set(true);
+                endpoint.getHandler().asyncDispatch(this.socket, SocketStatus.STOP);
+            } else {
+                dispatch.set(false);
+            }        
+        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+            if (param==null) return;
+            if (socket==0) return;
+            long timeout = ((Long)param).longValue();
+            Socket.timeoutSet(socket, timeout * 1000); 
+        } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
+           RequestInfo rp = request.getRequestProcessor();
+            AtomicBoolean dispatch = (AtomicBoolean)param;
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
+                endpoint.getPoller().add(this.socket);
+                dispatch.set(true);
+            } else {
+                dispatch.set(true);
+            }
         }
 
 
