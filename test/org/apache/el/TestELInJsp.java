@@ -385,6 +385,9 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "00-Hello JUnit from Tomcat");
         assertEcho(result, "01-Hello JUnit from Tomcat");
         assertEcho(result, "02-Hello JUnit from Tomcat");
+        assertEcho(result, "03-Hello JUnit from Tomcat");
+        assertEcho(result, "04-Hello JUnit from Tomcat");
+        assertEcho(result, "05-Hello JUnit from Tomcat");
     }
 
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo 
