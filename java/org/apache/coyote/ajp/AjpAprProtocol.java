@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -325,6 +326,9 @@ public class AjpAprProtocol
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
 
+        protected ConcurrentHashMap<Long, AjpAprProcessor> connections =
+            new ConcurrentHashMap<Long, AjpAprProcessor>();
+
         protected ConcurrentLinkedQueue<AjpAprProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<AjpAprProcessor>() {
             protected AtomicInteger size = new AtomicInteger(0);
@@ -384,8 +388,10 @@ public class AjpAprProtocol
                 processor.action(ActionCode.ACTION_START, null);
 
                 if (processor.process(socket)) {
+                    connections.put(Long.valueOf(socket), processor);
                     return SocketState.OPEN;
                 } else {
+                    // recycledProcessors.offer(processor);
                     return SocketState.CLOSED;
                 }
 
@@ -418,7 +424,45 @@ public class AjpAprProtocol
 
         // FIXME: Support for this could be added in AJP as well
         public SocketState asyncDispatch(long socket, SocketStatus status) {
-            return SocketState.CLOSED;
+
+            AjpAprProcessor result = connections.get(Long.valueOf(socket));
+            
+            SocketState state = SocketState.CLOSED; 
+            if (result != null) {
+                // Call the appropriate event
+                try {
+                    state = result.asyncDispatch(socket, status);
+                } catch (java.net.SocketException e) {
+                    // SocketExceptions are normal
+                    AjpAprProtocol.log.debug
+                        (sm.getString
+                            ("ajpprotocol.proto.socketexception.debug"), e);
+                } catch (java.io.IOException e) {
+                    // IOExceptions are normal
+                    AjpAprProtocol.log.debug
+                        (sm.getString
+                            ("ajpprotocol.proto.ioexception.debug"), e);
+                }
+                // Future developers: if you discover any other
+                // rare-but-nonfatal exceptions, catch them here, and log as
+                // above.
+                catch (Throwable e) {
+                    // any other exception or error is odd. Here we log it
+                    // with "ERROR" level, so it will show up even on
+                    // less-than-verbose logs.
+                    AjpAprProtocol.log.error
+                        (sm.getString("ajpprotocol.proto.error"), e);
+                } finally {
+                    if (state != SocketState.LONG) {
+                        connections.remove(Long.valueOf(socket));
+                        recycledProcessors.offer(result);
+                        if (state == SocketState.OPEN) {
+                            proto.endpoint.getPoller().add(socket);
+                        }
+                    }
+                }
+            }
+            return state;
         }
         
         protected AjpAprProcessor createProcessor() {
