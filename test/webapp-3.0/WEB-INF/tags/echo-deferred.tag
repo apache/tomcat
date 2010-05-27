@@ -13,6 +13,5 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---%>
-<%@ tag %><%@ attribute name="echo" deferredValue="true" %><%@
+--%><%@ tag %><%@ attribute name="echo" deferredValue="true" %><%@
 tag body-content="empty" %><p>${echo}</p>

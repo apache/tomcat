@@ -25,11 +25,14 @@
     TesterBeanB beanB = new TesterBeanB();
     beanB.setName("Tomcat");
     beanA.setBean(beanB);
-    pageContext.setAttribute("testBeanA", beanA);
-    pageContext.setAttribute("testBeanB", beanB);
+    pageContext.setAttribute("testBeanA", beanA, PageContext.REQUEST_SCOPE);
+    pageContext.setAttribute("testBeanB", beanB, PageContext.REQUEST_SCOPE);
     %>
     <tags:echo echo="00-${testBeanA[\"bean\"].sayHello('JUnit')}" />
     <tags:echo echo="01-${testBeanA.bean.sayHello('JUnit')}" />
     <tags:echo echo="02-${testBeanB.sayHello('JUnit')}" />
+    <tags:echo-deferred echo="03-#{testBeanA[\"bean\"].sayHello('JUnit')}" />
+    <tags:echo-deferred echo="04-#{testBeanA.bean.sayHello('JUnit')}" />
+    <tags:echo-deferred echo="05-#{testBeanB.sayHello('JUnit')}" />
   </body>
 </html>
