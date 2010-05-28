@@ -132,6 +132,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         if (event.getType() == Container.ADD_CHILD_EVENT) {
             Container child = (Container) event.getData();
             child.addLifecycleListener(this);
+            child.addContainerListener(this);
             if (child instanceof Host) {
                 registerHost((Host) child);
             } else if (child instanceof Context) {
@@ -141,7 +142,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             }
         } else if (event.getType() == Container.REMOVE_CHILD_EVENT) {
             Container child = (Container) event.getData();
-            child.removeLifecycleListener(this);
+            removeListeners(child);
             if (child instanceof Host) {
                 unregisterHost((Host) child);
             } else if (child instanceof Context) {
@@ -291,8 +292,6 @@ public class MapperListener implements ContainerListener, LifecycleListener {
      */
     private void unregisterHost(Host host) {
 
-        removeListeners(host);
-        
         String hostname = host.getName();
         
         mapper.removeHost(hostname);
@@ -308,8 +307,6 @@ public class MapperListener implements ContainerListener, LifecycleListener {
      */
     private void unregisterWrapper(Wrapper wrapper) {
 
-        removeListeners(wrapper);
-        
         String contextName = wrapper.getParent().getName();
         if ("/".equals(contextName)) {
             contextName = "";
@@ -364,8 +361,6 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             return;
         }
 
-        removeListeners(context);
-        
         String contextName = context.getName();
         if ("/".equals(contextName)) {
             contextName = "";
