@@ -244,10 +244,9 @@ public final class AstValue extends SimpleNode {
         Method m = null;
         Object[] values = null;
         if (isParametersProvided()) {
-            Class<?>[] types = ((AstMethodParameters)
-                    this.jjtGetChild(2)).getParameterTypes(ctx);
             values = ((AstMethodParameters)
                     this.jjtGetChild(2)).getParameters(ctx);
+            Class<?>[] types = getTypesFromValues(values);
             m = ReflectionUtil.getMethod(t.base, t.property, types);
         } else {
             m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
@@ -266,6 +265,23 @@ public final class AstValue extends SimpleNode {
         return result;
     }
 
+    private Class<?>[] getTypesFromValues(Object[] values) {
+        if (values == null) {
+            return null;
+        }
+        
+        Class<?> result[] = new Class<?>[values.length];
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                result[i] = null;
+            } else {
+                result[i] = values[i].getClass();
+            }
+        }
+        return result;
+    }
+
+    
     /**
      * @since EL 2.2
      */
