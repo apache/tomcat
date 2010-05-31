@@ -71,6 +71,8 @@ public class TestMethodExpressionImpl extends TestCase {
         assertEquals("Hello JUnit from Tomcat", me2.invoke(context, null));
         assertEquals("Hello JUnit from Tomcat", me2.invoke(context, new Object[] { "JUnit2" }));
         assertEquals("Hello JUnit2 from Tomcat", me3.invoke(context, new Object[] { "JUnit2" }));
+        assertEquals("Hello JUnit from Tomcat", me2.invoke(context, new Object[] { null }));
+        assertEquals("Hello null from Tomcat", me3.invoke(context, new Object[] { null }));
     }
 
 }
