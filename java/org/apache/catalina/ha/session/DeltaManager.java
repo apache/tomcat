@@ -987,8 +987,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.random = null;
         getCluster().removeManager(this);
         replicationValve = null;
-        
-        setState(LifecycleState.MUST_DESTROY);
     }
 
     // ----------------------------------------- PropertyChangeListener Methods
