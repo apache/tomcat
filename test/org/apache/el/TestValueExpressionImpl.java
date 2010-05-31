@@ -53,4 +53,32 @@ public class TestValueExpressionImpl extends TestCase {
         assertEquals("name", vr.getProperty());
     }
 
+ 
+    public void testBug49345() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+        
+        TesterBeanA beanA = new TesterBeanA();
+        TesterBeanB beanB = new TesterBeanB();
+        beanB.setName("Tomcat");
+        beanA.setBean(beanB);
+        
+        ValueExpression var =
+            factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${beanA.bean.name}", String.class);
+
+        // First check the basics work
+        String result = (String) ve.getValue(context);
+        assertEquals("Tomcat", result);
+        
+        // Now check the value reference
+        ValueReference vr = ve.getValueReference(context);
+        assertNotNull(vr);
+        
+        assertEquals(beanB, vr.getBase());
+        assertEquals("name", vr.getProperty());
+    }
 }
