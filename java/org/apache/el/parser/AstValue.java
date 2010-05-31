@@ -278,7 +278,7 @@ public final class AstValue extends SimpleNode {
             return null;
         }
         Target t = getTarget(ctx);
-        return new ValueReference(t.base, this.jjtGetChild(1).getValue(ctx));
+        return new ValueReference(t.base, t.property);
     }
 
     
