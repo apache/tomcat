@@ -253,8 +253,6 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
 
         cluster.removeManager(this);
         this.random = null;
-
-        setState(LifecycleState.MUST_DESTROY);
     }
 
     @Override
