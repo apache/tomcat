@@ -444,11 +444,16 @@ public class WebappClassLoader
      * instability. As such, enabling this should be viewed as an option of last
      * resort in a development environment and is not recommended in a
      * production environment. If not specified, the default value of
-     * <code>false</code> will be used. Note that instances of
-     * java.util.TimerThread will always be terminate since a safe method exists
-     * to do so.
+     * <code>false</code> will be used.
      */
     private boolean clearReferencesStopThreads = false;
+
+    /**
+     * Should Tomcat attempt to terminate any {@link java.util.TimerThread}s
+     * that have been started by the web application? If not specified, the
+     * default value of <code>false</code> will be used.
+     */
+    private boolean clearReferencesStopTimerThreads = false;
 
     /**
      * Should Tomcat attempt to clear any ThreadLocal objects that are instances
@@ -707,6 +712,25 @@ public class WebappClassLoader
 
 
      /**
+      * Return the clearReferencesStopTimerThreads flag for this Context.
+      */
+     public boolean getClearReferencesStopTimerThreads() {
+         return (this.clearReferencesStopTimerThreads);
+     }
+
+
+     /**
+      * Set the clearReferencesStopTimerThreads feature for this Context.
+      *
+      * @param clearReferencesStopTimerThreads The new flag value
+      */
+     public void setClearReferencesStopTimerThreads(
+             boolean clearReferencesStopTimerThreads) {
+         this.clearReferencesStopTimerThreads = clearReferencesStopTimerThreads;
+     }
+
+
+     /**
       * Return the clearReferencesLogFactoryRelease flag for this Context.
       */
      public boolean getClearReferencesLogFactoryRelease() {
@@ -714,6 +738,16 @@ public class WebappClassLoader
      }
 
 
+     /**
+      * Set the clearReferencesLogFactoryRelease feature for this Context.
+      *
+      * @param clearReferencesLogFactoryRelease The new flag value
+      */
+     public void setClearReferencesLogFactoryRelease(
+             boolean clearReferencesLogFactoryRelease) {
+         this.clearReferencesLogFactoryRelease =
+             clearReferencesLogFactoryRelease;
+     }
 
 
      /**
@@ -732,18 +766,6 @@ public class WebappClassLoader
      public void setClearReferencesThreadLocals(
              boolean clearReferencesThreadLocals) {
          this.clearReferencesThreadLocals = clearReferencesThreadLocals;
-     }
-
-
-     /**
-      * Set the clearReferencesLogFactoryRelease feature for this Context.
-      *
-      * @param clearReferencesLogFactoryRelease The new flag value
-      */
-     public void setClearReferencesLogFactoryRelease(
-             boolean clearReferencesLogFactoryRelease) {
-         this.clearReferencesLogFactoryRelease =
-             clearReferencesLogFactoryRelease;
      }
 
 
@@ -2152,9 +2174,10 @@ public class WebappClassLoader
                         continue;
                     }
                    
-                    // TimerThread is not normally visible
+                    // TimerThread can be stopped safely so treat separately
                     if (thread.getClass().getName().equals(
-                            "java.util.TimerThread")) {
+                            "java.util.TimerThread") &&
+                            clearReferencesStopTimerThreads) {
                         clearReferencesStopTimerThread(thread);
                         continue;
                     }
