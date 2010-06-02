@@ -436,7 +436,7 @@
 
       <attribute name="clearReferencesStopTimerThreads" required = "false">
         <p>If <code>true</code>, Tomcat attempts to terminate
-        <code>java.util.Timer</code>threads that have been started by the web
+        <code>java.util.Timer</code> threads that have been started by the web
         application. Unlike standard threads, timer threads can be stopped
         safely although there may still be side-effects for the application. If
         not specified, the default value of <code>false</code> will be used.</p>
