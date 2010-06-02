@@ -17,7 +17,7 @@
 
 package org.apache.tomcat.util.net;
 
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -607,12 +607,12 @@ public class AprEndpoint extends AbstractEndpoint {
              * BSD accept filters. The Acceptor will discard it.
              */
             if (deferAccept) {
-                PrintWriter pw;
+                OutputStreamWriter sw;
 
-                pw = new PrintWriter(s.getOutputStream());
-                pw.print("OPTIONS * HTTP/1.0\r\n" +
+                sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
+                sw.write("OPTIONS * HTTP/1.0\r\n" +
                          "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                pw.flush();
+                sw.flush();
             }
             if (log.isDebugEnabled()) {
                 log.debug("Socket unlock completed for:"+saddr);
