@@ -167,6 +167,7 @@ public class TestDataIntegrity extends TestCase {
     }
 
     public static class Data implements Serializable {
+        private static final long serialVersionUID = 1L;
         public int length;
         public byte[] data;
         public byte key;

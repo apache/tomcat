@@ -96,6 +96,7 @@ public class TestSenderConnections extends TestCase {
     }
     
     public static class TestMsg implements Serializable {
+        private static final long serialVersionUID = 1L;
         static Random r = new Random();
         HashMap<Integer, ArrayList<Object>> map =
             new HashMap<Integer, ArrayList<Object>>();
