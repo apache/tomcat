@@ -24,8 +24,13 @@ import java.util.EnumSet;
 
 import javax.servlet.SessionTrackingMode;
 
+import org.apache.catalina.AccessLog;
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
+import org.apache.catalina.Host;
+import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.comet.CometEvent;
@@ -115,6 +120,11 @@ public class CoyoteAdapter implements Adapter {
     protected static URLEncoder urlEncoder;
 
 
+    /**
+     * Access log to use for rejected requests
+     */
+    private volatile AccessLog accessLog = null;
+    
     // ----------------------------------------------------- Static Initializer
 
 
@@ -512,12 +522,14 @@ public class CoyoteAdapter implements Adapter {
         } catch (IOException ioe) {
             res.setStatus(400);
             res.setMessage("Invalid URI: " + ioe.getMessage());
+            getAccessLog().log(request, response, 0);
             return false;
         }
         // Normalization
         if (!normalize(req.decodedURI())) {
             res.setStatus(400);
             res.setMessage("Invalid URI");
+            getAccessLog().log(request, response, 0);
             return false;
         }
         // Character decoding
@@ -526,6 +538,7 @@ public class CoyoteAdapter implements Adapter {
         if (!checkNormalize(req.decodedURI())) {
             res.setStatus(400);
             res.setMessage("Invalid URI character encoding");
+            getAccessLog().log(request, response, 0);
             return false;
         }
 
@@ -585,6 +598,7 @@ public class CoyoteAdapter implements Adapter {
             res.setStatus(405);
             res.addHeader("Allow", header);
             res.setMessage("TRACE method is not allowed");
+            getAccessLog().log(request, response, 0);
             return false;
         }
 
@@ -623,6 +637,7 @@ public class CoyoteAdapter implements Adapter {
                 redirectPath = redirectPath + "?" + query;
             }
             response.sendRedirect(redirectPath);
+            getAccessLog().log(request, response, 0);
             return false;
         }
 
@@ -1075,4 +1090,61 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    /**
+     * Obtain a reference to the access log to use to log rejected requests.
+     * 
+     * @return
+     */
+    protected AccessLog getAccessLog() {
+        if (accessLog != null) {
+            return accessLog;
+        }
+        
+        // First look in Engine for associated service
+        Engine engine = (Engine) connector.getService().getContainer();
+        accessLog = findAccessLog(engine);
+        if (accessLog != null) {
+            return accessLog;
+        }
+        
+        // Then look in default host
+        Host defaultHost = (Host) engine.findChild(engine.getDefaultHost());
+        accessLog = findAccessLog(defaultHost);
+        if (accessLog != null) {
+            return accessLog;
+        }
+            
+        // Then look in ROOT context of default host
+        Context defaultContext = (Context) defaultHost.findChild("/");
+        accessLog = findAccessLog(defaultContext);
+        if (accessLog != null) {
+            return accessLog;
+        }
+
+        accessLog = new NoopAccessLog(); 
+        return accessLog;
+    }
+    
+    private AccessLog findAccessLog(Container container) {
+        if (container == null) {
+            return new NoopAccessLog();
+        }
+
+        Valve valves[] = container.getPipeline().getValves();
+        for (Valve valve : valves) {
+            if (valve instanceof AccessLog) {
+                return (AccessLog) valve;
+            }
+        }
+        return null;
+    }
+    
+    private static final class NoopAccessLog implements AccessLog {
+
+        @Override
+        public void log(Request request, Response response, long time) {
+            // NOOP
+        }
+        
+    }
 }
