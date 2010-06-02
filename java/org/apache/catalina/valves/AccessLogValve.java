@@ -36,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.AccessLog;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
@@ -118,7 +119,7 @@ import org.apache.juli.logging.LogFactory;
  * @version $Id$
  */
 
-public class AccessLogValve extends ValveBase {
+public class AccessLogValve extends ValveBase implements AccessLog {
 
     private static final Log log = LogFactory.getLog(AccessLogValve.class);
 
@@ -563,25 +564,30 @@ public class AccessLogValve extends ValveBase {
             
             long t2 = System.currentTimeMillis();
             long time = t2 - t1;
-    
-            if (logElements == null || condition != null
-                    && null != request.getRequest().getAttribute(condition)) {
-                return;
-            }
-    
-            Date date = getDate();
-            StringBuilder result = new StringBuilder(128);
-    
-            for (int i = 0; i < logElements.length; i++) {
-                logElements[i].addElement(result, date, request, response, time);
-            }
-    
-            log(result.toString());
+
+            log(request,response, time);
         } else
             getNext().invoke(request, response);       
     }
 
     
+    public void log(Request request, Response response, long time) {
+        if (logElements == null || condition != null
+                && null != request.getRequest().getAttribute(condition)) {
+            return;
+        }
+
+        Date date = getDate();
+        StringBuilder result = new StringBuilder(128);
+
+        for (int i = 0; i < logElements.length; i++) {
+            logElements[i].addElement(result, date, request, response, time);
+        }
+
+        log(result.toString());
+    }
+
+
     /**
      * Rename the existing log file to something else. Then open the
      * old log file name up once again. Intended to be called by a JMX
