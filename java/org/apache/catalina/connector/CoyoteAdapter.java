@@ -1115,7 +1115,7 @@ public class CoyoteAdapter implements Adapter {
         }
             
         // Then look in ROOT context of default host
-        Context defaultContext = (Context) defaultHost.findChild("/");
+        Context defaultContext = (Context) defaultHost.findChild("");
         accessLog = findAccessLog(defaultContext);
         if (accessLog != null) {
             return accessLog;
