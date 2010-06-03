@@ -31,6 +31,7 @@ import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
+import org.apache.catalina.AccessLog;
 import org.apache.catalina.CatalinaFactory;
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
@@ -264,6 +265,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     private volatile boolean threadDone = false;
 
+
+    /**
+     * The access log to use for requests normally handled by this container
+     * that have been handled earlier in the processing chain.
+     */
+    protected volatile AccessLog accessLog = null;
+    private volatile boolean accessLogScanComplete = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -1062,6 +1070,46 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         super.destroyInternal();
     }
 
+    
+    /**
+     * Check this container for an access log and if none is found, look to the
+     * parent. If there is no parent and still none is found, use the NoOp
+     * access log.
+     */
+    public void logAccess(Request request, Response response, long time,
+            boolean useDefault) {
+        
+        boolean logged = false;
+        
+        if (getAccessLog() != null) {
+            getAccessLog().log(request, response, time);
+            logged = true;
+        }
+        
+        if (getParent() != null) {
+            // No need to use default logger once request/response has been logged
+            // once
+            getParent().logAccess(request, response, time, (useDefault && !logged));
+        }
+    }
+
+    public AccessLog getAccessLog() {
+        
+        if (accessLogScanComplete) {
+            return accessLog;
+        }
+        
+        Valve valves[] = getPipeline().getValves();
+        for (Valve valve : valves) {
+            if (valve instanceof AccessLog) {
+                accessLog = (AccessLog) valve;
+                break;
+            }
+        }
+        accessLogScanComplete = true;
+        return accessLog;
+    }
+
     // ------------------------------------------------------- Pipeline Methods
 
 
@@ -1305,4 +1353,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     }
 
+    protected static final class NoopAccessLog implements AccessLog {
+
+        @Override
+        public void log(Request request, Response response, long time) {
+            // NOOP
+        }
+    }
 }

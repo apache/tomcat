@@ -23,9 +23,8 @@ import org.apache.catalina.connector.Response;
 
 /**
  * Intended for use by a {@link Valve} to indicate that the {@link Valve}
- * provides access logging. It is used by the Tomcat internals (the
- * {@link org.apache.catalina.connector.CoyoteAdapter} at the time of writing)
- * to identify a Valve that logs access requests so requests that are rejected
+ * provides access logging. It is used by the Tomcat internals to identify a
+ * Valve that logs access requests so requests that are rejected
  * earlier in the processing chain can still be added to the access log.
  * Implementations of this interface should be robust against the provided
  * {@link Request} and {@link Response} objects being null, having null
