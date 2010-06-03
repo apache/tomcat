@@ -930,19 +930,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         }
 
         // Add date header
-        String date = null;
-        if (isSecurityEnabled){
-            date = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-                        public String run(){
-                            return FastHttpDateFormat.getCurrentDate();
-                        }
-                    }
-            );
-        } else {
-            date = FastHttpDateFormat.getCurrentDate();
-        }
-        headers.setValue("Date").setString(date);
+        headers.setValue("Date").setString(FastHttpDateFormat.getCurrentDate());
 
         // FIXME: Add transfer encoding header
 
