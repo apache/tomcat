@@ -96,10 +96,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
         // Cause loading of HexUtils
         HexUtils.load();
-
-        // Cause loading of FastHttpDateFormat
-        FastHttpDateFormat.getCurrentDate();
-
     }
 
 

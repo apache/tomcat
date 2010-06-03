@@ -43,7 +43,6 @@ public final class SecurityClassLoad {
         loadUtilPackage(loader);
         loadJavaxPackage(loader);
         loadCoyotePackage(loader);        
-        loadHttp11Package(loader);        
         loadTomcatPackage(loader);
     }
     
@@ -141,13 +140,6 @@ public final class SecurityClassLoad {
     }
     
 
-    private final static void loadHttp11Package(ClassLoader loader)
-        throws Exception {
-        String basePackage = "org.apache.coyote.http11.";
-        loader.loadClass(basePackage + "Http11Processor$1");
-    }
-    
-    
     private final static void loadCoyotePackage(ClassLoader loader)
         throws Exception {
         String basePackage = "org.apache.catalina.connector.";
