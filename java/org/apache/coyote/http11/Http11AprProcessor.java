@@ -106,10 +106,6 @@ public class Http11AprProcessor implements ActionHook {
 
         // Cause loading of HexUtils
         HexUtils.load();
-
-        // Cause loading of FastHttpDateFormat
-        FastHttpDateFormat.getCurrentDate();
-
     }
 
 
