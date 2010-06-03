@@ -66,12 +66,17 @@
     <code>Host</code>, or <code>Engine</code>), and
     will record ALL requests processed by that container.</p>
 
-    <p>Some requests (e.g. those with mal-formed URLs) may be rejected by Tomcat
-    before they are passed to a container. In these cases Tomcat will look in
-    the <code>Engine</code>, then the default <code>Host</code> for the
-    <code>Engine</code> and finally the ROOT (or default) <code>Context</code>
-    for the default <code>Host</code> for an <code>AccessLogValve</code> or
-    other <code>AccessLog</code> implementation. Tomcat will use the first
+    <p>Some requests may be handled by Tomcat before they are passed to a
+    container. These include redirects from /foo to /foo/ and the rejection of
+    invalid requests. Where Tomcat can identify the <code>Context</code> that
+    would have handled the request, the request/response will be logged in the 
+    <code>AccessLog</code>(s) associated <code>Context</code>, <code>Host</code>
+    and <code>Engine</code>. Where Tomcat cannot identify the
+    <code>Context</code> that would have handled the request, e.g. in cases
+    where the URL is invalid, Tomcat will look first in the <code>Engine</code>,
+    then the default <code>Host</code> for the <code>Engine</code> and finally
+    the ROOT (or default) <code>Context</code> for the default <code>Host</code>
+    for an <code>AccessLog</code> implementation. Tomcat will use the first
     <code>AccessLog</code> implementation found to log those requests that are
     rejected before they are passed to a container.</p>
 
