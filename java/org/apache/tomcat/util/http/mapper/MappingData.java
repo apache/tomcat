@@ -42,12 +42,12 @@ public class MappingData {
         host = null;
         context = null;
         wrapper = null;
-        pathInfo.recycle();
+        jspWildCard = false;
+        contextPath.recycle();
         requestPath.recycle();
         wrapperPath.recycle();
-        contextPath.recycle();
+        pathInfo.recycle();
         redirectPath.recycle();
-        jspWildCard = false;
     }
 
 }
