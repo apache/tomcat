@@ -450,4 +450,27 @@ public interface Container extends Lifecycle {
      * @param data Event data
      */
     public void fireContainerEvent(String type, Object data);
+    
+    
+    /**
+     * Log a request/response that was destined for this container but has been
+     * handled earlier in the processing chain so that the request/response
+     * still appears in the correct access logs.
+     * @param request       Request (associated with the response) to log
+     * @param response      Response (associated with the request) to log
+     * @param time          Time taken to process the request/response in
+     *                      milliseconds (use 0 if not known) 
+     * @param   useDefault  Flag that indicates that the request/response should
+     *                      be logged in the engine's default access log
+     */
+    public void logAccess(Request request, Response response, long time,
+            boolean useDefault);
+    
+    
+    /**
+     * Identify the AccessLog to use to log a request/response that was destined
+     * for this container but was handled earlier in the processing chain so
+     * that the request/response still appears in the correct access logs.
+     */
+    public AccessLog getAccessLog();
 }
