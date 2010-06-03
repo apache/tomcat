@@ -18,12 +18,16 @@ package org.apache.catalina.core;
 
 import java.util.Locale;
 
+import org.apache.catalina.AccessLog;
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Service;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.JAASRealm;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.ServerInfo;
@@ -99,6 +103,11 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     private String jvmRouteId;
 
+    /**
+     * Default access log to use for request/response pairs where we can't ID
+     * the intended host and context.
+     */
+    private volatile AccessLog defaultAccessLog;
 
     // ------------------------------------------------------------- Properties
 
@@ -278,6 +287,51 @@ public class StandardEngine extends ContainerBase implements Engine {
         sb.append("]");
         return (sb.toString());
 
+    }
+
+    /**
+     * Override the default implementation. If no access log is defined for the
+     * Engine, look for one in the Engine's default host and then the default
+     * host's ROOT context. If still none is found, return the default NoOp
+     * access log.
+     */
+    @Override
+    /**
+     * Check this container for an access log and if none is found, look to the
+     * parent. If there is no parent and still none is found, use the NoOp
+     * access log.
+     */
+    public void logAccess(Request request, Response response, long time,
+            boolean useDefault) {
+
+        boolean logged = false;
+        
+        if (accessLog != null) {
+            accessLog.log(request, response, time);
+            logged = true;
+        }
+
+        if (!logged && useDefault) {
+            Host host = null;
+            if (defaultAccessLog == null) {
+                // If we reached this point, this Engine can't have an AccessLog
+                // Look in the defaultHost
+                host = (Host) findChild(getDefaultHost());
+                defaultAccessLog = host.getAccessLog();
+
+                if (defaultAccessLog == null) {
+                    // Try the ROOT context of default host
+                    Context context = (Context) host.findChild("");
+                    defaultAccessLog = context.getAccessLog();
+
+                    if (defaultAccessLog == null) {
+                        defaultAccessLog = new NoopAccessLog();
+                    }
+                }
+            }
+            
+            defaultAccessLog.log(request, response, time);
+        }
     }
 
 
