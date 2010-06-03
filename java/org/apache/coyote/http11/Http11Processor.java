@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -107,16 +105,22 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     protected InternalOutputBuffer outputBuffer = null;
 
 
-
     /**
      * SSL information.
      */
     protected SSLSupport sslSupport;
 
+    
     /**
      * Async used
      */
     protected boolean async = false;
+
+
+    /**
+     * State flag.
+     */
+    protected boolean started = false;
 
 
     /**
@@ -125,24 +129,13 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     protected SocketWrapper<Socket> socket;
 
 
-
     /**
      * Associated endpoint.
      */
     protected JIoEndpoint endpoint;
 
 
-
-
-    // ------------------------------------------------------------- Properties
-
-
-
-
- 
     // --------------------------------------------------------- Public Methods
-
-
 
     /**
      * Set the SSL information for this HTTP connection.
