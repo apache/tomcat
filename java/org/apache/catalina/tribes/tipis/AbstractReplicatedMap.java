@@ -228,7 +228,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         } catch (ChannelException x) {
             log.warn("Unable to send map start message.");
             // remove listener from channel
-            this.channel.removeChannelListener(this.rpcChannel);
+            this.rpcChannel.breakdown();
             this.channel.removeChannelListener(this);
             this.channel.removeMembershipListener(this);
             throw new RuntimeException("Unable to start replicated map.",x);
