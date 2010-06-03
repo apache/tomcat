@@ -416,6 +416,7 @@ public class AjpAprProcessor implements ActionHook {
                 log.debug(sm.getString("ajpprocessor.header.error"), t);
                 // 400 - Bad Request
                 response.setStatus(400);
+                adapter.log(request, response, 0);
                 error = true;
             }
 
@@ -427,6 +428,7 @@ public class AjpAprProcessor implements ActionHook {
                 log.debug(sm.getString("ajpprocessor.request.prepare"), t);
                 // 400 - Internal Server Error
                 response.setStatus(400);
+                adapter.log(request, response, 0);
                 error = true;
             }
 
@@ -441,6 +443,7 @@ public class AjpAprProcessor implements ActionHook {
                     log.error(sm.getString("ajpprocessor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
+                    adapter.log(request, response, 0);
                     error = true;
                 }
             }
@@ -501,6 +504,7 @@ public class AjpAprProcessor implements ActionHook {
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
+            adapter.log(request, response, 0);
             error = true;
         }
 
@@ -892,6 +896,7 @@ public class AjpAprProcessor implements ActionHook {
                     secret = true;
                     if (!tmpMB.equals(requiredSecret)) {
                         response.setStatus(403);
+                        adapter.log(request, response, 0);
                         error = true;
                     }
                 }
@@ -908,6 +913,7 @@ public class AjpAprProcessor implements ActionHook {
         // Check if secret was submitted if required
         if ((requiredSecret != null) && !secret) {
             response.setStatus(403);
+            adapter.log(request, response, 0);
             error = true;
         }
 
@@ -956,6 +962,7 @@ public class AjpAprProcessor implements ActionHook {
                 request.serverName().duplicate(request.localName());
             } catch (IOException e) {
                 response.setStatus(400);
+                adapter.log(request, response, 0);
                 error = true;
             }
             return;
@@ -1007,6 +1014,7 @@ public class AjpAprProcessor implements ActionHook {
                     error = true;
                     // 400 - Bad request
                     response.setStatus(400);
+                    adapter.log(request, response, 0);
                     break;
                 }
                 port = port + (charValue * mult);
