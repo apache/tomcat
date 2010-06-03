@@ -457,6 +457,41 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    public void log(org.apache.coyote.Request req,
+            org.apache.coyote.Response res, long time) {
+
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
+
+        if (request == null) {
+
+            // Create objects
+            request = connector.createRequest();
+            request.setCoyoteRequest(req);
+            response = connector.createResponse();
+            response.setCoyoteResponse(res);
+
+            // Link objects
+            request.setResponse(response);
+            response.setRequest(request);
+
+            // Set as notes
+            req.setNote(ADAPTER_NOTES, request);
+            res.setNote(ADAPTER_NOTES, response);
+
+            // Set query string encoding
+            req.getParameters().setQueryStringEncoding
+                (connector.getURIEncoding());
+        }
+        
+        connector.getService().getContainer().logAccess(
+                request, response, 0, true);
+        
+        request.recycle();
+        response.recycle();
+    }
+    
+    
     // ------------------------------------------------------ Protected Methods
 
 

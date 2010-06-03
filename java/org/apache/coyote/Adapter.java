@@ -45,11 +45,13 @@ public interface Adapter {
      *  runtime exceptions )
      */
     public void service(Request req, Response res)
-	throws Exception;
+            throws Exception;
 
     public boolean event(Request req, Response res, SocketStatus status)
-    throws Exception;
+            throws Exception;
     
-    public boolean asyncDispatch(Request req,Response res, SocketStatus status) throws Exception;
+    public boolean asyncDispatch(Request req,Response res, SocketStatus status)
+            throws Exception;
 
+    public void log(Request req, Response res, long time);
 }
