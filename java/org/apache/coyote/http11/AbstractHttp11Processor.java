@@ -330,7 +330,7 @@ public class AbstractHttp11Processor {
 
 
     /**
-     * Return the list of restricted user agents.
+     * Return the list of compressable mime-types.
      */
     public String[] findCompressableMimeTypes() {
         return (compressableMimeTypes);
@@ -614,8 +614,6 @@ public class AbstractHttp11Processor {
         return adapter;
     }
 
- 
-
 
     /**
      * Check for compression
@@ -677,6 +675,7 @@ public class AbstractHttp11Processor {
         return false;
     }
 
+    
     /**
      * Specialized utility method: find a sequence of lower case bytes inside
      * a ByteChunk.
@@ -688,23 +687,23 @@ public class AbstractHttp11Processor {
         int start = bc.getStart();
         int end = bc.getEnd();
 
-    // Look for first char
-    int srcEnd = b.length;
+        // Look for first char
+        int srcEnd = b.length;
 
-    for (int i = start; i <= (end - srcEnd); i++) {
-        if (Ascii.toLower(buff[i]) != first) continue;
-        // found first char, now look for a match
+        for (int i = start; i <= (end - srcEnd); i++) {
+            if (Ascii.toLower(buff[i]) != first) continue;
+            // found first char, now look for a match
             int myPos = i+1;
-        for (int srcPos = 1; srcPos < srcEnd; ) {
+            for (int srcPos = 1; srcPos < srcEnd; ) {
                 if (Ascii.toLower(buff[myPos++]) != b[srcPos++])
-            break;
+                    break;
                 if (srcPos == srcEnd) return i - start; // found it
+            }
         }
-    }
-    return -1;
-
+        return -1;
     }
 
+    
     /**
      * Determine if we must drop the connection because of the HTTP status
      * code.  Use the same list of codes as Apache/httpd.
