@@ -173,10 +173,9 @@ public final class FastHttpDateFormat {
         }
         if (date == null) {
             return (-1L);
-        } else {
-            return date.longValue();
         }
 
+        return date.longValue();
     }
 
 
