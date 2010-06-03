@@ -65,12 +65,6 @@ public class AbstractHttp11Processor {
 
 
     /**
-     * State flag.
-     */
-    protected boolean started = false;
-
-
-    /**
      * Error flag.
      */
     protected boolean error = false;
