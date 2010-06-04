@@ -485,7 +485,7 @@ public class CoyoteAdapter implements Adapter {
         }
         
         connector.getService().getContainer().logAccess(
-                request, response, 0, true);
+                request, response, time, true);
         
         request.recycle();
         response.recycle();
