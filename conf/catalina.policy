@@ -103,7 +103,7 @@ grant codeBase "file:${catalina.home}/lib/-" {
 };
 
 
-// If using a per instance lib directory, ie ${catalina.base}/lib
+// If using a per instance lib directory, i.e. ${catalina.base}/lib,
 // then the following permission will need to be uncommented
 // grant codeBase "file:${catalina.base}/lib/-" {
 //         permission java.security.AllPermission;
