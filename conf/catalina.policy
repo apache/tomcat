@@ -169,9 +169,12 @@ grant {
      "org.apache.el.parser.COERCE_TO_ZERO", "read";
 
     // The cookie code needs these.
-    permission java.util.PropertyPermission "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
-    permission java.util.PropertyPermission "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING", "read";
-    permission java.util.PropertyPermission "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "read";
+    permission java.util.PropertyPermission
+     "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
+    permission java.util.PropertyPermission
+     "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING", "read";
+    permission java.util.PropertyPermission
+     "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "read";
 
     // Applications using Comet need to be able to access this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
