@@ -269,6 +269,13 @@ grant codeBase "file:${catalina.home}/lib/-" {
 };
 
 
+// If using a per instance lib directory, i.e. ${catalina.base}/lib,
+// then the following permission will need to be uncommented
+// grant codeBase "file:${catalina.base}/lib/-" {
+//         permission java.security.AllPermission;
+// };
+
+
 // ========== WEB APPLICATION PERMISSIONS =====================================
 
 
@@ -326,6 +333,14 @@ grant {
      "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
     permission java.util.PropertyPermission
      "org.apache.el.parser.COERCE_TO_ZERO", "read";
+
+    // The cookie code needs these.
+    permission java.util.PropertyPermission
+     "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
+    permission java.util.PropertyPermission
+     "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING", "read";
+    permission java.util.PropertyPermission
+     "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "read";
 
     // Applications using Comet need to be able to access this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
