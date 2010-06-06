@@ -88,11 +88,10 @@ public class StandardSession
 
     protected static final boolean ACTIVITY_CHECK;
 
+    protected static final boolean LAST_ACCESS_AT_START;
 
     static {
-        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
-                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
-                "false")).booleanValue();
+        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
         
         String activityCheck = System.getProperty(
                 "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK");
@@ -101,6 +100,15 @@ public class StandardSession
         } else {
             ACTIVITY_CHECK =
                 Boolean.valueOf(activityCheck).booleanValue();
+        }
+
+        String lastAccessAtStart = System.getProperty(
+                "org.apache.catalina.session.StandardSession.LAST_ACCESS_AT_START");
+        if (lastAccessAtStart == null) {
+            LAST_ACCESS_AT_START = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            LAST_ACCESS_AT_START =
+                Boolean.valueOf(lastAccessAtStart).booleanValue();
         }
     }
     
@@ -614,7 +622,7 @@ public class StandardSession
         if (maxInactiveInterval >= 0) { 
             long timeNow = System.currentTimeMillis();
             int timeIdle;
-            if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            if (LAST_ACCESS_AT_START) {
                 timeIdle = (int) ((timeNow - lastAccessedTime) / 1000L);
             } else {
                 timeIdle = (int) ((timeNow - thisAccessedTime) / 1000L);
@@ -668,7 +676,7 @@ public class StandardSession
          * The servlet spec mandates to ignore request handling time
          * in lastAccessedTime.
          */
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (LAST_ACCESS_AT_START) {
             this.lastAccessedTime = this.thisAccessedTime;
             this.thisAccessedTime = System.currentTimeMillis();
         } else {
