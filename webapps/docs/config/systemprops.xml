@@ -231,7 +231,7 @@
       <li>
         The default value will be changed for:
         <ul>
-        <li><code>rg.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code></li>
+        <li><code>org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code></li>
         <li><code>org.apache.catalina.core.StandardHostValve.ACCESS_SESSION</code></li>
         <li><code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code></li>
         <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
