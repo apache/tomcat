@@ -70,6 +70,25 @@ final class ApplicationDispatcher
 
     private static final Log log = LogFactory.getLog(ApplicationDispatcher.class);
 
+    protected static final boolean STRICT_SERVLET_COMPLIANCE;
+
+    protected static final boolean WRAP_SAME_OBJECT;
+
+
+    static {
+        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
+        
+        String wrapSameObject = System.getProperty(
+                "org.apache.catalina.core.ApplicationDispatcher.WRAP_SAME_OBJECT");
+        if (wrapSameObject == null) {
+            WRAP_SAME_OBJECT = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            WRAP_SAME_OBJECT =
+                Boolean.valueOf(wrapSameObject).booleanValue();
+        }
+    }
+
+
     protected class PrivilegedForward
             implements PrivilegedExceptionAction<Void> {
         private ServletRequest request;
@@ -329,7 +348,7 @@ final class ApplicationDispatcher
         // Set up to handle the specified request and response
         State state = new State(request, response, false);
 
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (WRAP_SAME_OBJECT) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
             checkSameObjects(request, response);
         }
@@ -504,7 +523,7 @@ final class ApplicationDispatcher
         // Set up to handle the specified request and response
         State state = new State(request, response, true);
 
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (WRAP_SAME_OBJECT) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
             checkSameObjects(request, response);
         }
