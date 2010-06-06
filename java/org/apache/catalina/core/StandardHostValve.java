@@ -61,6 +61,25 @@ final class StandardHostValve
 
     private static final Log log = LogFactory.getLog(StandardHostValve.class);
 
+    protected static final boolean STRICT_SERVLET_COMPLIANCE;
+
+    protected static final boolean ACCESS_SESSION;
+
+    static {
+        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
+                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "false")).booleanValue();
+        
+        String accessSession = System.getProperty(
+                "org.apache.catalina.core.StandardHostValve.ACCESS_SESSION");
+        if (accessSession == null) {
+            ACCESS_SESSION = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            ACCESS_SESSION =
+                Boolean.valueOf(accessSession).booleanValue();
+        }
+    }
+
     //------------------------------------------------------ Constructor
     public StandardHostValve() {
         super(true);
@@ -147,7 +166,7 @@ final class StandardHostValve
 
         // Access a session (if present) to update last accessed time, based on a
         // strict interpretation of the specification
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (ACCESS_SESSION) {
             request.getSession(false);
         }
 
@@ -205,7 +224,7 @@ final class StandardHostValve
 
         // Access a session (if present) to update last accessed time, based on a
         // strict interpretation of the specification
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (ACCESS_SESSION) {
             request.getSession(false);
         }
 

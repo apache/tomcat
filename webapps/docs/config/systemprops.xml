@@ -228,10 +228,6 @@
       dispatcher will be checked to ensure that it has wrapped the original
       request or response. (SRV.8.2 / SRV.14.2.5.1)
       </li>
-      <li>every request that is associated with a session will cause the
-      session's last accessed time to be updated regardless of whether or not
-      the request explicitly accesses the session. (SRV.7.6)  
-      </li>
       <li>
         <code>ServletContext.getResource/getResourceAsStream</code> must start with "/"<br/>
         if set to false, code like <code>getResource("myfolder/myresource.txt")</code> will work
@@ -239,6 +235,7 @@
       <li>
         The default value will be changed for:
         <ul>
+        <li><code>org.apache.catalina.core.StandardHostValve.ACCESS_SESSION</code></li>
         <li><code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code></li>
         <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
         <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
@@ -343,9 +340,18 @@
       <code>JSESSIONIDSSO</code>.</p>
     </property>
     
+    <property name="org.apache.catalina.core. StandardHostValve.ACCESS_SESSION">
+      <p>If this is <code>true</code>, every request that is associated with a
+      session will cause the session's last accessed time to be updated
+      regardless of whether or not the request explicitly accesses the session.
+      If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>true</code>, the default of this setting will be <code>true</code>,
+      else the default value will be <code>false</code>.</p>
+    </property>
+    
     <property
     name="org.apache.catalina.session. StandardSession.ACTIVITY_CHECK">
-      <p>If this is <code>true</code> Tomcat will track the number of active
+      <p>If this is <code>true</code>, Tomcat will track the number of active
       requests for each session. When determining if a session is valid, any
       session with at least one active request will always be considered valid.
       If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
