@@ -66,7 +66,7 @@ public class ClusterSingleSignOn
      * Descriptive information about this Valve implementation.
      */
     protected static String info =
-        "org.apache.catalina.cluster.authenticator.ClusterSingleSignOn";
+        "org.apache.catalina.ha.authenticator.ClusterSingleSignOn";
 
     protected int messageNumber = 0;
 
