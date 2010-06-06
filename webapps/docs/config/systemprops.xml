@@ -222,31 +222,23 @@
   <properties>
 
     <property name="org.apache.catalina. STRICT_SERVLET_COMPLIANCE">
-      <p>If this is <code>true</code> the following actions will occur:
+      <p>If this is <code>true</code> the default values will be changed for:
       <ul>
-      <li>any wrapped request or response object passed to an application
-      dispatcher will be checked to ensure that it has wrapped the original
-      request or response. (SRV.8.2 / SRV.14.2.5.1)
-      </li>
-      <li>
-        The default value will be changed for:
-        <ul>
-        <li><code>org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code></li>
-        <li><code>org.apache.catalina.core.StandardHostValve.ACCESS_SESSION</code></li>
-        <li><code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code></li>
-        <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
-        <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
-        <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
-        <li>The <code>tldNamespaceAware</code> attribute of any
-            <a href="context.html">Context</a> element</li>.
-        <li>The <code>tldValidation</code> attribute of any
-            <a href="context.html">Context</a> element</li>.
-        <li>The <code>xmlNamespaceAware</code> attribute of any
-            <a href="context.html">Context</a> element</li>.
-        <li>The <code>xmlValidation</code> attribute of any
-            <a href="context.html">Context</a> element</li>.
-        </ul>
-      </li>
+      <li><code>org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code></li>
+      <li><code>org.apache.catalina.core.ApplicationDispatcher.WRAP_SAME_OBJECT</code></li>
+      <li><code>org.apache.catalina.core.StandardHostValve.ACCESS_SESSION</code></li>
+      <li><code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code></li>
+      <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
+      <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
+      <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
+      <li>The <code>tldNamespaceAware</code> attribute of any
+          <a href="context.html">Context</a> element</li>.
+      <li>The <code>tldValidation</code> attribute of any
+          <a href="context.html">Context</a> element</li>.
+      <li>The <code>xmlNamespaceAware</code> attribute of any
+          <a href="context.html">Context</a> element</li>.
+      <li>The <code>xmlValidation</code> attribute of any
+          <a href="context.html">Context</a> element</li>.
       </ul>
       </p>
       <p>Note that changing a number of the above defaults is likely to break
@@ -282,6 +274,15 @@
       else the default value will be <code>false</code>.</p>
     </property>
 
+    <property name="org.apache.catalina.core. ApplicationDispatcher.WRAP_SAME_OBJECT">
+      <p>If this is <code>true</code> then any wrapped request or response
+      object passed to an application dispatcher will be checked to ensure that
+      it has wrapped the original request or response. If
+      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>true</code>, the default of this setting will be <code>true</code>,
+      else the default value will be <code>false</code>.</p>
+    </property>
+    
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
       <p>If this is <code>true</code> Tomcat will allow <code>=</code>
