@@ -479,7 +479,12 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Stop our defined Connectors first
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                ((Lifecycle) connectors[i]).stop();
+                // If Service fails to start, connectors may not have been
+                // started
+                if (!LifecycleState.INITIALIZED.equals(
+                        ((Lifecycle) connectors[i]).getState())) {
+                    ((Lifecycle) connectors[i]).stop();
+                }
             }
         }
 
