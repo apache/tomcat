@@ -84,14 +84,28 @@ import org.apache.catalina.security.SecurityUtil;
 public class StandardSession
     implements HttpSession, Session, Serializable {
 
+    protected static final boolean STRICT_SERVLET_COMPLIANCE;
 
-    protected static final boolean ACTIVITY_CHECK = 
-        Globals.STRICT_SERVLET_COMPLIANCE
-        || Boolean.valueOf(System.getProperty("org.apache.catalina.session.StandardSession.ACTIVITY_CHECK", "false")).booleanValue();
+    protected static final boolean ACTIVITY_CHECK;
 
 
     // ----------------------------------------------------------- Constructors
 
+    static {
+        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
+                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "false")).booleanValue();
+        
+        String activityCheck = System.getProperty(
+                "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK");
+        if (activityCheck == null) {
+            ACTIVITY_CHECK = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            ACTIVITY_CHECK =
+                Boolean.valueOf(activityCheck).booleanValue();
+        }
+    }
+    
 
     /**
      * Construct a new Session associated with the specified Manager.
