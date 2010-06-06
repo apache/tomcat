@@ -40,7 +40,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
     /**
      * The descriptive information about this implementation.
      */
-    protected static final String info = "org.apache.catalina.session.ClusterSingleSignOnListener/1.0";
+    protected static final String info = "org.apache.catalina.ha.authenticator.ClusterSingleSignOnListener/1.0";
 
     // ------------------------------------------------------------- Properties
 
