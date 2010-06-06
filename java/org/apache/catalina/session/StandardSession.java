@@ -89,8 +89,6 @@ public class StandardSession
     protected static final boolean ACTIVITY_CHECK;
 
 
-    // ----------------------------------------------------------- Constructors
-
     static {
         STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
                 "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
@@ -106,6 +104,9 @@ public class StandardSession
         }
     }
     
+
+    // ----------------------------------------------------------- Constructors
+
 
     /**
      * Construct a new Session associated with the specified Manager.
