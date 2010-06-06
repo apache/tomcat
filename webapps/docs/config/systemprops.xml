@@ -239,6 +239,7 @@
       <li>
         The default value will be changed for:
         <ul>
+        <li><code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code></li>
         <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
         <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
         <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
@@ -274,16 +275,6 @@
       <br />
       If not specified, the default specification compliant value of
       <code>true</code> will be used.</p>
-    </property>
-
-    <property
-    name="org.apache.catalina.session. StandardSession.ACTIVITY_CHECK">
-      <p>If this is <code>true</code> or if
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is
-      <code>true</code> Tomcat will track the number of active requests for each
-      session. When determining if a session is valid, any session with at least
-      one active request will always be considered valid. If not specified, the
-      default value of <code>false</code> will be used.</p>
     </property>
 
     <property
@@ -352,6 +343,16 @@
       <code>JSESSIONIDSSO</code>.</p>
     </property>
     
+    <property
+    name="org.apache.catalina.session. StandardSession.ACTIVITY_CHECK">
+      <p>If this is <code>true</code> Tomcat will track the number of active
+      requests for each session. When determining if a session is valid, any
+      session with at least one active request will always be considered valid.
+      If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>true</code>, the default of this setting will be <code>true</code>,
+      else the default value will be <code>false</code>.</p>
+    </property>
+
   </properties>
 
 </section>
