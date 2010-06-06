@@ -39,7 +39,7 @@ public class ClusterSessionListener extends ClusterListener {
     /**
      * The descriptive information about this implementation.
      */
-    protected static final String info = "org.apache.catalina.session.ClusterSessionListener/1.1";
+    protected static final String info = "org.apache.catalina.ha.session.ClusterSessionListener/1.1";
 
     //--Constructor---------------------------------------------
 
