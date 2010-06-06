@@ -66,9 +66,7 @@ final class StandardHostValve
     protected static final boolean ACCESS_SESSION;
 
     static {
-        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
-                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
-                "false")).booleanValue();
+        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
         
         String accessSession = System.getProperty(
                 "org.apache.catalina.core.StandardHostValve.ACCESS_SESSION");
