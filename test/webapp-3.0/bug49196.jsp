@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%
-// As nonsensical as this is, in't shouldn't throw an NPE
+// As nonsensical as this is, it shouldn't throw an NPE
 pageContext.getErrorData();
 %>
 <html>
