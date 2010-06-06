@@ -93,6 +93,24 @@ import org.apache.catalina.Globals;
 public class ApplicationContext
     implements ServletContext {
 
+    protected static final boolean STRICT_SERVLET_COMPLIANCE;
+
+    protected static final boolean GET_RESOURCE_REQUIRE_SLASH;
+
+
+    static {
+        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
+        
+        String activityCheck = System.getProperty(
+                "org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH");
+        if (activityCheck == null) {
+            GET_RESOURCE_REQUIRE_SLASH = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            GET_RESOURCE_REQUIRE_SLASH =
+                Boolean.valueOf(activityCheck).booleanValue();
+        }
+    }
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -497,7 +515,7 @@ public class ApplicationContext
         if (path == null)
             throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
 
-        if (!path.startsWith("/") && Globals.STRICT_SERVLET_COMPLIANCE)
+        if (!path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
             throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
 
         
@@ -541,7 +559,7 @@ public class ApplicationContext
         if (path == null)
             return (null);
 
-        if (!path.startsWith("/") && Globals.STRICT_SERVLET_COMPLIANCE)
+        if (!path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
             return null;
 
         String normalizedPath = RequestUtil.normalize(path);
