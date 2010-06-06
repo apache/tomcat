@@ -60,7 +60,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     private final static ThreadLocal<ServletResponse> lastServicedResponse;
 
     static {
-        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+        if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
             lastServicedRequest = new ThreadLocal<ServletRequest>();
             lastServicedResponse = new ThreadLocal<ServletResponse>();
         } else {
@@ -271,7 +271,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
         // We fell off the end of the chain -- call the servlet instance
         try {
-            if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(request);
                 lastServicedResponse.set(response);
             }
@@ -325,7 +325,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             throw new ServletException
               (sm.getString("filterChain.servlet"), e);
         } finally {
-            if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(null);
                 lastServicedResponse.set(null);
             }
