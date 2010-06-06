@@ -134,7 +134,12 @@ public abstract class LifecycleBase implements Lifecycle {
 
         setState(LifecycleState.STARTING_PREP);
 
-        startInternal();
+        try {
+            startInternal();
+        } catch (LifecycleException e) {
+            setState(LifecycleState.FAILED);
+            throw e;
+        }
 
         if (state.equals(LifecycleState.FAILED) ||
                 state.equals(LifecycleState.MUST_STOP)) {
@@ -296,7 +301,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * @param state The new state for this component
      * @param data  The data to pass to the associated {@link Lifecycle} event
      */
-    protected void setState(LifecycleState state, Object data) {
+    protected synchronized void setState(LifecycleState state, Object data) {
         
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("lifecycleBase.setState", this, state));
