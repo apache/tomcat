@@ -164,10 +164,6 @@
 
     <h3>Persistent Manager Implementation</h3>
 
-    <p><em><strong>WARNING - Use of this Manager implementation
-    has not been thoroughly tested, and should be considered experimental!
-    </strong></em></p>
-
     <p><strong>NOTE:</strong> You must set either the
     <code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code> or
     <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
