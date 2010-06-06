@@ -101,13 +101,13 @@ public class ApplicationContext
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
         
-        String activityCheck = System.getProperty(
+        String requireSlash = System.getProperty(
                 "org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH");
-        if (activityCheck == null) {
+        if (requireSlash == null) {
             GET_RESOURCE_REQUIRE_SLASH = STRICT_SERVLET_COMPLIANCE;
         } else {
             GET_RESOURCE_REQUIRE_SLASH =
-                Boolean.valueOf(activityCheck).booleanValue();
+                Boolean.valueOf(requireSlash).booleanValue();
         }
     }
 
