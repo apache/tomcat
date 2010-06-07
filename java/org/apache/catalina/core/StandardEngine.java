@@ -296,11 +296,6 @@ public class StandardEngine extends ContainerBase implements Engine {
      * access log.
      */
     @Override
-    /**
-     * Check this container for an access log and if none is found, look to the
-     * parent. If there is no parent and still none is found, use the NoOp
-     * access log.
-     */
     public void logAccess(Request request, Response response, long time,
             boolean useDefault) {
 
