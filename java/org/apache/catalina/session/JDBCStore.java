@@ -55,7 +55,7 @@ public class JDBCStore extends StoreBase {
     /**
      * The descriptive information about this implementation.
      */
-    protected static String info = "JDBCStore/1.0";
+    protected static final String info = "JDBCStore/1.0";
 
     /**
      * Context name associated with this Store

@@ -43,7 +43,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * The descriptive information about this implementation.
      */
-    protected static String info = "StoreBase/1.0";
+    protected static final String info = "StoreBase/1.0";
 
     /**
      * Name to register for this Store, used for logging.

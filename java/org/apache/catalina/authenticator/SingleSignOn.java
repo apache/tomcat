@@ -79,7 +79,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     /**
      * Descriptive information about this Valve implementation.
      */
-    protected static String info =
+    protected static final String info =
         "org.apache.catalina.authenticator.SingleSignOn";
 
 
