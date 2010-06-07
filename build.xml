@@ -1177,18 +1177,6 @@
   </target>
 
   <target name="dist-prepare" depends="download-dist">
-    <!-- This is why releasing must be done on Windows / with wine:
-         otherwise this check fails and the .exe distro is not generated -->
-    <condition property="execute.installer">
-      <and>
-        <os family="windows" />
-        <available file="${nsis.exe}" />
-        <available file="${nsis.installoptions.dll}" />
-        <available file="${nsis.nsexec.dll}" />
-        <available file="${nsis.nsisdl.dll}" />
-      </and>
-    </condition>
-    
     <mkdir dir="${tomcat.dist}"/>
     <mkdir dir="${tomcat.dist}/bin"/>
     <mkdir dir="${tomcat.dist}/conf"/>
