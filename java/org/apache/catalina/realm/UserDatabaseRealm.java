@@ -64,7 +64,7 @@ public class UserDatabaseRealm
     /**
      * Descriptive information about this Realm implementation.
      */
-    protected final String info =
+    protected static final String info =
         "org.apache.catalina.realm.UserDatabaseRealm/1.0";
 
 

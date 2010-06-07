@@ -61,7 +61,7 @@ public class MemoryRealm  extends RealmBase {
     /**
      * Descriptive information about this Realm implementation.
      */
-    protected final String info =
+    protected static final String info =
         "org.apache.catalina.realm.MemoryRealm/1.0";
 
 
