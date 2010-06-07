@@ -84,7 +84,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * Descriptive information about this Valve implementation.  This value
      * should be overridden by subclasses.
      */
-    protected static String info =
+    protected static final String info =
         "org.apache.catalina.core.ValveBase/1.0";
 
 
