@@ -255,7 +255,7 @@ grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         // Note: To enable per context logging configuration, permit read access to
         // the appropriate file. Be sure that the logging configuration is
         // secure before enabling such access.
-        // E.g. for the examples web application, all in one line:
+        // E.g. for the examples web application:
         // permission java.io.FilePermission "${catalina.base}${file.separator}
         //  webapps${file.separator}examples${file.separator}WEB-INF
         //  ${file.separator}classes${file.separator}logging.properties", "read";
