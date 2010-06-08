@@ -36,7 +36,7 @@ Running With JRE 6.0 Or Later
 (1.2) Install the JRE according to the instructions included with the
       release.
 (1.3) Set an environment variable named JRE_HOME to the pathname of
-      the directory into which you installed the JRE, e.g. c:\jre5.0
+      the directory into which you installed the JRE, e.g. c:\jre6.0
       or /usr/local/java/jre6.0.
 
 NOTE: You may also use the full JDK rather than just the JRE. In this
@@ -119,7 +119,7 @@ of $CATALINA_HOME:
 Note that by default Tomcat will first try to load classes and JARs from
 $CATALINA_BASE/lib and then $CATALINA_HOME/lib. You can place instance specific
 JARs and classes (eg JDBC drivers) in $CATALINA_BASE/lib whilst keeping the
-standard Tomcat JARs in $CATALINA_HOME/lib.  
+standard Tomcat JARs in $CATALINA_HOME/lib.
 
 If you do not set $CATALINA_BASE, $CATALINA_BASE will default to the same value
 as $CATALINA_HOME, which means that the same directory is used for all relative
