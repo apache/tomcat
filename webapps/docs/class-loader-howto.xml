@@ -114,7 +114,7 @@ loaders as it is initialized:</p>
     <li><em>el-api.jar</em> - EL 2.1 API.</li>
     <li><em>jasper.jar</em> - Jasper 2 Compiler and Runtime.</li>
     <li><em>jasper-el.jar</em> - Jasper 2 EL implementation.</li>
-    <li><em>jasper-jdt.jar</em> - Eclipse JDT 3.2 Java compiler.</li>
+    <li><em>ecj-*.jar</em> - Eclipse JDT Java compiler.</li>
     <li><em>jsp-api.jar</em> - JSP 2.1 API.</li>
     <li><em>servlet-api.jar</em> - Servlet 3.0 API.</li>
     <li><em>tomcat-coyote.jar</em> - Tomcat connectors and utility classes.</li>
