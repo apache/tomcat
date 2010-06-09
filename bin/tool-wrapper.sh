@@ -35,8 +35,12 @@
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
+os400=false
+darwin=false
 case "`uname`" in
 CYGWIN*) cygwin=true;;
+OS400*) os400=true;;
+Darwin*) darwin=true;;
 esac
 
 # resolve links - $0 may be a softlink
@@ -54,42 +58,73 @@ done
 
 # Get standard environment variables
 PRGDIR=`dirname "$PRG"`
-CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
+
+# Only set CATALINA_HOME if not already set
+[ -z "$CATALINA_HOME" ] && CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
 # Ensure that any user defined CLASSPATH variables are not used on startup,
 # but allow them to be specified in setenv.sh, in rare case when it is needed.
 CLASSPATH=
 
-if [ -r "$CATALINA_HOME"/bin/setenv.sh ]; then
-  . "$CATALINA_HOME"/bin/setenv.sh
+if [ -r "$CATALINA_HOME/bin/setenv.sh" ]; then
+  . "$CATALINA_HOME/bin/setenv.sh"
 fi
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin; then
   [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+  [ -n "$JRE_HOME" ] && JRE_HOME=`cygpath --unix "$JRE_HOME"`
   [ -n "$CATALINA_HOME" ] && CATALINA_HOME=`cygpath --unix "$CATALINA_HOME"`
   [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
 fi
 
+# For OS400
+if $os400; then
+  # Set job priority to standard for interactive (interactive - 6) by using
+  # the interactive priority - 6, the helper threads that respond to requests
+  # will be running at the same priority as interactive jobs.
+  COMMAND='chgjob job('$JOBNAME') runpty(6)'
+  system $COMMAND
+
+  # Enable multi threading
+  export QIBM_MULTI_THREADED=Y
+fi
+
 # Get standard Java environment variables
-if [ -r "$CATALINA_HOME"/bin/setclasspath.sh ]; then
+if $os400; then
+  # -r will Only work on the os400 if the files are:
+  # 1. owned by the user
+  # 2. owned by the PRIMARY group of the user
+  # this will not work if the user belongs in secondary groups
   BASEDIR="$CATALINA_HOME"
-  . "$CATALINA_HOME"/bin/setclasspath.sh
+  . "$CATALINA_HOME"/bin/setclasspath.sh 
 else
-  echo "Cannot find $CATALINA_HOME/bin/setclasspath.sh"
-  echo "This file is needed to run this program"
-  exit 1
+  if [ -r "$CATALINA_HOME"/bin/setclasspath.sh ]; then
+    BASEDIR="$CATALINA_HOME"
+    . "$CATALINA_HOME"/bin/setclasspath.sh
+  else
+    echo "Cannot find $CATALINA_HOME/bin/setclasspath.sh"
+    echo "This file is needed to run this program"
+    exit 1
+  fi
 fi
 
 # Add on extra jar files to CLASSPATH
-CLASSPATH="$CLASSPATH":"$CATALINA_HOME"/bin/bootstrap.jar:"$BASEDIR"/lib/servlet-api.jar
+if [ ! -z "$CLASSPATH" ] ; then
+  CLASSPATH="$CLASSPATH":
+fi
+CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar:"$CATALINA_HOME"/bin/tomcat-juli.jar:"$CATALINA_HOME"/lib/servlet-api.jar
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
-  JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
-  CATALINA_HOME=`cygpath --path --windows "$CATALINA_HOME"`
+  JAVA_HOME=`cygpath --absolute --windows "$JAVA_HOME"`
+  JRE_HOME=`cygpath --absolute --windows "$JRE_HOME"`
+  CATALINA_HOME=`cygpath --absolute --windows "$CATALINA_HOME"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+  JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
+
+JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 
 # ----- Execute The Requested Command -----------------------------------------
 
