@@ -185,6 +185,7 @@
     <filter token="VERSION_MAJOR" value="${version.major}"/>
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
     <filter token="VERSION_BUILT" value="${today} ${tstamp}"/>
+    <filter token="JDT_VERSION" value="${jdt.version}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->
