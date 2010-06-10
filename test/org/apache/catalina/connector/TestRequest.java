@@ -18,7 +18,10 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
@@ -255,5 +258,47 @@ public class TestRequest extends TomcatBaseTest {
             resp.getWriter().write(OK);
         }
         
+    }
+    
+    public void testBug49424NoChunking() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
+        root.addServletMapping("/", "Bug37794");
+        tomcat.start();
+
+        HttpURLConnection conn = getConnection();
+        InputStream is = conn.getInputStream();
+        assertNotNull(is);
+    }
+
+    public void testBug49424WithChunking() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
+        root.addServletMapping("/", "Bug37794");
+        tomcat.start();
+        
+        HttpURLConnection conn = getConnection();
+        conn.setChunkedStreamingMode(8 * 1024);
+        InputStream is = conn.getInputStream();
+        assertNotNull(is);
+    }
+
+    private HttpURLConnection getConnection() throws IOException {
+        final String query = "http://localhost:" + getPort() + "/";
+        URL postURL;
+        postURL = new URL(query);
+        HttpURLConnection conn = (HttpURLConnection) postURL.openConnection();
+        conn.setRequestMethod("POST");
+
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+        conn.setUseCaches(false);
+        conn.setAllowUserInteraction(false);
+
+        return conn;
     }
 }
