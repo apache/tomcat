@@ -162,10 +162,10 @@ public final class AstValue extends SimpleNode {
                 // This is a property
                 if (suffix == null) {
                     return null;
-                } else {
-                    ctx.setPropertyResolved(false);
-                    base = resolver.getValue(ctx, base, suffix);
                 }
+                
+                ctx.setPropertyResolved(false);
+                base = resolver.getValue(ctx, base, suffix);
                 i++;
             }
         }
