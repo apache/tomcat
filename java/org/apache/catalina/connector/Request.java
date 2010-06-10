@@ -2818,7 +2818,9 @@ public class Request
                 }
                 return;
             }
-            parameters.processParameters(formData, 0, formData.length);
+            if (formData != null) {
+                parameters.processParameters(formData, 0, formData.length);
+            }
         }
 
     }
@@ -2863,6 +2865,9 @@ public class Request
             if (len > 0) {
                 body.append(buffer, 0, len);
             }
+        }
+        if (body.getLength() == 0) {
+            return null;
         }
         if (body.getLength() < body.getBuffer().length) {
             int length = body.getLength();
