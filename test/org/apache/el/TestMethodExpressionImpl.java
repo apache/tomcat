@@ -69,10 +69,37 @@ public class TestMethodExpressionImpl extends TestCase {
 
         assertEquals("Tomcat", me1.invoke(context, null));
         assertEquals("Hello JUnit from Tomcat", me2.invoke(context, null));
-        assertEquals("Hello JUnit from Tomcat", me2.invoke(context, new Object[] { "JUnit2" }));
-        assertEquals("Hello JUnit2 from Tomcat", me3.invoke(context, new Object[] { "JUnit2" }));
-        assertEquals("Hello JUnit from Tomcat", me2.invoke(context, new Object[] { null }));
-        assertEquals("Hello null from Tomcat", me3.invoke(context, new Object[] { null }));
+        assertEquals("Hello JUnit from Tomcat",
+                me2.invoke(context, new Object[] { "JUnit2" }));
+        assertEquals("Hello JUnit2 from Tomcat",
+                me3.invoke(context, new Object[] { "JUnit2" }));
+        assertEquals("Hello JUnit from Tomcat",
+                me2.invoke(context, new Object[] { null }));
+        assertEquals("Hello null from Tomcat",
+                me3.invoke(context, new Object[] { null }));
     }
 
+    public void testInvokeWithSuper() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+        ValueExpression varA =
+            factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", varA);
+        
+        TesterBeanC beanC = new TesterBeanC();        
+        beanC.setName("Tomcat");
+        ValueExpression varC =
+            factory.createValueExpression(beanC, TesterBeanC.class);
+        context.getVariableMapper().setVariable("beanC", varC);
+        
+        MethodExpression me1 = factory.createMethodExpression(context,
+                "${beanA.setBean(beanC)}", null ,
+                new Class<?>[] { TesterBeanB.class });
+        
+        me1.invoke(context, null);
+        
+        assertEquals(beanA.getBean(), beanC);
+    }
 }
