@@ -27,7 +27,15 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-      
+               
+    <attribute name="defaultContextXml"
+               description="The location of the default context file"
+               type="java.lang.String"/>  
+
+    <attribute name="defaultWebXml"
+               description="The location of the default deployment descriptor"
+               type="java.lang.String"/>     
+
   </mbean>
 
   <mbean name="EngineConfig"
@@ -67,6 +75,35 @@
     <attribute name="contextClass"
                description="The Java class name of the Context implementation we should use"
                type="java.lang.String"/>
+               
+     <attribute name="copyXML"
+               description="The copy XML config file flag for this component"
+               type="boolean"/>
+               
+     <attribute name="deployXML"
+               description="The deploy XML config file flag for this component"
+               type="boolean"/>
+               
+     <attribute name="unpackWARs"
+               description="The unpack WARs flag"
+               type="boolean"/>
+               
+    <attribute name="xmlNamespaceAware"
+               description="The Java class name of the Context configuration class we should use"
+               type="boolean"/>
+               
+    <attribute name="xmlValidation"
+               description="Set the validation feature of the XML parser used when parsing xml instances."
+               type="boolean"/>
+               
+    <operation name="addServiced"
+               description="Add a web application to the serviced list to show it gets serviced by another component"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="name"
+                 description="Application name"
+                 type="java.lang.String"/>
+    </operation>
       
     <operation name="check"
                description="Check a web application name for updates"
@@ -76,20 +113,11 @@
                  description="Application name"
                  type="java.lang.String"/>
     </operation>
-
-    <operation name="addServiced"
-               description="Add a web application to the serviced list to show it gets serviced by another component"
+    
+    <operation name="getDeploymentTime"
+               description="Get the instant where an application was deployed"
                impact="ACTION"
-               returnType="void">
-      <parameter name="name"
-                 description="Application name"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation name="isServiced"
-               description="Is a web application serviced by another component"
-               impact="ACTION"
-               returnType="boolean">
+               returnType="long">
       <parameter name="name"
                  description="Application name"
                  type="java.lang.String"/>
@@ -97,6 +125,15 @@
 
     <operation name="isDeployed"
                description="Was this web application deployed by this component"
+               impact="ACTION"
+               returnType="boolean">
+      <parameter name="name"
+                 description="Application name"
+                 type="java.lang.String"/>
+    </operation>
+    
+    <operation name="isServiced"
+               description="Is a web application serviced by another component"
                impact="ACTION"
                returnType="boolean">
       <parameter name="name"
