@@ -33,6 +33,16 @@
   </properties>
 
 <body>
+<section name="Tomcat 7.0.1 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        GSOC 2010. Continue work to align MBean descriptors with reality. Patch
+        provided by Chamith Buddhika. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
