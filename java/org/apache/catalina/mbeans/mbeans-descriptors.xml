@@ -137,6 +137,18 @@
           description="MBean Name of the associated parent component"
                  type="java.lang.String"/>
     </operation>
+    
+    <operation   name="createUserDatabaseRealm"
+          description="Create a new  UserDatabaseRealm"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="parent"
+          description="MBean Name of the associated parent component"
+                 type="java.lang.String"/>
+      <parameter name="resourceName"
+          description="Global JNDI resource name of the associated"
+                 type="java.lang.String"/>
+    </operation>
 
     <operation   name="createRemoteAddrValve"
           description="Create a new Remote Address Filter Valve"
@@ -149,15 +161,6 @@
 
     <operation   name="createRemoteHostValve"
           description="Create a new Remote Host Filter Valve"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createRequestDumperValve"
-          description="Create a new Request Dumper Valve"
                impact="ACTION"
            returnType="java.lang.String">
       <parameter name="parent"
