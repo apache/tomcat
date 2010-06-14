@@ -33,13 +33,19 @@
   </properties>
 
 <body>
-<!--  Catalina, Coyote, Jasper, HA, Webapps, Extras, Other -->
+<!--  Catalina, Coyote, Jasper, High Availability, Web applications, Extras,
+      Other -->
 <section name="Tomcat 7.0.1 (markt)">
   <subsection name="Catalina">
     <changelog>
       <fix>
         GSOC 2010. Continue work to align MBean descriptors with reality. Patch
         provided by Chamith Buddhika. (markt)
+      </fix>
+      <fix>
+        When running under a security manager, enforce package access and
+        package definition restrictions defined in the catalina.properties file.
+        (markt)
       </fix>
     </changelog>
   </subsection>
@@ -48,6 +54,15 @@
       <update>
         Remove references to Jikes since it does not support Java 6. (markt)
       </update>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>49213</bug>: Add the permissions necessary to enable the Manager
+        application to operate currently when running with a security manager.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
