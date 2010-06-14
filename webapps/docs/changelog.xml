@@ -237,14 +237,6 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Modules">
-    <changelog>
-      <add>
-        <rev>691359</rev> Added in a Bayeux protocol implementation built on top
-        of the Tomcat CometProcessor interface. (fhanik)
-      </add>
-    </changelog>
-  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
