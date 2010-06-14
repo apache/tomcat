@@ -54,6 +54,10 @@
       <update>
         Remove references to Jikes since it does not support Java 6. (markt)
       </update>
+      <fix>
+        Correct over zealous type checking for EL in attributes that broke the
+        use of JSF convertors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
