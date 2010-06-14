@@ -222,10 +222,6 @@
   <!--                                                                      -->
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet  [false]  -->
-  <!--                                                                      -->
-  <!-- If you wish to use Jikes to compile JSP pages:                       -->
-  <!--   Please see the "Using Jikes" section of the Jasper-HowTo           -->
-  <!--   page in the Tomcat documentation.                                  -->
 
     <servlet>
         <servlet-name>jsp</servlet-name>
