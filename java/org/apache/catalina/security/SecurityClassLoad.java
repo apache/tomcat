@@ -42,59 +42,59 @@ public final class SecurityClassLoad {
         loadSessionPackage(loader);
         loadUtilPackage(loader);
         loadJavaxPackage(loader);
-        loadCoyotePackage(loader);        
+        loadConnectorPackage(loader);        
         loadTomcatPackage(loader);
     }
     
     
     private final static void loadCorePackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.";
+        String basePackage = "org.apache.catalina.core.";
         loader.loadClass
             (basePackage +
-             "core.ApplicationContextFacade$1");
+             "ApplicationContextFacade$1");
         loader.loadClass
             (basePackage +
-             "core.ApplicationDispatcher$PrivilegedForward");
+             "ApplicationDispatcher$PrivilegedForward");
         loader.loadClass
             (basePackage +
-             "core.ApplicationDispatcher$PrivilegedInclude");
+             "ApplicationDispatcher$PrivilegedInclude");
         loader.loadClass
             (basePackage +
-            "core.AsyncContextImpl");
+            "AsyncContextImpl");
         loader.loadClass
             (basePackage +
-            "core.AsyncContextImpl$AsyncState");
+            "AsyncContextImpl$AsyncState");
         loader.loadClass
             (basePackage +
-            "core.AsyncContextImpl$DebugException");
+            "AsyncContextImpl$DebugException");
         loader.loadClass
             (basePackage +
-            "core.AsyncContextImpl$1");
+            "AsyncContextImpl$1");
         loader.loadClass
             (basePackage +
-            "core.AsyncContextImpl$2");
+            "AsyncContextImpl$2");
         loader.loadClass
             (basePackage +
-            "core.AsyncListenerWrapper");
+            "AsyncListenerWrapper");
         loader.loadClass
             (basePackage +
-             "core.ContainerBase$PrivilegedAddChild");
+             "ContainerBase$PrivilegedAddChild");
         loader.loadClass
             (basePackage +
-             "core.DefaultInstanceManager$1");
+             "DefaultInstanceManager$1");
         loader.loadClass
             (basePackage +
-             "core.DefaultInstanceManager$2");
+             "DefaultInstanceManager$2");
         loader.loadClass
             (basePackage +
-             "core.DefaultInstanceManager$3");
+             "DefaultInstanceManager$3");
         loader.loadClass
             (basePackage +
-             "core.DefaultInstanceManager$4");
+             "DefaultInstanceManager$4");
         loader.loadClass
             (basePackage +
-             "core.DefaultInstanceManager$5");
+             "DefaultInstanceManager$5");
         loader.loadClass
             (basePackage +
              "core.ApplicationHttpRequest$AttributeNamesEnumerator");
@@ -103,26 +103,24 @@ public final class SecurityClassLoad {
     
     private final static void loadLoaderPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.";
+        String basePackage = "org.apache.catalina.loader.";
         loader.loadClass
             (basePackage +
-             "loader.WebappClassLoader$PrivilegedFindResourceByName");
+             "WebappClassLoader$PrivilegedFindResourceByName");
     }
     
     
     private final static void loadSessionPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.";
+        String basePackage = "org.apache.catalina.session.";
         loader.loadClass
-            (basePackage + "session.StandardSession");
+            (basePackage + "StandardSession");
         loader.loadClass
-            (basePackage + "session.StandardSession$PrivilegedSetTccl");
+            (basePackage + "StandardSession$PrivilegedSetTccl");
         loader.loadClass
-            (basePackage +
-             "session.StandardSession$1");
+            (basePackage + "StandardSession$1");
         loader.loadClass
-            (basePackage +
-             "session.StandardManager$PrivilegedDoUnload");
+            (basePackage + "StandardManager$PrivilegedDoUnload");
     }
     
     
@@ -140,7 +138,7 @@ public final class SecurityClassLoad {
     }
     
 
-    private final static void loadCoyotePackage(ClassLoader loader)
+    private final static void loadConnectorPackage(ClassLoader loader)
         throws Exception {
         String basePackage = "org.apache.catalina.connector.";
         loader.loadClass
