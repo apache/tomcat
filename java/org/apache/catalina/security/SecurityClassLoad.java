@@ -97,7 +97,7 @@ public final class SecurityClassLoad {
              "DefaultInstanceManager$5");
         loader.loadClass
             (basePackage +
-             "core.ApplicationHttpRequest$AttributeNamesEnumerator");
+             "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
     
     
