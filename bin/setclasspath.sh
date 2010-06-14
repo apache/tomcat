@@ -98,17 +98,6 @@ if [ -z "$JAVA_ENDORSED_DIRS" ]; then
   JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
 fi
 
-# OSX hack to CLASSPATH
-JIKESPATH=
-if [ `uname -s` = "Darwin" ]; then
-  OSXHACK="/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Classes"
-  if [ -d "$OSXHACK" ]; then
-    for i in "$OSXHACK"/*.jar; do
-      JIKESPATH="$JIKESPATH":"$i"
-    done
-  fi
-fi
-
 # Set standard commands for invoking Java.
 _RUNJAVA="$JRE_HOME"/bin/java
 if [ "$os400" != "true" ]; then
