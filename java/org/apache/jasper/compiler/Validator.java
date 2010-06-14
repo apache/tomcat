@@ -1159,13 +1159,27 @@ class Validator {
                                             (n, "jsp.error.unknown_attribute_type",
                                              tldAttr.getName(), expectedType);
                                     }
-                                    // Check casting
-                                    try {
-                                        EXPRESSION_FACTORY.coerceToType(attrs.getValue(i), expectedClass);
-                                    } catch (Exception e) {
-                                        err.jspError
-                                            (n, "jsp.error.coerce_to_type",
-                                             tldAttr.getName(), expectedType, attrs.getValue(i));
+                                    // Check casting - not possible for all types
+                                    if (String.class.equals(expectedClass) ||
+                                            expectedClass == Long.TYPE ||
+                                            expectedClass == Double.TYPE ||
+                                            expectedClass == Byte.TYPE ||
+                                            expectedClass == Short.TYPE ||
+                                            expectedClass == Integer.TYPE ||
+                                            expectedClass == Float.TYPE ||
+                                            Number.class.isAssignableFrom(expectedClass) ||
+                                            Character.class.equals(expectedClass) ||
+                                            Character.TYPE == expectedClass ||
+                                            Boolean.class.equals(expectedClass) ||
+                                            Boolean.TYPE == expectedClass ||
+                                            expectedClass.isEnum()) {
+                                        try {
+                                            EXPRESSION_FACTORY.coerceToType(attrs.getValue(i), expectedClass);
+                                        } catch (Exception e) {
+                                            err.jspError
+                                                (n, "jsp.error.coerce_to_type",
+                                                 tldAttr.getName(), expectedType, attrs.getValue(i));
+                                        }
                                     }
                                 }
 
