@@ -34,6 +34,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
@@ -130,6 +131,14 @@ public class Catalina {
      */
     protected boolean useNaming = true;
 
+
+    // ----------------------------------------------------------- Constructors
+    
+    public Catalina() {
+        setSecurityProtection();
+    }
+    
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -767,6 +776,16 @@ public class Catalina {
         }
     }
 
+    
+    /**
+     * Set the security package access/protection.
+     */
+    protected void setSecurityProtection(){
+        SecurityConfig securityConfig = SecurityConfig.newInstance();
+        securityConfig.setPackageDefinition();
+        securityConfig.setPackageAccess();
+    }
+    
     
     // --------------------------------------- CatalinaShutdownHook Inner Class
 
