@@ -26,15 +26,13 @@ import org.apache.catalina.ha.ClusterMessage;
  * The following events are currently available:
  * <ul>
  *   <li><pre>public static final int EVT_SESSION_CREATED</pre><li>
+ *   <li><pre>public static final int EVT_SESSION_EXPIRED</pre><li>
  *   <li><pre>public static final int EVT_SESSION_ACCESSED</pre><li>
- *   <li><pre>public static final int EVT_ATTRIBUTE_ADDED</pre><li>
- *   <li><pre>public static final int EVT_ATTRIBUTE_REMOVED</pre><li>
- *   <li><pre>public static final int EVT_SESSION_EXPIRED_WONOTIFY</pre><li>
- *   <li><pre>public static final int EVT_SESSION_EXPIRED_WNOTIFY</pre><li>
  *   <li><pre>public static final int EVT_GET_ALL_SESSIONS</pre><li>
- *   <li><pre>public static final int EVT_SET_USER_PRINCIPAL</pre><li>
- *   <li><pre>public static final int EVT_SET_SESSION_NOTE</pre><li>
- *   <li><pre>public static final int EVT_REMOVE_SESSION_NOTE</pre><li>
+ *   <li><pre>public static final int EVT_SESSION_DELTA</pre><li>
+ *   <li><pre>public static final int EVT_ALL_SESSION_DATA</pre><li>
+ *   <li><pre>public static final int EVT_ALL_SESSION_TRANSFERCOMPLETE</pre><li>
+ *   <li><pre>public static final int EVT_CHANGE_SESSION_ID</pre><li>
  * </ul>
  *
  */
@@ -78,7 +76,11 @@ public interface SessionMessage extends ClusterMessage, java.io.Serializable
      * When a session state is complete transferred, this is the event.
      */
     public static final int EVT_ALL_SESSION_TRANSFERCOMPLETE = 14;
-    
+
+    /**
+     * Event type used when a sessionID has been changed.
+     */
+    public static final int EVT_CHANGE_SESSION_ID = 15;
 
     
     public String getContextName();

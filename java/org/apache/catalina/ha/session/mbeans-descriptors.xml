@@ -139,6 +139,11 @@
       type="long"
       writeable="false"/>
     <attribute
+      name="counterReceive_EVT_CHANGE_SESSION_ID"
+      description="Count receive EVT_CHANGE_SESSION_ID messages"
+      type="long"
+      writeable="false"/>
+    <attribute
       name="counterSend_EVT_GET_ALL_SESSIONS"
       description="Count send EVT_GET_ALL_SESSIONS messages"
       type="long"
@@ -171,6 +176,11 @@
     <attribute
       name="counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE"
       description="Count send EVT_ALL_SESSION_TRANSFERCOMPLETE messages"
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="counterSend_EVT_CHANGE_SESSION_ID"
+      description="Count send EVT_CHANGE_SESSION_ID messages"
       type="long"
       writeable="false"/>
     <attribute
