@@ -354,7 +354,7 @@ grant {
 
 // The Manager application needs access to the following packages to support the
 // session display functionality
-grant codeBase "file:${catalina.home}/webapps/manager/-" {
+grant codeBase "file:${catalina.base}/webapps/manager/-" {
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager.util";
