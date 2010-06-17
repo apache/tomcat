@@ -379,10 +379,10 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public String getCrlFile(){ return endpoint.getCrlFile();}
     
     public void setSessionCacheSize(String s){endpoint.setSessionCacheSize(s);}
-    public String getSessionCacheSize(){ return endpoint.getTruststoreAlgorithm();}
+    public String getSessionCacheSize(){ return endpoint.getSessionCacheSize();}
 
-    public void setSessionTimeout(String s){endpoint.setTruststoreAlgorithm(s);}
-    public String getSessionTimeout(){ return endpoint.getTruststoreAlgorithm();}
+    public void setSessionTimeout(String s){endpoint.setSessionTimeout(s);}
+    public String getSessionTimeout(){ return endpoint.getSessionTimeout();}
     
     public void setAllowUnsafeLegacyRenegotiation(String s) {
         endpoint.setAllowUnsafeLegacyRenegotiation(s);
