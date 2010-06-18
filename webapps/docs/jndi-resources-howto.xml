@@ -378,7 +378,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     relative, it is relative to <code>$CATALINA_BASE</code>.</p>
     
     <p>The <code>readonly</code> attribute is optional and defaults to
-    <code>false</code> if not supplied. If the XML is writeable then it will be
+    <code>true</code> if not supplied. If the XML is writeable then it will be
     written to when Tomcat starts. <strong>WARNING:</strong> When the file is
     written it will inherit the default file permissions for the user Tomcat
     is running as. Ensure that these are appropriate to maintain the security
