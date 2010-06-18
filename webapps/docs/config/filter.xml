@@ -315,11 +315,11 @@
          &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
@@ -392,11 +392,11 @@
          &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
@@ -447,11 +447,11 @@
          &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
@@ -505,11 +505,11 @@
          &lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
-         &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;
+         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
          &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
        &lt;/init-param&gt;
        &lt;init-param&gt;
@@ -558,7 +558,7 @@
 
     <attributes>
 
-      <attribute name="remoteIPHeader" required="false">
+      <attribute name="remoteIpHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the list of
         traversed IP addresses starting from the requesting client. If not
         specified, the default of <code>x-forwarded-for</code> is used.</p>
