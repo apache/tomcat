@@ -64,7 +64,7 @@ import org.apache.juli.logging.LogFactory;
  * If the incoming <code>request.getRemoteAddr()</code> matches the servlet filter's list of internal proxies :
  * <ul>
  * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given request's Http
- * header named <code>$remoteIPHeader</code> (default value <code>x-forwarded-for</code>). Values are processed in right-to-left order.</li>
+ * header named <code>$remoteIpHeader</code> (default value <code>x-forwarded-for</code>). Values are processed in right-to-left order.</li>
  * <li>For each ip/host of the list:
  * <ul>
  * <li>if it matches the internal proxies list, the ip/host is swallowed</li>
@@ -89,7 +89,7 @@ import org.apache.juli.logging.LogFactory;
  * <th>Default Value</th>
  * </tr>
  * <tr>
- * <td>remoteIPHeader</td>
+ * <td>remoteIpHeader</td>
  * <td>Name of the Http Header read by this servlet filter that holds the list of traversed IP addresses starting from the requesting client
  * </td>
  * <td>RemoteIPHeader</td>
@@ -110,7 +110,7 @@ import org.apache.juli.logging.LogFactory;
  * <tr>
  * <td>proxiesHeader</td>
  * <td>Name of the http header created by this servlet filter to hold the list of proxies that have been processed in the incoming
- * <code>remoteIPHeader</code></td>
+ * <code>remoteIpHeader</code></td>
  * <td>RemoteIPProxiesHeader</td>
  * <td>Compliant http header name</td>
  * <td>x-forwarded-by</td>
@@ -176,10 +176,10 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;protocolHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
@@ -253,10 +253,10 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;&lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
@@ -310,10 +310,10 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;&lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
@@ -368,10 +368,10 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIPProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;&lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
@@ -605,7 +605,7 @@ public class RemoteIpFilter implements Filter {
     
     protected static final String PROXIES_HEADER_PARAMETER = "proxiesHeader";
     
-    protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIPHeader";
+    protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
     
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
     
@@ -700,9 +700,9 @@ public class RemoteIpFilter implements Filter {
     private String proxiesHeader = "X-Forwarded-By";
     
     /**
-     * @see #setRemoteIPHeader(String)
+     * @see #setRemoteIpHeader(String)
      */
-    private String remoteIPHeader = "X-Forwarded-For";
+    private String remoteIpHeader = "X-Forwarded-For";
     
     /**
      * @see #setTrustedProxies(String)
@@ -720,11 +720,11 @@ public class RemoteIpFilter implements Filter {
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
             
-            String[] remoteIPHeaderValue = commaDelimitedListToStringArray(request.getHeader(remoteIPHeader));
+            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(request.getHeader(remoteIpHeader));
             int idx;
-            // loop on remoteIPHeaderValue to find the first trusted remote ip and to build the proxies chain
-            for (idx = remoteIPHeaderValue.length - 1; idx >= 0; idx--) {
-                String currentRemoteIp = remoteIPHeaderValue[idx];
+            // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
+            for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
+                String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
                 if (matchesOne(currentRemoteIp, internalProxies)) {
                     // do nothing, internalProxies IPs are not appended to the
@@ -735,10 +735,10 @@ public class RemoteIpFilter implements Filter {
                     break;
                 }
             }
-            // continue to loop on remoteIPHeaderValue to build the new value of the remoteIPHeader
+            // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
             LinkedList<String> newRemoteIpHeaderValue = new LinkedList<String>();
             for (; idx >= 0; idx--) {
-                String currentRemoteIp = remoteIPHeaderValue[idx];
+                String currentRemoteIp = remoteIpHeaderValue[idx];
                 newRemoteIpHeaderValue.addFirst(currentRemoteIp);
             }
             
@@ -755,10 +755,10 @@ public class RemoteIpFilter implements Filter {
                     xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
                 }
                 if (newRemoteIpHeaderValue.size() == 0) {
-                    xRequest.removeHeader(remoteIPHeader);
+                    xRequest.removeHeader(remoteIpHeader);
                 } else {
                     String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
-                    xRequest.setHeader(remoteIPHeader, commaDelimitedRemoteIpHeaderValue);
+                    xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
                 }
             }
             
@@ -780,12 +780,12 @@ public class RemoteIpFilter implements Filter {
             if (log.isDebugEnabled()) {
                 log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + request.getRemoteAddr()
                         + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
-                        + "', originalScheme='" + request.getScheme() + "', original[" + remoteIPHeader + "]='"
-                        + request.getHeader(remoteIPHeader) + ", original[" + protocolHeader + "]='"
+                        + "', originalScheme='" + request.getScheme() + "', original[" + remoteIpHeader + "]='"
+                        + request.getHeader(remoteIpHeader) + ", original[" + protocolHeader + "]='"
                         + (protocolHeader == null ? null : request.getHeader(protocolHeader)) + "' will be seen as newRemoteAddr='"
                         + xRequest.getRemoteAddr() + "', newRemoteHost='" + xRequest.getRemoteHost() + "', newScheme='"
-                        + xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" + remoteIPHeader + "]='"
-                        + xRequest.getHeader(remoteIPHeader) + ", new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
+                        + xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" + remoteIpHeader + "]='"
+                        + xRequest.getHeader(remoteIpHeader) + ", new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
             }
             chain.doFilter(xRequest, response);
         } else {
@@ -829,8 +829,8 @@ public class RemoteIpFilter implements Filter {
         return proxiesHeader;
     }
     
-    public String getRemoteIPHeader() {
-        return remoteIPHeader;
+    public String getRemoteIpHeader() {
+        return remoteIpHeader;
     }
     
     public Pattern[] getTrustedProxies() {
@@ -855,7 +855,7 @@ public class RemoteIpFilter implements Filter {
         }
         
         if (filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null) {
-            setRemoteIPHeader(filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER));
+            setRemoteIpHeader(filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER));
         }
         
         if (filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
@@ -972,13 +972,13 @@ public class RemoteIpFilter implements Filter {
      * Default value : <code>X-Forwarded-For</code>
      * </p>
      */
-    public void setRemoteIPHeader(String remoteIPHeader) {
-        this.remoteIPHeader = remoteIPHeader;
+    public void setRemoteIpHeader(String remoteIpHeader) {
+        this.remoteIpHeader = remoteIpHeader;
     }
     
     /**
      * <p>
-     * Comma delimited list of proxies that are trusted when they appear in the {@link #remoteIPHeader} header. Can be expressed as a
+     * Comma delimited list of proxies that are trusted when they appear in the {@link #remoteIpHeader} header. Can be expressed as a
      * regular expression.
      * </p>
      * <p>

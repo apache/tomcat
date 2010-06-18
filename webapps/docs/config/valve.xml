@@ -665,7 +665,7 @@
         <strong>org.apache.catalina.valves.RemoteIpValve</strong>.</p>
       </attribute>
 
-      <attribute name="remoteIPHeader" required="false">
+      <attribute name="remoteIpHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the list of
         traversed IP addresses starting from the requesting client. If not
         specified, the default of <code>x-forwarded-for</code> is used.</p>
