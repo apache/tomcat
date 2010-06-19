@@ -46,6 +46,12 @@
         package definition restrictions defined in the catalina.properties file.
         (markt)
       </fix>
+      <fix>
+        When using a Loader configured with
+        <code>searchExternalFirst=&quot;true&quot;</code> failure to find the
+        class in an external repository should not prevent searching of the
+        local repositories. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
