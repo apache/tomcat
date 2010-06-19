@@ -33,8 +33,7 @@
   </properties>
 
 <body>
-<!--  Catalina, Coyote, Jasper, High Availability, Web applications, Extras,
-      Other -->
+<!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.1 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -57,6 +56,15 @@
       <fix>
         Correct over zealous type checking for EL in attributes that broke the
         use of JSF convertors. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>49445</bug>: When session ID is changed after authentication,
+        ensure the DeltaManager replicates the change in ID to the other nodes
+        in the cluster. (kfujino)
       </fix>
     </changelog>
   </subsection>
