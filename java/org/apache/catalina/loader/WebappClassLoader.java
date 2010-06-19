@@ -1122,6 +1122,8 @@ public class WebappClassLoader
             if (hasExternalRepositories && searchExternalFirst) {
                 try {
                     clazz = super.findClass(name);
+                } catch(ClassNotFoundException cnfe) {
+                    // Ignore - will search internal repositories next
                 } catch(AccessControlException ace) {
                     log.warn("WebappClassLoader.findClassInternal(" + name
                             + ") security exception: " + ace.getMessage(), ace);
