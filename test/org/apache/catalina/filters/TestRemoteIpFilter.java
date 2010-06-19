@@ -148,7 +148,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
-        filterDef.addInitParameter("remoteIPHeader", "x-my-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-my-forwarded-for");
         filterDef.addInitParameter("httpServerPort", "8080");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -213,7 +213,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -244,7 +244,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -276,7 +276,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         filterDef.setFilter(remoteIpFilter);
@@ -309,7 +309,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "127\\.0\\.0\\.1, 192\\.168\\..*, another-internal-proxy");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -340,7 +340,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -371,7 +371,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -402,7 +402,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
         filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
-        filterDef.addInitParameter("remoteIPHeader", "x-forwarded-for");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
