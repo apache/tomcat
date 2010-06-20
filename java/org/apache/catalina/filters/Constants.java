@@ -36,4 +36,6 @@ public final class Constants {
     
     public static final String CSRF_NONCE_REQUEST_PARAM =
         "org.apache.catalina.filters.CSRF_NONCE";
+
+    public static final String METHOD_GET = "GET";
 }

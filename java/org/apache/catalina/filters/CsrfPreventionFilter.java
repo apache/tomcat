@@ -18,7 +18,9 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -48,9 +50,28 @@ public class CsrfPreventionFilter extends FilterBase {
     
     private final Random randomSource = new Random();
 
+    private final Set<String> entryPoints = new HashSet<String>();
+
     @Override
     protected Log getLogger() {
         return log;
+    }
+
+    /**
+     * Entry points are URLs that will not be tested for the presence of a valid
+     * nonce. They are used to provide a way to navigate back to a protected
+     * application after navigating away from it. Entry points will be limited
+     * to HTTP GET requests and should not trigger any security sensitive
+     * actions.
+     * 
+     * @param entryPoints   Comma separated list of URLs to be configured as
+     *                      entry points.
+     */
+    public void setEntryPoints(String entryPoints) {
+        String values[] = entryPoints.split(",");
+        for (String value : values) {
+            this.entryPoints.add(value);
+        }
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -64,14 +85,31 @@ public class CsrfPreventionFilter extends FilterBase {
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
 
-            String previousNonce =
-                req.getParameter(Constants.CSRF_NONCE_REQUEST_PARAM);
-            String expectedNonce = (String) req.getSession(true).getAttribute(
-                    Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+            boolean skipNonceCheck = false;
             
-            if (expectedNonce != null && !expectedNonce.equals(previousNonce)) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN);
-                return;
+            if (Constants.METHOD_GET.equals(req.getMethod())) {
+                String path = req.getServletPath();
+                if (req.getPathInfo() != null) {
+                    path = path + req.getPathInfo();
+                }
+                
+                if (entryPoints.contains(path)) {
+                    skipNonceCheck = true;
+                }
+            }
+
+            if (!skipNonceCheck) {
+                String previousNonce =
+                    req.getParameter(Constants.CSRF_NONCE_REQUEST_PARAM);
+                String expectedNonce =
+                    (String) req.getSession(true).getAttribute(
+                        Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+                
+                if (expectedNonce != null &&
+                        !expectedNonce.equals(previousNonce)) {
+                    res.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
             }
             
             String newNonce = generateNonce();
