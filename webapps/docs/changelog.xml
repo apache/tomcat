@@ -52,6 +52,9 @@
         class in an external repository should not prevent searching of the
         local repositories. (markt) 
       </fix>
+      <add>
+        Add entryPoint support to the CSRF prevention filter. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
