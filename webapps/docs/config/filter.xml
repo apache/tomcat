@@ -114,9 +114,21 @@
 
   <subsection name="Initialisation parameters">
 
-    <p>The CSRF Prevention Filter does not support any initialization
-    parameters.</p>
+    <p>The CSRF Prevention Filter supports the following initialisation
+    parameters:</p>
 
+    <attributes>
+
+      <attribute name="entryPoints" required="false">
+        <p>A comma separated list of URLs that will not be tested for the
+        presence of a valid nonce. They are used to provide a way to navigate
+        back to a protected application after having navigated away from it.
+        Entry points will be limited to HTTP GET requests and should not trigger
+        any security sensitive actions.</p>
+      </attribute>
+      
+    </attributes>
+    
   </subsection>
 
 </section>
