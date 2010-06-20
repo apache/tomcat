@@ -54,15 +54,15 @@
     </menu>
 
     <menu name="Nested Components">
-        <item name="Listeners"             href="listeners.html"/>
+        <item name="Filter"                href="filter.html"/>
         <item name="Global Resources"      href="globalresources.html"/>
-        <item name="Loader"                href="loader.html"/>
         <item name="JarScanner"            href="jar-scanner.html"/>
+        <item name="Listeners"             href="listeners.html"/>
+        <item name="Loader"                href="loader.html"/>
         <item name="Manager"               href="manager.html"/> 
         <item name="Realm"                 href="realm.html"/>
         <item name="Resources"             href="resources.html"/>
         <item name="Valve"                 href="valve.html"/>
-        <item name="Filter"                href="filter.html"/>
     </menu>
 
     <menu name="Cluster Elements">
