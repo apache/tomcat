@@ -30,14 +30,7 @@ import org.apache.coyote.ActionHook;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
-import org.apache.coyote.http11.filters.ChunkedInputFilter;
-import org.apache.coyote.http11.filters.ChunkedOutputFilter;
-import org.apache.coyote.http11.filters.GzipOutputFilter;
-import org.apache.coyote.http11.filters.IdentityInputFilter;
-import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
-import org.apache.coyote.http11.filters.VoidInputFilter;
-import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1149,32 +1142,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     }
 
 
-    /**
-     * Initialize standard input and output filters.
-     */
-    protected void initializeFilters() {
-
-        // Create and add the identity filters.
-        inputBuffer.addFilter(new IdentityInputFilter());
-        outputBuffer.addFilter(new IdentityOutputFilter());
-
-        // Create and add the chunked filters.
-        inputBuffer.addFilter(new ChunkedInputFilter());
-        outputBuffer.addFilter(new ChunkedOutputFilter());
-
-        // Create and add the void filters.
-        inputBuffer.addFilter(new VoidInputFilter());
-        outputBuffer.addFilter(new VoidOutputFilter());
-
-        // Create and add buffered input filter
-        inputBuffer.addFilter(new BufferedInputFilter());
-
-        // Create and add the chunked filters.
-        //inputBuffer.addFilter(new GzipInputFilter());
-        outputBuffer.addFilter(new GzipOutputFilter());
-
-    }
-    
     @Override
     protected AbstractInputBuffer getInputBuffer() {
         return inputBuffer;
