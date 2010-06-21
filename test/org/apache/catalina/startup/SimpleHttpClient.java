@@ -44,7 +44,9 @@ public abstract class SimpleHttpClient {
 
     public static final String OK_200 = "HTTP/1.1 200";
     public static final String FAIL_404 = "HTTP/1.1 404";
+    public static final String FAIL_50X = "HTTP/1.1 50";
     public static final String FAIL_500 = "HTTP/1.1 500";
+    public static final String FAIL_501 = "HTTP/1.1 501";
     
     private Socket socket;
     private Writer writer;
@@ -121,7 +123,7 @@ public abstract class SimpleHttpClient {
         StringBuilder builder = new StringBuilder();
         if (readBody) {
             line = readLine();
-            while (line != null && line.length() > 0) {
+            while (line != null) {
                 builder.append(line);
                 line = readLine();
             }
@@ -161,8 +163,16 @@ public abstract class SimpleHttpClient {
         return getResponseLine().startsWith(FAIL_404);
     }
 
+    public boolean isResponse50x() {
+        return getResponseLine().startsWith(FAIL_50X);
+    }
+    
     public boolean isResponse500() {
         return getResponseLine().startsWith(FAIL_500);
+    }
+    
+    public boolean isResponse501() {
+        return getResponseLine().startsWith(FAIL_501);
     }
     
     public Socket getSocket() {
