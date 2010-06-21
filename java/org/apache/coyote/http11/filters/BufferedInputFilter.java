@@ -89,11 +89,11 @@ public class BufferedInputFilter implements InputFilter {
     public int doRead(ByteChunk chunk, Request request) throws IOException {
         if (hasRead || buffered.getLength() <= 0) {
             return -1;
-        } else {
-            chunk.setBytes(buffered.getBytes(), buffered.getStart(),
-                           buffered.getLength());
-            hasRead = true;
         }
+
+        chunk.setBytes(buffered.getBytes(), buffered.getStart(),
+                buffered.getLength());
+        hasRead = true;
         return chunk.getLength();
     }
 

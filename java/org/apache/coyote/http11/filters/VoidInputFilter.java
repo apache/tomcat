@@ -75,6 +75,7 @@ public class VoidInputFilter implements InputFilter {
      * Set the associated request.
      */
     public void setRequest(Request request) {
+        // NOOP: Request isn't used so ignore it
     }
 
 
@@ -82,6 +83,7 @@ public class VoidInputFilter implements InputFilter {
      * Set the next buffer in the filter pipeline.
      */
     public void setBuffer(InputBuffer buffer) {
+        // NOOP: No body to read
     }
 
 
@@ -89,6 +91,7 @@ public class VoidInputFilter implements InputFilter {
      * Make the filter ready to process the next request.
      */
     public void recycle() {
+        // NOOP: Nothing to recycle
     }
 
 
