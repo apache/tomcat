@@ -176,6 +176,7 @@ public class ChunkedInputFilter implements InputFilter {
      * Read the content length from the request.
      */
     public void setRequest(Request request) {
+        // NOOP: Request isn't used so ignore it
     }
 
 
@@ -187,6 +188,7 @@ public class ChunkedInputFilter implements InputFilter {
 
         // Consume extra bytes : parse the stream until the end chunk is found
         while (doRead(readChunk, null) >= 0) {
+            // NOOP: Just consume the input
         }
 
         // Return the number of extra bytes which were consumed
@@ -275,6 +277,7 @@ public class ChunkedInputFilter implements InputFilter {
             }
 
             if (buf[pos] == Constants.CR) {
+                // FIXME: Improve parsing to check for CRLF 
             } else if (buf[pos] == Constants.LF) {
                 eol = true;
             } else if (buf[pos] == Constants.SEMI_COLON) {
