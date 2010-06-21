@@ -1001,55 +1001,6 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
 
     /**
-     * Add an input filter to the current request.
-     *
-     * @return false if the encoding was not found (which would mean it is
-     * unsupported)
-     */
-    protected boolean addInputFilter(InputFilter[] inputFilters,
-                                     String encodingName) {
-        if (encodingName.equals("identity")) {
-            // Skip
-        } else if (encodingName.equals("chunked")) {
-            inputBuffer.addActiveFilter
-                (inputFilters[Constants.CHUNKED_FILTER]);
-            contentDelimitation = true;
-        } else {
-            for (int i = 2; i < inputFilters.length; i++) {
-                if (inputFilters[i].getEncodingName()
-                    .toString().equals(encodingName)) {
-                    inputBuffer.addActiveFilter(inputFilters[i]);
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * Add input or output filter.
-     *
-     * @param className class name of the filter
-     */
-    protected void addFilter(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Object obj = clazz.newInstance();
-            if (obj instanceof InputFilter) {
-                inputBuffer.addFilter((InputFilter) obj);
-            } else if (obj instanceof OutputFilter) {
-                outputBuffer.addFilter((OutputFilter) obj);
-            } else {
-                log.warn(sm.getString("http11processor.filter.unknown", className));
-            }
-        } catch (Exception e) {
-            log.error(sm.getString("http11processor.filter.error", className), e);
-        }
-    }
-
-    /**
      * Parse host.
      */
     protected void parseHost(MessageBytes valueMB) {
@@ -1122,6 +1073,16 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
         }
 
+    }
+
+    @Override
+    protected AbstractInputBuffer getInputBuffer() {
+        return inputBuffer;
+    }
+
+    @Override
+    protected AbstractOutputBuffer getOutputBuffer() {
+        return outputBuffer;
     }
 
     /**

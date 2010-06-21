@@ -30,7 +30,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
-public class AbstractHttp11Processor {
+public abstract class AbstractHttp11Processor {
 
     /**
      * Logger.
@@ -718,6 +718,71 @@ public class AbstractHttp11Processor {
                status == 503 /* SC_SERVICE_UNAVAILABLE */ ||
                status == 501 /* SC_NOT_IMPLEMENTED */;
     }
+
+
+    /**
+     * Exposes input buffer to super class to allow better code re-use.
+     * @return  The input buffer used by the processor. 
+     */
+    protected abstract AbstractInputBuffer getInputBuffer();
+
+    /**
+     * Exposes output buffer to super class to allow better code re-use.
+     * @return  The output buffer used by the processor. 
+     */
+    protected abstract AbstractOutputBuffer getOutputBuffer();
+
+    /**
+     * Add input or output filter.
+     *
+     * @param className class name of the filter
+     */
+    protected void addFilter(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            Object obj = clazz.newInstance();
+            if (obj instanceof InputFilter) {
+                getInputBuffer().addFilter((InputFilter) obj);
+            } else if (obj instanceof OutputFilter) {
+                getOutputBuffer().addFilter((OutputFilter) obj);
+            } else {
+                log.warn(sm.getString("http11processor.filter.unknown",
+                        className));
+            }
+        } catch (Exception e) {
+            log.error(sm.getString(
+                    "http11processor.filter.error", className), e);
+        }
+    }
+
+
+    /**
+     * Add an input filter to the current request.
+     *
+     * @return false if the encoding was not found (which would mean it is
+     * unsupported)
+     */
+    protected boolean addInputFilter(InputFilter[] inputFilters,
+                                     String encodingName) {
+        if (encodingName.equals("identity")) {
+            // Skip
+        } else if (encodingName.equals("chunked")) {
+            getInputBuffer().addActiveFilter
+                (inputFilters[Constants.CHUNKED_FILTER]);
+            contentDelimitation = true;
+        } else {
+            for (int i = 2; i < inputFilters.length; i++) {
+                if (inputFilters[i].getEncodingName()
+                    .toString().equals(encodingName)) {
+                    getInputBuffer().addActiveFilter(inputFilters[i]);
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
 
 
 }
