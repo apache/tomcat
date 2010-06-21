@@ -23,6 +23,14 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.filters.BufferedInputFilter;
+import org.apache.coyote.http11.filters.ChunkedInputFilter;
+import org.apache.coyote.http11.filters.ChunkedOutputFilter;
+import org.apache.coyote.http11.filters.GzipOutputFilter;
+import org.apache.coyote.http11.filters.IdentityInputFilter;
+import org.apache.coyote.http11.filters.IdentityOutputFilter;
+import org.apache.coyote.http11.filters.VoidInputFilter;
+import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Ascii;
@@ -726,12 +734,40 @@ public abstract class AbstractHttp11Processor {
      */
     protected abstract AbstractInputBuffer getInputBuffer();
 
+    
     /**
      * Exposes output buffer to super class to allow better code re-use.
      * @return  The output buffer used by the processor. 
      */
     protected abstract AbstractOutputBuffer getOutputBuffer();
 
+    
+    /**
+     * Initialize standard input and output filters.
+     */
+    protected void initializeFilters() {
+        // Create and add the identity filters.
+        getInputBuffer().addFilter(new IdentityInputFilter());
+        getOutputBuffer().addFilter(new IdentityOutputFilter());
+
+        // Create and add the chunked filters.
+        getInputBuffer().addFilter(new ChunkedInputFilter());
+        getOutputBuffer().addFilter(new ChunkedOutputFilter());
+
+        // Create and add the void filters.
+        getInputBuffer().addFilter(new VoidInputFilter());
+        getOutputBuffer().addFilter(new VoidOutputFilter());
+
+        // Create and add buffered input filter
+        getInputBuffer().addFilter(new BufferedInputFilter());
+
+        // Create and add the chunked filters.
+        //getInputBuffer().addFilter(new GzipInputFilter());
+        getOutputBuffer().addFilter(new GzipOutputFilter());
+
+    }
+
+    
     /**
      * Add input or output filter.
      *
