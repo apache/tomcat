@@ -99,6 +99,7 @@ public class GzipOutputFilter implements OutputFilter {
      * after the response header processing is complete.
      */
     public void setResponse(Response response) {
+        // NOOP: No need for parameters from response in this filter
     }
 
 
@@ -166,9 +167,9 @@ public class GzipOutputFilter implements OutputFilter {
             buffer.doWrite(outputChunk, null);
         }
         @Override
-        public void flush() throws IOException {}
+        public void flush() throws IOException {/*NOOP*/}
         @Override
-        public void close() throws IOException {}
+        public void close() throws IOException {/*NOOP*/}
     }
 
 

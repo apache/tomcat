@@ -91,6 +91,7 @@ public class SavedRequestInputFilter implements InputFilter {
      * Set the next buffer in the filter pipeline (has no effect).
      */
     public void setBuffer(InputBuffer buffer) {
+        // NOOP since this filter will be providing the request body
     }
 
     /**
