@@ -142,6 +142,7 @@ public class ChunkedOutputFilter implements OutputFilter {
      * after the response header processing is complete.
      */
     public void setResponse(Response response) {
+        // NOOP: No need for parameters from response in this filter
     }
 
 
@@ -172,6 +173,7 @@ public class ChunkedOutputFilter implements OutputFilter {
      * Make the filter ready to process the next request.
      */
     public void recycle() {
+        // NOOP: Nothing to recycle
     }
 
 
