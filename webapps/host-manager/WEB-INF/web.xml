@@ -23,18 +23,12 @@
   version="3.0"
   metadata-complete="true">  
 
-  <display-name>Tomcat Manager Application</display-name>
+  <display-name>Tomcat Host Manager Application</display-name>
   <description>
-    A scriptable management web application for the Tomcat Web Server;
-	Manager lets you view, load/unload/etc particular web applications.
+    A scriptable host management web application for the Tomcat Web Server;
+	Manager lets you view, create and remove virual hosts.
   </description>
 
-  <!-- Define the Manager Servlet
-       Change servlet-class to: org.apache.catalina.servlets.HTMLManagerServlet
-       to get a Servlet with a more intuitive HTML interface, don't change if you
-       have software that is expected to parse the output from ManagerServlet
-       since they're not compatible.
-   -->
   <servlet>
     <servlet-name>HostManager</servlet-name>
     <servlet-class>org.apache.catalina.manager.host.HostManagerServlet</servlet-class>
