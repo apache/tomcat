@@ -80,6 +80,19 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         this.gcDaemonProtection = gcDaemonProtection;
     }
 
+     /**
+      * Protect against the memory leak caused when the first call to
+      * <code>sun.net.www.http.HttpClient</code> is triggered by a web
+      * application. This first call will start a KeepAlive thread with the
+      * thread's context class loader configured to be the web application class
+      * loader. Defaults to <code>true</code>.
+      */
+     private boolean keepAliveProtection = true;
+     public boolean isKeepAliveProtection() { return keepAliveProtection; }
+     public void setKeepAliveProtection(boolean keepAliveProtection) {
+         this.keepAliveProtection = keepAliveProtection;
+     }
+    
     /**
      * Protect against the memory leak, when the initialization of the
      * Java Cryptography Architecture is triggered by initializing
@@ -175,6 +188,21 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                     log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
                 } catch (InvocationTargetException e) {
                     log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
+                }
+            }
+
+            /*
+             * When a servlet opens a connection using a URL it will use
+             * sun.net.www.http.HttpClient which keeps a static reference to a
+             * keep-alive cache which is loaded using the web application class
+             * loader.
+             */
+            if (keepAliveProtection) {
+                try {
+                    Class.forName("sun.net.www.http.HttpClient");
+                } catch (ClassNotFoundException e) {
+                    log.error("Could not prevent sun.net.www.http.HttpClient" +
+                    		" from being loaded.", e);
                 }
             }
             
