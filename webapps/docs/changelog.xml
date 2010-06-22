@@ -98,6 +98,10 @@
         <bug>49436</bug>: Correct documented default for readonly attribute of
         the UserDatabase component. (markt)
       </fix>
+      <fix>
+        <bug>49475</bug>: Use new role name for manager application access on
+        the ROOT web application's index page. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
