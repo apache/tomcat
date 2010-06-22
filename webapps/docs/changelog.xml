@@ -86,6 +86,10 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
+        <bug>49112</bug>: Update the ROOT web application's index page. Patch
+        provided by pid. (markt)
+      </fix>
+      <fix>
         <bug>49213</bug>: Add the permissions necessary to enable the Manager
         application to operate currently when running with a security manager.
         (markt)
