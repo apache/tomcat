@@ -55,6 +55,12 @@
       <add>
         Add entryPoint support to the CSRF prevention filter. (markt)
       </add>
+      <fix>
+        <bug>49230</bug>: Enhance JRE leak prevention listener with protection
+        for the keep-alive thread started by
+        <code>sun.net.www.http.HttpClient</code>. Patch provided by Rob Kooper.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
