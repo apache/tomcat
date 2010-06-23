@@ -70,7 +70,7 @@ public class CsrfPreventionFilter extends FilterBase {
     public void setEntryPoints(String entryPoints) {
         String values[] = entryPoints.split(",");
         for (String value : values) {
-            this.entryPoints.add(value);
+            this.entryPoints.add(value.trim());
         }
     }
 
