@@ -201,8 +201,13 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 try {
                     Class.forName("sun.net.www.http.HttpClient");
                 } catch (ClassNotFoundException e) {
-                    log.error("Could not prevent sun.net.www.http.HttpClient" +
-                    		" from being loaded.", e);
+                    if (System.getProperty("java.vendor").startsWith("Sun")) {
+                        log.error(sm.getString(
+                                "jreLeakListener.keepAliveFail"), e);
+                    } else {
+                        log.debug(sm.getString(
+                                "jreLeakListener.keepAliveFail"), e);
+                    }
                 }
             }
             
