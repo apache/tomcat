@@ -83,6 +83,21 @@
     <url-pattern>/html/*</url-pattern>
   </servlet-mapping>
 
+  <filter>
+    <filter-name>CSRF</filter-name>
+    <filter-class>org.apache.catalina.filters.CsrfPreventionFilter</filter-class>
+    <init-param>
+      <param-name>entryPoints</param-name>
+      <param-value>/html,/html/,/html/list</param-value>
+    </init-param>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>CSRF</filter-name>
+    <servlet-name>HTMLManager</servlet-name>
+    <servlet-name>jsp</servlet-name>
+  </filter-mapping>
+  
   <!-- Define reference to the user database for looking up roles -->
   <resource-env-ref>
     <description>

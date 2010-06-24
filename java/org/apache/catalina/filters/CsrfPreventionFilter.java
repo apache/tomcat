@@ -19,6 +19,8 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -51,6 +53,8 @@ public class CsrfPreventionFilter extends FilterBase {
     private final Random randomSource = new Random();
 
     private final Set<String> entryPoints = new HashSet<String>();
+    
+    private final int nonceCacheSize = 5;
 
     @Override
     protected Log getLogger() {
@@ -98,24 +102,30 @@ public class CsrfPreventionFilter extends FilterBase {
                 }
             }
 
+            @SuppressWarnings("unchecked")
+            LruCache<String> nonceCache =
+                (LruCache<String>) req.getSession(true).getAttribute(
+                    Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+            
             if (!skipNonceCheck) {
                 String previousNonce =
                     req.getParameter(Constants.CSRF_NONCE_REQUEST_PARAM);
-                String expectedNonce =
-                    (String) req.getSession(true).getAttribute(
-                        Constants.CSRF_NONCE_SESSION_ATTR_NAME);
-                
-                if (expectedNonce != null &&
-                        !expectedNonce.equals(previousNonce)) {
+
+                if (nonceCache != null && !nonceCache.contains(previousNonce)) {
                     res.sendError(HttpServletResponse.SC_FORBIDDEN);
                     return;
                 }
             }
             
+            if (nonceCache == null) {
+                nonceCache = new LruCache<String>(nonceCacheSize);
+                req.getSession().setAttribute(
+                        Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonceCache);
+            }
+            
             String newNonce = generateNonce();
             
-            req.getSession(true).setAttribute(
-                    Constants.CSRF_NONCE_SESSION_ATTR_NAME, newNonce);
+            nonceCache.add(newNonce);
             
             wResponse = new CsrfResponseWrapper(res, newNonce);
         } else {
@@ -223,6 +233,34 @@ public class CsrfPreventionFilter extends FilterBase {
             sb.append('=');
             sb.append(nonce);
             return (sb.toString());
+        }
+    }
+    
+    private static class LruCache<T> {
+
+        // Although the internal implementation uses a Map, this cache
+        // implementation is only concerned with the keys.
+        private final Map<T,T> cache;
+        
+        public LruCache(final int cacheSize) {
+            cache = new LinkedHashMap<T,T>() {
+                private static final long serialVersionUID = 1L;
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<T,T> eldest) {
+                    if (size() > cacheSize) {
+                        return true;
+                    }
+                    return false;
+                }
+            };
+        }
+        
+        public void add(T key) {
+            cache.put(key, null);
+        }
+        
+        public boolean contains(T key) {
+            return cache.containsKey(key);
         }
     }
 }
