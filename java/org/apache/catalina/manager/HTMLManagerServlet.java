@@ -84,10 +84,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
     protected static final String APPLICATION_MESSAGE = "message";
     protected static final String APPLICATION_ERROR = "error";
     
-    protected static final String NONCE_SESSION =
-        "org.apache.catalina.manager.NONCE";
-    protected static final String NONCE_REQUEST = "nonce";
-        
     protected static final String sessionsListJspPath  = "/WEB-INF/jsp/sessionsList.jsp";
     protected static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
 
@@ -177,31 +173,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String deployPath = request.getParameter("deployPath");
         String deployConfig = request.getParameter("deployConfig");
         String deployWar = request.getParameter("deployWar");
-        String requestNonce = request.getParameter(NONCE_REQUEST);
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
         String message = "";
 
-        // Check nonce
-        // There *must* be a nonce in the session before any POST is processed
-        HttpSession session = request.getSession();
-        String sessionNonce = (String) session.getAttribute(NONCE_SESSION);
-        if (sessionNonce == null) {
-            message = sm.getString("htmlManagerServlet.noNonce", command);
-            // Reset the command
-            command = null;
-        } else {
-            if (!sessionNonce.equals(requestNonce)) {
-                // Nonce mis-match.
-                message =
-                    sm.getString("htmlManagerServlet.nonceMismatch", command);
-                // Reset the command
-                command = null;
-            }
-        }
-        
         if (command == null || command.length() == 0) {
             // No command == list
             // List always displayed -> do nothing
@@ -417,9 +394,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
             log("list: Listing contexts for virtual host '" +
                 host.getName() + "'");
 
-        String newNonce = generateNonce();
-        request.getSession().setAttribute(NONCE_SESSION, newNonce);
-        
         PrintWriter writer = response.getWriter();
 
         // HTML Header Section
@@ -509,12 +483,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
             Map.Entry<String,String> entry = iterator.next();
             String displayPath = entry.getKey();
             String contextPath = entry.getValue();
-            Context context = (Context) host.findChild(contextPath);
+            Context ctxt = (Context) host.findChild(contextPath);
             if (displayPath.equals("")) {
                 displayPath = "/";
             }
 
-            if (context != null ) {
+            if (ctxt != null ) {
                 try {
                     isDeployed = isDeployed(contextPath);
                 } catch (Exception e) {
@@ -525,17 +499,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args = new Object[7];
                 args[0] = URL_ENCODER.encode(displayPath);
                 args[1] = displayPath;
-                args[2] = context.getDisplayName();
+                args[2] = ctxt.getDisplayName();
                 if (args[2] == null) {
                     args[2] = "&nbsp;";
                 }
-                args[3] = new Boolean(context.getAvailable());
+                args[3] = new Boolean(ctxt.getAvailable());
                 args[4] = response.encodeURL
                     (request.getContextPath() +
                      "/html/sessions?path=" + URL_ENCODER.encode(displayPath));
-                if (context.getManager() != null) {
+                if (ctxt.getManager() != null) {
                     args[5] = new Integer
-                        (context.getManager().getActiveSessions());
+                        (ctxt.getManager().getActiveSessions());
                 } else {
                     args[5] = new Integer(0);
                 }
@@ -545,7 +519,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 writer.print
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[15];
+                args = new Object[14];
                 args[0] = response.encodeURL
                     (request.getContextPath() +
                      "/html/start?path=" + URL_ENCODER.encode(displayPath));
@@ -568,27 +542,26 @@ public final class HTMLManagerServlet extends ManagerServlet {
                      "/html/expire?path=" + URL_ENCODER.encode(displayPath));
                 args[9] = appsExpire;
                 args[10] = sm.getString("htmlManagerServlet.expire.explain");
-                Manager manager = context.getManager();
+                Manager manager = ctxt.getManager();
                 if (manager == null) {
                     args[11] = sm.getString("htmlManagerServlet.noManager");
                 } else {
                     args[11] = new Integer(
-                            context.getManager().getMaxInactiveInterval()/60);
+                            ctxt.getManager().getMaxInactiveInterval()/60);
                 }
                 args[12] = sm.getString("htmlManagerServlet.expire.unit");
                 args[13] = highlightColor;
-                args[14] = newNonce;
                 
-                if (context.getPath().equals(this.context.getPath())) {
+                if (ctxt.getPath().equals(this.context.getPath())) {
                     writer.print(MessageFormat.format(
                         MANAGER_APP_ROW_BUTTON_SECTION, args));
-                } else if (context.getAvailable() && isDeployed) {
+                } else if (ctxt.getAvailable() && isDeployed) {
                     writer.print(MessageFormat.format(
                         STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION, args));
-                } else if (context.getAvailable() && !isDeployed) {
+                } else if (ctxt.getAvailable() && !isDeployed) {
                     writer.print(MessageFormat.format(
                         STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION, args));
-                } else if (!context.getAvailable() && isDeployed) {
+                } else if (!ctxt.getAvailable() && isDeployed) {
                     writer.print(MessageFormat.format(
                         STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION, args));
                 } else {
@@ -600,7 +573,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         // Deploy Section
-        args = new Object[8];
+        args = new Object[7];
         args[0] = sm.getString("htmlManagerServlet.deployTitle");
         args[1] = sm.getString("htmlManagerServlet.deployServer");
         args[2] = response.encodeURL(request.getContextPath() + "/html/deploy");
@@ -608,26 +581,23 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[4] = sm.getString("htmlManagerServlet.deployConfig");
         args[5] = sm.getString("htmlManagerServlet.deployWar");
         args[6] = sm.getString("htmlManagerServlet.deployButton");
-        args[7] = newNonce;
         writer.print(MessageFormat.format(DEPLOY_SECTION, args));
 
-        args = new Object[5];
+        args = new Object[4];
         args[0] = sm.getString("htmlManagerServlet.deployUpload");
         args[1] = response.encodeURL(request.getContextPath() + "/html/upload");
         args[2] = sm.getString("htmlManagerServlet.deployUploadFile");
         args[3] = sm.getString("htmlManagerServlet.deployButton");
-        args[4] = newNonce;
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
         // Diagnostics section
-        args = new Object[6];
+        args = new Object[5];
         args[0] = sm.getString("htmlManagerServlet.diagnosticsTitle");
         args[1] = sm.getString("htmlManagerServlet.diagnosticsLeak");
         args[2] = response.encodeURL(
                 request.getContextPath() + "/html/findleaks");
-        args[3] = newNonce;
-        args[4] = sm.getString("htmlManagerServlet.diagnosticsLeakWarning");
-        args[5] = sm.getString("htmlManagerServlet.diagnosticsLeakButton");
+        args[3] = sm.getString("htmlManagerServlet.diagnosticsLeakWarning");
+        args[4] = sm.getString("htmlManagerServlet.diagnosticsLeakButton");
         writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
 
         // Server Header Section
@@ -870,12 +840,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String searchPath = path;
         if( path.equals("/") )
             searchPath = "";
-        Context context = (Context) host.findChild(searchPath);
-        if (null == context) {
+        Context ctxt = (Context) host.findChild(searchPath);
+        if (null == ctxt) {
             throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
                                         RequestUtil.filter(path)));
         }
-        Session[] sessions = context.getManager().findSessions();
+        Session[] sessions = ctxt.getManager().findSessions();
         return sessions;
     }
     protected Session getSessionForPathAndId(String path, String id) throws IOException {
@@ -886,12 +856,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String searchPath = path;
         if( path.equals("/") )
             searchPath = "";
-        Context context = (Context) host.findChild(searchPath);
-        if (null == context) {
+        Context ctxt = (Context) host.findChild(searchPath);
+        if (null == ctxt) {
             throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
                                         RequestUtil.filter(path)));
         }
-        Session session = context.getManager().findSession(id);
+        Session session = ctxt.getManager().findSession(id);
         return session;
     }
 
@@ -955,7 +925,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         resp.setHeader("Cache-Control", "no-cache,no-store,max-age=0"); // HTTP 1.1
         resp.setDateHeader("Expires", 0); // 0 means now
         req.setAttribute("currentSession", session);
-        getServletContext().getRequestDispatcher(sessionDetailJspPath).include(req, resp);
+        getServletContext().getRequestDispatcher(resp.encodeURL(sessionDetailJspPath)).include(req, resp);
     }
 
     /**
@@ -1152,7 +1122,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\">" +
-        "<small><a href=\"{4}\" target=\"_blank\">{5}</a></small></td>\n";
+        "<small><a href=\"{4}\">{5}</a></small></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
@@ -1167,7 +1137,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
@@ -1178,15 +1147,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{3}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{5}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
         "  <small><input type=\"submit\" value=\"{7}\"></small>" +
         "  </form>\n" +
         " </td>\n" +
@@ -1194,7 +1160,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
@@ -1204,13 +1169,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{1}\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{7}\"></small>" +
         "  </form>\n" +
         " </td>\n" +
@@ -1220,11 +1183,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{3}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{5}\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{7}</small>&nbsp;\n" +
@@ -1234,7 +1195,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\">" +
         "  <small><input type=\"submit\" value=\"{1}\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
@@ -1256,7 +1216,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
         "<form method=\"post\" action=\"{2}\">\n" +
-        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{7}\" >" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
@@ -1303,7 +1262,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td colspan=\"2\">\n" +
         "<form method=\"post\" action=\"{1}\" " +
         "enctype=\"multipart/form-data\">\n" +
-        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{4}\" >" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
@@ -1338,14 +1296,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
         "<form method=\"post\" action=\"{2}\">\n" +
-        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{3}\" >" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{5}\">\n" +
+        "  <input type=\"submit\" value=\"{4}\">\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <small>{4}</small>\n" +
+        "  <small>{3}</small>\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
