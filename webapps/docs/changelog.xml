@@ -107,6 +107,10 @@
         expiration features. Also switch the manager application to the generic
         CSRF protection filter. (markt)
       </fix>
+      <fix>
+        Better handle failure to create directories required for new hosts in
+        the Host Manager application. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
