@@ -24,7 +24,6 @@ import java.beans.PropertyChangeSupport;
 import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -229,7 +228,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
             if (getState().isAvailable()) {
                 try {
-                    ((Lifecycle) connector).start();
+                    connector.start();
                 } catch (LifecycleException e) {
                     log.error("Connector.start", e);
                 }
@@ -293,7 +292,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 return;
             if (getState().isAvailable()) {
                 try {
-                    ((Lifecycle) connectors[j]).stop();
+                    connectors[j].stop();
                 } catch (LifecycleException e) {
                     log.error("Connector.stop", e);
                 }
@@ -434,7 +433,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Start our defined Connectors second
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                ((Lifecycle) connectors[i]).start();
+                connectors[i].start();
             }
         }
     }
@@ -481,9 +480,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             for (int i = 0; i < connectors.length; i++) {
                 // If Service fails to start, connectors may not have been
                 // started
-                if (!LifecycleState.INITIALIZED.equals(
-                        ((Lifecycle) connectors[i]).getState())) {
-                    ((Lifecycle) connectors[i]).stop();
+                if (!LifecycleState.INITIALIZED
+                        .equals(connectors[i].getState())) {
+                    connectors[i].stop();
                 }
             }
         }
