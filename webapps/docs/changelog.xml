@@ -102,6 +102,11 @@
         <bug>49475</bug>: Use new role name for manager application access on
         the ROOT web application's index page. (markt)
       </fix>
+      <fix>
+        <bug>49476</bug>: CSRF protection was preventing access to the session
+        expiration features. Also switch the manager application to the generic
+        CSRF protection filter. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
