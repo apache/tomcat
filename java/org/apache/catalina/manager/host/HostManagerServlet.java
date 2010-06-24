@@ -102,7 +102,7 @@ public class HostManagerServlet
     /**
      * The Context container associated with our web application.
      */
-    protected Context context = null;
+    protected transient Context context = null;
 
 
     /**
@@ -114,19 +114,19 @@ public class HostManagerServlet
     /**
      * The associated host.
      */
-    protected Host installedHost = null;
+    protected transient Host installedHost = null;
 
     
     /**
      * The associated engine.
      */
-    protected Engine engine = null;
+    protected transient Engine engine = null;
 
     
     /**
      * MBean server.
      */
-    protected MBeanServer mBeanServer = null;
+    protected transient MBeanServer mBeanServer = null;
 
 
     /**
@@ -139,7 +139,7 @@ public class HostManagerServlet
     /**
      * The Wrapper container associated with this servlet.
      */
-    protected Wrapper wrapper = null;
+    protected transient Wrapper wrapper = null;
 
 
     // ----------------------------------------------- ContainerServlet Methods
@@ -372,7 +372,12 @@ public class HostManagerServlet
             appBaseFile = file;
         }
         if (!appBaseFile.exists()) {
-            appBaseFile.mkdirs();
+            if (!appBaseFile.mkdirs()) {
+                writer.println(sm.getString(
+                        "hostManagerServlet.appBaseCreateFail",
+                        appBaseFile.toString(), name));
+                return;
+            }
         }
         
         // Create base for config files
@@ -380,6 +385,11 @@ public class HostManagerServlet
         
         // Copy manager.xml if requested
         if (manager) {
+            if (configBaseFile == null) {
+                writer.println(sm.getString(
+                        "hostManagerServlet.configBaseCreateFail", name));
+                return;
+            }
             InputStream is = null;
             OutputStream os = null;
             try {
@@ -657,7 +667,11 @@ public class HostManagerServlet
         if (installedHost != null) {
             configBase = new File(configBase, hostName);
         }
-        configBase.mkdirs();
+        if (!configBase.exists()) {
+            if (!configBase.mkdirs()) {
+                return null;
+            }
+        }
         return configBase;
     }
 
