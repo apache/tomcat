@@ -26,7 +26,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <% String path = (String) request.getAttribute("path");
-   String submitUrl = ((HttpServletRequest)pageContext.getRequest()).getRequestURI() + "?path=" + path;
+   String submitUrl = response.encodeURL(((HttpServletRequest)
+           pageContext.getRequest()).getRequestURI() + "?path=" + path);
    Collection activeSessions = (Collection) request.getAttribute("activeSessions");
 %>
 <head>
@@ -99,7 +100,7 @@
 %>
 				<tr>
 					<td>
-<input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" /><a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>" target="_blank"><%= JspHelper.escapeXml(currentSessionId) %></a>
+<input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" /><a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>"><%= JspHelper.escapeXml(currentSessionId) %></a>
 					</td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
@@ -118,7 +119,11 @@
 	</fieldset>
 </form>
 
-<p style="text-align: center;"><button type="button" onclick="window.close()">Close window</button></p>
+<form method="get" action="<%=request.getContextPath()%>/html">
+  <p style="text-align: center;">
+    <input type="submit" value="Return to main page" />
+  </p>
+</form>
 
 <%--div style="display: none;">
 <p>
