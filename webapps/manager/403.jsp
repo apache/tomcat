@@ -33,7 +33,22 @@
  <body>
    <h1>403 Access Denied</h1>
    <p>
-    You are not authorized to view this page. If you have not changed
+    You are not authorized to view this page.
+   </p>
+   <p>
+    If you have already configured the manager application to allow access and
+    you have used your browsers back button, used a saved bookmark or similar
+    then you may have triggered the cross-site request forgery (CSRF) protection
+    that has been enabled for the HTML interface of the Manager application. You
+    will need to reset this protection by returning to the 
+    <a href="<%=request.getContextPath()%>/html">main manager page</a>. Once you
+    return to this page you will be able to continue using the manager
+    appliction's HTML interface normally. If you continue to see this access
+    denied message, check that you have the necessary permissions to access this
+    application.
+   </p>
+   <p>
+    If you have not changed
     any configuration files, please examine the file
     <tt>conf/tomcat-users.xml</tt> in your installation. That
     file must contain the credentials to let you use this webapp.

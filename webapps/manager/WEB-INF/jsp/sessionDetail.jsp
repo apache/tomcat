@@ -31,18 +31,19 @@
    Session currentSession = (Session)request.getAttribute("currentSession");
    HttpSession currentHttpSession = currentSession.getSession();
    String currentSessionId = currentSession.getId();
-   String submitUrl = ((HttpServletRequest)pageContext.getRequest()).getRequestURL().toString();
+   String submitUrl = response.encodeURL(((HttpServletRequest)
+           pageContext.getRequest()).getRequestURL().toString());
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
-	<meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
-	<meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
-	<meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
-	<meta http-equiv="content-language" content="en"/>
-	<meta name="author" content="Cedrik LIME"/>
-	<meta name="copyright" content="copyright 2005-2010 the Apache Software Foundation"/>
-	<meta name="robots" content="noindex,nofollow,noarchive"/>
-	<title>Sessions Administration: details for <%= currentSessionId %></title>
+    <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
+    <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
+    <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
+    <meta http-equiv="content-language" content="en"/>
+    <meta name="author" content="Cedrik LIME"/>
+    <meta name="copyright" content="copyright 2005-2010 the Apache Software Foundation"/>
+    <meta name="robots" content="noindex,nofollow,noarchive"/>
+    <title>Sessions Administration: details for <%= currentSessionId %></title>
 </head>
 <body>
 <h1>Details for Session <%= JspHelper.escapeXml(currentSessionId) %></h1>
@@ -86,7 +87,14 @@
   </tr>
 </table>
 
-<p style="text-align: center;"><button type="button" onclick="window.location.reload()">Refresh</button></p>
+<form method="post" action="<%= submitUrl %>">
+  <div>
+    <input type="hidden" name="path" value="<%= path %>" />
+    <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
+    <input type="hidden" name="action" value="sessionDetail" />
+    <input type="submit" value="Refresh" />
+  </div>
+</form>
 
 <div class="error"><%= JspHelper.escapeXml(request.getAttribute("error")) %></div>
 <div class="message"><%= JspHelper.escapeXml(request.getAttribute("message")) %></div>
@@ -95,52 +103,67 @@
 <% int nAttributes = 0;
    Enumeration attributeNamesEnumeration = currentHttpSession.getAttributeNames();
    while (attributeNamesEnumeration.hasMoreElements()) {
-	   attributeNamesEnumeration.nextElement();
-	   ++nAttributes;
+       attributeNamesEnumeration.nextElement();
+       ++nAttributes;
    }
 %>
-	<caption style="font-variant: small-caps;"><%= JspHelper.formatNumber(nAttributes) %> attributes</caption>
-	<thead>
-		<tr>
-			<th>Remove Attribute</th>
-			<th>Attribute name</th>
-			<th>Attribute value</th>
-		</tr>
-	</thead>
-	<%--tfoot>
-		<tr>
-			<td colspan="3" style="text-align: center;">
-				TODO: set Max Inactive Interval on sessions
-			</td>
-		</tr>
-	</tfoot--%>
-	<tbody>
+    <caption style="font-variant: small-caps;"><%= JspHelper.formatNumber(nAttributes) %> attributes</caption>
+    <thead>
+        <tr>
+            <th>Remove Attribute</th>
+            <th>Attribute name</th>
+            <th>Attribute value</th>
+        </tr>
+    </thead>
+    <%--tfoot>
+        <tr>
+            <td colspan="3" style="text-align: center;">
+                TODO: set Max Inactive Interval on sessions
+            </td>
+        </tr>
+    </tfoot--%>
+    <tbody>
 <% attributeNamesEnumeration = currentHttpSession.getAttributeNames();
    while (attributeNamesEnumeration.hasMoreElements()) {
-   	String attributeName = (String) attributeNamesEnumeration.nextElement();
+       String attributeName = (String) attributeNamesEnumeration.nextElement();
 %>
-		<tr>
-			<td align="center"><form action="<%= submitUrl %>"><div><input type="hidden" name="path" value="<%= path %>" /><input type="hidden" name="action" value="removeSessionAttribute" /><input type="hidden" name="sessionId" value="<%= currentSessionId %>" /><input type="hidden" name="attributeName" value="<%= attributeName %>" /><input type="submit" value="Remove" /></div></form></td>
-			<td><%= JspHelper.escapeXml(attributeName) %></td>
-			<td><% Object attributeValue = currentHttpSession.getAttribute(attributeName); %><span title="<%= attributeValue == null ? "" : attributeValue.getClass().toString() %>"><%= JspHelper.escapeXml(attributeValue) %></span></td>
-		</tr>
+        <tr>
+            <td align="center">
+                <form method="post" action="<%= submitUrl %>">
+                    <div>
+                        <input type="hidden" name="path" value="<%= path %>" />
+                        <input type="hidden" name="action" value="removeSessionAttribute" />
+                        <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
+                        <input type="hidden" name="attributeName" value="<%= attributeName %>" />
+                        <input type="submit" value="Remove" />
+                    </div>
+                </form>
+            </td>
+            <td><%= JspHelper.escapeXml(attributeName) %></td>
+            <td><% Object attributeValue = currentHttpSession.getAttribute(attributeName); %><span title="<%= attributeValue == null ? "" : attributeValue.getClass().toString() %>"><%= JspHelper.escapeXml(attributeValue) %></span></td>
+        </tr>
 <% } // end while %>
-	</tbody>
+    </tbody>
 </table>
 
-<p style="text-align: center;"><button type="button" onclick="window.close()">Close window</button></p>
+<form method="post" action="<%=submitUrl%>">
+  <p style="text-align: center;">
+    <input type="hidden" name="path" value="<%= path %>" />
+    <input type="submit" value="Return to session list" />
+  </p>
+</form>
 
 <%--div style="display: none;">
 <p>
-	<a href="http://validator.w3.org/check?uri=referer"><img
-		src="http://www.w3.org/Icons/valid-html401"
-		alt="Valid HTML 4.01!" height="31" width="88"></a>
-	<a href="http://validator.w3.org/check?uri=referer"><img
-		src="http://www.w3.org/Icons/valid-xhtml10"
-		alt="Valid XHTML 1.0!" height="31" width="88" /></a>
-	<a href="http://validator.w3.org/check?uri=referer"><img
-		src="http://www.w3.org/Icons/valid-xhtml11"
-		alt="Valid XHTML 1.1!" height="31" width="88" /></a>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-html401"
+        alt="Valid HTML 4.01!" height="31" width="88"></a>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml10"
+        alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml11"
+        alt="Valid XHTML 1.1!" height="31" width="88" /></a>
 </p>
 </div--%>
 
