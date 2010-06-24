@@ -567,15 +567,17 @@ public class HostManagerServlet
             return;
         }
 
+        Container host = engine.findChild(name);
+        
         // Check if host exists
-        if (engine.findChild(name) == null) {
+        if (host == null) {
             writer.println
                 (sm.getString("hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent starting our own host
-        if (engine.findChild(name) == installedHost) {
+        if (host == installedHost) {
             writer.println
                 (sm.getString("hostManagerServlet.cannotStartOwnHost", name));
             return;
@@ -583,7 +585,7 @@ public class HostManagerServlet
 
         // Start host
         try {
-            engine.findChild(name).start();
+            host.start();
             writer.println
                 (sm.getString("hostManagerServlet.started", name));
         } catch (Throwable t) {
@@ -617,15 +619,17 @@ public class HostManagerServlet
             return;
         }
 
+        Container host = engine.findChild(name);
+
         // Check if host exists
-        if (engine.findChild(name) == null) {
+        if (host == null) {
             writer.println
                 (sm.getString("hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent starting our own host
-        if (engine.findChild(name) == installedHost) {
+        if (host == installedHost) {
             writer.println
                 (sm.getString("hostManagerServlet.cannotStopOwnHost", name));
             return;
@@ -633,7 +637,7 @@ public class HostManagerServlet
 
         // Start host
         try {
-            engine.findChild(name).stop();
+            host.stop();
             writer.println
                 (sm.getString("hostManagerServlet.stopped", name));
         } catch (Throwable t) {
