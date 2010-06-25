@@ -46,6 +46,20 @@
     </init-param>
   </servlet>
 
+  <filter>
+    <filter-name>CSRF</filter-name>
+    <filter-class>org.apache.catalina.filters.CsrfPreventionFilter</filter-class>
+    <init-param>
+      <param-name>entryPoints</param-name>
+      <param-value>/html,/html/,/html/list</param-value>
+    </init-param>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>CSRF</filter-name>
+    <servlet-name>HTMLHostManager</servlet-name>
+  </filter-mapping>
+  
   <!-- Define the Manager Servlet Mapping -->
   <servlet-mapping>
     <servlet-name>HostManager</servlet-name>
