@@ -2184,8 +2184,13 @@ public class WebappClassLoader
                         continue;
                     }
 
-                    log.error(sm.getString("webappClassLoader.warnThread",
-                            contextName, thread.getName()));
+                    if (isRequestThread(thread)) {
+                        log.error(sm.getString("webappClassLoader.warnRequestThread",
+                                contextName, thread.getName()));
+                    } else {
+                        log.error(sm.getString("webappClassLoader.warnThread",
+                                contextName, thread.getName()));
+                    }
                     
                     // Don't try an stop the threads unless explicitly
                     // configured to do so
@@ -2240,6 +2245,36 @@ public class WebappClassLoader
         }
     }
 
+    
+    /*
+     * Look at a threads stack trace to see if it is a request thread or not. It
+     * isn't perfect, but it should be good-enough for most cases.
+     */
+    private boolean isRequestThread(Thread thread) {
+        
+        StackTraceElement[] elements = thread.getStackTrace();
+        
+        if (elements == null || elements.length == 0) {
+            // Must have stopped already. Too late to ignore it. Assume not a
+            // request processing thread.
+            return false;
+        }
+        
+        // Step through the methods in reverse order looking for a
+        // CoyoteAdapter.service() call. All requests will have this unless
+        // Tomcat has been heavily modified - in which case there isn't much we
+        // can do.
+        for (int i = 0; i < elements.length; i++) {
+            StackTraceElement element = elements[elements.length - (i+1)];
+            if ("org.apache.catalina.connector.CoyoteAdapter".equals(
+                    element.getClassName()) &&
+                    "service".equals(element.getMethodName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     
     private void clearReferencesStopTimerThread(Thread thread) {
         
