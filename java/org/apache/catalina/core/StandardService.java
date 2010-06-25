@@ -230,7 +230,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connector.start();
                 } catch (LifecycleException e) {
-                    log.error("Connector.start", e);
+                    log.error(sm.getString(
+                            "standardService.connector.startFailed",
+                            connector), e);
                 }
             }
 
@@ -294,7 +296,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connectors[j].stop();
                 } catch (LifecycleException e) {
-                    log.error("Connector.stop", e);
+                    log.error(sm.getString(
+                            "standardService.connector.stopFailed",
+                            connectors[j]), e);
                 }
             }
             connector.setService(null);
@@ -433,7 +437,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Start our defined Connectors second
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                connectors[i].start();
+                try {
+                    connectors[i].start();
+                } catch (Exception e) {
+                    log.error(sm.getString(
+                            "standardService.connector.startFailed",
+                            connectors[i]), e);
+                }
             }
         }
     }
@@ -453,7 +463,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Stop our defined Connectors first
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                connectors[i].pause();
+                try {
+                    connectors[i].pause();
+                } catch (Exception e) {
+                    log.error(sm.getString(
+                            "standardService.connector.pauseFailed",
+                            connectors[i]), e);
+                }
             }
         }
 
@@ -478,11 +494,18 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Stop our defined Connectors first
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                // If Service fails to start, connectors may not have been
-                // started
-                if (!LifecycleState.INITIALIZED
-                        .equals(connectors[i].getState())) {
+                if (LifecycleState.INITIALIZED.equals(
+                        connectors[i].getState())) {
+                    // If Service fails to start, connectors may not have been
+                    // started
+                    continue;
+                }
+                try {
                     connectors[i].stop();
+                } catch (Exception e) {
+                    log.error(sm.getString(
+                            "standardService.connector.stopFailed",
+                            connectors[i]), e);
                 }
             }
         }
@@ -522,9 +545,12 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connector.init();
                 } catch (Exception e) {
-                    log.error(sm.getString(
-                            "standardService.connector.initFailed", connector),
-                            e);
+                    String message = sm.getString(
+                            "standardService.connector.initFailed", connector);
+                    log.error(message, e);
+
+                    if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
+                        throw new LifecycleException(message);
                 }
             }
         }
