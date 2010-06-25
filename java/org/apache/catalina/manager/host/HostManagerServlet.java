@@ -583,6 +583,13 @@ public class HostManagerServlet
             return;
         }
 
+        // Don't start host of already started
+        if (host.getState().isAvailable()) {
+            writer.println
+                (sm.getString("hostManagerServlet.alreadyStarted", name));
+            return;
+        }
+
         // Start host
         try {
             host.start();
@@ -635,7 +642,14 @@ public class HostManagerServlet
             return;
         }
 
-        // Start host
+        // Don't stop host of already stopped
+        if (!host.getState().isAvailable()) {
+            writer.println
+                (sm.getString("hostManagerServlet.alreadyStopped", name));
+            return;
+        }
+
+        // Stop host
         try {
             host.stop();
             writer.println
