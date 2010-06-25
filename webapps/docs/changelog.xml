@@ -58,7 +58,13 @@
       <fix>
         <bug>49230</bug>: Enhance JRE leak prevention listener with protection
         for the keep-alive thread started by
-        <code>sun.net.www.http.HttpClient</code>. Patch provided by Rob Kooper.
+        <code>sun.net.www.http.HttpClient</code>. Based on a patch provided by
+        Rob Kooper. (markt)
+      </fix>
+      <fix>
+        <bug>49414</bug>: When reporting threads that may have triggered a
+        memory leak on web application stop, attempt to differentiate between
+        request processing threads and threads started by the application.
         (markt)
       </fix>
     </changelog>
@@ -110,6 +116,11 @@
       <fix>
         Better handle failure to create directories required for new hosts in
         the Host Manager application. (markt)
+      </fix>
+      <fix>
+        Switch the Host Manager application to the generic CSRF protection for
+        the HTML interface and prevent started hosts from being started and
+        stopped hosts from being stopped.
       </fix>
     </changelog>
   </subsection>
