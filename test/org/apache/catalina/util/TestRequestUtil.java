@@ -21,6 +21,13 @@ import junit.framework.TestCase;
 
 public class TestRequestUtil extends TestCase {
 
+    public void testNormalizeString() {
+        assertEquals("/something",RequestUtil.normalize("//something"));
+        assertEquals("/some/thing",RequestUtil.normalize("some//thing"));
+        assertEquals("/something/",RequestUtil.normalize("something//"));
+        assertEquals("/",RequestUtil.normalize("//"));
+    }
+
     public void testURLDecodeString() {
         // %n rather than %nn should throw an IAE according to the Javadoc
         Exception exception = null;
