@@ -25,13 +25,11 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
@@ -65,12 +63,6 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final String NONCE_SESSION =
-        "org.apache.catalina.manager.host.NONCE";
-    protected static final String NONCE_REQUEST = "nonce";
-
-    private final Random randomSource = new Random();
-    
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -129,31 +121,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         String command = request.getPathInfo();
 
         String name = request.getParameter("name");
-        String requestNonce = request.getParameter(NONCE_REQUEST);
  
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
         String message = "";
         
-        // Check nonce
-        // There *must* be a nonce in the session before any POST is processed
-        HttpSession session = request.getSession();
-        String sessionNonce = (String) session.getAttribute(NONCE_SESSION);
-        if (sessionNonce == null) {
-            message = sm.getString("htmlHostManagerServlet.noNonce", command);
-            // Reset the command
-            command = null;
-        } else {
-            if (!sessionNonce.equals(requestNonce)) {
-                // Nonce mis-match.
-                message =
-                    sm.getString("htmlHostManagerServlet.nonceMismatch", command);
-                // Reset the command
-                command = null;
-            }
-        }
- 
         // Process the requested command
         if (command == null) {
             // No command == list
@@ -174,37 +147,6 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     }
 
 
-    /**
-     * Generate a once time token (nonce) for authenticating subsequent
-     * requests. This will also add the token to the session. The nonce
-     * generation is a simplified version of ManagerBase.generateSessionId().
-     * 
-     */
-    protected String generateNonce() {
-        byte random[] = new byte[16];
-
-        // Render the result as a String of hexadecimal digits
-        StringBuilder buffer = new StringBuilder();
-
-        randomSource.nextBytes(random);
-       
-        for (int j = 0; j < random.length; j++) {
-            byte b1 = (byte) ((random[j] & 0xf0) >> 4);
-            byte b2 = (byte) (random[j] & 0x0f);
-            if (b1 < 10)
-                buffer.append((char) ('0' + b1));
-            else
-                buffer.append((char) ('A' + (b1 - 10)));
-            if (b2 < 10)
-                buffer.append((char) ('0' + b2));
-            else
-                buffer.append((char) ('A' + (b2 - 10)));
-        }
-
-        return buffer.toString();
-    }
-    
-    
     /**
      * Add a host using the specified parameters.
      *
@@ -286,9 +228,6 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
             log(sm.getString("hostManagerServlet.list", engine.getName()));
         }
 
-        String newNonce = generateNonce();
-        request.getSession().setAttribute(NONCE_SESSION, newNonce);
-        
         PrintWriter writer = response.getWriter();
 
         // HTML Header Section
@@ -383,23 +322,25 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 writer.print
                     (MessageFormat.format(HOSTS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[7];
-                args[0] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/start?name=" +
-                     URLEncoder.encode(hostName, "UTF-8"));
-                args[1] = hostsStart;
-                args[2] = response.encodeURL
+                args = new Object[4];
+                if (host.getState().isAvailable()) {
+                    args[0] = response.encodeURL
                     (request.getContextPath() +
                      "/html/stop?name=" +
                      URLEncoder.encode(hostName, "UTF-8"));
-                args[3] = hostsStop;
-                args[4] = response.encodeURL
+                    args[1] = hostsStop;
+                } else {
+                    args[0] = response.encodeURL
+                        (request.getContextPath() +
+                         "/html/start?name=" +
+                         URLEncoder.encode(hostName, "UTF-8"));
+                    args[1] = hostsStart;
+                }
+                args[2] = response.encodeURL
                     (request.getContextPath() +
                      "/html/remove?name=" +
                      URLEncoder.encode(hostName, "UTF-8"));
-                args[5] = hostsRemove;
-                args[6] = newNonce;
+                args[3] = hostsRemove;
                 if (host == this.installedHost) {
                     writer.print(MessageFormat.format(
                         MANAGER_HOST_ROW_BUTTON_SECTION, args));
@@ -407,19 +348,17 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                     writer.print(MessageFormat.format(
                         HOSTS_ROW_BUTTON_SECTION, args));
                 }
-
             }
         }
 
         // Add Section
-        args = new Object[7];
+        args = new Object[6];
         args[0] = sm.getString("htmlHostManagerServlet.addTitle");
         args[1] = sm.getString("htmlHostManagerServlet.addHost");
         args[2] = response.encodeURL(request.getContextPath() + "/html/add");
         args[3] = sm.getString("htmlHostManagerServlet.addName");
         args[4] = sm.getString("htmlHostManagerServlet.addAliases");
         args[5] = sm.getString("htmlHostManagerServlet.addAppBase");
-        args[6] = newNonce;
         writer.print(MessageFormat.format(ADD_SECTION_START, args));
  
         args = new Object[3];
@@ -514,9 +453,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     private static final String MANAGER_HOST_ROW_BUTTON_SECTION =
         " <td class=\"row-left\">\n" +
         "  <small>\n" +
-        "  &nbsp;{1}&nbsp;\n" +
-        "  &nbsp;{3}&nbsp;\n" +
-        "  &nbsp;{5}&nbsp;\n" +
+        sm.getString("htmlHostManagerServlet.hostThis") +
         "  </small>\n" +
         " </td>\n" +
         "</tr>\n";
@@ -524,16 +461,10 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     private static final String HOSTS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" NOWRAP>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "   <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"" +
         "   <small><input type=\"submit\" value=\"{1}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "   <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"" +
         "   <small><input type=\"submit\" value=\"{3}\"></small>" +
-        "  </form>\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "   <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"" +
-        "   <small><input type=\"submit\" value=\"{5}\"></small>" +
         "  </form>\n" +
         " </td>\n" +
         "</tr>\n";
@@ -551,7 +482,6 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
         "<form method=\"post\" action=\"{2}\">\n" +
-        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"\n" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
