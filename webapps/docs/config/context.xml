@@ -465,9 +465,8 @@
       </attribute>
 
       <attribute name="unloadDelay" required="false">
-        <p>Amount of ms that the container will wait for servlets to unload.
-        If not specified, the default value of the flag is <code>2000</code> 
-        ms.</p>
+        <p>Number of ms that the container will wait for servlets to unload.
+        If not specified, the default value is <code>2000</code> ms.</p>
       </attribute>
 
       <attribute name="unpackWAR" required="false">
