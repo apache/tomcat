@@ -380,9 +380,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     public Executor getExecutor(String name) {
         synchronized (executors) {
-            for (int i = 0; i < executors.size(); i++) {
-                if (name.equals(executors.get(i).getName()))
-                    return executors.get(i);
+            for (Executor executor: executors) {
+                if (name.equals(executor.getName()))
+                    return executor;
             }
         }
         return null;
@@ -429,20 +429,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         synchronized (executors) {
-            for ( int i=0; i<executors.size(); i++ ) {
-                executors.get(i).start();
+            for (Executor executor: executors) {
+                executor.start();
             }
         }
 
         // Start our defined Connectors second
         synchronized (connectors) {
-            for (int i = 0; i < connectors.length; i++) {
+            for (Connector connector: connectors) {
                 try {
-                    connectors[i].start();
+                    connector.start();
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "standardService.connector.startFailed",
-                            connectors[i]), e);
+                            connector), e);
                 }
             }
         }
@@ -462,13 +462,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Stop our defined Connectors first
         synchronized (connectors) {
-            for (int i = 0; i < connectors.length; i++) {
+            for (Connector connector: connectors) {
                 try {
-                    connectors[i].pause();
+                    connector.pause();
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "standardService.connector.pauseFailed",
-                            connectors[i]), e);
+                            connector), e);
                 }
             }
         }
@@ -493,26 +493,26 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // FIXME pero -- Why container stop first? KeepAlive connections can send request! 
         // Stop our defined Connectors first
         synchronized (connectors) {
-            for (int i = 0; i < connectors.length; i++) {
+            for (Connector connector: connectors) {
                 if (LifecycleState.INITIALIZED.equals(
-                        connectors[i].getState())) {
+                        connector.getState())) {
                     // If Service fails to start, connectors may not have been
                     // started
                     continue;
                 }
                 try {
-                    connectors[i].stop();
+                    connector.stop();
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "standardService.connector.stopFailed",
-                            connectors[i]), e);
+                            connector), e);
                 }
             }
         }
 
         synchronized (executors) {
-            for ( int i=0; i<executors.size(); i++ ) {
-                executors.get(i).stop();
+            for (Executor executor: executors) {
+                executor.stop();
             }
         }
     }
