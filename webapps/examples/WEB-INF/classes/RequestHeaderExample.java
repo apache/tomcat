@@ -35,7 +35,7 @@ public class RequestHeaderExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private transient ResourceBundle rb = ResourceBundle.getBundle("LocalStrings");
+    private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
     
     @Override
     public void doGet(HttpServletRequest request,
@@ -49,7 +49,7 @@ public class RequestHeaderExample extends HttpServlet {
         out.println("<body bgcolor=\"white\">");
         out.println("<head>");
 
-        String title = rb.getString("requestheader.title");
+        String title = RB.getString("requestheader.title");
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body>");
