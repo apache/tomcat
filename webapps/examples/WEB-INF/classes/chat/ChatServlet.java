@@ -45,7 +45,7 @@ public class ChatServlet
 
     protected ArrayList<HttpServletResponse> connections = 
         new ArrayList<HttpServletResponse>();
-    protected MessageSender messageSender = null;
+    protected transient MessageSender messageSender = null;
     
     @Override
     public void init() throws ServletException {

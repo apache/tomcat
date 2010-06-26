@@ -35,7 +35,7 @@ public class RequestParamExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    ResourceBundle rb = ResourceBundle.getBundle("LocalStrings");
+    private transient ResourceBundle rb = ResourceBundle.getBundle("LocalStrings");
     
     @Override
     public void doGet(HttpServletRequest request,
