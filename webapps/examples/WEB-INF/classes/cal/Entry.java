@@ -21,7 +21,6 @@ public class Entry {
 
     String hour;
     String description;
-    String color;
 
     public Entry(String hour) {
         this.hour = hour;
