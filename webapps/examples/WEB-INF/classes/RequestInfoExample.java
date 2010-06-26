@@ -35,7 +35,7 @@ public class RequestInfoExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private transient ResourceBundle rb = ResourceBundle.getBundle("LocalStrings");
+    private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
 
     @Override
     public void doGet(HttpServletRequest request,
@@ -49,7 +49,7 @@ public class RequestInfoExample extends HttpServlet {
         out.println("<body>");
         out.println("<head>");
 
-        String title = rb.getString("requestinfo.title");
+        String title = RB.getString("requestinfo.title");
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
@@ -70,23 +70,23 @@ public class RequestInfoExample extends HttpServlet {
 
         out.println("<h3>" + title + "</h3>");
         out.println("<table border=0><tr><td>");
-        out.println(rb.getString("requestinfo.label.method"));
+        out.println(RB.getString("requestinfo.label.method"));
         out.println("</td><td>");
         out.println(request.getMethod());
         out.println("</td></tr><tr><td>");
-        out.println(rb.getString("requestinfo.label.requesturi"));
+        out.println(RB.getString("requestinfo.label.requesturi"));
         out.println("</td><td>");        
         out.println(HTMLFilter.filter(request.getRequestURI()));
         out.println("</td></tr><tr><td>");        
-        out.println(rb.getString("requestinfo.label.protocol"));
+        out.println(RB.getString("requestinfo.label.protocol"));
         out.println("</td><td>");        
         out.println(request.getProtocol());
         out.println("</td></tr><tr><td>");
-        out.println(rb.getString("requestinfo.label.pathinfo"));
+        out.println(RB.getString("requestinfo.label.pathinfo"));
         out.println("</td><td>");        
         out.println(HTMLFilter.filter(request.getPathInfo()));
         out.println("</td></tr><tr><td>");
-        out.println(rb.getString("requestinfo.label.remoteaddr"));
+        out.println(RB.getString("requestinfo.label.remoteaddr"));
 
  	String cipherSuite=
  	    (String)request.getAttribute("javax.servlet.request.cipher_suite");
