@@ -2260,15 +2260,14 @@ public class WebappClassLoader
             return false;
         }
         
-        // Step through the methods in reverse order looking for a
-        // CoyoteAdapter.service() call. All requests will have this unless
+        // Step through the methods in reverse order looking for calls to any
+        // CoyoteAdapter method. All request threads will have this unless
         // Tomcat has been heavily modified - in which case there isn't much we
         // can do.
         for (int i = 0; i < elements.length; i++) {
             StackTraceElement element = elements[elements.length - (i+1)];
             if ("org.apache.catalina.connector.CoyoteAdapter".equals(
-                    element.getClassName()) &&
-                    "service".equals(element.getMethodName())) {
+                    element.getClassName())) {
                 return true;
             }
         }
