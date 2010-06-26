@@ -21,7 +21,6 @@ import java.util.*;
 
 public class JspCalendar {
     Calendar  calendar = null;
-    Date currentDate;
 
     public JspCalendar() {
 	calendar = Calendar.getInstance();
