@@ -38,10 +38,6 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Start JioEndpoint timeout thread, to inform AsyncListner as async timeout is set
-        and application thread doesn't finished. (pero)
-      </fix>
-      <fix>
         GSOC 2010. Continue work to align MBean descriptors with reality. Patch
         provided by Chamith Buddhika. (markt)
       </fix>
