@@ -17,13 +17,17 @@
 package org.apache.catalina.loader;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.LifecycleBase;
 
 /**
- * Simple webapp classloader that allows a customized classpath to be added
+ * A WebappLoader that allows a customized classpath to be added
  * through configuration in context xml. Any additional classpath entry will be
  * added to the default webapp classpath, making easy to emulate a standard
  * webapp without the need for assembly all the webapp dependencies as jars in
@@ -32,21 +36,23 @@ import org.apache.catalina.util.LifecycleBase;
  * <pre>
  * &lt;Context docBase="\webapps\mydocbase">
  *   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
- *              virtualClasspath="\dir\classes;\somedir\somejar.jar"/>
+ *              virtualClasspath="/dir/classes;/somedir/somejar.jar;/somedir/*.jar"/>
  * &lt;/Context>
  * </pre>
  *
- *
- * <strong>This is not meant to be used for production.
- * Its meant to ease development with IDE's without the
- * need for fully republishing jars in WEB-INF/lib</strong>
- *
+ * <p>The <code>*.jar</code> suffix can be used to include all JAR files in a
+ * certain directory. If a file or a directory does not exist, it will be
+ * skipped. 
+ * </p>
  *
  *
  * @author Fabrizio Giustina
  * @version $Id$
  */
 public class VirtualWebappLoader extends WebappLoader {
+
+    private static final org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( VirtualWebappLoader.class );
 
     /**
      * <code>;</code> separated list of additional path elements.
@@ -108,12 +114,75 @@ public class VirtualWebappLoader extends WebappLoader {
         // just add any jar/directory set in virtual classpath to the
         // repositories list before calling start on the standard WebappLoader
         StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
+        Set<String> set = new LinkedHashSet<String>();
         while (tkn.hasMoreTokens()) {
-            File file = new File(tkn.nextToken());
-            if (!file.exists()) {
-                continue;
+            String token = tkn.nextToken().trim();
+
+            if (log.isDebugEnabled())
+                log.debug(sm.getString("virtualWebappLoader.token", token));
+
+            if (token.endsWith("*.jar")) {
+                // glob
+                token = token.substring(0, token.length() - "*.jar".length());
+
+                File directory = new File(token);
+                if (!directory.isDirectory()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "virtualWebappLoader.token.notDirectory",
+                                directory.getAbsolutePath()));
+                    }
+                    continue;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "virtualWebappLoader.token.glob.dir",
+                            directory.getAbsolutePath()));
+                }
+                String filenames[] = directory.list();
+                Arrays.sort(filenames);
+                for (int j = 0; j < filenames.length; j++) {
+                    String filename = filenames[j].toLowerCase(Locale.ENGLISH);
+                    if (!filename.endsWith(".jar"))
+                        continue;
+                    File file = new File(directory, filenames[j]);
+                    if (!file.isFile()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString(
+                                    "virtualWebappLoader.token.notFile",
+                                    file.getAbsolutePath()));
+                        }
+                        continue;
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "virtualWebappLoader.token.file",
+                                file.getAbsolutePath()));
+                    }
+                    set.add(file.toURI().toString());
+                }
+            } else {
+                // single file or directory
+                File file = new File(token);
+                if (!file.exists()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "virtualWebappLoader.token.notExists",
+                                file.getAbsolutePath()));
+                    }
+                    continue;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "virtualWebappLoader.token.file",
+                            file.getAbsolutePath()));
+                }
+                set.add(file.toURI().toString());
             }
-            addRepository(file.toURI().toString());
+        }
+
+        for (String repository: set) {
+            addRepository(repository);
         }
 
         super.startInternal();

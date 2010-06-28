@@ -71,6 +71,10 @@
         request processing threads and threads started by the application.
         (markt)
       </fix>
+      <add>
+        Add support for <code>*.jar</code> pattern in VirtualWebappLoader.
+        (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
