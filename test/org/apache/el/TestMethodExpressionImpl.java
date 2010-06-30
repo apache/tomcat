@@ -88,10 +88,10 @@ public class TestMethodExpressionImpl extends TestCase {
             factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("beanA", varA);
         
-        TesterBeanC beanC = new TesterBeanC();        
+        TesterBeanBB beanC = new TesterBeanBB();        
         beanC.setName("Tomcat");
         ValueExpression varC =
-            factory.createValueExpression(beanC, TesterBeanC.class);
+            factory.createValueExpression(beanC, TesterBeanBB.class);
         context.getVariableMapper().setVariable("beanC", varC);
         
         MethodExpression me1 = factory.createMethodExpression(context,
