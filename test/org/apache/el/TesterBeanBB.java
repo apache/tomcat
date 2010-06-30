@@ -17,7 +17,7 @@
 
 package org.apache.el;
 
-public class TesterBeanC extends TesterBeanB {
+public class TesterBeanBB extends TesterBeanB {
 
     private String extra;
 
