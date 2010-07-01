@@ -273,7 +273,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
     private void registerHost(Host host) {
         
         String[] aliases = host.findAliases();
-        mapper.addHost(host.getName(), aliases, host.getObjectName());
+        mapper.addHost(host.getName(), aliases, host);
         
         host.addContainerListener(this);
         
@@ -330,13 +330,13 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         if ("/".equals(contextName)) {
             contextName = "";
         }
-        String hostName = context.getParent().getName();
+        Container host = context.getParent();
         
         javax.naming.Context resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
 
-        mapper.addContext(hostName, contextName, context, welcomeFiles,
-                resources);
+        mapper.addContext(host.getName(), host, contextName, context,
+                welcomeFiles, resources);
 
         context.addContainerListener(this);
        

@@ -630,6 +630,16 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
+        // If there is no context at this point, it is likely no ROOT context
+        // has been deployed
+        if (request.getContext() == null) {
+            res.setStatus(404);
+            res.setMessage("Not found");
+            // No context, so use host
+            request.getHost().logAccess(request, response, 0, true);
+            return false;
+        }
+        
         // Now we have the context, we can parse the session ID from the URL
         // (if any). Need to do this before we redirect in case we need to
         // include the session id in the redirect
