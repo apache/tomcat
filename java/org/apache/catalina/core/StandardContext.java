@@ -418,7 +418,7 @@ public class StandardContext extends ContainerBase
      * The naming resources for this web application.
      */
     private NamingResources namingResources = null;
-    private ObjectName onameNamingResoucres;
+    private ObjectName onameNamingResources;
 
     /**
      * The message destinations for this web application.
@@ -1753,8 +1753,8 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("namingResources",
                                    oldNamingResources, this.namingResources);
         
-        unregister(onameNamingResoucres);
-        onameNamingResoucres = register(namingResources,
+        unregister(onameNamingResources);
+        onameNamingResources = register(namingResources,
                 "type=NamingResources," + getObjectKeyPropertiesNameOnly());
     }
 
@@ -5027,7 +5027,7 @@ public class StandardContext extends ContainerBase
                             sequenceNumber++);
         broadcaster.sendNotification(notification);
 
-        unregister(onameNamingResoucres);
+        unregister(onameNamingResources);
 
         synchronized (instanceListenersLock) {
             instanceListeners = new String[0];
@@ -5585,7 +5585,7 @@ public class StandardContext extends ContainerBase
 
         // Register the naming resources
         if (namingResources != null) {
-            onameNamingResoucres = register(namingResources,
+            onameNamingResources = register(namingResources,
                     "type=NamingResources," + getObjectNameKeyProperties());
         }
 
