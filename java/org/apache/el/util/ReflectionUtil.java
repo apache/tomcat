@@ -22,6 +22,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.el.ELException;
 import javax.el.MethodNotFoundException;
@@ -120,6 +123,7 @@ public class ReflectionUtil {
      * @return the method specified
      * @throws MethodNotFoundException
      */
+    @SuppressWarnings("null")
     public static Method getMethod(Object base, Object property,
             Class<?>[] paramTypes) throws MethodNotFoundException {
         if (base == null || property == null) {
@@ -130,16 +134,156 @@ public class ReflectionUtil {
 
         String methodName = (property instanceof String) ? (String) property
                 : property.toString();
-
-        Method method = null;
-        try {
-            method = base.getClass().getMethod(methodName, paramTypes);
-        } catch (NoSuchMethodException nsme) {
-            throw new MethodNotFoundException(MessageFactory.get(
-                    "error.method.notfound", base, property,
-                    paramString(paramTypes)));
+        
+        int paramCount;
+        if (paramTypes == null) {
+            paramCount = 0;
+        } else {
+            paramCount = paramTypes.length;
         }
-        return method;
+
+        Method[] methods = base.getClass().getMethods();
+        Map<Method,Integer> candidates = new HashMap<Method,Integer>();
+        
+        for (Method m : methods) {
+            if (!m.getName().equals(methodName)) {
+                // Method name doesn't match
+                continue;
+            }
+            
+            Class<?>[] mParamTypes = m.getParameterTypes();
+            int mParamCount;
+            if (mParamTypes == null) {
+                mParamCount = 0;
+            } else {
+                mParamCount = mParamTypes.length;
+            }
+            
+            // Check the number of parameters
+            if (!(paramCount == mParamCount ||
+                    (m.isVarArgs() && paramCount >= mParamCount))) {
+                // Method has wrong number of parameters
+                continue;
+            }
+            
+            // Check the parameters match
+            int exactMatch = 0;
+            boolean noMatch = false;
+            for (int i = 0; i < mParamCount; i++) {
+                // Can't be null
+                if (mParamTypes[i].equals(paramTypes[i])) {
+                    exactMatch++;
+                } else if (i == (mParamCount - 1) && m.isVarArgs()) {
+                    Class<?> varType = mParamTypes[i].getComponentType();
+                    for (int j = i; j < paramCount; j++) {
+                        if (!varType.isAssignableFrom(paramTypes[j])) {
+                            break;
+                        }
+                        // Don't treat a varArgs match as an exact match, it can
+                        // lead to a varArgs method matching when the result
+                        // should be ambiguous
+                    }
+                } else if (!mParamTypes[i].isAssignableFrom(paramTypes[i])) {
+                    noMatch = true;
+                    break;
+                }
+            }
+            if (noMatch) {
+                continue;
+            }
+            
+            // If a method is found where every parameter matches exactly,
+            // return it
+            if (exactMatch == paramCount) {
+                return m;
+            }
+            
+            candidates.put(m, Integer.valueOf(exactMatch));
+        }
+
+        // Look for the method that has the highest number of parameters where
+        // the type matches exactly
+        int bestMatch = 0;
+        Method match = null;
+        boolean multiple = false;
+        for (Map.Entry<Method, Integer> entry : candidates.entrySet()) {
+            if (entry.getValue().intValue() > bestMatch ||
+                    match == null) {
+                bestMatch = entry.getValue().intValue();
+                match = entry.getKey();
+                multiple = false;
+            } else if (entry.getValue().intValue() == bestMatch) {
+                multiple = true;
+            }
+        }
+        if (multiple) {
+            if (bestMatch == paramCount - 1) {
+                // Only one parameter is not an exact match - try using the
+                // super class
+                match = resolveAmbiguousMethod(candidates.keySet(), paramTypes);
+            } else {
+                match = null;
+            }
+            
+            if (match == null) {
+                // If multiple methods have the same matching number of parameters
+                // the match is ambiguous so throw an exception
+                throw new MethodNotFoundException(MessageFactory.get(
+                        "error.method.ambiguous", base, property,
+                        paramString(paramTypes)));
+                }
+        }
+        
+        // Handle case where no match at all was found
+        if (match == null) {
+            throw new MethodNotFoundException(MessageFactory.get(
+                        "error.method.notfound", base, property,
+                        paramString(paramTypes)));
+        }
+        
+        return match;
+    }
+
+    @SuppressWarnings("null")
+    private static Method resolveAmbiguousMethod(Set<Method> candidates,
+            Class<?>[] paramTypes) {
+        // Identify which parameter isn't an exact match
+        Method m = candidates.iterator().next();
+        
+        int nonMatchIndex = 0;
+        Class<?> nonMatchClass = null;
+        
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (m.getParameterTypes()[i] != paramTypes[i]) {
+                nonMatchIndex = i;
+                nonMatchClass = paramTypes[i];
+                break;
+            }
+        }
+        
+        for (Method c : candidates) {
+           if (c.getParameterTypes()[nonMatchIndex] ==
+                   paramTypes[nonMatchIndex]) {
+               // Methods have different non-matching parameters
+               // Result is ambiguous
+               return null;
+           }
+        }
+        
+        // Can't be null
+        nonMatchClass = nonMatchClass.getSuperclass();
+        while (nonMatchClass != null) {
+            for (Method c : candidates) {
+                if (c.getParameterTypes()[nonMatchIndex].equals(
+                        nonMatchClass)) {
+                    // Found a match
+                    return c;
+                }
+            }
+            nonMatchClass = nonMatchClass.getSuperclass();
+        }
+        
+        return null;
     }
 
     protected static final String paramString(Class<?>[] types) {
