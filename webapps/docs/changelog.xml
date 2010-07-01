@@ -79,6 +79,10 @@
         Use a LockOutRealm in the default configuration to prevent attempts to
         guess user passwords by brute-force. (markt)
       </add>
+      <fix>
+        <bug>49525</bug>: Ensure cookies for the ROOT context have a path of /
+        rather than an empty string. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
