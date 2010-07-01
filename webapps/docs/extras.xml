@@ -80,7 +80,7 @@
   <p>
     Tomcat uses a package renamed commons-logging API implementation which is
     hardcoded to use the java.util.logging API. The commons-logging additional
-    component builds a full fledged package renames commons-logging
+    component builds a full fledged package renamed commons-logging
     implementation which can be used to replace the implementation provided with
     Tomcat. See the <a href="logging.html">logging</a> page for usage
     instructions.
