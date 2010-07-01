@@ -75,6 +75,10 @@
         Add support for <code>*.jar</code> pattern in VirtualWebappLoader.
         (kkolinko)
       </add>
+      <add>
+        Use a LockOutRealm in the default configuration to prevent attempts to
+        guess user passwords by brute-force. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
