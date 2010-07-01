@@ -17,23 +17,7 @@
 
 package org.apache.el;
 
-public class TesterBeanA {
-    private TesterBeanB bean;
-    private String name;
-
-    public TesterBeanB getBean() {
-        return bean;
-    }
-
-    public void setBean(TesterBeanB bean) {
-        this.bean = bean;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+public class TesterBeanAAA extends TesterBeanAA {
+    // No additional implementation - just need a class that extends AA for
+    // testing EL methods calls
 }
