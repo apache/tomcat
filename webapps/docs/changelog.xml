@@ -83,6 +83,11 @@
         <bug>49525</bug>: Ensure cookies for the ROOT context have a path of /
         rather than an empty string. (markt)
       </fix>
+      <fix>
+        <bug>49536</bug>: If no ROOT context is deployed, ensure a 404 rather
+        than a 200 is returned for requests that don't map to any other context.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
