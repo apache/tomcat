@@ -146,6 +146,9 @@
         the HTML interface and prevent started hosts from being started and
         stopped hosts from being stopped.
       </fix>
+      <fix>
+        <bug>49518</bug>: Fix typo in extras documentation. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
