@@ -1755,7 +1755,7 @@ public class StandardContext extends ContainerBase
         
         unregister(onameNamingResoucres);
         onameNamingResoucres = register(namingResources,
-                "type=NamingResources," + getObjectNameKeyProperties());
+                "type=NamingResources," + getObjectKeyPropertiesNameOnly());
     }
 
 
@@ -5546,22 +5546,8 @@ public class StandardContext extends ContainerBase
     protected String getObjectNameKeyProperties() {
 
         StringBuilder keyProperties =
-            new StringBuilder("j2eeType=WebModule,name=");
-        
-        String hostName = getParent().getName();
-        if (hostName == null) {
-            keyProperties.append("DEFAULT");
-        } else {
-            keyProperties.append(hostName);
-        }
-        
-        String pathName = getName();
-        if ("".equals(pathName)) {
-            keyProperties.append('/');
-        } else {
-            keyProperties.append(pathName);
-        }
-
+            new StringBuilder("j2eeType=WebModule,");
+        keyProperties.append(getObjectKeyPropertiesNameOnly());
         keyProperties.append(",J2EEApplication=");
         keyProperties.append(getJ2EEApplication());
         keyProperties.append(",J2EEServer=");
@@ -5570,6 +5556,24 @@ public class StandardContext extends ContainerBase
         return keyProperties.toString();
     }
     
+    private String getObjectKeyPropertiesNameOnly() {
+        StringBuilder result = new StringBuilder("name=");
+        String hostname = getParent().getName();
+        if (hostname == null) {
+            result.append("DEFAULT");
+        } else {
+            result.append(hostname);
+        }
+        
+        String pathName = getName();
+        if ("".equals(pathName)) {
+            result.append('/');
+        } else {
+            result.append(pathName);
+        }
+
+        return result.toString();
+    }
 
     @Override
     protected void initInternal() throws LifecycleException {
