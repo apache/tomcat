@@ -94,6 +94,10 @@
         Correct over zealous type checking for EL in attributes that broke the
         use of JSF convertors. (markt)
       </fix>
+      <fix>
+        Correct algorithm used to identify correct method to use when a
+        MethodExpressions is used in EL. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
