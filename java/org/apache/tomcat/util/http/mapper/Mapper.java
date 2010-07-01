@@ -210,33 +210,34 @@ public final class Mapper {
      * Add a new Context to an existing Host.
      *
      * @param hostName Virtual host name this context belongs to
+     * @param host Host object
      * @param path Context path
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
      */
     public void addContext
-        (String hostName, String path, Object context,
+        (String hostName, Object host, String path, Object context,
          String[] welcomeResources, javax.naming.Context resources) {
 
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if( pos <0 ) {
-            addHost(hostName, new String[0], "");
+            addHost(hostName, new String[0], host);
             hosts = this.hosts;
             pos = find(hosts, hostName);
         }
         if (pos < 0) {
             log.error("No host found: " + hostName);
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
+        Host mappedHost = hosts[pos];
+        if (mappedHost.name.equals(hostName)) {
             int slashCount = slashCount(path);
-            synchronized (host) {
-                Context[] contexts = host.contextList.contexts;
+            synchronized (mappedHost) {
+                Context[] contexts = mappedHost.contextList.contexts;
                 // Update nesting
-                if (slashCount > host.contextList.nesting) {
-                    host.contextList.nesting = slashCount;
+                if (slashCount > mappedHost.contextList.nesting) {
+                    mappedHost.contextList.nesting = slashCount;
                 }
                 Context[] newContexts = new Context[contexts.length + 1];
                 Context newContext = new Context();
@@ -245,7 +246,7 @@ public final class Mapper {
                 newContext.welcomeResources = welcomeResources;
                 newContext.resources = resources;
                 if (insertMap(contexts, newContexts, newContext)) {
-                    host.contextList.contexts = newContexts;
+                    mappedHost.contextList.contexts = newContexts;
                 }
             }
         }

@@ -617,10 +617,7 @@ public class Request
      * Return the Host within which this Request is being processed.
      */
     public Host getHost() {
-        if (getContext() == null)
-            return null;
-        return (Host) getContext().getParent();
-        //return ((Host) mappingData.host);
+        return ((Host) mappingData.host);
     }
 
 
