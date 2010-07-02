@@ -4682,6 +4682,11 @@ public class StandardContext extends ContainerBase
                 // Acquire clustered manager
                 Manager contextManager = null;
                 if (manager == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("standardContext.cluster.noManager",
+                                Boolean.valueOf((getCluster() != null)),
+                                Boolean.valueOf(distributable)));
+                    }
                     if ( (getCluster() != null) && distributable) {
                         try {
                             contextManager = getCluster().createManager(getName());
@@ -4696,6 +4701,10 @@ public class StandardContext extends ContainerBase
                 
                 // Configure default manager if none was specified
                 if (contextManager != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("standardContext.manager",
+                                contextManager.getClass().getName()));
+                    }
                     setManager(contextManager);
                 }
 
