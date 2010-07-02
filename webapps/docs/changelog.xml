@@ -88,6 +88,10 @@
         than a 200 is returned for requests that don't map to any other context.
         (markt)
       </fix>
+      <add>
+        Additional debug logging in StandardContext to provide information on
+        Manager selection. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
