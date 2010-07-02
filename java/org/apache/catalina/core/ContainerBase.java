@@ -915,14 +915,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             children.remove(child.getName());
         }
         
-        if (getState().isAvailable()) {
-            try {
-                if (child.getState().isAvailable()) {
-                    child.stop();
-                }
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.removeChild: stop: ", e);
+        try {
+            if (child.getState().isAvailable()) {
+                child.stop();
             }
+        } catch (LifecycleException e) {
+            log.error("ContainerBase.removeChild: stop: ", e);
         }
         
         fireContainerEvent(REMOVE_CHILD_EVENT, child);
