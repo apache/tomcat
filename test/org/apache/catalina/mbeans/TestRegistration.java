@@ -46,7 +46,10 @@ public class TestRegistration extends TomcatBaseTest {
 
         final Tomcat tomcat = getTomcatInstance();
         final File contextDir = new File(getTemporaryDirectory(), "webappFoo");
-        contextDir.mkdir();
+        if (!contextDir.exists()) {
+            if (!contextDir.mkdir())
+                fail("Failed to create: [" + contextDir.toString() + "]");
+        }
         tomcat.addContext("/foo", contextDir.getAbsolutePath());
         tomcat.start();
         
@@ -70,7 +73,10 @@ public class TestRegistration extends TomcatBaseTest {
         tomcat.getEngine().addChild(host);
 
         final File contextDir2 = new File(getTemporaryDirectory(), "webappFoo2");
-        contextDir2.mkdir();
+        if (!contextDir2.exists()) {
+            if (!contextDir2.mkdir())
+                fail("Failed to create: [" + contextDir2.toString() + "]");
+        }
         tomcat.addContext(host, "/foo2", contextDir2.getAbsolutePath());
         
         tomcat.start();
