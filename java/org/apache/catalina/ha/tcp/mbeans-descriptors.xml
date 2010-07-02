@@ -24,36 +24,35 @@
     group="Cluster"
     type="org.apache.catalina.ha.tcp.SimpleTcpCluster">
     <attribute
-      name="info"
-      description="Class version info"
-      type="java.lang.String"
-      writeable="false"/>
+      name="channelSendOptions"
+      description="This sets channel behaviour on sent messages."
+      type="int"/>
     <attribute
-      name="notifyLifecycleListenerOnFailure"
-      description="notify lifecycleListener from message transfer failure"
-      is="true"
-      type="boolean"/>
+      name="channelStartOptions"
+      description="This sets channel start behaviour."
+      type="java.lang.String"/>
+    <attribute
+      name="clusterName"
+      description="name of cluster"
+      type="java.lang.String"/>
     <attribute
       name="heartbeatBackgroundEnabled"
       description="enable that container background thread call channel heartbeat, default is that channel mangage heartbeat itself."
       is="true"
       type="boolean"/>
     <attribute
-      name="clusterName"
-      description="name of cluster"
-      type="java.lang.String"/>
+      name="info"
+      description="Class version info"
+      type="java.lang.String"
+      writeable="false"/>
     <attribute
       name="managerClassName"
       description="session mananager classname"
       type="java.lang.String"/>
     <attribute
-      name="clusterLogName"
-      description="Name of cluster transfer log device"
-      type="java.lang.String"/>
-    <attribute
-      name="doClusterLog"
+      name="notifyLifecycleListenerOnFailure"
+      description="notify lifecycleListener from message transfer failure"
       is="true"
-      description="enable cluster log transfer logging"
       type="boolean"/>
     <operation
       name="setProperty"
@@ -1173,31 +1172,31 @@
     group="Valve"
     type="org.apache.catalina.ha.tcp.ReplicationValve">
     <attribute
-      name="info"
-      description="Class version info"
-      type="java.lang.String"
-      writeable="false"/>
-    <attribute
-      name="filter"
-      description="resource filter to disable session replication check"
-      type="java.lang.String"/>
-    <attribute
-      name="primaryIndicator"
-      is="true"
-      description="set indicator that request processing is at primary session node"
+      name="asyncSupported"
+      description="Does this valve support async reporting?"
       type="boolean"/>
-    <attribute
-      name="primaryIndicatorName"
-      description="Request attribute name to indicate that request processing is at primary session node"
-      type="java.lang.String"/>
     <attribute
       name="doProcessingStats"
       is="true"
       description="active statistics counting"
       type="boolean"/>
     <attribute
-      name="nrOfRequests"
-      description="number of replicated requests"
+      name="filter"
+      description="resource filter to disable session replication check"
+      type="java.lang.String"/>
+    <attribute
+      name="info"
+      description="Class version info"
+      type="java.lang.String"
+      writeable="false"/>
+    <attribute
+      name="lastSendTime"
+      description="last replicated request time"
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="nrOfCrossContextSendRequests"
+      description="number of send cross context session requests"
       type="long"
       writeable="false"/>
     <attribute
@@ -1211,23 +1210,27 @@
       type="long"
       writeable="false"/>
     <attribute
-      name="nrOfCrossContextSendRequests"
-      description="number of send cross context session requests"
+      name="nrOfRequests"
+      description="number of replicated requests"
       type="long"
       writeable="false"/>
     <attribute
-      name="totalRequestTime"
-      description="total replicated request time"
-      type="long"
-      writeable="false"/>
+      name="primaryIndicator"
+      is="true"
+      description="set indicator that request processing is at primary session node"
+      type="boolean"/>
+    <attribute
+      name="primaryIndicatorName"
+      description="Request attribute name to indicate that request processing is at primary session node"
+      type="java.lang.String"/>
     <attribute
       name="totalSendTime"
       description="total replicated send time"
       type="long"
       writeable="false"/>
     <attribute
-      name="lastSendTime"
-      description="last replicated request time"
+      name="totalRequestTime"
+      description="total replicated request time"
       type="long"
       writeable="false"/>
     <operation
