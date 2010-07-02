@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -44,8 +45,38 @@ public class TestAsyncListener extends TomcatBaseTest {
 
     public void testTimeout() throws Exception {
         // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();        
+
+        TimeoutServlet timeout = createTimeoutTestApp(tomcat);
+        tomcat.start();
+        checkTimeoutRequest(timeout);
+    }
+
+    public void testNIOTimeout() throws Exception {
+        // Setup Tomcat instance with NIO Connector
         Tomcat tomcat = getTomcatInstance();
+        Connector nioConnector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+        nioConnector.setPort(getNextPort());
+        tomcat.getService().addConnector(nioConnector);
         
+        TimeoutServlet timeout = createTimeoutTestApp(tomcat);
+
+        tomcat.start();
+        checkTimeoutRequest(timeout);
+    }
+    
+    private void checkTimeoutRequest(TimeoutServlet timeout)
+            throws IOException, InterruptedException {
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
+        Thread.sleep(4000);
+        assertEquals(1,timeout.getAsyncTimeout());
+        //assertEquals(1,timeout.getAsyncStart());
+        assertEquals(1,timeout.getAsyncComplete());
+        //assertEquals("hello start: " + timeout.getStart() + "\n", res.toString());
+        assertNull(res.toString());
+    }
+    
+    private TimeoutServlet createTimeoutTestApp(Tomcat tomcat) {
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
         
@@ -62,15 +93,7 @@ public class TestAsyncListener extends TomcatBaseTest {
         Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/async", "time");
-
-        tomcat.start();
-        ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
-        Thread.sleep(4000);
-        assertEquals(1,timeout.getAsyncTimeout());
-        //assertEquals(1,timeout.getAsyncStart());
-        assertEquals(1,timeout.getAsyncComplete());
-        //assertEquals("hello start: " + timeout.getStart() + "\n", res.toString());
-        assertNull(res.toString());
+        return timeout;
     }
     
     private static class TimeoutServlet extends HttpServlet {
