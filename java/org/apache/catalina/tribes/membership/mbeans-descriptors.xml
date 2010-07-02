@@ -24,41 +24,44 @@
     group="Cluster"
     type="org.apache.catalina.tribes.membership.McastService">
     <attribute
+      name="address"
+      description="Multicast IP Address"
+      type="java.lang.String"/>
+    <attribute
+      name="bind"
+      description="Multicast IP Interface address (default auto)"
+      type="java.lang.String"/>
+    <attribute
+      name="dropTime"
+      description="Timeout from frequency ping after member disapper notify"
+      type="long"/>
+    <attribute
+      name="frequency"
+      description="Ping Frequency at msec"
+      type="long"/>
+    <attribute
       name="info"
       description="Class version info"
       type="java.lang.String"
       writeable="false"/>
     <attribute
-      name="mcastAddr"
-      description="Multicast IP Address"
-      type="java.lang.String"/>
+      name="localLoopbackDisabled"
+      description="Is local loopback disabled?"
+      is="true"
+      type="boolean"/>
     <attribute
-      name="mcastBindAddress"
-      description="Multicast IP Interface address (default auto)"
-      type="java.lang.String"/>
+      name="localMemberName"
+      description="Complete local receiver information"
+      type="java.lang.String"
+      writeable="false"/>
     <attribute
-      name="mcastPort"
+      name="membersByName"
+      description="Complete remote sender information"
+      type="[Ljava.lang.String;"
+      writeable="false"/>
+    <attribute
+      name="port"
       description="Multicast UDP Port"
-      type="int"/>
-    <attribute
-      name="mcastFrequency"
-      description="Ping Frequency at msec"
-      type="long"/>
-    <attribute
-      name="mcastClusterDomain"
-      description="Cluster Domain of this member"
-      type="java.lang.String"/>
-    <attribute
-      name="mcastDropTime"
-      description="Timeout from frequency ping after member disapper notify"
-      type="long"/>
-    <attribute
-      name="mcastSoTimeout"
-      description="Multicast Socket Timeout"
-      type="int"/>
-    <attribute
-      name="mcastTTL"
-      description=""
       type="int"/>
     <attribute
       name="recoveryCounter"
@@ -74,15 +77,13 @@
       description="Sleep time between next socket recovery (5000 msec)"
       type="long"/>
     <attribute
-      name="localMemberName"
-      description="Complete local receiver information"
-      type="java.lang.String"
-      writeable="false"/>
+      name="soTimeout"
+      description="Multicast Socket Timeout"
+      type="int"/>
     <attribute
-      name="membersByName"
-      description="Complete remote sender information"
-      type="[Ljava.lang.String;"
-      writeable="false"/>
+      name="Ttl"
+      description=""
+      type="int"/>
     <operation
       name="start"
       description="Start the cluster membership"
