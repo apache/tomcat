@@ -84,6 +84,10 @@
         rather than an empty string. (markt)
       </fix>
       <fix>
+        <bug>49530</bug>: Contexts and Servlets not stopped when Tomcat is shut
+        down. (markt)
+      </fix>
+      <fix>
         <bug>49536</bug>: If no ROOT context is deployed, ensure a 404 rather
         than a 200 is returned for requests that don't map to any other context.
         (markt)
