@@ -74,7 +74,7 @@ public class TestBug49158 extends CookiesBaseTest {
             session.invalidate();
             session = req.getSession();
             session.invalidate();
-            session = req.getSession();
+            req.getSession();
         }
         
     }
