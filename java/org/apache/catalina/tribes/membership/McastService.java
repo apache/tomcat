@@ -241,17 +241,49 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void setRecoveryCounter(int recoveryCounter) {
         properties.setProperty("recoveryCounter", String.valueOf(recoveryCounter));
     }
+    
+    public int getRecoveryCounter(){
+    	String p = properties.getProperty("recoveryCounter");
+    	if(p != null){
+    		return new Integer(p).intValue();
+    	}
+    	return -1;
+    }
 
     public void setRecoveryEnabled(boolean recoveryEnabled) {
         properties.setProperty("recoveryEnabled", String.valueOf(recoveryEnabled));
+    }
+    
+    public boolean getRecoveryEnabled() {
+    	String p = properties.getProperty("recoveryEnabled");
+    	if(p != null){
+    		return new Boolean(p).booleanValue();
+    	}
+    	return false;
     }
 
     public void setRecoverySleepTime(long recoverySleepTime) {
         properties.setProperty("recoverySleepTime", String.valueOf(recoverySleepTime));
     }
+    
+    public long getRecoverySleepTime(){
+    	String p = properties.getProperty("recoverySleepTime");
+    	if(p != null){
+    		return new Long(p).longValue();
+    	}
+    	return -1;
+    }
 
     public void setLocalLoopbackDisabled(boolean localLoopbackDisabled) {
         properties.setProperty("localLoopbackDisabled",String.valueOf(localLoopbackDisabled));
+    }
+    
+    public boolean getLocalLoopbackDisabled(boolean localLoopbackDisabled) {
+    	String p = properties.getProperty("localLoopbackDisabled");
+    	if(p != null){
+    		return new Boolean(p).booleanValue();
+    	}
+    	return false;
     }
 
     /**
