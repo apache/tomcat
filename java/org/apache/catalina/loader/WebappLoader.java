@@ -483,9 +483,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * such that the loaded classes should be reloaded?
      */
     public boolean modified() {
-
-        return (classLoader.modified());
-
+        return classLoader != null ? classLoader.modified() : false ;
     }
 
 
@@ -493,7 +491,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * Used to periodically signal to the classloader to release JAR resources.
      */
     public void closeJARs(boolean force) {
-        if (classLoader !=null){
+        if (classLoader !=null) {
             classLoader.closeJARs(force);
         }
     }
