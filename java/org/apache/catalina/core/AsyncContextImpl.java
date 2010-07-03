@@ -253,7 +253,7 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     public boolean isStarted() {
-        return (state.get() == AsyncState.STARTED || state.get() == AsyncState.DISPATCHING);
+        return (state.get() == AsyncState.STARTED || state.get() == AsyncState.DISPATCHING || state.get() == AsyncState.DISPATCHED);
     }
 
     public void setStarted(Context context) {
@@ -292,7 +292,8 @@ public class AsyncContextImpl implements AsyncContext {
     
     public void doInternalDispatch() throws ServletException, IOException {
         if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.COMPLETING)) {
-            log.debug("TIMING OUT!");
+        	if( log.isDebugEnabled())
+        	    log.debug("TIMING OUT!");
             boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
                 listener.fireOnTimeout(event);
@@ -303,15 +304,18 @@ public class AsyncContextImpl implements AsyncContext {
             }
             doInternalComplete(true);
         } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.COMPLETING)) {
-            log.debug("ON ERROR!");
+            if( log.isDebugEnabled())
+                log.debug("ON ERROR!");
             boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
                 try {
                     listener.fireOnError(event);
                 }catch (IllegalStateException x) {
-                    log.debug("Listener invoked invalid state.",x);
+                    if( log.isDebugEnabled())
+                        log.debug("Listener invoked invalid state.",x);
                 }catch (Exception x) {
-                    log.debug("Exception during onError.",x);
+                    if(log.isDebugEnabled())
+                        log.debug("Exception during onError.",x);
                 }
                 listenerInvoked = true;
             }
