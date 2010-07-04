@@ -213,7 +213,6 @@
     <include name="**/*.pom"/>
     <include name="**/*.properties"/>
     <include name="**/*.properties.default"/>
-    <include name="**/*.rtf"/>
     <include name="**/*.svg"/>
     <include name="**/*.tag"/>
     <include name="**/*.tagx"/>
