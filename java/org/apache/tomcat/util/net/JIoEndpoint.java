@@ -399,11 +399,6 @@ public class JIoEndpoint extends AbstractEndpoint {
                 acceptorThread.setDaemon(getDaemon());
                 acceptorThread.start();
             }
-            
-            // Start async timeout thread
-            Thread timeoutThread = new Thread(new AsyncTimeout(),getName() + "-AsyncTimeout");
-            timeoutThread.setDaemon(true);
-            timeoutThread.start();
         }
     }
 
