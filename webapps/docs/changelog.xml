@@ -38,8 +38,8 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>49528</bug>: HttpServletRequest.isAsyncStarted() now returns true when a Runnable is started! 
-        Reported by Pieter Libin (pero)
+        <bug>49528</bug>: HttpServletRequest.isAsyncStarted() now returns true when a Runnable is started. 
+        Bug reported by Pieter Libin. (pero)
       </fix>
       <fix>
         GSOC 2010. Continue work to align MBean descriptors with reality. Patch
