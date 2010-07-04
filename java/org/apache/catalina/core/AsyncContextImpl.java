@@ -48,7 +48,8 @@ import org.apache.juli.logging.LogFactory;
 public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
-        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT, ERROR_DISPATCHING
+        NOT_STARTED, STARTED, DISPATCHING, DISPATCHING_INTERNAL, DISPATCHED,
+        COMPLETING, TIMING_OUT, ERROR_DISPATCHING
     }
     
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
@@ -178,8 +179,8 @@ public class AsyncContextImpl implements AsyncContext {
             log.debug("AsyncContext Start Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
         }
 
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
-            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
+        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING_INTERNAL) ||
+            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING_INTERNAL)) {
             // TODO SERVLET3 - async
             final ServletContext sctx = getServletRequest().getServletContext();
             Runnable r = new Runnable() {
@@ -331,6 +332,20 @@ public class AsyncContextImpl implements AsyncContext {
                     else throw new ServletException(x);
                 } finally {
                     dispatch = null;
+                }
+            }
+        } else if (this.state.get() == AsyncState.DISPATCHING_INTERNAL) {
+            if (this.dispatch!=null) {
+                try {
+                    dispatch.run();
+                } catch (RuntimeException x) {
+                    doInternalComplete(true);
+                    if (x.getCause() instanceof ServletException) throw (ServletException)x.getCause();
+                    if (x.getCause() instanceof IOException) throw (IOException)x.getCause();
+                    else throw new ServletException(x);
+                } finally {
+                    dispatch = null;
+                    this.state.set(AsyncState.DISPATCHED);
                 }
             }
         } else if (this.state.get()==AsyncState.COMPLETING) {
