@@ -112,7 +112,7 @@
       </update>
       <fix>
         Correct over zealous type checking for EL in attributes that broke the
-        use of JSF convertors. (markt)
+        use of JSF converters. (markt)
       </fix>
       <fix>
         Correct algorithm used to identify correct method to use when a
@@ -160,7 +160,7 @@
       <fix>
         Switch the Host Manager application to the generic CSRF protection for
         the HTML interface and prevent started hosts from being started and
-        stopped hosts from being stopped.
+        stopped hosts from being stopped. (markt)
       </fix>
       <fix>
         <bug>49518</bug>: Fix typo in extras documentation. (markt)
@@ -183,7 +183,8 @@
         Improve and document VirtualWebappLoader. (rjung)
       </update>
       <add>
-        <bug>43642</bug>: Add prestartminSpareThreads attribute for Executor. (jfclere)
+        <bug>43642</bug>: Add prestartminSpareThreads attribute for Executor.
+        (jfclere)
       </add>
       <update>
         Switch from AnnotationProcessor to InstanceManager. Patch provided by
@@ -229,9 +230,9 @@
         queue size and a timeout for adding jobs to the queue. (fhanik) 
       </add>
       <add>
-        Add support for aliases to StandardContext. This allows content from other
-        directories and/or WAR files to be mapped to paths within the context.
-        (markt)
+        Add support for aliases to StandardContext. This allows content from
+        other directories and/or WAR files to be mapped to paths within the
+        context. (markt)
       </add>
       <update>
         Provide clearer definition of Lifecycle interface, particularly start
@@ -296,8 +297,8 @@
         Update EL support to the EL 2.2 specification. (markt)
       </update>
       <update>
-        <rev>787978</rev> Use "1.6" as the default value for compilerSourceVM and compilerTargetVM
-        options of Jasper. (kkolinko)
+        <rev>787978</rev> Use "1.6" as the default value for compilerSourceVM
+        and compilerTargetVM options of Jasper. (kkolinko)
       </update>
       <add>
         <bug>48358</bug>: Add support for limiting the number of JSPs that are
