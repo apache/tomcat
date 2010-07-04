@@ -98,14 +98,6 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        Start JioEndpoint timeout thread, to inform AsyncListner as async timeout is detected
-        and application thread doesn't finished the request. (pero)
-       </fix>
-    </changelog>
-  </subsection>    
   <subsection name="Jasper">
     <changelog>
       <update>
