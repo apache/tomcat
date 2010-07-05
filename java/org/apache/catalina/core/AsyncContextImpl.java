@@ -48,8 +48,8 @@ import org.apache.juli.logging.LogFactory;
 public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
-        NOT_STARTED, STARTED, DISPATCHING, DISPATCHING_INTERNAL, DISPATCHED,
-        COMPLETING, TIMING_OUT, ERROR_DISPATCHING
+        NOT_STARTED, STARTED, DISPATCHING, DISPATCHING_RUNNABLE, DISPATCHED,
+        COMPLETING, COMPLETING_RUNNABLE, TIMING_OUT, ERROR_DISPATCHING
     }
     
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
@@ -87,6 +87,9 @@ public class AsyncContextImpl implements AsyncContext {
             AtomicBoolean dispatched = new AtomicBoolean(false);
             request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
             if (!dispatched.get()) doInternalComplete(false);
+        } else if (state.compareAndSet(AsyncState.DISPATCHING_RUNNABLE,
+                AsyncState.COMPLETING_RUNNABLE)) {
+            // do nothing
         } else {
             throw new IllegalStateException("Complete not allowed. Invalid state:"+state.get());
         }
@@ -179,8 +182,8 @@ public class AsyncContextImpl implements AsyncContext {
             log.debug("AsyncContext Start Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
         }
 
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING_INTERNAL) ||
-            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING_INTERNAL)) {
+        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING_RUNNABLE) ||
+            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING_RUNNABLE)) {
             // TODO SERVLET3 - async
             final ServletContext sctx = getServletRequest().getServletContext();
             Runnable r = new Runnable() {
@@ -254,7 +257,9 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     public boolean isStarted() {
-        return (state.get() == AsyncState.STARTED || state.get() == AsyncState.DISPATCHING);
+        return (state.get() == AsyncState.STARTED ||
+                state.get() == AsyncState.DISPATCHING ||
+                state.get() == AsyncState.DISPATCHING_RUNNABLE);
     }
 
     public void setStarted(Context context) {
@@ -334,7 +339,7 @@ public class AsyncContextImpl implements AsyncContext {
                     dispatch = null;
                 }
             }
-        } else if (this.state.get() == AsyncState.DISPATCHING_INTERNAL) {
+        } else if (this.state.get() == AsyncState.DISPATCHING_RUNNABLE) {
             if (this.dispatch!=null) {
                 try {
                     dispatch.run();
@@ -345,7 +350,14 @@ public class AsyncContextImpl implements AsyncContext {
                     else throw new ServletException(x);
                 } finally {
                     dispatch = null;
-                    this.state.set(AsyncState.DISPATCHED);
+                }
+                if (this.state.compareAndSet(AsyncState.COMPLETING_RUNNABLE,
+                        AsyncState.COMPLETING)) {
+                    doInternalComplete(false);
+                } else if (this.state.get() == AsyncState.DISPATCHING_RUNNABLE) {
+                    doInternalComplete(true);
+                    throw new IllegalStateException(
+                            "Failed to call dispatch() or complete() after start()");
                 }
             }
         } else if (this.state.get()==AsyncState.COMPLETING) {
