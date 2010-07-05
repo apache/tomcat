@@ -746,6 +746,7 @@ public class Response
      *
      * @param type The new content type
      */
+    @SuppressWarnings("deprecation") // isSpace (deprecated) cannot be replaced by isWhiteSpace
     public void setContentType(String type) {
 
         if (isCommitted())
@@ -773,6 +774,7 @@ public class Response
             if (index != -1) {
                 int len = type.length();
                 index++;
+                // N.B. isSpace (deprecated) cannot be replaced by isWhiteSpace
                 while (index < len && Character.isSpace(type.charAt(index))) {
                     index++;
                 }
