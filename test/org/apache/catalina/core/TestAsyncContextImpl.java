@@ -50,17 +50,17 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // Call the servlet once
         getUrl("http://localhost:" + getPort() + "/");
 
-        assertEquals("", servlet.getErrors());
+        assertEquals("1false2true3true4true5false", servlet.getResult());
     }
     
     private static class Bug49528Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
-        private StringBuilder errors = new StringBuilder();
+        private StringBuilder result = new StringBuilder();
         
-        public String getErrors() {
-            return errors.toString();
+        public String getResult() {
+            return result.toString();
         }
 
         @Override
@@ -68,19 +68,24 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 final HttpServletResponse resp)
                 throws ServletException, IOException {
             
-            confirmFalse("1", req);
+            result.append('1');
+            result.append(req.isAsyncStarted());
             req.startAsync();
-            confirmTrue("2", req);
+            result.append('2');
+            result.append(req.isAsyncStarted());
             
             req.getAsyncContext().start(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        confirmTrue("3", req);
+                        result.append('3');
+                        result.append(req.isAsyncStarted());
                         Thread.sleep(1000);
-                        confirmTrue("4", req);
+                        result.append('4');
+                        result.append(req.isAsyncStarted());
                         req.getAsyncContext().complete();
-                        confirmFalse("5", req);
+                        result.append('5');
+                        result.append(req.isAsyncStarted());
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -91,20 +96,5 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             // when debugging
             req.getMethod();
         }
-        
-        private void confirmFalse(String stage, HttpServletRequest req) {
-            if (req.isAsyncStarted()) {
-                errors.append("Stage " + stage +
-                        ": Async started when not expected\n");
-            }
-        }
-
-        private void confirmTrue(String stage, HttpServletRequest req) {
-            if (!req.isAsyncStarted()) {
-                errors.append("Stage " + stage +
-                        ": Async not started when expected\n");
-            }
-        }
-
     }
 }
