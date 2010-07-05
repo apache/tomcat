@@ -127,6 +127,9 @@
         Correct algorithm used to identify correct method to use when a
         MethodExpressions is used in EL. (markt)
       </fix>
+      <fix>
+        <bug>49217</bug>: Prevent use of Java keywords in identifiers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
