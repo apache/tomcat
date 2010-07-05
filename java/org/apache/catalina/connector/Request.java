@@ -1578,6 +1578,7 @@ public class Request
         }
         
         return (asyncContext.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
+                asyncContext.getState()==AsyncContextImpl.AsyncState.DISPATCHING_RUNNABLE  ||
                 asyncContext.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
                 asyncContext.getState()==AsyncContextImpl.AsyncState.STARTED     ||
                 asyncContext.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING ||
