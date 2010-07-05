@@ -103,6 +103,11 @@
         Additional debug logging in StandardContext to provide information on
         Manager selection. (markt)
       </add>
+      <fix>
+        <bug>49550</bug>: Supress deprecation warning where deprecated code is
+        required to be used. No functional change. Patch provided by Sebb.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
