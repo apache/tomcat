@@ -18,6 +18,7 @@
 package org.apache.el.parser;
 
 import javax.el.ELContext;
+import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
@@ -53,7 +54,49 @@ public class TestELParser extends TestCase {
         testExpression("#$#{1+1}", "#$2");
         testExpression("$#{1+1}", "$2");
         testExpression("$#${1+1}", "$#2");
-}
+    }
+    
+    public void testJavaKeyWordSuffix() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+        
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setInt("five");
+        ValueExpression var =
+            factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        // Should fail
+        Exception e = null;
+        try {
+            factory.createValueExpression(context, "${beanA.int}",
+                    String.class);
+        } catch (ELException ele) {
+            e = ele;
+        }
+        assertNotNull(e);
+    }
+
+    public void testJavaKeyWordIdentifier() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+        
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setInt("five");
+        ValueExpression var =
+            factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("this", var);
+
+        // Should fail
+        Exception e = null;
+        try {
+            factory.createValueExpression(context, "${this}", String.class);
+        } catch (ELException ele) {
+            e = ele;
+        }
+        assertNotNull(e);
+    }
+
 
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
