@@ -537,7 +537,7 @@ public class ContextConfig
      */
     protected void contextConfig() {
         
-        // Open the default web.xml file, if it exists
+        // Open the default context.xml file, if it exists
         if( defaultContextXml==null && context instanceof StandardContext ) {
             defaultContextXml = ((StandardContext)context).getDefaultContextXml();
         }
@@ -545,7 +545,10 @@ public class ContextConfig
         if( defaultContextXml==null ) getDefaultContextXml();
 
         if (!context.getOverride()) {
-            File defaultContextFile = new File(getBaseDir(), defaultContextXml);
+            File defaultContextFile = new File(defaultContextXml);
+            if (!defaultContextFile.isAbsolute()) {
+                defaultContextFile =new File(getBaseDir(), defaultContextXml);
+            }
             if (defaultContextFile.exists()) {
                 try {
                     URL defaultContextUrl = defaultContextFile.toURI().toURL();
