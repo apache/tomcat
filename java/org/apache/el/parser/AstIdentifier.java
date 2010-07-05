@@ -28,6 +28,7 @@ import javax.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
+import org.apache.el.util.Validation;
 
 
 /**
@@ -123,6 +124,14 @@ public final class AstIdentifier extends SimpleNode {
     public MethodInfo getMethodInfo(EvaluationContext ctx,
             Class<?>[] paramTypes) throws ELException {
         return this.getMethodExpression(ctx).getMethodInfo(ctx.getELContext());
+    }
+
+    @Override
+    public void setImage(String image) {
+        if (Validation.isJavaKeyword(image)) {
+            throw new ELException("Can't use Java keyword as identifier");
+        }
+        this.image = image;
     }
 
     private final MethodExpression getMethodExpression(EvaluationContext ctx)
