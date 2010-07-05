@@ -108,6 +108,10 @@
         required to be used. No functional change. Patch provided by Sebb.
         (markt)
       </fix>
+      <fix>
+        <bug>49551</bug>: Allow default context.xml location to be specified
+        using an absolute path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
