@@ -26,27 +26,27 @@ public class ValuesBean {
     private double doubleValue;
     private long longValue;
 
-    public String getString() {
+    public String getStringValue() {
         return this.string;
     }
 
-    public void setString(String string) {
+    public void setStringValue(String string) {
         this.string = string;
     }
 
-    public double getDouble() {
+    public double getDoubleValue() {
         return doubleValue;
     }
 
-    public void setDouble(double doubleValue) {
+    public void setDoubleValue(double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
-    public long getLong() {
+    public long getLongValue() {
         return longValue;
     }
 
-    public void setLong(long longValue) {
+    public void setLongValue(long longValue) {
         this.longValue = longValue;
     }
 }
