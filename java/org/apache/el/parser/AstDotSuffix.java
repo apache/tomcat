@@ -41,7 +41,7 @@ public final class AstDotSuffix extends SimpleNode {
     
     @Override
     public void setImage(String image) {
-        if (Validation.isJavaKeyword(image)) {
+        if (!Validation.isIdentifier(image)) {
             throw new ELException("Can't use Java keyword as identifier");
         }
         this.image = image;
