@@ -128,7 +128,8 @@
         MethodExpressions is used in EL. (markt)
       </fix>
       <fix>
-        <bug>49217</bug>: Prevent use of Java keywords in identifiers. (markt)
+        <bug>49217</bug>: Ensure that identifiers used in EL meet the
+        requirements of the Java Language Specification. (markt)
       </fix>
     </changelog>
   </subsection>

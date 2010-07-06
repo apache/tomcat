@@ -19,15 +19,16 @@ package org.apache.el.util;
 
 public class Validation {
 
-    private static final String javaKeywords[] = { "abstract", "assert",
-        "boolean", "break", "byte", "case", "catch", "char", "class",
-        "const", "continue", "default", "do", "double", "else", "enum",
-        "extends", "final", "finally", "float", "for", "goto", "if",
-        "implements", "import", "instanceof", "int", "interface", "long",
-        "native", "new", "package", "private", "protected", "public",
-        "return", "short", "static", "strictfp", "super", "switch",
-        "synchronized", "this", "throw", "throws", "transient", "try",
-        "void", "volatile", "while" };
+    // Java keywords, boolean literals & the null literal in alphabetical order
+    private static final String invalidIdentifiers[] = { "abstract", "assert",
+        "boolean", "break", "byte", "case", "catch", "char", "class", "const",
+        "continue", "default", "do", "double", "else", "enum", "extends",
+        "false", "final", "finally", "float", "for", "goto", "if", "implements",
+        "import", "instanceof", "int", "interface", "long", "native", "new",
+        "null", "package", "private", "protected", "public", "return", "short",
+        "static", "strictfp", "super", "switch", "synchronized", "this",
+        "throw", "throws", "transient", "true", "try", "void", "volatile",
+        "while" };
     
     
     private Validation() {
@@ -35,16 +36,23 @@ public class Validation {
     }
     
     /**
-     * Test whether the argument is a Java keyword
+     * Test whether the argument is a Java identifier.
      */
-    public static boolean isJavaKeyword(String key) {
+    public static boolean isIdentifier(String key) {
+        
+        // Should not be the case but check to be sure
+        if (key == null || key.length() == 0) {
+            return false;
+        }
+        
+        // Check the list of known invalid values
         int i = 0;
-        int j = javaKeywords.length;
+        int j = invalidIdentifiers.length;
         while (i < j) {
             int k = (i + j) / 2;
-            int result = javaKeywords[k].compareTo(key);
+            int result = invalidIdentifiers[k].compareTo(key);
             if (result == 0) {
-                return true;
+                return false;
             }
             if (result < 0) {
                 i = k + 1;
@@ -52,6 +60,19 @@ public class Validation {
                 j = k;
             }
         }
-        return false;
+
+        // Check the start character that has more restrictions
+        if (!Character.isJavaIdentifierStart(key.charAt(0))) {
+            return false;
+        }
+
+        // Check each remaining character used is permitted
+        for (int idx = 1; idx < key.length(); idx++) {
+            if (!Character.isJavaIdentifierPart(key.charAt(idx))) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 }
