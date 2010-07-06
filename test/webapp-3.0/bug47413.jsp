@@ -19,31 +19,31 @@
 <html>
   <head><title>Bug 47413 test case</title></head>
   <body>
-    <jsp:setProperty name="values" property="string" value="${'hello'} wo${'rld'}"/>
-    <p>00-${values.string}</p>
+    <jsp:setProperty name="values" property="stringValue" value="${'hello'} wo${'rld'}"/>
+    <p>00-${values.stringValue}</p>
     <tags:echo echo="01-${'hello'} wo${'rld'}"/>
 
-    <jsp:setProperty name="values" property="double" value="${1+2}.${220}"/>
-    <p>02-${values.double}</p>
+    <jsp:setProperty name="values" property="doubleValue" value="${1+2}.${220}"/>
+    <p>02-${values.doubleValue}</p>
     <tags:echo-double index="03" echo="${1+2}.${220}"/>
     
-    <jsp:setProperty name="values" property="long" value="000${1}${7}"/>
-    <p>04-${values.long}</p>
+    <jsp:setProperty name="values" property="longValue" value="000${1}${7}"/>
+    <p>04-${values.longValue}</p>
     <tags:echo-long index="05" echo="000${1}${7}"/>
     
-    <jsp:setProperty name="values" property="string"
+    <jsp:setProperty name="values" property="stringValue"
                      value="${undefinedFoo}hello world${undefinedBar}"/>
-    <p>06-${values.string}</p>
+    <p>06-${values.stringValue}</p>
     <tags:echo echo="${undefinedFoo}07-hello world${undefinedBar}"/>
 
-    <jsp:setProperty name="values" property="double"
+    <jsp:setProperty name="values" property="doubleValue"
                      value="${undefinedFoo}${undefinedBar}"/>
-    <p>08-${values.double}</p>
+    <p>08-${values.doubleValue}</p>
     <tags:echo-double index="09" echo="${undefinedFoo}${undefinedBar}"/>
 
-    <jsp:setProperty name="values" property="long"
+    <jsp:setProperty name="values" property="longValue"
                      value="${undefinedFoo}${undefinedBar}"/>
-    <p>10-${values.long}</p>
+    <p>10-${values.longValue}</p>
     <tags:echo-long index="11" echo="${undefinedFoo}${undefinedBar}"/>
 
   </body>
