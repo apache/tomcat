@@ -41,7 +41,7 @@
       <tr>
         <td>\${'hello'} wo\${'rld'}</td>
         <td>String</td>
-        <td><jsp:setProperty name="values" property="string" value="${'hello'} wo${'rld'}"/>${values.string}</td>
+        <td><jsp:setProperty name="values" property="stringValue" value="${'hello'} wo${'rld'}"/>${values.stringValue}</td>
       </tr>
       <tr>
         <td>\${'hello'} wo\${'rld'}</td>
@@ -51,7 +51,7 @@
       <tr>
         <td>\${1+2}.\${220}</td>
         <td>Double</td>
-        <td><jsp:setProperty name="values" property="double" value="${1+2}.${220}"/>${values.double}</td>
+        <td><jsp:setProperty name="values" property="doubleValue" value="${1+2}.${220}"/>${values.doubleValue}</td>
       </tr>
       <tr>
         <td>\${1+2}.\${220}</td>
@@ -61,7 +61,7 @@
       <tr>
         <td>000\${1}\${7}</td>
         <td>Long</td>
-        <td><jsp:setProperty name="values" property="long" value="000${1}${7}"/>${values.long}</td>
+        <td><jsp:setProperty name="values" property="longValue" value="000${1}${7}"/>${values.longValue}</td>
       </tr>
       <tr>
         <td>000\${1}\${7}</td>
@@ -75,7 +75,7 @@
       <tr>
         <td>\${undefinedFoo}hello world\${undefinedBar}</td>
         <td>String</td>
-        <td><jsp:setProperty name="values" property="string" value="${undefinedFoo}hello world${undefinedBar}"/>${values.string}</td>
+        <td><jsp:setProperty name="values" property="stringValue" value="${undefinedFoo}hello world${undefinedBar}"/>${values.stringValue}</td>
       </tr>
       <tr>
         <td>\${undefinedFoo}hello world\${undefinedBar}</td>
@@ -85,7 +85,7 @@
       <tr>
         <td>\${undefinedFoo}\${undefinedBar}</td>
         <td>Double</td>
-        <td><jsp:setProperty name="values" property="double" value="${undefinedFoo}${undefinedBar}"/>${values.double}</td>
+        <td><jsp:setProperty name="values" property="doubleValue" value="${undefinedFoo}${undefinedBar}"/>${values.doubleValue}</td>
       </tr>
       <tr>
         <td>\${undefinedFoo}\${undefinedBar}</td>
@@ -95,7 +95,7 @@
       <tr>
         <td>\${undefinedFoo}\${undefinedBar}</td>
         <td>Long</td>
-        <td><jsp:setProperty name="values" property="long" value="${undefinedFoo}${undefinedBar}"/>${values.long}</td>
+        <td><jsp:setProperty name="values" property="longValue" value="${undefinedFoo}${undefinedBar}"/>${values.longValue}</td>
       </tr>
       <tr>
         <td>\${undefinedFoo}\${undefinedBar}</td>
