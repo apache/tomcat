@@ -253,14 +253,16 @@ final class StandardWrapperValve
             exception(request, response, e);
         } catch (IOException e) {
         	request.removeAttribute(Globals.JSP_FILE_ATTR);
-            container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString(
+                    "standardWrapper.serviceException", wrapper.getName(),
+                    context.getName()), e);
             throwable = e;
             exception(request, response, e);
         } catch (UnavailableException e) {
         	request.removeAttribute(Globals.JSP_FILE_ATTR);
-            container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString(
+                    "standardWrapper.serviceException", wrapper.getName(),
+                    context.getName()), e);
             //            throwable = e;
             //            exception(request, response, e);
             wrapper.unavailable(e);
@@ -281,15 +283,18 @@ final class StandardWrapperValve
         	request.removeAttribute(Globals.JSP_FILE_ATTR);
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
-                container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                                 wrapper.getName()), rootCause);
+                container.getLogger().error(sm.getString(
+                        "standardWrapper.serviceExceptionRoot",
+                        wrapper.getName(), context.getName(), e.getMessage()),
+                        rootCause);
             }
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
             request.removeAttribute(Globals.JSP_FILE_ATTR);
-            container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString(
+                    "standardWrapper.serviceException", wrapper.getName(),
+                    context.getName()), e);
             throwable = e;
             exception(request, response, e);
         }
@@ -437,29 +442,34 @@ final class StandardWrapperValve
             exception(request, response, e);
         } catch (IOException e) {
             request.removeAttribute(Globals.JSP_FILE_ATTR);
-            container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString(
+                    "standardWrapper.serviceException", wrapper.getName(),
+                    context.getName()), e);
             throwable = e;
             exception(request, response, e);
         } catch (UnavailableException e) {
             request.removeAttribute(Globals.JSP_FILE_ATTR);
-            container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString(
+                    "standardWrapper.serviceException", wrapper.getName(),
+                    context.getName()), e);
             // Do not save exception in 'throwable', because we
             // do not want to do exception(request, response, e) processing
         } catch (ServletException e) {
             request.removeAttribute(Globals.JSP_FILE_ATTR);
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
-                container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                                 wrapper.getName()), rootCause);
+                container.getLogger().error(sm.getString(
+                        "standardWrapper.serviceExceptionRoot",
+                        wrapper.getName(), context.getName(), e.getMessage()),
+                        rootCause);
             }
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
             request.removeAttribute(Globals.JSP_FILE_ATTR);
-            container.getLogger().error(sm.getString("standardWrapper.serviceException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString(
+                    "standardWrapper.serviceException", wrapper.getName(),
+                    context.getName()), e);
             throwable = e;
             exception(request, response, e);
         }
