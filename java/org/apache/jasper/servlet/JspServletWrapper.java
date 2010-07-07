@@ -63,6 +63,7 @@ import org.apache.tomcat.InstanceManager;
  * @author Tim Fennell
  */
 
+@SuppressWarnings("deprecation") // Have to support SingleThreadModel
 public class JspServletWrapper {
 
     // Logger
@@ -297,10 +298,10 @@ public class JspServletWrapper {
                         (HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                          Localizer.getMessage("jsp.error.unavailable"));
                     return;
-                } else {
-                    // Wait period has expired. Reset.
-                    available = 0;
                 }
+
+                // Wait period has expired. Reset.
+                available = 0;
             }
 
             /*
@@ -337,30 +338,26 @@ public class JspServletWrapper {
         } catch (ServletException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (FileNotFoundException fnfe) {
             // File has been removed. Let caller handle this.
             throw fnfe;
         } catch (IOException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (IllegalStateException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (Exception ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw new JasperException(ex);
             }
+            throw new JasperException(ex);
         }
 
         try {
@@ -393,41 +390,37 @@ public class JspServletWrapper {
                 // a response.sendError() will be ignored by the
                 // servlet engine.
                 throw ex;
-            } else {
-                int unavailableSeconds = ex.getUnavailableSeconds();
-                if (unavailableSeconds <= 0) {
-                    unavailableSeconds = 60;        // Arbitrary default
-                }
-                available = System.currentTimeMillis() +
-                    (unavailableSeconds * 1000L);
-                response.sendError
-                    (HttpServletResponse.SC_SERVICE_UNAVAILABLE, 
-                     ex.getMessage());
             }
+
+            int unavailableSeconds = ex.getUnavailableSeconds();
+            if (unavailableSeconds <= 0) {
+                unavailableSeconds = 60;        // Arbitrary default
+            }
+            available = System.currentTimeMillis() +
+                (unavailableSeconds * 1000L);
+            response.sendError
+                (HttpServletResponse.SC_SERVICE_UNAVAILABLE, 
+                 ex.getMessage());
         } catch (ServletException ex) {
             if(options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (IOException ex) {
             if(options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (IllegalStateException ex) {
             if(options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (Exception ex) {
             if(options.getDevelopment()) {
                 throw handleJspException(ex);
-            } else {
-                throw new JasperException(ex);
             }
+            throw new JasperException(ex);
         }
     }
 
@@ -497,42 +490,40 @@ public class JspServletWrapper {
                 // parsed JSP to hand, we can't really add anything
                 return new JasperException(ex);
             }
-            else {
-                int javaLineNumber = jspFrame.getLineNumber();
-                JavacErrorDetail detail = ErrorDispatcher.createJavacError(
-                        jspFrame.getMethodName(),
-                        this.ctxt.getCompiler().getPageNodes(),
-                        null,
-                        javaLineNumber,
-                        ctxt);
 
-                // If the line number is less than one we couldn't find out
-                // where in the JSP things went wrong
-                int jspLineNumber = detail.getJspBeginLineNumber();
-                if (jspLineNumber < 1) {
-                    throw new JasperException(ex);
-                }
+            int javaLineNumber = jspFrame.getLineNumber();
+            JavacErrorDetail detail = ErrorDispatcher.createJavacError(
+                    jspFrame.getMethodName(),
+                    this.ctxt.getCompiler().getPageNodes(),
+                    null,
+                    javaLineNumber,
+                    ctxt);
 
-                if (options.getDisplaySourceFragment()) {
-                    return new JasperException(Localizer.getMessage
-                            ("jsp.exception", detail.getJspFileName(),
-                                    "" + jspLineNumber) +
-                                    "\n\n" + detail.getJspExtract() +
-                                    "\n\nStacktrace:", ex);
-                    
-                } else {
-                    return new JasperException(Localizer.getMessage
-                            ("jsp.exception", detail.getJspFileName(),
-                                    "" + jspLineNumber), ex);
-                }
+            // If the line number is less than one we couldn't find out
+            // where in the JSP things went wrong
+            int jspLineNumber = detail.getJspBeginLineNumber();
+            if (jspLineNumber < 1) {
+                throw new JasperException(ex);
             }
+
+            if (options.getDisplaySourceFragment()) {
+                return new JasperException(Localizer.getMessage
+                        ("jsp.exception", detail.getJspFileName(),
+                                "" + jspLineNumber) +
+                                "\n\n" + detail.getJspExtract() +
+                                "\n\nStacktrace:", ex);
+                
+            }
+
+            return new JasperException(Localizer.getMessage
+                    ("jsp.exception", detail.getJspFileName(),
+                            "" + jspLineNumber), ex);
         } catch (Exception je) {
             // If anything goes wrong, just revert to the original behaviour
             if (ex instanceof JasperException) {
                 return (JasperException) ex;
-            } else {
-                return new JasperException(ex);
             }
+            return new JasperException(ex);
         }
     }
 
