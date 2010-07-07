@@ -177,6 +177,12 @@ public final class Globals {
 
 
     /**
+     * Platform specific new line sequence.
+     */
+    public static final String NEWLINE = System.getProperty("line.separator");
+    
+    
+    /**
      * The request attribute under which the request URI of the included
      * servlet is stored on an included dispatcher request.
      */
