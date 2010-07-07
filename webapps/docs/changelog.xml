@@ -112,6 +112,10 @@
         <bug>49551</bug>: Allow default context.xml location to be specified
         using an absolute path. (markt)
       </fix>
+      <add>
+        Improve logging of unhandled exceptions in servlets by including the
+        path of the context where the error occurred. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -131,6 +135,10 @@
         <bug>49217</bug>: Ensure that identifiers used in EL meet the
         requirements of the Java Language Specification. (markt)
       </fix>
+      <add>
+        Improve logging of JSP exceptions by including JSP snippet (if enabled)
+        rather than just the root cause in the host log. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

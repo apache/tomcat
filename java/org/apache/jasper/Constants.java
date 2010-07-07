@@ -97,6 +97,11 @@ public class Constants {
     public static final int MAX_POOL_SIZE = 5;
 
     /**
+     * Platform specific new line sequence.
+     */
+    public static final String NEWLINE = System.getProperty("line.separator");
+
+    /**
      * The query parameter that causes the JSP engine to just
      * pregenerated the servlet but not invoke it. 
      */
