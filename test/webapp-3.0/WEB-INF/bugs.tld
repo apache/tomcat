@@ -67,5 +67,9 @@
       <scope>AT_END</scope>
     </variable>
   </tag>
-  
+  <function>
+    <name>bug49555</name>
+    <function-class>org.apache.el.TesterFunctions$Inner</function-class>
+    <function-signature>java.lang.String bug49555()</function-signature>
+  </function>
 </taglib>
