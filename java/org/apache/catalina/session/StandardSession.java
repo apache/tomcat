@@ -1391,8 +1391,8 @@ public class StandardSession
 
         // Validate our current state
         if (!isValidInternal())
-            throw new IllegalStateException
-                (sm.getString("standardSession.setAttribute.ise"));
+            throw new IllegalStateException(sm.getString(
+                    "standardSession.setAttribute.ise", getIdInternal()));
         if ((manager != null) && manager.getDistributable() &&
           !(value instanceof Serializable))
             throw new IllegalArgumentException
