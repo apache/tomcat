@@ -80,6 +80,12 @@
         guess user passwords by brute-force. (markt)
       </add>
       <fix>
+        <bug>49503</bug>: Make sure connectors bind to their associated ports
+        sufficiently early to allow jsvc and the
+        org.apache.catalina.startup.EXIT_ON_INIT_FAILURE system property to
+        operate correctly. (markt)
+      </fix>
+      <fix>
         <bug>49525</bug>: Ensure cookies for the ROOT context have a path of /
         rather than an empty string. (markt)
       </fix>
