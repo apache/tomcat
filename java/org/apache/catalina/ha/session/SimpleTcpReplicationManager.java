@@ -138,6 +138,11 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         this.defaultMode = defaultMode;
     }
     
+    public boolean getUseDirtyFlag()
+    {
+        return useDirtyFlag;
+    }
+    
     public void setUseDirtyFlag(boolean usedirtyflag)
     {
         this.useDirtyFlag = usedirtyflag;
@@ -158,12 +163,22 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
     {
         return mExpireSessionsOnShutdown;
     }
+    
+    public boolean getPrintToScreen()
+    {
+        return mPrintToScreen;
+    }
 
     public void setPrintToScreen(boolean printtoscreen)
     {
         if(log.isDebugEnabled())
             log.debug("Setting screen debug to:"+printtoscreen);
         mPrintToScreen = printtoscreen;
+    }
+    
+    public boolean getSynchronousReplication()
+    {
+        return synchronousReplication;
     }
 
     public void setSynchronousReplication(boolean flag)
