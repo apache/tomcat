@@ -56,6 +56,10 @@
         Add entryPoint support to the CSRF prevention filter. (markt)
       </add>
       <fix>
+        <bug>48297</bug>: Correctly initialise handler chain for web services
+        resources. (markt)
+      </fix>
+      <fix>
         <bug>49030</bug>: When initializing/starting/stopping connectors and
         one of them fails, do not ignore the others. (markt/kkolinko)
       </fix>
