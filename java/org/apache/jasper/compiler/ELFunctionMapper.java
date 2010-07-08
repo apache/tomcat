@@ -212,8 +212,8 @@ public class ELFunctionMapper {
                 FunctionInfo funcInfo = f.getFunctionInfo();
                 String key = f.getPrefix()+ ":" + f.getName();
                 ds.append(funcMethod + "(\"" + key + "\", " +
-                        funcInfo.getFunctionClass() + ".class, " +
-                        '\"' + f.getMethodName() + "\", " +
+                        getCanonicalName(funcInfo.getFunctionClass()) +
+                        ".class, " + '\"' + f.getMethodName() + "\", " +
                         "new Class[] {");
                 String params[] = f.getParameters();
                 for (int k = 0; k < params.length; k++) {
@@ -285,6 +285,17 @@ public class ELFunctionMapper {
          */
         private String getMapName() {
             return "_jspx_fnmap_" + currFunc++;
+        }
+
+        /**
+         * Convert a binary class name into a canonical one that can be used
+         * when generating Java source code.
+         * 
+         * @param className Binary class name
+         * @return          Canonical equivalent
+         */
+        private String getCanonicalName(String className) {
+            return className.replace('$', '.');
         }
     }
 }
