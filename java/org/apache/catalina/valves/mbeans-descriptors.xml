@@ -22,29 +22,51 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.AccessLogValve">
+         
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               type="boolean"/>
+
+    <attribute name="buffered"
+               description="Flag to buffering."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="checkExists"
+               description="Check for file existence before logging."
+               is="true"
+               type="boolean"/>
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute name="info"
-               description="Information about this implementation"
-               type="java.lang.String"
-               writeable="false"/>
-
+    <attribute name="condition"
+               description="The value to look for conditional logging."
+               type="java.lang.String"/>
+               
+    <attribute name="containerName"
+               description="Object name of the container"
+               type="javax.management.ObjectName"/>
+               
+    <attribute name="directory"
+               description="The directory in which log files are created"
+               type="java.lang.String"/>
+               
      <attribute name="enabled"
                description="Enable Access Logging"
                is="true"
                type="boolean"/>
 
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
-
-    <attribute name="directory"
-               description="The directory in which log files are created"
+    <attribute name="fileDateFormat"
+               description="The format for the date date based log rotation."
                type="java.lang.String"/>
+               
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
 
     <attribute   name="pattern"
                description="The pattern used to format our access log lines"
@@ -67,24 +89,6 @@
     <attribute name="suffix"
                description="The suffix that is added to log file filenames"
                type="java.lang.String"/>
-
-    <attribute name="condition"
-               description="The value to look for conditional logging."
-               type="java.lang.String"/>
-
-    <attribute name="fileDateFormat"
-               description="The format for the date date based log rotation."
-               type="java.lang.String"/>
-
-    <attribute name="buffered"
-               description="Flag to buffering."
-               is="true"
-               type="boolean"/>
-
-    <attribute name="checkExists"
-               description="Check for file existence before logging."
-               is="true"
-               type="boolean"/>
     
     <operation name="rotate"
                description="Move the existing log file to a new name"
@@ -103,6 +107,10 @@
          group="Valve"
          type="org.apache.catalina.valves.ErrorReportValve">
 
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               type="boolean"/>
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
@@ -111,6 +119,11 @@
     <attribute name="containerName"
                description="Object name of the container"
                type="javax.management.ObjectName"/>
+
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
 
   </mbean>
 
@@ -120,101 +133,53 @@
          group="Valve"
          type="org.apache.catalina.valves.ExtendedAccessLogValve">
 
-    <attribute name="className"
-               description="Fully qualified class name of the managed object"
-               type="java.lang.String"
-               writeable="false"/>
-
-    <attribute name="info"
-               description="Information about this implementation"
-               type="java.lang.String"
-               writeable="false"/>
-
-     <attribute name="enabled"
-               description="Enable Access Logging"
-               is="true"
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
                type="boolean"/>
- 
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
-
-    <attribute name="directory"
-               description="The directory in which log files are created"
-               type="java.lang.String"/>
-
-    <attribute   name="pattern"
-               description="The pattern used to format our access log lines"
-               type="java.lang.String"/>
-
-    <attribute name="prefix"
-               description="The prefix that is added to log file filenames"
-               type="java.lang.String"/>
-
-    <attribute name="rotatable"
-               description="Rotate log"
-               is="true"
-               type="boolean"/>
-
-    <attribute name="condition"
-               description="The value to look for conditional logging."
-               type="java.lang.String"/>
-
-    <attribute name="checkExists"
-               description="Check for file existence before each logging."
-               is="true"
-               type="boolean"/>
-
-    <attribute name="suffix"
-               description="The suffix that is added to log file filenames"
-               type="java.lang.String"/>
-
-    <attribute name="fileDateFormat"
-               description="The format for the date date based log rotation."
-               type="java.lang.String"/>
 
     <attribute name="buffered"
                description="Flag to buffering."
                is="true"
                type="boolean"/>
 
-    <operation name="rotate"
-               description="Move the existing log file to a new name"
-               impact="ACTION"
-               returnType="boolean">
-      <parameter name="newFileName"
-                 description="File name to move the log file to."
-                 type="java.lang.String"/>
-    </operation>
-
-  </mbean>
-
-  <mbean name="FastCommonAccessLogValve"
-         description="Valve that generates a web server access log"
-         domain="Catalina"
-         group="Valve"
-         type="org.apache.catalina.valves.FastCommonAccessLogValve">
+    <attribute name="checkExists"
+               description="Check for file existence before logging."
+               is="true"
+               type="boolean"/>
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute name="enabled"
+    <attribute name="condition"
+               description="The value to look for conditional logging."
+               type="java.lang.String"/>
+               
+    <attribute name="containerName"
+               description="Object name of the container"
+               type="javax.management.ObjectName"/>
+               
+    <attribute name="directory"
+               description="The directory in which log files are created"
+               type="java.lang.String"/>
+               
+     <attribute name="enabled"
                description="Enable Access Logging"
                is="true"
                type="boolean"/>
 
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
-
-    <attribute name="directory"
-               description="The directory in which log files are created"
+    <attribute name="fileDateFormat"
+               description="The format for the date date based log rotation."
                type="java.lang.String"/>
+               
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
 
     <attribute   name="pattern"
-               description="The pattern used to format our access log lines, which must be either common or combined"
+               description="The pattern used to format our access log lines"
                type="java.lang.String"/>
 
     <attribute name="prefix"
@@ -235,13 +200,15 @@
                description="The suffix that is added to log file filenames"
                type="java.lang.String"/>
 
-    <attribute name="condition"
-               description="The value to look for conditional logging."
-               type="java.lang.String"/>
+    <operation name="rotate"
+               description="Move the existing log file to a new name"
+               impact="ACTION"
+               returnType="boolean">
+      <parameter name="newFileName"
+                 description="File name to move the log file to."
+                 type="java.lang.String"/>
+    </operation>
 
-    <attribute name="fileDateFormat"
-               description="The format for the date date based log rotation."
-               type="java.lang.String"/>
   </mbean>
 
   <mbean name="SemaphoreValve"
@@ -249,6 +216,14 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.SemaphoreValve">
+         
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               type="boolean"/>
+               
+    <attribute name="block"
+               description="Should this be blocked until a permit is available?"
+               type="boolean"/>
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
@@ -266,7 +241,16 @@
     <attribute name="fairness"
                description="Use a fair semaphore"
                type="boolean"/>
-
+               
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
+               
+    <attribute name="interruptible"
+               description="Should this be blocked interruptibly until a permit is availabl?"
+               type="boolean"/>
+               
   </mbean>
 
   <mbean name="RemoteAddrValve"
@@ -278,6 +262,10 @@
     <attribute name="allow"
                description="The comma-delimited set of allow expressions"
                type="java.lang.String"/>
+               
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               type="boolean"/>
 
     <attribute name="containerName"
                description="Object name of the container"
@@ -291,20 +279,27 @@
     <attribute   name="deny"
                description="The comma-delimited set of deny expressions"
                type="java.lang.String"/>
+               
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
 
   </mbean>
 
   <mbean name="RemoteHostValve"
-         description="Concrete implementation of RequestFilterValve that
-         filters based on the string representation of the remote
-         client's host name"
+         description="Concrete implementation of RequestFilterValve that filters based on the string representation of the remote client's host name"
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.RemoteHostValve">
 
-    <attribute   name="allow"
+    <attribute name="allow"
                description="The comma-delimited set of allow expressions"
                type="java.lang.String"/>
+               
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               type="boolean"/>
 
     <attribute name="containerName"
                description="Object name of the container"
@@ -318,40 +313,11 @@
     <attribute   name="deny"
                description="The comma-delimited set of deny expressions"
                type="java.lang.String"/>
-
-  </mbean>
-
-  <mbean name="RequestDumperValve"
-         description="Implementation of a Valve that logs interesting contents from the specified Request and the corresponding Response"
-         domain="Catalina"
-         group="Valve"
-         type="org.apache.catalina.valves.RequestDumperValve">
-
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
-
-    <attribute name="className"
-               description="Fully qualified class name of the managed object"
+               
+    <attribute name="info"
+               description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
-
-  </mbean>
-
-  <mbean name="RequestListenerValve"
-         description="Valve that handles request initialization and destroy events"
-         domain="Catalina"
-         group="Valve"
-         type="org.apache.catalina.valves.RequestListenerValve">
-
-    <attribute   name="className"
-               description="Fully qualified class name of the managed object"
-               type="java.lang.String"
-               writeable="false"/>
-
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
 
   </mbean>
 
@@ -360,11 +326,10 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.RemoteIpValve">
-    
-    <attribute name="internalProxies"
-               description="Comma delimited list of internal proxies"
-               type="java.lang.String"
-               writeable="false" />
+         
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               type="boolean"/>
 
     <attribute name="httpServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates http protocol"
@@ -373,6 +338,16 @@
     
     <attribute name="httpsServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates https protocol"
+               type="java.lang.String"
+               writeable="false" />
+               
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
+               
+    <attribute name="internalProxies"
+               description="Comma delimited list of internal proxies"
                type="java.lang.String"
                writeable="false" />
     
