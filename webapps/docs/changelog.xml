@@ -116,6 +116,10 @@
         Improve logging of unhandled exceptions in servlets by including the
         path of the context where the error occurred. (markt)
       </add>
+      <add>
+        Include session ID in error message logged when trying to set an
+        attribute on an invalid session. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
