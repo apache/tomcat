@@ -31,8 +31,8 @@
 
 4. Do an initial release (from trunk)
    - Create tc7.0.x\tags to hold release tags - Done
-   - Add to web site
-   - Update Wiki version status page
+   - Add to web site - Done
+   - Update Wiki version status page - Done
 
 5. Fix issues as they get reported
 
