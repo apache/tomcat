@@ -35,8 +35,7 @@ public class FunctionInfo {
      */
 
     public FunctionInfo(String name, String klass, String signature) {
-
-	this.name = name;
+        this.name = name;
         this.functionClass = klass;
         this.functionSignature = signature;
     }
@@ -48,7 +47,7 @@ public class FunctionInfo {
      */
 
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -74,7 +73,6 @@ public class FunctionInfo {
     /*
      * fields
      */
-
     private String name;
     private String functionClass;
     private String functionSignature;
