@@ -21,4 +21,12 @@ public class TesterFunctions {
     public static String trim(String input) {
         return input.trim();
     }
+
+    public static class Inner {
+        
+        public static final String RETVAL = "Return from bug49555";
+        public static String bug49555() {
+            return RETVAL;
+        }
+    }
 }
