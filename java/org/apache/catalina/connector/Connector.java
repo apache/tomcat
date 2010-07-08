@@ -840,6 +840,14 @@ public class Connector extends LifecycleMBeanBase  {
         IntrospectionUtils.setProperty(protocolHandler, "jkHome",
                                        System.getProperty("catalina.base"));
 
+        try {
+            protocolHandler.init();
+        } catch (Exception e) {
+            throw new LifecycleException
+                (sm.getString
+                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
+        }
+
         onameProtocolHandler = register(protocolHandler,
                 createObjectNameKeyProperties("ProtocolHandler"));
         
@@ -860,16 +868,6 @@ public class Connector extends LifecycleMBeanBase  {
 
         setState(LifecycleState.STARTING);
 
-        // Protocol handlers do not follow Lifecycle conventions.
-        // protocolHandler.init() needs to wait until the connector.start()
-        try {
-            protocolHandler.init();
-        } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
-        }
-
         try {
             protocolHandler.start();
         } catch (Exception e) {
@@ -883,7 +881,7 @@ public class Connector extends LifecycleMBeanBase  {
                  ("coyoteConnector.protocolHandlerStartFailed", e));
         }
 
-        // MapperListener doesn't follow Lifecycle conventions either
+        // MapperListener doesn't follow Lifecycle conventions
         mapperListener.init();
     }
 
@@ -898,17 +896,7 @@ public class Connector extends LifecycleMBeanBase  {
 
         setState(LifecycleState.STOPPING);
 
-        // Protocol handlers do not follow Lifecycle conventions.
-        // protocolHandler.destroy() needs to be called in connector.stop()
-        try {
-            protocolHandler.destroy();
-        } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerDestroyFailed", e));
-        }
-
-        // MapperListener doesn't follow Lifecycle conventions either
+        // MapperListener doesn't follow Lifecycle conventions
         mapperListener.destroy();
     }
 
@@ -918,6 +906,14 @@ public class Connector extends LifecycleMBeanBase  {
         unregister(onameMapper);
         unregister(onameProtocolHandler);
         
+        try {
+            protocolHandler.destroy();
+        } catch (Exception e) {
+            throw new LifecycleException
+                (sm.getString
+                 ("coyoteConnector.protocolHandlerDestroyFailed", e));
+        }
+
         if (getService() != null) {
             getService().removeConnector(this);
         }
