@@ -149,6 +149,10 @@
         Improve logging of JSP exceptions by including JSP snippet (if enabled)
         rather than just the root cause in the host log. (markt)
       </add>
+      <fix>
+        <bug>49555</bug>: Correctly handled Tag Libraries where functions are
+        defined in static inner classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
