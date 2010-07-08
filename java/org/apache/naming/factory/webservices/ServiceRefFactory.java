@@ -45,6 +45,7 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
 import javax.xml.namespace.QName;
+import javax.xml.rpc.handler.Handler;
 import javax.xml.rpc.handler.HandlerChain;
 import javax.xml.rpc.handler.HandlerInfo;
 import javax.xml.rpc.handler.HandlerRegistry;
@@ -355,7 +356,11 @@ public class ServiceRefFactory
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
             HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
         HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
-        handlerChain.add(handlerInfo);
+        Iterator<Handler> iter = handlerChain.iterator();
+        while (iter.hasNext()) {
+            Handler handler = iter.next();
+            handler.init(handlerInfo);
+        }
         String[] soaprolesRegistered = handlerChain.getRoles();
         String [] soaproles = new String[soaprolesRegistered.length + soaprolesToAdd.size()];
         int i;
