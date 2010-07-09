@@ -591,10 +591,10 @@
         <include name="docs/appdev/*.txt"/>
         <include name="docs/appdev/sample/**"/>
       </fileset>
-        <fileset dir="webapps">
-          <include name="docs/architecture/**"/>
-          <exclude name="docs/architecture/*.xml"/>
-        </fileset>
+      <fileset dir="webapps">
+        <include name="docs/architecture/**"/>
+        <exclude name="docs/architecture/*.xml"/>
+      </fileset>
     </copy>
     <copy todir="${tomcat.build}/webapps/docs" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
@@ -620,6 +620,9 @@
           excludes="build.xml project.xml"
           includes="*.xml">
       <param name="relative-path" expression="."/>
+      <param name="version" expression="${version}"/>
+      <param name="build-date" expression="${today}"/>
+      <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/appdev"
            destdir="${tomcat.build}/webapps/docs/appdev"
@@ -628,6 +631,9 @@
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
+      <param name="version" expression="${version}"/>
+      <param name="build-date" expression="${today}"/>
+      <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/funcspecs"
            destdir="${tomcat.build}/webapps/docs/funcspecs"
@@ -636,6 +642,9 @@
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
+      <param name="version" expression="${version}"/>
+      <param name="build-date" expression="${today}"/>
+      <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/config"
            destdir="${tomcat.build}/webapps/docs/config"
@@ -644,6 +653,9 @@
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
+      <param name="version" expression="${version}"/>
+      <param name="build-date" expression="${today}"/>
+      <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/architecture"
            destdir="${tomcat.build}/webapps/docs/architecture"
@@ -652,6 +664,9 @@
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
+      <param name="version" expression="${version}"/>
+      <param name="build-date" expression="${today}"/>
+      <param name="year" expression="${year}"/>
     </xslt>
 
     <xslt basedir="webapps/docs/tribes"
@@ -660,7 +675,10 @@
                  style="webapps/docs/tomcat-docs.xsl"
               excludes="project.xml"
               includes="*.xml">
-          <param name="relative-path" expression=".."/>
+      <param name="relative-path" expression=".."/>
+      <param name="version" expression="${version}"/>
+      <param name="build-date" expression="${today}"/>
+      <param name="year" expression="${year}"/>
     </xslt>
   </target>
 

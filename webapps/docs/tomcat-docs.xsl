@@ -36,6 +36,9 @@
   <xsl:param    name="printer-logo"     select="'/images/printer.gif'"/>
   <xsl:param    name="apache-logo"      select="'/images/asf-logo.gif'"/>
   <xsl:param    name="relative-path"    select="'.'"/>
+  <xsl:param    name="version"          select="'7.0.x'"/>
+  <xsl:param    name="build-date"       select="'MMM d yyyy'"/>
+  <xsl:param    name="year"             select="'yyyy'"/>
   <xsl:param    name="void-image"       select="'/images/void.gif'"/>
   <xsl:param    name="project-menu"     select="'menu'"/>
   <xsl:param    name="standalone"       select="''"/>
@@ -61,7 +64,7 @@
               select="document('project.xml')/project"/>
     <html>
     <head>
-    <title><xsl:value-of select="project/title"/> - <xsl:value-of select="properties/title"/></title>
+    <title><xsl:value-of select="project/title"/> (<xsl:value-of select="$version"/>) - <xsl:value-of select="properties/title"/></title>
     <xsl:for-each select="properties/author">
       <xsl:variable name="name">
         <xsl:value-of select="."/>
@@ -106,7 +109,10 @@
         </xsl:if>
         </td>
         <td>
-          <h1><font face="arial,helvetica,sanserif"><xsl:value-of select="$project/title"/></font></h1>
+          <font face="arial,helvetica,sanserif">
+            <h1><xsl:value-of select="$project/title"/></h1>
+            Version <xsl:value-of select="$version"/>, <xsl:value-of select="$build-date"/>
+          </font>
         </td>
         <td>
           <xsl:comment>APACHE LOGO</xsl:comment>
@@ -138,8 +144,7 @@
 
         <xsl:comment>RIGHT SIDE MAIN BODY</xsl:comment>
         <td width="80%" valign="top" align="left" id="mainBody">
-          <h1><xsl:value-of select="project/title"/></h1>
-          <h2><xsl:value-of select="properties/title"/></h2>
+          <h1><xsl:value-of select="properties/title"/></h1>
           <xsl:apply-templates select="body/section"/>
         </td>
 
@@ -155,7 +160,7 @@
       <xsl:comment>PAGE FOOTER</xsl:comment>
       <tr><td colspan="2">
         <div align="center"><font color="{$body-link}" size="-1"><em>
-        Copyright &#169; 1999-2010, Apache Software Foundation
+        Copyright &#169; 1999-<xsl:value-of select="$year"/>, Apache Software Foundation
         </em></font></div>
       </td></tr>
 
