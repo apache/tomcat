@@ -55,7 +55,7 @@ public class CsrfPreventionFilter extends FilterBase {
 
     private final Set<String> entryPoints = new HashSet<String>();
     
-    private final int nonceCacheSize = 5;
+    private int nonceCacheSize = 5;
 
     @Override
     protected Log getLogger() {
@@ -79,6 +79,19 @@ public class CsrfPreventionFilter extends FilterBase {
         }
     }
 
+    /**
+     * Sets the number of previously issued nonces that will be cached on a LRU
+     * basis to support parallel requests, limited use of the refresh and back
+     * in the browser and similar behaviors that may result in the submission
+     * of a previous nonce rather than the current one. If not set, the default
+     * value of 5 will be used.
+     * 
+     * @param nonceCacheSize    The number of nonces to cache
+     */
+    public void setNonceCacheSize(int nonceCacheSize) {
+        this.nonceCacheSize = nonceCacheSize;
+    }
+    
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
