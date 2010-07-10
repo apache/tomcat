@@ -306,6 +306,16 @@ public class CompressionResponseStream
                 gzipstream = output;
             } else {
                 response.addHeader("Content-Encoding", "gzip");
+                String vary = response.getHeader("Vary");
+                if (vary == null) {
+                    // Add a new Vary header
+                    response.setHeader("Vary", "Accept-Encoding");
+                } else if (vary.equals("*")) {
+                    // No action required
+                } else {
+                    // Merge into current header
+                    response.setHeader("Vary", vary + ",Accept-Encoding");
+                }
                 gzipstream = new GZIPOutputStream(output);
             }
         }
