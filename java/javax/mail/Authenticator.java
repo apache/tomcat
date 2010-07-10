@@ -17,5 +17,5 @@
 package javax.mail;
 
 public class Authenticator {
-
+    // Dummy implementation
 }
