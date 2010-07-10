@@ -130,6 +130,10 @@
         Include session ID in error message logged when trying to set an
         attribute on an invalid session. (markt)
       </add>
+      <fix>
+        Improve the CSRF protection filter by using SecureRandom rather than
+        Random to generate nonces. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

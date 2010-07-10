@@ -18,6 +18,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class CsrfPreventionFilter extends FilterBase {
     private static final Log log =
         LogFactory.getLog(CsrfPreventionFilter.class);
     
-    private final Random randomSource = new Random();
+    private final Random randomSource = new SecureRandom();
 
     private final Set<String> entryPoints = new HashSet<String>();
     
