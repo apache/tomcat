@@ -132,7 +132,8 @@
       </add>
       <fix>
         Improve the CSRF protection filter by using SecureRandom rather than
-        Random to generate nonces. (markt)
+        Random to generate nonces. Also make the implementation class used user
+        configurable. (markt)
       </fix>
     </changelog>
   </subsection>
