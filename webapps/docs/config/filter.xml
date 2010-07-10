@@ -79,8 +79,20 @@
 
   <subsection name="Initialisation parameters">
 
-    <p>The Add Default Character Set Filter does not support any initialization
-    parameters.</p>
+    <p>The Add Default Character Set Filter supports the following initialization
+    parameters:</p>
+
+    <attributes>
+
+      <attribute name="encoding" required="false">
+        <p>Name of the character set which should be set, if no other character set 
+        was set explicitly by a Servlet. This parameter has two special values 
+        <code>default</code> and <code>system</code>. A value of <code>system</code>
+        uses the JVM wide default character set, which is usually set by locale.
+        A value of <code>default</code> will use <strong>ISO-8859-1</strong>.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 
