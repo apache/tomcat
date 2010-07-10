@@ -83,6 +83,11 @@
         Use a LockOutRealm in the default configuration to prevent attempts to
         guess user passwords by brute-force. (markt)
       </add>
+      <add>
+        <bug>49478</bug>: Add support for user specified character sets to the
+        <code>AddDefaultCharsetFilter</code>. Based on a patch by Felix
+        Schumacher. (markt)
+      </add>
       <fix>
         <bug>49503</bug>: Make sure connectors bind to their associated ports
         sufficiently early to allow jsvc and the
