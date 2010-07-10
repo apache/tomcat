@@ -135,6 +135,12 @@
         value of 5 will be used.</p>
       </attribute>
       
+      <attribute name="randomClass" required="false">
+        <p>The name of the class to use to generate nonces. The class must be an
+        instance of <code>java.util.Rnadom</code>. If not set, the default value
+        of <code>java.security.SecureRandom</code> will be used.</p>
+      </attribute>
+      
     </attributes>
     
   </subsection>
