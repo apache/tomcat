@@ -197,11 +197,9 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/admin].level = I
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/admin].handlers = \
    4admin.org.apache.juli.FileHandler
 
-# For example, set the com.xyz.foo logger to only log SEVERE
-# messages:
-#org.apache.catalina.startup.ContextConfig.level = FINE
-#org.apache.catalina.startup.HostConfig.level = FINE
-#org.apache.catalina.session.ManagerBase.level = FINE
+# For example, set the org.apache.catalina.util.LifecycleBase logger to log
+# each component that extends LifecycleBase changing state:
+#org.apache.catalina.util.LifecycleBase.level = FINE
     </source>
     </p>
     
