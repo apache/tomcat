@@ -133,8 +133,9 @@ public class EchoRpcTest implements RpcCallback, Runnable {
             int options = RpcChannel.ALL_REPLY;
             long timeout = 15000;
             String message = "EchoRpcMessage";
-            if ( args.length == 0 ) {
-                args = new String[] {"-help"};
+            if (args.length == 0) {
+                usage();
+                System.exit(1);
             }
             for (int i = 0; i < args.length; i++) {
                 if ("-threads".equals(args[i])) {
@@ -161,8 +162,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                     else if ( "majority".equals(args[i]) ) options = RpcChannel.MAJORITY_REPLY;
                 } else if ("-debug".equals(args[i])) {
                     // Not used
-                } else if ("-help".equals(args[i])) 
-                {
+                } else if ("-help".equals(args[i])) {
                     usage();
                     System.exit(1);
                 }
