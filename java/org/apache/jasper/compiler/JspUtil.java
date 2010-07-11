@@ -378,7 +378,7 @@ public class JspUtil {
          * Determine whether to use the expected type's textual name or, if it's
          * a primitive, the name of its correspondent boxed type.
          */
-        String targetType = getCanonicalName(expectedType);
+        String targetType = expectedType.getCanonicalName();
         String primitiveConverterMethod = null;
         if (expectedType.isPrimitive()) {
             if (expectedType.equals(Boolean.TYPE)) {
@@ -942,32 +942,5 @@ public class JspUtil {
             resultType.append("[]");
         }
         return resultType.toString();
-    }
-
-    /**
-     * Compute the canonical name from a Class instance. Note that a simple
-     * replacement of '$' with '.' of a binary name would not work, as '$' is a
-     * legal Java Identifier character.
-     * 
-     * @param c
-     *            A instance of java.lang.Class
-     * @return The canonical name of c.
-     */
-    public static String getCanonicalName(Class<?> c) {
-
-        String binaryName = c.getName();
-        c = c.getDeclaringClass();
-
-        if (c == null) {
-            return binaryName;
-        }
-
-        StringBuilder buf = new StringBuilder(binaryName);
-        do {
-            buf.setCharAt(c.getName().length(), '.');
-            c = c.getDeclaringClass();
-        } while (c != null);
-
-        return buf.toString();
     }
 }
