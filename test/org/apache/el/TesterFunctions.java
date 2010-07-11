@@ -22,7 +22,7 @@ public class TesterFunctions {
         return input.trim();
     }
 
-    public static class Inner {
+    public static class Inner$Class {
         
         public static final String RETVAL = "Return from bug49555";
         public static String bug49555() {
