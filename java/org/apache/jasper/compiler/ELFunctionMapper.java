@@ -294,8 +294,14 @@ public class ELFunctionMapper {
          * @param className Binary class name
          * @return          Canonical equivalent
          */
-        private String getCanonicalName(String className) {
-            return className.replace('$', '.');
+        private String getCanonicalName(String className) throws JasperException {
+            Class<?> clazz;
+            try {
+                clazz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                throw new JasperException(e);
+            }
+            return clazz.getCanonicalName();
         }
     }
 }
