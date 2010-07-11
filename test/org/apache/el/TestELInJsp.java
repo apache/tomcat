@@ -322,7 +322,7 @@ public class TestELInJsp extends TomcatBaseTest {
                 "/test/bug49555.jsp");
         
         String result = res.toString();
-        assertEcho(result, "00-" + TesterFunctions.Inner.RETVAL);
+        assertEcho(result, "00-" + TesterFunctions.Inner$Class.RETVAL);
     }
 
     public void testELMisc() throws Exception {
