@@ -277,7 +277,7 @@
     <antcall target="generic-deploy">
       <param name="maven.repo.repositoryId" value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="${maven.snapshot.deploy.version}"/>
+      <param name="maven.deploy.version" value="7.0-SNAPSHOT"/>
     </antcall>
   </target>
 
