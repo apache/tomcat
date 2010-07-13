@@ -56,6 +56,8 @@ public class SSIServlet extends HttpServlet {
     protected String inputEncoding = null;
     /** Output encoding. If not specified, uses platform default */
     protected String outputEncoding = "UTF-8";
+    /** Allow exec (normally blocked for security) */
+    protected boolean allowExec = false;
 
 
     //----------------- Public methods.
@@ -84,6 +86,9 @@ public class SSIServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("outputEncoding") != null)
             outputEncoding = getServletConfig().getInitParameter("outputEncoding");
         
+        allowExec = Boolean.parseBoolean(
+                getServletConfig().getInitParameter("allowExec"));
+
         if (debug > 0)
             log("SSIServlet.init() SSI invoker started with 'debug'=" + debug);
 
@@ -181,7 +186,7 @@ public class SSIServlet extends HttpServlet {
             new SSIServletExternalResolver(getServletContext(), req, res,
                     isVirtualWebappRelative, debug, inputEncoding);
         SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver,
-                debug);
+                debug, allowExec);
         PrintWriter printWriter = null;
         StringWriter stringWriter = null;
         if (buffered) {

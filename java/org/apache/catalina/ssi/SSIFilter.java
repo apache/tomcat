@@ -59,6 +59,8 @@ public class SSIFilter implements Filter {
 	/** default pattern for ssi filter content type matching */
 	protected Pattern shtmlRegEx =
         Pattern.compile("text/x-server-parsed-html(;.*)?");
+	/** Allow exec (normally blocked for security) */
+	protected boolean allowExec = false;
 
 
     //----------------- Public methods.
@@ -86,6 +88,8 @@ public class SSIFilter implements Filter {
 
         if (config.getInitParameter("expires") != null)
             expires = Long.valueOf(config.getInitParameter("expires"));
+
+        allowExec = Boolean.parseBoolean(config.getInitParameter("allowExec"));
 
         if (debug > 0)
             config.getServletContext().log(
@@ -125,7 +129,7 @@ public class SSIFilter implements Filter {
                 new SSIServletExternalResolver(config.getServletContext(), req,
                         res, isVirtualWebappRelative, debug, encoding);
             SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver,
-                    debug);
+                    debug, allowExec);
             
             // prepare readers/writers
             Reader reader =

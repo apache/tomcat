@@ -60,6 +60,11 @@
         <bug>48297</bug>: Correctly initialise handler chain for web services
         resources. (markt)
       </fix>
+      <add>
+        <bug>48960</bug>: Add a new option to the SSI Servlet and SSI Filter to
+        allow the disabling of the <code>exec</code> command. This is now
+        disabled by default. Based on a patch by Yair Lenga. (markt)
+      </add>
       <fix>
         <bug>49030</bug>: When initializing/starting/stopping connectors and
         one of them fails, do not ignore the others. (markt/kkolinko)

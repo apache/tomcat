@@ -267,6 +267,8 @@
   <!--                                                                      -->
   <!--   outputEncoding      The encoding to use for the page that results  -->
   <!--                       from the SSI processing. [UTF-8]               -->
+  <!--                                                                      -->
+  <!--   allowExec           Is use of the exec command enabled? [false]    -->
 
 <!--
     <servlet>
@@ -415,6 +417,8 @@
   <!--                       Should "virtual" paths be interpreted as       -->
   <!--                       relative to the context root, instead of       -->
   <!--                       the server root?  (0=false, 1=true) [0]        -->
+  <!--                                                                      -->
+  <!--   allowExec           Is use of the exec command enabled? [false]    -->
 
 <!--
     <filter>
