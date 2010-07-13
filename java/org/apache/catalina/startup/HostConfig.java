@@ -846,7 +846,7 @@ public class HostConfig
                 if (entry != null) {
                     xmlInWar = true;
                 }
-                if (copyXML) {
+                if (copyXML && xmlInWar) {
                     istream = jar.getInputStream(entry);
                     
                     ostream =
