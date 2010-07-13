@@ -105,6 +105,8 @@ resources if one cannot be determined from the resource itself. Default is
 the default platform encoding.</li>
 <li><strong>outputEncoding</strong> - The encoding to be used for the result
 of the SSI processing. Default is UTF-8.</li>
+<li><strong>allowExec</strong> - Is the exec command enabled? Default is
+false.</li>
 </ul>
 </p>
 
@@ -128,6 +130,8 @@ evaluated for every request.</li>
 <li><strong>isVirtualWebappRelative</strong> - Should "virtual" SSI directive
 paths be interpreted as relative to the context root, instead of the server
 root? (0=false, 1=true) Default 0 (false).</li>
+<li><strong>allowExec</strong> - Is the exec command enabled? Default is
+false.</li>
 </ul>
 </p>
 
