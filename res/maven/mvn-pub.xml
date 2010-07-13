@@ -63,6 +63,7 @@
   <target name="maven-deploy" depends="init-maven">
     <!--cleanup-->
     <delete file="${pom}.tmp"/>
+    <delete file="${pom}.asc"/>
     <delete file="${file}.asc"/>
     <delete file="${src}.asc"/>
 
@@ -73,7 +74,7 @@
       </filterset>
     </copy>
     
-    <!--sign the jar-->
+    <!--sign the jar, the source and the pom -->
     <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
@@ -88,6 +89,15 @@
       <arg value="-b"/>
       <arg value="${src}"/>
     </exec>
+    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="-o"/>
+      <arg value="${pom}.asc"/>
+      <arg value="${pom}.tmp"/>
+    </exec>
     
     <!--deploy it-->
     <artifact:deploy file="${file}">
@@ -97,10 +107,12 @@
         </remoteRepository>
         <attach file="${file}.asc" type="jar.asc"/>
         <attach file="${src}" classifier="sources" type="jar"/>
-        <attach file="${src}.asc" type="jar.asc"/>
+        <attach file="${src}.asc" classifier="sources" type="jar.asc"/>
+        <attach file="${pom}.asc" type="pom.asc"/>
     </artifact:deploy>
 
     <delete file="${pom}.tmp"/>
+    <delete file="${pom}.asc"/>
     <delete file="${file}.asc"/>
     <delete file="${src}.asc"/>
   </target>
@@ -128,6 +140,7 @@
   <target name="maven-deploy-nosrc" depends="init-maven">
     <!--cleanup-->
     <delete file="${pom}.tmp"/>
+    <delete file="${pom}.asc"/>
     <delete file="${file}.asc"/>
 
     <!--replace the version in the pom-->
@@ -137,13 +150,22 @@
       </filterset>
     </copy>
 	    
-    <!--sign the jar-->
+    <!--sign the jar and pom -->
     <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
       <arg value="-b"/>
       <arg value="${file}"/>
+    </exec>
+    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="-o"/>
+      <arg value="${pom}.asc"/>
+      <arg value="${pom}.tmp"/>
     </exec>
 	    
     <!--deploy it-->
@@ -153,9 +175,11 @@
         <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
       </remoteRepository>
 	  <attach file="${file}.asc" type="jar.asc"/>
+      <attach file="${pom}.asc" type="pom.asc"/>
     </artifact:deploy>
 
     <delete file="${pom}.tmp"/>
+    <delete file="${pom}.asc"/>
     <delete file="${file}.asc"/>
   </target>
 
