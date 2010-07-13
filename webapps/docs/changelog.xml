@@ -29,6 +29,7 @@
     <author email="rjung@apache.org">Rainer Jung</author>
     <author email="kkolinko@apache.org">Konstantin Kolinko</author>
     <author email="pero@apache.org">Peter Rossbach</author>
+    <author email="kfujino@apache.org">Keiichi Fujino</author>    
     <title>Changelog</title>
   </properties>
 
@@ -139,6 +140,10 @@
         Improve the CSRF protection filter by using SecureRandom rather than
         Random to generate nonces. Also make the implementation class used user
         configurable. (markt)
+      </fix>
+      <fix>
+        Avoid NullPointerException, when copyXML=true and META-INF/context.xml 
+        does not exist. (kfujino)
       </fix>
     </changelog>
   </subsection>
