@@ -44,11 +44,14 @@ public class SSIProcessor {
     protected HashMap<String,SSICommand> commands =
         new HashMap<String,SSICommand>();
     protected int debug;
+    protected final boolean allowExec;
 
 
-    public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug) {
+    public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug,
+            boolean allowExec) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.debug = debug;
+        this.allowExec = allowExec;
         addBuiltinCommands();
     }
 
@@ -56,7 +59,9 @@ public class SSIProcessor {
     protected void addBuiltinCommands() {
         addCommand("config", new SSIConfig());
         addCommand("echo", new SSIEcho());
-        addCommand("exec", new SSIExec());
+        if (allowExec) {
+            addCommand("exec", new SSIExec());
+        }
         addCommand("include", new SSIInclude());
         addCommand("flastmod", new SSIFlastmod());
         addCommand("fsize", new SSIFsize());
