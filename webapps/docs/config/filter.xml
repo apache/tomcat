@@ -366,47 +366,6 @@ The expiry time can be fine-tuned by adding several &#x27;
 
     <attributes>
 
-      <attribute name="ExpiresActive" required="false">
-        <p>
-        This directive enables or disables the generation of the <tt>Expires</tt> and
-        <tt>Cache-Control</tt> headers by this <tt>ExpiresFilter</tt>. If set to
-        <tt>Off</tt>, the headers will not be generated for any HTTP response. If set
-        to <tt>On</tt> or <tt>true</tt>, the headers will be added to served HTTP
-        responses according to the criteria defined by the
-        <tt>ExpiresByType &lt;content-type&gt;</tt> and <tt>ExpiresDefault</tt>
-        directives. Note that this directive does not guarantee that an
-        <tt>Expires</tt> or <tt>Cache-Control</tt> header will be generated. If the
-        criteria aren&#x27;t met, no header will be sent, and the effect will be as
-        though this directive wasn&#x27;t even specified.
-        </p>
-        <p>
-        Default value is <tt>true</tt>.
-        </p>
-        
-        <p>
-        <i>Sample: enable filter</i>
-        </p>
-    
-        <source>
-&lt;init-param&gt;
- &lt;!-- supports case insensitive &#x27;On&#x27; or &#x27;true&#x27; --&gt;
- &lt;param-name&gt;ExpiresActive&lt;/param-name&gt;
- &lt;param-value&gt;On&lt;/param-value&gt;
-&lt;/init-param&gt;
-         </source>
-         <p>
-         <i>Sample: disable filter</i>
-         </p>
-    
-         <source>
-&lt;init-param&gt;
- &lt;!-- supports anything different from case insensitive &#x27;On&#x27; and &#x27;true&#x27; --&gt;
- &lt;param-name&gt;ExpiresActive&lt;/param-name&gt;
- &lt;param-value&gt;Off&lt;/param-value&gt;
-&lt;/init-param&gt;
-         </source>
-      </attribute>
-
       <attribute name="ExpiresExcludedResponseStatusCodes" required="false">
          <p>
          This directive defines the http response status codes for which the

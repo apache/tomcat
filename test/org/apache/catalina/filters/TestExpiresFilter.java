@@ -77,8 +77,6 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         tomcat.start();
         try {
-            Assert.assertEquals(false, expiresFilter.isActive());
-
             // VERIFY EXCLUDED RESPONSE STATUS CODES
             {
                 int[] excludedResponseStatusCodes = expiresFilter.getExcludedResponseStatusCodesAsInts();
