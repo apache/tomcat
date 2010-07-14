@@ -16,7 +16,9 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------------------
-#  Set CLASSPATH and Java options
+#  Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
+#  are valid and consistent with the selected start-up options and set up the
+#  endorsed directory. 
 #
 #  $Id$
 # -----------------------------------------------------------------------------
