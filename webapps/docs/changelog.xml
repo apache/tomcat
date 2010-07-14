@@ -70,6 +70,10 @@
         one of them fails, do not ignore the others. (markt/kkolinko)
       </fix>
       <fix>
+        <bug>49128</bug>: Don't swallow exceptions unnecessarily in
+        <code>WebappClassLoader.start()</code>. (markt)
+      </fix>
+      <fix>
         <bug>49182</bug>: Align comments in setclasspath.[sh|bat] with
         behaviour. Based on a patch provided by sebb. (markt)
       </fix>
