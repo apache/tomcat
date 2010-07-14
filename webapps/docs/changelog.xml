@@ -70,6 +70,10 @@
         one of them fails, do not ignore the others. (markt/kkolinko)
       </fix>
       <fix>
+        <bug>49182</bug>: Align comments in setclasspath.[sh|bat] with
+        behaviour. Based on a patch provided by sebb. (markt)
+      </fix>
+      <fix>
         <bug>49230</bug>: Enhance JRE leak prevention listener with protection
         for the keep-alive thread started by
         <code>sun.net.www.http.HttpClient</code>. Based on a patch provided by
