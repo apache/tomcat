@@ -159,6 +159,406 @@
 
 </section>
 
+<section name="Expires Filter">
+
+  <subsection name="Introduction">
+
+    <p>
+    ExpiresFilter is a Java Servlet API port of <a
+    href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
+    mod_expires</a>.
+    This filter controls the setting of the <tt>Expires</tt> HTTP header and the
+    <tt>max-age</tt> directive of the <tt>Cache-Control</tt> HTTP header in
+    server responses. The expiration date can set to be relative to either the
+    time the source file was last modified, or to the time of the client access.
+    </p>
+    
+    <p>
+    These HTTP headers are an instruction to the client about the document&#x27;s
+    validity and persistence. If cached, the document may be fetched from the
+    cache rather than from the source until this time has passed. After that, the
+    cache copy is considered &quot;expired&quot; and invalid, and a new copy must
+    be obtained from the source.
+    </p>
+    <p>
+    To modify <tt>Cache-Control</tt> directives other than <tt>max-age</tt> (see
+    <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9" >RFC
+    2616 section 14.9</a>), you can use other servlet filters or <a
+    href="http://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
+    mod_headers</a> module.
+    </p>
+        
+  </subsection>
+
+  <subsection name="Basic configuration sample">
+    <p>
+    Basic configuration to add '<tt>Expires</tt>' and '<tt>Cache-Control: max-age=</tt>' 
+    headers to images, css and javascript.
+    </p>
+
+    <source>
+&lt;filter&gt;
+ &lt;filter-name&gt;ExpiresFilter&lt;/filter-name&gt;
+ &lt;filter-class&gt;org.apache.catalina.filters.ExpiresFilter&lt;/filter-class&gt;
+ &lt;init-param&gt;
+    &lt;param-name&gt;ExpiresByType image&lt;/param-name&gt;
+    &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
+ &lt;/init-param&gt;
+ &lt;init-param&gt;
+    &lt;param-name&gt;ExpiresByType text/css&lt;/param-name&gt;
+    &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
+ &lt;/init-param&gt;
+ &lt;init-param&gt;
+    &lt;param-name&gt;ExpiresByType text/javascript&lt;/param-name&gt;
+    &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
+ &lt;/init-param&gt;
+&lt;/filter&gt;
+...
+&lt;filter-mapping&gt;
+ &lt;filter-name&gt;ExpiresFilter&lt;/filter-name&gt;
+ &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+&lt;/filter-mapping&gt;
+
+    </source>
+    
+  </subsection>
+  
+  <subsection name="Alternate Syntax">
+    <p>
+    The <tt>ExpiresDefault</tt> and <tt>ExpiresByType</tt> directives can also be
+    defined in a more readable syntax of the form:
+    </p>
+    
+    <source>
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
+ &lt;param-value&gt;&lt;base&gt; [plus] {&lt;num&gt;   &lt;type&gt;}*&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresByType type&lt;/param-name&gt;
+ &lt;param-value&gt;&lt;base&gt; [plus]   {&lt;num&gt; &lt;type&gt;}*&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresByType type;encoding&lt;/param-name&gt;
+ &lt;param-value&gt;&lt;base&gt; [plus]   {&lt;num&gt; &lt;type&gt;}*&lt;/param-value&gt;
+&lt;/init-param&gt;
+    </source>
+    <p>
+    where <tt>&lt;base&gt;</tt> is one of:
+    <ul>
+    <li><tt>access</tt></li>
+    <li><tt>now</tt> (equivalent to &#x27;<tt>access</tt>&#x27;)</li>
+    <li><tt>modification</tt></li>
+    </ul>
+    </p>
+    <p>
+    The <tt>plus</tt> keyword is optional. <tt>&lt;num&gt;</tt> should be an
+    integer value (acceptable to <tt>Integer.parseInt()</tt>), and
+    <tt>&lt;type&gt;</tt> is one of:
+    <ul>
+    <li><tt>years</tt></li>
+    <li><tt>months</tt></li>
+    <li><tt>weeks</tt></li>
+    <li><tt>days</tt></li>
+    <li><tt>hours</tt></li>
+    <li><tt>minutes</tt></li>
+    <li><tt>seconds</tt></li>
+    </ul>
+    For example, any of the following directives can be used to make documents
+    expire 1 month after being accessed, by default:
+    </p>
+    
+    <source>
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
+ &lt;param-value&gt;access plus 1 month&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
+ &lt;param-value&gt;access plus 4 weeks&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
+ &lt;param-value&gt;access plus 30 days&lt;/param-value&gt;
+&lt;/init-param&gt;
+</source>
+<p>
+The expiry time can be fine-tuned by adding several &#x27;
+<tt>&lt;num&gt; &lt;type&gt;</tt>&#x27; clauses:
+</p>
+
+<source>
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
+ &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
+ &lt;param-value&gt;modification plus 5 hours 3   minutes&lt;/param-value&gt;
+&lt;/init-param&gt;
+    </source>
+    <p>
+    Note that if you use a modification date based setting, the <tt>Expires</tt>
+    header will <strong>not</strong> be added to content that does not come from
+    a file on disk. This is due to the fact that there is no modification time
+    for such content.
+    </p>  
+  </subsection>
+  
+  <subsection name="Expiration headers generation eligibility">
+    <p>
+    A response is eligible to be enriched by <tt>ExpiresFilter</tt> if :
+    <ol>
+    <li>no expiration header is defined (<tt>Expires</tt> header or the
+    <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header),</li>
+    <li>the response status code is not excluded by the directive
+    <tt>ExpiresExcludedResponseStatusCodes</tt>,</li>
+    <li>The <tt>Content-Type</tt> of the response matches one of the types
+    defined the in <tt>ExpiresByType</tt> directives or the
+    <tt>ExpiresDefault</tt> directive is defined.</li>
+    </ol>
+    </p>
+    <p>
+    Note : If <tt>Cache-Control</tt> header contains other directives than
+    <tt>max-age</tt>, they are concatenated with the <tt>max-age</tt> directive
+    that is added by the <tt>ExpiresFilter</tt>.
+    </p>
+
+  </subsection>
+  
+  <subsection name="Expiration configuration selection">
+    <p>
+    The expiration configuration if elected according to the following algorithm:
+    <ol>
+    <li><tt>ExpiresByType</tt> matching the exact content-type returned by
+    <tt>HttpServletResponse.getContentType()</tt> possibly including the charset
+    (e.g. &#x27;<tt>text/xml;charset=UTF-8</tt>&#x27;),</li>
+    <li><tt>ExpiresByType</tt> matching the content-type without the charset if
+    <tt>HttpServletResponse.getContentType()</tt> contains a charset (e.g. &#x27;
+    <tt>text/xml;charset=UTF-8</tt>&#x27; -&gt; &#x27;<tt>text/xml</tt>&#x27;),</li>
+    <li><tt>ExpiresByType</tt> matching the major type (e.g. substring before
+    &#x27;<tt>/</tt>&#x27;) of <tt>HttpServletResponse.getContentType()</tt>
+    (e.g. &#x27;<tt>text/xml;charset=UTF-8</tt>&#x27; -&gt; &#x27;<tt>text</tt>
+    &#x27;),</li>
+    <li><tt>ExpiresDefault</tt></li>
+    </ol>
+    </p>
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Expires Filter is
+    <strong><code>org.apache.catalina.filters.ExpiresFilter</code>
+    </strong>.</p>
+
+  </subsection>
+  
+  <subsection name="Initialisation parameters">
+
+    <p>The <strong>Expires Filter</strong> supports the following
+    initialisation parameters:</p>
+
+    <attributes>
+
+      <attribute name="ExpiresActive" required="false">
+        <p>
+        This directive enables or disables the generation of the <tt>Expires</tt> and
+        <tt>Cache-Control</tt> headers by this <tt>ExpiresFilter</tt>. If set to
+        <tt>Off</tt>, the headers will not be generated for any HTTP response. If set
+        to <tt>On</tt> or <tt>true</tt>, the headers will be added to served HTTP
+        responses according to the criteria defined by the
+        <tt>ExpiresByType &lt;content-type&gt;</tt> and <tt>ExpiresDefault</tt>
+        directives. Note that this directive does not guarantee that an
+        <tt>Expires</tt> or <tt>Cache-Control</tt> header will be generated. If the
+        criteria aren&#x27;t met, no header will be sent, and the effect will be as
+        though this directive wasn&#x27;t even specified.
+        </p>
+        <p>
+        Default value is <tt>true</tt>.
+        </p>
+        
+        <p>
+        <i>Sample: enable filter</i>
+        </p>
+    
+        <source>
+&lt;init-param&gt;
+ &lt;!-- supports case insensitive &#x27;On&#x27; or &#x27;true&#x27; --&gt;
+ &lt;param-name&gt;ExpiresActive&lt;/param-name&gt;
+ &lt;param-value&gt;On&lt;/param-value&gt;
+&lt;/init-param&gt;
+         </source>
+         <p>
+         <i>Sample: disable filter</i>
+         </p>
+    
+         <source>
+&lt;init-param&gt;
+ &lt;!-- supports anything different from case insensitive &#x27;On&#x27; and &#x27;true&#x27; --&gt;
+ &lt;param-name&gt;ExpiresActive&lt;/param-name&gt;
+ &lt;param-value&gt;Off&lt;/param-value&gt;
+&lt;/init-param&gt;
+         </source>
+      </attribute>
+
+      <attribute name="ExpiresExcludedResponseStatusCodes" required="false">
+         <p>
+         This directive defines the http response status codes for which the
+         <tt>ExpiresFilter</tt> will not generate expiration headers. By default, the
+         <tt>304</tt> status code (&quot;<tt>Not modified</tt>&quot;) is skipped. The
+         value is a comma separated list of http status codes.
+         </p>
+         <p>
+         This directive is useful to ease usage of <tt>ExpiresDefault</tt> directive.
+         Indeed, the behavior of <tt>304 Not modified</tt> (which does specify a
+         <tt>Content-Type</tt> header) combined with <tt>Expires</tt> and
+         <tt>Cache-Control:max-age=</tt> headers can be unnecessarily tricky to
+         understand.
+         </p>
+         <p>
+         <i>Sample : exclude response status codes 302, 500 and 503</i>
+         </p>
+         
+         <source>
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;
+ &lt;param-value&gt;302, 500, 503&lt;/param-value&gt;
+&lt;/init-param&gt;
+         </source>
+      </attribute>
+
+      <attribute name="ExpiresByType &lt;content-type&gt;" required="false">
+         <p>
+         This directive defines the value of the <tt>Expires</tt> header and the
+         <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header generated for
+         documents of the specified type (<i>e.g.</i>, <tt>text/html</tt>). The second
+         argument sets the number of seconds that will be added to a base time to
+         construct the expiration date. The <tt>Cache-Control: max-age</tt> is
+         calculated by subtracting the request time from the expiration date and
+         expressing the result in seconds.
+         </p>
+         <p>
+         The base time is either the last modification time of the file, or the time
+         of the client&#x27;s access to the document. Which should be used is
+         specified by the <tt>&lt;code&gt;</tt> field; <tt>M</tt> means that the
+         file&#x27;s last modification time should be used as the base time, and
+         <tt>A</tt> means the client&#x27;s access time should be used. The duration
+         is expressed in seconds. <tt>A2592000</tt> stands for
+         <tt>access plus 30 days</tt> in alternate syntax.
+         </p>
+         <p>
+         The difference in effect is subtle. If <tt>M</tt> (<tt>modification</tt> in
+         alternate syntax) is used, all current copies of the document in all caches
+         will expire at the same time, which can be good for something like a weekly
+         notice that&#x27;s always found at the same URL. If <tt>A</tt> (
+         <tt>access</tt> or <tt>now</tt> in alternate syntax) is used, the date of
+         expiration is different for each client; this can be good for image files
+         that don&#x27;t change very often, particularly for a set of related
+         documents that all refer to the same images (<i>i.e.</i>, the images will be
+         accessed repeatedly within a relatively short timespan).
+         </p>
+         <p>
+         <strong>Note:</strong> When the content type includes a charset (e.g. 
+         <tt>'ExpiresByType text/xml;charset=utf-8'</tt>), Tomcat removes blank chars 
+         between the '<tt>;</tt>' and the '<tt>charset</tt>' keyword. Due to this, 
+         configuration of an expiration with a charset must <strong>not</strong> include 
+         such a space character. 
+         </p>
+         <p>
+         <i>Sample:</i>
+         </p>
+         
+         <source>
+&lt;init-param&gt;
+   &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
+   &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
+&lt;/init-param&gt;
+ 
+&lt;init-param&gt;
+   &lt;!-- 2592000 seconds = 30 days --&gt;
+   &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
+   &lt;param-value&gt;A2592000&lt;/param-value&gt;
+&lt;/init-param&gt;
+         </source>
+         <p>
+         Note that this directive only has effect if <tt>ExpiresActive On</tt> has
+         been specified. It overrides, for the specified MIME type <i>only</i>, any
+         expiration date set by the <tt>ExpiresDefault</tt> directive.
+         </p>
+         <p>
+         You can also specify the expiration time calculation using an alternate
+         syntax, described earlier in this document.
+         </p>
+      </attribute>
+
+      <attribute name="ExpiresDefault" required="false">
+         <p>
+         This directive sets the default algorithm for calculating the
+         expiration time for all documents in the affected realm. It can be
+         overridden on a type-by-type basis by the <tt>ExpiresByType</tt> directive. See the
+         description of that directive for details about the syntax of the
+         argument, and the "alternate syntax"
+         description as well.
+         </p>
+      </attribute>
+    </attributes>
+
+  </subsection>
+  
+  <subsection name="Troubleshooting">
+    <p>
+    To troubleshoot, enable logging on the
+    <tt>org.apache.catalina.filters.ExpiresFilter</tt>.
+    </p>
+    <p>
+    Extract of logging.properties
+    </p>
+    
+    <source>
+org.apache.catalina.filters.ExpiresFilter.level = FINE
+    </source>
+    <p>
+    Sample of initialization log message :
+    </p>
+    
+    <source>
+Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
+FINE: Filter initialized with configuration ExpiresFilter[
+ active=true, 
+ excludedResponseStatusCode=[304], 
+ default=null, 
+ byType={
+    image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]], 
+    text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]], 
+    text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
+    </source>
+    <p>
+    Sample of per-request log message where <tt>ExpiresFilter</tt> adds an
+    expiration date
+    </p>
+    
+    <source>
+Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
+FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
+    </source>
+    <p>
+    Sample of per-request log message where <tt>ExpiresFilter</tt> does not add
+    an expiration date
+    </p>
+    
+    <source>
+Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
+FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
+    </source>
+  </subsection>
+
+</section>
 
 <section name="Remote Address Filter">
 
