@@ -1059,8 +1059,6 @@ public class ExpiresFilter extends FilterBase {
 
     private static final Log log = LogFactory.getLog(ExpiresFilter.class);
 
-    private static final String PARAMETER_EXPIRES_ACTIVE = "ExpiresActive";
-
     private static final String PARAMETER_EXPIRES_BY_TYPE = "ExpiresByType";
 
     private static final String PARAMETER_EXPIRES_DEFAULT = "ExpiresDefault";
@@ -1197,11 +1195,6 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * @see #isActive()
-     */
-    private boolean active = true;
-
-    /**
      * Default Expires configuration.
      */
     private ExpiresConfiguration defaultExpiresConfiguration;
@@ -1231,7 +1224,7 @@ public class ExpiresFilter extends FilterBase {
                             httpRequest.getRequestURL()));
                 }
                 chain.doFilter(request, response);
-            } else if (active) {
+            } else {
                 XHttpServletResponse xResponse = new XHttpServletResponse(
                         httpRequest, httpResponse);
                 chain.doFilter(request, xResponse);
@@ -1240,12 +1233,6 @@ public class ExpiresFilter extends FilterBase {
                     // onBeforeWriteResponseBody()
                     onBeforeWriteResponseBody(httpRequest, xResponse);
                 }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("expiresFilter.filterNotActive",
-                            httpRequest.getRequestURL()));
-                }
-                chain.doFilter(request, response);
             }
         } else {
             chain.doFilter(request, response);
@@ -1411,9 +1398,6 @@ public class ExpiresFilter extends FilterBase {
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.defaultExpiresConfiguration = expiresConfiguration;
-                } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_ACTIVE)) {
-                    this.active = "On".equalsIgnoreCase(value) ||
-                            Boolean.valueOf(value).booleanValue();
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES)) {
                     this.excludedResponseStatusCodes = commaDelimitedListToIntArray(value);
                 } else {
@@ -1430,14 +1414,6 @@ public class ExpiresFilter extends FilterBase {
 
         log.debug(sm.getString("expiresFilter.filterInitialized",
                 this.toString()));
-    }
-
-    /**
-     * Indicates that the filter is active. If <code>false</code>, the filter is
-     * pass-through. Default is <code>true</code>.
-     */
-    public boolean isActive() {
-        return active;
     }
 
     /**
@@ -1651,10 +1627,6 @@ public class ExpiresFilter extends FilterBase {
         return new ExpiresConfiguration(startingPoint, durations);
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     public void setDefaultExpiresConfiguration(
             ExpiresConfiguration defaultExpiresConfiguration) {
         this.defaultExpiresConfiguration = defaultExpiresConfiguration;
@@ -1671,8 +1643,7 @@ public class ExpiresFilter extends FilterBase {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[active=" + this.active +
-                ", excludedResponseStatusCode=[" +
+        return getClass().getSimpleName() + "[excludedResponseStatusCode=[" +
                 intsToCommaDelimitedString(this.excludedResponseStatusCodes) +
                 "], default=" + this.defaultExpiresConfiguration + ", byType=" +
                 this.expiresConfigurationByContentType + "]";
