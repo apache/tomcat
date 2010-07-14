@@ -239,6 +239,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>49130</bug>: Better describe the core package in the Windows
+        installer, making it clear that the service will be installed. Patch
+        provided by sebb. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.0 (markt)" rtext="beta, 2010-06-29">
   <subsection name="Catalina">
