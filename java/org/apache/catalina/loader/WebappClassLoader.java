@@ -1811,7 +1811,7 @@ public class WebappClassLoader
         String encoding = null;
         try {
             encoding = System.getProperty("file.encoding");
-        } catch (Exception e) {
+        } catch (SecurityException e) {
             return;
         }
         if (encoding.indexOf("EBCDIC")!=-1) {
