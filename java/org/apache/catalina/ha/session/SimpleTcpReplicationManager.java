@@ -520,7 +520,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
                 do {
                     try {
                         Thread.sleep(100);
-                    }catch ( Exception sleep) {}
+                    } catch (InterruptedException sleep) { /* Ignore */ }
                     reqNow = System.currentTimeMillis();
                     isTimeout=((reqNow-reqStart)>(1000*60));
                 } while ( (!isStateTransferred()) && (!isTimeout));
