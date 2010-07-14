@@ -93,7 +93,7 @@ ${StrRep}
   ;Component-selection page
     ;Descriptions
     LangString DESC_SecTomcat ${LANG_ENGLISH} "Install the Tomcat Servlet container."
-    LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core."
+    LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core and create the Windows service."
     LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start Tomcat when the computer is started."
     LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Install APR based Tomcat native .dll for better performance and scalability in production environments."
     LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
