@@ -65,6 +65,10 @@
         allow the disabling of the <code>exec</code> command. This is now
         disabled by default. Based on a patch by Yair Lenga. (markt)
       </add>
+      <add>
+        <bug>48998</bug>: Add the ExpiresFilter, a port of the httpd mod_expires
+        module. Patch provided by Cyrille Le Clerc. (markt)
+      </add>
       <fix>
         <bug>49030</bug>: When initializing/starting/stopping connectors and
         one of them fails, do not ignore the others. (markt/kkolinko)
