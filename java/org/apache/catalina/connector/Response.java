@@ -974,7 +974,7 @@ public class Response
         for (int i = 0; i < n; i++) {
             if (headers.getName(i).toString().equals(headername)) {
                 if (headers.getValue(i).toString().startsWith(startsWith)) {
-                    headers.setValue(sb.toString());
+                    headers.getValue(i).setString(sb.toString());
                     set = true;
                 }
             }
