@@ -162,6 +162,11 @@
         Avoid NullPointerException, when copyXML=true and META-INF/context.xml 
         does not exist. (kfujino)
       </fix>
+      <fix>
+        <bug>49598</bug>: When session is changed and the session cookie is
+        replaced, ensure that the new Set-Cookie header overwrites the old
+        Set-Cookie header. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
