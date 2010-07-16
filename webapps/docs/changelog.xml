@@ -93,6 +93,11 @@
         request processing threads and threads started by the application.
         (markt)
       </fix>
+      <fix>
+        <bug>49428</bug>: Add a work-around for the known namespace issues for
+        some Microsoft WebDAV clients. Patch provided by Panagiotis Astithas.
+        (markt)
+      </fix>
       <add>
         Add support for <code>*.jar</code> pattern in VirtualWebappLoader.
         (kkolinko)
