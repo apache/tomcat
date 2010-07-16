@@ -88,7 +88,7 @@
     <filter-class>org.apache.catalina.filters.CsrfPreventionFilter</filter-class>
     <init-param>
       <param-name>entryPoints</param-name>
-      <param-value>/html,/html/,/html/list</param-value>
+      <param-value>/html,/html/,/html/list,/index.jsp</param-value>
     </init-param>
   </filter>
   

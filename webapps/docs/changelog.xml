@@ -254,6 +254,11 @@
         <bug>49570</bug>: When using the example compression filter, set the
         Vary header on compressed responses. (markt)
       </fix>
+      <add>
+        Add redirects for the root of the manager and host-manager web
+        applications that redirect users to the html interface rather than
+        returning a 404. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
