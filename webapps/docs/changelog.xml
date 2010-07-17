@@ -172,6 +172,12 @@
         replaced, ensure that the new Set-Cookie header overwrites the old
         Set-Cookie header. (markt) 
       </fix>
+      <fix>
+        Create a thread to trigger asynchronous timeouts when using the BIO
+        connector, change the default timeout to 10s (was infinite) and make the 
+        default timeout configurable using the <code>asyncTimeout</code>
+        attribute on the connector. (pero/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -1560,7 +1560,11 @@ public class Request
         //TODO SERVLET3 - async - need to retrieve the ServletContext here
         //or just the webapp classloader associated with to do 
         //run with start(Runnable)
-        asyncContext.setHasOriginalRequestAndResponse(request==getRequest() && response==getResponse().getResponse());
+        asyncContext.setHasOriginalRequestAndResponse(request==getRequest() &&
+                response==getResponse().getResponse());
+        
+        asyncContext.setTimeout(getConnector().getAsyncTimeout());
+        
         return asyncContext;
     }
 
