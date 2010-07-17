@@ -95,6 +95,12 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
+     * Default timeout for asynchronous requests (ms).
+     */
+    protected  long asyncTimeout = 10000;
+
+
+    /**
      * The "enable DNS lookups" flag for this Connector.
      */
     protected boolean enableLookups = false;
@@ -334,6 +340,29 @@ public class Connector extends LifecycleMBeanBase  {
 
         this.allowTrace = allowTrace;
         setProperty("allowTrace", String.valueOf(allowTrace));
+
+    }
+
+    
+    /**
+     * Return the default timeout for async requests in ms.
+     */
+    public long getAsyncTimeout() {
+
+        return asyncTimeout;
+
+    }
+
+
+    /**
+     * Set the default timeout for async requests.
+     *
+     * @param allowTrace The new timeout in ms.
+     */
+    public void setAsyncTimeout(long asyncTimeout) {
+
+        this.asyncTimeout= asyncTimeout;
+        setProperty("asyncTimeout", String.valueOf(asyncTimeout));
 
     }
 
