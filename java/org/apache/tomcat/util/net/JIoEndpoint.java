@@ -394,11 +394,19 @@ public class JIoEndpoint extends AbstractEndpoint {
 
             // Start acceptor threads
             for (int i = 0; i < acceptorThreadCount; i++) {
-                Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
+                Thread acceptorThread = new Thread(new Acceptor(),
+                        getName() + "-Acceptor-" + i);
                 acceptorThread.setPriority(threadPriority);
                 acceptorThread.setDaemon(getDaemon());
                 acceptorThread.start();
             }
+            
+            // Start async timeout thread
+            Thread timeoutThread = new Thread(new AsyncTimeout(),
+                    getName() + "-AsyncTimeout");
+            timeoutThread.setPriority(threadPriority);
+            timeoutThread.setDaemon(true);
+            timeoutThread.start();
         }
     }
 
