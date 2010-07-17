@@ -18,6 +18,7 @@
 package org.apache.coyote;
 
 import java.util.Iterator;
+import java.util.concurrent.Executor;
 
 
 /**
@@ -48,6 +49,12 @@ public interface ProtocolHandler {
      */
     public void setAdapter(Adapter adapter);
     public Adapter getAdapter();
+
+
+    /**
+     * The executor, provide access to the underlying thread pool.
+     */
+    public Executor getExecutor();
 
 
     /**
