@@ -26,7 +26,8 @@ import java.util.Iterator;
  * will not fit Jk protocols like JNI.
  *
  * This is the main interface to be implemented by a coyote connector.
- * Adapter is the main interface to be implemented by a coyote servlet container.
+ * Adapter is the main interface to be implemented by a coyote servlet
+ * container.
  *
  * @author Remy Maucherat
  * @author Costin Manolache
@@ -34,52 +35,47 @@ import java.util.Iterator;
  */
 public interface ProtocolHandler {
 
-
     /**
      * Pass config info.
      */
     public void setAttribute(String name, Object value);
-
-
     public Object getAttribute(String name);
     public Iterator<String> getAttributeNames();
 
+    
     /**
      * The adapter, used to call the connector.
      */
     public void setAdapter(Adapter adapter);
-
-
     public Adapter getAdapter();
 
 
     /**
-     * Init the protocol.
+     * Initialise the protocol.
      */
-    public void init()
-        throws Exception;
+    public void init() throws Exception;
 
 
     /**
      * Start the protocol.
      */
-    public void start()
-        throws Exception;
+    public void start() throws Exception;
+
 
     /**
      * Pause the protocol (optional).
      */
-    public void pause()
-        throws Exception;
+    public void pause() throws Exception;
+
 
     /**
      * Resume the protocol (optional).
      */
-    public void resume()
-        throws Exception;
-
-    public void destroy()
-        throws Exception;
+    public void resume() throws Exception;
 
 
+    /**
+     * Destroy the protocol (optional).
+     */
+    public void destroy() throws Exception;
 }
