@@ -79,6 +79,11 @@
       HTTP method. If not specified, this attribute is set to false.</p>
     </attribute>
 
+    <attribute name="asyncTimeout" required="false">
+      <p>The default timeout for asynchronous requests in milliseconds. If not
+      specified, this attribute is set to 10000 (10 seconds).</p>
+    </attribute>
+
     <attribute name="enableLookups" required="false">
       <p>Set to <code>true</code> if you want calls to
       <code>request.getRemoteHost()</code> to perform DNS lookups in
