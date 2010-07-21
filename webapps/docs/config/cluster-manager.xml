@@ -112,7 +112,7 @@
      <attribute name="mapSendOptions" required="false">
        The backup manager uses a replicated map, this map is sending and
        receiving messages. You can setup the flag for how this map is sending
-       messages, the default value is <code>6</code>(asynchronous).<br/>
+       messages, the default value is <code>6</code>(synchronous).<br/>
        Note that if you use asynchronous messaging it is possible for update
        messages for a session to be processed by the receiving node in a
        different order to the order in which they were sent.
