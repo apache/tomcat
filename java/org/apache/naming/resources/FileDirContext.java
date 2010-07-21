@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import javax.naming.Binding;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
@@ -237,8 +238,8 @@ public class FileDirContext extends BaseDirContext {
         File file = file(name);
 
         if (file == null)
-            throw new NamingException
-                (sm.getString("resources.notFound", name));
+            throw new NameNotFoundException(
+                    sm.getString("resources.notFound", name));
 
         if (!file.delete())
             throw new NamingException
@@ -265,7 +266,7 @@ public class FileDirContext extends BaseDirContext {
         File file = file(oldName);
 
         if (file == null)
-            throw new NamingException
+            throw new NameNotFoundException
                 (sm.getString("resources.notFound", oldName));
 
         File newFile = new File(base, newName);
@@ -295,7 +296,7 @@ public class FileDirContext extends BaseDirContext {
         File file = file(name);
 
         if (file == null)
-            throw new NamingException
+            throw new NameNotFoundException
                 (sm.getString("resources.notFound", name));
 
         return new NamingContextEnumeration(list(file).iterator());
