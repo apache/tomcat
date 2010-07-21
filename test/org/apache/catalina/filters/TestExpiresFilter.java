@@ -59,7 +59,6 @@ public class TestExpiresFilter extends TomcatBaseTest {
                 "modification plus 5 hours 3 minutes");
         filterDef.addInitParameter("ExpiresByType image/jpg", "A10000");
         filterDef.addInitParameter("ExpiresByType video/mpeg", "M20000");
-        filterDef.addInitParameter("ExpiresActive", "Off");
         filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes",
                 "304, 503");
 

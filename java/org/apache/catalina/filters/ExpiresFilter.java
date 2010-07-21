@@ -110,43 +110,7 @@ import org.apache.juli.logging.LogFactory;
  * &lt;/web-app&gt;
  * </pre></code>
  * 
- * <h2>Configuration Parameters</h2><h3>
- * <tt>ExpiresActive</tt></h3>
- * <p>
- * This directive enables or disables the generation of the <tt>Expires</tt> and
- * <tt>Cache-Control</tt> headers by this <tt>ExpiresFilter</tt>. If set to
- * <tt>Off</tt>, the headers will not be generated for any HTTP response. If set
- * to <tt>On</tt> or <tt>true</tt>, the headers will be added to served HTTP
- * responses according to the criteria defined by the
- * <tt>ExpiresByType &lt;content-type&gt;</tt> and <tt>ExpiresDefault</tt>
- * directives. Note that this directive does not guarantee that an
- * <tt>Expires</tt> or <tt>Cache-Control</tt> header will be generated. If the
- * criteria aren&#x27;t met, no header will be sent, and the effect will be as
- * though this directive wasn&#x27;t even specified.
- * </p>
- * <p>
- * This parameter is optional, default value is <tt>true</tt>.
- * </p>
- * <p>
- * <i>Enable filter</i>
- * </p>
- * 
- * <code><pre>
- * &lt;init-param&gt;
- *    &lt;!-- supports case insensitive &#x27;On&#x27; or &#x27;true&#x27; --&gt;
- *    &lt;param-name&gt;ExpiresActive&lt;/param-name&gt;&lt;param-value&gt;On&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </pre></code>
- * <p>
- * <i>Disable filter</i>
- * </p>
- * 
- * <code><pre>
- * &lt;init-param&gt;
- *    &lt;!-- supports anything different from case insensitive &#x27;On&#x27; and &#x27;true&#x27; --&gt;
- *    &lt;param-name&gt;ExpiresActive&lt;/param-name&gt;&lt;param-value&gt;Off&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </pre></code>
+ * <h2>Configuration Parameters</h2>
  * 
  * <h3>
  * <tt>ExpiresByType &lt;content-type&gt;</tt></h3>
@@ -316,7 +280,7 @@ import org.apache.juli.logging.LogFactory;
  * <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header),</li>
  * <li>the response status code is not excluded by the directive
  * <tt>ExpiresExcludedResponseStatusCodes</tt>,</li>
- * <li>The <tt>Content-Type</tt> of the response matches one of the types
+ * <li>the <tt>Content-Type</tt> of the response matches one of the types
  * defined the in <tt>ExpiresByType</tt> directives or the
  * <tt>ExpiresDefault</tt> directive is defined.</li>
  * </ol>
@@ -412,7 +376,6 @@ import org.apache.juli.logging.LogFactory;
  * <code><pre>
  * Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
  * FINE: Filter initialized with configuration ExpiresFilter[
- *    active=true, 
  *    excludedResponseStatusCode=[304], 
  *    default=null, 
  *    byType={
