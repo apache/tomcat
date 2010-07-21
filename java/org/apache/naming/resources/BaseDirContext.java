@@ -36,6 +36,7 @@ import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -475,7 +476,8 @@ public abstract class BaseDirContext implements DirContext {
         }
         
         // Really not found
-        throw new NamingException(sm.getString("resources.notFound", name));
+        throw new NameNotFoundException(
+                sm.getString("resources.notFound", name));
     }
 
     /**
@@ -702,7 +704,8 @@ public abstract class BaseDirContext implements DirContext {
         }
 
         // Really not found
-        throw new NamingException(sm.getString("resources.notFound", name));
+        throw new NameNotFoundException(
+                sm.getString("resources.notFound", name));
     }
 
 
@@ -1058,7 +1061,8 @@ public abstract class BaseDirContext implements DirContext {
         }
         
         // Really not found
-        throw new NamingException(sm.getString("resources.notFound", name));
+        throw new NameNotFoundException(
+                sm.getString("resources.notFound", name));
     }
 
     /**
