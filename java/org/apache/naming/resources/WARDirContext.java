@@ -35,6 +35,7 @@ import javax.naming.CompositeName;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
@@ -296,7 +297,7 @@ public class WARDirContext extends BaseDirContext {
             return new NamingContextEnumeration(list(entries).iterator());
         Entry entry = treeLookup(name);
         if (entry == null)
-            throw new NamingException
+            throw new NameNotFoundException
                 (sm.getString("resources.notFound", name));
         return new NamingContextEnumeration(list(entry).iterator());
     }
