@@ -178,6 +178,12 @@
         default timeout configurable using the <code>asyncTimeout</code>
         attribute on the connector. (pero/markt)
       </fix>
+      <fix>
+        <bug>49600</bug>: Make exceptions returned by the
+        <code>ProxyDirContext</code> consistent for resources that weren't found
+        by checking the <code>DirContext</code> or the cache. Test case based on
+        a patch provided by Marc Guillemot. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
