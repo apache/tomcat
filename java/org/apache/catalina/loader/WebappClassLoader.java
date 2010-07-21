@@ -1709,7 +1709,7 @@ public class WebappClassLoader
     public URL[] getURLs() {
 
         if (repositoryURLs != null) {
-            return repositoryURLs;
+            return repositoryURLs.clone();
         }
 
         URL[] external = super.getURLs();
@@ -1749,7 +1749,7 @@ public class WebappClassLoader
             repositoryURLs = new URL[0];
         }
 
-        return repositoryURLs;
+        return repositoryURLs.clone();
 
     }
 
