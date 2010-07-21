@@ -319,7 +319,7 @@ The expiry time can be fine-tuned by adding several &#x27;
     <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header),</li>
     <li>the response status code is not excluded by the directive
     <tt>ExpiresExcludedResponseStatusCodes</tt>,</li>
-    <li>The <tt>Content-Type</tt> of the response matches one of the types
+    <li>the <tt>Content-Type</tt> of the response matches one of the types
     defined the in <tt>ExpiresByType</tt> directives or the
     <tt>ExpiresDefault</tt> directive is defined.</li>
     </ol>
@@ -446,8 +446,7 @@ The expiry time can be fine-tuned by adding several &#x27;
 &lt;/init-param&gt;
          </source>
          <p>
-         Note that this directive only has effect if <tt>ExpiresActive On</tt> has
-         been specified. It overrides, for the specified MIME type <i>only</i>, any
+         It overrides, for the specified MIME type <i>only</i>, any
          expiration date set by the <tt>ExpiresDefault</tt> directive.
          </p>
          <p>
@@ -483,13 +482,12 @@ The expiry time can be fine-tuned by adding several &#x27;
 org.apache.catalina.filters.ExpiresFilter.level = FINE
     </source>
     <p>
-    Sample of initialization log message :
+    Sample of initialization log message:
     </p>
     
     <source>
 Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
 FINE: Filter initialized with configuration ExpiresFilter[
- active=true, 
  excludedResponseStatusCode=[304], 
  default=null, 
  byType={
@@ -499,7 +497,7 @@ FINE: Filter initialized with configuration ExpiresFilter[
     </source>
     <p>
     Sample of per-request log message where <tt>ExpiresFilter</tt> adds an
-    expiration date
+    expiration date:
     </p>
     
     <source>
@@ -508,7 +506,7 @@ FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif",
     </source>
     <p>
     Sample of per-request log message where <tt>ExpiresFilter</tt> does not add
-    an expiration date
+    an expiration date:
     </p>
     
     <source>
