@@ -56,6 +56,13 @@ public class ProxyDirContext implements DirContext {
     public static final String HOST = "host";
 
 
+    /**
+     * Immutable name not found exception.
+     */
+    protected static final NameNotFoundException NOT_FOUND_EXCEPTION =
+        new ImmutableNameNotFoundException();
+
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -134,7 +141,8 @@ public class ProxyDirContext implements DirContext {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
 
     /**
@@ -184,13 +192,6 @@ public class ProxyDirContext implements DirContext {
      * Max size of resources which will have their content cached.
      */
     protected int cacheObjectMaxSize = 512; // 512 KB
-
-
-    /**
-     * Immutable name not found exception.
-     */
-    protected NameNotFoundException notFoundException =
-        new ImmutableNameNotFoundException();
 
 
     /**
@@ -263,7 +264,7 @@ public class ProxyDirContext implements DirContext {
         CacheEntry entry = cacheLookup(name.toString());
         if (entry != null) {
             if (!entry.exists) {
-                throw notFoundException;
+                throw NOT_FOUND_EXCEPTION;
             }
             if (entry.resource != null) {
                 // Check content caching.
@@ -292,7 +293,7 @@ public class ProxyDirContext implements DirContext {
         CacheEntry entry = cacheLookup(name);
         if (entry != null) {
             if (!entry.exists) {
-                throw notFoundException;
+                throw NOT_FOUND_EXCEPTION;
             }
             if (entry.resource != null) {
                 return entry.resource;
@@ -813,7 +814,7 @@ public class ProxyDirContext implements DirContext {
         CacheEntry entry = cacheLookup(name.toString());
         if (entry != null) {
             if (!entry.exists) {
-                throw notFoundException;
+                throw NOT_FOUND_EXCEPTION;
             }
             return entry.attributes;
         }
@@ -837,7 +838,7 @@ public class ProxyDirContext implements DirContext {
         CacheEntry entry = cacheLookup(name);
         if (entry != null) {
             if (!entry.exists) {
-                throw notFoundException;
+                throw NOT_FOUND_EXCEPTION;
             }
             return entry.attributes;
         }
