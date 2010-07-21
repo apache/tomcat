@@ -66,8 +66,8 @@
         disabled by default. Based on a patch by Yair Lenga. (markt)
       </add>
       <add>
-        <bug>48998</bug>: Add the ExpiresFilter, a port of the httpd mod_expires
-        module. Patch provided by Cyrille Le Clerc. (markt)
+        <bug>48998</bug>, <bug>49617</bug>: Add the ExpiresFilter, a port of the
+        httpd mod_expires module. Patch provided by Cyrille Le Clerc. (markt)
       </add>
       <fix>
         <bug>49030</bug>: When initializing/starting/stopping connectors and
