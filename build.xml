@@ -410,7 +410,18 @@
   	
   </target>
 
-  <target name="compile" depends="build-prepare,download-compile">
+  <target name="validate" depends="download-validate">
+    <taskdef resource="checkstyletask.properties"
+  	         classpath="${checkstyle.jar}" />
+  	<checkstyle config="checkstyle.xml">
+      <fileset dir="java">
+      	<include name="**/*.java" />
+        <exclude name="org/apache/tomcat/util/bcel/**" />
+  	  </fileset>
+  	</checkstyle>
+  </target>
+
+  <target name="compile" depends="build-prepare,download-compile,validate">
 
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
@@ -1887,6 +1898,17 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
 	
   <!-- ================ Download and dependency building =================== -->
+
+  <target name="download-validate"
+          description="Download components necessary to validate source" >
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${checkstyle.loc}"/>
+      <param name="destfile" value="${checkstyle.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+
+  </target>
 
   <target name="download-compile"
 	      description="Download (and build) components necessary to compile" >
