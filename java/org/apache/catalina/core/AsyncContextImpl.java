@@ -17,6 +17,8 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -180,15 +182,36 @@ public class AsyncContextImpl implements AsyncContext {
         }
 
         if (state.get() ==  AsyncState.STARTED) {
-            // TODO SERVLET3 - async - set context class loader when running the
-            // task.
-            // final ServletContext sctx = getServletRequest().getServletContext();
-            // TODO - Use a container thread without creating a memory leak 
             // Execute the runnable using a container thread from the
-            // Connector's thread pool
-            // request.getConnector().getProtocolHandler().getExecutor().execute(run);
-            Thread t = new Thread(run);
-            t.start();
+            // Connector's thread pool. Use a wrapper to prevent a memory leak
+            Runnable wrapper = new RunnableWrapper(run, context);
+            ClassLoader oldCL;
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                oldCL = AccessController.doPrivileged(pa);
+            } else {
+                oldCL = Thread.currentThread().getContextClassLoader();
+            }
+            try {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                            this.getClass().getClassLoader());
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(
+                            this.getClass().getClassLoader());
+                }
+                request.getConnector().getProtocolHandler().getExecutor(
+                        ).execute(wrapper);
+            } finally {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                            oldCL);
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(oldCL);
+                }
+            }
         } else {
             throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
         }
@@ -390,5 +413,73 @@ public class AsyncContextImpl implements AsyncContext {
         this.servletResponse = response;
         event = new AsyncEvent(this, request, response); 
     }
-    public static class DebugException extends Exception {}
+    
+    private static class DebugException extends Exception {}
+    
+    private static class RunnableWrapper implements Runnable {
+
+        private Runnable wrapped = null;
+        private Context context = null;
+        
+        public RunnableWrapper(Runnable wrapped, Context ctxt) {
+            this.wrapped = wrapped;
+            this.context = ctxt;
+        }
+
+        @Override
+        public void run() {
+            ClassLoader oldCL;
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                oldCL = AccessController.doPrivileged(pa);
+            } else {
+                oldCL = Thread.currentThread().getContextClassLoader();
+            }
+            
+            try {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                            context.getLoader().getClassLoader());
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader
+                            (context.getLoader().getClassLoader());
+                }                wrapped.run();
+            } finally {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                            oldCL);
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(oldCL);
+                }
+            }
+        }
+        
+    }
+
+
+    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
+
+    private static class PrivilegedGetTccl
+            implements PrivilegedAction<ClassLoader> {
+
+        public ClassLoader run() {
+            Thread.currentThread().getContextClassLoader();
+            return null;
+        }
+    }
+
 }
