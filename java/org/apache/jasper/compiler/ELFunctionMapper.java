@@ -17,8 +17,12 @@
 
 package org.apache.jasper.compiler;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 import javax.servlet.jsp.tagext.FunctionInfo;
+
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 
 /**
@@ -296,12 +300,29 @@ public class ELFunctionMapper {
          */
         private String getCanonicalName(String className) throws JasperException {
             Class<?> clazz;
+            
+            ClassLoader tccl;
+            if (Constants.IS_SECURITY_ENABLED) {
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                tccl = AccessController.doPrivileged(pa);
+            } else {
+                tccl = Thread.currentThread().getContextClassLoader();
+            }
+
             try {
-                clazz = Class.forName(className);
+                clazz = Class.forName(className, true, tccl);
             } catch (ClassNotFoundException e) {
                 throw new JasperException(e);
             }
             return clazz.getCanonicalName();
+        }
+    }
+    
+    private static class PrivilegedGetTccl
+            implements PrivilegedAction<ClassLoader> {
+
+        public ClassLoader run() {
+            return Thread.currentThread().getContextClassLoader();
         }
     }
 }
