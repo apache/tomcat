@@ -72,7 +72,6 @@ public class AsyncContextImpl implements AsyncContext {
         if (log.isDebugEnabled()) {
             log.debug("AsyncContext created["+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
         }
-        //TODO SERVLET3 - async
         this.request = request;
     }
 
@@ -85,7 +84,6 @@ public class AsyncContextImpl implements AsyncContext {
             //do nothing
         } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING) ||
                    state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
-            // TODO SERVLET3 - async
             AtomicBoolean dispatched = new AtomicBoolean(false);
             request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
             if (!dispatched.get()) doInternalComplete(false);
@@ -115,7 +113,6 @@ public class AsyncContextImpl implements AsyncContext {
             log.debug("AsyncContext Dispatch Called["+state.get()+"; "+path+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
         }
 
-        // TODO SERVLET3 - async
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
             state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
 
@@ -342,7 +339,7 @@ public class AsyncContextImpl implements AsyncContext {
                     doInternalComplete(true);
                     if (x.getCause() instanceof ServletException) throw (ServletException)x.getCause();
                     if (x.getCause() instanceof IOException) throw (IOException)x.getCause();
-                    else throw new ServletException(x);
+                    throw new ServletException(x);
                 } finally {
                     dispatch = null;
                 }
@@ -414,7 +411,9 @@ public class AsyncContextImpl implements AsyncContext {
         event = new AsyncEvent(this, request, response); 
     }
     
-    private static class DebugException extends Exception {}
+    private static class DebugException extends Exception {
+        private static final long serialVersionUID = 1L;
+    }
     
     private static class RunnableWrapper implements Runnable {
 
