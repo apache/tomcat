@@ -26,154 +26,154 @@ import java.util.List;
 
 public class ListELResolver extends ELResolver {
 
-	private final boolean readOnly;
+    private final boolean readOnly;
 
-	private final static Class<?> UNMODIFIABLE =
-	    Collections.unmodifiableList(new ArrayList<Object>()).getClass();
+    private final static Class<?> UNMODIFIABLE =
+        Collections.unmodifiableList(new ArrayList<Object>()).getClass();
 
-	public ListELResolver() {
-		this.readOnly = false;
-	}
+    public ListELResolver() {
+        this.readOnly = false;
+    }
 
-	public ListELResolver(boolean readOnly) {
-		this.readOnly = readOnly;
-	}
+    public ListELResolver(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
 
-	@Override
+    @Override
     public Object getValue(ELContext context, Object base, Object property)
-			throws NullPointerException, PropertyNotFoundException, ELException {
-		if (context == null) {
-			throw new NullPointerException();
-		}
+            throws NullPointerException, PropertyNotFoundException, ELException {
+        if (context == null) {
+            throw new NullPointerException();
+        }
 
-		if (base instanceof List<?>) {
-			context.setPropertyResolved(true);
-			List<?> list = (List<?>) base;
-			int idx = coerce(property);
-			if (idx < 0 || idx >= list.size()) {
-				return null;
-			}
-			return list.get(idx);
-		}
+        if (base instanceof List<?>) {
+            context.setPropertyResolved(true);
+            List<?> list = (List<?>) base;
+            int idx = coerce(property);
+            if (idx < 0 || idx >= list.size()) {
+                return null;
+            }
+            return list.get(idx);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
+    @Override
     public Class<?> getType(ELContext context, Object base, Object property)
-			throws NullPointerException, PropertyNotFoundException, ELException {
-		if (context == null) {
-			throw new NullPointerException();
-		}
+            throws NullPointerException, PropertyNotFoundException, ELException {
+        if (context == null) {
+            throw new NullPointerException();
+        }
 
-		if (base instanceof List<?>) {
-			context.setPropertyResolved(true);
-			List<?> list = (List<?>) base;
-			int idx = coerce(property);
-			if (idx < 0 || idx >= list.size()) {
+        if (base instanceof List<?>) {
+            context.setPropertyResolved(true);
+            List<?> list = (List<?>) base;
+            int idx = coerce(property);
+            if (idx < 0 || idx >= list.size()) {
                 throw new PropertyNotFoundException(
                         new ArrayIndexOutOfBoundsException(idx).getMessage());
-			}
-			Object obj = list.get(idx);
-			return (obj != null) ? obj.getClass() : null;
-		}
+            }
+            Object obj = list.get(idx);
+            return (obj != null) ? obj.getClass() : null;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
+    @Override
     public void setValue(ELContext context, Object base, Object property,
-			Object value) throws NullPointerException,
-			PropertyNotFoundException, PropertyNotWritableException,
-			ELException {
-		if (context == null) {
-			throw new NullPointerException();
-		}
+            Object value) throws NullPointerException,
+            PropertyNotFoundException, PropertyNotWritableException,
+            ELException {
+        if (context == null) {
+            throw new NullPointerException();
+        }
 
-		if (base instanceof List<?>) {
-			context.setPropertyResolved(true);
-			@SuppressWarnings("unchecked") // Must be OK to cast to Object
-			List<Object> list = (List<Object>) base;
+        if (base instanceof List<?>) {
+            context.setPropertyResolved(true);
+            @SuppressWarnings("unchecked") // Must be OK to cast to Object
+            List<Object> list = (List<Object>) base;
 
-			if (this.readOnly) {
-				throw new PropertyNotWritableException(message(context,
-						"resolverNotWriteable", new Object[] { base.getClass()
-								.getName() }));
-			}
+            if (this.readOnly) {
+                throw new PropertyNotWritableException(message(context,
+                        "resolverNotWriteable", new Object[] { base.getClass()
+                                .getName() }));
+            }
 
-			int idx = coerce(property);
-			try {
-				list.set(idx, value);
-			} catch (UnsupportedOperationException e) {
-				throw new PropertyNotWritableException(e);
-			} catch (IndexOutOfBoundsException e) {
-				throw new PropertyNotFoundException(e);
-			}
-		}
-	}
+            int idx = coerce(property);
+            try {
+                list.set(idx, value);
+            } catch (UnsupportedOperationException e) {
+                throw new PropertyNotWritableException(e);
+            } catch (IndexOutOfBoundsException e) {
+                throw new PropertyNotFoundException(e);
+            }
+        }
+    }
 
-	@Override
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property)
-			throws NullPointerException, PropertyNotFoundException, ELException {
-		if (context == null) {
-			throw new NullPointerException();
-		}
+            throws NullPointerException, PropertyNotFoundException, ELException {
+        if (context == null) {
+            throw new NullPointerException();
+        }
 
-		if (base instanceof List<?>) {
-			context.setPropertyResolved(true);
-			List<?> list = (List<?>) base;
-			int idx = coerce(property);
-			if (idx < 0 || idx >= list.size()) {
-				throw new PropertyNotFoundException(
-						new ArrayIndexOutOfBoundsException(idx).getMessage());
-			}
-			return this.readOnly || UNMODIFIABLE.equals(list.getClass());
-		}
+        if (base instanceof List<?>) {
+            context.setPropertyResolved(true);
+            List<?> list = (List<?>) base;
+            int idx = coerce(property);
+            if (idx < 0 || idx >= list.size()) {
+                throw new PropertyNotFoundException(
+                        new ArrayIndexOutOfBoundsException(idx).getMessage());
+            }
+            return this.readOnly || UNMODIFIABLE.equals(list.getClass());
+        }
 
-		return this.readOnly;
-	}
+        return this.readOnly;
+    }
 
-	@Override
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		if (base instanceof List<?>) {
-			FeatureDescriptor[] descs = new FeatureDescriptor[((List<?>) base).size()];
-			for (int i = 0; i < descs.length; i++) {
-				descs[i] = new FeatureDescriptor();
-				descs[i].setDisplayName("["+i+"]");
-				descs[i].setExpert(false);
-				descs[i].setHidden(false);
-				descs[i].setName(""+i);
-				descs[i].setPreferred(true);
-				descs[i].setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.FALSE);
-				descs[i].setValue(TYPE, Integer.class);
-			}
-			return Arrays.asList(descs).iterator();
-		}
-		return null;
-	}
+        if (base instanceof List<?>) {
+            FeatureDescriptor[] descs = new FeatureDescriptor[((List<?>) base).size()];
+            for (int i = 0; i < descs.length; i++) {
+                descs[i] = new FeatureDescriptor();
+                descs[i].setDisplayName("["+i+"]");
+                descs[i].setExpert(false);
+                descs[i].setHidden(false);
+                descs[i].setName(""+i);
+                descs[i].setPreferred(true);
+                descs[i].setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.FALSE);
+                descs[i].setValue(TYPE, Integer.class);
+            }
+            return Arrays.asList(descs).iterator();
+        }
+        return null;
+    }
 
-	@Override
+    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
-		if (base instanceof List<?>) { // implies base != null
-			return Integer.class;
-		}
-		return null;
-	}
+        if (base instanceof List<?>) { // implies base != null
+            return Integer.class;
+        }
+        return null;
+    }
 
-	private final static int coerce(Object property) {
-		if (property instanceof Number) {
-			return ((Number) property).intValue();
-		}
-		if (property instanceof Character) {
-			return ((Character) property).charValue();
-		}
-		if (property instanceof Boolean) {
-			return (((Boolean) property).booleanValue() ? 1 : 0);
-		}
+    private final static int coerce(Object property) {
+        if (property instanceof Number) {
+            return ((Number) property).intValue();
+        }
+        if (property instanceof Character) {
+            return ((Character) property).charValue();
+        }
+        if (property instanceof Boolean) {
+            return (((Boolean) property).booleanValue() ? 1 : 0);
+        }
         if (property instanceof String) {
             return Integer.parseInt((String) property);
         }
-		throw new IllegalArgumentException(property != null ? property
-				.toString() : "null");
-	}
+        throw new IllegalArgumentException(property != null ?
+                property.toString() : "null");
+    }
 }
