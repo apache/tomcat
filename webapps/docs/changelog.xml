@@ -294,6 +294,11 @@
         Re-factor unit tests to enable them to be run once with each of the HTTP
         connector implementations (BIO, NIO and APR/native). (markt)
       </add>
+      <add>
+        <bug>49268</bug>: Add the necessary plumbing to include CheckStyle in
+        the build process. Start with no checks. Additional checks will be
+        added as they are agreed. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
