@@ -136,7 +136,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
-        if (Lifecycle.INIT_EVENT.equals(event.getType())) {
+        if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             /*
              * Several components end up calling:
              * sun.awt.AppContext.getAppContext()

@@ -327,7 +327,7 @@ public class ContextConfig
                 originalDocBase = docBase;
             }
             configureStop();
-        } else if (event.getType().equals(Lifecycle.INIT_EVENT)) {
+        } else if (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) {
             init();
         } else if (event.getType().equals(Lifecycle.DESTROY_EVENT)) {
             destroy();
