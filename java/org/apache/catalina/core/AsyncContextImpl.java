@@ -48,8 +48,8 @@ import org.apache.juli.logging.LogFactory;
 public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
-        NOT_STARTED, STARTED, DISPATCHING, DISPATCHING_RUNNABLE, DISPATCHED,
-        COMPLETING, COMPLETING_RUNNABLE, TIMING_OUT, ERROR_DISPATCHING
+        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT,
+        ERROR_DISPATCHING
     }
     
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
@@ -87,9 +87,6 @@ public class AsyncContextImpl implements AsyncContext {
             AtomicBoolean dispatched = new AtomicBoolean(false);
             request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
             if (!dispatched.get()) doInternalComplete(false);
-        } else if (state.compareAndSet(AsyncState.DISPATCHING_RUNNABLE,
-                AsyncState.COMPLETING_RUNNABLE)) {
-            // do nothing
         } else {
             throw new IllegalStateException("Complete not allowed. Invalid state:"+state.get());
         }
@@ -182,33 +179,16 @@ public class AsyncContextImpl implements AsyncContext {
             log.debug("AsyncContext Start Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
         }
 
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING_RUNNABLE) ||
-            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING_RUNNABLE)) {
-            // TODO SERVLET3 - async
-            final ServletContext sctx = getServletRequest().getServletContext();
-            Runnable r = new Runnable() {
-                public void run() {
-                    //TODO SERVLET3 - async - set context class loader when running the task.
-                    try {
-                        
-                        run.run();
-                    }catch (Exception x) {
-                        log.error("Unable to run async task.",x);
-                    }
-                }
-            };
-            this.dispatch = r;
-            AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
-            if (!dispatched.get()) {
-                try {
-                    doInternalDispatch();
-                }catch (ServletException sx) {
-                    throw new RuntimeException(sx);
-                }catch (IOException ix) {
-                    throw new RuntimeException(ix);
-                }
-            }
+        if (state.get() ==  AsyncState.STARTED) {
+            // TODO SERVLET3 - async - set context class loader when running the
+            // task.
+            // final ServletContext sctx = getServletRequest().getServletContext();
+            // TODO - Use a container thread without creating a memory leak 
+            // Execute the runnable using a container thread from the
+            // Connector's thread pool
+            // request.getConnector().getProtocolHandler().getExecutor().execute(run);
+            Thread t = new Thread(run);
+            t.start();
         } else {
             throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
         }
@@ -258,8 +238,7 @@ public class AsyncContextImpl implements AsyncContext {
 
     public boolean isStarted() {
         return (state.get() == AsyncState.STARTED ||
-                state.get() == AsyncState.DISPATCHING ||
-                state.get() == AsyncState.DISPATCHING_RUNNABLE);
+                state.get() == AsyncState.DISPATCHING);
     }
 
     public void setStarted(Context context) {
@@ -304,10 +283,16 @@ public class AsyncContextImpl implements AsyncContext {
                 listener.fireOnTimeout(event);
                 listenerInvoked = true;
             }
-            if (!listenerInvoked) {
-                ((HttpServletResponse)servletResponse).setStatus(500);
+            if (listenerInvoked) {
+                // Listener should have called complete
+                if (state.get() != AsyncState.NOT_STARTED) {
+                    ((HttpServletResponse)servletResponse).setStatus(500);
+                    doInternalComplete(true);
+                }
+            } else {
+                // No listeners, container calls complete
+                doInternalComplete(false);
             }
-            doInternalComplete(true);
         } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.COMPLETING)) {
             log.debug("ON ERROR!");
             boolean listenerInvoked = false;
@@ -337,27 +322,6 @@ public class AsyncContextImpl implements AsyncContext {
                     else throw new ServletException(x);
                 } finally {
                     dispatch = null;
-                }
-            }
-        } else if (this.state.get() == AsyncState.DISPATCHING_RUNNABLE) {
-            if (this.dispatch!=null) {
-                try {
-                    dispatch.run();
-                } catch (RuntimeException x) {
-                    doInternalComplete(true);
-                    if (x.getCause() instanceof ServletException) throw (ServletException)x.getCause();
-                    if (x.getCause() instanceof IOException) throw (IOException)x.getCause();
-                    else throw new ServletException(x);
-                } finally {
-                    dispatch = null;
-                }
-                if (this.state.compareAndSet(AsyncState.COMPLETING_RUNNABLE,
-                        AsyncState.COMPLETING)) {
-                    doInternalComplete(false);
-                } else if (this.state.get() == AsyncState.DISPATCHING_RUNNABLE) {
-                    doInternalComplete(true);
-                    throw new IllegalStateException(
-                            "Failed to call dispatch() or complete() after start()");
                 }
             }
         } else if (this.state.get()==AsyncState.COMPLETING) {
