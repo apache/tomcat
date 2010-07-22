@@ -30,7 +30,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -56,15 +55,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         }
     };
 
-    private void initSsl(Tomcat tomcat, boolean nio) {
-        if (nio) {
-            Connector connector = 
-                new Connector("org.apache.coyote.http11.Http11NioProtocol");
-            connector.setPort(getPort());
-            tomcat.getService().addConnector(connector);
-            tomcat.setConnector(connector);
-            tomcat.getConnector().setProperty("sslProtocol", "tls");
-        }
+    private void initSsl(Tomcat tomcat) {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.indexOf("Apr") == -1) {
             tomcat.getConnector().setProperty("sslProtocol", "tls");
@@ -88,14 +79,6 @@ public class TestTomcatSSL extends TomcatBaseTest {
     }
     
     public void testSimpleSsl() throws Exception {
-        simpleSsl(false);
-    }
-    
-    public void testSimpleSslNio() throws Exception {
-        simpleSsl(true);
-    }
-    
-    public void simpleSsl(boolean nio) throws Exception {
         // Install the all-trusting trust manager so https:// works 
         // with unsigned certs. 
 
@@ -113,7 +96,7 @@ public class TestTomcatSSL extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
-        initSsl(tomcat, nio);
+        initSsl(tomcat);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -124,19 +107,16 @@ public class TestTomcatSSL extends TomcatBaseTest {
     boolean handshakeDone = false;
     
     public void testRenegotiateFail() throws Exception {
-        renegotiateFail(false);
-    }
-    
-    public void renegotiateFail(boolean nio) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        initSsl(tomcat, nio);
-        // Default - MITM not enabled
+        initSsl(tomcat);
 
+        // Default - MITM attack prevented
+        
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
@@ -191,36 +171,22 @@ public class TestTomcatSSL extends TomcatBaseTest {
     }
     
     public void testRenegotiateWorks() throws Exception {
-        renegotiateWorks(false);
-    }
-    
-    
-    // Re-negotiation not implemented in NIO
-    //    public void testRenegotiateWorksNio() throws Exception {
-    //        renegotiateWorks(true);    
-    //    }
-
-    public void testRenegotiateFailNio() throws Exception {
-        renegotiateFail(true);        
-    }
-    
-    
-    public void renegotiateWorks(boolean nio) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        initSsl(tomcat, nio);
+        initSsl(tomcat);
+        
         // Enable MITM attack
         tomcat.getConnector().setAttribute("allowUnsafeLegacyRenegotiation", "true");
 
         tomcat.start();
 
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Apr") != -1) {
-            return; // Not supported yet (10/05/25)
+        if (protocol.indexOf("Nio") != -1) {
+            return; // Not supported yet (2010-07-22)
         }
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
@@ -264,5 +230,12 @@ public class TestTomcatSSL extends TomcatBaseTest {
             fail("Re-negotiation failed");
         }
         
+    }
+
+    @Override
+    public void setUp() throws Exception {
+        // Make sure SSL renegotiation is not disabled in the JVM
+        System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
+        super.setUp();
     }
 }
