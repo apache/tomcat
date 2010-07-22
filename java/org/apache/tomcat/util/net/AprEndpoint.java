@@ -964,7 +964,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // in the poller can cause problems
             try {
                 synchronized (this) {
-                    this.wait(pollTime / 1000);
+                    this.wait(pollTime);
                 }
             } catch (InterruptedException e) {
                 // Ignore
@@ -1223,7 +1223,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // in the poller can cause problems
             try {
                 synchronized (this) {
-                    this.wait(pollTime / 1000);
+                    this.wait(pollTime);
                 }
             } catch (InterruptedException e) {
                 // Ignore
