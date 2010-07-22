@@ -19,7 +19,9 @@ package org.apache.jasper.compiler;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.servlet.jsp.tagext.FunctionInfo;
 
 import org.apache.jasper.Constants;
