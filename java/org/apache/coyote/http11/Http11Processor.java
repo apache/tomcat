@@ -349,8 +349,8 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         } else if (async) {
             return SocketState.LONG;
         } else {
+            recycle();
             if (!keepAlive) {
-                recycle();
                 return SocketState.CLOSED;
             } else {
                 return SocketState.OPEN;

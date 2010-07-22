@@ -267,7 +267,7 @@ public class CoyoteAdapter implements Adapter {
                 //configure settings for timed out
                 asyncConImpl.setTimeoutState();
             }
-            if (status==SocketStatus.ERROR || status==SocketStatus.STOP || status==SocketStatus.DISCONNECT) {
+            if (status==SocketStatus.ERROR || status==SocketStatus.DISCONNECT) {
                 AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
                 //TODO SERVLET3 - async
                 //configure settings for timed out

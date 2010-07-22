@@ -122,11 +122,11 @@
         rather than an empty string. (markt)
       </fix>
       <fix>
-        <bug>49528</bug>: Ensure AsyncContext.isAsyncStarted() returns the
-        correct value after AsyncContext.start(). Tomcat implements this
-        using an internal dispatch that requires slightly different treatment
-        from a standard dispatch to ensure the correct value is returned.
-        (markt)
+        <bug>49528</bug>, <bug>49567</bug>: Ensure that
+        <code>AsyncContext.isAsyncStarted()</code> returns the correct value
+        after <code>AsyncContext.start()</code> and that if
+        <code>AsyncContext.complete()</code> is called on a separate thread that
+        it is handled correctly. (markt)
       </fix>
       <fix>
         <bug>49530</bug>: Contexts and Servlets not stopped when Tomcat is shut
