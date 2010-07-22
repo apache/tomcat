@@ -317,7 +317,9 @@ public class StandardEngine extends ContainerBase implements Engine {
                 if (defaultAccessLog == null) {
                     // Try the ROOT context of default host
                     Context context = (Context) host.findChild("");
-                    defaultAccessLog = context.getAccessLog();
+                    if (context != null) {
+                        defaultAccessLog = context.getAccessLog();
+                    }
 
                     if (defaultAccessLog == null) {
                         defaultAccessLog = new NoopAccessLog();
