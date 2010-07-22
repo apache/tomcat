@@ -184,6 +184,11 @@
         by checking the <code>DirContext</code> or the cache. Test case based on
         a patch provided by Marc Guillemot. (markt)
       </fix>
+      <fix>
+        <bug>49613</bug>: Improve performance when using SSL for applications
+        that make multiple class to <code>Request.getAttributeNames()</code>.
+        Patch provided by Sampo Savolainen. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
