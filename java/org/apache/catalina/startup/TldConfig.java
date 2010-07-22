@@ -577,7 +577,7 @@ public final class TldConfig  implements LifecycleListener {
             return;
         }
         
-        if (event.getType().equals(Lifecycle.INIT_EVENT)) {
+        if (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) {
             init();
         } else if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
             try {

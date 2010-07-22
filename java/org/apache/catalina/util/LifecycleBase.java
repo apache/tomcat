@@ -92,11 +92,12 @@ public abstract class LifecycleBase implements Lifecycle {
     
     public synchronized final void init() throws LifecycleException {
         if (!state.equals(LifecycleState.NEW)) {
-            invalidTransition(Lifecycle.INIT_EVENT);
+            invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
         }
+        setState(LifecycleState.INITIALIZING);
 
         initInternal();
-        
+
         setState(LifecycleState.INITIALIZED);
     }
     
