@@ -57,7 +57,7 @@ public class JasperListener
      */
     public void lifecycleEvent(LifecycleEvent event) {
 
-        if (Lifecycle.INIT_EVENT.equals(event.getType())) {
+        if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             try {
                 // Set JSP factory
                 Class.forName("org.apache.jasper.compiler.JspRuntimeContext",
