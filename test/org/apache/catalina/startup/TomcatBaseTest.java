@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.AprLifecycleListener;
 
@@ -109,17 +110,30 @@ public abstract class TomcatBaseTest extends TestCase {
         
         tomcat = new Tomcat();
 
-        // Add AprLifecycleListener
-        StandardServer server = (StandardServer) tomcat.getServer();
-        AprLifecycleListener listener = new AprLifecycleListener();
-        server.addLifecycleListener(listener);
+        // Has a protocol been specified
+        String protocol = System.getProperty("tomcat.test.protocol");
+        
+        // Use BIO by default
+        if (protocol == null) {
+            protocol = "org.apache.coyote.http11.Http11Protocol";
+        }
+
+        Connector connector = new Connector(protocol);
+        // If each test is running on same port - they
+        // may interfere with each other (on unix at least)
+        connector.setPort(getNextPort());
+        tomcat.getService().addConnector(connector);
+        tomcat.setConnector(connector);
+
+        // Add AprLifecycleListener if we are using the Apr connector
+        if (protocol.contains("Apr")) {
+            StandardServer server = (StandardServer) tomcat.getServer();
+            AprLifecycleListener listener = new AprLifecycleListener();
+            server.addLifecycleListener(listener);
+        }
         
         tomcat.setBaseDir(tempDir.getAbsolutePath());
         tomcat.getHost().setAppBase(appBase.getAbsolutePath());
-          
-        // If each test is running on same port - they
-        // may interfere with each other (on unix at least)
-        tomcat.setPort(getNextPort());
     }
     
     @Override
