@@ -1539,7 +1539,6 @@ public class Request
      }
 
     public AsyncContext startAsync() {
-        // TODO SERVLET3 - async
         return startAsync(getRequest(),response.getResponse());
     }
 
@@ -1557,9 +1556,6 @@ public class Request
         
         asyncContext.setStarted(getContext());
         asyncContext.init(request,response);
-        //TODO SERVLET3 - async - need to retrieve the ServletContext here
-        //or just the webapp classloader associated with to do 
-        //run with start(Runnable)
         asyncContext.setHasOriginalRequestAndResponse(request==getRequest() &&
                 response==getResponse().getResponse());
         
