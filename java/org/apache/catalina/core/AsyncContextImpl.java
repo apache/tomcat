@@ -476,8 +476,7 @@ public class AsyncContextImpl implements AsyncContext {
             implements PrivilegedAction<ClassLoader> {
 
         public ClassLoader run() {
-            Thread.currentThread().getContextClassLoader();
-            return null;
+            return Thread.currentThread().getContextClassLoader();
         }
     }
 
