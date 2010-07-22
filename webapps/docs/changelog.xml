@@ -285,6 +285,10 @@
         installer, making it clear that the service will be installed. Patch
         provided by sebb. (markt)
       </fix>
+      <add>
+        Re-factor unit tests to enable them to be run once with each of the HTTP
+        connector implementations (BIO, NIO and APR/native). (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
