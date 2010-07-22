@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
 
@@ -48,9 +50,88 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
         
         // Call the servlet once
-        getUrl("http://localhost:" + getPort() + "/");
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("OK", bc.toString());
+
 
         assertEquals("1false2true3true4true5false", servlet.getResult());
+    }
+    
+    public void testBug49567() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        Bug49567Servlet servlet = new Bug49567Servlet();
+        
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/", "servlet");
+        
+        tomcat.start();
+        
+        // Call the servlet once
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("OK", bc.toString());
+
+        assertEquals("1false2true3true4true5false", servlet.getResult());
+    }
+    
+    public void testAsyncStartNoComplete() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Minimise pauses during test
+        tomcat.getConnector().setAttribute(
+                "connectionTimeout", Integer.valueOf(3000));
+        
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        AsyncStartNoCompleteServlet servlet =
+            new AsyncStartNoCompleteServlet();
+        
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/", "servlet");
+        
+        tomcat.start();
+        
+        // Call the servlet the first time
+        ByteChunk bc1 = getUrl("http://localhost:" + getPort() +
+                "/?echo=run1");
+        assertEquals("OK-run1", bc1.toString());
+
+        // Call the servlet the second time with a request parameter
+        ByteChunk bc2 = getUrl("http://localhost:" + getPort() +
+                "/?echo=run2");
+        assertEquals("OK-run2", bc2.toString());
+    }
+    
+    public void testAsyncStartWithComplete() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        AsyncStartWithCompleteServlet servlet =
+            new AsyncStartWithCompleteServlet();
+        
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/", "servlet");
+        
+        tomcat.start();
+        
+        // Call the servlet once
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("OK", bc.toString());
     }
     
     private static class Bug49528Servlet extends HttpServlet {
@@ -83,12 +164,15 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                         Thread.sleep(1000);
                         result.append('4');
                         result.append(req.isAsyncStarted());
+                        resp.setContentType("text/plain");
+                        resp.getWriter().print("OK");
                         req.getAsyncContext().complete();
                         result.append('5');
                         result.append(req.isAsyncStarted());
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        result.append(e);
+                    } catch (IOException e) {
+                        result.append(e);
                     }
                 }
             });
@@ -97,4 +181,96 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             req.getMethod();
         }
     }
+
+    private static class Bug49567Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        
+        private StringBuilder result = new StringBuilder();
+        
+        public String getResult() {
+            return result.toString();
+        }
+
+        @Override
+        protected void doGet(final HttpServletRequest req,
+                final HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            result.append('1');
+            result.append(req.isAsyncStarted());
+            req.startAsync();
+            result.append('2');
+            result.append(req.isAsyncStarted());
+            
+            req.getAsyncContext().start(new Runnable() {
+                @Override
+                public void run() {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                result.append('3');
+                                result.append(req.isAsyncStarted());
+                                Thread.sleep(1000);
+                                result.append('4');
+                                result.append(req.isAsyncStarted());
+                                resp.setContentType("text/plain");
+                                resp.getWriter().print("OK");
+                                req.getAsyncContext().complete();
+                                result.append('5');
+                                result.append(req.isAsyncStarted());
+                            } catch (InterruptedException e) {
+                                result.append(e);
+                            } catch (IOException e) {
+                                result.append(e);
+                            }
+                        }
+                    });
+                    t.start();
+                }
+            });
+            // Pointless method call so there is somewhere to put a break point
+            // when debugging
+            req.getMethod();
+        }
+    }
+    
+    private static class AsyncStartNoCompleteServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        
+        @Override
+        protected void doGet(final HttpServletRequest req,
+                final HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            String echo = req.getParameter("echo");
+            AsyncContext actxt = req.startAsync();
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+            if (echo != null) {
+                resp.getWriter().print("-" + echo);
+            }
+            // Speed up the test by reducing the timeout
+            actxt.setTimeout(1000);
+        }
+    }
+
+    private static class AsyncStartWithCompleteServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        
+        @Override
+        protected void doGet(final HttpServletRequest req,
+                final HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            AsyncContext actxt = req.startAsync();
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+            actxt.complete();
+        }
+    }
+
 }
