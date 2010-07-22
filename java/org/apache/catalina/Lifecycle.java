@@ -27,10 +27,12 @@ package org.apache.catalina;
  * <br>
  * The valid state transitions for components that support Lifecycle are:
  * <pre>
- *                                  --------------------<-----------------------
- *                                  |                                          |
- *    init()           start()      |        auto          auto         stop() |
- * NEW ->-- INITIALIZED -->-- STARTING_PREP -->- STARTING -->- STARTED -->---  |
+ *    init()
+ * NEW ->-- INITIALIZING
+ * |||           |                  --------------------<-----------------------
+ * |||           |auto              |                                          |
+ * |||           |     start()      |        auto          auto         stop() |
+ * |||      INITIALIZED -->-- STARTING_PREP -->- STARTING -->- STARTED -->---  |
  * |||                              ^                             |         |  |
  * |||        start()               |                             |         |  |
  * ||----------->--------------------                             |         |  |
@@ -99,9 +101,15 @@ public interface Lifecycle {
 
 
     /**
-     * The LifecycleEvent type for the "component init" event.
+     * The LifecycleEvent type for the "component after init" event.
      */
-    public static final String INIT_EVENT = "init";
+    public static final String BEFORE_INIT_EVENT = "before_init";
+
+
+    /**
+     * The LifecycleEvent type for the "component after init" event.
+     */
+    public static final String AFTER_INIT_EVENT = "after_init";
 
 
     /**

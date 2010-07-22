@@ -23,7 +23,8 @@ package org.apache.catalina;
  */
 public enum LifecycleState {
     NEW(false, null),
-    INITIALIZED(false, Lifecycle.INIT_EVENT),
+    INITIALIZING(false, Lifecycle.BEFORE_INIT_EVENT),
+    INITIALIZED(false, Lifecycle.AFTER_INIT_EVENT),
     STARTING_PREP(false, Lifecycle.BEFORE_START_EVENT),
     STARTING(true, Lifecycle.START_EVENT),
     STARTED(true, Lifecycle.AFTER_START_EVENT),

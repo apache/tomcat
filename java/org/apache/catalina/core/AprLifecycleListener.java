@@ -97,7 +97,7 @@ public class AprLifecycleListener
      */
     public void lifecycleEvent(LifecycleEvent event) {
 
-        if (Lifecycle.INIT_EVENT.equals(event.getType())) {
+        if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             synchronized (lock) {
                 init();
                 if (aprAvailable) {
