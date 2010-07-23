@@ -1436,7 +1436,7 @@ public class Request
      * @param value The associated value
      */
     public void setAttribute(String name, Object value) {
-	
+
         // Name cannot be null
         if (name == null)
             throw new IllegalArgumentException

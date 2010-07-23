@@ -55,7 +55,6 @@ import org.apache.tomcat.util.net.SocketStatus;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class CoyoteAdapter implements Adapter {
     
     private static final Log log = LogFactory.getLog(CoyoteAdapter.class);
@@ -355,7 +354,7 @@ public class CoyoteAdapter implements Adapter {
      * Service method.
      */
     public void service(org.apache.coyote.Request req, 
-    	                org.apache.coyote.Response res)
+                        org.apache.coyote.Response res)
         throws Exception {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
@@ -500,7 +499,7 @@ public class CoyoteAdapter implements Adapter {
      */
     protected boolean postParseRequest(org.apache.coyote.Request req, 
                                        Request request,
-    		                       org.apache.coyote.Response res, 
+                                       org.apache.coyote.Response res, 
                                        Response response)
             throws Exception {
 
