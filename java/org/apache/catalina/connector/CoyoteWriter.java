@@ -158,7 +158,7 @@ public class CoyoteWriter
 
     @Override
     public void write(char buf[]) {
-	write(buf, 0, buf.length);
+        write(buf, 0, buf.length);
     }
 
 

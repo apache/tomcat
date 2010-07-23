@@ -78,51 +78,51 @@ public class WebdavFixFilter implements Filter {
         // NOOP
     }
 
-	public void destroy() {
-	    // NOOP
-	}
+    public void destroy() {
+        // NOOP
+    }
 
     /**
      * Check for the broken MS WebDAV client and if detected issue a re-direct
      * that hopefully will cause the non-broken client to be used.
      */
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
-	    if (!(request instanceof HttpServletRequest) ||
-	            !(response instanceof HttpServletResponse)) {
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
+        if (!(request instanceof HttpServletRequest) ||
+                !(response instanceof HttpServletResponse)) {
             chain.doFilter(request, response);
             return;
         }
-		HttpServletRequest httpRequest = ((HttpServletRequest) request);
-		HttpServletResponse httpResponse = ((HttpServletResponse) response);
-		String ua = httpRequest.getHeader("User-Agent");
-		
-		if (ua == null || ua.length() == 0 ||
-		        !ua.startsWith(UA_MINIDIR_START)) {
-	        // No UA or starts with non MS value
-		    // Hope everything just works...
-		    chain.doFilter(request, response);
-		} else if (ua.startsWith(UA_MINIDIR_5_1_2600)) {
-		    // XP 32-bit SP3 - needs redirect with explicit port
-		    httpResponse.sendRedirect(buildRedirect(httpRequest));
-		} else if (ua.startsWith(UA_MINIDIR_5_2_3790)) {
-		    // XP 64-bit SP2
-		    if (!"".equals(httpRequest.getContextPath())) {
-		        log(request,
-		                "XP-x64-SP2 clients only work with the root context");
-		    }
-		    // Namespace issue maybe
-		    // see http://greenbytes.de/tech/webdav/webdav-redirector-list.html
-		    log(request, "XP-x64-SP2 is known not to work with WebDAV Servlet");
-		    
-		    chain.doFilter(request, response);
-		} else {
-		    // Don't know which MS client it is - try the redirect with an
-		    // explicit port in the hope that it moves the client to a different
-		    // WebDAV implementation that works
-			httpResponse.sendRedirect(buildRedirect(httpRequest));
-		}		
-	}
+        HttpServletRequest httpRequest = ((HttpServletRequest) request);
+        HttpServletResponse httpResponse = ((HttpServletResponse) response);
+        String ua = httpRequest.getHeader("User-Agent");
+        
+        if (ua == null || ua.length() == 0 ||
+                !ua.startsWith(UA_MINIDIR_START)) {
+            // No UA or starts with non MS value
+            // Hope everything just works...
+            chain.doFilter(request, response);
+        } else if (ua.startsWith(UA_MINIDIR_5_1_2600)) {
+            // XP 32-bit SP3 - needs redirect with explicit port
+            httpResponse.sendRedirect(buildRedirect(httpRequest));
+        } else if (ua.startsWith(UA_MINIDIR_5_2_3790)) {
+            // XP 64-bit SP2
+            if (!"".equals(httpRequest.getContextPath())) {
+                log(request,
+                        "XP-x64-SP2 clients only work with the root context");
+            }
+            // Namespace issue maybe
+            // see http://greenbytes.de/tech/webdav/webdav-redirector-list.html
+            log(request, "XP-x64-SP2 is known not to work with WebDAV Servlet");
+            
+            chain.doFilter(request, response);
+        } else {
+            // Don't know which MS client it is - try the redirect with an
+            // explicit port in the hope that it moves the client to a different
+            // WebDAV implementation that works
+            httpResponse.sendRedirect(buildRedirect(httpRequest));
+        }        
+    }
 
     private String buildRedirect(HttpServletRequest request) {
         StringBuilder location =

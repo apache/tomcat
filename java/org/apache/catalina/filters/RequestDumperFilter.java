@@ -239,7 +239,7 @@ public class RequestDumperFilter implements Filter {
         doLog("END TIME          ", getTimestamp());
         doLog("==================",
                 "============================================");
-	}
+    }
 
     private void doLog(String attribute, String value) {
         StringBuilder sb = new StringBuilder(80);

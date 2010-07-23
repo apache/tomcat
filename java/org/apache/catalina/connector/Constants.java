@@ -14,20 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.connector;
-
 
 /**
  * Static constants for this package.
  */
-
 public final class Constants {
-
-	
-    // -------------------------------------------------------------- Constants
-
 
     public static final String Package = "org.apache.catalina.connector";
 
@@ -38,6 +30,4 @@ public final class Constants {
 
     public static final int PROCESSOR_IDLE = 0;
     public static final int PROCESSOR_ACTIVE = 1;
-
-
 }
