@@ -189,6 +189,10 @@
         that make multiple class to <code>Request.getAttributeNames()</code>.
         Patch provided by Sampo Savolainen. (markt)
       </fix>
+      <fix>
+        Handle the edge cases where resources packaged in JARs have names that
+        start with a single quote character or a double quote character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
