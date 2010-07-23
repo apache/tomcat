@@ -408,7 +408,7 @@ public abstract class BaseDirContext implements DirContext {
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext){
                 path = ((BaseDirContext) altDirContext).getRealPath(
-                        "META-INF/resources/" + name);
+                        "/META-INF/resources" + name);
                 if (path != null)
                     return path;
             }
@@ -462,7 +462,7 @@ public abstract class BaseDirContext implements DirContext {
         // Check the alternate locations
         for (DirContext altDirContext : altDirContexts) {
             try {
-                obj = altDirContext.lookup("META-INF/resources/" + name);
+                obj = altDirContext.lookup("/META-INF/resources" + name);
                 if (obj != null)
                     return obj;
             } catch ( NamingException ex) {
@@ -686,7 +686,7 @@ public abstract class BaseDirContext implements DirContext {
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext)
                 bindings = ((BaseDirContext) altDirContext).doListBindings(
-                        "META-INF/resources/" + name);
+                        "/META-INF/resources" + name);
             else {
                 try {
                     bindings = altDirContext.listBindings(name);
@@ -1043,7 +1043,7 @@ public abstract class BaseDirContext implements DirContext {
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext)
                 attrs = ((BaseDirContext) altDirContext).doGetAttributes(
-                        "META-INF/resources/" + name, attrIds);
+                        "/META-INF/resources" + name, attrIds);
             else {
                 try {
                     attrs = altDirContext.getAttributes(name, attrIds);
