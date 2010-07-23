@@ -34,7 +34,7 @@ public class StandardClassLoader
     extends URLClassLoader
     implements StandardClassLoaderMBean {
 
-	public StandardClassLoader(URL repositories[]) {
+    public StandardClassLoader(URL repositories[]) {
         super(repositories);
     }
 

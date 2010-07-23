@@ -177,7 +177,7 @@ public class InputBuffer extends Reader
      * @param coyoteRequest Associated Coyote request
      */
     public void setRequest(Request coyoteRequest) {
-	this.coyoteRequest = coyoteRequest;
+        this.coyoteRequest = coyoteRequest;
     }
 
 
@@ -273,7 +273,7 @@ public class InputBuffer extends Reader
      * @throws IOException An underlying IOException occurred
      */
     public int realReadBytes(byte cbuf[], int off, int len)
-	throws IOException {
+            throws IOException {
 
         if (closed)
             return -1;
