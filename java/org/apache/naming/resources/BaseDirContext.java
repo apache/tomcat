@@ -61,9 +61,6 @@ public abstract class BaseDirContext implements DirContext {
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( BaseDirContext.class );
 
-    // -------------------------------------------------------------- Constants
-
-
     // ----------------------------------------------------------- Constructors
 
 
@@ -157,18 +154,25 @@ public abstract class BaseDirContext implements DirContext {
      * a requested resource can not be found in the main context.
      */
     public void addResourcesJar(URL url) {
+        JarFile jarFile = null; 
         try {
             JarURLConnection conn = (JarURLConnection) url.openConnection();
-            JarFile jarFile = conn.getJarFile();   
+            jarFile = conn.getJarFile();   
             ZipEntry entry = jarFile.getEntry("/");
             WARDirContext warDirContext = new WARDirContext(jarFile,
                     new WARDirContext.Entry("/", entry));
             warDirContext.loadEntries();
             altDirContexts.add(warDirContext);
         } catch (IOException ioe) {
-            // TODO: Log failure
+            log.warn(sm.getString("resources.addResourcesJarFail", url), ioe);
         } finally {
-            // TODO: Clean up
+            if (jarFile != null) {
+                try {
+                    jarFile.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
     }
     
@@ -868,8 +872,8 @@ public abstract class BaseDirContext implements DirContext {
      */
     public Name composeName(Name name, Name prefix)
         throws NamingException {
-        prefix = (Name) prefix.clone();
-        return prefix.addAll(name);
+        Name clone = (Name) prefix.clone();
+        return clone.addAll(name);
     }
 
 
