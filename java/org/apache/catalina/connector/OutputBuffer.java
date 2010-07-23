@@ -170,7 +170,7 @@ public class OutputBuffer extends Writer
      * @param coyoteResponse Associated Coyote response
      */
     public void setResponse(Response coyoteResponse) {
-	this.coyoteResponse = coyoteResponse;
+        this.coyoteResponse = coyoteResponse;
     }
 
 
@@ -341,7 +341,7 @@ public class OutputBuffer extends Writer
      * @throws IOException An underlying IOException occurred
      */
     public void realWriteBytes(byte buf[], int off, int cnt)
-	throws IOException {
+            throws IOException {
 
         if (closed)
             return;
