@@ -154,10 +154,9 @@ public abstract class BaseDirContext implements DirContext {
      * a requested resource can not be found in the main context.
      */
     public void addResourcesJar(URL url) {
-        JarFile jarFile = null; 
         try {
             JarURLConnection conn = (JarURLConnection) url.openConnection();
-            jarFile = conn.getJarFile();   
+            JarFile jarFile = conn.getJarFile();   
             ZipEntry entry = jarFile.getEntry("/");
             WARDirContext warDirContext = new WARDirContext(jarFile,
                     new WARDirContext.Entry("/", entry));
@@ -165,14 +164,6 @@ public abstract class BaseDirContext implements DirContext {
             altDirContexts.add(warDirContext);
         } catch (IOException ioe) {
             log.warn(sm.getString("resources.addResourcesJarFail", url), ioe);
-        } finally {
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
         }
     }
     
