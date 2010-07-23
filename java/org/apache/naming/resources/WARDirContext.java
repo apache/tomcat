@@ -198,7 +198,7 @@ public class WARDirContext extends BaseDirContext {
 
         Name name;
         try {
-            name = new CompositeName(strName);
+            name = getEscapedJndiName(strName);
         } catch (InvalidNameException e) {
             log.info(sm.getString("resources.invalidName", strName), e);
             return null;
@@ -217,6 +217,19 @@ public class WARDirContext extends BaseDirContext {
             return new WARResource(entry.getEntry());
     }
 
+
+    /**
+     * JNDI treats ' and " as reserved characters therefore they need to be
+     * escaped as part of converting file names to JNDI names. Note that while
+     * ' can be used in Windows and Unix file names, " is only valid on Unix.
+     * This method assumes that the string is currently unquoted.
+     * 
+     * @return  A valid JNDI name
+     * @throws InvalidNameException 
+     */
+    private Name getEscapedJndiName(String name) throws InvalidNameException {
+        return new CompositeName(name.replace("'", "\\'").replace("\"", ""));
+    }
 
     /**
      * Unbinds the named object. Removes the terminal atomic name in name 
@@ -273,7 +286,7 @@ public class WARDirContext extends BaseDirContext {
     @Override
     public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
-        return list(new CompositeName(name));
+        return list(getEscapedJndiName(name));
     }
 
 
@@ -320,7 +333,7 @@ public class WARDirContext extends BaseDirContext {
     protected NamingEnumeration<Binding> doListBindings(String strName)
         throws NamingException {
         
-        Name name = new CompositeName(strName);
+        Name name = getEscapedJndiName(strName);
 
         if (name.isEmpty())
             return new NamingContextBindingsEnumeration(list(entries).iterator(),
@@ -426,7 +439,7 @@ public class WARDirContext extends BaseDirContext {
     @Override
     protected Attributes doGetAttributes(String name, String[] attrIds)
         throws NamingException {
-        return getAttributes(new CompositeName(name), attrIds);
+        return getAttributes(getEscapedJndiName(name), attrIds);
     }
 
 
@@ -760,8 +773,8 @@ public class WARDirContext extends BaseDirContext {
                 int currentPos = -1;
                 int lastPos = 0;
                 while ((currentPos = name.indexOf('/', lastPos)) != -1) {
-                    Name parentName = new CompositeName(name.substring(0, lastPos));
-                    Name childName = new CompositeName(name.substring(0, currentPos));
+                    Name parentName = getEscapedJndiName(name.substring(0, lastPos));
+                    Name childName = getEscapedJndiName(name.substring(0, currentPos));
                     String entryName = name.substring(lastPos, currentPos);
                     // Parent should have been created in last cycle through
                     // this loop
@@ -781,7 +794,7 @@ public class WARDirContext extends BaseDirContext {
                     lastPos = currentPos + 1;
                 }
                 String entryName = name.substring(pos + 1, name.length());
-                Name compositeName = new CompositeName(name.substring(0, pos));
+                Name compositeName = getEscapedJndiName(name.substring(0, pos));
                 Entry parent = treeLookup(compositeName);
                 Entry child = new Entry(entryName, entry);
                 if (parent != null)
