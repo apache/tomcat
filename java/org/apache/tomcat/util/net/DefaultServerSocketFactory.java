@@ -61,15 +61,14 @@ class DefaultServerSocketFactory extends ServerSocketFactory {
  
     @Override
     public Socket acceptSocket(ServerSocket socket)
- 	throws IOException {
- 	return socket.accept();
+            throws IOException {
+        return socket.accept();
     }
  
     @Override
     public void handshake(Socket sock)
- 	throws IOException {
+        throws IOException {
         // NOOP
     }
- 	    
         
- }
+}

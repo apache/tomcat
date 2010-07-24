@@ -73,36 +73,36 @@ public final class MessageBytes implements Cloneable, Serializable {
     /** Construct a new MessageBytes instance
      */
     public static MessageBytes newInstance() {
-	return factory.newInstance();
+        return factory.newInstance();
     }
 
     public MessageBytes getClone() {
-	try {
-	    return (MessageBytes)this.clone();
-	} catch( Exception ex) {
-	    return null;
-	}
+        try {
+            return (MessageBytes)this.clone();
+        } catch( Exception ex) {
+            return null;
+        }
     }
 
     public boolean isNull() {
-//		should we check also hasStrValue ???
-		return byteC.isNull() && charC.isNull() && ! hasStrValue;
-	// bytes==null && strValue==null;
+        // should we check also hasStrValue ???
+        return byteC.isNull() && charC.isNull() && ! hasStrValue;
+        // bytes==null && strValue==null;
     }
     
     /**
      * Resets the message bytes to an uninitialized (NULL) state.
      */
     public void recycle() {
-	type=T_NULL;
-	byteC.recycle();
-	charC.recycle();
+        type=T_NULL;
+        byteC.recycle();
+        charC.recycle();
 
-	strValue=null;
+        strValue=null;
 
-	hasStrValue=false;
-	hasHashCode=false;
-	hasIntValue=false;
+        hasStrValue=false;
+        hasHashCode=false;
+        hasIntValue=false;
     hasLongValue=false;
     }
 
@@ -128,12 +128,12 @@ public final class MessageBytes implements Cloneable, Serializable {
      *  If no encoding is set, we'll use 8859-1.
      */
     public void setEncoding( String enc ) {
-	if( !byteC.isNull() ) {
-	    // if the encoding changes we need to reset the conversion results
-	    charC.recycle();
-	    hasStrValue=false;
-	}
-	byteC.setEncoding(enc);
+        if( !byteC.isNull() ) {
+            // if the encoding changes we need to reset the conversion results
+            charC.recycle();
+            hasStrValue=false;
+        }
+        byteC.setEncoding(enc);
     }
 
     /** 
@@ -153,16 +153,16 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     /** Remove the cached string value. Use it after a conversion on the
-     *	byte[] or after the encoding is changed
+     *  byte[] or after the encoding is changed
      *  XXX Is this needed ?
      */
     public void resetStringValue() {
-	if( type != T_STR ) {
-	    // If this was created as a byte[] or char[], we remove
-	    // the old string value
-	    hasStrValue=false;
-	    strValue=null;
-	}
+        if( type != T_STR ) {
+            // If this was created as a byte[] or char[], we remove
+            // the old string value
+            hasStrValue=false;
+            strValue=null;
+        }
     }
 
     /** 
@@ -208,7 +208,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      *  T_STR, T_BYTES, T_CHARS or T_NULL
      */
     public int getType() {
-	return type;
+        return type;
     }
     
     /**
@@ -216,7 +216,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      * Valid only if T_BYTES or after a conversion was made.
      */
     public ByteChunk getByteChunk() {
-	return byteC;
+        return byteC;
     }
 
     /**
@@ -224,7 +224,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      * Valid only if T_CHARS or after a conversion was made.
      */
     public CharChunk getCharChunk() {
-	return charC;
+        return charC;
     }
 
     /**
@@ -232,7 +232,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      * Valid only if T_STR or after a conversion was made.
      */
     public String getString() {
-	return strValue;
+        return strValue;
     }
 
     /** Do a char->byte conversion.
@@ -252,15 +252,15 @@ public final class MessageBytes implements Cloneable, Serializable {
      *  XXX Not optimized - it converts to String first.
      */
     public void toChars() {
-	if( ! charC.isNull() ) {
+        if( ! charC.isNull() ) {
             type=T_CHARS;
-	    return;
-	}
-	// inefficient
-	toString();
+            return;
+        }
+        // inefficient
+        toString();
         type=T_CHARS;
-	char cc[]=strValue.toCharArray();
-	charC.setChars(cc, 0, cc.length);
+        char cc[]=strValue.toCharArray();
+        charC.setChars(cc, 0, cc.length);
     }
     
 
@@ -270,16 +270,16 @@ public final class MessageBytes implements Cloneable, Serializable {
      * in chars.
      */
     public int getLength() {
-	if(type==T_BYTES)
-	    return byteC.getLength();
-	if(type==T_CHARS) {
-	    return charC.getLength();
-	}
-	if(type==T_STR)
-	    return strValue.length();
-	toString();
-	if( strValue==null ) return 0;
-	return strValue.length();
+        if(type==T_BYTES)
+            return byteC.getLength();
+        if(type==T_CHARS) {
+            return charC.getLength();
+        }
+        if(type==T_STR)
+            return strValue.length();
+        toString();
+        if( strValue==null ) return 0;
+        return strValue.length();
     }
 
     // -------------------- equals --------------------
@@ -290,17 +290,17 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return true if the comparison succeeded, false otherwise
      */
     public boolean equals(String s) {
-	switch (type) {
-	case T_STR:
-	    if( strValue==null && s!=null) return false;
-	    return strValue.equals( s );
-	case T_CHARS:
-	    return charC.equals( s );
-	case T_BYTES:
-	    return byteC.equals( s );
-	default:
-	    return false;
-	}
+        switch (type) {
+        case T_STR:
+            if( strValue==null && s!=null) return false;
+            return strValue.equals( s );
+        case T_CHARS:
+            return charC.equals( s );
+        case T_BYTES:
+            return byteC.equals( s );
+        default:
+            return false;
+        }
     }
 
     /**
@@ -309,49 +309,49 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return true if the comparison succeeded, false otherwise
      */
     public boolean equalsIgnoreCase(String s) {
-	switch (type) {
-	case T_STR:
-	    if( strValue==null && s!=null) return false;
-	    return strValue.equalsIgnoreCase( s );
-	case T_CHARS:
-	    return charC.equalsIgnoreCase( s );
-	case T_BYTES:
-	    return byteC.equalsIgnoreCase( s );
-	default:
-	    return false;
-	}
+        switch (type) {
+        case T_STR:
+            if( strValue==null && s!=null) return false;
+            return strValue.equalsIgnoreCase( s );
+        case T_CHARS:
+            return charC.equalsIgnoreCase( s );
+        case T_BYTES:
+            return byteC.equalsIgnoreCase( s );
+        default:
+            return false;
+        }
     }
 
     public boolean equals(MessageBytes mb) {
-	switch (type) {
-	case T_STR:
-	    return mb.equals( strValue );
-	}
+        switch (type) {
+        case T_STR:
+            return mb.equals( strValue );
+        }
 
-	if( mb.type != T_CHARS &&
-	    mb.type!= T_BYTES ) {
-	    // it's a string or int/date string value
-	    return equals( mb.toString() );
-	}
+        if( mb.type != T_CHARS &&
+            mb.type!= T_BYTES ) {
+            // it's a string or int/date string value
+            return equals( mb.toString() );
+        }
 
-	// mb is either CHARS or BYTES.
-	// this is either CHARS or BYTES
-	// Deal with the 4 cases ( in fact 3, one is symmetric)
-	
-	if( mb.type == T_CHARS && type==T_CHARS ) {
-	    return charC.equals( mb.charC );
-	} 
-	if( mb.type==T_BYTES && type== T_BYTES ) {
-	    return byteC.equals( mb.byteC );
-	}
-	if( mb.type== T_CHARS && type== T_BYTES ) {
-	    return byteC.equals( mb.charC );
-	}
-	if( mb.type== T_BYTES && type== T_CHARS ) {
-	    return mb.byteC.equals( charC );
-	}
-	// can't happen
-	return true;
+        // mb is either CHARS or BYTES.
+        // this is either CHARS or BYTES
+        // Deal with the 4 cases ( in fact 3, one is symmetric)
+        
+        if( mb.type == T_CHARS && type==T_CHARS ) {
+            return charC.equals( mb.charC );
+        } 
+        if( mb.type==T_BYTES && type== T_BYTES ) {
+            return byteC.equals( mb.byteC );
+        }
+        if( mb.type== T_CHARS && type== T_BYTES ) {
+            return byteC.equals( mb.charC );
+        }
+        if( mb.type== T_BYTES && type== T_CHARS ) {
+            return mb.byteC.equals( charC );
+        }
+        // can't happen
+        return true;
     }
 
     
@@ -360,16 +360,16 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @param s the string
      */
     public boolean startsWith(String s) {
-	switch (type) {
-	case T_STR:
-	    return strValue.startsWith( s );
-	case T_CHARS:
-	    return charC.startsWith( s );
-	case T_BYTES:
-	    return byteC.startsWith( s );
-	default:
-	    return false;
-	}
+        switch (type) {
+        case T_STR:
+            return strValue.startsWith( s );
+        case T_CHARS:
+            return charC.startsWith( s );
+        case T_BYTES:
+            return byteC.startsWith( s );
+        default:
+            return false;
+        }
     }
 
     /**
@@ -378,25 +378,25 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @param pos The start position
      */
     public boolean startsWithIgnoreCase(String s, int pos) {
-	switch (type) {
-	case T_STR:
-	    if( strValue==null ) return false;
-	    if( strValue.length() < pos + s.length() ) return false;
-	    
-	    for( int i=0; i<s.length(); i++ ) {
-		if( Ascii.toLower( s.charAt( i ) ) !=
-		    Ascii.toLower( strValue.charAt( pos + i ))) {
-		    return false;
-		}
-	    }
-	    return true;
-	case T_CHARS:
-	    return charC.startsWithIgnoreCase( s, pos );
-	case T_BYTES:
-	    return byteC.startsWithIgnoreCase( s, pos );
-	default:
-	    return false;
-	}
+        switch (type) {
+        case T_STR:
+            if( strValue==null ) return false;
+            if( strValue.length() < pos + s.length() ) return false;
+            
+            for( int i=0; i<s.length(); i++ ) {
+                if( Ascii.toLower( s.charAt( i ) ) !=
+                    Ascii.toLower( strValue.charAt( pos + i ))) {
+                    return false;
+                }
+            }
+            return true;
+        case T_CHARS:
+            return charC.startsWithIgnoreCase( s, pos );
+        case T_BYTES:
+            return byteC.startsWithIgnoreCase( s, pos );
+        default:
+            return false;
+        }
     }
 
     
@@ -415,45 +415,45 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // normal hash. 
     private int hash() {
-	int code=0;
-	switch (type) {
-	case T_STR:
-	    // We need to use the same hash function
-	    for (int i = 0; i < strValue.length(); i++) {
-		code = code * 37 + strValue.charAt( i );
-	    }
-	    return code;
-	case T_CHARS:
-	    return charC.hash();
-	case T_BYTES:
-	    return byteC.hash();
-	default:
-	    return 0;
-	}
+        int code=0;
+        switch (type) {
+        case T_STR:
+            // We need to use the same hash function
+            for (int i = 0; i < strValue.length(); i++) {
+                code = code * 37 + strValue.charAt( i );
+            }
+            return code;
+        case T_CHARS:
+            return charC.hash();
+        case T_BYTES:
+            return byteC.hash();
+        default:
+            return 0;
+        }
     }
 
     public int indexOf(char c) {
-	return indexOf( c, 0);
+        return indexOf( c, 0);
     }
 
     // Inefficient initial implementation. Will be replaced on the next
     // round of tune-up
     public int indexOf(String s, int starting) {
-	toString();
-	return strValue.indexOf( s, starting );
+        toString();
+        return strValue.indexOf( s, starting );
     }
     
     // Inefficient initial implementation. Will be replaced on the next
     // round of tune-up
     public int indexOf(String s) {
-	return indexOf( s, 0 );
+        return indexOf( s, 0 );
     }
     
     public int indexOfIgnoreCase(String s, int starting) {
-	toString();
-	String upper=strValue.toUpperCase(Locale.ENGLISH);
-	String sU=s.toUpperCase(Locale.ENGLISH);
-	return upper.indexOf( sU, starting );
+        toString();
+        String upper=strValue.toUpperCase(Locale.ENGLISH);
+        String sU=s.toUpperCase(Locale.ENGLISH);
+        return upper.indexOf( sU, starting );
     }
     
     /**
@@ -462,16 +462,16 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @param starting The start position
      */
     public int indexOf(char c, int starting) {
-	switch (type) {
-	case T_STR:
-	    return strValue.indexOf( c, starting );
-	case T_CHARS:
-	    return charC.indexOf( c, starting);
-	case T_BYTES:
-	    return byteC.indexOf( c, starting );
-	default:
-	    return -1;
-	}
+        switch (type) {
+        case T_STR:
+            return strValue.indexOf( c, starting );
+        case T_CHARS:
+            return charC.indexOf( c, starting);
+        case T_BYTES:
+            return byteC.indexOf( c, starting );
+        default:
+            return -1;
+        }
     }
 
     /** Copy the src into this MessageBytes, allocating more space if
@@ -479,25 +479,25 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     public void duplicate( MessageBytes src ) throws IOException
     {
-	switch( src.getType() ) {
-	case MessageBytes.T_BYTES:
-	    type=T_BYTES;
-	    ByteChunk bc=src.getByteChunk();
-	    byteC.allocate( 2 * bc.getLength(), -1 );
-	    byteC.append( bc );
-	    break;
-	case MessageBytes.T_CHARS:
-	    type=T_CHARS;
-	    CharChunk cc=src.getCharChunk();
-	    charC.allocate( 2 * cc.getLength(), -1 );
-	    charC.append( cc );
-	    break;
-	case MessageBytes.T_STR:
-	    type=T_STR;
-	    String sc=src.getString();
-	    this.setString( sc );
-	    break;
-	}
+        switch( src.getType() ) {
+        case MessageBytes.T_BYTES:
+            type=T_BYTES;
+            ByteChunk bc=src.getByteChunk();
+            byteC.allocate( 2 * bc.getLength(), -1 );
+            byteC.append( bc );
+            break;
+        case MessageBytes.T_CHARS:
+            type=T_CHARS;
+            CharChunk cc=src.getCharChunk();
+            charC.allocate( 2 * cc.getLength(), -1 );
+            charC.append( cc );
+            break;
+        case MessageBytes.T_STR:
+            type=T_STR;
+            String sc=src.getString();
+            this.setString( sc );
+            break;
+        }
     }
 
     // -------------------- Deprecated code --------------------
@@ -598,18 +598,18 @@ public final class MessageBytes implements Cloneable, Serializable {
      */ 
     public int getInt() 
     {
-	if( hasIntValue )
-	    return intValue;
-	
-	switch (type) {
-	case T_BYTES:
-	    intValue=byteC.getInt();
-	    break;
-	default:
-	    intValue=Integer.parseInt(toString());
-	}
-	hasIntValue=true;
-	return intValue;
+        if( hasIntValue )
+            return intValue;
+        
+        switch (type) {
+        case T_BYTES:
+            intValue=byteC.getInt();
+            break;
+        default:
+            intValue=Integer.parseInt(toString());
+        }
+        hasIntValue=true;
+        return intValue;
     }
 
     // Used for headers conversion
@@ -637,14 +637,14 @@ public final class MessageBytes implements Cloneable, Serializable {
     private static MessageBytesFactory factory=new MessageBytesFactory();
 
     public static void setFactory( MessageBytesFactory mbf ) {
-	factory=mbf;
+        factory=mbf;
     }
     
     public static class MessageBytesFactory {
-	protected MessageBytesFactory() {
-	}
-	public MessageBytes newInstance() {
-	    return new MessageBytes();
-	}
+        protected MessageBytesFactory() {
+        }
+        public MessageBytes newInstance() {
+            return new MessageBytes();
+        }
     }
 }

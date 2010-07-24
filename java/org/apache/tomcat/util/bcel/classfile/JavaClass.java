@@ -177,23 +177,24 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
     }
     
     public AnnotationEntry[] getAnnotationEntries() {
-      	if (annotationsOutOfDate) { 
-      		// Find attributes that contain annotation data
-      		Attribute[] attrs = getAttributes();
-      		List accumulatedAnnotations = new ArrayList();
-      		for (int i = 0; i < attrs.length; i++) {
-    			Attribute attribute = attrs[i];
-    			if (attribute instanceof Annotations) {				
-    				Annotations runtimeAnnotations = (Annotations)attribute;
-    				for(int j = 0; j < runtimeAnnotations.getAnnotationEntries().length; j++)
-    					accumulatedAnnotations.add(runtimeAnnotations.getAnnotationEntries()[j]);
-    			}
-    		}
-      		annotations = (AnnotationEntry[])accumulatedAnnotations.toArray(new AnnotationEntry[accumulatedAnnotations.size()]);
-      		annotationsOutOfDate = false;
-      	}
-      	return annotations;
-      }
+        if (annotationsOutOfDate) { 
+            // Find attributes that contain annotation data
+            Attribute[] attrs = getAttributes();
+            List accumulatedAnnotations = new ArrayList();
+            for (int i = 0; i < attrs.length; i++) {
+                Attribute attribute = attrs[i];
+                if (attribute instanceof Annotations) {
+                    Annotations runtimeAnnotations = (Annotations)attribute;
+                    for(int j = 0; j < runtimeAnnotations.getAnnotationEntries().length; j++)
+                        accumulatedAnnotations.add(runtimeAnnotations.getAnnotationEntries()[j]);
+                }
+            }
+            annotations = (AnnotationEntry[])accumulatedAnnotations.toArray(new AnnotationEntry[accumulatedAnnotations.size()]);
+            annotationsOutOfDate = false;
+        }
+        return annotations;
+    }
+
     /**
      * @return Class name.
      */
@@ -237,9 +238,9 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
         }
         AnnotationEntry[] annotations = getAnnotationEntries();
         if (annotations!=null && annotations.length>0) {
-        	buf.append("\nAnnotation(s):\n");
-        	for (int i=0; i<annotations.length; i++) 
-        		buf.append(indent(annotations[i]));
+            buf.append("\nAnnotation(s):\n");
+            for (int i=0; i<annotations.length; i++) 
+                buf.append(indent(annotations[i]));
         }
         if (fields.length > 0) {
             buf.append("\n").append(fields.length).append(" fields:\n");
