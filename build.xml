@@ -418,6 +418,9 @@
       	<include name="**/*.java" />
         <exclude name="org/apache/tomcat/util/bcel/**" />
   	  </fileset>
+      <fileset dir="test">
+        <include name="**/*.java" />
+      </fileset>
   	</checkstyle>
   </target>
 
