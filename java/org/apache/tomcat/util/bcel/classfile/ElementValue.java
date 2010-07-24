@@ -28,108 +28,108 @@ import java.io.IOException;
  */
 public abstract class ElementValue
 {
-	protected int type;
+    protected int type;
 
-	protected ConstantPool cpool;
+    protected ConstantPool cpool;
 
-	public String toString()
-	{
-		return stringifyValue();
-	}
+    public String toString()
+    {
+        return stringifyValue();
+    }
 
-	protected ElementValue(int type, ConstantPool cpool)
-	{
-		this.type = type;
-		this.cpool = cpool;
-	}
+    protected ElementValue(int type, ConstantPool cpool)
+    {
+        this.type = type;
+        this.cpool = cpool;
+    }
 
-	
+    
 
-	public abstract String stringifyValue();
+    public abstract String stringifyValue();
 
-	public abstract void dump(DataOutputStream dos) throws IOException;
+    public abstract void dump(DataOutputStream dos) throws IOException;
 
-	public static final int STRING = 's';
+    public static final int STRING = 's';
 
-	public static final int ENUM_CONSTANT = 'e';
+    public static final int ENUM_CONSTANT = 'e';
 
-	public static final int CLASS = 'c';
+    public static final int CLASS = 'c';
 
-	public static final int ANNOTATION = '@';
+    public static final int ANNOTATION = '@';
 
-	public static final int ARRAY = '[';
+    public static final int ARRAY = '[';
 
-	public static final int PRIMITIVE_INT = 'I';
+    public static final int PRIMITIVE_INT = 'I';
 
-	public static final int PRIMITIVE_BYTE = 'B';
+    public static final int PRIMITIVE_BYTE = 'B';
 
-	public static final int PRIMITIVE_CHAR = 'C';
+    public static final int PRIMITIVE_CHAR = 'C';
 
-	public static final int PRIMITIVE_DOUBLE = 'D';
+    public static final int PRIMITIVE_DOUBLE = 'D';
 
-	public static final int PRIMITIVE_FLOAT = 'F';
+    public static final int PRIMITIVE_FLOAT = 'F';
 
-	public static final int PRIMITIVE_LONG = 'J';
+    public static final int PRIMITIVE_LONG = 'J';
 
-	public static final int PRIMITIVE_SHORT = 'S';
+    public static final int PRIMITIVE_SHORT = 'S';
 
-	public static final int PRIMITIVE_BOOLEAN = 'Z';
+    public static final int PRIMITIVE_BOOLEAN = 'Z';
 
-	public static ElementValue readElementValue(DataInputStream dis,
-			ConstantPool cpool) throws IOException
-	{
-		byte type = dis.readByte();
-		switch (type)
-		{
-		case 'B': // byte
-			return new SimpleElementValue(PRIMITIVE_BYTE, dis
-					.readUnsignedShort(), cpool);
-		case 'C': // char
-			return new SimpleElementValue(PRIMITIVE_CHAR, dis
-					.readUnsignedShort(), cpool);
-		case 'D': // double
-			return new SimpleElementValue(PRIMITIVE_DOUBLE, dis
-					.readUnsignedShort(), cpool);
-		case 'F': // float
-			return new SimpleElementValue(PRIMITIVE_FLOAT, dis
-					.readUnsignedShort(), cpool);
-		case 'I': // int
-			return new SimpleElementValue(PRIMITIVE_INT, dis
-					.readUnsignedShort(), cpool);
-		case 'J': // long
-			return new SimpleElementValue(PRIMITIVE_LONG, dis
-					.readUnsignedShort(), cpool);
-		case 'S': // short
-			return new SimpleElementValue(PRIMITIVE_SHORT, dis
-					.readUnsignedShort(), cpool);
-		case 'Z': // boolean
-			return new SimpleElementValue(PRIMITIVE_BOOLEAN, dis
-					.readUnsignedShort(), cpool);
-		case 's': // String
-			return new SimpleElementValue(STRING, dis.readUnsignedShort(),
-					cpool);
-		case 'e': // Enum constant
-			return new EnumElementValue(ENUM_CONSTANT, dis.readUnsignedShort(),
-					dis.readUnsignedShort(), cpool);
-		case 'c': // Class
-			return new ClassElementValue(CLASS, dis.readUnsignedShort(), cpool);
-		case '@': // Annotation
-			// TODO isRuntimeVisible
-			return new AnnotationElementValue(ANNOTATION, AnnotationEntry.read(
-					dis, cpool, false), cpool);
-		case '[': // Array
-			int numArrayVals = dis.readUnsignedShort();
-			ElementValue[] evalues = new ElementValue[numArrayVals];
-			for (int j = 0; j < numArrayVals; j++)
-			{
-				evalues[j] = ElementValue.readElementValue(dis, cpool);
-			}
-			return new ArrayElementValue(ARRAY, evalues, cpool);
-		default:
-			throw new RuntimeException(
-					"Unexpected element value kind in annotation: " + type);
-		}
-	}
+    public static ElementValue readElementValue(DataInputStream dis,
+            ConstantPool cpool) throws IOException
+    {
+        byte type = dis.readByte();
+        switch (type)
+        {
+        case 'B': // byte
+            return new SimpleElementValue(PRIMITIVE_BYTE, dis
+                    .readUnsignedShort(), cpool);
+        case 'C': // char
+            return new SimpleElementValue(PRIMITIVE_CHAR, dis
+                    .readUnsignedShort(), cpool);
+        case 'D': // double
+            return new SimpleElementValue(PRIMITIVE_DOUBLE, dis
+                    .readUnsignedShort(), cpool);
+        case 'F': // float
+            return new SimpleElementValue(PRIMITIVE_FLOAT, dis
+                    .readUnsignedShort(), cpool);
+        case 'I': // int
+            return new SimpleElementValue(PRIMITIVE_INT, dis
+                    .readUnsignedShort(), cpool);
+        case 'J': // long
+            return new SimpleElementValue(PRIMITIVE_LONG, dis
+                    .readUnsignedShort(), cpool);
+        case 'S': // short
+            return new SimpleElementValue(PRIMITIVE_SHORT, dis
+                    .readUnsignedShort(), cpool);
+        case 'Z': // boolean
+            return new SimpleElementValue(PRIMITIVE_BOOLEAN, dis
+                    .readUnsignedShort(), cpool);
+        case 's': // String
+            return new SimpleElementValue(STRING, dis.readUnsignedShort(),
+                    cpool);
+        case 'e': // Enum constant
+            return new EnumElementValue(ENUM_CONSTANT, dis.readUnsignedShort(),
+                    dis.readUnsignedShort(), cpool);
+        case 'c': // Class
+            return new ClassElementValue(CLASS, dis.readUnsignedShort(), cpool);
+        case '@': // Annotation
+            // TODO isRuntimeVisible
+            return new AnnotationElementValue(ANNOTATION, AnnotationEntry.read(
+                    dis, cpool, false), cpool);
+        case '[': // Array
+            int numArrayVals = dis.readUnsignedShort();
+            ElementValue[] evalues = new ElementValue[numArrayVals];
+            for (int j = 0; j < numArrayVals; j++)
+            {
+                evalues[j] = ElementValue.readElementValue(dis, cpool);
+            }
+            return new ArrayElementValue(ARRAY, evalues, cpool);
+        default:
+            throw new RuntimeException(
+                    "Unexpected element value kind in annotation: " + type);
+        }
+    }
 
-	
+    
 }

@@ -105,7 +105,7 @@ public class RecyclableNamingEnumeration<E>
      * Recycle.
      */
     void recycle() {
-    	enumeration = entries.elements();
+        enumeration = entries.elements();
     }
 
 

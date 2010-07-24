@@ -29,9 +29,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public class SavedRequestInputFilter implements InputFilter {
 
-	/**
+    /**
      * The original request body.
-	 */
+     */
     protected ByteChunk input = null;
 
     /**
@@ -53,7 +53,7 @@ public class SavedRequestInputFilter implements InputFilter {
         if (chunk.getLimit() > 0 && chunk.getLimit() < input.getLength()) {
             writeLength = chunk.getLimit();
         } else {
-        	writeLength = input.getLength();
+            writeLength = input.getLength();
         }
         
         if(input.getOffset()>= input.getEnd())

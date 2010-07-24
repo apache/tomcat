@@ -55,18 +55,14 @@ public class AnnotationEntry implements Constants, Serializable {
     
     public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException 
     {
-    	AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool, isRuntimeVisible);
-    	annotationEntry.num_element_value_pairs = (file.readUnsignedShort());
-    	annotationEntry.element_value_pairs = new ArrayList();
+        AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool, isRuntimeVisible);
+        annotationEntry.num_element_value_pairs = (file.readUnsignedShort());
+        annotationEntry.element_value_pairs = new ArrayList();
         for (int i = 0; i < annotationEntry.num_element_value_pairs; i++) {
-        	annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool), constant_pool));
+            annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool), constant_pool));
         }
         return annotationEntry;
     }
-
-
-    
-
 
     /**
      * @return the annotation type name
@@ -76,36 +72,24 @@ public class AnnotationEntry implements Constants, Serializable {
         c = (ConstantUtf8) constant_pool.getConstant(type_index, CONSTANT_Utf8);
         return c.getBytes();
     }
-    
-    
-
-
-    
-
 
     /**
      * @return the element value pairs in this annotation entry
      */
     public ElementValuePair[] getElementValuePairs() {
-    	// TOFO return List
+        // TOFO return List
         return (ElementValuePair[]) element_value_pairs.toArray(new ElementValuePair[element_value_pairs.size()]);
     }
 
 
-	public void dump(DataOutputStream dos) throws IOException
-	{
-		dos.writeShort(type_index);	// u2 index of type name in cpool
-		dos.writeShort(element_value_pairs.size()); // u2 element_value pair count
-		for (int i = 0 ; i<element_value_pairs.size();i++) {
-			ElementValuePair envp = (ElementValuePair) element_value_pairs.get(i);
-			envp.dump(dos);
-		}
-	}
+    public void dump(DataOutputStream dos) throws IOException
+    {
+        dos.writeShort(type_index);    // u2 index of type name in cpool
+        dos.writeShort(element_value_pairs.size()); // u2 element_value pair count
+        for (int i = 0 ; i<element_value_pairs.size();i++) {
+            ElementValuePair envp = (ElementValuePair) element_value_pairs.get(i);
+            envp.dump(dos);
+        }
+    }
 
-
-	
-
-	
-
-	
 }

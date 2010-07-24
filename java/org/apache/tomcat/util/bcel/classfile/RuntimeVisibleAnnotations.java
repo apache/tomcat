@@ -32,36 +32,36 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class RuntimeVisibleAnnotations extends Annotations
 {
-	/**
-	 * @param name_index
-	 *            Index pointing to the name <em>Code</em>
-	 * @param length
-	 *            Content length in bytes
-	 * @param file
-	 *            Input stream
-	 * @param constant_pool
-	 *            Array of constants
-	 */
-	public RuntimeVisibleAnnotations(int name_index, int length,
-			DataInputStream file, ConstantPool constant_pool)
-			throws IOException
-	{
-		super(Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS, name_index, length,
-				file, constant_pool, true);
-	}
+    /**
+     * @param name_index
+     *            Index pointing to the name <em>Code</em>
+     * @param length
+     *            Content length in bytes
+     * @param file
+     *            Input stream
+     * @param constant_pool
+     *            Array of constants
+     */
+    public RuntimeVisibleAnnotations(int name_index, int length,
+            DataInputStream file, ConstantPool constant_pool)
+            throws IOException
+    {
+        super(Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS, name_index, length,
+                file, constant_pool, true);
+    }
 
-	/**
-	 * @return deep copy of this attribute
-	 */
-	public Attribute copy(ConstantPool constant_pool)
-	{
-		Annotations c = (Annotations) clone();
-		return c;
-	}
+    /**
+     * @return deep copy of this attribute
+     */
+    public Attribute copy(ConstantPool constant_pool)
+    {
+        Annotations c = (Annotations) clone();
+        return c;
+    }
 
-	public final void dump(DataOutputStream dos) throws IOException
-	{
-		super.dump(dos);
-		writeAnnotations(dos);
-	}
+    public final void dump(DataOutputStream dos) throws IOException
+    {
+        super.dump(dos);
+        writeAnnotations(dos);
+    }
 }

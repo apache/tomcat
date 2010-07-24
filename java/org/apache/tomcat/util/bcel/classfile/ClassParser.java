@@ -139,23 +139,23 @@ public final class ClassParser {
             //        byte[] buf = new byte[bytes];
             //        file.read(buf);
             //        if(!(is_zip && (buf.length == 1))) {
-            //  	System.err.println("WARNING: Trailing garbage at end of " + file_name);
-            //  	System.err.println(bytes + " extra bytes: " + Utility.toHexString(buf));
+            //          System.err.println("WARNING: Trailing garbage at end of " + file_name);
+            //          System.err.println(bytes + " extra bytes: " + Utility.toHexString(buf));
             //        }
             //      }
         } finally {
             // Read everything of interest, so close the file
             if (fileOwned) {
-            	try {
-	                if (file != null) {
-	                    file.close();
-	                }
-	                if (zip != null) {
-	                    zip.close();
-	                }
-            	} catch (IOException ioe) {
-            		//ignore close exceptions
-            	}
+                try {
+                    if (file != null) {
+                        file.close();
+                    }
+                    if (zip != null) {
+                        zip.close();
+                    }
+                } catch (IOException ioe) {
+                    //ignore close exceptions
+                }
             }
         }
         // Return the information we have gathered in a new object

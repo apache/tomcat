@@ -242,44 +242,44 @@ public class JIoEndpoint extends AbstractEndpoint {
 
         public void run() {
             boolean launch = false;
-        	try {
-        	    
-        	    if (!socket.processing.compareAndSet(false, true)) {
-        	        log.error("Unable to process socket. Invalid state.");
-        	        return;
-        	    }
-        	    
-        	    SocketState state = SocketState.OPEN;
-        	    // Process the request from this socket
-        	    if ( (!socket.isInitialized()) && (!setSocketOptions(socket.getSocket())) ) { 
-        	        state = SocketState.CLOSED;
-        	    }
-        	    socket.setInitialized(true);
+            try {
+                
+                if (!socket.processing.compareAndSet(false, true)) {
+                    log.error("Unable to process socket. Invalid state.");
+                    return;
+                }
+                
+                SocketState state = SocketState.OPEN;
+                // Process the request from this socket
+                if ( (!socket.isInitialized()) && (!setSocketOptions(socket.getSocket())) ) { 
+                    state = SocketState.CLOSED;
+                }
+                socket.setInitialized(true);
 
-        	    if ( (state != SocketState.CLOSED) ) {
-        	        state = (status==null)?handler.process(socket):handler.process(socket,status);
-        	    }
-        	    if (state == SocketState.CLOSED) {
-        	        // Close socket
-        	        if (log.isTraceEnabled()) {
-        	            log.trace("Closing socket:"+socket);
-        	        }
-        	        try {
-        	            socket.getSocket().close();
-        	        } catch (IOException e) {
-        	            // Ignore
-        	        }
-        	    } else if (state == SocketState.OPEN){
-        	        socket.setKeptAlive(true);
-        	        socket.access();
-        	        //keepalive connection
-        	        //TODO - servlet3 check async status, we may just be in a hold pattern
-        	        launch = true;
-        	    } else if (state == SocketState.LONG) {
-        	        socket.access();
-        	        waitingRequests.add(socket);
-        	    }
-        	} finally {
+                if ( (state != SocketState.CLOSED) ) {
+                    state = (status==null)?handler.process(socket):handler.process(socket,status);
+                }
+                if (state == SocketState.CLOSED) {
+                    // Close socket
+                    if (log.isTraceEnabled()) {
+                        log.trace("Closing socket:"+socket);
+                    }
+                    try {
+                        socket.getSocket().close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                } else if (state == SocketState.OPEN){
+                    socket.setKeptAlive(true);
+                    socket.access();
+                    //keepalive connection
+                    //TODO - servlet3 check async status, we may just be in a hold pattern
+                    launch = true;
+                } else if (state == SocketState.LONG) {
+                    socket.access();
+                    waitingRequests.add(socket);
+                }
+            } finally {
                 socket.processing.set(false);
                 if (launch) getExecutor().execute(new SocketProcessor(socket));
                 socket = null;

@@ -31,63 +31,63 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class AnnotationDefault extends Attribute
 {
-	ElementValue default_value;
+    ElementValue default_value;
 
-	/**
-	 * @param annotation_type
-	 *            the subclass type of the annotation
-	 * @param name_index
-	 *            Index pointing to the name <em>Code</em>
-	 * @param length
-	 *            Content length in bytes
-	 * @param file
-	 *            Input stream
-	 * @param constant_pool
-	 *            Array of constants
-	 */
-	public AnnotationDefault(int name_index, int length,
-			DataInputStream file, ConstantPool constant_pool)
-			throws IOException
-	{
-		this(name_index, length, (ElementValue) null,
-				constant_pool);
-		default_value = ElementValue.readElementValue(file, constant_pool);
-	}
+    /**
+     * @param annotation_type
+     *            the subclass type of the annotation
+     * @param name_index
+     *            Index pointing to the name <em>Code</em>
+     * @param length
+     *            Content length in bytes
+     * @param file
+     *            Input stream
+     * @param constant_pool
+     *            Array of constants
+     */
+    public AnnotationDefault(int name_index, int length,
+            DataInputStream file, ConstantPool constant_pool)
+            throws IOException
+    {
+        this(name_index, length, (ElementValue) null,
+                constant_pool);
+        default_value = ElementValue.readElementValue(file, constant_pool);
+    }
 
-	/**
-	 * @param annotation_type
-	 *            the subclass type of the annotation
-	 * @param name_index
-	 *            Index pointing to the name <em>Code</em>
-	 * @param length
-	 *            Content length in bytes
-	 * @param defaultValue
-	 *            the annotation's default value
-	 * @param constant_pool
-	 *            Array of constants
-	 */
-	public AnnotationDefault(int name_index, int length,
-			ElementValue defaultValue, ConstantPool constant_pool)
-	{
-		super(Constants.ATTR_ANNOTATION_DEFAULT, name_index, length, constant_pool);
-		setDefaultValue(defaultValue);
-	}
+    /**
+     * @param annotation_type
+     *            the subclass type of the annotation
+     * @param name_index
+     *            Index pointing to the name <em>Code</em>
+     * @param length
+     *            Content length in bytes
+     * @param defaultValue
+     *            the annotation's default value
+     * @param constant_pool
+     *            Array of constants
+     */
+    public AnnotationDefault(int name_index, int length,
+            ElementValue defaultValue, ConstantPool constant_pool)
+    {
+        super(Constants.ATTR_ANNOTATION_DEFAULT, name_index, length, constant_pool);
+        setDefaultValue(defaultValue);
+    }
 
-	/**
-	 * @param defaultValue
-	 *            the default value of this methodinfo's annotation
-	 */
-	public final void setDefaultValue(ElementValue defaultValue)
-	{
-		default_value = defaultValue;
-	}
+    /**
+     * @param defaultValue
+     *            the default value of this methodinfo's annotation
+     */
+    public final void setDefaultValue(ElementValue defaultValue)
+    {
+        default_value = defaultValue;
+    }
 
-	
+    
 
-	public Attribute copy(ConstantPool _constant_pool)
-	{
-		throw new RuntimeException("Not implemented yet!");
-	}
+    public Attribute copy(ConstantPool _constant_pool)
+    {
+        throw new RuntimeException("Not implemented yet!");
+    }
 
     public final void dump(DataOutputStream dos) throws IOException
     {
