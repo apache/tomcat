@@ -421,6 +421,9 @@
       <fileset dir="test">
         <include name="**/*.java" />
       </fileset>
+      <fileset dir="webapps">
+        <include name="**/*.java" />
+      </fileset>
   	</checkstyle>
   </target>
 

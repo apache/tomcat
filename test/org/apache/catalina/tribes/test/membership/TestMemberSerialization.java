@@ -63,16 +63,14 @@ public class TestMemberSerialization extends TestCase {
     }
     
     public void testUdpPort() throws Exception {
-    	byte[] md1 = m1.getData();
-    	byte[] md2 = m2.getData();
+        byte[] md1 = m1.getData();
+        byte[] md2 = m2.getData();
 
         MemberImpl a1 = MemberImpl.getMember(md1);
         MemberImpl a2 = MemberImpl.getMember(md2);
         
         assertEquals(true, a1.getUdpPort()==a2.getUdpPort());
         assertEquals(true,a1.getUdpPort()==udpPort);
-
-    	
     }
     
     public void testSerializationOne() throws Exception {

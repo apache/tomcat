@@ -37,19 +37,19 @@ public class EchoAttributesTag
 
     @Override
     public void doTag() throws JspException, IOException {
-	JspWriter out = getJspContext().getOut();
-	for( int i = 0; i < keys.size(); i++ ) {
-	    String key = keys.get( i );
-	    Object value = values.get( i );
-	    out.println( "<li>" + key + " = " + value + "</li>" );
+        JspWriter out = getJspContext().getOut();
+        for( int i = 0; i < keys.size(); i++ ) {
+            String key = keys.get( i );
+            Object value = values.get( i );
+            out.println( "<li>" + key + " = " + value + "</li>" );
         }
     }
 
     public void setDynamicAttribute( String uri, String localName, 
-	Object value ) 
-	throws JspException
+        Object value ) 
+        throws JspException
     {
-	keys.add( localName );
-	values.add( value );
+        keys.add( localName );
+        values.add( value );
     }
 }
