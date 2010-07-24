@@ -794,9 +794,9 @@ public class FileDirContext extends BaseDirContext {
         File file = new File(base, name);
         if (file.exists() && file.canRead()) {
 
-        	if (allowLinking)
-        		return file;
-        	
+            if (allowLinking)
+                return file;
+            
             // Check that this file belongs to our root path
             String canPath = null;
             try {

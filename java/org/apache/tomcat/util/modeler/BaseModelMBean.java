@@ -1139,40 +1139,40 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     }
 
     static class MethodKey {
-	private String name;
-	private String[] signature;
+        private String name;
+        private String[] signature;
 
-	MethodKey(String name, String[] signature) {
-	    this.name = name;
-	    if(signature == null) {
-		signature = new String[0];
-	    }
-	    this.signature = signature;
-	}
+        MethodKey(String name, String[] signature) {
+            this.name = name;
+            if(signature == null) {
+                signature = new String[0];
+            }
+            this.signature = signature;
+        }
 
-	@Override
-    public boolean equals(Object other) {
-	    if(!(other instanceof MethodKey)) {
-		return false;
-	    }
-	    MethodKey omk = (MethodKey)other;
-	    if(!name.equals(omk.name)) {
-		return false;
-	    }
-	    if(signature.length != omk.signature.length) {
-		return false;
-	    }
-	    for(int i=0; i < signature.length; i++) {
-		if(!signature[i].equals(omk.signature[i])) {
-		    return false;
-		}
-	    }
-	    return true;
-	}
+        @Override
+        public boolean equals(Object other) {
+            if(!(other instanceof MethodKey)) {
+                return false;
+            }
+            MethodKey omk = (MethodKey)other;
+            if(!name.equals(omk.name)) {
+                return false;
+            }
+            if(signature.length != omk.signature.length) {
+                return false;
+            }
+            for(int i=0; i < signature.length; i++) {
+                if(!signature[i].equals(omk.signature[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-	@Override
-    public int hashCode() {
-	    return name.hashCode();
-	}
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
     }
 }

@@ -48,7 +48,7 @@ public final class IntrospectionUtils {
         Method executeM = null;
         Class<?> c = proxy.getClass();
         Class<?> params[] = new Class[0];
-        //	params[0]=args.getClass();
+        // params[0]=args.getClass();
         executeM = findMethod(c, method, params);
         if (executeM == null) {
             throw new RuntimeException("No execute in " + proxy.getClass());
@@ -164,7 +164,7 @@ public final class IntrospectionUtils {
         StringTokenizer st = new StringTokenizer(cpath, pathSep);
         while (st.hasMoreTokens()) {
             String path = st.nextToken();
-            //	    log( "path " + path );
+            // log( "path " + path );
             if (path.endsWith(jarName)) {
                 home = path.substring(0, path.length() - jarName.length());
                 try {

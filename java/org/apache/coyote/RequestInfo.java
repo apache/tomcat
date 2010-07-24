@@ -52,7 +52,7 @@ public class RequestInfo  {
             this.global=global;
             global.addRequestProcessor( this );
         } else {
-        	if (this.global != null) {
+            if (this.global != null) {
                 this.global.removeRequestProcessor( this ); 
                 this.global = null;
             }

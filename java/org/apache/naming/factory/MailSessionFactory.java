@@ -89,11 +89,10 @@ public class MailSessionFactory implements ObjectFactory {
      * @exception Exception if an error occurs during object creation
      */
     public Object getObjectInstance(Object refObj, Name name, Context context,
-				    Hashtable<?,?> env) throws Exception 
-    {
+            Hashtable<?,?> env) throws Exception {
 
         // Return null if we cannot create an object of the requested type
-	final Reference ref = (Reference) refObj;
+        final Reference ref = (Reference) refObj;
         if (!ref.getClassName().equals(factoryType))
             return (null);
 
@@ -103,7 +102,7 @@ public class MailSessionFactory implements ObjectFactory {
         //
         // Bugzilla 31288, 33077: add support for authentication.
         return AccessController.doPrivileged(new PrivilegedAction<Session>() {
-		public Session run() {
+                public Session run() {
 
                     // Create the JavaMail properties we will use
                     Properties props = new Properties();
@@ -148,10 +147,7 @@ public class MailSessionFactory implements ObjectFactory {
                     Session session = Session.getInstance(props, auth);
                     return (session);
 
-		}
-	    } );
-
+                }
+        } );
     }
-
-
 }

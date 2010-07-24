@@ -266,13 +266,13 @@ public class NioBlockingSelector {
                             if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
                         } else {
                             if (sk.isValid()) {
-                            	sk.interestOps(sk.interestOps() & (~ops));
-                            	if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                            	if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
-                            	if (sk.interestOps()==0) {
-                            	    sk.cancel();
-                            	    sk.attach(null);
-                            	}
+                                sk.interestOps(sk.interestOps() & (~ops));
+                                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
+                                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                                if (sk.interestOps()==0) {
+                                    sk.cancel();
+                                    sk.attach(null);
+                                }
                             }else {
                                 sk.cancel();
                                 sk.attach(null);

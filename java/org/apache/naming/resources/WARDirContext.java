@@ -121,26 +121,26 @@ public class WARDirContext extends BaseDirContext {
     @Override
     public void setDocBase(String docBase) {
 
-	// Validate the format of the proposed document root
-	if (docBase == null)
-	    throw new IllegalArgumentException
-		(sm.getString("resources.null"));
-	if (!(docBase.endsWith(".war")))
-	    throw new IllegalArgumentException
-		(sm.getString("warResources.notWar"));
+        // Validate the format of the proposed document root
+        if (docBase == null)
+            throw new IllegalArgumentException
+                (sm.getString("resources.null"));
+        if (!(docBase.endsWith(".war")))
+            throw new IllegalArgumentException
+                (sm.getString("warResources.notWar"));
 
-	// Calculate a File object referencing this document base directory
-	File base = new File(docBase);
+        // Calculate a File object referencing this document base directory
+        File base = new File(docBase);
 
-	// Validate that the document base is an existing directory
-	if (!base.exists() || !base.canRead() || base.isDirectory())
-	    throw new IllegalArgumentException
-		(sm.getString("warResources.invalidWar", docBase));
+        // Validate that the document base is an existing directory
+        if (!base.exists() || !base.canRead() || base.isDirectory())
+            throw new IllegalArgumentException
+                (sm.getString("warResources.invalidWar", docBase));
         try {
             this.base = new ZipFile(base);
         } catch (Exception e) {
-	    throw new IllegalArgumentException
-		(sm.getString("warResources.invalidWar", e.getMessage()));
+            throw new IllegalArgumentException
+                (sm.getString("warResources.invalidWar", e.getMessage()));
         }
         super.setDocBase(docBase);
 
