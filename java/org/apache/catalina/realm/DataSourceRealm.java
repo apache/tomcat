@@ -249,7 +249,7 @@ public class DataSourceRealm
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     @Override
-	public String getInfo() {
+    public String getInfo() {
 
         return info;
 
@@ -274,14 +274,14 @@ public class DataSourceRealm
      */
     @Override
     public Principal authenticate(String username, String credentials) {
-    	
-    	// No user or no credentials
-        // Can't possibly authenticate, don't bother the database then
-    	if (username == null || credentials == null) {
-    		return null;
-    	}
         
-    	Connection dbConnection = null;
+        // No user or no credentials
+        // Can't possibly authenticate, don't bother the database then
+        if (username == null || credentials == null) {
+            return null;
+        }
+        
+        Connection dbConnection = null;
 
         // Ensure that we have an open database connection
         dbConnection = open();
@@ -293,9 +293,9 @@ public class DataSourceRealm
         // Acquire a Principal object for this user
         Principal principal = authenticate(dbConnection, username, credentials);
             
-    	close(dbConnection);
+        close(dbConnection);
 
-    	return principal;
+        return principal;
     }
 
 
@@ -395,7 +395,7 @@ public class DataSourceRealm
                     ((StandardServer)getServer()).getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource)context.lookup(dataSourceName);
-	    return dataSource.getConnection();
+        return dataSource.getConnection();
         } catch (Exception e) {
             // Log the problem for posterity
             containerLog.error(sm.getString("dataSourceRealm.exception"), e);
@@ -428,7 +428,7 @@ public class DataSourceRealm
         }
 
         try {
-        	return getPassword(dbConnection, username);        	
+            return getPassword(dbConnection, username);            
         } finally {
             close(dbConnection);
         }
@@ -440,7 +440,7 @@ public class DataSourceRealm
      * @param username Username for which password should be retrieved
      */
     protected String getPassword(Connection dbConnection, 
-								 String username) {
+                                 String username) {
 
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -460,19 +460,19 @@ public class DataSourceRealm
                     sm.getString("dataSourceRealm.getPassword.exception",
                                  username));
         } finally {
-        	try {
-	            if (rs != null) {
-	                rs.close();
-	            }
-	            if (stmt != null) {
-	                stmt.close();
-	            }
-        	} catch (SQLException e) {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
                     containerLog.error(
                         sm.getString("dataSourceRealm.getPassword.exception",
-        		             username));
-        		
-        	}
+                             username));
+                
+            }
         }
         
         return null;
@@ -484,16 +484,16 @@ public class DataSourceRealm
      */
     @Override
     protected Principal getPrincipal(String username) {
-    	Connection dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             return new GenericPrincipal(username, null, null);
         }
         try {
-        	return (new GenericPrincipal(username,
-					getPassword(dbConnection, username),
-					getRoles(dbConnection, username)));
+            return (new GenericPrincipal(username,
+                    getPassword(dbConnection, username),
+                    getRoles(dbConnection, username)));
         } finally {
-        	close(dbConnection);
+            close(dbConnection);
         }
 
     }
@@ -515,7 +515,7 @@ public class DataSourceRealm
         try {
             return getRoles(dbConnection, username);
         } finally {
-        	close(dbConnection);
+            close(dbConnection);
         }
     }
     
@@ -526,43 +526,43 @@ public class DataSourceRealm
      */
     protected ArrayList<String> getRoles(Connection dbConnection,
                                      String username) {
-    	
+        
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<String> list = null;
-    	
+        
         try {
-    		stmt = roles(dbConnection, username);
-    		rs = stmt.executeQuery();
-    		list = new ArrayList<String>();
-    		
-    		while (rs.next()) {
-    			String role = rs.getString(1);
-    			if (role != null) {
-    				list.add(role.trim());
-    			}
-    		}
-    		return list;
-    	} catch(SQLException e) {
+            stmt = roles(dbConnection, username);
+            rs = stmt.executeQuery();
+            list = new ArrayList<String>();
+            
+            while (rs.next()) {
+                String role = rs.getString(1);
+                if (role != null) {
+                    list.add(role.trim());
+                }
+            }
+            return list;
+        } catch(SQLException e) {
             containerLog.error(
                 sm.getString("dataSourceRealm.getRoles.exception", username));
         }
-    	finally {
-        	try {
-	            if (rs != null) {
-	                rs.close();
-	            }
-	            if (stmt != null) {
-	                stmt.close();
-	            }
-        	} catch (SQLException e) {
+        finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
                     containerLog.error(
                         sm.getString("dataSourceRealm.getRoles.exception",
                                      username));
-        	}
+            }
         }
-    	
-    	return null;
+        
+        return null;
     }
 
     /**

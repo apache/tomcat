@@ -627,11 +627,11 @@ public class StandardWrapper extends ContainerBase
         HashSet<String> allow = new HashSet<String>();
         allow.add("TRACE");
         allow.add("OPTIONS");
-	
+
         Method[] methods = getAllDeclaredMethods(servletClazz);
         for (int i=0; methods != null && i<methods.length; i++) {
             Method m = methods[i];
-	    
+
             if (m.getName().equals("doGet")) {
                 allow.add("GET");
                 allow.add("HEAD");
@@ -1636,15 +1636,15 @@ public class StandardWrapper extends ContainerBase
         if ((parentMethods != null) && (parentMethods.length > 0)) {
             Method[] allMethods =
                 new Method[parentMethods.length + thisMethods.length];
-	    System.arraycopy(parentMethods, 0, allMethods, 0,
+            System.arraycopy(parentMethods, 0, allMethods, 0,
                              parentMethods.length);
-	    System.arraycopy(thisMethods, 0, allMethods, parentMethods.length,
+            System.arraycopy(thisMethods, 0, allMethods, parentMethods.length,
                              thisMethods.length);
 
-	    thisMethods = allMethods;
-	}
+            thisMethods = allMethods;
+        }
 
-	return thisMethods;
+        return thisMethods;
     }
 
 
@@ -1790,9 +1790,8 @@ public class StandardWrapper extends ContainerBase
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     public void removeNotificationListener(NotificationListener listener, 
-    		NotificationFilter filter, Object object) throws ListenerNotFoundException {
-    	broadcaster.removeNotificationListener(listener,filter,object);
-    	
+            NotificationFilter filter, Object object) throws ListenerNotFoundException {
+        broadcaster.removeNotificationListener(listener,filter,object);
     }
     
     protected MBeanNotificationInfo[] notificationInfo;
@@ -1803,44 +1802,43 @@ public class StandardWrapper extends ContainerBase
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     public MBeanNotificationInfo[] getNotificationInfo() {
-    	
-    	if(notificationInfo == null) {
-    		notificationInfo = new MBeanNotificationInfo[]{
-    				new MBeanNotificationInfo(new String[] {
-    				"j2ee.object.created"},
-					Notification.class.getName(),
-					"servlet is created"
-    				), 
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.starting"},
-					Notification.class.getName(),
-					"servlet is starting"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.running"},
-					Notification.class.getName(),
-					"servlet is running"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.stopped"},
-					Notification.class.getName(),
-					"servlet start to stopped"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.object.stopped"},
-					Notification.class.getName(),
-					"servlet is stopped"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.object.deleted"},
-					Notification.class.getName(),
-					"servlet is deleted"
-					)
-    		};
-    		
-    	}
-    	
-    	return notificationInfo;
+
+        if(notificationInfo == null) {
+            notificationInfo = new MBeanNotificationInfo[]{
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.object.created"},
+                    Notification.class.getName(),
+                    "servlet is created"
+                    ), 
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.state.starting"},
+                    Notification.class.getName(),
+                    "servlet is starting"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.state.running"},
+                    Notification.class.getName(),
+                    "servlet is running"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.state.stopped"},
+                    Notification.class.getName(),
+                    "servlet start to stopped"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.object.stopped"},
+                    Notification.class.getName(),
+                    "servlet is stopped"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.object.deleted"},
+                    Notification.class.getName(),
+                    "servlet is deleted"
+                    )
+            };
+        }
+
+        return notificationInfo;
     }
     
     
@@ -1849,7 +1847,7 @@ public class StandardWrapper extends ContainerBase
      */
     public void addNotificationListener(NotificationListener listener, 
             NotificationFilter filter, Object object) throws IllegalArgumentException {
-    	broadcaster.addNotificationListener(listener,filter,object);
+        broadcaster.addNotificationListener(listener,filter,object);
     }
     
     
@@ -1859,7 +1857,7 @@ public class StandardWrapper extends ContainerBase
      */
     public void removeNotificationListener(NotificationListener listener) 
         throws ListenerNotFoundException {
-    	broadcaster.removeNotificationListener(listener);
+        broadcaster.removeNotificationListener(listener);
     }
     
     

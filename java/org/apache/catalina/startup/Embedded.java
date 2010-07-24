@@ -371,8 +371,8 @@ public class Embedded  extends StandardService {
      */
     public Connector createConnector(InetAddress address, int port,
                                      boolean secure) {
-	return createConnector(address != null? address.toString() : null,
-			       port, secure);
+        return createConnector(address != null? address.toString() : null,
+                port, secure);
     }
 
     public Connector createConnector(String address, int port,
@@ -388,33 +388,33 @@ public class Embedded  extends StandardService {
 
     public Connector createConnector(InetAddress address, int port,
                                      String protocol) {
-	return createConnector(address != null? address.toString() : null,
-			       port, protocol);
+        return createConnector(address != null? address.toString() : null,
+                port, protocol);
     }
 
     public Connector createConnector(String address, int port,
-				     String protocol) {
+            String protocol) {
 
         Connector connector = null;
 
-	if (address != null) {
-	    /*
-	     * InetAddress.toString() returns a string of the form
-	     * "<hostname>/<literal_IP>". Get the latter part, so that the
-	     * address can be parsed (back) into an InetAddress using
-	     * InetAddress.getByName().
-	     */
-	    int index = address.indexOf('/');
-	    if (index != -1) {
-		address = address.substring(index + 1);
-	    }
-	}
+        if (address != null) {
+            /*
+             * InetAddress.toString() returns a string of the form
+             * "<hostname>/<literal_IP>". Get the latter part, so that the
+             * address can be parsed (back) into an InetAddress using
+             * InetAddress.getByName().
+             */
+            int index = address.indexOf('/');
+            if (index != -1) {
+                address = address.substring(index + 1);
+            }
+        }
 
-	if (log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Creating connector for address='" +
-		      ((address == null) ? "ALL" : address) +
-		      "' port='" + port + "' protocol='" + protocol + "'");
-	}
+                      ((address == null) ? "ALL" : address) +
+                      "' port='" + port + "' protocol='" + protocol + "'");
+        }
 
         try {
 

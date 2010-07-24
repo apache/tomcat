@@ -37,7 +37,7 @@ public final class SSIFlastmod implements SSICommand {
      */
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer) {
-    	long lastModified = 0;
+        long lastModified = 0;
         String configErrMsg = ssiMediator.getConfigErrMsg();
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];

@@ -83,7 +83,7 @@ public class NioReplicationTask extends AbstractRxTask {
             buffer.clear();
         }
         if (key == null) {
-            return;	// just in case
+            return; // just in case
         }
         if ( log.isTraceEnabled() )
             log.trace("Servicing key:"+key);
@@ -155,18 +155,18 @@ public class NioReplicationTask extends AbstractRxTask {
         reader.access();
         ReadableByteChannel channel = (ReadableByteChannel) key.channel();
         int count=-1;
-        buffer.clear();			// make buffer empty
+        buffer.clear();         // make buffer empty
         SocketAddress saddr = null;
 
         if (channel instanceof SocketChannel) {
             // loop while data available, channel is non-blocking
             while ((count = channel.read (buffer)) > 0) {
-                buffer.flip();		// make buffer readable
+                buffer.flip();      // make buffer readable
                 if ( buffer.hasArray() )
                     reader.append(buffer.array(),0,count,false);
                 else
                     reader.append(buffer,count,false);
-                buffer.clear();		// make buffer empty
+                buffer.clear();     // make buffer empty
                 //do we have at least one package?
                 if ( reader.hasPackage() ) break;
             }

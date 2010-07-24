@@ -813,9 +813,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
             log("sessions: Session action '" + action + "' for web application at '" + path + "'");
         }
         if ("sessionDetail".equals(action)) {
-	        String sessionId = req.getParameter("sessionId");
-	        displaySessionDetailPage(req, resp, path, sessionId);
-	        return;
+            String sessionId = req.getParameter("sessionId");
+            displaySessionDetailPage(req, resp, path, sessionId);
+            return;
         } else if ("invalidateSessions".equals(action)) {
             String[] sessionIds = req.getParameterValues("sessionIds");
             int i = invalidateSessions(path, sessionIds);
@@ -887,11 +887,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     //orderBy = "DESC";
                 }
                 try {
-					Collections.sort(activeSessions, comparator);
-				} catch (IllegalStateException ise) {
-					// at least 1 of the sessions is invalidated
-					req.setAttribute(APPLICATION_ERROR, "Can't sort session list: one session is invalidated");
-				}
+                    Collections.sort(activeSessions, comparator);
+                } catch (IllegalStateException ise) {
+                    // at least 1 of the sessions is invalidated
+                    req.setAttribute(APPLICATION_ERROR, "Can't sort session list: one session is invalidated");
+                }
             } else {
                 log("WARNING: unknown sort order: " + sortBy);
             }
@@ -944,22 +944,22 @@ public final class HTMLManagerServlet extends ManagerServlet {
             HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
-            	if (debug >= 1) {
-            		log("WARNING: can't invalidate null session " + sessionId);
-            	}
+                if (debug >= 1) {
+                    log("WARNING: can't invalidate null session " + sessionId);
+                }
                 continue;
             }
             try {
-				session.invalidate();
-				++nbAffectedSessions;
-	            if (debug >= 1) {
-	                log("Invalidating session id " + sessionId);
-	            }
-			} catch (IllegalStateException ise) {
-				if (debug >= 1) {
-					log("Can't invalidate already invalidated session id " + sessionId);
-				}
-			}
+                session.invalidate();
+                ++nbAffectedSessions;
+                if (debug >= 1) {
+                    log("Invalidating session id " + sessionId);
+                }
+            } catch (IllegalStateException ise) {
+                if (debug >= 1) {
+                    log("Can't invalidate already invalidated session id " + sessionId);
+                }
+            }
         }
         return nbAffectedSessions;
     }
@@ -975,18 +975,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
         if (null == session) {
             // Shouldn't happen, but let's play nice...
-        	if (debug >= 1) {
-        		log("WARNING: can't remove attribute '" + attributeName + "' for null session " + sessionId);
-        	}
+            if (debug >= 1) {
+                log("WARNING: can't remove attribute '" + attributeName + "' for null session " + sessionId);
+            }
             return false;
         }
         boolean wasPresent = (null != session.getAttribute(attributeName));
         try {
             session.removeAttribute(attributeName);
         } catch (IllegalStateException ise) {
-        	if (debug >= 1) {
-        		log("Can't remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
-        	}
+            if (debug >= 1) {
+                log("Can't remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
+            }
         }
         return wasPresent;
     }
@@ -1002,21 +1002,21 @@ public final class HTMLManagerServlet extends ManagerServlet {
         HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
         if (null == session) {
             // Shouldn't happen, but let's play nice...
-        	if (debug >= 1) {
-        		log("WARNING: can't set timout for null session " + sessionId);
-        	}
+            if (debug >= 1) {
+                log("WARNING: can't set timout for null session " + sessionId);
+            }
             return 0;
         }
         try {
-			int oldMaxInactiveInterval = session.getMaxInactiveInterval();
-			session.setMaxInactiveInterval(maxInactiveInterval);
-			return oldMaxInactiveInterval;
+            int oldMaxInactiveInterval = session.getMaxInactiveInterval();
+            session.setMaxInactiveInterval(maxInactiveInterval);
+            return oldMaxInactiveInterval;
         } catch (IllegalStateException ise) {
-        	if (debug >= 1) {
-        		log("Can't set MaxInactiveInterval '" + maxInactiveInterval + "' for invalidated session id " + sessionId);
-        	}
-        	return 0;
-		}
+            if (debug >= 1) {
+                log("Can't set MaxInactiveInterval '" + maxInactiveInterval + "' for invalidated session id " + sessionId);
+            }
+            return 0;
+        }
     }
 
     protected Comparator<Session> getComparator(String sortBy) {

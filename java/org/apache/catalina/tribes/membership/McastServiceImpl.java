@@ -222,7 +222,7 @@ public class McastServiceImpl
         }
         socket.setLoopbackMode(localLoopbackDisabled); //hint if we want disable loop back(local machine) messages
         if (mcastBindAddress != null) {
-			if(log.isInfoEnabled())
+            if(log.isInfoEnabled())
                 log.info("Setting multihome multicast interface to:" +mcastBindAddress);
             socket.setInterface(mcastBindAddress);
         } //end if
@@ -233,7 +233,7 @@ public class McastServiceImpl
         socket.setSoTimeout(mcastSoTimeout);
 
         if ( mcastTTL >= 0 ) {
-			if(log.isInfoEnabled())
+            if(log.isInfoEnabled())
                 log.info("Setting cluster mcast TTL to " + mcastTTL);
             socket.setTimeToLive(mcastTTL);
         }

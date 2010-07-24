@@ -175,12 +175,12 @@ public class StandardPipeline extends LifecycleBase
         // Start the Valves in our pipeline (including the basic), if any
         Valve current = first;
         if (current == null) {
-        	current = basic;
+            current = basic;
         }
         while (current != null) {
             if (current instanceof Lifecycle)
                 ((Lifecycle) current).start();
-        	current = current.getNext();
+            current = current.getNext();
         }
 
         setState(LifecycleState.STARTING);
@@ -202,12 +202,12 @@ public class StandardPipeline extends LifecycleBase
         // Stop the Valves in our pipeline (including the basic), if any
         Valve current = first;
         if (current == null) {
-        	current = basic;
+            current = basic;
         }
         while (current != null) {
             if (current instanceof Lifecycle)
                 ((Lifecycle) current).stop();
-        	current = current.getNext();
+            current = current.getNext();
         }
     }
 
@@ -303,11 +303,11 @@ public class StandardPipeline extends LifecycleBase
         // Update the pipeline
         Valve current = first;
         while (current != null) {
-        	if (current.getNext() == oldBasic) {
-        		current.setNext(valve);
-        		break;
-        	}
-        	current = current.getNext();
+            if (current.getNext() == oldBasic) {
+                current.setNext(valve);
+                break;
+            }
+            current = current.getNext();
         }
         
         this.basic = valve;
@@ -353,18 +353,18 @@ public class StandardPipeline extends LifecycleBase
 
         // Add this Valve to the set associated with this Pipeline
         if (first == null) {
-        	first = valve;
-        	valve.setNext(basic);
+            first = valve;
+            valve.setNext(basic);
         } else {
             Valve current = first;
             while (current != null) {
-				if (current.getNext() == basic) {
-					current.setNext(valve);
-					valve.setNext(basic);
-					break;
-				}
-				current = current.getNext();
-			}
+                if (current.getNext() == basic) {
+                    current.setNext(valve);
+                    valve.setNext(basic);
+                    break;
+                }
+                current = current.getNext();
+            }
         }
         
         container.fireContainerEvent(Container.ADD_VALVE_EVENT, valve);
@@ -378,14 +378,14 @@ public class StandardPipeline extends LifecycleBase
      */
     public Valve[] getValves() {
 
-    	ArrayList<Valve> valveList = new ArrayList<Valve>();
+        ArrayList<Valve> valveList = new ArrayList<Valve>();
         Valve current = first;
         if (current == null) {
-        	current = basic;
+            current = basic;
         }
         while (current != null) {
-        	valveList.add(current);
-        	current = current.getNext();
+            valveList.add(current);
+            current = current.getNext();
         }
 
         return valveList.toArray(new Valve[0]);
@@ -394,16 +394,16 @@ public class StandardPipeline extends LifecycleBase
 
     public ObjectName[] getValveObjectNames() {
 
-    	ArrayList<ObjectName> valveList = new ArrayList<ObjectName>();
+        ArrayList<ObjectName> valveList = new ArrayList<ObjectName>();
         Valve current = first;
         if (current == null) {
-        	current = basic;
+            current = basic;
         }
         while (current != null) {
-        	if (current instanceof ValveBase) {
-        		valveList.add(((ValveBase) current).getObjectName());
-        	}
-        	current = current.getNext();
+            if (current instanceof ValveBase) {
+                valveList.add(((ValveBase) current).getObjectName());
+            }
+            current = current.getNext();
         }
 
         return valveList.toArray(new ObjectName[0]);
