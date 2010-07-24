@@ -54,12 +54,12 @@ public class CookieExample extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
-	// relative links
+        // relative links
 
         // XXX
         // making these absolute till we work out the
         // addition of a PathInfo issue 
-	
+
         out.println("<a href=\"../cookies.html\">");
         out.println("<img src=\"../images/code.gif\" height=24 " +
                     "width=24 align=right border=0 alt=\"view code\"></a>");
