@@ -56,12 +56,12 @@ public class RequestParamExample extends HttpServlet {
 
         // img stuff not req'd for source code html showing
 
-	// all links relative
+       // all links relative
 
         // XXX
         // making these absolute till we work out the
         // addition of a PathInfo issue 
-	
+
         out.println("<a href=\"../reqparams.html\">");
         out.println("<img src=\"../images/code.gif\" height=24 " +
                     "width=24 align=right border=0 alt=\"view code\"></a>");

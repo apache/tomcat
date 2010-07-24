@@ -22,14 +22,15 @@ public class servletToJsp extends HttpServlet {
 
     @Override
     public void doGet (HttpServletRequest request,
-		       HttpServletResponse response) {
+            HttpServletResponse response) {
 
-	try {
-	    // Set the attribute and Forward to hello.jsp
-	    request.setAttribute ("servletName", "servletToJsp");
-	    getServletConfig().getServletContext().getRequestDispatcher("/jsp/jsptoserv/hello.jsp").forward(request, response);
-	} catch (Exception ex) {
-	    ex.printStackTrace ();
-	}
+       try {
+           // Set the attribute and Forward to hello.jsp
+           request.setAttribute ("servletName", "servletToJsp");
+           getServletConfig().getServletContext().getRequestDispatcher(
+                   "/jsp/jsptoserv/hello.jsp").forward(request, response);
+       } catch (Exception ex) {
+           ex.printStackTrace ();
+       }
     }
 }

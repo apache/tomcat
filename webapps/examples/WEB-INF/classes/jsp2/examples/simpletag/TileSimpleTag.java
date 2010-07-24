@@ -31,9 +31,9 @@ public class TileSimpleTag extends SimpleTagSupport {
 
     @Override
     public void doTag() throws JspException, IOException {
-	getJspContext().getOut().write( 
-	    "<td width=\"32\" height=\"32\" bgcolor=\"" + this.color + 
-	    "\"><font color=\"#ffffff\"><center>" + this.label + 
+        getJspContext().getOut().write( 
+                "<td width=\"32\" height=\"32\" bgcolor=\"" + this.color + 
+                "\"><font color=\"#ffffff\"><center>" + this.label + 
                 "</center></font></td>" );
     }
 

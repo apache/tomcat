@@ -55,12 +55,12 @@ public class RequestInfoExample extends HttpServlet {
         out.println("<body bgcolor=\"white\">");
 
         // img stuff not req'd for source code html showing
-	// all links relative!
+        // all links relative!
 
         // XXX
         // making these absolute till we work out the
         // addition of a PathInfo issue
-	
+
         out.println("<a href=\"../reqinfo.html\">");
         out.println("<img src=\"../images/code.gif\" height=24 " +
                     "width=24 align=right border=0 alt=\"view code\"></a>");
@@ -88,21 +88,20 @@ public class RequestInfoExample extends HttpServlet {
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.remoteaddr"));
 
- 	String cipherSuite=
- 	    (String)request.getAttribute("javax.servlet.request.cipher_suite");
+        String cipherSuite=
+            (String)request.getAttribute("javax.servlet.request.cipher_suite");
         out.println("</td><td>");                
         out.println(request.getRemoteAddr());
         out.println("</table>");
-
- 	if(cipherSuite!=null){
- 	    out.println("</td></tr><tr><td>");	
- 	    out.println("SSLCipherSuite:");
- 	    out.println("</td>");
- 	    out.println("<td>");	    
- 	    out.println(request.getAttribute("javax.servlet.request.cipher_suite"));
-	    out.println("</td>");	    
- 	}
-	
+        
+        if(cipherSuite!=null){
+            out.println("</td></tr><tr><td>");
+            out.println("SSLCipherSuite:");
+            out.println("</td>");
+            out.println("<td>");    
+            out.println(request.getAttribute("javax.servlet.request.cipher_suite"));
+            out.println("</td>");
+        }
     }
 
     @Override
