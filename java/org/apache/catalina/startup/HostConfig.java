@@ -390,12 +390,12 @@ public class HostConfig
      * on which the application was deployed
      */
     public long getDeploymentTime(String name) {
-    	DeployedApplication app = deployed.get(name);
-    	if (app == null) {
-    		return 0L;
-    	}
-    	
-    	return app.timestamp;
+        DeployedApplication app = deployed.get(name);
+        if (app == null) {
+            return 0L;
+        }
+        
+        return app.timestamp;
     }
     
     
@@ -1546,40 +1546,40 @@ public class HostConfig
      * the monitored resources.
      */
     protected class DeployedApplication {
-    	public DeployedApplication(String name) {
-    		this.name = name;
-    	}
-    	
-    	/**
-    	 * Application context path. The assertion is that 
-    	 * (host.getChild(name) != null).
-    	 */
-    	public String name;
-    	
-    	/**
-    	 * Any modification of the specified (static) resources will cause a 
-    	 * redeployment of the application. If any of the specified resources is
-    	 * removed, the application will be undeployed. Typically, this will
-    	 * contain resources like the context.xml file, a compressed WAR path.
+        public DeployedApplication(String name) {
+            this.name = name;
+        }
+        
+        /**
+         * Application context path. The assertion is that 
+         * (host.getChild(name) != null).
+         */
+        public String name;
+        
+        /**
+         * Any modification of the specified (static) resources will cause a 
+         * redeployment of the application. If any of the specified resources is
+         * removed, the application will be undeployed. Typically, this will
+         * contain resources like the context.xml file, a compressed WAR path.
          * The value is the last modification time.
-    	 */
-    	public LinkedHashMap<String, Long> redeployResources =
-    	    new LinkedHashMap<String, Long>();
+         */
+        public LinkedHashMap<String, Long> redeployResources =
+            new LinkedHashMap<String, Long>();
 
-    	/**
-    	 * Any modification of the specified (static) resources will cause a 
-    	 * reload of the application. This will typically contain resources
-    	 * such as the web.xml of a webapp, but can be configured to contain
-    	 * additional descriptors.
+        /**
+         * Any modification of the specified (static) resources will cause a 
+         * reload of the application. This will typically contain resources
+         * such as the web.xml of a webapp, but can be configured to contain
+         * additional descriptors.
          * The value is the last modification time.
-    	 */
-    	public HashMap<String, Long> reloadResources =
-    	    new HashMap<String, Long>();
+         */
+        public HashMap<String, Long> reloadResources =
+            new HashMap<String, Long>();
 
-    	/**
-    	 * Instant where the application was last put in service.
-    	 */
-    	public long timestamp = System.currentTimeMillis();
+        /**
+         * Instant where the application was last put in service.
+         */
+     public long timestamp = System.currentTimeMillis();
     }
 
 }

@@ -371,10 +371,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public void endAccess() {
-    	super.endAccess() ;
-    	if(manager instanceof DeltaManager) {
-            ((DeltaManager)manager).registerSessionAtReplicationValve(this);   	
-    	}
+        super.endAccess() ;
+        if(manager instanceof DeltaManager) {
+            ((DeltaManager)manager).registerSessionAtReplicationValve(this);
+        }
     }
     
     // ------------------------------------------------- Session Public Methods

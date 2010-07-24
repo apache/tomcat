@@ -47,7 +47,7 @@ import org.apache.catalina.Globals;
  * @see org.apache.catalina.ssi.SSIServlet
  */
 public class SSIFilter implements Filter {
-	protected FilterConfig config = null;
+    protected FilterConfig config = null;
     /** Debug level for this servlet. */
     protected int debug = 0;
     /** Expiration time in seconds for the doc. */
@@ -55,12 +55,12 @@ public class SSIFilter implements Filter {
     /** virtual path can be webapp-relative */
     protected boolean isVirtualWebappRelative = false;
     /** regex pattern to match when evaluating content types */
-	protected Pattern contentTypeRegEx = null;
-	/** default pattern for ssi filter content type matching */
-	protected Pattern shtmlRegEx =
+    protected Pattern contentTypeRegEx = null;
+    /** default pattern for ssi filter content type matching */
+    protected Pattern shtmlRegEx =
         Pattern.compile("text/x-server-parsed-html(;.*)?");
-	/** Allow exec (normally blocked for security) */
-	protected boolean allowExec = false;
+    /** Allow exec (normally blocked for security) */
+    protected boolean allowExec = false;
 
 
     //----------------- Public methods.
@@ -71,8 +71,8 @@ public class SSIFilter implements Filter {
      *                if an error occurs
      */
     public void init(FilterConfig config) throws ServletException {
-    	this.config = config;
-    	
+        this.config = config;
+        
         if (config.getInitParameter("debug") != null) {
             debug = Integer.parseInt(config.getInitParameter("debug"));
         }
@@ -159,10 +159,10 @@ public class SSIFilter implements Filter {
             Matcher shtmlMatcher =
                 shtmlRegEx.matcher(responseIncludeWrapper.getContentType());
             if (shtmlMatcher.matches()) {
-            	// Convert shtml mime type to ordinary html mime type but preserve
+                // Convert shtml mime type to ordinary html mime type but preserve
                 // encoding, if any.
-            	String enc = shtmlMatcher.group(1);
-            	res.setContentType("text/html" + ((enc != null) ? enc : ""));
+                String enc = shtmlMatcher.group(1);
+                res.setContentType("text/html" + ((enc != null) ? enc : ""));
             }
         }
 

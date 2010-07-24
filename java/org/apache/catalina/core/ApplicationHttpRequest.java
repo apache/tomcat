@@ -367,7 +367,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String name) {
 
-	parseParameters();
+        parseParameters();
 
         Object value = parameters.get(name);
         if (value == null)
@@ -389,7 +389,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public Map<String, String[]> getParameterMap() {
 
-	parseParameters();
+        parseParameters();
         return (parameters);
 
     }
@@ -402,7 +402,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public Enumeration<String> getParameterNames() {
 
-	parseParameters();
+        parseParameters();
         return (new Enumerator<String>(parameters.keySet()));
 
     }
@@ -417,7 +417,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public String[] getParameterValues(String name) {
 
-	parseParameters();
+        parseParameters();
         Object value = parameters.get(name);
         if (value == null)
             return null;
@@ -751,9 +751,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     void parseParameters() {
 
-	if (parsedParams) {
-	    return;
-	}
+        if (parsedParams) {
+            return;
+        }
 
         parameters = new HashMap<String, String[]>();
         parameters = copyMap(getRequest().getParameterMap());
