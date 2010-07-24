@@ -39,7 +39,7 @@ public class NamingContextEnumeration
 
 
     public NamingContextEnumeration(Iterator<NamingEntry> entries) {
-    	iterator = entries;
+        iterator = entries;
     }
 
 

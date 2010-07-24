@@ -42,7 +42,7 @@ public class NamingContextBindingsEnumeration
 
     public NamingContextBindingsEnumeration(Iterator<NamingEntry> entries,
             Context ctx) {
-    	iterator = entries;
+        iterator = entries;
         this.ctx = ctx;
     }
 

@@ -98,9 +98,9 @@ public abstract class Annotations extends Attribute {
     
     
     protected void writeAnnotations(DataOutputStream dos) throws IOException
-	{
-		dos.writeShort(annotation_table_length);
-		for (int i = 0; i < annotation_table_length; i++)
-			annotation_table[i].dump(dos);
-	}
+    {
+        dos.writeShort(annotation_table_length);
+        for (int i = 0; i < annotation_table_length; i++)
+            annotation_table[i].dump(dos);
+    }
 }
