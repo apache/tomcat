@@ -520,7 +520,7 @@ public final class JspRuntimeContext {
      * If JSP's to be unloaded are found, they will be destroyed.
      * Uses the lastCheck time from background compiler to determine if it is time to unload JSP's.
      */
-    public void checkUnload() {    	
+    public void checkUnload() {
         if (options.getMaxLoadedJsps() > 0) {
             long now = System.currentTimeMillis();
             if (now > (lastCheck + (options.getCheckInterval() * 1000L))) {

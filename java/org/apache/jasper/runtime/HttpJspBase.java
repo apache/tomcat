@@ -33,34 +33,29 @@ import org.apache.jasper.compiler.Localizer;
  *
  * @author Anil K. Vijendran
  */
-public abstract class HttpJspBase 
-    extends HttpServlet 
-    implements HttpJspPage 
-        
-    
-{
+public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     
     protected HttpJspBase() {
     }
 
     @Override
     public final void init(ServletConfig config) 
-	throws ServletException 
+        throws ServletException 
     {
         super.init(config);
-	jspInit();
+        jspInit();
         _jspInit();
     }
     
     @Override
     public String getServletInfo() {
-	return Localizer.getMessage("jsp.engine.info");
+        return Localizer.getMessage("jsp.engine.info");
     }
 
     @Override
     public final void destroy() {
-	jspDestroy();
-	_jspDestroy();
+        jspDestroy();
+        _jspDestroy();
     }
 
     /**
@@ -68,7 +63,7 @@ public abstract class HttpJspBase
      */
     @Override
     public final void service(HttpServletRequest request, HttpServletResponse response) 
-	throws ServletException, IOException 
+        throws ServletException, IOException 
     {
         _jspService(request, response);
     }
@@ -86,6 +81,6 @@ public abstract class HttpJspBase
     }
 
     public abstract void _jspService(HttpServletRequest request, 
-				     HttpServletResponse response) 
-	throws ServletException, IOException;
+                                     HttpServletResponse response) 
+        throws ServletException, IOException;
 }

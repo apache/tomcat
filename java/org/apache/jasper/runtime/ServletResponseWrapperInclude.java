@@ -46,10 +46,10 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
     private JspWriter jspWriter;
 
     public ServletResponseWrapperInclude(ServletResponse response, 
-					 JspWriter jspWriter) {
-	super((HttpServletResponse)response);
-	this.printWriter = new PrintWriter(jspWriter);
-	this.jspWriter = jspWriter;
+                                         JspWriter jspWriter) {
+        super((HttpServletResponse)response);
+        this.printWriter = new PrintWriter(jspWriter);
+        this.jspWriter = jspWriter;
     }
 
     /**
@@ -57,12 +57,12 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
      */
     @Override
     public PrintWriter getWriter() throws IOException {
-	return printWriter;
+        return printWriter;
     }
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-	throw new IllegalStateException();
+        throw new IllegalStateException();
     }
 
     /**
@@ -71,9 +71,9 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
      */
     @Override
     public void resetBuffer() {
-	try {
-	    jspWriter.clearBuffer();
-	} catch (IOException ioe) {
-	}
+        try {
+            jspWriter.clearBuffer();
+        } catch (IOException ioe) {
+        }
     }
 }

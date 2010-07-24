@@ -93,12 +93,12 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
         if(ptd.current >=0 ) {
             return ptd.handlers[ptd.current--];
         } else {
-	    try {
-		return handlerClass.newInstance();
-	    } catch (Exception e) {
-		throw new JspException(e.getMessage(), e);
-	    }
-	}
+            try {
+                return handlerClass.newInstance();
+            } catch (Exception e) {
+                throw new JspException(e.getMessage(), e);
+            }
+        }
     }
 
     /**
@@ -111,8 +111,8 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
     @Override
     public void reuse(Tag handler) {
         PerThreadData ptd = perThread.get();
-	if (ptd.current < (ptd.handlers.length - 1)) {
-	    ptd.handlers[++ptd.current] = handler;
+        if (ptd.current < (ptd.handlers.length - 1)) {
+            ptd.handlers[++ptd.current] = handler;
         } else {
             handler.release();
         }
@@ -125,12 +125,12 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
     public void release() {        
         Enumeration<PerThreadData> enumeration = perThreadDataVector.elements();
         while (enumeration.hasMoreElements()) {
-	    PerThreadData ptd = enumeration.nextElement();
+            PerThreadData ptd = enumeration.nextElement();
             if (ptd.handlers != null) {
                 for (int i=ptd.current; i>=0; i--) {
                     if (ptd.handlers[i] != null) {
                         ptd.handlers[i].release();
-		    }
+                    }
                 }
             }
         }

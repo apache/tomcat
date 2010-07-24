@@ -26,7 +26,7 @@ package org.apache.jasper;
 public class JasperException extends javax.servlet.ServletException {
     
     public JasperException(String reason) {
-	super(reason);
+        super(reason);
     }
 
     /**
@@ -34,13 +34,13 @@ public class JasperException extends javax.servlet.ServletException {
      * throwing a JasperException
      */
     public JasperException (String reason, Throwable exception) {
-   	super(reason, exception);
+        super(reason, exception);
     }
 
     /**
      * Creates a JasperException with the embedded exception
      */
     public JasperException (Throwable exception) {
-   	super(exception);
+        super(exception);
     }
 }

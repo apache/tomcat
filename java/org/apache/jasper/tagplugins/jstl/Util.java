@@ -156,7 +156,7 @@ public class Util {
             int sessionEnd = u.toString().indexOf(";", sessionStart + 1);
             if (sessionEnd == -1)
                 sessionEnd = u.toString().indexOf("?", sessionStart + 1);
-            if (sessionEnd == -1) 				// still
+            if (sessionEnd == -1) // still
                 sessionEnd = u.length();
             u.delete(sessionStart, sessionEnd);
         }
@@ -328,7 +328,7 @@ public class Util {
                 else
                     return bos.toString("ISO-8859-1");
             } else
-                return "";		// target didn't write anything
+                return ""; // target didn't write anything
         }
     }
     

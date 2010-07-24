@@ -88,7 +88,7 @@ public class ASCIIReader
         int b0 = fInputStream.read();
         if (b0 > 0x80) {
             throw new IOException(Localizer.getMessage("jsp.error.xml.invalidASCII",
-						       Integer.toString(b0)));
+                                                       Integer.toString(b0)));
         }
         return b0;
     } // read():int
@@ -117,7 +117,7 @@ public class ASCIIReader
             int b0 = (0xff & fBuffer[i]); // Convert to unsigned
             if (b0 > 0x80) {
                 throw new IOException(Localizer.getMessage("jsp.error.xml.invalidASCII",
-							   Integer.toString(b0)));
+                                                           Integer.toString(b0)));
             }
             ch[offset + i] = (char)b0;
         }
@@ -150,7 +150,7 @@ public class ASCIIReader
      */
     @Override
     public boolean ready() throws IOException {
-	return false;
+        return false;
     } // ready()
 
     /**
@@ -158,7 +158,7 @@ public class ASCIIReader
      */
     @Override
     public boolean markSupported() {
-	return fInputStream.markSupported();
+        return fInputStream.markSupported();
     } // markSupported()
 
     /**
@@ -176,7 +176,7 @@ public class ASCIIReader
      */
     @Override
     public void mark(int readAheadLimit) throws IOException {
-	fInputStream.mark(readAheadLimit);
+        fInputStream.mark(readAheadLimit);
     } // mark(int)
 
     /**

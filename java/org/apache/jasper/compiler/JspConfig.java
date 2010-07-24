@@ -45,8 +45,8 @@ public class JspConfig {
     private ServletContext ctxt;
     private volatile boolean initialized = false;
 
-    private final static String defaultIsXml = null;		// unspecified
-    private String defaultIsELIgnored = null;	// unspecified
+    private final static String defaultIsXml = null;    // unspecified
+    private String defaultIsELIgnored = null;           // unspecified
     private final static String defaultIsScriptingInvalid = null;
     private String defaultDeferedSyntaxAllowedAsLiteral = null;
     private final static String defaultTrimDirectiveWhitespaces = null;
@@ -289,7 +289,7 @@ public class JspConfig {
 
         init();
 
-        // JSP Configuration settings do not apply to tag files	    
+        // JSP Configuration settings do not apply to tag files
         if (jspProperties == null || uri.endsWith(".tag")
                 || uri.endsWith(".tagx")) {
             return defaultJspProperty;

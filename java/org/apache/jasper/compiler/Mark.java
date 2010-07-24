@@ -142,7 +142,7 @@ final class Mark {
         // store current state in stack
         includeStack.push(new IncludeState(cursor, line, col, fileId,
                                            fileName, baseDir, 
-					   encoding, stream) );
+                                           encoding, stream) );
 
         // set new variables
         cursor = 0;
@@ -202,7 +202,7 @@ final class Mark {
 
     @Override
     public String toString() {
-	return getFile()+"("+line+","+col+")";
+        return getFile()+"("+line+","+col+")";
     }
 
     public String getFile() {
@@ -222,13 +222,13 @@ final class Mark {
 
     @Override
     public boolean equals(Object other) {
-	if (other instanceof Mark) {
-	    Mark m = (Mark) other;
-	    return this.reader == m.reader && this.fileId == m.fileId 
-		&& this.cursor == m.cursor && this.line == m.line 
-		&& this.col == m.col;
-	} 
-	return false;
+        if (other instanceof Mark) {
+            Mark m = (Mark) other;
+            return this.reader == m.reader && this.fileId == m.fileId 
+                && this.cursor == m.cursor && this.line == m.line 
+                && this.col == m.col;
+        } 
+        return false;
     }
 
     /**

@@ -2299,30 +2299,30 @@ class Generator {
         }
 
         private void writeNewInstance(String tagHandlerVar, String tagHandlerClassName) {
-        	if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
-        		out.printin(tagHandlerClassName);
-        		out.print(" ");
-        		out.print(tagHandlerVar);
-        		out.print(" = (");
-        		out.print(tagHandlerClassName);
-        		out.print(")");
-        		out.print(VAR_INSTANCEMANAGER);
-        		out.print(".newInstance(\"");
-        		out.print(tagHandlerClassName);
-        		out.println("\", this.getClass().getClassLoader());");
-        	} else {
-        		out.printin(tagHandlerClassName);
-        		out.print(" ");
-        		out.print(tagHandlerVar);
-        		out.print(" = (");
-        		out.print("new ");
-        		out.print(tagHandlerClassName);
-        		out.println("());");
-        		out.printin(VAR_INSTANCEMANAGER);
-        		out.print(".newInstance(");
-        		out.print(tagHandlerVar);
-        		out.println(");");
-        	}
+            if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
+                out.printin(tagHandlerClassName);
+                out.print(" ");
+                out.print(tagHandlerVar);
+                out.print(" = (");
+                out.print(tagHandlerClassName);
+                out.print(")");
+                out.print(VAR_INSTANCEMANAGER);
+                out.print(".newInstance(\"");
+                out.print(tagHandlerClassName);
+                out.println("\", this.getClass().getClassLoader());");
+            } else {
+                out.printin(tagHandlerClassName);
+                out.print(" ");
+                out.print(tagHandlerVar);
+                out.print(" = (");
+                out.print("new ");
+                out.print(tagHandlerClassName);
+                out.println("());");
+                out.printin(VAR_INSTANCEMANAGER);
+                out.print(".newInstance(");
+                out.print(tagHandlerVar);
+                out.println(");");
+            }
         }
 
         private void writeDestroyInstance(String tagHandlerVar) {
