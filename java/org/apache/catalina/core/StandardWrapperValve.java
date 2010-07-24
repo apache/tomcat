@@ -105,7 +105,7 @@ final class StandardWrapperValve
         
         // Check for the application being marked unavailable
         if (!context.getAvailable()) {
-        	response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                            sm.getString("standardContext.isUnavailable"));
             unavailable = true;
         }
@@ -139,12 +139,12 @@ final class StandardWrapperValve
                             wrapper.getName()), e);
             long available = wrapper.getAvailable();
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
-            	response.setDateHeader("Retry-After", available);
-            	response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                response.setDateHeader("Retry-After", available);
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                            sm.getString("standardWrapper.isUnavailable",
                                         wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-            	response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,
                            sm.getString("standardWrapper.notFound",
                                         wrapper.getName()));
             }
@@ -173,7 +173,7 @@ final class StandardWrapperValve
         try {
             response.sendAcknowledgement();
         } catch (IOException e) {
-        	request.removeAttribute(Globals.JSP_FILE_ATTR);
+            request.removeAttribute(Globals.JSP_FILE_ATTR);
             container.getLogger().warn(sm.getString("standardWrapper.acknowledgeException",
                              wrapper.getName()), e);
             throwable = e;
@@ -208,9 +208,9 @@ final class StandardWrapperValve
         try {
             String jspFile = wrapper.getJspFile();
             if (jspFile != null)
-            	request.setAttribute(Globals.JSP_FILE_ATTR, jspFile);
+                request.setAttribute(Globals.JSP_FILE_ATTR, jspFile);
             else
-            	request.removeAttribute(Globals.JSP_FILE_ATTR);
+                request.removeAttribute(Globals.JSP_FILE_ATTR);
             if ((servlet != null) && (filterChain != null)) {
                 // Swallow output if needed
                 if (context.getSwallowOutput()) {
@@ -248,18 +248,18 @@ final class StandardWrapperValve
             }
             request.removeAttribute(Globals.JSP_FILE_ATTR);
         } catch (ClientAbortException e) {
-        	request.removeAttribute(Globals.JSP_FILE_ATTR);
+            request.removeAttribute(Globals.JSP_FILE_ATTR);
             throwable = e;
             exception(request, response, e);
         } catch (IOException e) {
-        	request.removeAttribute(Globals.JSP_FILE_ATTR);
+            request.removeAttribute(Globals.JSP_FILE_ATTR);
             container.getLogger().error(sm.getString(
                     "standardWrapper.serviceException", wrapper.getName(),
                     context.getName()), e);
             throwable = e;
             exception(request, response, e);
         } catch (UnavailableException e) {
-        	request.removeAttribute(Globals.JSP_FILE_ATTR);
+            request.removeAttribute(Globals.JSP_FILE_ATTR);
             container.getLogger().error(sm.getString(
                     "standardWrapper.serviceException", wrapper.getName(),
                     context.getName()), e);
@@ -273,14 +273,14 @@ final class StandardWrapperValve
                            sm.getString("standardWrapper.isUnavailable",
                                         wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-            	response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,
                             sm.getString("standardWrapper.notFound",
                                         wrapper.getName()));
             }
             // Do not save exception in 'throwable', because we
             // do not want to do exception(request, response, e) processing
         } catch (ServletException e) {
-        	request.removeAttribute(Globals.JSP_FILE_ATTR);
+            request.removeAttribute(Globals.JSP_FILE_ATTR);
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
                 container.getLogger().error(sm.getString(
@@ -535,7 +535,7 @@ final class StandardWrapperValve
      */
     private void exception(Request request, Response response,
                            Throwable exception) {
-    	request.setAttribute(Globals.EXCEPTION_ATTR, exception);
+        request.setAttribute(Globals.EXCEPTION_ATTR, exception);
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
     }

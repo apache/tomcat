@@ -49,8 +49,8 @@ public class SSIExec implements SSICommand {
         String substitutedValue = ssiMediator.substituteVariables(paramValue);
         if (paramName.equalsIgnoreCase("cgi")) {
             lastModified = ssiInclude.process(ssiMediator, "include",
-                    			new String[]{"virtual"}, new String[]{substitutedValue},
-								writer);
+                    new String[]{"virtual"}, new String[]{substitutedValue},
+                    writer);
         } else if (paramName.equalsIgnoreCase("cmd")) {
             boolean foundProgram = false;
             try {

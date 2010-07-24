@@ -308,7 +308,7 @@ public class JAASRealm
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     @Override
-	public String getInfo() {
+    public String getInfo() {
 
         return info;
 

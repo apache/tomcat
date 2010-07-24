@@ -907,7 +907,7 @@ public class JNDIRealm extends RealmBase {
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     @Override
-	public String getInfo() {
+    public String getInfo() {
 
         return info;
 
@@ -2012,7 +2012,7 @@ public class JNDIRealm extends RealmBase {
         if (derefAliases != null)
             env.put(JNDIRealm.DEREF_ALIASES, derefAliases);
         if (connectionTimeout != null)
-        	env.put("com.sun.jndi.ldap.connect.timeout", connectionTimeout);
+            env.put("com.sun.jndi.ldap.connect.timeout", connectionTimeout);
 
         return env;
 

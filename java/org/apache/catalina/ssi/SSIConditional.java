@@ -33,8 +33,8 @@ public class SSIConditional implements SSICommand {
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer)
             throws SSIStopProcessingException {
-    	// Assume anything using conditionals was modified by it
-    	long lastModified = System.currentTimeMillis();
+        // Assume anything using conditionals was modified by it
+        long lastModified = System.currentTimeMillis();
         // Retrieve the current state information
         SSIConditionalState state = ssiMediator.getConditionalState();
         if ("if".equalsIgnoreCase(commandName)) {
