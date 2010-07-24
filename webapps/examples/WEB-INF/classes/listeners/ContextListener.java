@@ -14,7 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package listeners;
 
 
@@ -58,8 +57,8 @@ public final class ContextListener
      */
     public void attributeAdded(ServletContextAttributeEvent event) {
 
-	log("attributeAdded('" + event.getName() + "', '" +
-	    event.getValue() + "')");
+        log("attributeAdded('" + event.getName() + "', '" +
+                event.getValue() + "')");
 
     }
 
@@ -71,8 +70,8 @@ public final class ContextListener
      */
     public void attributeRemoved(ServletContextAttributeEvent event) {
 
-	log("attributeRemoved('" + event.getName() + "', '" +
-	    event.getValue() + "')");
+        log("attributeRemoved('" + event.getName() + "', '" +
+                event.getValue() + "')");
 
     }
 
@@ -84,8 +83,8 @@ public final class ContextListener
      */
     public void attributeReplaced(ServletContextAttributeEvent event) {
 
-	log("attributeReplaced('" + event.getName() + "', '" +
-	    event.getValue() + "')");
+        log("attributeReplaced('" + event.getName() + "', '" +
+                event.getValue() + "')");
 
     }
 
@@ -97,8 +96,8 @@ public final class ContextListener
      */
     public void contextDestroyed(ServletContextEvent event) {
 
-	log("contextDestroyed()");
-	this.context = null;
+        log("contextDestroyed()");
+        this.context = null;
 
     }
 
@@ -110,8 +109,8 @@ public final class ContextListener
      */
     public void contextInitialized(ServletContextEvent event) {
 
-	this.context = event.getServletContext();
-	log("contextInitialized()");
+        this.context = event.getServletContext();
+        log("contextInitialized()");
 
     }
 
@@ -126,10 +125,10 @@ public final class ContextListener
      */
     private void log(String message) {
 
-	if (context != null)
-	    context.log("ContextListener: " + message);
-	else
-	    System.out.println("ContextListener: " + message);
+        if (context != null)
+            context.log("ContextListener: " + message);
+        else
+            System.out.println("ContextListener: " + message);
 
     }
 

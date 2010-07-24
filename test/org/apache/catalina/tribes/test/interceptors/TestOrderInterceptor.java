@@ -119,8 +119,8 @@ public class TestOrderInterceptor extends TestCase {
             threads[i].join();
         }
         if (!exceptionQueue.isEmpty()) {
-        	fail("Exception while sending in threads: " 
-        			+ exceptionQueue.remove().toString());
+            fail("Exception while sending in threads: " 
+                    + exceptionQueue.remove().toString());
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {

@@ -54,12 +54,12 @@ public class RequestHeaderExample extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
-	// all links relative
+        // all links relative
 
         // XXX
         // making these absolute till we work out the
         // addition of a PathInfo issue 
-	
+
         out.println("<a href=\"../reqheaders.html\">");
         out.println("<img src=\"../images/code.gif\" height=24 " +
                     "width=24 align=right border=0 alt=\"view code\"></a>");

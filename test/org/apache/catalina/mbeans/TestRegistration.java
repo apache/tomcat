@@ -39,8 +39,8 @@ public class TestRegistration extends TomcatBaseTest {
      * registered.
      * @author Marc Guillemot
      */
-	public void testMBeanDeregistration() throws Exception {
-		final MBeanServer mbeanServer = Registry.getRegistry(null, null).getMBeanServer();
+    public void testMBeanDeregistration() throws Exception {
+        final MBeanServer mbeanServer = Registry.getRegistry(null, null).getMBeanServer();
         Set<ObjectName> onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         assertEquals("Remaining: " + onames, 0, onames.size());
 
@@ -88,6 +88,6 @@ public class TestRegistration extends TomcatBaseTest {
         assertEquals("Remaining: " + onames, 0, onames.size());
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
         assertEquals("Remaining: " + onames, 0, onames.size());
-	}
-	
+    }
+    
 }
