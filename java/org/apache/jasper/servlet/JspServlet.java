@@ -194,11 +194,11 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         if (value.equals("true")) {
             return (true);             // ?jsp_precompile=true
         } else if (value.equals("false")) {
-	    // Spec says if jsp_precompile=false, the request should not
-	    // be delivered to the JSP page; the easiest way to implement
-	    // this is to set the flag to true, and precompile the page anyway.
-	    // This still conforms to the spec, since it says the
-	    // precompilation request can be ignored.
+            // Spec says if jsp_precompile=false, the request should not
+            // be delivered to the JSP page; the easiest way to implement
+            // this is to set the flag to true, and precompile the page anyway.
+            // This still conforms to the spec, since it says the
+            // precompilation request can be ignored.
             return (true);             // ?jsp_precompile=false
         } else {
             throw new ServletException("Cannot have request parameter " +
@@ -211,7 +211,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     @Override
     public void service (HttpServletRequest request, 
-    			 HttpServletResponse response)
+                             HttpServletResponse response)
                 throws ServletException, IOException {
 
         String jspUri = null;
@@ -228,7 +228,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             jspUri = (String) request.getAttribute(Constants.INC_SERVLET_PATH);
             if (jspUri != null) {
                 /*
-		 * Requested JSP has been target of
+                 * Requested JSP has been target of
                  * RequestDispatcher.include(). Its path is assembled from the
                  * relevant javax.servlet.include.* request attributes
                  */
@@ -251,7 +251,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
         }
 
-        if (log.isDebugEnabled()) {	    
+        if (log.isDebugEnabled()) {    
             log.debug("JspEngine --> " + jspUri);
             log.debug("\t     ServletPath: " + request.getServletPath());
             log.debug("\t        PathInfo: " + request.getPathInfo());

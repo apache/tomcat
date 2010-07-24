@@ -72,6 +72,6 @@ public class Param implements TagPlugin {
         ctxt.generateJavaSource("        " + urlName + " = " + urlName + " + \"&\" + " + nameName + " + \"=\" + " + valueName + ";");
         ctxt.generateJavaSource("    }");
         ctxt.generateJavaSource("    pageContext.setAttribute(\"url_without_param\"," + urlName + ");");
-        ctxt.generateJavaSource("}");	
+        ctxt.generateJavaSource("}");
     }
 }

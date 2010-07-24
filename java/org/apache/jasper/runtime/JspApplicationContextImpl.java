@@ -48,105 +48,105 @@ import org.apache.jasper.el.ELContextImpl;
  */
 public class JspApplicationContextImpl implements JspApplicationContext {
 
-	private final static String KEY = JspApplicationContextImpl.class.getName();
+    private final static String KEY = JspApplicationContextImpl.class.getName();
 
-	private final static ExpressionFactory expressionFactory =
-	    ExpressionFactory.newInstance();
+    private final static ExpressionFactory expressionFactory =
+        ExpressionFactory.newInstance();
 
-	private final List<ELContextListener> contextListeners = new ArrayList<ELContextListener>();
+    private final List<ELContextListener> contextListeners = new ArrayList<ELContextListener>();
 
-	private final List<ELResolver> resolvers = new ArrayList<ELResolver>();
+    private final List<ELResolver> resolvers = new ArrayList<ELResolver>();
 
-	private boolean instantiated = false;
+    private boolean instantiated = false;
 
-	private ELResolver resolver;
+    private ELResolver resolver;
 
-	public JspApplicationContextImpl() {
+    public JspApplicationContextImpl() {
 
-	}
+    }
 
-	public void addELContextListener(ELContextListener listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException("ELConextListener was null");
-		}
-		this.contextListeners.add(listener);
-	}
+    public void addELContextListener(ELContextListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("ELConextListener was null");
+        }
+        this.contextListeners.add(listener);
+    }
 
-	public static JspApplicationContextImpl getInstance(ServletContext context) {
-		if (context == null) {
-			throw new IllegalArgumentException("ServletContext was null");
-		}
-		JspApplicationContextImpl impl = (JspApplicationContextImpl) context
-				.getAttribute(KEY);
-		if (impl == null) {
-			impl = new JspApplicationContextImpl();
-			context.setAttribute(KEY, impl);
-		}
-		return impl;
-	}
+    public static JspApplicationContextImpl getInstance(ServletContext context) {
+        if (context == null) {
+            throw new IllegalArgumentException("ServletContext was null");
+        }
+        JspApplicationContextImpl impl = (JspApplicationContextImpl) context
+                .getAttribute(KEY);
+        if (impl == null) {
+            impl = new JspApplicationContextImpl();
+            context.setAttribute(KEY, impl);
+        }
+        return impl;
+    }
 
-	public ELContextImpl createELContext(JspContext context) {
-		if (context == null) {
-			throw new IllegalArgumentException("JspContext was null");
-		}
+    public ELContextImpl createELContext(JspContext context) {
+        if (context == null) {
+            throw new IllegalArgumentException("JspContext was null");
+        }
 
-		// create ELContext for JspContext
-		final ELResolver r = this.createELResolver();
-		ELContextImpl ctx;
-		if (Constants.IS_SECURITY_ENABLED) {
-		    ctx = AccessController.doPrivileged(
-		            new PrivilegedAction<ELContextImpl>() {
-		                public ELContextImpl run() {
-		                    return new ELContextImpl(r);
-		                }
-		            });
-		} else {
-		    ctx = new ELContextImpl(r);
-		}
-		ctx.putContext(JspContext.class, context);
+        // create ELContext for JspContext
+        final ELResolver r = this.createELResolver();
+        ELContextImpl ctx;
+        if (Constants.IS_SECURITY_ENABLED) {
+            ctx = AccessController.doPrivileged(
+                    new PrivilegedAction<ELContextImpl>() {
+                        public ELContextImpl run() {
+                            return new ELContextImpl(r);
+                        }
+                    });
+        } else {
+            ctx = new ELContextImpl(r);
+        }
+        ctx.putContext(JspContext.class, context);
 
-		// alert all ELContextListeners
-		ELContextEvent event = new ELContextEvent(ctx);
-		for (int i = 0; i < this.contextListeners.size(); i++) {
-			this.contextListeners.get(i).contextCreated(event);
-		}
+        // alert all ELContextListeners
+        ELContextEvent event = new ELContextEvent(ctx);
+        for (int i = 0; i < this.contextListeners.size(); i++) {
+            this.contextListeners.get(i).contextCreated(event);
+        }
 
-		return ctx;
-	}
+        return ctx;
+    }
 
-	private ELResolver createELResolver() {
-		this.instantiated = true;
-		if (this.resolver == null) {
-			CompositeELResolver r = new CompositeELResolver();
-			r.add(new ImplicitObjectELResolver());
-			for (Iterator<ELResolver> itr = this.resolvers.iterator();
-			        itr.hasNext();) {
-				r.add(itr.next());
-			}
-			r.add(new MapELResolver());
-			r.add(new ResourceBundleELResolver());
-			r.add(new ListELResolver());
-			r.add(new ArrayELResolver());	
-			r.add(new BeanELResolver());
-			r.add(new ScopedAttributeELResolver());
-			this.resolver = r;
-		}
-		return this.resolver;
-	}
+    private ELResolver createELResolver() {
+        this.instantiated = true;
+        if (this.resolver == null) {
+            CompositeELResolver r = new CompositeELResolver();
+            r.add(new ImplicitObjectELResolver());
+            for (Iterator<ELResolver> itr = this.resolvers.iterator();
+                    itr.hasNext();) {
+                r.add(itr.next());
+            }
+            r.add(new MapELResolver());
+            r.add(new ResourceBundleELResolver());
+            r.add(new ListELResolver());
+            r.add(new ArrayELResolver());    
+            r.add(new BeanELResolver());
+            r.add(new ScopedAttributeELResolver());
+            this.resolver = r;
+        }
+        return this.resolver;
+    }
 
-	public void addELResolver(ELResolver resolver) throws IllegalStateException {
-		if (resolver == null) {
-			throw new IllegalArgumentException("ELResolver was null");
-		}
-		if (this.instantiated) {
-			throw new IllegalStateException(
-					"cannot call addELResolver after the first request has been made");
-		}
-		this.resolvers.add(resolver);
-	}
+    public void addELResolver(ELResolver resolver) throws IllegalStateException {
+        if (resolver == null) {
+            throw new IllegalArgumentException("ELResolver was null");
+        }
+        if (this.instantiated) {
+            throw new IllegalStateException(
+                    "cannot call addELResolver after the first request has been made");
+        }
+        this.resolvers.add(resolver);
+    }
 
-	public ExpressionFactory getExpressionFactory() {
-		return expressionFactory;
-	}
+    public ExpressionFactory getExpressionFactory() {
+        return expressionFactory;
+    }
 
 }

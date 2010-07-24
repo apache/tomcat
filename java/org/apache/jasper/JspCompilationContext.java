@@ -195,9 +195,9 @@ public class JspCompilationContext {
      * plus the directory derived from the package name.
      */
     public String getOutputDir() {
-	if (outputDir == null) {
-	    createOutputDir();
-	}
+        if (outputDir == null) {
+            createOutputDir();
+        }
 
         return outputDir;
     }
@@ -458,7 +458,7 @@ public class JspCompilationContext {
         }
         return derivedPackageName;
     }
-	    
+            
     /**
      * The package name into which the servlet class is generated.
      */
@@ -502,12 +502,12 @@ public class JspCompilationContext {
         }
 
         if (isTagFile()) {
-	    String tagName = tagInfo.getTagClassName();
+            String tagName = tagInfo.getTagClassName();
             javaPath = tagName.replace('.', '/') + ".java";
         } else {
             javaPath = getServletPackageName().replace('.', '/') + '/' +
                        getServletClassName() + ".java";
-	}
+        }
         return javaPath;
     }
 

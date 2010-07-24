@@ -121,7 +121,7 @@ public class XMLEncodingDetector {
         this.err=err;
         createInitialReader();
         scanXMLDecl();
-	
+
         return new Object[] { this.encoding,
                               Boolean.valueOf(this.isEncodingSetInProlog),
                               Boolean.valueOf(this.isBomPresent),
@@ -136,48 +136,48 @@ public class XMLEncodingDetector {
     // org.apache.xerces.impl.XMLEntityManager.startEntity()
     private void createInitialReader() throws IOException, JasperException {
 
-	// wrap this stream in RewindableInputStream
-	stream = new RewindableInputStream(stream);
+        // wrap this stream in RewindableInputStream
+        stream = new RewindableInputStream(stream);
 
-	// perform auto-detect of encoding if necessary
-	if (encoding == null) {
-	    // read first four bytes and determine encoding
-	    final byte[] b4 = new byte[4];
-	    int count = 0;
-	    for (; count<4; count++ ) {
-		b4[count] = (byte)stream.read();
-	    }
-	    if (count == 4) {
-		Object [] encodingDesc = getEncodingName(b4, count);
-		encoding = (String)(encodingDesc[0]);
-		isBigEndian = (Boolean)(encodingDesc[1]);
+        // perform auto-detect of encoding if necessary
+        if (encoding == null) {
+            // read first four bytes and determine encoding
+            final byte[] b4 = new byte[4];
+            int count = 0;
+            for (; count<4; count++ ) {
+                b4[count] = (byte)stream.read();
+            }
+            if (count == 4) {
+                Object [] encodingDesc = getEncodingName(b4, count);
+                encoding = (String)(encodingDesc[0]);
+                isBigEndian = (Boolean)(encodingDesc[1]);
         
-        if (encodingDesc.length > 3) {
-            isBomPresent = ((Boolean)(encodingDesc[2])).booleanValue();
-            skip = ((Integer)(encodingDesc[3])).intValue();
-        } else {
-            isBomPresent = true;
-            skip = ((Integer)(encodingDesc[2])).intValue();
-        }
+                if (encodingDesc.length > 3) {
+                    isBomPresent = ((Boolean)(encodingDesc[2])).booleanValue();
+                    skip = ((Integer)(encodingDesc[3])).intValue();
+                } else {
+                    isBomPresent = true;
+                    skip = ((Integer)(encodingDesc[2])).intValue();
+                }
 
-		stream.reset();
-		// Special case UTF-8 files with BOM created by Microsoft
-		// tools. It's more efficient to consume the BOM than make
-		// the reader perform extra checks. -Ac
-		if (count > 2 && encoding.equals("UTF-8")) {
-		    int b0 = b4[0] & 0xFF;
-		    int b1 = b4[1] & 0xFF;
-		    int b2 = b4[2] & 0xFF;
-		    if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-			// ignore first three bytes...
-			stream.skip(3);
-		    }
-		}
-		reader = createReader(stream, encoding, isBigEndian);
-	    } else {
-		reader = createReader(stream, encoding, isBigEndian);
-	    }
-	}
+                stream.reset();
+                // Special case UTF-8 files with BOM created by Microsoft
+                // tools. It's more efficient to consume the BOM than make
+                // the reader perform extra checks. -Ac
+                if (count > 2 && encoding.equals("UTF-8")) {
+                    int b0 = b4[0] & 0xFF;
+                    int b1 = b4[1] & 0xFF;
+                    int b2 = b4[2] & 0xFF;
+                    if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
+                        // ignore first three bytes...
+                        stream.skip(3);
+                    }
+                }
+                reader = createReader(stream, encoding, isBigEndian);
+            } else {
+                reader = createReader(stream, encoding, isBigEndian);
+            }
+        }
     }
 
     // Adapted from:
@@ -199,7 +199,7 @@ public class XMLEncodingDetector {
      * @return Returns a reader.
      */
     private Reader createReader(InputStream inputStream, String encoding,
-				Boolean isBigEndian)
+                                Boolean isBigEndian)
                 throws IOException, JasperException {
 
         // normalize encoding name
@@ -225,7 +225,7 @@ public class XMLEncodingDetector {
                 }
             } else {
                 err.jspError("jsp.error.xml.encodingByteOrderUnsupported",
-			     encoding);
+                             encoding);
             }
         }
         if (ENCODING.equals("ISO-10646-UCS-2")) {
@@ -238,7 +238,7 @@ public class XMLEncodingDetector {
                 }
             } else {
                 err.jspError("jsp.error.xml.encodingByteOrderUnsupported",
-			     encoding);
+                             encoding);
             }
         }
 
@@ -262,7 +262,7 @@ public class XMLEncodingDetector {
         String javaEncoding = EncodingMap.getIANA2JavaMapping(ENCODING);
         if (javaEncoding == null) {
             if (fAllowJavaEncodings) {
-		javaEncoding = encoding;
+                javaEncoding = encoding;
             } else {
                 err.jspError("jsp.error.xml.encodingDeclInvalid", encoding);
                 // see comment above.
@@ -369,7 +369,7 @@ public class XMLEncodingDetector {
     // org.apache.xerces.impl.XMLEntityManager.EntityScanner.isExternal
     /** Returns true if the current entity being scanned is external. */
     public boolean isExternal() {
-	return true;
+        return true;
     }
 
     // Adapted from:
@@ -383,23 +383,23 @@ public class XMLEncodingDetector {
      * @throws EOFException Thrown on end of file.
      */
     public int peekChar() throws IOException {
-	
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	}
-	
-	// peek at character
-	int c = fCurrentEntity.ch[fCurrentEntity.position];
+        
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        }
+        
+        // peek at character
+        int c = fCurrentEntity.ch[fCurrentEntity.position];
 
-	// return peeked character
-	if (fCurrentEntity.isExternal()) {
-	    return c != '\r' ? c : '\n';
-	}
-	else {
-	    return c;
-	}
-	
+        // return peeked character
+        if (fCurrentEntity.isExternal()) {
+            return c != '\r' ? c : '\n';
+        }
+        else {
+            return c;
+        }
+        
     } // peekChar():int
     
     // Adapted from:
@@ -414,34 +414,34 @@ public class XMLEncodingDetector {
      */
     public int scanChar() throws IOException {
 
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	}
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        }
 
-	// scan character
-	int c = fCurrentEntity.ch[fCurrentEntity.position++];
-	boolean external = false;
-	if (c == '\n' ||
-	    (c == '\r' && (external = fCurrentEntity.isExternal()))) {
-	    fCurrentEntity.lineNumber++;
-	    fCurrentEntity.columnNumber = 1;
-	    if (fCurrentEntity.position == fCurrentEntity.count) {
-		fCurrentEntity.ch[0] = (char)c;
-		load(1, false);
-	    }
-	    if (c == '\r' && external) {
-		if (fCurrentEntity.ch[fCurrentEntity.position++] != '\n') {
-		    fCurrentEntity.position--;
-		}
-		c = '\n';
-	    }
-	}
+        // scan character
+        int c = fCurrentEntity.ch[fCurrentEntity.position++];
+        boolean external = false;
+        if (c == '\n' ||
+            (c == '\r' && (external = fCurrentEntity.isExternal()))) {
+            fCurrentEntity.lineNumber++;
+            fCurrentEntity.columnNumber = 1;
+            if (fCurrentEntity.position == fCurrentEntity.count) {
+                fCurrentEntity.ch[0] = (char)c;
+                load(1, false);
+            }
+            if (c == '\r' && external) {
+                if (fCurrentEntity.ch[fCurrentEntity.position++] != '\n') {
+                    fCurrentEntity.position--;
+                }
+                c = '\n';
+            }
+        }
 
-	// return character that was scanned
-	fCurrentEntity.columnNumber++;
-	return c;
-	
+        // return character that was scanned
+        fCurrentEntity.columnNumber++;
+        return c;
+        
     }
 
     // Adapted from:
@@ -463,56 +463,56 @@ public class XMLEncodingDetector {
      * @see XMLChar#isNameStart
      */
     public String scanName() throws IOException {
-	
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	}
-	
-	// scan name
-	int offset = fCurrentEntity.position;
-	if (XMLChar.isNameStart(fCurrentEntity.ch[offset])) {
-	    if (++fCurrentEntity.position == fCurrentEntity.count) {
-		fCurrentEntity.ch[0] = fCurrentEntity.ch[offset];
-		offset = 0;
-		if (load(1, false)) {
-		    fCurrentEntity.columnNumber++;
-		    String symbol = fSymbolTable.addSymbol(fCurrentEntity.ch,
-							   0, 1);
-		    return symbol;
-		}
-	    }
-	    while (XMLChar.isName(fCurrentEntity.ch[fCurrentEntity.position])) {
-		if (++fCurrentEntity.position == fCurrentEntity.count) {
-		    int length = fCurrentEntity.position - offset;
-		    if (length == fBufferSize) {
-			// bad luck we have to resize our buffer
-			char[] tmp = new char[fBufferSize * 2];
-			System.arraycopy(fCurrentEntity.ch, offset,
-					 tmp, 0, length);
-			fCurrentEntity.ch = tmp;
-			fBufferSize *= 2;
-		    } else {
-			System.arraycopy(fCurrentEntity.ch, offset,
-					 fCurrentEntity.ch, 0, length);
-		    }
-		    offset = 0;
-		    if (load(length, false)) {
-			break;
-		    }
-		}
-	    }
-	}
-	int length = fCurrentEntity.position - offset;
-	fCurrentEntity.columnNumber += length;
+        
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        }
+        
+        // scan name
+        int offset = fCurrentEntity.position;
+        if (XMLChar.isNameStart(fCurrentEntity.ch[offset])) {
+            if (++fCurrentEntity.position == fCurrentEntity.count) {
+                fCurrentEntity.ch[0] = fCurrentEntity.ch[offset];
+                offset = 0;
+                if (load(1, false)) {
+                    fCurrentEntity.columnNumber++;
+                    String symbol = fSymbolTable.addSymbol(fCurrentEntity.ch,
+                                                           0, 1);
+                    return symbol;
+                }
+            }
+            while (XMLChar.isName(fCurrentEntity.ch[fCurrentEntity.position])) {
+                if (++fCurrentEntity.position == fCurrentEntity.count) {
+                    int length = fCurrentEntity.position - offset;
+                    if (length == fBufferSize) {
+                        // bad luck we have to resize our buffer
+                        char[] tmp = new char[fBufferSize * 2];
+                        System.arraycopy(fCurrentEntity.ch, offset,
+                                         tmp, 0, length);
+                        fCurrentEntity.ch = tmp;
+                        fBufferSize *= 2;
+                    } else {
+                        System.arraycopy(fCurrentEntity.ch, offset,
+                                         fCurrentEntity.ch, 0, length);
+                    }
+                    offset = 0;
+                    if (load(length, false)) {
+                        break;
+                    }
+                }
+            }
+        }
+        int length = fCurrentEntity.position - offset;
+        fCurrentEntity.columnNumber += length;
 
-	// return name
-	String symbol = null;
-	if (length > 0) {
-	    symbol = fSymbolTable.addSymbol(fCurrentEntity.ch, offset, length);
-	}
-	return symbol;
-	
+        // return name
+        String symbol = null;
+        if (length > 0) {
+            symbol = fSymbolTable.addSymbol(fCurrentEntity.ch, offset, length);
+        }
+        return symbol;
+        
     }
 
     // Adapted from:
@@ -546,108 +546,108 @@ public class XMLEncodingDetector {
      * @throws EOFException Thrown on end of file.
      */
     public int scanLiteral(int quote, XMLString content)
-	throws IOException {
+        throws IOException {
 
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	} else if (fCurrentEntity.position == fCurrentEntity.count - 1) {
-	    fCurrentEntity.ch[0] = fCurrentEntity.ch[fCurrentEntity.count - 1];
-	    load(1, false);
-	    fCurrentEntity.position = 0;
-	}
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        } else if (fCurrentEntity.position == fCurrentEntity.count - 1) {
+            fCurrentEntity.ch[0] = fCurrentEntity.ch[fCurrentEntity.count - 1];
+            load(1, false);
+            fCurrentEntity.position = 0;
+        }
 
-	// normalize newlines
-	int offset = fCurrentEntity.position;
-	int c = fCurrentEntity.ch[offset];
-	int newlines = 0;
-	boolean external = fCurrentEntity.isExternal();
-	if (c == '\n' || (c == '\r' && external)) {
-	    do {
-		c = fCurrentEntity.ch[fCurrentEntity.position++];
-		if (c == '\r' && external) {
-		    newlines++;
-		    fCurrentEntity.lineNumber++;
-		    fCurrentEntity.columnNumber = 1;
-		    if (fCurrentEntity.position == fCurrentEntity.count) {
-			offset = 0;
-			fCurrentEntity.position = newlines;
-			if (load(newlines, false)) {
-			    break;
-			}
-		    }
-		    if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
-			fCurrentEntity.position++;
-			offset++;
-		    }
-		    /*** NEWLINE NORMALIZATION ***/
-		    else {
-			newlines++;
-		    }
-		    /***/
-		}
-		else if (c == '\n') {
-		    newlines++;
-		    fCurrentEntity.lineNumber++;
-		    fCurrentEntity.columnNumber = 1;
-		    if (fCurrentEntity.position == fCurrentEntity.count) {
-			offset = 0;
-			fCurrentEntity.position = newlines;
-			if (load(newlines, false)) {
-			    break;
-			}
-		    }
-		    /*** NEWLINE NORMALIZATION ***
-			 if (fCurrentEntity.ch[fCurrentEntity.position] == '\r'
-			 && external) {
-			 fCurrentEntity.position++;
-			 offset++;
-			 }
-			 /***/
-		}
-		else {
-		    fCurrentEntity.position--;
-		    break;
-		}
-	    } while (fCurrentEntity.position < fCurrentEntity.count - 1);
-	    for (int i = offset; i < fCurrentEntity.position; i++) {
-		fCurrentEntity.ch[i] = '\n';
-	    }
-	    int length = fCurrentEntity.position - offset;
-	    if (fCurrentEntity.position == fCurrentEntity.count - 1) {
-		content.setValues(fCurrentEntity.ch, offset, length);
-		return -1;
-	    }
-	}
+        // normalize newlines
+        int offset = fCurrentEntity.position;
+        int c = fCurrentEntity.ch[offset];
+        int newlines = 0;
+        boolean external = fCurrentEntity.isExternal();
+        if (c == '\n' || (c == '\r' && external)) {
+            do {
+                c = fCurrentEntity.ch[fCurrentEntity.position++];
+                if (c == '\r' && external) {
+                    newlines++;
+                    fCurrentEntity.lineNumber++;
+                    fCurrentEntity.columnNumber = 1;
+                    if (fCurrentEntity.position == fCurrentEntity.count) {
+                        offset = 0;
+                        fCurrentEntity.position = newlines;
+                        if (load(newlines, false)) {
+                            break;
+                        }
+                    }
+                    if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
+                        fCurrentEntity.position++;
+                        offset++;
+                    }
+                    /*** NEWLINE NORMALIZATION ***/
+                    else {
+                        newlines++;
+                    }
+                    /***/
+                }
+                else if (c == '\n') {
+                    newlines++;
+                    fCurrentEntity.lineNumber++;
+                    fCurrentEntity.columnNumber = 1;
+                    if (fCurrentEntity.position == fCurrentEntity.count) {
+                        offset = 0;
+                        fCurrentEntity.position = newlines;
+                        if (load(newlines, false)) {
+                            break;
+                        }
+                    }
+                    /*** NEWLINE NORMALIZATION ***
+                         if (fCurrentEntity.ch[fCurrentEntity.position] == '\r'
+                         && external) {
+                         fCurrentEntity.position++;
+                         offset++;
+                         }
+                         /***/
+                }
+                else {
+                    fCurrentEntity.position--;
+                    break;
+                }
+            } while (fCurrentEntity.position < fCurrentEntity.count - 1);
+            for (int i = offset; i < fCurrentEntity.position; i++) {
+                fCurrentEntity.ch[i] = '\n';
+            }
+            int length = fCurrentEntity.position - offset;
+            if (fCurrentEntity.position == fCurrentEntity.count - 1) {
+                content.setValues(fCurrentEntity.ch, offset, length);
+                return -1;
+            }
+        }
 
-	// scan literal value
-	while (fCurrentEntity.position < fCurrentEntity.count) {
-	    c = fCurrentEntity.ch[fCurrentEntity.position++];
-	    if ((c == quote &&
-		 (!fCurrentEntity.literal || external))
-		|| c == '%' || !XMLChar.isContent(c)) {
-		fCurrentEntity.position--;
-		break;
-	    }
-	}
-	int length = fCurrentEntity.position - offset;
-	fCurrentEntity.columnNumber += length - newlines;
-	content.setValues(fCurrentEntity.ch, offset, length);
+        // scan literal value
+        while (fCurrentEntity.position < fCurrentEntity.count) {
+            c = fCurrentEntity.ch[fCurrentEntity.position++];
+            if ((c == quote &&
+                 (!fCurrentEntity.literal || external))
+                || c == '%' || !XMLChar.isContent(c)) {
+                fCurrentEntity.position--;
+                break;
+            }
+        }
+        int length = fCurrentEntity.position - offset;
+        fCurrentEntity.columnNumber += length - newlines;
+        content.setValues(fCurrentEntity.ch, offset, length);
 
-	// return next character
-	if (fCurrentEntity.position != fCurrentEntity.count) {
-	    c = fCurrentEntity.ch[fCurrentEntity.position];
-	    // NOTE: We don't want to accidentally signal the
-	    //       end of the literal if we're expanding an
-	    //       entity appearing in the literal. -Ac
-	    if (c == quote && fCurrentEntity.literal) {
-		c = -1;
-	    }
-	}
-	else {
-	    c = -1;
-	}
-	return c;
+        // return next character
+        if (fCurrentEntity.position != fCurrentEntity.count) {
+            c = fCurrentEntity.ch[fCurrentEntity.position];
+            // NOTE: We don't want to accidentally signal the
+            //       end of the literal if we're expanding an
+            //       entity appearing in the literal. -Ac
+            if (c == quote && fCurrentEntity.literal) {
+                c = -1;
+            }
+        }
+        else {
+            c = -1;
+        }
+        return c;
 
     }
 
@@ -682,136 +682,136 @@ public class XMLEncodingDetector {
      * @throws EOFException Thrown on end of file.
      */
     public boolean scanData(String delimiter, XMLStringBuffer buffer)
-	throws IOException {
+        throws IOException {
 
-	boolean done = false;
-	int delimLen = delimiter.length();
-	char charAt0 = delimiter.charAt(0);
-	boolean external = fCurrentEntity.isExternal();
-	do {
+        boolean done = false;
+        int delimLen = delimiter.length();
+        char charAt0 = delimiter.charAt(0);
+        boolean external = fCurrentEntity.isExternal();
+        do {
     
-	    // load more characters, if needed
+            // load more characters, if needed
     
-	    if (fCurrentEntity.position == fCurrentEntity.count) {
-		load(0, true);
-	    }
-	    else if (fCurrentEntity.position >= fCurrentEntity.count - delimLen) {
-		System.arraycopy(fCurrentEntity.ch, fCurrentEntity.position,
-				 fCurrentEntity.ch, 0, fCurrentEntity.count - fCurrentEntity.position);
-		load(fCurrentEntity.count - fCurrentEntity.position, false);
-		fCurrentEntity.position = 0;
-	    } 
-	    if (fCurrentEntity.position >= fCurrentEntity.count - delimLen) {
-		// something must be wrong with the input: e.g., file ends an
-		// unterminated comment
-		int length = fCurrentEntity.count - fCurrentEntity.position;
-		buffer.append (fCurrentEntity.ch, fCurrentEntity.position,
-			       length); 
-		fCurrentEntity.columnNumber += fCurrentEntity.count;
-		fCurrentEntity.position = fCurrentEntity.count;
-		load(0,true);
-		return false;
-	    }
+            if (fCurrentEntity.position == fCurrentEntity.count) {
+                load(0, true);
+            }
+            else if (fCurrentEntity.position >= fCurrentEntity.count - delimLen) {
+                System.arraycopy(fCurrentEntity.ch, fCurrentEntity.position,
+                                 fCurrentEntity.ch, 0, fCurrentEntity.count - fCurrentEntity.position);
+                load(fCurrentEntity.count - fCurrentEntity.position, false);
+                fCurrentEntity.position = 0;
+            } 
+            if (fCurrentEntity.position >= fCurrentEntity.count - delimLen) {
+                // something must be wrong with the input: e.g., file ends an
+                // unterminated comment
+                int length = fCurrentEntity.count - fCurrentEntity.position;
+                buffer.append (fCurrentEntity.ch, fCurrentEntity.position,
+                               length); 
+                fCurrentEntity.columnNumber += fCurrentEntity.count;
+                fCurrentEntity.position = fCurrentEntity.count;
+                load(0,true);
+                return false;
+            }
     
-	    // normalize newlines
-	    int offset = fCurrentEntity.position;
-	    int c = fCurrentEntity.ch[offset];
-	    int newlines = 0;
-	    if (c == '\n' || (c == '\r' && external)) {
-		do {
-		    c = fCurrentEntity.ch[fCurrentEntity.position++];
-		    if (c == '\r' && external) {
-			newlines++;
-			fCurrentEntity.lineNumber++;
-			fCurrentEntity.columnNumber = 1;
-			if (fCurrentEntity.position == fCurrentEntity.count) {
-			    offset = 0;
-			    fCurrentEntity.position = newlines;
-			    if (load(newlines, false)) {
-				break;
-			    }
-			}
-			if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
-			    fCurrentEntity.position++;
-			    offset++;
-			}
-			/*** NEWLINE NORMALIZATION ***/
-			else {
-			    newlines++;
-			}
-		    }
-		    else if (c == '\n') {
-			newlines++;
-			fCurrentEntity.lineNumber++;
-			fCurrentEntity.columnNumber = 1;
-			if (fCurrentEntity.position == fCurrentEntity.count) {
-			    offset = 0;
-			    fCurrentEntity.position = newlines;
-			    fCurrentEntity.count = newlines;
-			    if (load(newlines, false)) {
-				break;
-			    }
-			}
-		    }
-		    else {
-			fCurrentEntity.position--;
-			break;
-		    }
-		} while (fCurrentEntity.position < fCurrentEntity.count - 1);
-		for (int i = offset; i < fCurrentEntity.position; i++) {
-		    fCurrentEntity.ch[i] = '\n';
-		}
-		int length = fCurrentEntity.position - offset;
-		if (fCurrentEntity.position == fCurrentEntity.count - 1) {
-		    buffer.append(fCurrentEntity.ch, offset, length);
-		    return true;
-		}
-	    }
+            // normalize newlines
+            int offset = fCurrentEntity.position;
+            int c = fCurrentEntity.ch[offset];
+            int newlines = 0;
+            if (c == '\n' || (c == '\r' && external)) {
+                do {
+                    c = fCurrentEntity.ch[fCurrentEntity.position++];
+                    if (c == '\r' && external) {
+                        newlines++;
+                        fCurrentEntity.lineNumber++;
+                        fCurrentEntity.columnNumber = 1;
+                        if (fCurrentEntity.position == fCurrentEntity.count) {
+                            offset = 0;
+                            fCurrentEntity.position = newlines;
+                            if (load(newlines, false)) {
+                                break;
+                            }
+                        }
+                        if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
+                            fCurrentEntity.position++;
+                            offset++;
+                        }
+                        /*** NEWLINE NORMALIZATION ***/
+                        else {
+                            newlines++;
+                        }
+                    }
+                    else if (c == '\n') {
+                        newlines++;
+                        fCurrentEntity.lineNumber++;
+                        fCurrentEntity.columnNumber = 1;
+                        if (fCurrentEntity.position == fCurrentEntity.count) {
+                            offset = 0;
+                            fCurrentEntity.position = newlines;
+                            fCurrentEntity.count = newlines;
+                            if (load(newlines, false)) {
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        fCurrentEntity.position--;
+                        break;
+                    }
+                } while (fCurrentEntity.position < fCurrentEntity.count - 1);
+                for (int i = offset; i < fCurrentEntity.position; i++) {
+                    fCurrentEntity.ch[i] = '\n';
+                }
+                int length = fCurrentEntity.position - offset;
+                if (fCurrentEntity.position == fCurrentEntity.count - 1) {
+                    buffer.append(fCurrentEntity.ch, offset, length);
+                    return true;
+                }
+            }
     
-	    // iterate over buffer looking for delimiter
-	OUTER: while (fCurrentEntity.position < fCurrentEntity.count) {
-	    c = fCurrentEntity.ch[fCurrentEntity.position++];
-	    if (c == charAt0) {
-		// looks like we just hit the delimiter
-		int delimOffset = fCurrentEntity.position - 1;
-		for (int i = 1; i < delimLen; i++) {
-		    if (fCurrentEntity.position == fCurrentEntity.count) {
-			fCurrentEntity.position -= i;
-			break OUTER;
-		    }
-		    c = fCurrentEntity.ch[fCurrentEntity.position++];
-		    if (delimiter.charAt(i) != c) {
-			fCurrentEntity.position--;
-			break;
-		    }
-		}
-		if (fCurrentEntity.position == delimOffset + delimLen) {
-		    done = true;
-		    break;
-		}
-	    }
-	    else if (c == '\n' || (external && c == '\r')) {
-		fCurrentEntity.position--;
-		break;
-	    }
-	    else if (XMLChar.isInvalid(c)) {
-		fCurrentEntity.position--;
-		int length = fCurrentEntity.position - offset;
-		fCurrentEntity.columnNumber += length - newlines;
-		buffer.append(fCurrentEntity.ch, offset, length); 
-		return true;
-	    }
-	}
-	    int length = fCurrentEntity.position - offset;
-	    fCurrentEntity.columnNumber += length - newlines;
-	    if (done) {
-		length -= delimLen;
-	    }
-	    buffer.append (fCurrentEntity.ch, offset, length);
+            // iterate over buffer looking for delimiter
+        OUTER: while (fCurrentEntity.position < fCurrentEntity.count) {
+            c = fCurrentEntity.ch[fCurrentEntity.position++];
+            if (c == charAt0) {
+                // looks like we just hit the delimiter
+                int delimOffset = fCurrentEntity.position - 1;
+                for (int i = 1; i < delimLen; i++) {
+                    if (fCurrentEntity.position == fCurrentEntity.count) {
+                        fCurrentEntity.position -= i;
+                        break OUTER;
+                    }
+                    c = fCurrentEntity.ch[fCurrentEntity.position++];
+                    if (delimiter.charAt(i) != c) {
+                        fCurrentEntity.position--;
+                        break;
+                    }
+                }
+                if (fCurrentEntity.position == delimOffset + delimLen) {
+                    done = true;
+                    break;
+                }
+            }
+            else if (c == '\n' || (external && c == '\r')) {
+                fCurrentEntity.position--;
+                break;
+            }
+            else if (XMLChar.isInvalid(c)) {
+                fCurrentEntity.position--;
+                int length = fCurrentEntity.position - offset;
+                fCurrentEntity.columnNumber += length - newlines;
+                buffer.append(fCurrentEntity.ch, offset, length); 
+                return true;
+            }
+        }
+            int length = fCurrentEntity.position - offset;
+            fCurrentEntity.columnNumber += length - newlines;
+            if (done) {
+                length -= delimLen;
+            }
+            buffer.append (fCurrentEntity.ch, offset, length);
     
-	    // return true if string was skipped
-	} while (!done);
-	return !done;
+            // return true if string was skipped
+        } while (!done);
+        return !done;
 
     }
 
@@ -832,40 +832,40 @@ public class XMLEncodingDetector {
      */
     public boolean skipChar(int c) throws IOException {
 
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	}
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        }
 
-	// skip character
-	int cc = fCurrentEntity.ch[fCurrentEntity.position];
-	if (cc == c) {
-	    fCurrentEntity.position++;
-	    if (c == '\n') {
-		fCurrentEntity.lineNumber++;
-		fCurrentEntity.columnNumber = 1;
-	    }
-	    else {
-		fCurrentEntity.columnNumber++;
-	    }
-	    return true;
-	} else if (c == '\n' && cc == '\r' && fCurrentEntity.isExternal()) {
-	    // handle newlines
-	    if (fCurrentEntity.position == fCurrentEntity.count) {
-		fCurrentEntity.ch[0] = (char)cc;
-		load(1, false);
-	    }
-	    fCurrentEntity.position++;
-	    if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
-		fCurrentEntity.position++;
-	    }
-	    fCurrentEntity.lineNumber++;
-	    fCurrentEntity.columnNumber = 1;
-	    return true;
-	}
+        // skip character
+        int cc = fCurrentEntity.ch[fCurrentEntity.position];
+        if (cc == c) {
+            fCurrentEntity.position++;
+            if (c == '\n') {
+                fCurrentEntity.lineNumber++;
+                fCurrentEntity.columnNumber = 1;
+            }
+            else {
+                fCurrentEntity.columnNumber++;
+            }
+            return true;
+        } else if (c == '\n' && cc == '\r' && fCurrentEntity.isExternal()) {
+            // handle newlines
+            if (fCurrentEntity.position == fCurrentEntity.count) {
+                fCurrentEntity.ch[0] = (char)cc;
+                load(1, false);
+            }
+            fCurrentEntity.position++;
+            if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
+                fCurrentEntity.position++;
+            }
+            fCurrentEntity.lineNumber++;
+            fCurrentEntity.columnNumber = 1;
+            return true;
+        }
 
-	// character was not skipped
-	return false;
+        // character was not skipped
+        return false;
 
     }
 
@@ -886,60 +886,60 @@ public class XMLEncodingDetector {
      */
     public boolean skipSpaces() throws IOException {
 
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	}
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        }
 
-	// skip spaces
-	int c = fCurrentEntity.ch[fCurrentEntity.position];
-	if (XMLChar.isSpace(c)) {
-	    boolean external = fCurrentEntity.isExternal();
-	    do {
-		boolean entityChanged = false;
-		// handle newlines
-		if (c == '\n' || (external && c == '\r')) {
-		    fCurrentEntity.lineNumber++;
-		    fCurrentEntity.columnNumber = 1;
-		    if (fCurrentEntity.position == fCurrentEntity.count - 1) {
-			fCurrentEntity.ch[0] = (char)c;
-			entityChanged = load(1, true);
-			if (!entityChanged)
+        // skip spaces
+        int c = fCurrentEntity.ch[fCurrentEntity.position];
+        if (XMLChar.isSpace(c)) {
+            boolean external = fCurrentEntity.isExternal();
+            do {
+                boolean entityChanged = false;
+                // handle newlines
+                if (c == '\n' || (external && c == '\r')) {
+                    fCurrentEntity.lineNumber++;
+                    fCurrentEntity.columnNumber = 1;
+                    if (fCurrentEntity.position == fCurrentEntity.count - 1) {
+                        fCurrentEntity.ch[0] = (char)c;
+                        entityChanged = load(1, true);
+                        if (!entityChanged)
                                 // the load change the position to be 1,
                                 // need to restore it when entity not changed
-			    fCurrentEntity.position = 0;
-		    }
-		    if (c == '\r' && external) {
-			// REVISIT: Does this need to be updated to fix the
-			//          #x0D ^#x0A newline normalization problem? -Ac
-			if (fCurrentEntity.ch[++fCurrentEntity.position] != '\n') {
-			    fCurrentEntity.position--;
-			}
-		    }
-		    /*** NEWLINE NORMALIZATION ***
-			 else {
-			 if (fCurrentEntity.ch[fCurrentEntity.position + 1] == '\r'
-			 && external) {
-			 fCurrentEntity.position++;
-			 }
-			 }
-			 /***/
-		}
-		else {
-		    fCurrentEntity.columnNumber++;
-		}
-		// load more characters, if needed
-		if (!entityChanged)
-		    fCurrentEntity.position++;
-		if (fCurrentEntity.position == fCurrentEntity.count) {
-		    load(0, true);
-		}
-	    } while (XMLChar.isSpace(c = fCurrentEntity.ch[fCurrentEntity.position]));
-	    return true;
-	}
+                            fCurrentEntity.position = 0;
+                    }
+                    if (c == '\r' && external) {
+                        // REVISIT: Does this need to be updated to fix the
+                        //          #x0D ^#x0A newline normalization problem? -Ac
+                        if (fCurrentEntity.ch[++fCurrentEntity.position] != '\n') {
+                            fCurrentEntity.position--;
+                        }
+                    }
+                    /*** NEWLINE NORMALIZATION ***
+                         else {
+                         if (fCurrentEntity.ch[fCurrentEntity.position + 1] == '\r'
+                         && external) {
+                         fCurrentEntity.position++;
+                         }
+                         }
+                         /***/
+                }
+                else {
+                    fCurrentEntity.columnNumber++;
+                }
+                // load more characters, if needed
+                if (!entityChanged)
+                    fCurrentEntity.position++;
+                if (fCurrentEntity.position == fCurrentEntity.count) {
+                    load(0, true);
+                }
+            } while (XMLChar.isSpace(c = fCurrentEntity.ch[fCurrentEntity.position]));
+            return true;
+        }
 
-	// no spaces were found
-	return false;
+        // no spaces were found
+        return false;
 
     }
 
@@ -958,31 +958,31 @@ public class XMLEncodingDetector {
      */
     public boolean skipString(String s) throws IOException {
 
-	// load more characters, if needed
-	if (fCurrentEntity.position == fCurrentEntity.count) {
-	    load(0, true);
-	}
+        // load more characters, if needed
+        if (fCurrentEntity.position == fCurrentEntity.count) {
+            load(0, true);
+        }
 
-	// skip string
-	final int length = s.length();
-	for (int i = 0; i < length; i++) {
-	    char c = fCurrentEntity.ch[fCurrentEntity.position++];
-	    if (c != s.charAt(i)) {
-		fCurrentEntity.position -= i + 1;
-		return false;
-	    }
-	    if (i < length - 1 && fCurrentEntity.position == fCurrentEntity.count) {
-		System.arraycopy(fCurrentEntity.ch, fCurrentEntity.count - i - 1, fCurrentEntity.ch, 0, i + 1);
-		// REVISIT: Can a string to be skipped cross an
-		//          entity boundary? -Ac
-		if (load(i + 1, false)) {
-		    fCurrentEntity.position -= i + 1;
-		    return false;
-		}
-	    }
-	}
-	fCurrentEntity.columnNumber += length;
-	return true;
+        // skip string
+        final int length = s.length();
+        for (int i = 0; i < length; i++) {
+            char c = fCurrentEntity.ch[fCurrentEntity.position++];
+            if (c != s.charAt(i)) {
+                fCurrentEntity.position -= i + 1;
+                return false;
+            }
+            if (i < length - 1 && fCurrentEntity.position == fCurrentEntity.count) {
+                System.arraycopy(fCurrentEntity.ch, fCurrentEntity.count - i - 1, fCurrentEntity.ch, 0, i + 1);
+                // REVISIT: Can a string to be skipped cross an
+                //          entity boundary? -Ac
+                if (load(i + 1, false)) {
+                    fCurrentEntity.position -= i + 1;
+                    return false;
+                }
+            }
+        }
+        fCurrentEntity.columnNumber += length;
+        return true;
 
     }
 
@@ -1003,42 +1003,42 @@ public class XMLEncodingDetector {
      *          load operation.
      */
     final boolean load(int offset, boolean changeEntity)
-	throws IOException {
+        throws IOException {
 
-	// read characters
-	int length = fCurrentEntity.mayReadChunks?
-	    (fCurrentEntity.ch.length - offset):
-	    (DEFAULT_XMLDECL_BUFFER_SIZE);
-	int count = fCurrentEntity.reader.read(fCurrentEntity.ch, offset,
-					       length);
+        // read characters
+        int length = fCurrentEntity.mayReadChunks?
+            (fCurrentEntity.ch.length - offset):
+            (DEFAULT_XMLDECL_BUFFER_SIZE);
+        int count = fCurrentEntity.reader.read(fCurrentEntity.ch, offset,
+                                               length);
 
-	// reset count and position
-	boolean entityChanged = false;
-	if (count != -1) {
-	    if (count != 0) {
-		fCurrentEntity.count = count + offset;
-		fCurrentEntity.position = offset;
-	    }
-	}
+        // reset count and position
+        boolean entityChanged = false;
+        if (count != -1) {
+            if (count != 0) {
+                fCurrentEntity.count = count + offset;
+                fCurrentEntity.position = offset;
+            }
+        }
 
-	// end of this entity
-	else {
-	    fCurrentEntity.count = offset;
-	    fCurrentEntity.position = offset;
-	    entityChanged = true;
-	    if (changeEntity) {
-		endEntity();
-		if (fCurrentEntity == null) {
-		    throw new EOFException();
-		}
-		// handle the trailing edges
-		if (fCurrentEntity.position == fCurrentEntity.count) {
-		    load(0, false);
-		}
-	    }
-	}
+        // end of this entity
+        else {
+            fCurrentEntity.count = offset;
+            fCurrentEntity.position = offset;
+            entityChanged = true;
+            if (changeEntity) {
+                endEntity();
+                if (fCurrentEntity == null) {
+                    throw new EOFException();
+                }
+                // handle the trailing edges
+                if (fCurrentEntity.position == fCurrentEntity.count) {
+                    load(0, false);
+                }
+            }
+        }
 
-	return entityChanged;
+        return entityChanged;
 
     }
 
@@ -1174,14 +1174,14 @@ public class XMLEncodingDetector {
                 return bytesLeft;
             }
             n -= bytesLeft;
-	    /*
-	     * In a manner of speaking, when this class isn't permitting more
-	     * than one byte at a time to be read, it is "blocking".  The
-	     * available() method should indicate how much can be read without
-	     * blocking, so while we're in this mode, it should only indicate
-	     * that bytes in its buffer are available; otherwise, the result of
-	     * available() on the underlying InputStream is appropriate.
-	     */
+            /*
+             * In a manner of speaking, when this class isn't permitting more
+             * than one byte at a time to be read, it is "blocking".  The
+             * available() method should indicate how much can be read without
+             * blocking, so while we're in this mode, it should only indicate
+             * that bytes in its buffer are available; otherwise, the result of
+             * available() on the underlying InputStream is appropriate.
+             */
             return fInputStream.skip(n) + bytesLeft;
         }
 
@@ -1193,7 +1193,7 @@ public class XMLEncodingDetector {
                     return -1;
                 }
                 return fCurrentEntity.mayReadChunks ? fInputStream.available()
-		    : 0;
+                    : 0;
             }
             return bytesLeft;
         }
@@ -1226,27 +1226,27 @@ public class XMLEncodingDetector {
     // org.apache.xerces.impl.XMLDocumentScannerImpl.dispatch
     private void scanXMLDecl() throws IOException, JasperException {
 
-	if (skipString("<?xml")) {
-	    fMarkupDepth++;
-	    // NOTE: special case where document starts with a PI
-	    //       whose name starts with "xml" (e.g. "xmlfoo")
-	    if (XMLChar.isName(peekChar())) {
-		fStringBuffer.clear();
-		fStringBuffer.append("xml");
-		while (XMLChar.isName(peekChar())) {
-		    fStringBuffer.append((char)scanChar());
-		}
-		String target = fSymbolTable.addSymbol(fStringBuffer.ch,
-						       fStringBuffer.offset,
-						       fStringBuffer.length);
-		scanPIData(target, fString);
-	    }
+        if (skipString("<?xml")) {
+            fMarkupDepth++;
+            // NOTE: special case where document starts with a PI
+            //       whose name starts with "xml" (e.g. "xmlfoo")
+            if (XMLChar.isName(peekChar())) {
+                fStringBuffer.clear();
+                fStringBuffer.append("xml");
+                while (XMLChar.isName(peekChar())) {
+                    fStringBuffer.append((char)scanChar());
+                }
+                String target = fSymbolTable.addSymbol(fStringBuffer.ch,
+                                                       fStringBuffer.offset,
+                                                       fStringBuffer.length);
+                scanPIData(target, fString);
+            }
 
-	    // standard XML declaration
-	    else {
-		scanXMLDeclOrTextDecl(false);
-	    }
-	}
+            // standard XML declaration
+            else {
+                scanXMLDeclOrTextDecl(false);
+            }
+        }
     }
     
     // Adapted from:
@@ -1282,7 +1282,7 @@ public class XMLEncodingDetector {
         // set encoding on reader
         if (encodingPseudoAttr != null) {
             isEncodingSetInProlog = true;
-	    encoding = encodingPseudoAttr;
+            encoding = encodingPseudoAttr;
         }
     }
 
@@ -1313,7 +1313,7 @@ public class XMLEncodingDetector {
      * at the time of calling is lost.
      */
     private void scanXMLDeclOrTextDecl(boolean scanningTextDecl,
-				       String[] pseudoAttributeValues) 
+                                       String[] pseudoAttributeValues) 
                 throws IOException, JasperException {
 
         // pseudo-attribute values
@@ -1346,10 +1346,10 @@ public class XMLEncodingDetector {
                         state = STATE_ENCODING;
                         if (!version.equals("1.0")) {
                             // REVISIT: XML REC says we should throw an error
-			    // in such cases.
+                            // in such cases.
                             // some may object the throwing of fatalError.
                             err.jspError("jsp.error.xml.versionNotSupported",
-					 version);
+                                         version);
                         }
                     } else if (name == fEncodingSymbol) {
                         if (!scanningTextDecl) {
@@ -1410,7 +1410,7 @@ public class XMLEncodingDetector {
                             err.jspError("jsp.error.xml.sdDeclInvalid");
                         }
                     } else {
-			err.jspError("jsp.error.xml.encodingDeclRequired");
+                        err.jspError("jsp.error.xml.encodingDeclRequired");
                     }
                     break;
                 }
@@ -1426,7 +1426,7 @@ public class XMLEncodingDetector {
         }
         
         // If there is no data in the xml or text decl then we fail to report
-	// error for version or encoding info above.
+        // error for version or encoding info above.
         if (scanningTextDecl) {
             if (!dataFoundForTarget && encoding == null) {
                 err.jspError("jsp.error.xml.encodingDeclRequired");
@@ -1480,17 +1480,17 @@ public class XMLEncodingDetector {
         skipSpaces();
         if (!skipChar('=')) {
             reportFatalError(scanningTextDecl ?
-			     "jsp.error.xml.eqRequiredInTextDecl"
+                             "jsp.error.xml.eqRequiredInTextDecl"
                              : "jsp.error.xml.eqRequiredInXMLDecl",
-			     name);
+                             name);
         }
         skipSpaces();
         int quote = peekChar();
         if (quote != '\'' && quote != '"') {
             reportFatalError(scanningTextDecl ?
-			     "jsp.error.xml.quoteRequiredInTextDecl"
+                             "jsp.error.xml.quoteRequiredInTextDecl"
                              : "jsp.error.xml.quoteRequiredInXMLDecl" ,
-			     name);
+                             name);
         }
         scanChar();
         int c = scanLiteral(quote, value);
@@ -1508,7 +1508,7 @@ public class XMLEncodingDetector {
                     else if (XMLChar.isInvalid(c)) {
                         String key = scanningTextDecl
                             ? "jsp.error.xml.invalidCharInTextDecl"
-			    : "jsp.error.xml.invalidCharInXMLDecl";
+                            : "jsp.error.xml.invalidCharInXMLDecl";
                         reportFatalError(key, Integer.toString(c, 16));
                         scanChar();
                     }
@@ -1520,9 +1520,9 @@ public class XMLEncodingDetector {
         }
         if (!skipChar(quote)) {
             reportFatalError(scanningTextDecl ?
-			     "jsp.error.xml.closeQuoteMissingInTextDecl"
+                             "jsp.error.xml.closeQuoteMissingInTextDecl"
                              : "jsp.error.xml.closeQuoteMissingInXMLDecl",
-			     name);
+                             name);
         }
 
         // return
@@ -1579,7 +1579,7 @@ public class XMLEncodingDetector {
                         scanSurrogates(fStringBuffer);
                     } else if (XMLChar.isInvalid(c)) {
                         err.jspError("jsp.error.xml.invalidCharInPI",
-				     Integer.toHexString(c));
+                                     Integer.toHexString(c));
                         scanChar();
                     }
                 }
@@ -1607,7 +1607,7 @@ public class XMLEncodingDetector {
         int low = peekChar();
         if (!XMLChar.isLowSurrogate(low)) {
             err.jspError("jsp.error.xml.invalidCharInContent",
-			 Integer.toString(high, 16));
+                         Integer.toString(high, 16));
             return false;
         }
         scanChar();
@@ -1618,7 +1618,7 @@ public class XMLEncodingDetector {
         // supplemental character must be a valid XML character
         if (!XMLChar.isValid(c)) {
             err.jspError("jsp.error.xml.invalidCharInContent",
-			 Integer.toString(c, 16)); 
+                         Integer.toString(c, 16)); 
             return false;
         }
 
