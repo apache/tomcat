@@ -545,7 +545,7 @@ public class UTF8Reader
      */
     @Override
     public boolean ready() throws IOException {
-	    return false;
+        return false;
     } // ready()
 
     /**
@@ -553,7 +553,7 @@ public class UTF8Reader
      */
     @Override
     public boolean markSupported() {
-	    return false;
+        return false;
     } // markSupported()
 
     /**
@@ -571,9 +571,9 @@ public class UTF8Reader
      */
     @Override
     public void mark(int readAheadLimit) throws IOException {
-	throw new IOException(
+        throw new IOException(
                 Localizer.getMessage("jsp.error.xml.operationNotSupported",
-				     "mark()", "UTF-8"));
+                                     "mark()", "UTF-8"));
     }
 
     /**
@@ -617,8 +617,8 @@ public class UTF8Reader
 
         throw new UTFDataFormatException(
                 Localizer.getMessage("jsp.error.xml.expectedByte",
-				     Integer.toString(position),
-				     Integer.toString(count)));
+                                     Integer.toString(position),
+                                     Integer.toString(count)));
 
     }
 
@@ -628,8 +628,8 @@ public class UTF8Reader
 
         throw new UTFDataFormatException(
                 Localizer.getMessage("jsp.error.xml.invalidByte",
-				     Integer.toString(position),
-				     Integer.toString(count)));
+                                     Integer.toString(position),
+                                     Integer.toString(count)));
     }
 
     /** Throws an exception for invalid surrogate bits. */
@@ -637,7 +637,7 @@ public class UTF8Reader
         
         throw new UTFDataFormatException(
                 Localizer.getMessage("jsp.error.xml.invalidHighSurrogate",
-				     Integer.toHexString(uuuuu)));
+                                     Integer.toHexString(uuuuu)));
     }
 
 } // class UTF8Reader

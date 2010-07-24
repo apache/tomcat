@@ -247,7 +247,7 @@ public class UCSReader extends Reader {
      */
     @Override
     public boolean ready() throws IOException {
-	return false;
+        return false;
     } // ready()
 
     /**
@@ -255,7 +255,7 @@ public class UCSReader extends Reader {
      */
     @Override
     public boolean markSupported() {
-	return fInputStream.markSupported();
+        return fInputStream.markSupported();
     } // markSupported()
 
     /**
@@ -273,7 +273,7 @@ public class UCSReader extends Reader {
      */
     @Override
     public void mark(int readAheadLimit) throws IOException {
-	fInputStream.mark(readAheadLimit);
+        fInputStream.mark(readAheadLimit);
     } // mark(int)
 
     /**

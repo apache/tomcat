@@ -41,7 +41,7 @@ public class JarScannerFactory {
      */
     public static JarScanner getJarScanner(ServletContext ctxt) {
         JarScanner jarScanner = 
-        	(JarScanner) ctxt.getAttribute(JarScanner.class.getName());
+            (JarScanner) ctxt.getAttribute(JarScanner.class.getName());
         if (jarScanner == null) {
             ctxt.log(Localizer.getMessage("jsp.warning.noJarScanner"));
             jarScanner = new StandardJarScanner();

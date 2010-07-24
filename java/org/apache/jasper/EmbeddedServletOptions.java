@@ -451,7 +451,7 @@ public final class EmbeddedServletOptions implements Options {
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.enablePooling"));
-                }		       	   
+                }
             }
         }
         

@@ -293,25 +293,25 @@ public abstract class Compiler {
         return smapStr;
     }
 
-	private ServletWriter setupContextWriter(String javaFileName)
-			throws FileNotFoundException, JasperException {
-		ServletWriter writer;
-		// Setup the ServletWriter
-		String javaEncoding = ctxt.getOptions().getJavaEncoding();
-		OutputStreamWriter osw = null;
+    private ServletWriter setupContextWriter(String javaFileName)
+            throws FileNotFoundException, JasperException {
+        ServletWriter writer;
+        // Setup the ServletWriter
+        String javaEncoding = ctxt.getOptions().getJavaEncoding();
+        OutputStreamWriter osw = null;
 
-		try {
-		    osw = new OutputStreamWriter(
-		            new FileOutputStream(javaFileName), javaEncoding);
-		} catch (UnsupportedEncodingException ex) {
-		    errDispatcher.jspError("jsp.error.needAlternateJavaEncoding",
-		            javaEncoding);
-		}
+        try {
+            osw = new OutputStreamWriter(
+                    new FileOutputStream(javaFileName), javaEncoding);
+        } catch (UnsupportedEncodingException ex) {
+            errDispatcher.jspError("jsp.error.needAlternateJavaEncoding",
+                    javaEncoding);
+        }
 
-		writer = new ServletWriter(new PrintWriter(osw));
-		ctxt.setWriter(writer);
-		return writer;
-	}
+        writer = new ServletWriter(new PrintWriter(osw));
+        ctxt.setWriter(writer);
+        return writer;
+    }
 
     /**
      * Compile the servlet from .java file to .class file

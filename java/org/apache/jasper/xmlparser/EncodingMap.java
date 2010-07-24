@@ -705,7 +705,7 @@ public class EncodingMap {
         fIANA2JavaMap.put("WINDOWS-31J",       "MS932");
         fIANA2JavaMap.put("CSWINDOWS31J",       "MS932");
 
-	    // Add support for Cp1252 and its friends
+        // Add support for Cp1252 and its friends
         fIANA2JavaMap.put("WINDOWS-1250",   "Cp1250");
         fIANA2JavaMap.put("WINDOWS-1251",   "Cp1251");
         fIANA2JavaMap.put("WINDOWS-1252",   "Cp1252");

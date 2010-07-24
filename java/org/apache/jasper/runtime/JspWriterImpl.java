@@ -70,7 +70,7 @@ public class JspWriterImpl extends JspWriter {
      * buffer of the given size.
      *
      * @param  response A Servlet Response
-     * @param  sz   	Output-buffer size, a positive integer
+     * @param  sz       Output-buffer size, a positive integer
      *
      * @exception  IllegalArgumentException  If sz is <= 0
      */
