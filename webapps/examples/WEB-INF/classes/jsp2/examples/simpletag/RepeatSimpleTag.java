@@ -33,11 +33,11 @@ public class RepeatSimpleTag extends SimpleTagSupport {
     public void doTag() throws JspException, IOException {
         for (int i=0; i<num; i++) {
             getJspContext().setAttribute("count", String.valueOf( i + 1 ) );
-	    getJspBody().invoke(null);
+            getJspBody().invoke(null);
         }
     }
 
     public void setNum(int num) {
-	this.num = num;
+        this.num = num;
     }
 }

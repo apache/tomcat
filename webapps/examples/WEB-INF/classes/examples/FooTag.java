@@ -57,7 +57,7 @@ public class FooTag extends ExampleTagBase {
     @Override
     public int doStartTag() throws JspException {
         i = 0;
-	return EVAL_BODY_BUFFERED;
+        return EVAL_BODY_BUFFERED;
     }
 
     @Override

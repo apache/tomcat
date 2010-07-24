@@ -40,6 +40,6 @@ public class FindBookSimpleTag extends SimpleTagSupport {
     }
 
     public void setVar( String var ) {
-	this.var = var;
+        this.var = var;
     }
 }

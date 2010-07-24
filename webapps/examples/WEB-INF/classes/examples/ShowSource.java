@@ -38,10 +38,10 @@ public class ShowSource extends TagSupport {
 
     @Override
     public int doEndTag() throws JspException {
-	if ((jspFile.indexOf( ".." ) >= 0) ||
+        if ((jspFile.indexOf( ".." ) >= 0) ||
             (jspFile.toUpperCase(Locale.ENGLISH).indexOf("/WEB-INF/") != 0) ||
             (jspFile.toUpperCase(Locale.ENGLISH).indexOf("/META-INF/") != 0))
-	    throw new JspTagException("Invalid JSP file " + jspFile);
+            throw new JspTagException("Invalid JSP file " + jspFile);
 
         InputStream in
             = pageContext.getServletContext().getResourceAsStream(jspFile);
