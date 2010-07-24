@@ -460,7 +460,7 @@ public class JDBCStore extends StoreBase {
                                 + sessionTable + " WHERE " + sessionAppCol
                                 + " = ?";
                         preparedKeysSql = _conn.prepareStatement(keysSql);
-					}
+                    }
 
                     preparedKeysSql.setString(1, getName());
                     rst = preparedKeysSql.executeQuery();
@@ -523,7 +523,7 @@ public class JDBCStore extends StoreBase {
                                 + ") FROM " + sessionTable + " WHERE "
                                 + sessionAppCol + " = ?";
                         preparedSizeSql = _conn.prepareStatement(sizeSql);
-					}
+                    }
 
                     preparedSizeSql.setString(1, getName());
                     rst = preparedSizeSql.executeQuery();
@@ -780,7 +780,7 @@ public class JDBCStore extends StoreBase {
                            + sessionLastAccessedCol
                            + ") VALUES (?, ?, ?, ?, ?, ?)";
                        preparedSaveSql = _conn.prepareStatement(saveSql);
-					}
+                    }
 
                     preparedSaveSql.setString(1, session.getIdInternal());
                     preparedSaveSql.setString(2, getName());
@@ -926,7 +926,7 @@ public class JDBCStore extends StoreBase {
             ExceptionUtils.handleThrowable(f);
         }
          
-		try {
+        try {
             preparedRemoveSql.close();
         } catch (Throwable f) {
             ExceptionUtils.handleThrowable(f);

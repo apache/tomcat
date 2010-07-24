@@ -109,7 +109,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         if ( domain == null ) return;
         if (domain.startsWith("{"))
             setDomain(org.apache.catalina.tribes.util.Arrays.fromString(domain));
-	    else
+        else
             setDomain(org.apache.catalina.tribes.util.Arrays.convert(domain));
     }
 

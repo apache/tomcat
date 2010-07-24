@@ -60,7 +60,7 @@ public class CatalinaProperties {
      * Return specified property value.
      */
     public static String getProperty(String name) {
-	
+    
         return properties.getProperty(name);
 
     }

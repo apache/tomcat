@@ -78,7 +78,7 @@ public class BioReplicationTask extends AbstractRxTask {
     public synchronized void serviceSocket(Socket socket, ObjectReader reader) {
         this.socket = socket;
         this.reader = reader;
-        this.notify();		// awaken the thread
+        this.notify();      // awaken the thread
     }
     
     protected void execute(ObjectReader reader) throws Exception{

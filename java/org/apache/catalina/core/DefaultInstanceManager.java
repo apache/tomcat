@@ -124,8 +124,8 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     public void newInstance(Object o) 
-		throws IllegalAccessException, InvocationTargetException, NamingException {
-    	newInstance(o, o.getClass());
+            throws IllegalAccessException, InvocationTargetException, NamingException {
+        newInstance(o, o.getClass());
     }
 
     private Object newInstance(Object instance, Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException {

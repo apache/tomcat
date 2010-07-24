@@ -201,7 +201,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      * Sessions currently being swapped in and the associated locks
      */
     private final Map<String,Object> sessionSwapInLocks =
-    	new HashMap<String,Object>();
+        new HashMap<String,Object>();
 
 
     // ------------------------------------------------------------- Properties
@@ -211,10 +211,10 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-	 * Indicates how many seconds old a session can get, after its last use in a
-	 * request, before it should be backed up to the store. -1 means sessions
-	 * are not backed up.
-	 */
+     * Indicates how many seconds old a session can get, after its last use in a
+     * request, before it should be backed up to the store. -1 means sessions
+     * are not backed up.
+     */
     public int getMaxIdleBackup() {
 
         return maxIdleBackup;
@@ -314,13 +314,13 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-	 * Set the Container with which this Manager has been associated. If it is a
-	 * Context (the usual case), listen for changes to the session timeout
-	 * property.
-	 * 
-	 * @param container
-	 *            The associated Container
-	 */
+     * Set the Container with which this Manager has been associated. If it is a
+     * Context (the usual case), listen for changes to the session timeout
+     * property.
+     * 
+     * @param container
+     *            The associated Container
+     */
     @Override
     public void setContainer(Container container) {
 
@@ -517,9 +517,9 @@ public abstract class PersistentManagerBase extends ManagerBase
     /**
      * Implements the Manager interface, direct call to processExpires and processPersistenceChecks
      */
-	@Override
+    @Override
     public void processExpires() {
-		
+        
         long timeNow = System.currentTimeMillis();
         Session sessions[] = findSessions();
         int expireHere = 0 ;
@@ -540,8 +540,8 @@ public abstract class PersistentManagerBase extends ManagerBase
         if(log.isDebugEnabled())
              log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
         processingTime += (timeEnd - timeNow);
- 		
-	}
+         
+    }
 
 
     /**

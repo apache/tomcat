@@ -27,28 +27,28 @@ import org.apache.catalina.ha.ClusterMessageBase;
  */
 public class SessionIDMessage extends ClusterMessageBase {
 
-	private int messageNumber;
+    private int messageNumber;
 
-	private String orignalSessionID;
+    private String orignalSessionID;
 
-	private String backupSessionID;
+    private String backupSessionID;
 
-	private String host ;
-	private String contextPath;
+    private String host ;
+    private String contextPath;
 
-	@Override
+    @Override
     public String getUniqueId() {
-		StringBuilder result = new StringBuilder(getOrignalSessionID());
-		result.append("#-#");
-		result.append(getHost());
+        StringBuilder result = new StringBuilder(getOrignalSessionID());
+        result.append("#-#");
+        result.append(getHost());
                 result.append("#-#");
                 result.append(getContextPath());
-		result.append("#-#");
-		result.append(getMessageNumber());
-		result.append("#-#");
-		result.append(System.currentTimeMillis());
-		return result.toString();
-	}
+        result.append("#-#");
+        result.append(getMessageNumber());
+        result.append("#-#");
+        result.append(System.currentTimeMillis());
+        return result.toString();
+    }
 
     /**
      * @return Returns the host.
@@ -64,68 +64,68 @@ public class SessionIDMessage extends ClusterMessageBase {
         this.host = host;
     }
     
-	/**
-	 * @return Returns the contextPath.
-	 */
-	public String getContextPath() {
-		return contextPath;
-	}
-	/**
-	 * @param contextPath The contextPath to set.
-	 */
-	public void setContextPath(String contextPath) {
-		this.contextPath = contextPath;
-	}
-	/**
-	 * @return Returns the messageNumber.
-	 */
-	public int getMessageNumber() {
-		return messageNumber;
-	}
+    /**
+     * @return Returns the contextPath.
+     */
+    public String getContextPath() {
+        return contextPath;
+    }
+    /**
+     * @param contextPath The contextPath to set.
+     */
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
+    }
+    /**
+     * @return Returns the messageNumber.
+     */
+    public int getMessageNumber() {
+        return messageNumber;
+    }
 
-	/**
-	 * @param messageNumber
-	 *            The messageNumber to set.
-	 */
-	public void setMessageNumber(int messageNumber) {
-		this.messageNumber = messageNumber;
-	}
+    /**
+     * @param messageNumber
+     *            The messageNumber to set.
+     */
+    public void setMessageNumber(int messageNumber) {
+        this.messageNumber = messageNumber;
+    }
 
-	
-	/**
-	 * @return Returns the backupSessionID.
-	 */
-	public String getBackupSessionID() {
-		return backupSessionID;
-	}
+    
+    /**
+     * @return Returns the backupSessionID.
+     */
+    public String getBackupSessionID() {
+        return backupSessionID;
+    }
 
-	/**
-	 * @param backupSessionID
-	 *            The backupSessionID to set.
-	 */
-	public void setBackupSessionID(String backupSessionID) {
-		this.backupSessionID = backupSessionID;
-	}
+    /**
+     * @param backupSessionID
+     *            The backupSessionID to set.
+     */
+    public void setBackupSessionID(String backupSessionID) {
+        this.backupSessionID = backupSessionID;
+    }
 
-	/**
-	 * @return Returns the orignalSessionID.
-	 */
-	public String getOrignalSessionID() {
-		return orignalSessionID;
-	}
+    /**
+     * @return Returns the orignalSessionID.
+     */
+    public String getOrignalSessionID() {
+        return orignalSessionID;
+    }
 
-	/**
-	 * @param orignalSessionID
-	 *            The orignalSessionID to set.
-	 */
-	public void setOrignalSessionID(String orignalSessionID) {
-		this.orignalSessionID = orignalSessionID;
-	}
+    /**
+     * @param orignalSessionID
+     *            The orignalSessionID to set.
+     */
+    public void setOrignalSessionID(String orignalSessionID) {
+        this.orignalSessionID = orignalSessionID;
+    }
 
-	@Override
+    @Override
     public String toString() {
-	    return "SESSIONID-UPDATE#" + getHost() + "." + getContextPath() + "#" + getOrignalSessionID() + ":" + getBackupSessionID();
-	}
+        return "SESSIONID-UPDATE#" + getHost() + "." + getContextPath() + "#" + getOrignalSessionID() + ":" + getBackupSessionID();
+    }
 
 }
 

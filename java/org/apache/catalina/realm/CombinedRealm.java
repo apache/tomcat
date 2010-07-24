@@ -47,36 +47,36 @@ public class CombinedRealm extends RealmBase {
     /**
      * The list of Realms contained by this Realm.
      */
-	protected List<Realm> realms = new LinkedList<Realm>();
+    protected List<Realm> realms = new LinkedList<Realm>();
 
 
-	/**
-	 * Add a realm to the list of realms that will be used to authenticate
-	 * users.
-	 */
-	public void addRealm(Realm theRealm) {
-	    realms.add(theRealm);
-	    
-	    if (log.isDebugEnabled()) {
-	        sm.getString("combinedRealm.addRealm", theRealm.getInfo(), 
-	                Integer.toString(realms.size()));
-	    }
-	}
+    /**
+     * Add a realm to the list of realms that will be used to authenticate
+     * users.
+     */
+    public void addRealm(Realm theRealm) {
+        realms.add(theRealm);
+        
+        if (log.isDebugEnabled()) {
+            sm.getString("combinedRealm.addRealm", theRealm.getInfo(), 
+                    Integer.toString(realms.size()));
+        }
+    }
 
 
-	/**
-	 * Return the set of Realms that this Realm is wrapping
-	 */
-	public ObjectName[] getRealms() {
-	    ObjectName[] result = new ObjectName[realms.size()];
-	    for (Realm realm : realms) {
-	        if (realm instanceof RealmBase) {
-	            result[realms.indexOf(realm)] =
-	                ((RealmBase) realm).getObjectName();
-	        }
-	    }
-	    return result;
-	}
+    /**
+     * Return the set of Realms that this Realm is wrapping
+     */
+    public ObjectName[] getRealms() {
+        ObjectName[] result = new ObjectName[realms.size()];
+        for (Realm realm : realms) {
+            if (realm instanceof RealmBase) {
+                result[realms.indexOf(realm)] =
+                    ((RealmBase) realm).getObjectName();
+            }
+        }
+        return result;
+    }
 
 
     /**
@@ -187,19 +187,19 @@ public class CombinedRealm extends RealmBase {
     @Override
     protected void startInternal() throws LifecycleException {
         // Start 'sub-realms' then this one
-    	Iterator<Realm> iter = realms.iterator();
-    	
+        Iterator<Realm> iter = realms.iterator();
+        
         while (iter.hasNext()) {
-        	Realm realm = iter.next();
+            Realm realm = iter.next();
             if (realm instanceof Lifecycle) {
-            	try {
-            		((Lifecycle) realm).start();
-            	} catch (LifecycleException e) {
-            		// If realm doesn't start can't authenticate against it
-            		iter.remove();
-            		log.error(sm.getString("combinedRealm.realmStartFail",
-            				realm.getInfo()), e);
-            	}
+                try {
+                    ((Lifecycle) realm).start();
+                } catch (LifecycleException e) {
+                    // If realm doesn't start can't authenticate against it
+                    iter.remove();
+                    log.error(sm.getString("combinedRealm.realmStartFail",
+                            realm.getInfo()), e);
+                }
             }
         }
         super.startInternal();

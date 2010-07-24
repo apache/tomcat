@@ -816,7 +816,7 @@ public final class ApplicationContextFacade
      * @param ex The current exception
      */
     private void handleException(Exception ex)
-	    throws Throwable {
+        throws Throwable {
 
         Throwable realException;
         
