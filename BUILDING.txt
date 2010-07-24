@@ -42,11 +42,11 @@ do the following:
   into which you installed the JDK release.
 
 
-(1) Install Apache Ant 1.6.x on your computer
+(1) Install Apache Ant 1.8.x on your computer
 
-* If Apache Ant 1.6.x is already installed on your computer, skip to (2).
+* If Apache Ant 1.8.x is already installed on your computer, skip to (2).
 
-* Download a binary distribution of Ant 1.6.x from:
+* Download a binary distribution of Ant 1.8.x from:
 
     http://ant.apache.org/bindownload.cgi
 

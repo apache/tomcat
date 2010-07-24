@@ -410,7 +410,7 @@
   	
   </target>
 
-  <target name="validate" depends="download-validate">
+  <target name="validate" depends="download-validate" if="${execute.validate}">
     <taskdef resource="checkstyletask.properties"
   	         classpath="${checkstyle.jar}" />
   	<checkstyle config="checkstyle.xml">
@@ -763,7 +763,8 @@
              optimize="${compile.optimize}"
              classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**"
-             encoding="ISO-8859-1">
+             encoding="ISO-8859-1"
+    	     includeantruntime="false">
     </javac>
 
     <javac   srcdir="webapps/examples/jsp/plugin/applet"
@@ -774,7 +775,8 @@
              optimize="${compile.optimize}"
              classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**"
-             encoding="ISO-8859-1">
+             encoding="ISO-8859-1"
+    	     includeantruntime="false">
     </javac>
 
     <!-- Add sources for examples -->
@@ -931,7 +933,8 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            optimize="${compile.optimize}"
-           encoding="ISO-8859-1">
+           encoding="ISO-8859-1"
+    	   includeantruntime="false">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
       <include name="javax/servlet/**" />
@@ -1151,7 +1154,8 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            optimize="${compile.optimize}"
-           encoding="ISO-8859-1">
+           encoding="ISO-8859-1"
+    	   includeantruntime="false">
       <classpath refid="tomcat.webservices.classpath" />
       <include name="org/apache/naming/factory/webservices/**" />
     </javac>
@@ -2044,7 +2048,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
            target="${compile.target}"
            sourcepath="${tomcat-dbcp.home}/src/java"
            srcdir="${tomcat-dbcp.home}/src/java"
-           encoding="ISO-8859-1">
+           encoding="ISO-8859-1"
+    	   includeantruntime="false">
       <include name="**" />
     </javac>
   	<jarIt jarfile="${tomcat-dbcp.jar}"
