@@ -24,7 +24,6 @@ package org.apache.tomcat.util.http;
  */
 public final class CookieSupport {
 
-	
     // --------------------------------------------------------------- Constants
     /**
      * If set to true, we parse cookies strictly according to the servlet,

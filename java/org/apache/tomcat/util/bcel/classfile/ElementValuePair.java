@@ -30,38 +30,38 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class ElementValuePair
 {
-	private ElementValue elementValue;
+    private ElementValue elementValue;
 
-	private ConstantPool constantPool;
+    private ConstantPool constantPool;
 
-	private int elementNameIndex;
+    private int elementNameIndex;
 
-	public ElementValuePair(int elementNameIndex, ElementValue elementValue,
-			ConstantPool constantPool)
-	{
-		this.elementValue = elementValue;
-		this.elementNameIndex = elementNameIndex;
-		this.constantPool = constantPool;
-	}
+    public ElementValuePair(int elementNameIndex, ElementValue elementValue,
+            ConstantPool constantPool)
+    {
+        this.elementValue = elementValue;
+        this.elementNameIndex = elementNameIndex;
+        this.constantPool = constantPool;
+    }
 
-	public String getNameString()
-	{
-		ConstantUtf8 c = (ConstantUtf8) constantPool.getConstant(
-				elementNameIndex, Constants.CONSTANT_Utf8);
-		return c.getBytes();
-	}
+    public String getNameString()
+    {
+        ConstantUtf8 c = (ConstantUtf8) constantPool.getConstant(
+                elementNameIndex, Constants.CONSTANT_Utf8);
+        return c.getBytes();
+    }
 
-	public final ElementValue getValue()
-	{
-		return elementValue;
-	}
+    public final ElementValue getValue()
+    {
+        return elementValue;
+    }
 
-	
+    
 
-	
-	
-	protected void dump(DataOutputStream dos) throws IOException {
-		dos.writeShort(elementNameIndex); // u2 name of the element
-		elementValue.dump(dos);
-	}
+    
+    
+    protected void dump(DataOutputStream dos) throws IOException {
+        dos.writeShort(elementNameIndex); // u2 name of the element
+        elementValue.dump(dos);
+    }
 }
