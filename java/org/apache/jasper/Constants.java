@@ -56,9 +56,9 @@ public class Constants {
      * generated code. 
      */
     private static final String[] PRIVATE_STANDARD_IMPORTS = { 
-	"javax.servlet.*", 
-	"javax.servlet.http.*", 
-	"javax.servlet.jsp.*"
+        "javax.servlet.*", 
+        "javax.servlet.http.*", 
+        "javax.servlet.jsp.*"
     };
     public static final List<String> STANDARD_IMPORTS =
         Collections.unmodifiableList(Arrays.asList(PRIVATE_STANDARD_IMPORTS));
@@ -135,26 +135,26 @@ public class Constants {
      * of the DTDs for tag library descriptors. 
      */
     public static final String TAGLIB_DTD_PUBLIC_ID_11 = 
-	"-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
+        "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
     public static final String TAGLIB_DTD_RESOURCE_PATH_11 = 
-	"/javax/servlet/jsp/resources/web-jsptaglibrary_1_1.dtd";
+        "/javax/servlet/jsp/resources/web-jsptaglibrary_1_1.dtd";
     public static final String TAGLIB_DTD_PUBLIC_ID_12 = 
-	"-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
+        "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
     public static final String TAGLIB_DTD_RESOURCE_PATH_12 = 
-	"/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
+        "/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
 
     /**
      * Public Id and the Resource path (of the cached copy) 
      * of the DTDs for web application deployment descriptors
      */
     public static final String WEBAPP_DTD_PUBLIC_ID_22 = 
-	"-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
     public static final String WEBAPP_DTD_RESOURCE_PATH_22 = 
-	"/javax/servlet/resources/web-app_2_2.dtd";
+        "/javax/servlet/resources/web-app_2_2.dtd";
     public static final String WEBAPP_DTD_PUBLIC_ID_23 = 
-	"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN";
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN";
     public static final String WEBAPP_DTD_RESOURCE_PATH_23 = 
-	"/javax/servlet/resources/web-app_2_3.dtd";
+        "/javax/servlet/resources/web-app_2_3.dtd";
 
     /**
      * List of the Public IDs that we cache, and their
@@ -164,19 +164,19 @@ public class Constants {
      */
     // TODO Add 2.4, 2.5, 3.0
     private static final String[] PRIVATE_CACHED_DTD_PUBLIC_IDS = {
-	TAGLIB_DTD_PUBLIC_ID_11,
-	TAGLIB_DTD_PUBLIC_ID_12,
-	WEBAPP_DTD_PUBLIC_ID_22,
-	WEBAPP_DTD_PUBLIC_ID_23,
+        TAGLIB_DTD_PUBLIC_ID_11,
+        TAGLIB_DTD_PUBLIC_ID_12,
+        WEBAPP_DTD_PUBLIC_ID_22,
+        WEBAPP_DTD_PUBLIC_ID_23,
     };
     public static final List<String> CACHED_DTD_PUBLIC_IDS =
         Collections.unmodifiableList(
                 Arrays.asList(PRIVATE_CACHED_DTD_PUBLIC_IDS));
     private static final String[] PRIVATE_CACHED_DTD_RESOURCE_PATHS = {
-	TAGLIB_DTD_RESOURCE_PATH_11,
-	TAGLIB_DTD_RESOURCE_PATH_12,
-	WEBAPP_DTD_RESOURCE_PATH_22,
-	WEBAPP_DTD_RESOURCE_PATH_23,
+        TAGLIB_DTD_RESOURCE_PATH_11,
+        TAGLIB_DTD_RESOURCE_PATH_12,
+        WEBAPP_DTD_RESOURCE_PATH_22,
+        WEBAPP_DTD_RESOURCE_PATH_23,
     };
     public static final List<String> CACHED_DTD_RESOURCE_PATHS =
         Collections.unmodifiableList(

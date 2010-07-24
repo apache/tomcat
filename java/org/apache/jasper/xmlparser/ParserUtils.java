@@ -94,23 +94,23 @@ public class ParserUtils {
             builder.setEntityResolver(entityResolver);
             builder.setErrorHandler(errorHandler);
             document = builder.parse(is);
-	} catch (ParserConfigurationException ex) {
+        } catch (ParserConfigurationException ex) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml", location), ex);
-	} catch (SAXParseException ex) {
+        } catch (SAXParseException ex) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml.line",
-				      location,
-				      Integer.toString(ex.getLineNumber()),
-				      Integer.toString(ex.getColumnNumber())),
-		 ex);
-	} catch (SAXException sx) {
+                                      location,
+                                      Integer.toString(ex.getLineNumber()),
+                                      Integer.toString(ex.getColumnNumber())),
+                 ex);
+        } catch (SAXException sx) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml", location), sx);
         } catch (IOException io) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml", location), io);
-	}
+        }
 
         // Convert the resulting document to a graph of TreeNodes
         return (convert(null, document.getDocumentElement()));

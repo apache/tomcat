@@ -85,7 +85,7 @@ public class TagHandlerPool {
      * Constructs a tag handler pool with the default capacity.
      */
     public TagHandlerPool() {
-	// Nothing - jasper generated servlets call the other constructor,
+        // Nothing - jasper generated servlets call the other constructor,
         // this should be used in future + init .
     }
 
@@ -100,7 +100,7 @@ public class TagHandlerPool {
      * @throws JspException if a tag handler cannot be instantiated
      */
     public Tag get(Class<? extends Tag> handlerClass) throws JspException {
-    	Tag handler;
+        Tag handler;
         synchronized( this ) {
             if (current >= 0) {
                 handler = handlers[current--];
@@ -111,13 +111,13 @@ public class TagHandlerPool {
         // Out of sync block - there is no need for other threads to
         // wait for us to construct a tag for this thread.
         try {
-        	if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
-        		return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
-        	} else {
+            if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
+                return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
+            } else {
                 Tag instance = handlerClass.newInstance();
                 instanceManager.newInstance(instance);
                 return instance;
-        	}
+            }
         } catch (Exception e) {
             throw new JspException(e.getMessage(), e);
         }

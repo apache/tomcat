@@ -665,21 +665,21 @@ class JspDocumentParser
         }
 
         if (current instanceof Node.CustomTag) {
-        	String bodyType = getBodyType((Node.CustomTag) current);
-        	if (TagInfo.BODY_CONTENT_EMPTY.equalsIgnoreCase(bodyType)) {
-        		// Children - if any - must be JSP attributes
-        		Node.Nodes children = current.getBody();
-        		if (children != null && children.size() > 0) {
-        			for (int i = 0; i < children.size(); i++) {
-        				Node child = children.getNode(i);
-        				if (!(child instanceof Node.NamedAttribute)) {
-        					throw new SAXParseException(Localizer.getMessage(
-        							"jasper.error.emptybodycontent.nonempty",
-        							current.qName), locator); 
-        				}
-        			}
-        		}
-        	}
+            String bodyType = getBodyType((Node.CustomTag) current);
+            if (TagInfo.BODY_CONTENT_EMPTY.equalsIgnoreCase(bodyType)) {
+                // Children - if any - must be JSP attributes
+                Node.Nodes children = current.getBody();
+                if (children != null && children.size() > 0) {
+                    for (int i = 0; i < children.size(); i++) {
+                        Node child = children.getNode(i);
+                        if (!(child instanceof Node.NamedAttribute)) {
+                            throw new SAXParseException(Localizer.getMessage(
+                                    "jasper.error.emptybodycontent.nonempty",
+                                    current.qName), locator); 
+                        }
+                    }
+                }
+            }
         }
         if (current.getParent() != null) {
             current = current.getParent();
