@@ -4742,10 +4742,10 @@ public class StandardContext extends ContainerBase
                 if (isUseNaming() && namingContextListener != null) {
                     context = namingContextListener.getEnvContext();
                 }
-                Map<String, Map<String, String>> injectionMap = 
-                	buildInjectionMap(getIgnoreAnnotations() ? new NamingResources(): getNamingResources());
-                instanceManager = new DefaultInstanceManager
-                	(context, injectionMap, this, this.getClass().getClassLoader());
+                Map<String, Map<String, String>> injectionMap = buildInjectionMap(
+                        getIgnoreAnnotations() ? new NamingResources(): getNamingResources());
+                instanceManager = new DefaultInstanceManager(
+                        context, injectionMap, this, this.getClass().getClassLoader());
                 getServletContext().setAttribute(InstanceManager.class.getName(), instanceManager);
             }
         }
@@ -5614,8 +5614,7 @@ public class StandardContext extends ContainerBase
      */
     public void removeNotificationListener(NotificationListener listener, 
             NotificationFilter filter, Object object) throws ListenerNotFoundException {
-    	broadcaster.removeNotificationListener(listener,filter,object);
-    	
+        broadcaster.removeNotificationListener(listener,filter,object);
     }
     
     private MBeanNotificationInfo[] notificationInfo;
@@ -5626,44 +5625,44 @@ public class StandardContext extends ContainerBase
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     public MBeanNotificationInfo[] getNotificationInfo() {
-    	// FIXME: i18n
-    	if(notificationInfo == null) {
-    		notificationInfo = new MBeanNotificationInfo[]{
-    				new MBeanNotificationInfo(new String[] {
-    				"j2ee.object.created"},
-					Notification.class.getName(),
-					"web application is created"
-    				), 
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.starting"},
-					Notification.class.getName(),
-					"change web application is starting"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.running"},
-					Notification.class.getName(),
-					"web application is running"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.state.stopping"},
-					Notification.class.getName(),
-					"web application start to stopped"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.object.stopped"},
-					Notification.class.getName(),
-					"web application is stopped"
-					),
-					new MBeanNotificationInfo(new String[] {
-					"j2ee.object.deleted"},
-					Notification.class.getName(),
-					"web application is deleted"
-					)
-    		};
-    		
-    	}
-    	
-    	return notificationInfo;
+        // FIXME: i18n
+        if(notificationInfo == null) {
+            notificationInfo = new MBeanNotificationInfo[]{
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.object.created"},
+                    Notification.class.getName(),
+                    "web application is created"
+                    ), 
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.state.starting"},
+                    Notification.class.getName(),
+                    "change web application is starting"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.state.running"},
+                    Notification.class.getName(),
+                    "web application is running"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.state.stopping"},
+                    Notification.class.getName(),
+                    "web application start to stopped"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.object.stopped"},
+                    Notification.class.getName(),
+                    "web application is stopped"
+                    ),
+                    new MBeanNotificationInfo(new String[] {
+                    "j2ee.object.deleted"},
+                    Notification.class.getName(),
+                    "web application is deleted"
+                    )
+            };
+            
+        }
+        
+        return notificationInfo;
     }
     
     
@@ -5672,8 +5671,7 @@ public class StandardContext extends ContainerBase
      */
     public void addNotificationListener(NotificationListener listener, 
             NotificationFilter filter, Object object) throws IllegalArgumentException {
-    	broadcaster.addNotificationListener(listener,filter,object);
-    	
+        broadcaster.addNotificationListener(listener,filter,object);
     }
     
     
@@ -5683,8 +5681,7 @@ public class StandardContext extends ContainerBase
      */
     public void removeNotificationListener(NotificationListener listener) 
     throws ListenerNotFoundException {
-    	broadcaster.removeNotificationListener(listener);
-    	
+        broadcaster.removeNotificationListener(listener);
     }
     
     
@@ -5787,14 +5784,14 @@ public class StandardContext extends ContainerBase
      * @param newProcessTlds The new value
      */
     public void setProcessTlds(boolean newProcessTlds) {
-	processTlds = newProcessTlds;
+        processTlds = newProcessTlds;
     }
 
     /**
      * Returns the processTlds attribute value.
      */
     public boolean getProcessTlds() {
-	return processTlds;
+        return processTlds;
     }
 
     /**

@@ -33,7 +33,7 @@ public class SSIPrintenv implements SSICommand {
      */
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer) {
-    	long lastModified = 0;
+        long lastModified = 0;
         //any arguments should produce an error
         if (paramNames.length > 0) {
             String errorMessage = ssiMediator.getConfigErrMsg();

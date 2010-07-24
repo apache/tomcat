@@ -243,11 +243,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     }
     
     public int getRecoveryCounter(){
-    	String p = properties.getProperty("recoveryCounter");
-    	if(p != null){
-    		return new Integer(p).intValue();
-    	}
-    	return -1;
+        String p = properties.getProperty("recoveryCounter");
+        if(p != null){
+            return new Integer(p).intValue();
+        }
+        return -1;
     }
 
     public void setRecoveryEnabled(boolean recoveryEnabled) {
@@ -255,11 +255,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     }
     
     public boolean getRecoveryEnabled() {
-    	String p = properties.getProperty("recoveryEnabled");
-    	if(p != null){
-    		return new Boolean(p).booleanValue();
-    	}
-    	return false;
+        String p = properties.getProperty("recoveryEnabled");
+        if(p != null){
+            return new Boolean(p).booleanValue();
+        }
+        return false;
     }
 
     public void setRecoverySleepTime(long recoverySleepTime) {
@@ -267,11 +267,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     }
     
     public long getRecoverySleepTime(){
-    	String p = properties.getProperty("recoverySleepTime");
-    	if(p != null){
-    		return new Long(p).longValue();
-    	}
-    	return -1;
+        String p = properties.getProperty("recoverySleepTime");
+        if(p != null){
+            return new Long(p).longValue();
+        }
+        return -1;
     }
 
     public void setLocalLoopbackDisabled(boolean localLoopbackDisabled) {
@@ -279,11 +279,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     }
     
     public boolean getLocalLoopbackDisabled(boolean localLoopbackDisabled) {
-    	String p = properties.getProperty("localLoopbackDisabled");
-    	if(p != null){
-    		return new Boolean(p).booleanValue();
-    	}
-    	return false;
+        String p = properties.getProperty("localLoopbackDisabled");
+        if(p != null){
+            return new Boolean(p).booleanValue();
+        }
+        return false;
     }
 
     /**

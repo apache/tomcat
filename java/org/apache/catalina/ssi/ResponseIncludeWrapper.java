@@ -78,8 +78,8 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      * @param captureServletOutputStream The ServletOutputStream to use
      */
     public ResponseIncludeWrapper(ServletContext context, 
-    		HttpServletRequest request, HttpServletResponse response,
-           ServletOutputStream captureServletOutputStream) {
+            HttpServletRequest request, HttpServletResponse response,
+            ServletOutputStream captureServletOutputStream) {
         super(response);
         this.context = context;
         this.request = request;
@@ -184,14 +184,11 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
         if (contentType == null) {
             String url = request.getRequestURI();
             String mime = context.getMimeType(url);
-            if (mime != null)
-            {
+            if (mime != null) {
                 setContentType(mime);
-            }
-            else
-            {
-            	// return a safe value
-               setContentType("application/x-octet-stream");
+            } else {
+                // return a safe value
+                setContentType("application/x-octet-stream");
             }
         }
         return contentType;

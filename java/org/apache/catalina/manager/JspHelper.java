@@ -73,22 +73,22 @@ public class JspHelper {
 
     public static String getDisplayCreationTimeForSession(Session in_session) {
         try {
-			DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
-			return formatter.format(new Date(in_session.getCreationTime()));
+            DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
+            return formatter.format(new Date(in_session.getCreationTime()));
         } catch (IllegalStateException ise) {
-        	//ignore: invalidated session
-        	return "";
-		}
+            //ignore: invalidated session
+            return "";
+        }
     }
 
     public static String getDisplayLastAccessedTimeForSession(Session in_session) {
         try {
-			DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
-			return formatter.format(new Date(in_session.getLastAccessedTime()));
+            DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
+            return formatter.format(new Date(in_session.getLastAccessedTime()));
         } catch (IllegalStateException ise) {
-        	//ignore: invalidated session
-        	return "";
-		}
+            //ignore: invalidated session
+            return "";
+        }
     }
 
     public static String getDisplayUsedTimeForSession(Session in_session) {
@@ -166,9 +166,9 @@ public class JspHelper {
      * See also OutSupport.writeEscapedXml().
      */
     public static String escapeXml(String buffer) {
-    	if (buffer == null) {
-			return "";
-		}
+        if (buffer == null) {
+            return "";
+        }
         int start = 0;
         int length = buffer.length();
         char[] arrayBuffer = buffer.toCharArray();
@@ -205,6 +205,6 @@ public class JspHelper {
     }
 
     public static String formatNumber(long number) {
-    	return NumberFormat.getNumberInstance().format(number);
+        return NumberFormat.getNumberInstance().format(number);
     }
 }
