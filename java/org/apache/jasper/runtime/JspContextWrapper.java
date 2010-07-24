@@ -59,438 +59,438 @@ import org.apache.jasper.util.Enumerator;
  */
 public class JspContextWrapper extends PageContext implements VariableResolver {
 
-	// Invoking JSP context
-	private PageContext invokingJspCtxt;
+    // Invoking JSP context
+    private PageContext invokingJspCtxt;
 
-	private transient HashMap<String, Object> pageAttributes;
+    private transient HashMap<String, Object> pageAttributes;
 
-	// ArrayList of NESTED scripting variables
-	private ArrayList<String> nestedVars;
+    // ArrayList of NESTED scripting variables
+    private ArrayList<String> nestedVars;
 
-	// ArrayList of AT_BEGIN scripting variables
-	private ArrayList<String> atBeginVars;
+    // ArrayList of AT_BEGIN scripting variables
+    private ArrayList<String> atBeginVars;
 
-	// ArrayList of AT_END scripting variables
-	private ArrayList<String> atEndVars;
+    // ArrayList of AT_END scripting variables
+    private ArrayList<String> atEndVars;
 
-	private Map<String,String> aliases;
+    private Map<String,String> aliases;
 
-	private HashMap<String, Object> originalNestedVars;
+    private HashMap<String, Object> originalNestedVars;
 
-	public JspContextWrapper(JspContext jspContext,
-	        ArrayList<String> nestedVars, ArrayList<String> atBeginVars,
-	        ArrayList<String> atEndVars, Map<String,String> aliases) {
-		this.invokingJspCtxt = (PageContext) jspContext;
-		this.nestedVars = nestedVars;
-		this.atBeginVars = atBeginVars;
-		this.atEndVars = atEndVars;
-		this.pageAttributes = new HashMap<String, Object>(16);
-		this.aliases = aliases;
+    public JspContextWrapper(JspContext jspContext,
+            ArrayList<String> nestedVars, ArrayList<String> atBeginVars,
+            ArrayList<String> atEndVars, Map<String,String> aliases) {
+        this.invokingJspCtxt = (PageContext) jspContext;
+        this.nestedVars = nestedVars;
+        this.atBeginVars = atBeginVars;
+        this.atEndVars = atEndVars;
+        this.pageAttributes = new HashMap<String, Object>(16);
+        this.aliases = aliases;
 
-		if (nestedVars != null) {
-			this.originalNestedVars = new HashMap<String, Object>(nestedVars.size());
-		}
-		syncBeginTagFile();
-	}
+        if (nestedVars != null) {
+            this.originalNestedVars = new HashMap<String, Object>(nestedVars.size());
+        }
+        syncBeginTagFile();
+    }
 
-	@Override
+    @Override
     public void initialize(Servlet servlet, ServletRequest request,
-			ServletResponse response, String errorPageURL,
-			boolean needsSession, int bufferSize, boolean autoFlush)
-			throws IOException, IllegalStateException, IllegalArgumentException {
-	}
+            ServletResponse response, String errorPageURL,
+            boolean needsSession, int bufferSize, boolean autoFlush)
+            throws IOException, IllegalStateException, IllegalArgumentException {
+    }
 
-	@Override
+    @Override
     public Object getAttribute(String name) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		return pageAttributes.get(name);
-	}
+        return pageAttributes.get(name);
+    }
 
-	@Override
+    @Override
     public Object getAttribute(String name, int scope) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		if (scope == PAGE_SCOPE) {
-			return pageAttributes.get(name);
-		}
+        if (scope == PAGE_SCOPE) {
+            return pageAttributes.get(name);
+        }
 
-		return invokingJspCtxt.getAttribute(name, scope);
-	}
+        return invokingJspCtxt.getAttribute(name, scope);
+    }
 
-	@Override
+    @Override
     public void setAttribute(String name, Object value) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		if (value != null) {
-			pageAttributes.put(name, value);
-		} else {
-			removeAttribute(name, PAGE_SCOPE);
-		}
-	}
+        if (value != null) {
+            pageAttributes.put(name, value);
+        } else {
+            removeAttribute(name, PAGE_SCOPE);
+        }
+    }
 
-	@Override
+    @Override
     public void setAttribute(String name, Object value, int scope) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		if (scope == PAGE_SCOPE) {
-			if (value != null) {
-				pageAttributes.put(name, value);
-			} else {
-				removeAttribute(name, PAGE_SCOPE);
-			}
-		} else {
-			invokingJspCtxt.setAttribute(name, value, scope);
-		}
-	}
+        if (scope == PAGE_SCOPE) {
+            if (value != null) {
+                pageAttributes.put(name, value);
+            } else {
+                removeAttribute(name, PAGE_SCOPE);
+            }
+        } else {
+            invokingJspCtxt.setAttribute(name, value, scope);
+        }
+    }
 
-	@Override
+    @Override
     public Object findAttribute(String name) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		Object o = pageAttributes.get(name);
-		if (o == null) {
-			o = invokingJspCtxt.getAttribute(name, REQUEST_SCOPE);
-			if (o == null) {
-				if (getSession() != null) {
-					o = invokingJspCtxt.getAttribute(name, SESSION_SCOPE);
-				}
-				if (o == null) {
-					o = invokingJspCtxt.getAttribute(name, APPLICATION_SCOPE);
-				}
-			}
-		}
+        Object o = pageAttributes.get(name);
+        if (o == null) {
+            o = invokingJspCtxt.getAttribute(name, REQUEST_SCOPE);
+            if (o == null) {
+                if (getSession() != null) {
+                    o = invokingJspCtxt.getAttribute(name, SESSION_SCOPE);
+                }
+                if (o == null) {
+                    o = invokingJspCtxt.getAttribute(name, APPLICATION_SCOPE);
+                }
+            }
+        }
 
-		return o;
-	}
+        return o;
+    }
 
-	@Override
+    @Override
     public void removeAttribute(String name) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		pageAttributes.remove(name);
-		invokingJspCtxt.removeAttribute(name, REQUEST_SCOPE);
-		if (getSession() != null) {
-			invokingJspCtxt.removeAttribute(name, SESSION_SCOPE);
-		}
-		invokingJspCtxt.removeAttribute(name, APPLICATION_SCOPE);
-	}
+        pageAttributes.remove(name);
+        invokingJspCtxt.removeAttribute(name, REQUEST_SCOPE);
+        if (getSession() != null) {
+            invokingJspCtxt.removeAttribute(name, SESSION_SCOPE);
+        }
+        invokingJspCtxt.removeAttribute(name, APPLICATION_SCOPE);
+    }
 
-	@Override
+    @Override
     public void removeAttribute(String name, int scope) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		if (scope == PAGE_SCOPE) {
-			pageAttributes.remove(name);
-		} else {
-			invokingJspCtxt.removeAttribute(name, scope);
-		}
-	}
+        if (scope == PAGE_SCOPE) {
+            pageAttributes.remove(name);
+        } else {
+            invokingJspCtxt.removeAttribute(name, scope);
+        }
+    }
 
-	@Override
+    @Override
     public int getAttributesScope(String name) {
 
-		if (name == null) {
-			throw new NullPointerException(Localizer
-					.getMessage("jsp.error.attribute.null_name"));
-		}
+        if (name == null) {
+            throw new NullPointerException(Localizer
+                    .getMessage("jsp.error.attribute.null_name"));
+        }
 
-		if (pageAttributes.get(name) != null) {
-			return PAGE_SCOPE;
-		} else {
-			return invokingJspCtxt.getAttributesScope(name);
-		}
-	}
+        if (pageAttributes.get(name) != null) {
+            return PAGE_SCOPE;
+        } else {
+            return invokingJspCtxt.getAttributesScope(name);
+        }
+    }
 
-	@Override
+    @Override
     public Enumeration<String> getAttributeNamesInScope(int scope) {
-		if (scope == PAGE_SCOPE) {
-			return new Enumerator<String>(pageAttributes.keySet().iterator());
-		}
+        if (scope == PAGE_SCOPE) {
+            return new Enumerator<String>(pageAttributes.keySet().iterator());
+        }
 
-		return invokingJspCtxt.getAttributeNamesInScope(scope);
-	}
+        return invokingJspCtxt.getAttributeNamesInScope(scope);
+    }
 
-	@Override
+    @Override
     public void release() {
-		invokingJspCtxt.release();
-	}
+        invokingJspCtxt.release();
+    }
 
-	@Override
+    @Override
     public JspWriter getOut() {
-		return invokingJspCtxt.getOut();
-	}
+        return invokingJspCtxt.getOut();
+    }
 
-	@Override
+    @Override
     public HttpSession getSession() {
-		return invokingJspCtxt.getSession();
-	}
+        return invokingJspCtxt.getSession();
+    }
 
-	@Override
+    @Override
     public Object getPage() {
-		return invokingJspCtxt.getPage();
-	}
+        return invokingJspCtxt.getPage();
+    }
 
-	@Override
+    @Override
     public ServletRequest getRequest() {
-		return invokingJspCtxt.getRequest();
-	}
+        return invokingJspCtxt.getRequest();
+    }
 
-	@Override
+    @Override
     public ServletResponse getResponse() {
-		return invokingJspCtxt.getResponse();
-	}
+        return invokingJspCtxt.getResponse();
+    }
 
-	@Override
+    @Override
     public Exception getException() {
-		return invokingJspCtxt.getException();
-	}
+        return invokingJspCtxt.getException();
+    }
 
-	@Override
+    @Override
     public ServletConfig getServletConfig() {
-		return invokingJspCtxt.getServletConfig();
-	}
+        return invokingJspCtxt.getServletConfig();
+    }
 
-	@Override
+    @Override
     public ServletContext getServletContext() {
-		return invokingJspCtxt.getServletContext();
-	}
+        return invokingJspCtxt.getServletContext();
+    }
 
-	@Override
+    @Override
     public void forward(String relativeUrlPath) throws ServletException,
-			IOException {
-		invokingJspCtxt.forward(relativeUrlPath);
-	}
+            IOException {
+        invokingJspCtxt.forward(relativeUrlPath);
+    }
 
-	@Override
+    @Override
     public void include(String relativeUrlPath) throws ServletException,
-			IOException {
-		invokingJspCtxt.include(relativeUrlPath);
-	}
+            IOException {
+        invokingJspCtxt.include(relativeUrlPath);
+    }
 
-	@Override
+    @Override
     public void include(String relativeUrlPath, boolean flush)
-			throws ServletException, IOException {
-		invokingJspCtxt.include(relativeUrlPath, false);
-	}
+            throws ServletException, IOException {
+        invokingJspCtxt.include(relativeUrlPath, false);
+    }
 
-	@Override
-	@Deprecated
+    @Override
+    @Deprecated
     public VariableResolver getVariableResolver() {
-		return this;
-	}
+        return this;
+    }
 
-	@Override
+    @Override
     public BodyContent pushBody() {
-		return invokingJspCtxt.pushBody();
-	}
+        return invokingJspCtxt.pushBody();
+    }
 
-	@Override
+    @Override
     public JspWriter pushBody(Writer writer) {
-		return invokingJspCtxt.pushBody(writer);
-	}
+        return invokingJspCtxt.pushBody(writer);
+    }
 
-	@Override
+    @Override
     public JspWriter popBody() {
-		return invokingJspCtxt.popBody();
-	}
+        return invokingJspCtxt.popBody();
+    }
 
-	@Override
-	@Deprecated
+    @Override
+    @Deprecated
     public ExpressionEvaluator getExpressionEvaluator() {
-		return invokingJspCtxt.getExpressionEvaluator();
-	}
+        return invokingJspCtxt.getExpressionEvaluator();
+    }
 
-	@Override
+    @Override
     public void handlePageException(Exception ex) throws IOException,
-			ServletException {
-		// Should never be called since handleException() called with a
-		// Throwable in the generated servlet.
-		handlePageException((Throwable) ex);
-	}
+            ServletException {
+        // Should never be called since handleException() called with a
+        // Throwable in the generated servlet.
+        handlePageException((Throwable) ex);
+    }
 
-	@Override
+    @Override
     public void handlePageException(Throwable t) throws IOException,
-			ServletException {
-		invokingJspCtxt.handlePageException(t);
-	}
+            ServletException {
+        invokingJspCtxt.handlePageException(t);
+    }
 
-	/**
-	 * VariableResolver interface
-	 */
-	@Deprecated
-	public Object resolveVariable(String pName) throws ELException {
-		ELContext ctx = this.getELContext();
-		return ctx.getELResolver().getValue(ctx, null, pName);
-	}
+    /**
+     * VariableResolver interface
+     */
+    @Deprecated
+    public Object resolveVariable(String pName) throws ELException {
+        ELContext ctx = this.getELContext();
+        return ctx.getELResolver().getValue(ctx, null, pName);
+    }
 
-	/**
-	 * Synchronize variables at begin of tag file
-	 */
-	public void syncBeginTagFile() {
-		saveNestedVariables();
-	}
+    /**
+     * Synchronize variables at begin of tag file
+     */
+    public void syncBeginTagFile() {
+        saveNestedVariables();
+    }
 
-	/**
-	 * Synchronize variables before fragment invocation
-	 */
-	public void syncBeforeInvoke() {
-		copyTagToPageScope(VariableInfo.NESTED);
-		copyTagToPageScope(VariableInfo.AT_BEGIN);
-	}
+    /**
+     * Synchronize variables before fragment invocation
+     */
+    public void syncBeforeInvoke() {
+        copyTagToPageScope(VariableInfo.NESTED);
+        copyTagToPageScope(VariableInfo.AT_BEGIN);
+    }
 
-	/**
-	 * Synchronize variables at end of tag file
-	 */
-	public void syncEndTagFile() {
-		copyTagToPageScope(VariableInfo.AT_BEGIN);
-		copyTagToPageScope(VariableInfo.AT_END);
-		restoreNestedVariables();
-	}
+    /**
+     * Synchronize variables at end of tag file
+     */
+    public void syncEndTagFile() {
+        copyTagToPageScope(VariableInfo.AT_BEGIN);
+        copyTagToPageScope(VariableInfo.AT_END);
+        restoreNestedVariables();
+    }
 
-	/**
-	 * Copies the variables of the given scope from the virtual page scope of
-	 * this JSP context wrapper to the page scope of the invoking JSP context.
-	 * 
-	 * @param scope
-	 *            variable scope (one of NESTED, AT_BEGIN, or AT_END)
-	 */
-	private void copyTagToPageScope(int scope) {
-		Iterator<String> iter = null;
+    /**
+     * Copies the variables of the given scope from the virtual page scope of
+     * this JSP context wrapper to the page scope of the invoking JSP context.
+     * 
+     * @param scope
+     *            variable scope (one of NESTED, AT_BEGIN, or AT_END)
+     */
+    private void copyTagToPageScope(int scope) {
+        Iterator<String> iter = null;
 
-		switch (scope) {
-		case VariableInfo.NESTED:
-			if (nestedVars != null) {
-				iter = nestedVars.iterator();
-			}
-			break;
-		case VariableInfo.AT_BEGIN:
-			if (atBeginVars != null) {
-				iter = atBeginVars.iterator();
-			}
-			break;
-		case VariableInfo.AT_END:
-			if (atEndVars != null) {
-				iter = atEndVars.iterator();
-			}
-			break;
-		}
+        switch (scope) {
+        case VariableInfo.NESTED:
+            if (nestedVars != null) {
+                iter = nestedVars.iterator();
+            }
+            break;
+        case VariableInfo.AT_BEGIN:
+            if (atBeginVars != null) {
+                iter = atBeginVars.iterator();
+            }
+            break;
+        case VariableInfo.AT_END:
+            if (atEndVars != null) {
+                iter = atEndVars.iterator();
+            }
+            break;
+        }
 
-		while ((iter != null) && iter.hasNext()) {
-			String varName = iter.next();
-			Object obj = getAttribute(varName);
-			varName = findAlias(varName);
-			if (obj != null) {
-				invokingJspCtxt.setAttribute(varName, obj);
-			} else {
-				invokingJspCtxt.removeAttribute(varName, PAGE_SCOPE);
-			}
-		}
-	}
+        while ((iter != null) && iter.hasNext()) {
+            String varName = iter.next();
+            Object obj = getAttribute(varName);
+            varName = findAlias(varName);
+            if (obj != null) {
+                invokingJspCtxt.setAttribute(varName, obj);
+            } else {
+                invokingJspCtxt.removeAttribute(varName, PAGE_SCOPE);
+            }
+        }
+    }
 
-	/**
-	 * Saves the values of any NESTED variables that are present in the invoking
-	 * JSP context, so they can later be restored.
-	 */
-	private void saveNestedVariables() {
-		if (nestedVars != null) {
-			Iterator<String> iter = nestedVars.iterator();
-			while (iter.hasNext()) {
-				String varName = iter.next();
-				varName = findAlias(varName);
-				Object obj = invokingJspCtxt.getAttribute(varName);
-				if (obj != null) {
-					originalNestedVars.put(varName, obj);
-				}
-			}
-		}
-	}
+    /**
+     * Saves the values of any NESTED variables that are present in the invoking
+     * JSP context, so they can later be restored.
+     */
+    private void saveNestedVariables() {
+        if (nestedVars != null) {
+            Iterator<String> iter = nestedVars.iterator();
+            while (iter.hasNext()) {
+                String varName = iter.next();
+                varName = findAlias(varName);
+                Object obj = invokingJspCtxt.getAttribute(varName);
+                if (obj != null) {
+                    originalNestedVars.put(varName, obj);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Restores the values of any NESTED variables in the invoking JSP context.
-	 */
-	private void restoreNestedVariables() {
-		if (nestedVars != null) {
-			Iterator<String> iter = nestedVars.iterator();
-			while (iter.hasNext()) {
-				String varName = iter.next();
-				varName = findAlias(varName);
-				Object obj = originalNestedVars.get(varName);
-				if (obj != null) {
-					invokingJspCtxt.setAttribute(varName, obj);
-				} else {
-					invokingJspCtxt.removeAttribute(varName, PAGE_SCOPE);
-				}
-			}
-		}
-	}
+    /**
+     * Restores the values of any NESTED variables in the invoking JSP context.
+     */
+    private void restoreNestedVariables() {
+        if (nestedVars != null) {
+            Iterator<String> iter = nestedVars.iterator();
+            while (iter.hasNext()) {
+                String varName = iter.next();
+                varName = findAlias(varName);
+                Object obj = originalNestedVars.get(varName);
+                if (obj != null) {
+                    invokingJspCtxt.setAttribute(varName, obj);
+                } else {
+                    invokingJspCtxt.removeAttribute(varName, PAGE_SCOPE);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Checks to see if the given variable name is used as an alias, and if so,
-	 * returns the variable name for which it is used as an alias.
-	 * 
-	 * @param varName
-	 *            The variable name to check
-	 * @return The variable name for which varName is used as an alias, or
-	 *         varName if it is not being used as an alias
-	 */
-	private String findAlias(String varName) {
+    /**
+     * Checks to see if the given variable name is used as an alias, and if so,
+     * returns the variable name for which it is used as an alias.
+     * 
+     * @param varName
+     *            The variable name to check
+     * @return The variable name for which varName is used as an alias, or
+     *         varName if it is not being used as an alias
+     */
+    private String findAlias(String varName) {
 
-		if (aliases == null)
-			return varName;
+        if (aliases == null)
+            return varName;
 
-		String alias = aliases.get(varName);
-		if (alias == null) {
-			return varName;
-		}
-		return alias;
-	}
+        String alias = aliases.get(varName);
+        if (alias == null) {
+            return varName;
+        }
+        return alias;
+    }
 
-	//private ELContextImpl elContext;
+    //private ELContextImpl elContext;
 
-	@Override
+    @Override
     public ELContext getELContext() {
         // instead decorate!!!
         
         return this.invokingJspCtxt.getELContext();
         
         /*
-		if (this.elContext != null) {
-			JspFactory jspFact = JspFactory.getDefaultFactory();
-			ServletContext servletContext = this.getServletContext();
-			JspApplicationContextImpl jspCtx = (JspApplicationContextImpl) jspFact
-					.getJspApplicationContext(servletContext);
-			this.elContext = jspCtx.createELContext(this);
-		}
-		return this.elContext;
+        if (this.elContext != null) {
+            JspFactory jspFact = JspFactory.getDefaultFactory();
+            ServletContext servletContext = this.getServletContext();
+            JspApplicationContextImpl jspCtx = (JspApplicationContextImpl) jspFact
+                    .getJspApplicationContext(servletContext);
+            this.elContext = jspCtx.createELContext(this);
+        }
+        return this.elContext;
         */
-	}
+    }
 }

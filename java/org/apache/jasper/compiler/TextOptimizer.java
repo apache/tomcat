@@ -45,7 +45,7 @@ public class TextOptimizer {
             collectText();
         }
 
-	/*
+        /*
          * The following directives are ignored in text concatenation
          */
 
@@ -117,7 +117,7 @@ public class TextOptimizer {
         TextCatVisitor v = new TextCatVisitor(compiler);
         page.visit(v);
 
-	// Cleanup, in case the page ends with a template text
+        // Cleanup, in case the page ends with a template text
         v.collectText();
     }
 }
