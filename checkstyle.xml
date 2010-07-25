@@ -19,5 +19,25 @@
     "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
     "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 <module name="Checker">
+  <!-- When adding checks, keep to the order checks are listed under         -->
+  <!-- 'Standard Checks' in the Checkstyle documentation:                    -->
+  <!-- http://checkstyle.sourceforge.net/config_coding.html                  -->
+
+  <!-- Misc -->
+  <module name="Translation"/>
+  
+  <!-- Whitespace -->
   <module name="FileTabCharacter"/>
+
+  <module name="TreeWalker">
+    <!-- Coding -->
+    <module name="IllegalInstantiation"/>
+    
+    <!-- Imports -->
+    <module name="IllegalImport"/>
+    <!--
+    Do not use - does not take account of imports required for Javadocs
+    <module name="UnusedImports"/>
+    -->
+  </module>
 </module>
