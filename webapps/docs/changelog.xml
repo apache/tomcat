@@ -303,6 +303,10 @@
         the build process. Start with no checks. Additional checks will be
         added as they are agreed. (markt)
       </add>
+      <update>
+        Updated to Ant 1.8.1. The build now requires a minimum of Ant 1.8.x.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
