@@ -952,13 +952,13 @@
   </target>
   
   <target name="test-bio" description="Runs the JUnit test cases for BIO"
-          depends="test-compile,deploy" >
+          depends="test-compile,deploy" if="${execute.test.bio}">
     <runtests protocol="org.apache.coyote.http11.Http11Protocol"
               extension=".BIO.txt" />
   </target>
   
   <target name="test-nio" description="Runs the JUnit test cases for NIO"
-          depends="test-compile,deploy" >
+          depends="test-compile,deploy" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO.txt" />
   </target>
@@ -970,7 +970,8 @@
               extension=".APR.txt" />
   </target>
   
-  <target name="test-apr-exists" description="Checks for APR lib">
+  <target name="test-apr-exists" description="Checks for APR lib"
+          if="${execute.test.apr}">
     <available file="${tomcat.build}/bin/native" property="apr.exists" />
   </target>
 

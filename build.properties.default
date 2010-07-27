@@ -33,6 +33,10 @@ version.suffix=-dev
 
 # ----- Build control flags -----
 execute.validate=false
+execute.test.bio=true
+execute.test.nio=true
+# Still requires APR/native library to be present
+execute.test.apr=true
 
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
