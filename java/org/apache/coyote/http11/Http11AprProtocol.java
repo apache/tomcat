@@ -169,6 +169,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         if(log.isInfoEnabled())
             log.info(sm.getString("http11protocol.stop", getName()));
         endpoint.destroy();
+        cHandler.recycledProcessors.clear();
         if( tpOname!=null )
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
         if( rgOname != null )
