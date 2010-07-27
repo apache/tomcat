@@ -702,27 +702,27 @@ public class AprEndpoint extends AbstractEndpoint {
         if (running) {
             stop();
         }
-        try {
+        
+        // Destroy pool if it was initialised
+        if (serverSockPool != 0) {
             Pool.destroy(serverSockPool);
-        } catch (UnsatisfiedLinkError e) {
-            // Ignore - APR was not initialised
+            serverSockPool = 0;
         }
-        serverSockPool = 0;
-        // Close server socket
-        try {
+        
+        // Close server socket if it was initialised
+        if (serverSock != 0) {
             Socket.close(serverSock);
-        } catch (UnsatisfiedLinkError e) {
-            // Ignore - APR was not initialised
+            serverSock = 0;
         }
-        serverSock = 0;
+        
         sslContext = 0;
-        // Close all APR memory pools and resources
-        try {
+        
+        // Close all APR memory pools and resources if initialised
+        if (rootPool != 0) {
             Pool.destroy(rootPool);
-        } catch (UnsatisfiedLinkError e) {
-            // Ignore - APR was not initialised
+            rootPool = 0;
         }
-        rootPool = 0;
+        
         initialized = false;
     }
 
