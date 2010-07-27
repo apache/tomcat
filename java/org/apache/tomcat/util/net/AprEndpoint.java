@@ -663,6 +663,16 @@ public class AprEndpoint extends AbstractEndpoint {
         if (running) {
             running = false;
             unlockAccept();
+            // Wait for polltime before doing anything, so that the poller threads
+            // exit, otherwise parallel destruction of sockets which are still
+            // in the poller can cause problems
+            try {
+                synchronized (this) {
+                    this.wait(pollTime);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            }
             for (int i = 0; i < pollers.length; i++) {
                 pollers[i].destroy();
             }
@@ -959,16 +969,6 @@ public class AprEndpoint extends AbstractEndpoint {
          * Destroy the poller.
          */
         protected void destroy() {
-            // Wait for polltime before doing anything, so that the poller threads
-            // exit, otherwise parallel destruction of sockets which are still
-            // in the poller can cause problems
-            try {
-                synchronized (this) {
-                    this.wait(pollTime);
-                }
-            } catch (InterruptedException e) {
-                // Ignore
-            }
             // Close all sockets in the add queue
             for (int i = 0; i < addCount; i++) {
                 if (comet) {
@@ -1218,16 +1218,6 @@ public class AprEndpoint extends AbstractEndpoint {
          * Destroy the poller.
          */
         protected void destroy() {
-            // Wait for polltime before doing anything, so that the poller threads
-            // exit, otherwise parallel destruction of sockets which are still
-            // in the poller can cause problems
-            try {
-                synchronized (this) {
-                    this.wait(pollTime);
-                }
-            } catch (InterruptedException e) {
-                // Ignore
-            }
             // Close any socket remaining in the add queue
             addCount = 0;
             for (int i = (addS.size() - 1); i >= 0; i--) {
