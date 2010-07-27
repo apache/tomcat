@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
@@ -40,7 +39,6 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
-import org.apache.catalina.core.AprLifecycleListener;
 
 
 /**
@@ -66,6 +64,8 @@ public class AprEndpoint extends AbstractEndpoint {
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
+    private static final boolean IS_SECURITY_ENABLED =
+        (System.getSecurityManager() != null);
 
     // ----------------------------------------------------------------- Fields
     /**
@@ -323,13 +323,13 @@ public class AprEndpoint extends AbstractEndpoint {
     public int getKeepAliveCount() {
         if (pollers == null) {
             return 0;
-        } else {
-            int keepAliveCount = 0;
-            for (int i = 0; i < pollers.length; i++) {
-                keepAliveCount += pollers[i].getKeepAliveCount();
-            }
-            return keepAliveCount;
         }
+
+        int keepAliveCount = 0;
+        for (int i = 0; i < pollers.length; i++) {
+            keepAliveCount += pollers[i].getKeepAliveCount();
+        }
+        return keepAliveCount;
     }
 
 
@@ -339,13 +339,13 @@ public class AprEndpoint extends AbstractEndpoint {
     public int getSendfileCount() {
         if (sendfiles == null) {
             return 0;
-        } else {
-            int sendfileCount = 0;
-            for (int i = 0; i < sendfiles.length; i++) {
-                sendfileCount += sendfiles[i].getSendfileCount();
-            }
-            return sendfileCount;
         }
+        
+        int sendfileCount = 0;
+        for (int i = 0; i < sendfiles.length; i++) {
+            sendfileCount += sendfiles[i].getSendfileCount();
+        }
+        return sendfileCount;
     }
 
 
@@ -361,12 +361,14 @@ public class AprEndpoint extends AbstractEndpoint {
 
         if (initialized)
             return;
-        if (!AprLifecycleListener.isAprAvailable()) {
+
+        // Create the root APR memory pool
+        try {
+            rootPool = Pool.create(0);
+        } catch (UnsatisfiedLinkError e) {
             throw new Exception(sm.getString("endpoint.init.notavail"));
         }
-        
-        // Create the root APR memory pool
-        rootPool = Pool.create(0);
+
         // Create the pool for the server socket
         serverSockPool = Pool.create(rootPool);
         // Create the APR address that will be bound
@@ -840,7 +842,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     new SocketEventProcessor(socket, status);
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 try {
-                    if (Globals.IS_SECURITY_ENABLED) {
+                    if (IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                                 getClass().getClassLoader());
                         AccessController.doPrivileged(pa);
@@ -850,7 +852,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }                
                     getExecutor().execute(proc);
                 } finally {
-                    if (Globals.IS_SECURITY_ENABLED) {
+                    if (IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
                         AccessController.doPrivileged(pa);
                     } else {
@@ -1280,15 +1282,15 @@ public class AprEndpoint extends AbstractEndpoint {
                             // Break the loop and add the socket to poller.
                             break;
                         }
-                    } else {
-                        data.pos = data.pos + nw;
-                        if (data.pos >= data.end) {
-                            // Entire file has been sent
-                            Pool.destroy(data.fdpool);
-                            // Set back socket to blocking mode
-                            Socket.timeoutSet(data.socket, socketProperties.getSoTimeout() * 1000);
-                            return true;
-                        }
+                    }
+
+                    data.pos = data.pos + nw;
+                    if (data.pos >= data.end) {
+                        // Entire file has been sent
+                        Pool.destroy(data.fdpool);
+                        // Set back socket to blocking mode
+                        Socket.timeoutSet(data.socket, socketProperties.getSoTimeout() * 1000);
+                        return true;
                     }
                 }
             } catch (Exception e) {
