@@ -188,6 +188,9 @@ public class TestTomcatSSL extends TomcatBaseTest {
         if (protocol.indexOf("Nio") != -1) {
             return; // Not supported yet (2010-07-22)
         }
+        if (protocol.indexOf("Apr") != -1) {
+            return; // Disabled by default in 1.1.20 windows binary (2010-07-27)
+        }
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
