@@ -108,7 +108,7 @@ public class AprLifecycleListener
                     }
                 }
             }
-        } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
+        } else if (Lifecycle.DESTROY_EVENT.equals(event.getType())) {
             synchronized (lock) {
                 if (!aprAvailable) {
                     return;
