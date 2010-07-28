@@ -1234,8 +1234,8 @@ public class ExpiresFilter extends FilterBase {
         ExpiresConfiguration configuration = expiresConfigurationByContentType.get(contentType);
         if (configuration != null) {
             Date result = getExpirationDate(configuration, response);
-            if (log.isErrorEnabled()) {
-                log.error(sm.getString(
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString(
                         "expiresFilter.useMatchingConfiguration",
                         configuration, contentType, contentType, result));
             }
@@ -1249,8 +1249,8 @@ public class ExpiresFilter extends FilterBase {
 
             if (configuration != null) {
                 Date result = getExpirationDate(configuration, response);
-                if (log.isErrorEnabled()) {
-                    log.error(sm.getString(
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
                             "expiresFilter.useMatchingConfiguration",
                             configuration, contentTypeWithoutCharset,
                             contentType, result));
@@ -1265,8 +1265,8 @@ public class ExpiresFilter extends FilterBase {
             configuration = expiresConfigurationByContentType.get(majorType);
             if (configuration != null) {
                 Date result = getExpirationDate(configuration, response);
-                if (log.isErrorEnabled()) {
-                    log.error(sm.getString(
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
                             "expiresFilter.useMatchingConfiguration",
                             configuration, majorType, contentType, result));
                 }
@@ -1277,15 +1277,15 @@ public class ExpiresFilter extends FilterBase {
         if (defaultExpiresConfiguration != null) {
             Date result = getExpirationDate(defaultExpiresConfiguration,
                     response);
-            if (log.isErrorEnabled()) {
-                log.error(sm.getString("expiresFilter.useDefaultConfiguration",
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.useDefaultConfiguration",
                         defaultExpiresConfiguration, contentType, result));
             }
             return result;
         }
 
-        if (log.isErrorEnabled()) {
-            log.error(sm.getString(
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString(
                     "expiresFilter.noExpirationConfiguredForContentType",
                     contentType));
         }
