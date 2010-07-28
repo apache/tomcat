@@ -997,9 +997,11 @@
 
         <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
         <test todir="${tomcat.build}/logs" name="${test.entry}" if="test.entry"/>
-        <batchtest todir="${tomcat.build}/logs" unless="test.entry"
-          errorproperty="test.result.error" failureproperty="test.result.failure" 
-          >
+        <batchtest todir="${tomcat.build}/logs"
+                   unless="test.entry"
+                   errorproperty="test.result.error"
+        	       failureproperty="test.result.failure"
+                   haltonfailure="${test.haltonfailure}">
           <fileset dir="test" >
             <!-- Include all by default -->
             <include name="**/Test*.java" />
@@ -1911,7 +1913,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ================ Download and dependency building =================== -->
 
   <target name="download-validate"
-          description="Download components necessary to validate source" >
+          description="Download components necessary to validate source"
+  	      if="${execute.validate}">
 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${checkstyle.loc}"/>
