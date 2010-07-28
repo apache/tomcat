@@ -130,6 +130,7 @@ public abstract class TomcatBaseTest extends TestCase {
             StandardServer server = (StandardServer) tomcat.getServer();
             AprLifecycleListener listener = new AprLifecycleListener();
             server.addLifecycleListener(listener);
+            connector.setAttribute("pollerThreadCount", Integer.valueOf(1));
         }
         
         tomcat.setBaseDir(tempDir.getAbsolutePath());
