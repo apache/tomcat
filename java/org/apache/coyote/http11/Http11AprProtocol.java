@@ -526,39 +526,42 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
-                // Call the appropriate event
-                try {
-                    state = result.event(status);
-                } catch (java.net.SocketException e) {
-                    // SocketExceptions are normal
-                    Http11AprProtocol.log.debug
-                        (sm.getString
-                            ("http11protocol.proto.socketexception.debug"), e);
-                } catch (java.io.IOException e) {
-                    // IOExceptions are normal
-                    Http11AprProtocol.log.debug
-                        (sm.getString
-                            ("http11protocol.proto.ioexception.debug"), e);
-                }
-                // Future developers: if you discover any other
-                // rare-but-nonfatal exceptions, catch them here, and log as
-                // above.
-                catch (Throwable e) {
-                    // any other exception or error is odd. Here we log it
-                    // with "ERROR" level, so it will show up even on
-                    // less-than-verbose logs.
-                    Http11AprProtocol.log.error
-                        (sm.getString("http11protocol.proto.error"), e);
-                } finally {
-                    if (state != SocketState.LONG) {
-                        connections.remove(Long.valueOf(socket));
-                        recycledProcessors.offer(result);
-                        if (state == SocketState.OPEN) {
-                            proto.endpoint.getPoller().add(socket);
-                        }
-                    } else {
-                        proto.endpoint.getCometPoller().add(socket);
+                if (result.comet) {
+                    // Call the appropriate event
+                    try {
+                        state = result.event(status);
+                    } catch (java.net.SocketException e) {
+                        // SocketExceptions are normal
+                        Http11AprProtocol.log.debug(sm.getString(
+                                "http11protocol.proto.socketexception.debug"),
+                                e);
+                    } catch (java.io.IOException e) {
+                        // IOExceptions are normal
+                        Http11AprProtocol.log.debug(sm.getString(
+                                "http11protocol.proto.ioexception.debug"), e);
                     }
+                    // Future developers: if you discover any other
+                    // rare-but-nonfatal exceptions, catch them here, and log as
+                    // above.
+                    catch (Throwable e) {
+                        // any other exception or error is odd. Here we log it
+                        // with "ERROR" level, so it will show up even on
+                        // less-than-verbose logs.
+                        Http11AprProtocol.log.error(sm.getString(
+                                "http11protocol.proto.error"), e);
+                    } finally {
+                        if (state != SocketState.LONG) {
+                            connections.remove(Long.valueOf(socket));
+                            recycledProcessors.offer(result);
+                            if (state == SocketState.OPEN) {
+                                proto.endpoint.getPoller().add(socket);
+                            }
+                        } else {
+                            proto.endpoint.getCometPoller().add(socket);
+                        }
+                    }
+                } else if (result.async) {
+                    state = asyncDispatch(socket, status);
                 }
             }
             return state;
