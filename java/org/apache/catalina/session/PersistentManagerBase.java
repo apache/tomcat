@@ -25,8 +25,6 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.catalina.Container;
-import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -294,34 +292,6 @@ public abstract class PersistentManagerBase extends ManagerBase {
         support.firePropertyChange("minIdleSwap",
                                    new Integer(oldMinIdleSwap),
                                    new Integer(this.minIdleSwap));
-
-    }
-
-
-    /**
-     * Set the Container with which this Manager has been associated. If it is a
-     * Context (the usual case), listen for changes to the session timeout
-     * property.
-     * 
-     * @param container
-     *            The associated Container
-     */
-    @Override
-    public void setContainer(Container container) {
-
-        // De-register from the old Container (if any)
-        if ((this.container != null) && (this.container instanceof Context))
-            ((Context) this.container).removePropertyChangeListener(this);
-
-        // Default processing provided by our superclass
-        super.setContainer(container);
-
-        // Register with the new Container (if any)
-        if ((this.container != null) && (this.container instanceof Context)) {
-            setMaxInactiveInterval
-                ( ((Context) this.container).getSessionTimeout()*60 );
-            ((Context) this.container).addPropertyChangeListener(this);
-        }
 
     }
 
