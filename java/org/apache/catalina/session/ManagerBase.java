@@ -185,6 +185,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     private final Object maxActiveUpdateLock = new Object();
 
+    /**
+     * The maximum number of active Sessions allowed, or -1 for no limit.
+     */
+    protected int maxActiveSessions = -1;
+
+    /**
+     * Number of session creations that failed due to maxActiveSessions.
+     */
+    protected int rejectedSessions = 0;
+
     // number of duplicated session ids - anything >0 means we have problems
     protected volatile int duplicates=0;
 
@@ -617,6 +627,15 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
+     * Number of session creations that failed due to maxActiveSessions
+     * 
+     * @return The count
+     */
+    public int getRejectedSessions() {
+        return rejectedSessions;
+    }
+
+    /**
      * Gets the number of sessions that have expired.
      *
      * @return Number of sessions that have expired
@@ -777,6 +796,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      *  instantiated for any reason
      */
     public Session createSession(String sessionId) {
+        
+        if ((maxActiveSessions >= 0) &&
+                (sessions.size() >= maxActiveSessions)) {
+            rejectedSessions++;
+            throw new IllegalStateException(
+                    sm.getString("managerBase.createSession.ise"));
+        }
         
         // Recycle or create a Session instance
         Session session = createEmptySession();
@@ -1049,6 +1075,34 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         synchronized (maxActiveUpdateLock) {
             this.maxActive = maxActive;
         }
+    }
+
+
+    /**
+     * Return the maximum number of active Sessions allowed, or -1 for
+     * no limit.
+     */
+    public int getMaxActiveSessions() {
+
+        return (this.maxActiveSessions);
+
+    }
+
+
+    /**
+     * Set the maximum number of active Sessions allowed, or -1 for
+     * no limit.
+     *
+     * @param max The new maximum number of sessions
+     */
+    public void setMaxActiveSessions(int max) {
+
+        int oldMaxActiveSessions = this.maxActiveSessions;
+        this.maxActiveSessions = max;
+        support.firePropertyChange("maxActiveSessions",
+                                   new Integer(oldMaxActiveSessions),
+                                   new Integer(this.maxActiveSessions));
+
     }
 
 
