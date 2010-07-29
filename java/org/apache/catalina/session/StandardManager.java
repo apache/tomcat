@@ -107,12 +107,6 @@ public class StandardManager extends ManagerBase
 
 
     /**
-     * The maximum number of active Sessions allowed, or -1 for no limit.
-     */
-    protected int maxActiveSessions = -1;
-
-
-    /**
      * The descriptive name of this Manager implementation (for logging).
      */
     protected static String name = "StandardManager";
@@ -127,12 +121,6 @@ public class StandardManager extends ManagerBase
      * the <code>javax.servlet.context.tempdir</code> context attribute.
      */
     protected String pathname = "SESSIONS.ser";
-
-
-    /**
-     * Number of session creations that failed due to maxActiveSessions.
-     */
-    protected int rejectedSessions = 0;
 
 
     // ------------------------------------------------------------- Properties
@@ -179,43 +167,6 @@ public class StandardManager extends ManagerBase
 
 
     /**
-     * Return the maximum number of active Sessions allowed, or -1 for
-     * no limit.
-     */
-    public int getMaxActiveSessions() {
-
-        return (this.maxActiveSessions);
-
-    }
-
-
-    /** Number of session creations that failed due to maxActiveSessions
-     *
-     * @return The count
-     */
-    public int getRejectedSessions() {
-        return rejectedSessions;
-    }
-
-
-    /**
-     * Set the maximum number of active Sessions allowed, or -1 for
-     * no limit.
-     *
-     * @param max The new maximum number of sessions
-     */
-    public void setMaxActiveSessions(int max) {
-
-        int oldMaxActiveSessions = this.maxActiveSessions;
-        this.maxActiveSessions = max;
-        support.firePropertyChange("maxActiveSessions",
-                                   new Integer(oldMaxActiveSessions),
-                                   new Integer(this.maxActiveSessions));
-
-    }
-
-
-    /**
      * Return the descriptive short name of this Manager implementation.
      */
     @Override
@@ -252,31 +203,6 @@ public class StandardManager extends ManagerBase
 
 
     // --------------------------------------------------------- Public Methods
-
-    /**
-     * Construct and return a new session object, based on the default
-     * settings specified by this Manager's properties.  The session
-     * id will be assigned by this method, and available via the getId()
-     * method of the returned session.  If a new session cannot be created
-     * for any reason, return <code>null</code>.
-     *
-     * @exception IllegalStateException if a new session cannot be
-     *  instantiated for any reason
-     */
-    @Override
-    public Session createSession(String sessionId) {
-
-        if ((maxActiveSessions >= 0) &&
-            (sessions.size() >= maxActiveSessions)) {
-            rejectedSessions++;
-            throw new IllegalStateException
-                (sm.getString("standardManager.createSession.ise"));
-        }
-
-        return (super.createSession(sessionId));
-
-    }
-
 
     /**
      * Load any currently active sessions that were previously unloaded
