@@ -529,7 +529,6 @@ public class SimpleTcpCluster extends LifecycleBase
         String clusterName = getManagerName(cmanager.getName(), manager);
         cmanager.setName(clusterName);
         cmanager.setCluster(this);
-        cmanager.setDefaultMode(false);
     
         managers.put(clusterName, cmanager);
         // Notify our interested LifecycleListeners
