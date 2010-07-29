@@ -409,10 +409,6 @@ public abstract class PersistentManagerBase extends ManagerBase
     }
 
     
-    public void setRejectedSessions(int rejectedSessions) {
-        this.rejectedSessions = rejectedSessions;
-    }
-
     /**
      * Return the descriptive short name of this Manager implementation.
      */

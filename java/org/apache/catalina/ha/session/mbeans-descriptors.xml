@@ -309,7 +309,8 @@
     <attribute
       name="rejectedSessions"
       description="Number of sessions we rejected due to maxActive beeing reached"
-      type="int"/>
+      type="int"
+      writeable="false"/>
     <operation
       name="expireSession"
       description="Expired the given session"
