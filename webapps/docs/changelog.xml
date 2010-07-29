@@ -197,6 +197,12 @@
         Correct copy and paste typo in web.xml parsing rules that mixed up
         <code>local-ejb-ref</code> and <code>resource-env-ref</code>. (markt)
       </fix>
+      <update>
+        Refactor session managers to remove unused code and to reduce code
+        duplication. Also, all session managers used for session replication now
+        extend <code>org.apache.catalina.ha.session.ClusterManagerBase</code>.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
