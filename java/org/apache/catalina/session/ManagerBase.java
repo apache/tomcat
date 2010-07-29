@@ -19,6 +19,7 @@
 package org.apache.catalina.session;
 
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.DataInputStream;
@@ -64,7 +65,7 @@ import org.apache.juli.logging.LogFactory;
  */
 
 public abstract class ManagerBase extends LifecycleMBeanBase
-        implements Manager {
+        implements Manager, PropertyChangeListener {
 
     private final Log log = LogFactory.getLog(ManagerBase.class); // must not be static
 
@@ -1335,4 +1336,29 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         return MBeanUtils.getDomain(container);
     }
 
+    // ----------------------------------------- PropertyChangeListener Methods
+
+    /**
+     * Process property change events from our associated Context.
+     * 
+     * @param event
+     *            The property change event that has occurred
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+
+        // Validate the source of this event
+        if (!(event.getSource() instanceof Context))
+            return;
+        
+        // Process a relevant property change
+        if (event.getPropertyName().equals("sessionTimeout")) {
+            try {
+                setMaxInactiveInterval(
+                        ((Integer) event.getNewValue()).intValue() * 60);
+            } catch (NumberFormatException e) {
+                log.error(sm.getString("managerBase.sessionTimeout",
+                        event.getNewValue()));
+            }
+        }
+    }
 }
