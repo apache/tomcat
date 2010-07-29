@@ -19,7 +19,6 @@
 package org.apache.catalina.session;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -63,8 +62,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @version $Id$
  */
 
-public class StandardManager extends ManagerBase
-        implements PropertyChangeListener {
+public class StandardManager extends ManagerBase {
 
     private final Log log = LogFactory.getLog(StandardManager.class); // must not be static
 
@@ -544,34 +542,6 @@ public class StandardManager extends ManagerBase
 
         // Require a new random number generator if we are restarted
         this.random = null;
-    }
-
-
-    // ----------------------------------------- PropertyChangeListener Methods
-
-
-    /**
-     * Process property change events from our associated Context.
-     *
-     * @param event The property change event that has occurred
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-
-        // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
-            return;
-
-        // Process a relevant property change
-        if (event.getPropertyName().equals("sessionTimeout")) {
-            try {
-                setMaxInactiveInterval
-                    ( ((Integer) event.getNewValue()).intValue()*60 );
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("standardManager.sessionTimeout",
-                                 event.getNewValue().toString()));
-            }
-        }
-
     }
 
 
