@@ -17,7 +17,6 @@
 
 package org.apache.catalina.ha.session;
 
-import java.beans.PropertyChangeEvent;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1004,30 +1003,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.random = null;
         getCluster().removeManager(this);
         replicationValve = null;
-    }
-
-    // ----------------------------------------- PropertyChangeListener Methods
-
-    /**
-     * Process property change events from our associated Context.
-     * 
-     * @param event
-     *            The property change event that has occurred
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-
-        // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
-            return;
-        // Process a relevant property change
-        if (event.getPropertyName().equals("sessionTimeout")) {
-            try {
-                setMaxInactiveInterval(((Integer) event.getNewValue()).intValue() * 60);
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("deltaManager.sessionTimeout", event.getNewValue()));
-            }
-        }
-
     }
 
     // -------------------------------------------------------- Replication
