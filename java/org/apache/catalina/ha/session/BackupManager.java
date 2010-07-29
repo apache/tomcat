@@ -94,18 +94,6 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     public void setDomainReplication(boolean sendClusterDomainOnly) {
     }
 
-    /**
-     * @return Returns the defaultMode.
-     */
-    public boolean isDefaultMode() {
-        return false;
-    }
-    /**
-     * @param defaultMode The defaultMode to set.
-     */
-    public void setDefaultMode(boolean defaultMode) {
-    }
-
     public void setExpireSessionsOnShutdown(boolean expireSessionsOnShutdown)
     {
         mExpireSessionsOnShutdown = expireSessionsOnShutdown;
