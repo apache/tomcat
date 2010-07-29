@@ -18,7 +18,6 @@
 
 package org.apache.catalina.session;
 
-import java.beans.PropertyChangeEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,7 +33,6 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.servlet.ServletContext;
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -122,33 +120,6 @@ public class StandardManager extends ManagerBase {
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Set the Container with which this Manager has been associated.  If
-     * it is a Context (the usual case), listen for changes to the session
-     * timeout property.
-     *
-     * @param container The associated Container
-     */
-    @Override
-    public void setContainer(Container container) {
-
-        // De-register from the old Container (if any)
-        if ((this.container != null) && (this.container instanceof Context))
-            ((Context) this.container).removePropertyChangeListener(this);
-
-        // Default processing provided by our superclass
-        super.setContainer(container);
-
-        // Register with the new Container (if any)
-        if ((this.container != null) && (this.container instanceof Context)) {
-            setMaxInactiveInterval
-                ( ((Context) this.container).getSessionTimeout()*60 );
-            ((Context) this.container).addPropertyChangeListener(this);
-        }
-
-    }
 
 
     /**
