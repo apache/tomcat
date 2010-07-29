@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.ha.session;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.catalina.LifecycleException;
@@ -26,9 +24,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
-import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.util.LifecycleBase;
@@ -40,9 +36,9 @@ import org.apache.juli.logging.LogFactory;
  *@author Filip Hanik
  *@version 1.0
  */
-public class BackupManager extends StandardManager implements ClusterManager, MapOwner
-{
-    private static final Log log = LogFactory.getLog( BackupManager.class );
+public class BackupManager extends ClusterManagerBase implements MapOwner {
+
+    private static final Log log = LogFactory.getLog(BackupManager.class);
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
@@ -111,13 +107,6 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     }
 
 
-    /**
-     * Override persistence since they don't go hand in hand with replication for now.
-     */
-    @Override
-    public void unload() throws IOException {
-    }
-    
     public ClusterMessage requestCompleted(String sessionId) {
         if (!getState().isAvailable()) return null;
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
@@ -144,29 +133,6 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
         return new DeltaSession(this);
     }
     
-    public ClassLoader[] getClassLoaders() {
-        return ClusterManagerBase.getClassLoaders(this.container);
-    }
-
-    /**
-     * Open Stream and use correct ClassLoader (Container) Switch
-     * ThreadClassLoader
-     * 
-     * @param data
-     * @return The object input stream
-     * @throws IOException
-     */
-    public ReplicationStream getReplicationStream(byte[] data) throws IOException {
-        return getReplicationStream(data,0,data.length);
-    }
-
-    public ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException {
-        ByteArrayInputStream fis = new ByteArrayInputStream(data, offset, length);
-        return new ReplicationStream(fis, getClassLoaders());
-    }    
-
-
-
 
     @Override
     public String getName() {
