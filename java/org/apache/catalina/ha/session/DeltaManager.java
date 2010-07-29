@@ -88,7 +88,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected static String managerName = "DeltaManager";
     protected String name = null;
-    protected boolean defaultMode = false;
     private CatalinaCluster cluster = null;
 
     /**
@@ -474,20 +473,7 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     
-    /**
-     * @return Returns the defaultMode.
-     */
-    public boolean isDefaultMode() {
-        return defaultMode;
-    }
-    /**
-     * @param defaultMode The defaultMode to set.
-     */
-    public void setDefaultMode(boolean defaultMode) {
-        this.defaultMode = defaultMode;
-    }
-    
-    public CatalinaCluster getCluster() {
+   public CatalinaCluster getCluster() {
         return cluster;
     }
 
