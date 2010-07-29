@@ -20,6 +20,7 @@
 <%@page import="java.util.Iterator" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.Session" %>
+<%@page import="org.apache.catalina.ha.session.DeltaSession" %>
 <!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -69,6 +70,7 @@
 			<thead>
 				<tr>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Session Id</a></th>
+                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Type</a></th>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='locale'; document.getElementById('refreshButton').click(); return true;">Guessed Locale</a></th>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='user'; document.getElementById('refreshButton').click(); return true;">Guessed User name</a></th>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='CreationTime'; document.getElementById('refreshButton').click(); return true;">Creation Time</a></th>
@@ -82,6 +84,7 @@
 			<tfoot><%-- <tfoot> is the same as <thead> --%>
 				<tr>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Session Id</a></th>
+                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Type</a></th>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='locale'; document.getElementById('refreshButton').click(); return true;">Guessed Locale</a></th>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='user'; document.getElementById('refreshButton').click(); return true;">Guessed User name</a></th>
 					<th><a onclick="document.getElementById('sessionsFormSort').value='CreationTime'; document.getElementById('refreshButton').click(); return true;">Creation Time</a></th>
@@ -97,11 +100,22 @@
    while (iter.hasNext()) {
    	Session currentSession = (Session) iter.next();
    	String currentSessionId = currentSession.getId();
+   	String type;
+   	if (currentSession instanceof DeltaSession) {
+   	    if (((DeltaSession) currentSession).isPrimarySession()) {
+   	        type = "Primary";
+   	    } else {
+   	        type = "Backup";
+   	    }
+   	} else {
+   	    type = "Primary";
+   	}
 %>
 				<tr>
-					<td>
-<input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" /><a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>"><%= JspHelper.escapeXml(currentSessionId) %></a>
+					<td><input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" />
+					  <a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>&amp;sessionType=<%= type %>"><%= JspHelper.escapeXml(currentSessionId) %></a>
 					</td>
+                    <td style="text-align: center;"><%= type %></td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
 					<td style="text-align: center;"><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
