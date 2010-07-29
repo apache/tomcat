@@ -193,6 +193,10 @@
         Handle the edge cases where resources packaged in JARs have names that
         start with a single quote character or a double quote character. (markt)
       </fix>
+      <fix>
+        Correct copy and paste typo in web.xml parsing rules that mixed up
+        <code>local-ejb-ref</code> and <code>resource-env-ref</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
