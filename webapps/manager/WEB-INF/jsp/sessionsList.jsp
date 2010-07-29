@@ -25,7 +25,8 @@
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<%@page import="org.apache.catalina.manager.DummyProxySession"%><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <% String path = (String) request.getAttribute("path");
    String submitUrl = response.encodeURL(((HttpServletRequest)
            pageContext.getRequest()).getRequestURI() + "?path=" + path);
@@ -107,13 +108,23 @@
    	    } else {
    	        type = "Backup";
    	    }
+   	} else if (currentSession instanceof DummyProxySession) {
+   	    type = "Proxy";
    	} else {
    	    type = "Primary";
    	}
 %>
 				<tr>
 					<td><input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" />
+					  <%
+					    if ("Proxy".equals(type)) {
+					        out.print(currentSessionId);
+					    } else {
+					  %>
 					  <a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>&amp;sessionType=<%= type %>"><%= JspHelper.escapeXml(currentSessionId) %></a>
+					  <%
+					    }
+					  %>
 					</td>
                     <td style="text-align: center;"><%= type %></td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>

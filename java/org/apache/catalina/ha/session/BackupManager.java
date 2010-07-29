@@ -16,7 +16,9 @@
  */
 package org.apache.catalina.ha.session;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -214,11 +216,6 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         this.distributable = dist;
     }
 
-    @Override
-    public boolean getDistributable() {
-        return distributable;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -273,4 +270,16 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         }
         return sb.toString();
     }
+    
+    public Set<String> getSessionIdsFull() {
+        Set<String> sessionIds = new HashSet<String>();
+        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+        @SuppressWarnings("unchecked") // sessions is of type Map<String, Session>
+        Iterator<String> keys = map.keySetFull().iterator();
+        while (keys.hasNext()) {
+            sessionIds.add(keys.next());
+        }
+        return sessionIds;
+    }
+
 }

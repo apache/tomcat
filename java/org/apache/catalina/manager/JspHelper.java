@@ -73,6 +73,9 @@ public class JspHelper {
 
     public static String getDisplayCreationTimeForSession(Session in_session) {
         try {
+            if (in_session.getCreationTime() == 0) {
+                return "";
+            }
             DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
             return formatter.format(new Date(in_session.getCreationTime()));
         } catch (IllegalStateException ise) {
@@ -83,6 +86,9 @@ public class JspHelper {
 
     public static String getDisplayLastAccessedTimeForSession(Session in_session) {
         try {
+            if (in_session.getLastAccessedTime() == 0) {
+                return "";
+            }
             DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
             return formatter.format(new Date(in_session.getLastAccessedTime()));
         } catch (IllegalStateException ise) {
@@ -92,14 +98,38 @@ public class JspHelper {
     }
 
     public static String getDisplayUsedTimeForSession(Session in_session) {
+        try {
+            if (in_session.getCreationTime() == 0) {
+                return "";
+            }
+        } catch (IllegalStateException ise) {
+            //ignore: invalidated session
+            return "";
+        }
         return secondsToTimeString(SessionUtils.getUsedTimeForSession(in_session)/1000);
     }
 
     public static String getDisplayTTLForSession(Session in_session) {
+        try {
+            if (in_session.getCreationTime() == 0) {
+                return "";
+            }
+        } catch (IllegalStateException ise) {
+            //ignore: invalidated session
+            return "";
+        }
         return secondsToTimeString(SessionUtils.getTTLForSession(in_session)/1000);
     }
 
     public static String getDisplayInactiveTimeForSession(Session in_session) {
+        try {
+            if (in_session.getCreationTime() == 0) {
+                return "";
+            }
+        } catch (IllegalStateException ise) {
+            //ignore: invalidated session
+            return "";
+        }
         return secondsToTimeString(SessionUtils.getInactiveTimeForSession(in_session)/1000);
     }
 
