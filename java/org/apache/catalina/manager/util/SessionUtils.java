@@ -176,6 +176,9 @@ public class SessionUtils {
             return in_session.getPrincipal().getName();
         }
         HttpSession httpSession = in_session.getSession();
+        if (httpSession == null)
+            return null;
+        
         try {
             Object user = null;
             // First search "known locations"
