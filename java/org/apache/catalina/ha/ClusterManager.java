@@ -91,17 +91,6 @@ public interface ClusterManager extends Manager {
     */
    public void setDomainReplication(boolean domainReplication);
 
-   /**
-    * @param mode The mode
-    * @since 5.5.10
-    */
-   public void setDefaultMode(boolean mode);
-
-   /**
-    * @since 5.5.10
-    */
-   public boolean isDefaultMode();
-   
    public ReplicationStream getReplicationStream(byte[] data) throws IOException;
 
    public ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException;
