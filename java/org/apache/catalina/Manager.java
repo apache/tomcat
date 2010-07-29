@@ -192,15 +192,6 @@ public interface Manager {
 
 
     /**
-     * Sets the number of sessions that were not created because the maximum
-     * number of active sessions was reached.
-     *
-     * @param rejectedSessions Number of rejected sessions
-     */
-    public void setRejectedSessions(int rejectedSessions);
-
-
-    /**
      * Gets the longest time (in seconds) that an expired session had been
      * alive.
      *

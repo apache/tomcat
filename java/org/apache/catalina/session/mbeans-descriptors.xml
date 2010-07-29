@@ -117,7 +117,8 @@
 
     <attribute   name="rejectedSessions"
           description="Number of sessions we rejected due to maxActive beeing reached"
-                 type="int" />
+                 type="int"
+            writeable="false"/>
                  
     <operation   name="backgroundProcess"
           description="Invalidate all sessions that have expired."
@@ -311,7 +312,8 @@
 
     <attribute   name="rejectedSessions"
           description="Number of sessions we rejected due to maxActive beeing reached"
-                 type="int" />
+                 type="int"
+            writeable="false"/>
 
     <operation   name="backgroundProcess"
           description="Invalidate all sessions that have expired."
