@@ -772,7 +772,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public void add(Session session) {
 
         sessions.put(session.getIdInternal(), session);
-        int size = sessions.size();
+        int size = getActiveSessions();
         if( size > maxActive ) {
             synchronized(maxActiveUpdateLock) {
                 if( size > maxActive ) {
@@ -811,7 +811,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public Session createSession(String sessionId) {
         
         if ((maxActiveSessions >= 0) &&
-                (sessions.size() >= maxActiveSessions)) {
+                (getActiveSessions() >= maxActiveSessions)) {
             rejectedSessions++;
             throw new IllegalStateException(
                     sm.getString("managerBase.createSession.ise"));
