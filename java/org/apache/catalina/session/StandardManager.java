@@ -135,12 +135,6 @@ public class StandardManager extends ManagerBase
     protected int rejectedSessions = 0;
 
 
-    /**
-     * Processing time during session expiration.
-     */
-    protected long processingTime = 0;
-
-
     // ------------------------------------------------------------- Properties
 
 
