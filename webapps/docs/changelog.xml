@@ -300,6 +300,11 @@
         applications that redirect users to the html interface rather than
         returning a 404. (markt)
       </add>
+      <add>
+        Provide the HTML Manager application with the ability to differentiate
+        between primary, backup and proxy sessions. Note that proxy sessions are
+        only shown if enabled in web.xml. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
