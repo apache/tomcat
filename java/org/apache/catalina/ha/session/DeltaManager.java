@@ -442,31 +442,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.cluster = cluster;
     }
 
-    /**
-     * Set the Container with which this Manager has been associated. If it is a
-     * Context (the usual case), listen for changes to the session timeout
-     * property.
-     * 
-     * @param container
-     *            The associated Container
-     */
-    @Override
-    public void setContainer(Container container) {
-        // De-register from the old Container (if any)
-        if ((this.container != null) && (this.container instanceof Context))
-            ((Context) this.container).removePropertyChangeListener(this);
-
-        // Default processing provided by our superclass
-        super.setContainer(container);
-
-        // Register with the new Container (if any)
-        if ((this.container != null) && (this.container instanceof Context)) {
-            setMaxInactiveInterval(((Context) this.container).getSessionTimeout() * 60);
-            ((Context) this.container).addPropertyChangeListener(this);
-        }
-
-    }
-    
     // --------------------------------------------------------- Public Methods
 
     /**
