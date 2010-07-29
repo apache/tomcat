@@ -307,10 +307,6 @@ public class DeltaManager extends ClusterManagerBase{
         return rejectedSessions;
     }
 
-    public void setRejectedSessions(int rejectedSessions) {
-        this.rejectedSessions = rejectedSessions;
-    }
-
     /**
      * @return Returns the counterNoStateTransfered.
      */

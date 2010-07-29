@@ -198,11 +198,6 @@ public class StandardManager extends ManagerBase
     }
 
 
-    public void setRejectedSessions(int rejectedSessions) {
-        this.rejectedSessions = rejectedSessions;
-    }
-
-
     /**
      * Set the maximum number of active Sessions allowed, or -1 for
      * no limit.
