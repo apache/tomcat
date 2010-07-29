@@ -998,7 +998,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 while (i.hasNext()) {
                     Map.Entry<?,?> e = i.next();
                     MapEntry entry = (MapEntry) super.get(e.getKey());
-                    if (entry!=null && entry.isPrimary() && value.equals(entry.getValue())) return true;
+                    if (entry!=null && entry.isActive() && value.equals(entry.getValue())) return true;
                 }//while
                 return false;
             }//end if
@@ -1035,7 +1035,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Map.Entry<?,?> e = i.next();
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
-                if ( entry != null && entry.isPrimary() ) {
+                if ( entry != null && entry.isActive() ) {
                     set.add(new MapEntry(key, entry.getValue()));
                 }
             }
@@ -1052,7 +1052,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Map.Entry<?,?> e = i.next();
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
-                if ( entry!=null && entry.isPrimary() ) set.add(key);
+                if ( entry!=null && entry.isActive() ) set.add(key);
             }
             return Collections.unmodifiableSet(set);
 
@@ -1069,7 +1069,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Map.Entry<?,?> e = it.next();
                 if ( e != null ) {
                     MapEntry entry = (MapEntry) super.get(e.getKey());
-                    if (entry!=null && entry.isPrimary() && entry.getValue() != null) counter++;
+                    if (entry!=null && entry.isActive() && entry.getValue() != null) counter++;
                 }
             }
             return counter;
@@ -1087,7 +1087,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             while ( i.hasNext() ) {
                 Map.Entry<?,?> e = i.next();
                 MapEntry entry = (MapEntry)super.get(e.getKey());
-                if (entry!=null && entry.isPrimary() && entry.getValue()!=null) values.add(entry.getValue());
+                if (entry!=null && entry.isActive() && entry.getValue()!=null) values.add(entry.getValue());
             }
             return Collections.unmodifiableCollection(values);
         }
@@ -1135,9 +1135,13 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
 
         public boolean isPrimary() {
-            return ( (!proxy) && (!backup));
+            return (!proxy && !backup);
         }
 
+        public boolean isActive() {
+            return !proxy;
+        }
+        
         public void setProxy(boolean proxy) {
             this.proxy = proxy;
         }

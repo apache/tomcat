@@ -239,6 +239,11 @@
         <code>SimpleTcpReplicationManager.startInternal()</code>. (markt)
       </fix>
       <fix>
+        <bug>49407</bug>: Change the BackupManager so it is consistent with
+        DeltaManager and reports both primary and backup sessions when active
+        sessions are requested. (markt)
+      </fix>
+      <fix>
         <bug>49445</bug>: When session ID is changed after authentication,
         ensure the DeltaManager replicates the change in ID to the other nodes
         in the cluster. (kfujino)
