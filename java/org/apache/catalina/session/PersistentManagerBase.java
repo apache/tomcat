@@ -139,12 +139,6 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * The maximum number of active Sessions allowed, or -1 for no limit.
-     */
-    protected int maxActiveSessions = -1;
-
-
-    /**
      * The descriptive name of this Manager implementation (for logging).
      */
     private static String name = "PersistentManagerBase";
@@ -183,12 +177,6 @@ public abstract class PersistentManagerBase extends ManagerBase
      * should not be forced out.
      */
     protected int maxIdleSwap = -1;
-
-
-    /**
-     * Number of session creations that failed due to maxActiveSessions.
-     */
-    protected int rejectedSessions = 0;
 
 
     /**
@@ -371,44 +359,6 @@ public abstract class PersistentManagerBase extends ManagerBase
     }
 
 
-    /**
-     * Return the maximum number of active Sessions allowed, or -1 for
-     * no limit.
-     */
-    public int getMaxActiveSessions() {
-
-        return (this.maxActiveSessions);
-
-    }
-
-
-    /**
-     * Set the maximum number of active Sessions allowed, or -1 for
-     * no limit.
-     *
-     * @param max The new maximum number of sessions
-     */
-    public void setMaxActiveSessions(int max) {
-
-        int oldMaxActiveSessions = this.maxActiveSessions;
-        this.maxActiveSessions = max;
-        support.firePropertyChange("maxActiveSessions",
-                                   new Integer(oldMaxActiveSessions),
-                                   new Integer(this.maxActiveSessions));
-
-    }
-
-
-    /** 
-     * Number of session creations that failed due to maxActiveSessions.
-     *
-     * @return The count
-     */
-    public int getRejectedSessions() {
-        return rejectedSessions;
-    }
-
-    
     /**
      * Return the descriptive short name of this Manager implementation.
      */
