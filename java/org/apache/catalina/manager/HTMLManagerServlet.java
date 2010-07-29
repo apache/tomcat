@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -45,12 +47,14 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.catalina.ha.session.BackupManager;
 import org.apache.catalina.manager.util.BaseSessionComparator;
 import org.apache.catalina.manager.util.ReverseComparator;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
 
 /**
@@ -94,6 +98,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
     
     private final Random randomSource = new Random();
+    
+    private boolean showProxySessions = false;
 
     // --------------------------------------------------------- Public Methods
 
@@ -507,9 +513,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args[4] = response.encodeURL
                     (request.getContextPath() +
                      "/html/sessions?path=" + URL_ENCODER.encode(displayPath));
-                if (ctxt.getManager() != null) {
-                    args[5] = new Integer
-                        (ctxt.getManager().getActiveSessions());
+                Manager manager = ctxt.getManager(); 
+                if (manager instanceof BackupManager && showProxySessions) {
+                    args[5] = new Integer(
+                            ((BackupManager)manager).getActiveSessionsFull());
+                } else if (ctxt.getManager() != null){
+                    args[5] = new Integer(manager.getActiveSessions());
                 } else {
                     args[5] = new Integer(0);
                 }
@@ -542,7 +551,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
                      "/html/expire?path=" + URL_ENCODER.encode(displayPath));
                 args[9] = appsExpire;
                 args[10] = sm.getString("htmlManagerServlet.expire.explain");
-                Manager manager = ctxt.getManager();
                 if (manager == null) {
                     args[11] = sm.getString("htmlManagerServlet.noManager");
                 } else {
@@ -775,6 +783,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        
+        // Set our properties from the initialization parameters
+        String value = null;
+        try {
+            value = getServletConfig().getInitParameter("showProxySessions");
+            showProxySessions = Boolean.parseBoolean(value);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+        }
+
     }   
 
     // ------------------------------------------------ Sessions administration
@@ -832,7 +850,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         displaySessionsListPage(path, req, resp);
     }
 
-    protected Session[] getSessionsForPath(String path) {
+    protected List<Session> getSessionsForPath(String path) {
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
             throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
                                         RequestUtil.filter(path)));
@@ -845,7 +863,22 @@ public final class HTMLManagerServlet extends ManagerServlet {
             throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
                                         RequestUtil.filter(path)));
         }
-        Session[] sessions = ctxt.getManager().findSessions();
+        Manager manager = ctxt.getManager();
+        List<Session> sessions = new ArrayList<Session>();
+        sessions.addAll(Arrays.asList(manager.findSessions()));
+        if (manager instanceof BackupManager && showProxySessions) {
+            // Add dummy proxy sessions
+            Set<String> sessionIds =
+                ((BackupManager) manager).getSessionIdsFull();
+            // Remove active (primary and backup) session IDs from full list
+            for (Session session : sessions) {
+                sessionIds.remove(session.getId());
+            }
+            // Left with just proxy sessions - add them
+            for (String sessionId : sessionIds) {
+                sessions.add(new DummyProxySession(sessionId));
+            }
+        }
         return sessions;
     }
     protected Session getSessionForPathAndId(String path, String id) throws IOException {
@@ -873,7 +906,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @throws IOException
      */
     protected void displaySessionsListPage(String path, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Session> activeSessions = Arrays.asList(getSessionsForPath(path));
+        List<Session> sessions = getSessionsForPath(path);
         String sortBy = req.getParameter("sort");
         String orderBy = null;
         if (null != sortBy && !"".equals(sortBy.trim())) {
@@ -887,7 +920,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     //orderBy = "DESC";
                 }
                 try {
-                    Collections.sort(activeSessions, comparator);
+                    Collections.sort(sessions, comparator);
                 } catch (IllegalStateException ise) {
                     // at least 1 of the sessions is invalidated
                     req.setAttribute(APPLICATION_ERROR, "Can't sort session list: one session is invalidated");
@@ -899,7 +932,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // keep sort order
         req.setAttribute("sort", sortBy);
         req.setAttribute("order", orderBy);
-        req.setAttribute("activeSessions", activeSessions);
+        req.setAttribute("activeSessions", sessions);
         //strong>NOTE</strong> - This header will be overridden
         // automatically if a <code>RequestDispatcher.forward()</code> call is
         // ultimately invoked.
