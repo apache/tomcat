@@ -520,7 +520,7 @@ public class WebRuleSet extends RuleSetBase {
                 "setName", 0);
         digester.addCallMethod(fullPrefix + "/resource-env-ref/resource-env-ref-type",
                 "setType", 0);
-        configureInjectionRules(digester, "web-app/ejb-local-ref/");
+        configureInjectionRules(digester, "web-app/resource-env-ref/");
 
         //message-destination
         digester.addObjectCreate(fullPrefix + "/message-destination",
