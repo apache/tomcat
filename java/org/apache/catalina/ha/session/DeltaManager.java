@@ -95,10 +95,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     private volatile ReplicationValve replicationValve = null ;
     
-    /**
-     * The maximum number of active Sessions allowed, or -1 for no limit.
-     */
-    private int maxActiveSessions = -1;
     private boolean expireSessionsOnShutdown = false;
     private boolean notifyListenersOnReplication = true;
     private boolean notifySessionListenersOnReplication = true;
@@ -120,9 +116,7 @@ public class DeltaManager extends ClusterManagerBase{
     
     // ------------------------------------------------------------------ stats attributes
     
-    int rejectedSessions = 0;
     private long sessionReplaceCounter = 0 ;
-    long processingTime = 0;
     private long counterReceive_EVT_GET_ALL_SESSIONS = 0 ;
     private long counterReceive_EVT_ALL_SESSION_DATA = 0 ;
     private long counterReceive_EVT_SESSION_CREATED = 0 ;
@@ -299,15 +293,6 @@ public class DeltaManager extends ClusterManagerBase{
     }
     
     /**
-     * Number of session creations that failed due to maxActiveSessions
-     * 
-     * @return The count
-     */
-    public int getRejectedSessions() {
-        return rejectedSessions;
-    }
-
-    /**
      * @return Returns the counterNoStateTransfered.
      */
     public int getCounterNoStateTransfered() {
@@ -387,25 +372,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     public void setStateTimestampDrop(boolean isTimestampDrop) {
         this.stateTimestampDrop = isTimestampDrop;
-    }
-    
-    /**
-     * Return the maximum number of active Sessions allowed, or -1 for no limit.
-     */
-    public int getMaxActiveSessions() {
-        return (this.maxActiveSessions);
-    }
-
-    /**
-     * Set the maximum number of active Sessions allowed, or -1 for no limit.
-     * 
-     * @param max
-     *            The new maximum number of sessions
-     */
-    public void setMaxActiveSessions(int max) {
-        int oldMaxActiveSessions = this.maxActiveSessions;
-        this.maxActiveSessions = max;
-        support.firePropertyChange("maxActiveSessions", new Integer(oldMaxActiveSessions), new Integer(this.maxActiveSessions));
     }
     
     /**
@@ -536,10 +502,6 @@ public class DeltaManager extends ClusterManagerBase{
      * @return The session
      */
     public Session createSession(String sessionId, boolean distribute) {
-        if ((maxActiveSessions >= 0) && (sessions.size() >= maxActiveSessions)) {
-            rejectedSessions++;
-            throw new IllegalStateException(sm.getString("deltaManager.createSession.ise"));
-        }
         DeltaSession session = (DeltaSession) super.createSession(sessionId) ;
         if (distribute) {
             sendCreateSession(session.getId(), session);
@@ -547,7 +509,6 @@ public class DeltaManager extends ClusterManagerBase{
         if (log.isDebugEnabled())
             log.debug(sm.getString("deltaManager.createSession.newSession",session.getId(), new Integer(sessions.size())));
         return (session);
-
     }
 
     /**
