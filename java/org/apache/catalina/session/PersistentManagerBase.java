@@ -18,8 +18,6 @@
 
 package org.apache.catalina.session;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -53,8 +51,7 @@ import org.apache.juli.logging.LogFactory;
  * @version $Id$
  */
 
-public abstract class PersistentManagerBase extends ManagerBase
-    implements PropertyChangeListener {
+public abstract class PersistentManagerBase extends ManagerBase {
 
     private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
 
@@ -904,34 +901,6 @@ public abstract class PersistentManagerBase extends ManagerBase
 
         // Require a new random number generator if we are restarted
         this.random = null;
-    }
-
-
-    // ----------------------------------------- PropertyChangeListener Methods
-
-
-    /**
-     * Process property change events from our associated Context.
-     *
-     * @param event The property change event that has occurred
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-
-        // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
-            return;
-
-        // Process a relevant property change
-        if (event.getPropertyName().equals("sessionTimeout")) {
-            try {
-                setMaxInactiveInterval
-                    ( ((Integer) event.getNewValue()).intValue()*60 );
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("standardManager.sessionTimeout",
-                                 event.getNewValue().toString()));
-            }
-        }
-
     }
 
 
