@@ -90,6 +90,10 @@
                description="The frequency of the manager checks (expiration and passivation)"
                type="int"/>
 
+    <attribute   name="processingTime"
+          description="Time spent doing housekeeping and expiration"
+                 type="long" />
+               
     <attribute   name="sessionAverageAliveTime"
           description="Average time an expired session had been alive"
                  type="int" />
