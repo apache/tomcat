@@ -766,23 +766,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Construct and return a new session object, based on the default
      * settings specified by this Manager's properties.  The session
-     * id will be assigned by this method, and available via the getId()
-     * method of the returned session.  If a new session cannot be created
-     * for any reason, return <code>null</code>.
-     * 
-     * @exception IllegalStateException if a new session cannot be
-     *  instantiated for any reason
-     * @deprecated
-     */
-    @Deprecated
-    public Session createSession() {
-        return createSession(null);
-    }
-    
-    
-    /**
-     * Construct and return a new session object, based on the default
-     * settings specified by this Manager's properties.  The session
      * id specified will be used as the session id.  
      * If a new session cannot be created for any reason, return 
      * <code>null</code>.
