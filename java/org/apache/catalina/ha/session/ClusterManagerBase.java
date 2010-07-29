@@ -20,6 +20,8 @@ package org.apache.catalina.ha.session;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.Loader;
+import org.apache.catalina.Manager;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -32,7 +34,7 @@ import org.apache.catalina.Container;
  */
 
 public abstract class ClusterManagerBase extends ManagerBase
-        implements ClusterManager{
+        implements ClusterManager {
 
     public static ClassLoader[] getClassLoaders(Container container) {
         Loader loader = null;
@@ -70,4 +72,17 @@ public abstract class ClusterManagerBase extends ManagerBase
     }    
 
 
+    //  ---------------------------------------------------- persistence handler
+
+    /**
+     * {@link Manager} implementations that also implement
+     * {@link ClusterManager} do not support local session persistence.
+     */
+    public void load() {
+        // NOOP 
+    }
+
+    public void unload() {
+        // NOOP
+    }
 }

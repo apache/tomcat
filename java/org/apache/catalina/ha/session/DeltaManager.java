@@ -1174,16 +1174,6 @@ public class DeltaManager extends ClusterManagerBase{
         
     }
    
-    //  -------------------------------------------------------- persistence handler
-
-    public void load() {
-
-    }
-
-    public void unload() {
-
-    }
-
     //  -------------------------------------------------------- expire
 
     /**
