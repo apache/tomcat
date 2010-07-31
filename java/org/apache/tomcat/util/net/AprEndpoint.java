@@ -670,7 +670,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // in the poller can cause problems
             try {
                 synchronized (this) {
-                    this.wait(pollTime);
+                    this.wait(pollTime / 1000);
                 }
             } catch (InterruptedException e) {
                 // Ignore
@@ -688,6 +688,15 @@ public class AprEndpoint extends AbstractEndpoint {
                     sendfiles[i].destroy();
                 }
                 sendfiles = null;
+            }
+            // Wait another polltime to make sure everything is shutdown else
+            // the JVM will crash when we terminate the APR library
+            try {
+                synchronized (this) {
+                    this.wait(pollTime / 1000);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
             }
         }
         shutdownExecutor();
