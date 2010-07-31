@@ -53,6 +53,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("OK", bc.toString());
 
+        // Give the async thread a chance to finish (but not too long)
+        int counter = 0;
+        while (!servlet.isDone() && counter < 10) {
+            Thread.sleep(1000);
+            counter++;
+        }
 
         assertEquals("1false2true3true4true5false", servlet.getResult());
     }
@@ -76,6 +82,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // Call the servlet once
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("OK", bc.toString());
+
+        // Give the async thread a chance to finish (but not too long)
+        int counter = 0;
+        while (!servlet.isDone() && counter < 10) {
+            Thread.sleep(1000);
+            counter++;
+        }
 
         assertEquals("1false2true3true4true5false", servlet.getResult());
     }
@@ -134,14 +147,23 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("OK", bc.toString());
     }
     
+    /*
+     * NOTE: This servlet is only intended to be used in single-threaded tests.
+     */
     private static class Bug49528Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
-        private StringBuilder result = new StringBuilder();
+        private volatile boolean done = false;
+        
+        private StringBuilder result;
         
         public String getResult() {
             return result.toString();
+        }
+
+        public boolean isDone() {
+            return done;
         }
 
         @Override
@@ -149,6 +171,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 final HttpServletResponse resp)
                 throws ServletException, IOException {
             
+            result  = new StringBuilder();
             result.append('1');
             result.append(req.isAsyncStarted());
             req.startAsync();
@@ -169,6 +192,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                         req.getAsyncContext().complete();
                         result.append('5');
                         result.append(req.isAsyncStarted());
+                        done = true;
                     } catch (InterruptedException e) {
                         result.append(e);
                     } catch (IOException e) {
@@ -182,14 +206,23 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    /*
+     * NOTE: This servlet is only intended to be used in single-threaded tests.
+     */
     private static class Bug49567Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
-        private StringBuilder result = new StringBuilder();
+        private volatile boolean done = false;
+        
+        private StringBuilder result;
         
         public String getResult() {
             return result.toString();
+        }
+
+        public boolean isDone() {
+            return done;
         }
 
         @Override
@@ -197,6 +230,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 final HttpServletResponse resp)
                 throws ServletException, IOException {
             
+            result = new StringBuilder();
             result.append('1');
             result.append(req.isAsyncStarted());
             req.startAsync();
@@ -220,6 +254,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                                 req.getAsyncContext().complete();
                                 result.append('5');
                                 result.append(req.isAsyncStarted());
+                                done = true;
                             } catch (InterruptedException e) {
                                 result.append(e);
                             } catch (IOException e) {
