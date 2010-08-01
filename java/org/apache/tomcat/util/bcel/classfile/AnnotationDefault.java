@@ -34,8 +34,6 @@ public class AnnotationDefault extends Attribute
     ElementValue default_value;
 
     /**
-     * @param annotation_type
-     *            the subclass type of the annotation
      * @param name_index
      *            Index pointing to the name <em>Code</em>
      * @param length
@@ -55,8 +53,6 @@ public class AnnotationDefault extends Attribute
     }
 
     /**
-     * @param annotation_type
-     *            the subclass type of the annotation
      * @param name_index
      *            Index pointing to the name <em>Code</em>
      * @param length

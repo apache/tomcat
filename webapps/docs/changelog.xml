@@ -333,6 +333,10 @@
         original commons-fileupload layout to make merging of future updates
         easier. (markt)
       </update>
+      <update>
+        Update the re-packaged version of Jakarta BCEL from trunk revision
+        880760 to trunk revision 978831. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
