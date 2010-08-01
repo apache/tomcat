@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.http.fileupload;
+package org.apache.tomcat.util.http.fileupload.servlet;
 
 import java.io.InputStream;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.tomcat.util.http.fileupload.RequestContext;
 
 
 /**

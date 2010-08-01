@@ -22,6 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.tomcat.util.http.fileupload.util.Closeable;
+import org.apache.tomcat.util.http.fileupload.util.Streams;
+
 
 /**
  * <p> Low level API for processing file uploads.

@@ -14,9 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.http.fileupload;
+package org.apache.tomcat.util.http.fileupload.disk;
 
 import java.io.File;
+
+import org.apache.tomcat.util.http.fileupload.FileCleaningTracker;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.FileItemFactory;
 
 
 /**
@@ -174,7 +178,7 @@ public class DiskFileItemFactory implements FileItemFactory {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Create a new {@link org.apache.commons.fileupload.disk.DiskFileItem}
+     * Create a new {@link org.apache.tomcat.util.http.fileupload.disk.commons.fileupload.disk.DiskFileItem}
      * instance from the supplied parameters and the local factory
      * configuration.
      *
