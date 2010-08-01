@@ -327,6 +327,12 @@
         Updated to Ant 1.8.1. The build now requires a minimum of Ant 1.8.x.
         (markt)
       </update>
+      <update>
+        Update the re-packaged version of commons-fileupload from 1.2.1 to
+        1.2.2. The layout of re-packaged version was also restored to the
+        original commons-fileupload layout to make merging of future updates
+        easier. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
