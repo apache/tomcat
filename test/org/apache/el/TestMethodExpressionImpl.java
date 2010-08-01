@@ -311,4 +311,19 @@ public class TestMethodExpressionImpl extends TestCase {
         Object r9 = me9.invoke(context, null);
         assertEquals("ABB[]: Hello AAA from BBB, BBB", r9.toString());
     }
+    
+    /*
+     * This is also tested implicitly in numerous places elsewhere in this
+     * class.
+     */
+    public void testBug49655() throws Exception {
+        // This is the call the failed
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanA.setName('New value')}", null, null);
+        // The rest is to check it worked correctly
+        me.invoke(context, null);
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanA.name}", java.lang.String.class);
+        assertEquals("New value", ve.getValue(context));
+    }
 }
