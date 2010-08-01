@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.IOException;
+
 import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.ByteSequence;
 
@@ -104,6 +105,8 @@ public abstract class Utility {
 
 
     /**
+     * @param access_flags the class flags
+     * 
      * @return "class" or "interface", depending on the ACC_INTERFACE flag
      */
     public static final String classOrInterface( int access_flags ) {
@@ -160,6 +163,8 @@ public abstract class Utility {
      * @param  constant_pool Array of constants
      * @param  verbose be verbose, e.g. print constant pool index
      * @return String representation of byte code
+     * 
+     * @throws IOException if a failure from reading from the bytes argument occurs
      */
     public static final String codeToString( ByteSequence bytes, ConstantPool constant_pool,
             boolean verbose ) throws IOException {
@@ -306,7 +311,7 @@ public abstract class Utility {
             case Constants.NEW:
             case Constants.CHECKCAST:
                 buf.append("\t");
-                /* FALL THRU */
+                //$FALL-THROUGH$
             case Constants.INSTANCEOF:
                 index = bytes.readUnsignedShort();
                 buf.append("\t<").append(
@@ -458,37 +463,6 @@ public abstract class Utility {
         return compactClassName(str, "java.lang.", chopit);
     }
 
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
     /**
      * A returntype signature represents the return value from a method.
      * It is a series of bytes in the following grammar:
@@ -513,6 +487,8 @@ public abstract class Utility {
      * @param  signature    Method signature
      * @param  name         Method name
      * @param  access       Method access rights
+     * @param chopit
+     * @param vars
      * @return Java type declaration
      * @throws  ClassFormatException  
      */
@@ -579,7 +555,7 @@ public abstract class Utility {
     public static final String replace( String str, String old, String new_ ) {
         int index, old_index;
         try {
-            if ((index = str.indexOf(old)) != -1) { // `old' found in str
+            if (str.indexOf(old) != -1) { // `old' found in str
                 StringBuffer buf = new StringBuffer();
                 old_index = 0; // String start offset
                 // While we have something to replace
@@ -702,16 +678,6 @@ public abstract class Utility {
         }
     }
 
-
-    
-
-
-    
-
-
-    
-
-
     /**
      * Convert (signed) byte to (unsigned) short value, i.e., all negative
      * values become positive.
@@ -721,9 +687,11 @@ public abstract class Utility {
     }
 
 
-    /** Convert bytes into hexidecimal string
+    /** Convert bytes into hexadecimal string
      *
-     * @return bytes as hexidecimal string, e.g. 00 FA 12 ...
+     * @param bytes an array of bytes to convert to hexadecimal
+     * 
+     * @return bytes as hexadecimal string, e.g. 00 FA 12 ...
      */
     public static final String toHexString( byte[] bytes ) {
         StringBuffer buf = new StringBuffer();
@@ -740,10 +708,6 @@ public abstract class Utility {
         }
         return buf.toString();
     }
-
-
-    
-
 
     /**
      * Fillup char with up to length characters with char `fill' and justify it left or right.
@@ -765,33 +729,6 @@ public abstract class Utility {
         }
         return new String(buf) + str;
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
     // A-Z, g-z, _, $
     private static final int FREE_CHARS = 48;

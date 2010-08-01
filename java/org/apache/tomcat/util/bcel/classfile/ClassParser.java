@@ -103,6 +103,11 @@ public final class ClassParser {
                 if (is_zip) {
                     zip = new ZipFile(zip_file);
                     ZipEntry entry = zip.getEntry(file_name);
+                    
+                    if (entry == null) {
+                        throw new IOException("File " + file_name + " not found");
+                    }
+                    
                     file = new DataInputStream(new BufferedInputStream(zip.getInputStream(entry),
                             BUFSIZE));
                 } else {
