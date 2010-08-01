@@ -91,7 +91,6 @@ public class LocalVariableTable extends Attribute {
 
 
     /** 
-     * @return first matching variable using index
      * 
      * @param index the variable slot
      * 
@@ -108,10 +107,6 @@ public class LocalVariableTable extends Attribute {
         }
         return null;
     }
-
-
-    
-
 
     public final void setLocalVariableTable( LocalVariable[] local_variable_table ) {
         this.local_variable_table = local_variable_table;

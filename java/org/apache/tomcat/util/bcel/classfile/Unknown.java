@@ -44,7 +44,7 @@ public final class Unknown extends Attribute {
 
     private byte[] bytes;
     private String name;
-    private static Map unknown_attributes = new HashMap();
+    private static final Map unknown_attributes = new HashMap();
 
 
     

@@ -55,10 +55,6 @@ public class ElementValuePair
     {
         return elementValue;
     }
-
-    
-
-    
     
     protected void dump(DataOutputStream dos) throws IOException {
         dos.writeShort(elementNameIndex); // u2 name of the element

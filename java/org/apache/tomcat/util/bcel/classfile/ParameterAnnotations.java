@@ -76,13 +76,5 @@ public abstract class ParameterAnnotations extends Attribute {
                 ? 0
                 : parameter_annotation_table.length;
     }
-
-
-    
-
-
-    
-
-
     
 }
