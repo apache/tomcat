@@ -47,13 +47,5 @@ public class ParameterAnnotationEntry implements Constants {
             annotation_table[i] = AnnotationEntry.read(file, constant_pool, false);
         }
     }
-
-
-    
-
-
-    
-
-
     
 }

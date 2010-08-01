@@ -35,41 +35,46 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class AnnotationEntry implements Constants, Serializable {
 
+    private static final long serialVersionUID = 1L;
+    
     private int type_index;
-    private int num_element_value_pairs;
-    private List element_value_pairs;
     private ConstantPool constant_pool;
     private boolean isRuntimeVisible;
 
-
-    /**
-     * Construct object from file stream.
-     * @param file Input stream
-     */
-    public AnnotationEntry(int type_index, ConstantPool constant_pool, boolean isRuntimeVisible) {
-        this.type_index = type_index;
-        
-        this.constant_pool = constant_pool;
-        this.isRuntimeVisible = isRuntimeVisible;
-    }
+    private List element_value_pairs;
     
-    public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException 
-    {
-        AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool, isRuntimeVisible);
-        annotationEntry.num_element_value_pairs = (file.readUnsignedShort());
+    /**
+     * Factory method to create an AnnotionEntry from a DataInputStream
+     * 
+     * @param file
+     * @param constant_pool
+     * @param isRuntimeVisible
+     * @return
+     * @throws IOException
+     */
+    public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException {
+        
+        final AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool, isRuntimeVisible);
+        final int num_element_value_pairs = (file.readUnsignedShort());
         annotationEntry.element_value_pairs = new ArrayList();
-        for (int i = 0; i < annotationEntry.num_element_value_pairs; i++) {
-            annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool), constant_pool));
+        for (int i = 0; i < num_element_value_pairs; i++) {
+            annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool),
+                    constant_pool));
         }
         return annotationEntry;
     }
 
+    public AnnotationEntry(int type_index, ConstantPool constant_pool, boolean isRuntimeVisible) {
+        this.type_index = type_index;
+        this.constant_pool = constant_pool;
+        this.isRuntimeVisible = isRuntimeVisible;
+    }
+    
     /**
      * @return the annotation type name
      */
     public String getAnnotationType() {
-        ConstantUtf8 c;
-        c = (ConstantUtf8) constant_pool.getConstant(type_index, CONSTANT_Utf8);
+        final ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(type_index, CONSTANT_Utf8);
         return c.getBytes();
     }
 

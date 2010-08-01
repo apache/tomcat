@@ -30,10 +30,10 @@ import java.io.IOException;
  */
 public abstract class Annotations extends Attribute {
 
-    private int annotation_table_length;
-    private AnnotationEntry[] annotation_table; // Table of annotations
-
-
+    private static final long serialVersionUID = 1L;
+    
+    private AnnotationEntry[] annotation_table;
+    
     /**
      * @param annotation_type the subclass type of the annotation
      * @param name_index Index pointing to the name <em>Code</em>
@@ -41,10 +41,9 @@ public abstract class Annotations extends Attribute {
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    public Annotations(byte annotation_type, int name_index, int length, DataInputStream file,
-            ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException {
+    public Annotations(byte annotation_type, int name_index, int length, DataInputStream file, ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException {
         this(annotation_type, name_index, length, (AnnotationEntry[]) null, constant_pool);
-        annotation_table_length = (file.readUnsignedShort());
+        final int annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
             annotation_table[i] = AnnotationEntry.read(file, constant_pool, isRuntimeVisible);
@@ -59,31 +58,17 @@ public abstract class Annotations extends Attribute {
      * @param annotation_table the actual annotations
      * @param constant_pool Array of constants
      */
-    public Annotations(byte annotation_type, int name_index, int length,
-            AnnotationEntry[] annotation_table, ConstantPool constant_pool) {
+    public Annotations(byte annotation_type, int name_index, int length, AnnotationEntry[] annotation_table, ConstantPool constant_pool) {
         super(annotation_type, name_index, length, constant_pool);
         setAnnotationTable(annotation_table);
     }
-
 
     /**
      * @param annotation_table the entries to set in this annotation
      */
     public final void setAnnotationTable( AnnotationEntry[] annotation_table ) {
         this.annotation_table = annotation_table;
-        annotation_table_length = (annotation_table == null) ? 0 : annotation_table.length;
     }
-
-
-    // TODO: update method names
-    /**
-     * @return the annotation entry table
-     */
-    /*
-    public final AnnotationEntry[] getAnnotationTable() {
-        return annotation_table;
-    }*/
-
 
     /**
      * returns the array of annotation entries in this annotation
@@ -92,15 +77,12 @@ public abstract class Annotations extends Attribute {
         return annotation_table;
     }
 
-
-    
-    
-    
-    
-    protected void writeAnnotations(DataOutputStream dos) throws IOException
-    {
-        dos.writeShort(annotation_table_length);
-        for (int i = 0; i < annotation_table_length; i++)
+    protected void writeAnnotations(DataOutputStream dos) throws IOException {
+        if (annotation_table == null) {
+            return;
+        }
+        dos.writeShort(annotation_table.length);
+        for (int i = 0; i < annotation_table.length; i++)
             annotation_table[i].dump(dos);
     }
 }
