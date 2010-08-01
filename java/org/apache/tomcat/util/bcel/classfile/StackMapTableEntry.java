@@ -113,20 +113,22 @@ public final class StackMapTableEntry implements Cloneable {
      */
     public final void dump( DataOutputStream file ) throws IOException {
         file.write(frame_type);
-        if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME && frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
+        if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
+            // nothing to be done
+        } else if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME && frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
             types_of_stack_items[0].dump(file);
         } else if (frame_type == Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED) {
-            file.write(byte_code_offset_delta);
+            file.writeShort(byte_code_offset_delta);
             types_of_stack_items[0].dump(file);
         } else if (frame_type >= Constants.CHOP_FRAME && frame_type <= Constants.CHOP_FRAME_MAX) {
-            file.write(byte_code_offset_delta);
+            file.writeShort(byte_code_offset_delta);
         } else if (frame_type == Constants.SAME_FRAME_EXTENDED) {
-            file.write(byte_code_offset_delta);
+            file.writeShort(byte_code_offset_delta);
         } else if (frame_type >= Constants.APPEND_FRAME && frame_type <= Constants.APPEND_FRAME_MAX) {
-            file.write(byte_code_offset_delta);
+            file.writeShort(byte_code_offset_delta);
             for (int i = 0; i < number_of_locals; i++) {
                 types_of_locals[i].dump(file);
-            }            
+            }
         } else if (frame_type == Constants.FULL_FRAME) {        
             file.writeShort(byte_code_offset_delta);
             file.writeShort(number_of_locals);
