@@ -607,7 +607,7 @@ public abstract class FileUploadBase {
                 if (fileSizeMax != -1) {
                     if (pContentLength != -1
                             &&  pContentLength > fileSizeMax) {
-                    	FileSizeLimitExceededException e =
+                        FileSizeLimitExceededException e =
                             new FileSizeLimitExceededException(
                                 "The field " + fieldName
                                 + " exceeds its maximum permitted "
@@ -632,7 +632,7 @@ public abstract class FileUploadBase {
                                     pCount, pSizeMax);
                             e.setFieldName(fieldName);
                             e.setFileName(name);
-                    		throw new FileUploadIOException(e);
+                            throw new FileUploadIOException(e);
                         }
                     };
                 }
@@ -1152,7 +1152,7 @@ public abstract class FileUploadBase {
          * @return File name, if known, or null.
          */
         public String getFileName() {
-        	return fileName;
+            return fileName;
         }
 
         /**
@@ -1160,7 +1160,7 @@ public abstract class FileUploadBase {
          * exception.
          */
         public void setFileName(String pFileName) {
-        	fileName = pFileName;
+            fileName = pFileName;
         }
 
         /**
@@ -1169,7 +1169,7 @@ public abstract class FileUploadBase {
          * @return Field name, if known, or null.
          */
         public String getFieldName() {
-        	return fieldName;
+            return fieldName;
         }
 
         /**
@@ -1177,7 +1177,7 @@ public abstract class FileUploadBase {
          * exception.
          */
         public void setFieldName(String pFieldName) {
-        	fieldName = pFieldName;
+            fieldName = pFieldName;
         }
     }
 

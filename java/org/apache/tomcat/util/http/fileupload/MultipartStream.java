@@ -90,7 +90,7 @@ public class MultipartStream {
      * Internal class, which is used to invoke the
      * {@link ProgressListener}.
      */
-	public static class ProgressNotifier {
+    public static class ProgressNotifier {
         /** The listener to invoke.
          */
         private final ProgressListener listener;
