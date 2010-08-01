@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
+
 
 /** Utility class for working with streams.
  */
@@ -162,5 +164,35 @@ public final class Streams {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         copy(pStream, baos, true);
         return baos.toString(pEncoding);
+    }
+
+    /**
+     * Checks, whether the given file name is valid in the sense,
+     * that it doesn't contain any NUL characters. If the file name
+     * is valid, it will be returned without any modifications. Otherwise,
+     * an {@link InvalidFileNameException} is raised.
+     * @param pFileName The file name to check
+     * @return Unmodified file name, if valid.
+     * @throws InvalidFileNameException The file name was found to be invalid.
+     */
+    public static String checkFileName(String pFileName) {
+        if (pFileName != null  &&  pFileName.indexOf('\u0000') != -1) {
+            // pFileName.replace("\u0000", "\\0")
+            final StringBuffer sb = new StringBuffer();
+            for (int i = 0;  i < pFileName.length();  i++) {
+                char c = pFileName.charAt(i);
+                switch (c) {
+                    case 0:
+                        sb.append("\\0");
+                        break;
+                    default:
+                        sb.append(c);
+                        break;
+                }
+            }
+            throw new InvalidFileNameException(pFileName,
+                    "Invalid file name: " + sb);
+        }
+        return pFileName;
     }
 }

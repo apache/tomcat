@@ -82,12 +82,12 @@ import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookie;
-import org.apache.tomcat.util.http.fileupload.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.util.http.fileupload.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase.InvalidContentTypeException;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.mapper.MappingData;
 import org.apache.tomcat.util.res.StringManager;
 
