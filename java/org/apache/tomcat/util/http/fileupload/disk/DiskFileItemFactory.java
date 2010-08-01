@@ -41,15 +41,18 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * </ul>
  * </p>
  *
- * <p>When using the <code>DiskFileItemFactory</code>, then you should
- * consider the following: Temporary files are automatically deleted as
- * soon as they are no longer needed. (More precisely, when the
+ * <p>Temporary files, which are created for file items, should be
+ * deleted later on. The best way to do this is using a
+ * {@link FileCleaningTracker}, which you can set on the
+ * {@link DiskFileItemFactory}. However, if you do use such a tracker,
+ * then you must consider the following: Temporary files are automatically
+ * deleted as soon as they are no longer needed. (More precisely, when the
  * corresponding instance of {@link java.io.File} is garbage collected.)
- * Cleaning up those files is done by an instance of
- * {@link FileCleaningTracker}, and an associated thread. In a complex
- * environment, for example in a web application, you should consider
- * terminating this thread, for example, when your web application
- * ends. See the section on "Resource cleanup"
+ * This is done by the so-called reaper thread, which is started
+ * automatically when the class {@link org.apache.commons.io.FileCleaner}
+ * is loaded.
+ * It might make sense to terminate that thread, for example, if
+ * your web application ends. See the section on "Resource cleanup"
  * in the users guide of commons-fileupload.</p>
  *
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
@@ -206,20 +209,19 @@ public class DiskFileItemFactory implements FileItemFactory {
     /**
      * Returns the tracker, which is responsible for deleting temporary
      * files.
-     * @return An instance of {@link FileCleaningTracker}, defaults to
-     *   {@link org.apache.commons.io.FileCleaner#getInstance()}. Null,
-     *   if temporary files aren't tracked.
+     * @return An instance of {@link FileCleaningTracker}, or null
+     *   (default), if temporary files aren't tracked.
      */
     public FileCleaningTracker getFileCleaningTracker() {
         return fileCleaningTracker;
     }
 
     /**
-     * Returns the tracker, which is responsible for deleting temporary
+     * Sets the tracker, which is responsible for deleting temporary
      * files.
      * @param pTracker An instance of {@link FileCleaningTracker},
-     *   which will from now on track the created files. May be null
-     *   to disable tracking.
+     *   which will from now on track the created files, or null
+     *   (default), to disable tracking.
      */
     public void setFileCleaningTracker(FileCleaningTracker pTracker) {
         fileCleaningTracker = pTracker;

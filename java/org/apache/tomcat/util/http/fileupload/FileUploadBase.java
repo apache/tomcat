@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -297,19 +298,23 @@ public abstract class FileUploadBase {
      */
     public List<FileItem> parseRequest(RequestContext ctx)
             throws FileUploadException {
+        List<FileItem> items = new ArrayList<FileItem>();
+        boolean successful = false;
         try {
             FileItemIterator iter = getItemIterator(ctx);
-            List<FileItem> items = new ArrayList<FileItem>();
             FileItemFactory fac = getFileItemFactory();
             if (fac == null) {
                 throw new NullPointerException(
                     "No FileItemFactory has been set.");
             }
             while (iter.hasNext()) {
-                FileItemStream item = iter.next();
+                final FileItemStream item = iter.next();
+                // Don't use getName() here to prevent an InvalidFileNameException.
+                final String fileName = ((org.apache.tomcat.util.http.fileupload.FileUploadBase.FileItemIteratorImpl.FileItemStreamImpl) item).name;
                 FileItem fileItem = fac.createItem(item.getFieldName(),
                         item.getContentType(), item.isFormField(),
-                        item.getName());
+                        fileName);
+                items.add(fileItem);
                 try {
                     Streams.copy(item.openStream(), fileItem.getOutputStream(),
                             true);
@@ -324,13 +329,24 @@ public abstract class FileUploadBase {
                     final FileItemHeaders fih = item.getHeaders();
                     ((FileItemHeadersSupport) fileItem).setHeaders(fih);
                 }
-                items.add(fileItem);
             }
+            successful = true;
             return items;
         } catch (FileUploadIOException e) {
             throw (FileUploadException) e.getCause();
         } catch (IOException e) {
             throw new FileUploadException(e.getMessage(), e);
+        } finally {
+            if (!successful) {
+                for (Iterator<FileItem> iterator = items.iterator(); iterator.hasNext();) {
+                    FileItem fileItem = iterator.next();
+                    try {
+                        fileItem.delete();
+                    } catch (Throwable e) {
+                        // ignore it
+                    }
+                }
+            }
         }
     }
 
@@ -547,7 +563,7 @@ public abstract class FileUploadBase {
         /**
          * Default implementation of {@link FileItemStream}.
          */
-        private class FileItemStreamImpl implements FileItemStream {
+        class FileItemStreamImpl implements FileItemStream {
             /** The file items content type.
              */
             private final String contentType;
@@ -591,13 +607,15 @@ public abstract class FileUploadBase {
                 if (fileSizeMax != -1) {
                     if (pContentLength != -1
                             &&  pContentLength > fileSizeMax) {
-                        FileUploadException e =
+                    	FileSizeLimitExceededException e =
                             new FileSizeLimitExceededException(
                                 "The field " + fieldName
                                 + " exceeds its maximum permitted "
                                 + " size of " + fileSizeMax
-                                + " characters.",
+                                + " bytes.",
                                 pContentLength, fileSizeMax);
+                        e.setFileName(pName);
+                        e.setFieldName(pFieldName);
                         throw new FileUploadIOException(e);
                     }
                     istream = new LimitedInputStream(istream, fileSizeMax) {
@@ -605,14 +623,16 @@ public abstract class FileUploadBase {
                         protected void raiseError(long pSizeMax, long pCount)
                                 throws IOException {
                             itemStream.close(true);
-                            FileUploadException e =
+                            FileSizeLimitExceededException e =
                                 new FileSizeLimitExceededException(
                                     "The field " + fieldName
                                     + " exceeds its maximum permitted "
                                     + " size of " + pSizeMax
-                                    + " characters.",
+                                    + " bytes.",
                                     pCount, pSizeMax);
-                            throw new FileUploadIOException(e);
+                            e.setFieldName(fieldName);
+                            e.setFileName(name);
+                    		throw new FileUploadIOException(e);
                         }
                     };
                 }
@@ -638,9 +658,13 @@ public abstract class FileUploadBase {
             /**
              * Returns the items file name.
              * @return File name, if known, or null.
+             * @throws InvalidFileNameException The file name contains a NUL character,
+             *   which might be an indicator of a security attack. If you intend to
+             *   use the file name anyways, catch the exception and use
+             *   InvalidFileNameException#getName().
              */
             public String getName() {
-                return name;
+                return Streams.checkFileName(name);
             }
 
             /**
@@ -1024,7 +1048,7 @@ public abstract class FileUploadBase {
      */
     public abstract static class SizeException extends FileUploadException {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -8776225574705254126L;
 
         /**
          * The actual size of the request.
@@ -1100,6 +1124,16 @@ public abstract class FileUploadBase {
         private static final long serialVersionUID = 8150776562029630058L;
 
         /**
+         * File name of the item, which caused the exception.
+         */
+        private String fileName;
+
+        /**
+         * Field name of the item, which caused the exception.
+         */
+        private String fieldName;
+
+        /**
          * Constructs a <code>SizeExceededException</code> with
          * the specified detail message, and actual and permitted sizes.
          *
@@ -1110,6 +1144,40 @@ public abstract class FileUploadBase {
         public FileSizeLimitExceededException(String message, long actual,
                 long permitted) {
             super(message, actual, permitted);
+        }
+
+        /**
+         * Returns the file name of the item, which caused the
+         * exception.
+         * @return File name, if known, or null.
+         */
+        public String getFileName() {
+        	return fileName;
+        }
+
+        /**
+         * Sets the file name of the item, which caused the
+         * exception.
+         */
+        public void setFileName(String pFileName) {
+        	fileName = pFileName;
+        }
+
+        /**
+         * Returns the field name of the item, which caused the
+         * exception.
+         * @return Field name, if known, or null.
+         */
+        public String getFieldName() {
+        	return fieldName;
+        }
+
+        /**
+         * Sets the field name of the item, which caused the
+         * exception.
+         */
+        public void setFieldName(String pFieldName) {
+        	fieldName = pFieldName;
         }
     }
 

@@ -35,8 +35,10 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
 import org.apache.tomcat.util.http.fileupload.FileItemHeadersSupport;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
+import org.apache.tomcat.util.http.fileupload.util.Streams;
 
 
 /**
@@ -52,9 +54,12 @@ import org.apache.tomcat.util.http.fileupload.ParameterParser;
  * {@link #getInputStream()} and process the file without attempting to load
  * it into memory, which may come handy with large files.
  *
- * <p>When using the <code>DiskFileItemFactory</code>, then you should
- * consider the following: Temporary files are automatically deleted as
- * soon as they are no longer needed. (More precisely, when the
+ * <p>Temporary files, which are created for file items, should be
+ * deleted later on. The best way to do this is using a
+ * {@link FileCleaningTracker}, which you can set on the
+ * {@link DiskFileItemFactory}. However, if you do use such a tracker,
+ * then you must consider the following: Temporary files are automatically
+ * deleted as soon as they are no longer needed. (More precisely, when the
  * corresponding instance of {@link java.io.File} is garbage collected.)
  * This is done by the so-called reaper thread, which is started
  * automatically when the class {@link org.apache.commons.io.FileCleaner}
@@ -269,9 +274,13 @@ public class DiskFileItem
      * Returns the original filename in the client's filesystem.
      *
      * @return The original filename in the client's filesystem.
+     * @throws InvalidFileNameException The file name contains a NUL character,
+     *   which might be an indicator of a security attack. If you intend to
+     *   use the file name anyways, catch the exception and use
+     *   InvalidFileNameException#getName().
      */
     public String getName() {
-        return fileName;
+        return Streams.checkFileName(fileName);
     }
 
 
