@@ -39,8 +39,8 @@ public interface FilterConfig {
      * Returns a reference to the {@link ServletContext} in which the caller is
      * executing.
      * 
-     * @returns {@link ServletContext} object, used by the caller to interact
-     *          with its servlet container
+     * @return {@link ServletContext} object, used by the caller to interact
+     *         with its servlet container
      * 
      * @seeServletContext
      */
@@ -55,8 +55,8 @@ public interface FilterConfig {
      *            <code>String</code> specifying the name of the initialization
      *            parameter
      * 
-     * @returns <code>String</code> containing the value of the initialization
-     *          parameter
+     * @return <code>String</code> containing the value of the initialization
+     *         parameter
      */
     public String getInitParameter(String name);
 
@@ -65,8 +65,8 @@ public interface FilterConfig {
      * <code>Enumeration</code> of <code>String</code> objects, or an empty
      * <code>Enumeration</code> if the filter has no initialization parameters.
      * 
-     * @returns <code>Enumeration</code> of <code>String</code> objects
-     *          containing the names of the filter's initialization parameters
+     * @return <code>Enumeration</code> of <code>String</code> objects
+     *         containing the names of the filter's initialization parameters
      */
     public Enumeration<String> getInitParameterNames();
 
