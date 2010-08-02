@@ -1866,8 +1866,8 @@ public class ContextConfig
 
     /**
      * For classes packaged with the web application, the class and each
-     * super class needs to be checked for a match with {@Link HandlesTypes} or
-     * for an annotation that matches {@Link HandlesTypes}.
+     * super class needs to be checked for a match with {@link HandlesTypes} or
+     * for an annotation that matches {@link HandlesTypes}.
      * @param javaClass
      */
     protected void checkHandlesTypes(JavaClass javaClass) {
