@@ -891,8 +891,8 @@
         java.lang.Long
         java.lang.Float
         java.lang.Double
-        		  java.lang.Class
-        		  any enumeration type (i.e. a subclass of java.lang.Enum)
+        java.lang.Class
+        any enumeration type (i.e. a subclass of java.lang.Enum)
         
         Examples:
         
@@ -1061,8 +1061,8 @@
     <xsd:annotation>
       <xsd:documentation>
 
-        	The following transaction isolation levels are allowed
-        	(see documentation for the java.sql.Connection interface):
+        The following transaction isolation levels are allowed
+        (see documentation for the java.sql.Connection interface):
         TRANSACTION_READ_UNCOMMITTED
         TRANSACTION_READ_COMMITTED
         TRANSACTION_REPEATABLE_READ
