@@ -89,14 +89,14 @@ repository.  This might be done by a series of commands like this, where
 stored in the CVS repository, and {username} is your login username:</p>
 <source>
 cd {my home directory}
-mkdir myapp	&lt;-- Assumed "project source directory"
+mkdir myapp &lt;-- Assumed "project source directory"
 cd myapp
 mkdir docs
 mkdir src
 mkdir web
 mkdir web/WEB-INF
 cvs import -m "Initial Project Creation" {project} \
-	{username} start
+    {username} start
 </source>
 
 <p>Now, to verify that it was created correctly in CVS, we will perform a
@@ -115,7 +115,7 @@ or code it from scratch.</p>
 <source>
 cd {my home directory}
 cd myapp
-emacs build.xml		&lt;-- if you want a real editor :-)
+emacs build.xml     &lt;-- if you want a real editor :-)
 cvs add build.xml
 cvs commit
 </source>
@@ -188,7 +188,7 @@ building and testing is successful), commit the new file to the repository.
 For example, to create a new JSP page:</p>
 <source>
 cd {my home directory}
-cd myapp/web		&lt;-- Ultimate destination is document root
+cd myapp/web        &lt;-- Ultimate destination is document root
 emacs mypage.jsp
 cvs add mypage.jsp
 ... build and test the application ...
@@ -218,7 +218,7 @@ commands (generally, you will want a shell window open that is set to
 the project source directory, so that only the last command is needed):</p>
 <source>
 cd {my home directory}
-cd myapp		&lt;-- Normally leave a window open here
+cd myapp        &lt;-- Normally leave a window open here
 ant
 </source>
 

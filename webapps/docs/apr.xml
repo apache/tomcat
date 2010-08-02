@@ -104,7 +104,7 @@
     </p>
     
     </subsection>
-	
+
   </section>
 
   <section name="APR Components">
@@ -171,14 +171,14 @@
       </p>
     
     </subsection>
-	
+
     <subsection name="AJP">
 
       <p>For AJP configuration, see the <a href="config/ajp.html">AJP</a>
       connector configuration documentation.</p>
     
     </subsection>
-	
+
   </section>
 
 </body>

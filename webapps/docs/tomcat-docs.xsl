@@ -77,10 +77,10 @@
       <meta name="email" content="{$email}"/>
        -->
     </xsl:for-each>
-		<style type="text/css" media="print">
-			.noPrint {display: none;}
-			td#mainBody {width: 100%;}
-		</style>
+        <style type="text/css" media="print">
+            .noPrint {display: none;}
+            td#mainBody {width: 100%;}
+        </style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
