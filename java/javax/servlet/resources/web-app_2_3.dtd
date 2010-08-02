@@ -21,8 +21,8 @@ All Servlet 2.3 deployment descriptors must include a DOCTYPE
 of the following form:
 
   <!DOCTYPE web-app PUBLIC
-	"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-	"http://java.sun.com/dtd/web-app_2_3.dtd">
+    "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 -->
 
@@ -147,9 +147,9 @@ Used in: ejb-local-ref, ejb-ref
 
 Examples:
 
-	<ejb-link>EmployeeRecord</ejb-link>
+    <ejb-link>EmployeeRecord</ejb-link>
 
-	<ejb-link>../products/product.jar#ProductEJB</ejb-link>
+    <ejb-link>../products/product.jar#ProductEJB</ejb-link>
 
 -->
 <!ELEMENT ejb-link (#PCDATA)>
@@ -158,37 +158,37 @@ Examples:
 The ejb-local-ref element is used for the declaration of a reference to
 an enterprise bean's local home. The declaration consists of:
 
-	- an optional description
-	- the EJB reference name used in the code of the web application
-	  that's referencing the enterprise bean
-	- the expected type of the referenced enterprise bean
-	- the expected local home and local interfaces of the referenced
-	  enterprise bean
-	- optional ejb-link information, used to specify the referenced
-	  enterprise bean
+    - an optional description
+    - the EJB reference name used in the code of the web application
+      that's referencing the enterprise bean
+    - the expected type of the referenced enterprise bean
+    - the expected local home and local interfaces of the referenced
+      enterprise bean
+    - optional ejb-link information, used to specify the referenced
+      enterprise bean
 
 Used in: web-app
 -->
 <!ELEMENT ejb-local-ref (description?, ejb-ref-name, ejb-ref-type,
-		local-home, local, ejb-link?)>
+        local-home, local, ejb-link?)>
 
 <!--
 The ejb-ref element is used for the declaration of a reference to
 an enterprise bean's home. The declaration consists of:
 
-	- an optional description
-	- the EJB reference name used in the code of
-	  the web application that's referencing the enterprise bean
-	- the expected type of the referenced enterprise bean
-	- the expected home and remote interfaces of the referenced
-	  enterprise bean
-	- optional ejb-link information, used to specify the referenced
-	  enterprise bean
+    - an optional description
+    - the EJB reference name used in the code of
+      the web application that's referencing the enterprise bean
+    - the expected type of the referenced enterprise bean
+    - the expected home and remote interfaces of the referenced
+      enterprise bean
+    - optional ejb-link information, used to specify the referenced
+      enterprise bean
 
 Used in: web-app
 -->
 <!ELEMENT ejb-ref (description?, ejb-ref-name, ejb-ref-type,
-		home, remote, ejb-link?)>
+        home, remote, ejb-link?)>
 
 <!--
 The ejb-ref-name element contains the name of an EJB reference. The
@@ -212,8 +212,8 @@ referenced enterprise bean.
 
 The ejb-ref-type element must be one of the following:
 
-	<ejb-ref-type>Entity</ejb-ref-type>
-	<ejb-ref-type>Session</ejb-ref-type>
+    <ejb-ref-type>Entity</ejb-ref-type>
+    <ejb-ref-type>Session</ejb-ref-type>
 
 Used in: ejb-local-ref, ejb-ref
 -->
@@ -249,15 +249,15 @@ code.
 
 The following are the legal values of env-entry-type:
 
-	java.lang.Boolean
-	java.lang.Byte
-	java.lang.Character
-	java.lang.String
-	java.lang.Short
-	java.lang.Integer
-	java.lang.Long
-	java.lang.Float
-	java.lang.Double
+    java.lang.Boolean
+    java.lang.Byte
+    java.lang.Character
+    java.lang.String
+    java.lang.Short
+    java.lang.Integer
+    java.lang.Long
+    java.lang.Float
+    java.lang.Double
 
 Used in: env-entry
 -->
@@ -575,8 +575,8 @@ Deployer.
 
 The value of this element must be one of the two following:
 
-	<res-auth>Application</res-auth>
-	<res-auth>Container</res-auth>
+    <res-auth>Application</res-auth>
+    <res-auth>Container</res-auth>
 
 Used in: resource-ref
 -->
@@ -597,8 +597,8 @@ through the given resource manager connection factory reference can be
 shared. The value of this element, if specified, must be one of the
 two following:
 
-	<res-sharing-scope>Shareable</res-sharing-scope>
-	<res-sharing-scope>Unshareable</res-sharing-scope>
+    <res-sharing-scope>Shareable</res-sharing-scope>
+    <res-sharing-scope>Unshareable</res-sharing-scope>
 
 The default value is Shareable.
 
@@ -633,7 +633,7 @@ Example:
 </resource-env-ref>
 -->
 <!ELEMENT resource-env-ref (description?, resource-env-ref-name,
-		resource-env-ref-type)>
+        resource-env-ref-type)>
 
 <!--
 The resource-env-ref-name element specifies the name of a resource
@@ -669,14 +669,14 @@ Used in: web-app
 Example:
 
     <resource-ref>
-	<res-ref-name>jdbc/EmployeeAppDB</res-ref-name>
-	<res-type>javax.sql.DataSource</res-type>
-	<res-auth>Container</res-auth>
-	<res-sharing-scope>Shareable</res-sharing-scope>
+    <res-ref-name>jdbc/EmployeeAppDB</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+    <res-sharing-scope>Shareable</res-sharing-scope>
     </resource-ref>
 -->
 <!ELEMENT resource-ref (description?, res-ref-name, res-type, res-auth,
-		res-sharing-scope?)>
+        res-sharing-scope?)>
 
 <!--
 The role-link element is a reference to a defined security role. The
@@ -724,11 +724,11 @@ Used in: web-app
 Example:
 
     <security-role>
-	<description>
-	    This role includes all employees who are authorized
-	    to access the employee service application.
-	</description>
-	<role-name>employee</role-name>
+    <description>
+        This role includes all employees who are authorized
+        to access the employee service application.
+    </description>
+    <role-name>employee</role-name>
     </security-role>
 -->
 <!ELEMENT security-role (description?, role-name)>
