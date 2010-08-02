@@ -29,7 +29,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * (J2ME). This attribute is used by the <a
  * href="http://java.sun.com/products/cldc/">KVM</a> and contained
  * within the Code attribute of a method. See CLDC specification
- * �5.3.1.2
+ * &sect;5.3.1.2
  *
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
