@@ -864,8 +864,8 @@ public class ApplicationContext
      * @param   filterName  Name of filter to add
      * @param   filterClass Name of filter class
      * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link FilterRegistration.Dynamic} object that can be
-     *          used to further configure the filter
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
@@ -884,8 +884,8 @@ public class ApplicationContext
      * @param   filterName  Name of filter to add
      * @param   filter      Filter to add
      * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link FilterRegistration.Dynamic} object that can be
-     *          used to further configure the filter
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
@@ -904,8 +904,8 @@ public class ApplicationContext
      * @param   filterName  Name of filter to add
      * @param   filterClass Class of filter to add
      * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link FilterRegistration.Dynamic} object that can be
-     *          used to further configure the filter
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
@@ -993,8 +993,8 @@ public class ApplicationContext
      * @param   servletName  Name of servlet to add
      * @param   servletClass Name of servlet class
      * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link ServletRegistration.Dynamic} object that can be
-     *          used to further configure the servlet
+     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     *          that can be used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
@@ -1013,8 +1013,8 @@ public class ApplicationContext
      * @param   servletName Name of servlet to add
      * @param   servlet     Servlet instance to add
      * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link ServletRegistration.Dynamic} object that can be
-     *          used to further configure the servlet
+     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     *          that can be used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
@@ -1033,8 +1033,8 @@ public class ApplicationContext
      * @param   servletName  Name of servlet to add
      * @param   servletClass Class of servlet to add
      * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link ServletRegistration.Dynamic} object that can be
-     *          used to further configure the servlet
+     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     *          that can be used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
