@@ -32,25 +32,25 @@
       <tr valign="top">
         <td>
           <tags:panel color="#ff8080" bgcolor="#ffc0c0" title="Panel 1">
-	    First panel.<br/>
-	  </tags:panel>
+            First panel.<br/>
+          </tags:panel>
         </td>
         <td>
           <tags:panel color="#80ff80" bgcolor="#c0ffc0" title="Panel 2">
-	    Second panel.<br/>
-	    Second panel.<br/>
-	    Second panel.<br/>
-	    Second panel.<br/>
-	  </tags:panel>
+            Second panel.<br/>
+            Second panel.<br/>
+            Second panel.<br/>
+            Second panel.<br/>
+          </tags:panel>
         </td>
         <td>
           <tags:panel color="#8080ff" bgcolor="#c0c0ff" title="Panel 3">
-	    Third panel.<br/>
+            Third panel.<br/>
             <tags:panel color="#ff80ff" bgcolor="#ffc0ff" title="Inner">
-	      A panel in a panel.
-	    </tags:panel>
-	    Third panel.<br/>
-	  </tags:panel>
+              A panel in a panel.
+            </tags:panel>
+            Third panel.<br/>
+          </tags:panel>
         </td>
       </tr>
     </table>

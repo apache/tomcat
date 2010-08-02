@@ -17,7 +17,7 @@
 <tags:xhtmlbasic xmlns:tags="urn:jsptagdir:/WEB-INF/tags"
                  xmlns:jsp="http://java.sun.com/JSP/Page"
                  xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
-		 xmlns="http://www.w3.org/1999/xhtml">
+                 xmlns="http://www.w3.org/1999/xhtml">
   <jsp:directive.page contentType="text/html" />
   <head>
     <title>JSPX - XHTML Basic Example</title>
