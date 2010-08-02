@@ -35,7 +35,17 @@
 
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
-<section name="Tomcat 7.0.1 (markt)">
+<section name="Tomcat 7.0.2 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix repgrssion that prevented running with a security manager enabled.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 7.0.1 (markt)" rtext="Not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
