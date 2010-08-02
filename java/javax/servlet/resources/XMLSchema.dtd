@@ -335,21 +335,21 @@
 <!ELEMENT %unique; ((%annotation;)?, %selector;, (%field;)+)>
 <!ATTLIST %unique;
           name     %NCName;       #REQUIRED
-	  id       ID             #IMPLIED
-	  %uniqueAttrs;>
+          id       ID             #IMPLIED
+          %uniqueAttrs;>
 
 <!ELEMENT %key;    ((%annotation;)?, %selector;, (%field;)+)>
 <!ATTLIST %key;
           name     %NCName;       #REQUIRED
-	  id       ID             #IMPLIED
-	  %keyAttrs;>
+          id       ID             #IMPLIED
+          %keyAttrs;>
 
 <!ELEMENT %keyref; ((%annotation;)?, %selector;, (%field;)+)>
 <!ATTLIST %keyref;
           name     %NCName;       #REQUIRED
-	  refer    %QName;        #REQUIRED
-	  id       ID             #IMPLIED
-	  %keyrefAttrs;>
+          refer    %QName;        #REQUIRED
+          id       ID             #IMPLIED
+          %keyrefAttrs;>
 
 <!ELEMENT %selector; ((%annotation;)?)>
 <!ATTLIST %selector;
@@ -385,11 +385,11 @@
 
 <!ELEMENT %notation; (%annotation;)?>
 <!ATTLIST %notation;
-	  name        %NCName;    #REQUIRED
-	  id          ID          #IMPLIED
-	  public      CDATA       #REQUIRED
-	  system      %URIref;    #IMPLIED
-	  %notationAttrs;>
+          name        %NCName;    #REQUIRED
+          id          ID          #IMPLIED
+          public      CDATA       #REQUIRED
+          system      %URIref;    #IMPLIED
+          %notationAttrs;>
 
 <!-- Annotation is either application information or documentation -->
 <!-- By having these here they are available for datatypes as well
