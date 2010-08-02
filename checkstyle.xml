@@ -23,9 +23,6 @@
   <!-- 'Standard Checks' in the Checkstyle documentation:                    -->
   <!-- http://checkstyle.sourceforge.net/config_coding.html                  -->
 
-  <!-- Misc -->
-  <module name="Translation"/>
-  
   <!-- Whitespace -->
   <module name="FileTabCharacter"/>
 
