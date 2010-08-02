@@ -37,23 +37,23 @@ of the following form:
 
   <!DOCTYPE taglib
         PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
-	"http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+        "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
 
 -->
 
 <!--
 The taglib tag is the document root, it defines:
 
-tlib-version	the version of the tag library implementation
+tlib-version    the version of the tag library implementation
 
-jsp-version	the version of JSP the tag library depends upon
+jsp-version     the version of JSP the tag library depends upon
 
-short-name	a simple default short name that could be used by
-		a JSP authoring tool to create names with a mnemonic
-		value; for example, the it may be used as the prefered
-		prefix value in taglib directives
+short-name      a simple default short name that could be used by
+                a JSP authoring tool to create names with a mnemonic
+                value; for example, the it may be used as the prefered
+                prefix value in taglib directives
 
-uri		a uri uniquely identifying this taglib
+uri             a uri uniquely identifying this taglib
 
 display-name    the display-name element contains a short name that
                 is intended to be displayed by tools
@@ -61,8 +61,8 @@ small-icon      optional small-icon that can be used by tools
 
 large-icon      optional large-icon that can be used by tools
 
-description	a simple string describing the "use" of this taglib,
-		should be user discernable
+description     a simple string describing the "use" of this taglib,
+                should be user discernable
 
 validator       optional TagLibraryValidator information
 
@@ -76,8 +76,8 @@ listener        optional event listener specification
                   validator?, listener*, tag+) >
 
 <!ATTLIST taglib id ID #IMPLIED
-	  xmlns CDATA #FIXED
-		"http://java.sun.com/JSP/TagLibraryDescriptor"
+        xmlns CDATA #FIXED
+        "http://java.sun.com/JSP/TagLibraryDescriptor"
 >
 
 <!--
@@ -114,13 +114,13 @@ Defines a public URI that uniquely identifies this version of
 the taglibrary.  Leave it empty if it does not apply.
 -->
 
-<!ELEMENT uri	 (#PCDATA) >
+<!ELEMENT uri             (#PCDATA) >
 
 <!--
-Defines an arbitrary text string descirbing the tag library
+Defines an arbitrary text string describing the tag library
 -->
 
-<!ELEMENT description	(#PCDATA) >
+<!ELEMENT description     (#PCDATA) >
 
 <!--
 
@@ -245,13 +245,13 @@ intended for use by page composition tools.
 
 There are currently three values specified:
 
-tagdependent	The body of the tag is interpreted by the tag
-		implementation itself, and is most likely in a
-		different "langage", e.g embedded SQL statements.
+tagdependent    The body of the tag is interpreted by the tag
+                implementation itself, and is most likely in a
+                different "langage", e.g embedded SQL statements.
 
-JSP		The body of the tag contains nested JSP syntax
+JSP             The body of the tag contains nested JSP syntax
 
-empty		The body must be empty
+empty           The body must be empty
 
 The default (if not defined) is JSP
 
@@ -380,7 +380,7 @@ values are "AT_BEGIN" and "AT_END".
 The attribute tag defines an attribute for the nesting tag
 
 An attribute definition is composed of:
-	
+
 - the attributes name (required)
 - if the attribute is required or optional (optional)
 - if the attributes value may be dynamically calculated at runtime
@@ -416,7 +416,7 @@ Defines the canonical name of a tag or attribute being defined
 #PCDATA ::= NMTOKEN
 -->
 
-<!ELEMENT name	(#PCDATA) >
+<!ELEMENT name        (#PCDATA) >
 
 <!--
 Defines if the nesting attribute is required or optional.

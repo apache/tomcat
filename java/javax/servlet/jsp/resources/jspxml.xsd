@@ -171,7 +171,7 @@
         before the first /, ? or #, if any (RFC2396).
       </xsd:documentation>
     </xsd:annotation>
-	<xsd:restriction base = "xsd:anyURI">
+    <xsd:restriction base = "xsd:anyURI">
       <xsd:pattern value = "&RelativeURL;"/>
     </xsd:restriction>
   </xsd:simpleType>
@@ -340,7 +340,7 @@
     <xsd:annotation>
       <xsd:documentation>
         directive.include is the "include directive".
-	This element does not appear on XML views of JSP pages.
+        This element does not appear on XML views of JSP pages.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
