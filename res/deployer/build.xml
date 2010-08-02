@@ -73,7 +73,7 @@
            failonerror="false"
            srcdir="${webapp.path}/WEB-INF/classes"
            encoding="UTF-8"
-	   excludes="**/*.smap">
+           excludes="**/*.smap">
       <classpath>
         <fileset dir="${webapp.path}/WEB-INF/lib">
           <include name="*.jar"/>
