@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <HEAD><TITLE> 
-	Calendar: A JSP APPLICATION
+    Calendar: A JSP APPLICATION
 </TITLE></HEAD>
 
 
@@ -26,8 +26,8 @@
 <jsp:useBean id="table" scope="session" class="cal.TableBean" />
 
 <%
-	table.processRequest(request);
-	if (table.getProcessError() == false) {
+    table.processRequest(request);
+    if (table.getProcessError() == false) {
 %>
 
 <!-- html table goes here -->
@@ -48,20 +48,20 @@
 </TR>
 <FORM METHOD=POST ACTION=cal1.jsp>
 <%
-	for(int i=0; i<table.getEntries().getRows(); i++) {
-	   cal.Entry entr = table.getEntries().getEntry(i);	
+    for(int i=0; i<table.getEntries().getRows(); i++) {
+       cal.Entry entr = table.getEntries().getEntry(i);
 %>
-	<TR>
-	<TD> 
-	<A HREF=cal2.jsp?time=<%= entr.getHour() %>>
-		<%= entr.getHour() %> </A>
-	</TD>
-	<TD BGCOLOR=<%= entr.getColor() %>>
-	<% out.print(util.HTMLFilter.filter(entr.getDescription())); %>
-	</TD> 
-	</TR>
+    <TR>
+    <TD> 
+    <A HREF=cal2.jsp?time=<%= entr.getHour() %>>
+        <%= entr.getHour() %> </A>
+    </TD>
+    <TD BGCOLOR=<%= entr.getColor() %>>
+    <% out.print(util.HTMLFilter.filter(entr.getDescription())); %>
+    </TD> 
+    </TR>
 <%
-	}
+    }
 %>
 </FORM>
 </TABLE>
@@ -71,19 +71,19 @@
 <TABLE WIDTH=60% BGCOLOR=yellow CELLPADDING=15>
 <TR>
 <TD ALIGN=CENTER>  <% out.print(util.HTMLFilter.filter(table.getName())); %> : 
-		     <% out.print(util.HTMLFilter.filter(table.getEmail())); %> </TD>
+             <% out.print(util.HTMLFilter.filter(table.getEmail())); %> </TD>
 </TR>
 </TABLE>
 </CENTER>
 
 <%
-	} else {
+    } else {
 %>
 <font size=5>
-	You must enter your name and email address correctly.
+    You must enter your name and email address correctly.
 </font>
 <%
-	}
+    }
 %>
 
 

@@ -43,15 +43,15 @@ FF"></a>
     </c:forEach>
 
     <% Vector v = new Vector();
-	v.add("One"); v.add("Two"); v.add("Three"); v.add("Four");
+        v.add("One"); v.add("Two"); v.add("Three"); v.add("Four");
 
-	pageContext.setAttribute("vector", v);
+        pageContext.setAttribute("vector", v);
     %>
 
     <h3>Iterating over a Vector</h3>
 
     <c:forEach items="${vector}" var="item" >
-	${item}
+        ${item}
     </c:forEach>
   </body>
 </html> 

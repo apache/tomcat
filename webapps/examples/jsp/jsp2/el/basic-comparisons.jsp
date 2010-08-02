@@ -36,80 +36,80 @@
       <code>
         <table border="1">
           <thead>
-	    <td><b>EL Expression</b></td>
-	    <td><b>Result</b></td>
-	  </thead>
-	  <tr>
-	    <td>\${1 &lt; 2}</td>
-	    <td>${1 < 2}</td>
-	  </tr>
-	  <tr>
-	    <td>\${1 lt 2}</td>
-	    <td>${1 lt 2}</td>
-	  </tr>
-	  <tr>
-	    <td>\${1 &gt; (4/2)}</td>
-	    <td>${1 > (4/2)}</td>
-	  </tr>
-	  <tr>
-	    <td>\${1 gt (4/2)}</td>
-	    <td>${1 gt (4/2)}</td>
-	  </tr>
-	  <tr>
-	    <td>\${4.0 &gt;= 3}</td>
-	    <td>${4.0 >= 3}</td>
-	  </tr>
-	  <tr>
-	    <td>\${4.0 ge 3}</td>
-	    <td>${4.0 ge 3}</td>
-	  </tr>
-	  <tr>
-	    <td>\${4 &lt;= 3}</td>
-	    <td>${4 <= 3}</td>
-	  </tr>
-	  <tr>
-	    <td>\${4 le 3}</td>
-	    <td>${4 le 3}</td>
-	  </tr>
-	  <tr>
-	    <td>\${100.0 == 100}</td>
-	    <td>${100.0 == 100}</td>
-	  </tr>
-	  <tr>
-	    <td>\${100.0 eq 100}</td>
-	    <td>${100.0 eq 100}</td>
-	  </tr>
-	  <tr>
-	    <td>\${(10*10) != 100}</td>
-	    <td>${(10*10) != 100}</td>
-	  </tr>
-	  <tr>
-	    <td>\${(10*10) ne 100}</td>
-	    <td>${(10*10) ne 100}</td>
-	  </tr>
-	</table>
+        <td><b>EL Expression</b></td>
+        <td><b>Result</b></td>
+      </thead>
+      <tr>
+        <td>\${1 &lt; 2}</td>
+        <td>${1 < 2}</td>
+      </tr>
+      <tr>
+        <td>\${1 lt 2}</td>
+        <td>${1 lt 2}</td>
+      </tr>
+      <tr>
+        <td>\${1 &gt; (4/2)}</td>
+        <td>${1 > (4/2)}</td>
+      </tr>
+      <tr>
+        <td>\${1 gt (4/2)}</td>
+        <td>${1 gt (4/2)}</td>
+      </tr>
+      <tr>
+        <td>\${4.0 &gt;= 3}</td>
+        <td>${4.0 >= 3}</td>
+      </tr>
+      <tr>
+        <td>\${4.0 ge 3}</td>
+        <td>${4.0 ge 3}</td>
+      </tr>
+      <tr>
+        <td>\${4 &lt;= 3}</td>
+        <td>${4 <= 3}</td>
+      </tr>
+      <tr>
+        <td>\${4 le 3}</td>
+        <td>${4 le 3}</td>
+      </tr>
+      <tr>
+        <td>\${100.0 == 100}</td>
+        <td>${100.0 == 100}</td>
+      </tr>
+      <tr>
+        <td>\${100.0 eq 100}</td>
+        <td>${100.0 eq 100}</td>
+      </tr>
+      <tr>
+        <td>\${(10*10) != 100}</td>
+        <td>${(10*10) != 100}</td>
+      </tr>
+      <tr>
+        <td>\${(10*10) ne 100}</td>
+        <td>${(10*10) ne 100}</td>
+      </tr>
+    </table>
       </code>
       <br>
       <u><b>Alphabetic</b></u>
       <code>
         <table border="1">
           <thead>
-	    <td><b>EL Expression</b></td>
-	    <td><b>Result</b></td>
-	  </thead>
-	  <tr>
-	    <td>\${'a' &lt; 'b'}</td>
-	    <td>${'a' < 'b'}</td>
-	  </tr>
-	  <tr>
-	    <td>\${'hip' &gt; 'hit'}</td>
-	    <td>${'hip' > 'hit'}</td>
-	  </tr>
-	  <tr>
-	    <td>\${'4' &gt; 3}</td>
-	    <td>${'4' > 3}</td>
-	  </tr>
-	</table>
+            <td><b>EL Expression</b></td>
+            <td><b>Result</b></td>
+          </thead>
+          <tr>
+            <td>\${'a' &lt; 'b'}</td>
+            <td>${'a' < 'b'}</td>
+          </tr>
+          <tr>
+            <td>\${'hip' &gt; 'hit'}</td>
+            <td>${'hip' > 'hit'}</td>
+          </tr>
+          <tr>
+            <td>\${'4' &gt; 3}</td>
+            <td>${'4' > 3}</td>
+          </tr>
+        </table>
       </code>
     </blockquote>
   </body>

@@ -31,25 +31,25 @@
     <my:findBook var="book"/>
     <table border="1">
         <thead>
-	    <td><b>Field</b></td>
-	    <td><b>Value</b></td>
-	    <td><b>Capitalized</b></td>
-	</thead>
-	<tr>
-	    <td>Title</td>
-	    <td>${book.title}</td>
-	    <td>${my:caps(book.title)}</td>
-	</tr>
-	<tr>
-	    <td>Author</td>
-	    <td>${book.author}</td>
-	    <td>${my:caps(book.author)}</td>
-	</tr>
-	<tr>
-	    <td>ISBN</td>
-	    <td>${book.isbn}</td>
-	    <td>${my:caps(book.isbn)}</td>
-	</tr>
+        <td><b>Field</b></td>
+        <td><b>Value</b></td>
+        <td><b>Capitalized</b></td>
+    </thead>
+    <tr>
+        <td>Title</td>
+        <td>${book.title}</td>
+        <td>${my:caps(book.title)}</td>
+    </tr>
+    <tr>
+        <td>Author</td>
+        <td>${book.author}</td>
+        <td>${my:caps(book.author)}</td>
+    </tr>
+    <tr>
+        <td>ISBN</td>
+        <td>${book.isbn}</td>
+        <td>${my:caps(book.isbn)}</td>
+    </tr>
     </table>
   </body>
 </html>

@@ -32,33 +32,33 @@
     <blockquote>
       <u><b>Change Parameter</b></u>
       <form action="functions.jsp" method="GET">
-	  foo = <input type="text" name="foo" value="${fn:escapeXml(param["foo"])}">
+          foo = <input type="text" name="foo" value="${fn:escapeXml(param["foo"])}">
           <input type="submit">
       </form>
       <br>
       <code>
         <table border="1">
           <thead>
-	    <td><b>EL Expression</b></td>
-	    <td><b>Result</b></td>
-	  </thead>
-	  <tr>
-	    <td>\${param["foo"]}</td>
-	    <td>${fn:escapeXml(param["foo"])}&nbsp;</td>
-	  </tr>
-	  <tr>
-	    <td>\${my:reverse(param["foo"])}</td>
-	    <td>${my:reverse(fn:escapeXml(param["foo"]))}&nbsp;</td>
-	  </tr>
-	  <tr>
-	    <td>\${my:reverse(my:reverse(param["foo"]))}</td>
-	    <td>${my:reverse(my:reverse(fn:escapeXml(param["foo"])))}&nbsp;</td>
-	  </tr>
-	  <tr>
-	    <td>\${my:countVowels(param["foo"])}</td>
-	    <td>${my:countVowels(fn:escapeXml(param["foo"]))}&nbsp;</td>
-	  </tr>
-	</table>
+            <td><b>EL Expression</b></td>
+            <td><b>Result</b></td>
+          </thead>
+          <tr>
+            <td>\${param["foo"]}</td>
+            <td>${fn:escapeXml(param["foo"])}&nbsp;</td>
+          </tr>
+          <tr>
+            <td>\${my:reverse(param["foo"])}</td>
+            <td>${my:reverse(fn:escapeXml(param["foo"]))}&nbsp;</td>
+          </tr>
+          <tr>
+            <td>\${my:reverse(my:reverse(param["foo"]))}</td>
+            <td>${my:reverse(my:reverse(fn:escapeXml(param["foo"])))}&nbsp;</td>
+          </tr>
+          <tr>
+            <td>\${my:countVowels(param["foo"])}</td>
+            <td>${my:countVowels(fn:escapeXml(param["foo"]))}&nbsp;</td>
+          </tr>
+        </table>
       </code>
     </blockquote>
   </body>
