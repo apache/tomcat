@@ -26,7 +26,7 @@ import org.apache.tomcat.util.bcel.Constants;
 /**
  * This class represents a stack map entry recording the types of
  * local variables and the the of stack items at a given byte code offset.
- * See CLDC specification ��?5.3.1.2
+ * See CLDC specification &sect;5.3.1.2
  *
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
