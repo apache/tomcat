@@ -37,8 +37,8 @@
     <plugin-class>org.apache.jasper.tagplugins.jstl.core.ForEach</plugin-class>
   </tag-plugin>
   <tag-plugin>
-  	<tag-class>org.apache.taglibs.standard.tag.rt.core.OutTag</tag-class>
-  	<plugin-class>org.apache.jasper.tagplugins.jstl.core.Out</plugin-class>
+    <tag-class>org.apache.taglibs.standard.tag.rt.core.OutTag</tag-class>
+    <plugin-class>org.apache.jasper.tagplugins.jstl.core.Out</plugin-class>
   </tag-plugin>
   <tag-plugin>
     <tag-class>org.apache.taglibs.standard.tag.rt.core.SetTag</tag-class>
