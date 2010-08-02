@@ -30,22 +30,22 @@
 <!--
 The taglib tag is the document root, it defines:
 
-tlibversion	the version of the tag library implementation
-jspversion	the version of JSP the tag library depends upon
+tlibversion the version of the tag library implementation
+jspversion  the version of JSP the tag library depends upon
 
-shortname	a simple default short name that could be used by
-		a JSP authoring tool to create names with a mnemonic
-		value; for example, the it may be used as the prefered
-		prefix value in taglib directives
-uri		a uri uniquely identifying this taglib
-info		a simple string describing the "use" of this taglib,
-		should be user discernable
+shortname   a simple default short name that could be used by
+            a JSP authoring tool to create names with a mnemonic
+            value; for example, the it may be used as the prefered
+            prefix value in taglib directives
+uri         a uri uniquely identifying this taglib
+info        a simple string describing the "use" of this taglib,
+            should be user discernable
 -->
 
 <!ELEMENT taglib (tlibversion, jspversion?, shortname, uri?, info?, tag+) >
 <!ATTLIST taglib id ID #IMPLIED
-	  xmlns CDATA #FIXED
-		"http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"
+          xmlns CDATA #FIXED
+                "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"
 >
 
 <!--
@@ -75,20 +75,20 @@ white space, and do not start with digits or underscore.
 #PCDATA ::= NMTOKEN
 -->
 
-<!ELEMENT shortname      (#PCDATA) >
+<!ELEMENT shortname   (#PCDATA) >
 
 <!--
 Defines a public URI that uniquely identifies this version of
 the taglibrary Leave it empty if it does not apply.
 -->
 
-<!ELEMENT uri	 (#PCDATA) >
+<!ELEMENT uri         (#PCDATA) >
 
 <!--
 Defines an arbitrary text string descirbing the tag library
 -->
 
-<!ELEMENT info	(#PCDATA) >
+<!ELEMENT info        (#PCDATA) >
 
 <!--
 The tag defines a unique tag in this tag library, defining:
@@ -129,13 +129,13 @@ intended for use by page composition tools.
 
 There are currently three values specified:
 
-tagdependent	The body of the tag is interpreted by the tag
-		implementation itself, and is most likely in a
-		different "langage", e.g embedded SQL statements.
+tagdependent    The body of the tag is interpreted by the tag
+                implementation itself, and is most likely in a
+                different "langage", e.g embedded SQL statements.
 
-JSP		The body of the tag contains nested JSP syntax
+JSP             The body of the tag contains nested JSP syntax
 
-empty		The body must be empty
+empty           The body must be empty
 
 The default (if not defined) is JSP
 
@@ -165,7 +165,7 @@ Defines the canonical name of a tag or attribute being defined
 #PCDATA ::= NMTOKEN
 -->
 
-<!ELEMENT name	(#PCDATA) >
+<!ELEMENT name        (#PCDATA) >
 
 <!--
 Defines if the nesting attribute is required or optional.
