@@ -73,9 +73,6 @@ public final class SecurityClassLoad {
             "AsyncContextImpl$1");
         loader.loadClass
             (basePackage +
-            "AsyncContextImpl$2");
-        loader.loadClass
-            (basePackage +
             "AsyncListenerWrapper");
         loader.loadClass
             (basePackage +
