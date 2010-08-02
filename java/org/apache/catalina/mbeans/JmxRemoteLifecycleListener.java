@@ -77,7 +77,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     /**
      * Get the port on which the Platform RMI server is exported. This is the
      * port that is normally chosen by the RMI stack.
-     * @returns The port number
+     * @return The port number
      */
     public int getRmiServerPortPlatform() {
         return rmiServerPortPlatform;
@@ -94,7 +94,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     
     /**
      * Get the port on which the Platform RMI registry is exported.
-     * @returns The port number
+     * @return The port number
      */
     public int getRmiRegistryPortPlatform() {
         return rmiRegistryPortPlatform;
@@ -112,7 +112,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
      * Get the flag that indicates that local ports should be used for all
      * connections. If using SSH tunnels, or similar, this should be set to
      * true to ensure the RMI client uses the tunnel.
-     * @returns <code>true</code> if local ports should be used
+     * @return <code>true</code> if local ports should be used
      */
     public boolean getUseLocalPorts() {
         return useLocalPorts;
