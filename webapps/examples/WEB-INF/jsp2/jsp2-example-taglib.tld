@@ -25,10 +25,10 @@
     <short-name>SimpleTagLibrary</short-name>
     <uri>http://tomcat.apache.org/jsp2-example-taglib</uri>
     <tag>
-	<description>Outputs Hello, World</description>
+        <description>Outputs Hello, World</description>
         <name>helloWorld</name>
-	<tag-class>jsp2.examples.simpletag.HelloWorldSimpleTag</tag-class>
-	<body-content>empty</body-content>
+        <tag-class>jsp2.examples.simpletag.HelloWorldSimpleTag</tag-class>
+        <body-content>empty</body-content>
     </tag>
     <tag>
         <description>Repeats the body of the tag 'num' times</description>
@@ -46,15 +46,15 @@
         </attribute>
     </tag>
     <tag>
-	<description>Populates the page context with a BookBean</description>
+        <description>Populates the page context with a BookBean</description>
         <name>findBook</name>
-	<tag-class>jsp2.examples.simpletag.FindBookSimpleTag</tag-class>
-	<body-content>empty</body-content>
-	<attribute>
-	    <name>var</name>
-	    <required>true</required>
-	    <rtexprvalue>true</rtexprvalue>
-	</attribute>
+        <tag-class>jsp2.examples.simpletag.FindBookSimpleTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>var</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
     </tag>
     <tag>
         <description>
@@ -66,17 +66,17 @@
         <attribute>
             <name>fragment1</name>
             <required>true</required>
-	    <fragment>true</fragment>
+            <fragment>true</fragment>
         </attribute>
         <attribute>
             <name>fragment2</name>
             <required>true</required>
-	    <fragment>true</fragment>
+            <fragment>true</fragment>
         </attribute>
         <attribute>
             <name>fragment3</name>
             <required>true</required>
-	    <fragment>true</fragment>
+            <fragment>true</fragment>
         </attribute>
     </tag>
     <tag>
@@ -94,31 +94,31 @@
         </attribute>
     </tag>
     <tag>
-	<description>
-	  Tag that echoes all its attributes and body content
-	</description>
-	<name>echoAttributes</name>
-	<tag-class>jsp2.examples.simpletag.EchoAttributesTag</tag-class>
-	<body-content>empty</body-content>
-	<dynamic-attributes>true</dynamic-attributes>
+        <description>
+          Tag that echoes all its attributes and body content
+        </description>
+        <name>echoAttributes</name>
+        <tag-class>jsp2.examples.simpletag.EchoAttributesTag</tag-class>
+        <body-content>empty</body-content>
+        <dynamic-attributes>true</dynamic-attributes>
     </tag>
     <function>
         <description>Reverses the characters in the given String</description>
         <name>reverse</name>
-	<function-class>jsp2.examples.el.Functions</function-class>
-	<function-signature>java.lang.String reverse( java.lang.String )</function-signature>
+        <function-class>jsp2.examples.el.Functions</function-class>
+        <function-signature>java.lang.String reverse( java.lang.String )</function-signature>
     </function>
     <function>
         <description>Counts the number of vowels (a,e,i,o,u) in the given String</description>
         <name>countVowels</name>
-	<function-class>jsp2.examples.el.Functions</function-class>
-	<function-signature>java.lang.String numVowels( java.lang.String )</function-signature>
+        <function-class>jsp2.examples.el.Functions</function-class>
+        <function-signature>java.lang.String numVowels( java.lang.String )</function-signature>
     </function>
     <function>
-	<description>Converts the string to all caps</description>
+        <description>Converts the string to all caps</description>
         <name>caps</name>
-	<function-class>jsp2.examples.el.Functions</function-class>
-	<function-signature>java.lang.String caps( java.lang.String )</function-signature>
+        <function-class>jsp2.examples.el.Functions</function-class>
+        <function-signature>java.lang.String caps( java.lang.String )</function-signature>
     </function>
 </taglib>
 
