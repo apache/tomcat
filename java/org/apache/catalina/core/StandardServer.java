@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResources;
