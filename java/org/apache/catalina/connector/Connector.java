@@ -357,7 +357,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * Set the default timeout for async requests.
      *
-     * @param allowTrace The new timeout in ms.
+     * @param asyncTimeout The new timeout in ms.
      */
     public void setAsyncTimeout(long asyncTimeout) {
 
