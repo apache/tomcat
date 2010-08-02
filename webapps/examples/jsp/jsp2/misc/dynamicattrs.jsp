@@ -37,8 +37,8 @@
     <h2>Invocation 3 (three attributes)</h2>
     <ul>
       <my:echoAttributes dogName="Scruffy" 
-	   		 catName="Fluffy" 
-			 blowfishName="Puffy"/>
+                         catName="Fluffy" 
+                         blowfishName="Puffy"/>
     </ul>
   </body>
 </html>

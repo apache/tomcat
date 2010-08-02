@@ -40,18 +40,18 @@ FF"></a>
     <c:forEach var="index" begin="0" end="4">
       # ${index}: 
       <c:choose>
-	<c:when test="${index == 1}">
+        <c:when test="${index == 1}">
           One!</br>
-	</c:when>
-	<c:when test="${index == 4}">
+        </c:when>
+        <c:when test="${index == 4}">
           Four!</br>
-	</c:when>
-	<c:when test="${index == 3}">
+        </c:when>
+        <c:when test="${index == 3}">
           Three!</br>
-	</c:when>
-	<c:otherwise>
+        </c:when>
+        <c:otherwise>
           Huh?</br>
-	</c:otherwise>
+        </c:otherwise>
       </c:choose>
     </c:forEach>
   </body>

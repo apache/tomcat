@@ -36,7 +36,7 @@
       Bean created!  Setting foo.bar...<br>
       <jsp:setProperty name="foo" property="bar">
         <jsp:attribute name="value">
-	  <my:helloWorld/>
+          <my:helloWorld/>
         </jsp:attribute>
       </jsp:setProperty>
     </jsp:useBean>

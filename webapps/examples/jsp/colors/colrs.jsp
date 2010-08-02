@@ -20,7 +20,7 @@
 <jsp:setProperty name="cb" property="*" />
 
 <%
-	cb.processRequest();
+    cb.processRequest();
 %>
 
 <body bgcolor=<%= cb.getColor1() %>>
@@ -28,20 +28,20 @@
 <p>
 
 <% if (cb.getHint()==true) { %>
-	
-	<p> Hint #1: Vampires prey at night!
-	<p>  <p> Hint #2: Nancy without the n.
+    
+    <p> Hint #1: Vampires prey at night!
+    <p>  <p> Hint #2: Nancy without the n.
 
 <% } %>
 
 <% if  (cb.getSuccess()==true) { %>
 
     <p> CONGRATULATIONS!!
-	<% if  (cb.getHintTaken()==true) { %>
+    <% if  (cb.getHintTaken()==true) { %>
     
         <p> ( although I know you cheated and peeked into the hints)
 
-	<% } %>
+    <% } %>
 
 <% } %>
 
