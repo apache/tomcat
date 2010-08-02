@@ -80,7 +80,7 @@ public abstract class Attribute implements Cloneable, Serializable
         file.writeInt(length);
     }
 
-	private static final Map readers = new HashMap();
+    private static final Map readers = new HashMap();
 
     /*
      * Class method reads one attribute from the input data stream. This method
