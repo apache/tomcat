@@ -22,8 +22,8 @@
 
     <display-name>Hello, World Application</display-name>
     <description>
-	This is a simple web application with a source code organization
-	based on the recommendations of the Application Developer's Guide.
+        This is a simple web application with a source code organization
+        based on the recommendations of the Application Developer's Guide.
     </description>
 
     <servlet>
