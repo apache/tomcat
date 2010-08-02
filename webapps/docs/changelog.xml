@@ -44,6 +44,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Extend Checkstyle validation checks to check for tabs in nearly all text
+        files. (markt) 
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.1 (markt)" rtext="Not released">
   <subsection name="Catalina">
