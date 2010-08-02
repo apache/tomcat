@@ -123,7 +123,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * {@link ObjectName} that will be used to register this component.
      * 
      * @return  The string representation of the key properties component of the
-     *          desired {@Link ObjectName}
+     *          desired {@link ObjectName}
      */
     protected abstract String getObjectNameKeyProperties();
     
