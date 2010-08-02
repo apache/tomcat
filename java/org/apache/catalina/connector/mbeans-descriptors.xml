@@ -30,12 +30,12 @@
                 group="Connector"
                  type="org.apache.catalina.connector.Connector">
 
-	<!-- Common -->
+    <!-- Common -->
     <attribute   name="acceptCount"
           description="The accept count for this Connector"
                  type="int"/>
-	
-	<!-- Common -->
+    
+    <!-- Common -->
     <attribute   name="address"
           description="The IP address on which to bind"
                  type="java.lang.String"/>
@@ -58,7 +58,7 @@
           description="Linger value on the incoming connection"
                  type="int"/>
 
-	<!-- Common -->
+    <!-- Common -->
     <attribute   name="connectionTimeout"
           description="Timeout value on the incoming connection"
                  type="int"/>
@@ -71,12 +71,12 @@
           description="The 'enable DNS lookups' flag for this Connector"
                  type="boolean"/>
 
-	<!-- Common -->
+    <!-- Common -->
     <attribute   name="keepAliveTimeout"
           description="The number of seconds Tomcat will wait for a subsequent request before closing the connection"
                  type="int"/>
 
-	<attribute   name="maxKeepAliveRequests"
+    <attribute   name="maxKeepAliveRequests"
           description="Maximum number of Keep-Alive requests to honor per connection"
                  type="int"/>
 
@@ -88,8 +88,8 @@
           description="Maximum size of a POST which will be saved by the container during authentication"
                  type="int"/>                
 
-	<!-- Common -->
-	<attribute   name="maxThreads"
+    <!-- Common -->
+    <attribute   name="maxThreads"
           description="The maximum number of request processing threads to be created"
                  type="int"/>
 
@@ -97,7 +97,7 @@
           description="The number of request processing threads that will be created"
                  type="int"/>
 
-	<!-- Common -->
+    <!-- Common -->
     <attribute   name="port"
           description="The port number on which we listen for ajp13 requests"
                 type="int"/>
@@ -154,7 +154,7 @@
           description="Thread pool strategy"
                  type="java.lang.String"/>
 
-	<!-- Common -->
+    <!-- Common -->
     <attribute   name="tcpNoDelay"
           description="Should we use TCP no delay?"
                  type="boolean"/>
