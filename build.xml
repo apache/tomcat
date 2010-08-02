@@ -34,7 +34,7 @@
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
-	
+    
   <!-- Version numbers -->
   <property name="version.major"         value="7" />
   <property name="version.minor"         value="0" />
@@ -174,7 +174,7 @@
 
   <!-- Version info filter set -->
   <tstamp>
-  	<format property="year" pattern="yyyy" locale="en"/>
+    <format property="year" pattern="yyyy" locale="en"/>
     <format property="today" pattern="MMM d yyyy" locale="en"/>
     <format property="tstamp" pattern="hh:mm:ss"/>
   </tstamp>
@@ -358,7 +358,7 @@
 
   <!-- Pattern sets for extras JARs -->
   <patternset id="files.tomcat-extras-ws">
-  	<include name="org/apache/naming/factory/webservices/**" />
+    <include name="org/apache/naming/factory/webservices/**" />
   </patternset>
 
   <patternset id="files.tomcat-extras-jmxremote">
@@ -378,14 +378,14 @@
 
   <target name="build-prepare">
 
-  	<!-- Required so we can compile -->
+    <!-- Required so we can compile -->
     <mkdir dir="${tomcat.classes}"/>
 
     <!-- Ensure these directories are removed every time we re-build -->
     <delete dir="${tomcat.build}/temp" />
     <delete dir="${tomcat.build}/work" />
 
-  	<!-- Minimum dirs needed for a working Tomcat instance -->
+    <!-- Minimum dirs needed for a working Tomcat instance -->
     <mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.build}/bin"/>
     <mkdir dir="${tomcat.build}/conf"/>
@@ -407,24 +407,21 @@
         <include name="*.notice" />
       </srcfiles>
     </uptodate>
-  	
+    
   </target>
 
   <target name="validate" depends="download-validate" if="${execute.validate}">
     <taskdef resource="checkstyletask.properties"
-  	         classpath="${checkstyle.jar}" />
-  	<checkstyle config="checkstyle.xml">
-      <fileset dir="java">
-      	<include name="**/*.java" />
-        <exclude name="org/apache/tomcat/util/bcel/**" />
-  	  </fileset>
-      <fileset dir="test">
-        <include name="**/*.java" />
+             classpath="${checkstyle.jar}" />
+    <checkstyle config="checkstyle.xml">
+      <fileset dir="." >
+        <patternset refid="text.files" />
+        <exclude name=".*/**"/>
+        <exclude name="output/**"/>
+        <exclude name="modules/**"/>
+        <exclude name="**/*.mdl"/>
       </fileset>
-      <fileset dir="webapps">
-        <include name="**/*.java" />
-      </fileset>
-  	</checkstyle>
+    </checkstyle>
   </target>
 
   <target name="compile" depends="build-prepare,download-compile,validate">
@@ -770,7 +767,7 @@
              classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
-    	     includeantruntime="false">
+             includeantruntime="false">
     </javac>
 
     <javac   srcdir="webapps/examples/jsp/plugin/applet"
@@ -782,7 +779,7 @@
              classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
-    	     includeantruntime="false">
+             includeantruntime="false">
     </javac>
 
     <!-- Add sources for examples -->
@@ -904,7 +901,7 @@
   </target>
 
   <target name="embed-sources"
-  	      description="Create source jars for embedded jars"
+          description="Create source jars for embedded jars"
           depends="build-manifests" >
 
     <mkdir dir="${tomcat.embed.sources}" />
@@ -928,8 +925,8 @@
   </target>
 
   <target name="embed-release"
-	      description="Creates the experimental embedded release"
-	      depends="embed,embed-sources,embed-extras" />
+          description="Creates the experimental embedded release"
+          depends="embed,embed-sources,embed-extras" />
 
   <target name="test-compile" depends="compile,download-test-compile" >
     <mkdir dir="${test.classes}"/>
@@ -940,7 +937,7 @@
            source="${compile.source}"
            optimize="${compile.optimize}"
            encoding="ISO-8859-1"
-    	   includeantruntime="false">
+           includeantruntime="false">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
       <include name="javax/servlet/**" />
@@ -965,7 +962,7 @@
   
   <target name="test-apr" description="Runs the JUnit test cases for APR"
           depends="test-compile,deploy,test-apr-exists"
-  	      if="${apr.exists}">
+          if="${apr.exists}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
               extension=".APR.txt" />
   </target>
@@ -1000,7 +997,7 @@
         <batchtest todir="${tomcat.build}/logs"
                    unless="test.entry"
                    errorproperty="test.result.error"
-        	       failureproperty="test.result.failure"
+                   failureproperty="test.result.failure"
                    haltonfailure="${test.haltonfailure}">
           <fileset dir="test" >
             <!-- Include all by default -->
@@ -1027,7 +1024,7 @@
   </target>
 
   <target name="extras-commons-logging"
-  	      depends="extras-prepare,compile,build-manifests"
+          depends="extras-prepare,compile,build-manifests"
           description="Build JULI for log4j extras package">
 
     <antcall target="downloadfile">
@@ -1104,7 +1101,7 @@
     <antcall target="md5sum">
       <param name="file" value="${tomcat-juli-adapters.jar}" />
     </antcall>
-  	
+    
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
@@ -1164,19 +1161,19 @@
            source="${compile.source}"
            optimize="${compile.optimize}"
            encoding="ISO-8859-1"
-    	   includeantruntime="false">
+           includeantruntime="false">
       <classpath refid="tomcat.webservices.classpath" />
       <include name="org/apache/naming/factory/webservices/**" />
     </javac>
 
-  	<jarIt jarfile="${catalina-ws.jar}"
-  	  filesDir="${tomcat.classes}"
-  	  filesId="files.tomcat-extras-ws" />
+    <jarIt jarfile="${catalina-ws.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-extras-ws" />
 
     <antcall target="md5sum">
       <param name="file" value="${catalina-ws.jar}" />
     </antcall>
-  	
+    
     <jarIt jarfile="${catalina-ws-src.jar}"
       filesDir="java"
       filesId="files.tomcat-extras-ws" />
@@ -1202,7 +1199,7 @@
   </target>
 
   <target name="extras"
-  	      depends="extras-commons-logging,extras-webservices,extras-jmx-remote"
+          depends="extras-commons-logging,extras-webservices,extras-jmx-remote"
           description="Build all extras packages">
   </target>
 
@@ -1229,7 +1226,7 @@
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-  	
+    
     <jar jarfile="${tomcat-embed-log4j-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java">
@@ -1361,7 +1358,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="dist-deployer" depends="dist-prepare,deploy"
-  	description="Create the Tomcat deployer binary">
+    description="Create the Tomcat deployer binary">
 
     <!-- Servlet and JSP -->
     <copy todir="${tomcat.deployer}/lib">
@@ -1462,7 +1459,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="release"
-  	depends="clean,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat 7 packaged distribution">
 
     <copy file="KEYS"
@@ -1894,7 +1891,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesId="files.jasper-el" />
 
     <!-- Repackaged DBCP -->
-  	<copy file="${tomcat-dbcp-src.jar}" todir="${tomcat.src.jars}" />
+    <copy file="${tomcat-dbcp-src.jar}" todir="${tomcat.src.jars}" />
 
   </target>
 
@@ -1910,12 +1907,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete dir="${tomcat.output}" />
   </target>
 
-	
+    
   <!-- ================ Download and dependency building =================== -->
 
   <target name="download-validate"
           description="Download components necessary to validate source"
-  	      if="${execute.validate}">
+          if="${execute.validate}">
 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${checkstyle.loc}"/>
@@ -1926,7 +1923,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="download-compile"
-	      description="Download (and build) components necessary to compile" >
+          description="Download (and build) components necessary to compile" >
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${tomcat-native.loc}"/>
@@ -2060,12 +2057,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
            sourcepath="${tomcat-dbcp.home}/src/java"
            srcdir="${tomcat-dbcp.home}/src/java"
            encoding="ISO-8859-1"
-    	   includeantruntime="false">
+           includeantruntime="false">
       <include name="**" />
     </javac>
-  	<jarIt jarfile="${tomcat-dbcp.jar}"
-  	  filesDir="${tomcat-dbcp.home}/classes"
-  	  filesId="files.tomcat-dbcp" />
+    <jarIt jarfile="${tomcat-dbcp.jar}"
+      filesDir="${tomcat-dbcp.home}/classes"
+      filesId="files.tomcat-dbcp" />
     <jarIt jarfile="${tomcat-dbcp-src.jar}"
       filesDir="${tomcat-dbcp.home}/src/java"
       filesId="files.tomcat-dbcp" />
@@ -2152,11 +2149,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">
     <attribute name="jarfile"
-    	       description="the name of the JAR file to create"/>
+               description="the name of the JAR file to create"/>
     <attribute name="filesDir"
-    	       description="the directory from which to obtain the files "/>
+               description="the directory from which to obtain the files "/>
     <attribute name="filesId"
-    	       description="the patternset id of the files to use"/>
+               description="the patternset id of the files to use"/>
     <attribute name="manifest" description="the manifest file use"
                default="${tomcat.manifests}/default.manifest" />
     <attribute name="notice" description="the LICENSE file to use"
