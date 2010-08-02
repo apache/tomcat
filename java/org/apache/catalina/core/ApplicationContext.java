@@ -863,7 +863,7 @@ public class ApplicationContext
      * Add filter to context.
      * @param   filterName  Name of filter to add
      * @param   filterClass Name of filter class
-     * @returns <code>null</code> if the filter has already been fully defined,
+     * @return  <code>null</code> if the filter has already been fully defined,
      *          else a {@link FilterRegistration.Dynamic} object that can be
      *          used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
@@ -883,7 +883,7 @@ public class ApplicationContext
      * Add filter to context.
      * @param   filterName  Name of filter to add
      * @param   filter      Filter to add
-     * @returns <code>null</code> if the filter has already been fully defined,
+     * @return  <code>null</code> if the filter has already been fully defined,
      *          else a {@link FilterRegistration.Dynamic} object that can be
      *          used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
@@ -903,7 +903,7 @@ public class ApplicationContext
      * Add filter to context.
      * @param   filterName  Name of filter to add
      * @param   filterClass Class of filter to add
-     * @returns <code>null</code> if the filter has already been fully defined,
+     * @return  <code>null</code> if the filter has already been fully defined,
      *          else a {@link FilterRegistration.Dynamic} object that can be
      *          used to further configure the filter
      * @throws IllegalStateException if the context has already been initialised
@@ -992,7 +992,7 @@ public class ApplicationContext
      * Add servlet to context.
      * @param   servletName  Name of servlet to add
      * @param   servletClass Name of servlet class
-     * @returns <code>null</code> if the servlet has already been fully defined,
+     * @return  <code>null</code> if the servlet has already been fully defined,
      *          else a {@link ServletRegistration.Dynamic} object that can be
      *          used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
@@ -1012,7 +1012,7 @@ public class ApplicationContext
      * Add servlet to context.
      * @param   servletName Name of servlet to add
      * @param   servlet     Servlet instance to add
-     * @returns <code>null</code> if the servlet has already been fully defined,
+     * @return  <code>null</code> if the servlet has already been fully defined,
      *          else a {@link ServletRegistration.Dynamic} object that can be
      *          used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
@@ -1032,7 +1032,7 @@ public class ApplicationContext
      * Add servlet to context.
      * @param   servletName  Name of servlet to add
      * @param   servletClass Class of servlet to add
-     * @returns <code>null</code> if the servlet has already been fully defined,
+     * @return  <code>null</code> if the servlet has already been fully defined,
      *          else a {@link ServletRegistration.Dynamic} object that can be
      *          used to further configure the servlet
      * @throws IllegalStateException if the context has already been initialised
