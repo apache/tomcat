@@ -26,7 +26,7 @@
   <display-name>Tomcat Host Manager Application</display-name>
   <description>
     A scriptable host management web application for the Tomcat Web Server;
-	Manager lets you view, create and remove virtual hosts.
+    Manager lets you view, create and remove virtual hosts.
   </description>
 
   <servlet>
