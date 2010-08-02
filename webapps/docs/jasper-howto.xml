@@ -282,7 +282,7 @@ download) to precompile a webapp:
            optimize="off"
            debug="on" failonerror="false"
            srcdir="${webapp.path}/WEB-INF/src" 
-	   excludes="**/*.smap"&gt;
+           excludes="**/*.smap"&gt;
       &lt;classpath&gt;
         &lt;pathelement location="${webapp.path}/WEB-INF/classes"/&gt;
         &lt;fileset dir="${webapp.path}/WEB-INF/lib"&gt;
@@ -306,10 +306,10 @@ download) to precompile a webapp:
   &lt;/target&gt;
 
   &lt;target name="cleanup"&gt;
-  	&lt;delete&gt;
+    &lt;delete&gt;
         &lt;fileset dir="${webapp.path}/WEB-INF/src"/&gt;
         &lt;fileset dir="${webapp.path}/WEB-INF/classes/org/apache/jsp"/&gt;
-  	&lt;/delete&gt;
+    &lt;/delete&gt;
   &lt;/target&gt;
 
 &lt;/project&gt;

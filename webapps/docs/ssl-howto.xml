@@ -433,14 +433,14 @@ by the Certificate Authority to create a Certificate that will identify your web
 as "secure". To create a CSR follow these steps:</p>
 <ul>
 <li>Create a local Certificate (as described in the previous section):
-	<source>keytool -genkey -alias tomcat -keyalg RSA \
-	-keystore &lt;your_keystore_filename&gt;</source>
-	Note: In some cases you will have to enter the domain of your website (i.e. <code>www.myside.org</code>)
-	in the field "first- and lastname" in order to create a working Certificate. 
+    <source>keytool -genkey -alias tomcat -keyalg RSA \
+    -keystore &lt;your_keystore_filename&gt;</source>
+    Note: In some cases you will have to enter the domain of your website (i.e. <code>www.myside.org</code>)
+    in the field "first- and lastname" in order to create a working Certificate. 
 </li>
 <li>The CSR is then created with:
-	<source>keytool -certreq -keyalg RSA -alias tomcat -file certreq.csr \
-	-keystore &lt;your_keystore_filename&gt;</source>
+    <source>keytool -certreq -keyalg RSA -alias tomcat -file certreq.csr \
+    -keystore &lt;your_keystore_filename&gt;</source>
 </li>
 </ul>
 <p>Now you have a file called <code>certreq.csr</code> that you can submit to the Certificate Authority (look at the
@@ -454,22 +454,22 @@ After that you can proceed with importing your Certificate.</p>
 
 <ul>
 <li>Download a Chain Certificate from the Certificate Authority you obtained the Certificate from.<br/>
-	For Verisign.com commercial certificates go to:
+    For Verisign.com commercial certificates go to:
             http://www.verisign.com/support/install/intermediate.html<br/>
         For Verisign.com trial certificates go to:
             http://www.verisign.com/support/verisign-intermediate-ca/Trial_Secure_Server_Root/index.html<br/>
-	For Trustcenter.de go to:
+    For Trustcenter.de go to:
             http://www.trustcenter.de/certservices/cacerts/en/en.htm#server<br/>
-	For Thawte.com go to:
+    For Thawte.com go to:
             http://www.thawte.com/certs/trustmap.html<br/>
 </li>
 <li>Import the Chain Certificate into your keystore
     <source>keytool -import -alias root -keystore &lt;your_keystore_filename&gt; \
-	-trustcacerts -file &lt;filename_of_the_chain_certificate&gt;</source>
+    -trustcacerts -file &lt;filename_of_the_chain_certificate&gt;</source>
 </li>
 <li>And finally import your new Certificate
-	<source>keytool -import -alias tomcat -keystore &lt;your_keystore_filename&gt; \
-	-file &lt;your_certificate_filename&gt;</source>
+    <source>keytool -import -alias tomcat -keystore &lt;your_keystore_filename&gt; \
+    -file &lt;your_certificate_filename&gt;</source>
 </li>
 </ul>
 </subsection>

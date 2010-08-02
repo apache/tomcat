@@ -1149,69 +1149,69 @@ can be used:
 
 <table border="1">
 <tr><td><pre>
-	&lt;target name="manager.deploy"
-		depends="context.status"
-		if="context.notInstalled"&gt;
-		&lt;deploy url="${mgr.url}"
-			username="${mgr.username}"
-			password="${mgr.password}"
-			path="${mgr.context.path}"
-			config="${mgr.context.descriptor}"/&gt;
-	&lt;/target&gt;
+    &lt;target name="manager.deploy"
+        depends="context.status"
+        if="context.notInstalled"&gt;
+        &lt;deploy url="${mgr.url}"
+            username="${mgr.username}"
+            password="${mgr.password}"
+            path="${mgr.context.path}"
+            config="${mgr.context.descriptor}"/&gt;
+    &lt;/target&gt;
 
-	&lt;target name="manager.deploy.war"
-		depends="context.status"
-		if="context.deployable"&gt;
-		&lt;deploy url="${mgr.url}"
-			username="${mgr.username}"
-			password="${mgr.password}"
-			update="${mgr.update}"
-			path="${mgr.context.path}"
-			war="${mgr.war.file}"/&gt;
-	&lt;/target&gt;
-	
-	&lt;target name="context.status"&gt;
-		&lt;property name="running" value="${mgr.context.path}:running"/&gt;
-		&lt;property name="stopped" value="${mgr.context.path}:stopped"/&gt;
-	
-		&lt;list url="${mgr.url}"
-			outputproperty="ctx.status"
-			username="${mgr.username}"
-			password="${mgr.password}"&gt;
-		&lt;/list&gt;
-		
-		&lt;condition property="context.running"&gt;
-			&lt;contains string="${ctx.status}" substring="${running}"/&gt;
-		&lt;/condition&gt;
-		&lt;condition property="context.stopped"&gt;
-			&lt;contains string="${ctx.status}" substring="${stopped}"/&gt;
-		&lt;/condition&gt;
-		&lt;condition property="context.notInstalled"&gt;
-			&lt;and&gt;
-				&lt;isfalse value="${context.running}"/&gt;
-				&lt;isfalse value="${context.stopped}"/&gt;
-			&lt;/and&gt;
-		&lt;/condition&gt;
-		&lt;condition property="context.deployable"&gt;
-			&lt;or&gt;
-				&lt;istrue value="${context.notInstalled}"/&gt;
-				&lt;and&gt;
-					&lt;istrue value="${context.running}"/&gt;
-					&lt;istrue value="${mgr.update}"/&gt;
-				&lt;/and&gt;
-				&lt;and&gt;
-					&lt;istrue value="${context.stopped}"/&gt;
-					&lt;istrue value="${mgr.update}"/&gt;
-				&lt;/and&gt;
-			&lt;/or&gt;
-		&lt;/condition&gt;
-		&lt;condition property="context.undeployable"&gt;
-			&lt;or&gt;
-				&lt;istrue value="${context.running}"/&gt;
-				&lt;istrue value="${context.stopped}"/&gt;
-			&lt;/or&gt;
-		&lt;/condition&gt;
-	&lt;/target&gt;
+    &lt;target name="manager.deploy.war"
+        depends="context.status"
+        if="context.deployable"&gt;
+        &lt;deploy url="${mgr.url}"
+            username="${mgr.username}"
+            password="${mgr.password}"
+            update="${mgr.update}"
+            path="${mgr.context.path}"
+            war="${mgr.war.file}"/&gt;
+    &lt;/target&gt;
+    
+    &lt;target name="context.status"&gt;
+        &lt;property name="running" value="${mgr.context.path}:running"/&gt;
+        &lt;property name="stopped" value="${mgr.context.path}:stopped"/&gt;
+    
+        &lt;list url="${mgr.url}"
+            outputproperty="ctx.status"
+            username="${mgr.username}"
+            password="${mgr.password}"&gt;
+        &lt;/list&gt;
+        
+        &lt;condition property="context.running"&gt;
+            &lt;contains string="${ctx.status}" substring="${running}"/&gt;
+        &lt;/condition&gt;
+        &lt;condition property="context.stopped"&gt;
+            &lt;contains string="${ctx.status}" substring="${stopped}"/&gt;
+        &lt;/condition&gt;
+        &lt;condition property="context.notInstalled"&gt;
+            &lt;and&gt;
+                &lt;isfalse value="${context.running}"/&gt;
+                &lt;isfalse value="${context.stopped}"/&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;condition property="context.deployable"&gt;
+            &lt;or&gt;
+                &lt;istrue value="${context.notInstalled}"/&gt;
+                &lt;and&gt;
+                    &lt;istrue value="${context.running}"/&gt;
+                    &lt;istrue value="${mgr.update}"/&gt;
+                &lt;/and&gt;
+                &lt;and&gt;
+                    &lt;istrue value="${context.stopped}"/&gt;
+                    &lt;istrue value="${mgr.update}"/&gt;
+                &lt;/and&gt;
+            &lt;/or&gt;
+        &lt;/condition&gt;
+        &lt;condition property="context.undeployable"&gt;
+            &lt;or&gt;
+                &lt;istrue value="${context.running}"/&gt;
+                &lt;istrue value="${context.stopped}"/&gt;
+            &lt;/or&gt;
+        &lt;/condition&gt;
+    &lt;/target&gt;
 </pre></td></tr>
 </table>
 
