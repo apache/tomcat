@@ -999,8 +999,8 @@ public class XMLEncodingDetector {
      *                     boundary will be signaled by the return
      *                     value.
      *
-     * @returns Returns true if the entity changed as a result of this
-     *          load operation.
+     * @return Returns true if the entity changed as a result of this
+     *         load operation.
      */
     final boolean load(int offset, boolean changeEntity)
         throws IOException {
@@ -1598,7 +1598,7 @@ public class XMLEncodingDetector {
      * identified as a high surrogate.
      *
      * @param buf The StringBuffer to append the read surrogates to.
-     * @returns True if it succeeded.
+     * @return True if it succeeded.
      */
     private boolean scanSurrogates(XMLStringBuffer buf)
         throws IOException, JasperException {
