@@ -17,7 +17,7 @@
 -->
 
 <HEAD><TITLE> 
-	Calendar: A JSP APPLICATION
+    Calendar: A JSP APPLICATION
 </TITLE></HEAD>
 
 
@@ -25,7 +25,7 @@
 <jsp:useBean id="table" scope="session" class="cal.TableBean" />
 
 <% 
-	String time = request.getParameter ("time");
+    String time = request.getParameter ("time");
 %>
 
 <FONT SIZE=5> Please add the following event:
