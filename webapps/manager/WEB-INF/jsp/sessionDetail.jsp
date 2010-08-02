@@ -135,14 +135,14 @@
                         <input type="hidden" name="action" value="removeSessionAttribute" />
                         <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
                         <input type="hidden" name="attributeName" value="<%= attributeName %>" />
-					    <%
-					      if ("Primary".equals(request.getAttribute("sessionType"))) {
-					    %>
+                        <%
+                          if ("Primary".equals(request.getAttribute("sessionType"))) {
+                        %>
                           <input type="submit" value="Remove" />
                         <%
-					      } else {
-					        out.print("Primary sessions only");
-					      }
+                          } else {
+                            out.print("Primary sessions only");
+                          }
                         %>
                     </div>
                 </form>
