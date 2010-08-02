@@ -45,7 +45,7 @@ public class ClusterMessageBase implements ClusterMessage {
      * getAddress
      *
      * @return Member
-     * @todo Implement this org.apache.catalina.ha.ClusterMessage method
+     * TODO Implement this org.apache.catalina.ha.ClusterMessage method
      */
     public Member getAddress() {
         return address;
@@ -63,7 +63,7 @@ public class ClusterMessageBase implements ClusterMessage {
      * setAddress
      *
      * @param member Member
-     * @todo Implement this org.apache.catalina.ha.ClusterMessage method
+     * TODO Implement this org.apache.catalina.ha.ClusterMessage method
      */
     public void setAddress(Member member) {
         this.address = member;

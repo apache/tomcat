@@ -318,9 +318,9 @@ public class SimpleTcpCluster extends LifecycleBase
     }
 
     /**
-     * add cluster message listener and register cluster to this listener
+     * Add cluster message listener and register cluster to this listener.
      * 
-     * @see org.apache.catalina.ha.CatalinaCluster#addClusterListener(org.apache.catalina.ha.MessageListener)
+     * @see org.apache.catalina.ha.CatalinaCluster#addClusterListener(org.apache.catalina.ha.ClusterListener)
      */
     public void addClusterListener(ClusterListener listener) {
         if (listener != null && !clusterListeners.contains(listener)) {
@@ -330,9 +330,9 @@ public class SimpleTcpCluster extends LifecycleBase
     }
 
     /**
-     * remove message listener and deregister Cluster from listener
+     * Remove message listener and deregister Cluster from listener.
      * 
-     * @see org.apache.catalina.ha.CatalinaCluster#removeClusterListener(org.apache.catalina.ha.MessageListener)
+     * @see org.apache.catalina.ha.CatalinaCluster#removeClusterListener(org.apache.catalina.ha.ClusterListener)
      */
     public void removeClusterListener(ClusterListener listener) {
         if (listener != null) {
@@ -498,7 +498,6 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param name
      *            Context Name of this manager
      * @see org.apache.catalina.Cluster#createManager(java.lang.String)
-     * @see #addManager(String, Manager)
      * @see DeltaManager#start()
      */
     public synchronized Manager createManager(String name) {
@@ -536,10 +535,11 @@ public class SimpleTcpCluster extends LifecycleBase
     }
 
     /**
-     * remove an application form cluster replication bus
+     * Remove an application from cluster replication bus.
      * 
-     * @see org.apache.catalina.ha.CatalinaCluster#removeManager(java.lang.String,Manager)
+     * @see org.apache.catalina.Cluster#removeManager(Manager)
      */
+    @Override
     public void removeManager(Manager manager) {
         if (manager != null && manager instanceof ClusterManager ) {
             ClusterManager cmgr = (ClusterManager) manager;
@@ -786,7 +786,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param msg message to transfer
      * @param dest Receiver member
      * @see org.apache.catalina.ha.CatalinaCluster#send(org.apache.catalina.ha.ClusterMessage,
-     *      org.apache.catalina.ha.Member)
+     *      org.apache.catalina.tribes.Member)
      */
     public void send(ClusterMessage msg, Member dest) {
         try {
@@ -811,7 +811,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * New cluster member is registered
      * 
-     * @see org.apache.catalina.ha.MembershipListener#memberAdded(org.apache.catalina.ha.Member)
+     * @see org.apache.catalina.tribes.MembershipListener#memberAdded(org.apache.catalina.tribes.Member)
      */
     public void memberAdded(Member member) {
         try {
@@ -830,7 +830,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * Cluster member is gone
      * 
-     * @see org.apache.catalina.ha.MembershipListener#memberDisappeared(org.apache.catalina.ha.Member)
+     * @see org.apache.catalina.tribes.MembershipListener#memberDisappeared(org.apache.catalina.tribes.Member)
      */
     public void memberDisappeared(Member member) {
         try {

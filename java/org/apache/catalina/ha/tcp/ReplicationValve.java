@@ -516,7 +516,7 @@ public class ReplicationValve
 
    /**
     * Send message delta message from request session 
-    * @param request current request
+    * @param session current session
     * @param manager session manager
     * @param cluster replication cluster
     */

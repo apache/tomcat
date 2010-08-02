@@ -354,7 +354,7 @@ import org.apache.juli.logging.LogFactory;
  * {@link #isEligibleToExpirationHeaderGeneration(HttpServletRequest, XHttpServletResponse)}
  * </li>
  * <li>
- * {@link #getExpirationDate(HttpServletRequest, XHttpServletResponse)}</li>
+ * {@link #getExpirationDate(XHttpServletResponse)}</li>
  * </ul>
  * </p>
  * <h1>Troubleshooting</h1>
@@ -1427,7 +1427,7 @@ public class ExpiresFilter extends FilterBase {
      * </p>
      * <p>
      * Invocations to <tt>Logger.debug(...)</tt> are guarded by
-     * {@link Logger#isDebugEnabled()} because
+     * {@link Log#isDebugEnabled()} because
      * {@link HttpServletRequest#getRequestURI()} and
      * {@link HttpServletResponse#getContentType()} costs <tt>String</tt>
      * objects instantiations (as of Tomcat 7).
