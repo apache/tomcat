@@ -17,8 +17,8 @@
 package javax.servlet;
 
 /**
- * @since Servlet 3.0
  * TODO SERVLET3 - Add comments
+ * @since Servlet 3.0
  */
 public class AsyncEvent {
     private AsyncContext context;

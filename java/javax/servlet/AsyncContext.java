@@ -17,9 +17,9 @@
 package javax.servlet;
 
 /**
- * @since Servlet 3.0
  * $Id$
  * TODO SERVLET3 - Add comments
+ * @since Servlet 3.0
  */
 public interface AsyncContext {
     public static final String ASYNC_REQUEST_URI =
