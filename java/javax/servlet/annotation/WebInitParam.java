@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * <br />
  * 
  * E.g.
- * <code>@WebServlet(name="TestServlet", urlPatterns={"/test"},initParams={@WebInitParam(name="test", value="true")})
+ * <code>&amp;#064;WebServlet(name="TestServlet", urlPatterns={"/test"},initParams={&amp;#064;WebInitParam(name="test", value="true")})
  * public class TestServlet extends HttpServlet { ... </code><br />
  * 
  * @since Servlet 3.0

@@ -316,7 +316,6 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getServletContext() on
      * the wrapped request object.
      * 
-     * @return
      * @since Servlet 3.0
      */
     public ServletContext getServletContext() {
@@ -327,7 +326,6 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return startAsync() on the
      * wrapped request object.
      * 
-     * @return
      * @throws java.lang.IllegalStateException
      * @since Servlet 3.0
      */
@@ -341,7 +339,6 @@ public class ServletRequestWrapper implements ServletRequest {
      * 
      * @param servletRequest
      * @param servletResponse
-     * @return
      * @throws java.lang.IllegalStateException
      * @since Servlet 3.0
      */
@@ -354,7 +351,6 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return isAsyncStarted() on the
      * wrapped request object.
      * 
-     * @return
      * @since Servlet 3.0
      */
     public boolean isAsyncStarted() {
@@ -365,7 +361,6 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return isAsyncSupported() on
      * the wrapped request object.
      * 
-     * @return
      * @since Servlet 3.0
      */
     public boolean isAsyncSupported() {
@@ -376,7 +371,6 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getAsyncContext() on the
      * wrapped request object.
      * 
-     * @return
      * @since Servlet 3.0
      */
     public AsyncContext getAsyncContext() {
