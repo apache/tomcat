@@ -1133,9 +1133,9 @@
 
   </target>
 
-  <target name="extras-webservices"
-          depends="extras-prepare,compile,build-manifests"
-          description="Build web services extras package">
+  <target name="extras-webservices-prepare"
+          depends="extras-prepare"
+          description="Prepare to build web services extras package">
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${jaxrpc-lib.loc}"/>
@@ -1153,6 +1153,11 @@
           tofile="${tomcat.extras}/webservices/jaxrpc.jar" />
     <copy file="${wsdl4j-lib.jar}"
           tofile="${tomcat.extras}/webservices/wsdl4j.jar" />
+  </target>
+
+  <target name="extras-webservices"
+          depends="extras-webservices-prepare,compile,build-manifests"
+          description="Build web services extras package">
 
     <!-- Compile web services classes components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
@@ -1335,8 +1340,60 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     
   </target>
 
-  <target name="javadoc" depends="dist-source,extras-prepare"
+  <target name="javadoc" depends="dist-source,extras-webservices-prepare"
     description="Create the Tomcat javadoc" >
+    <javadoc packagenames="javax.servlet.*"
+      excludepackagenames="javax.servlet.jsp.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/servletapi"
+      version="true"
+      windowtitle="Servlet 3.0 API Documentation - Apache Tomcat ${version}"
+      doctitle="Servlet 3.0 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;Servlet 3.0 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="ISO-8859-1"
+      additionalparam="-breakiterator"
+      maxmemory="256m" >
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path refid="tomcat.webservices.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
+    <javadoc packagenames="javax.servlet.jsp.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/jspapi"
+      version="true"
+      windowtitle="JSP 2.2 API Documentation - Apache Tomcat ${version}"
+      doctitle="JSP 2.2 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;JSP 2.2 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="ISO-8859-1"
+      additionalparam="-breakiterator"
+      maxmemory="256m" >
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path refid="tomcat.webservices.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
+    <javadoc packagenames="javax.el.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/elapi"
+      version="true"
+      windowtitle="EL 2.2 API Documentation - Apache Tomcat ${version}"
+      doctitle="EL 2.2 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;EL 2.2 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="ISO-8859-1"
+      additionalparam="-breakiterator"
+      maxmemory="256m" >
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path refid="tomcat.webservices.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
     <javadoc packagenames="org.apache.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/api"
@@ -1353,7 +1410,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
+      <link href="../servletapi"/>
+      <link href="../jspapi"/>
+      <link href="../elapi"/>
       <link href="http://java.sun.com/j2se/1.6.0/docs/api/"/>
+      <link href="http://commons.apache.org/io/api-release/"/>
+      <link href="http://download-llnw.oracle.com/javaee/6/api/"/>
     </javadoc>
   </target>
 
