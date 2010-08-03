@@ -114,7 +114,7 @@ public class ObjectReader {
      * Send buffer to cluster listener (callback).
      * Is message complete receiver send message to callback?
      *
-     * @see org.apache.catalina.tribes.transport.ClusterReceiverBase#messageDataReceived(ChannelMessage)
+     * @see org.apache.catalina.tribes.transport.ReceiverBase#messageDataReceived(ChannelMessage)
      * @see XByteBuffer#doesPackageExist()
      * @see XByteBuffer#extractPackage(boolean)
      *

@@ -1142,7 +1142,7 @@ public class JNDIRealm extends RealmBase {
      *
      * @exception NamingException if a directory server error occurs
      *
-     * @see #getUser(DirContext, String, int)
+     * @see #getUser(DirContext, String, String, int)
      */
     protected User getUser(DirContext context, String username, String credentials)
         throws NamingException {

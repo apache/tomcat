@@ -50,9 +50,6 @@ public class ReflectionUtil {
             byte.class, char.class, double.class, float.class, int.class,
             long.class, short.class, Void.TYPE };
 
-    /**
-     * 
-     */
     private ReflectionUtil() {
         super();
     }
@@ -87,7 +84,6 @@ public class ReflectionUtil {
     /**
      * Converts an array of Class names to Class types
      * @param s
-     * @return
      * @throws ClassNotFoundException
      */
     public static Class<?>[] toTypeArray(String[] s) throws ClassNotFoundException {
@@ -103,7 +99,6 @@ public class ReflectionUtil {
     /**
      * Converts an array of Class types to Class names
      * @param c
-     * @return
      */
     public static String[] toTypeNameArray(Class<?>[] c) {
         if (c == null)
@@ -300,13 +295,6 @@ public class ReflectionUtil {
         return null;
     }
 
-    /**
-     * @param base
-     * @param property
-     * @return
-     * @throws ELException
-     * @throws PropertyNotFoundException
-     */
     public static PropertyDescriptor getPropertyDescriptor(Object base,
             Object property) throws ELException, PropertyNotFoundException {
         String name = ELSupport.coerceToString(property);

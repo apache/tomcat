@@ -38,17 +38,18 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
+import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 
 
 /**
  * <p> The default implementation of the
- * {@link org.apache.commons.fileupload.FileItem FileItem} interface.
+ * {@link org.apache.tomcat.util.http.fileupload.FileItem FileItem} interface.
  *
  * <p> After retrieving an instance of this class from a {@link
- * org.apache.commons.fileupload.DiskFileUpload DiskFileUpload} instance (see
- * {@link org.apache.commons.fileupload.DiskFileUpload
- * #parseRequest(javax.servlet.http.HttpServletRequest)}), you may
+ * org.apache.tomcat.util.http.fileupload.FileUpload FileUpload} instance (see
+ * {@link org.apache.tomcat.util.http.fileupload.FileUpload
+ * #parseRequest(RequestContext)}), you may
  * either request all contents of file at once using {@link #get()} or
  * request an {@link java.io.InputStream InputStream} with
  * {@link #getInputStream()} and process the file without attempting to load
@@ -56,7 +57,8 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  *
  * <p>Temporary files, which are created for file items, should be
  * deleted later on. The best way to do this is using a
- * {@link FileCleaningTracker}, which you can set on the
+ * {@link org.apache.tomcat.util.http.fileupload.FileCleaningTracker
+ * FileCleaningTracker}, which you can set on the
  * {@link DiskFileItemFactory}. However, if you do use such a tracker,
  * then you must consider the following: Temporary files are automatically
  * deleted as soon as they are no longer needed. (More precisely, when the
@@ -382,7 +384,7 @@ public class DiskFileItem
      *
      * @return The contents of the file, as a string.
      *
-     * @todo Consider making this method throw UnsupportedEncodingException.
+     * TODO Consider making this method throw UnsupportedEncodingException.
      */
     public String getString() {
         byte[] rawdata = get();

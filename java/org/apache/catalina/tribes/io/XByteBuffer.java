@@ -83,7 +83,7 @@ public class XByteBuffer
     /**
      * Constructs a new XByteBuffer
      * @param size - the initial size of the byte buffer
-     * @todo use a pool of byte[] for performance
+     * TODO use a pool of byte[] for performance
      */
     public XByteBuffer(int size, boolean discard) {
         buf = new byte[size];

@@ -223,7 +223,6 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * Returns true if the Host will attempt to create directories for appBase and xmlBase
      * unless they already exist.
-     * @return
      */
     public boolean getCreateDirs() {
         return createDirs;

@@ -144,11 +144,6 @@ public class FastQueue {
         lock.setRemoveWaitTimeout(removeWaitTimeout);
     }
 
-    /**
-     * get Max Queue length
-     * 
-     * @see org.apache.catalina.tribes.util.IQueue#getMaxQueueLength()
-     */
     public int getMaxQueueLength() {
         return maxQueueLength;
     }
@@ -236,8 +231,8 @@ public class FastQueue {
     }
 
     /**
-     * Add new data to the queue
-     * @see org.apache.catalina.tribes.util.IQueue#add(java.lang.String, java.lang.Object)
+     * Add new data to the queue.
+     * 
      * FIXME extract some method
      */
     public boolean add(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
@@ -307,8 +302,7 @@ public class FastQueue {
     }
 
     /**
-     * remove the complete queued object list
-     * @see org.apache.catalina.tribes.util.IQueue#remove()
+     * Remove the complete queued object list.
      * FIXME extract some method
      */
     public LinkObject remove() {

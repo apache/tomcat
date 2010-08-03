@@ -29,7 +29,7 @@ public interface ServletRegistration extends Registration {
     /**
      * 
      * @param urlPatterns
-     * @return
+     * @return TODO
      * @throws IllegalArgumentException if urlPattern is null or empty
      * @throws IllegalStateException if the associated ServletContext has
      *                                  already been initialised
