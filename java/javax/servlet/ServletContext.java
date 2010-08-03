@@ -104,14 +104,14 @@ public interface ServletContext {
     public int getMinorVersion();
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public int getEffectiveMajorVersion();
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -431,7 +431,7 @@ public interface ServletContext {
     /**
      * @param name
      * @param value
-     * @return
+     * @return TODO
      * @throws IllegalStateException
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -519,6 +519,7 @@ public interface ServletContext {
     /**
      * @param servletName
      * @param className
+     * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -529,6 +530,7 @@ public interface ServletContext {
     /**
      * @param servletName
      * @param servlet
+     * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -539,6 +541,7 @@ public interface ServletContext {
     /**
      * @param servletName
      * @param servletClass
+     * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -548,7 +551,7 @@ public interface ServletContext {
 
     /**
      * @param c
-     * @return
+     * @return TODO
      * @throws ServletException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -557,14 +560,14 @@ public interface ServletContext {
 
     /**
      * @param servletName
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public ServletRegistration getServletRegistration(String servletName);
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -573,6 +576,7 @@ public interface ServletContext {
     /**
      * @param filterName
      * @param className
+     * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -583,6 +587,7 @@ public interface ServletContext {
     /**
      * @param filterName
      * @param filter
+     * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -592,6 +597,7 @@ public interface ServletContext {
     /**
      * @param filterName
      * @param filterClass
+     * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -601,7 +607,7 @@ public interface ServletContext {
 
     /**
      * @param c
-     * @return
+     * @return TODO
      * @throws ServletException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -610,21 +616,21 @@ public interface ServletContext {
 
     /**
      * @param filterName
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public FilterRegistration getFilterRegistration(String filterName);
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Map<String, ? extends FilterRegistration> getFilterRegistrations();
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -646,13 +652,13 @@ public interface ServletContext {
             throws IllegalStateException, IllegalArgumentException;
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes();
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes();
@@ -672,6 +678,7 @@ public interface ServletContext {
     /**
      * @param <T>
      * @param t
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public <T extends EventListener> void addListener(T t);
@@ -679,7 +686,7 @@ public interface ServletContext {
     /**
      * @param <T>
      * @param c
-     * @return
+     * @return TODO
      * @throws ServletException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -696,7 +703,7 @@ public interface ServletContext {
     public void declareRoles(String... roleNames);
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @throws SecurityException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -704,7 +711,7 @@ public interface ServletContext {
     public ClassLoader getClassLoader();
 
     /**
-     * @return
+     * @return TODO
      * @throws UnsupportedOperationException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */

@@ -141,8 +141,7 @@ public class BioReplicationTask extends AbstractRxTask {
 
     /**
      * send a reply-acknowledgment (6,2,3)
-     * @param key
-     * @param channel
+     * @param command
      */
     protected void sendAck(byte[] command) {
         try {

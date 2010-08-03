@@ -80,7 +80,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
     }
     
     /**
-     * @todo Fix to create an automatically growing buffer.
+     * TODO Fix to create an automatically growing buffer.
      * @param data byte[]
      * @return byte[]
      * @throws IOException

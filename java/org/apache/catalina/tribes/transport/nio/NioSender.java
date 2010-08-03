@@ -211,7 +211,7 @@ public class NioSender extends AbstractSender {
      * connect - blocking in this operation
      *
      * @throws IOException
-     * @todo Implement this org.apache.catalina.tribes.transport.IDataSender method
+     * TODO Implement this org.apache.catalina.tribes.transport.IDataSender method
      */
     @Override
     public synchronized void connect() throws IOException {
@@ -256,7 +256,7 @@ public class NioSender extends AbstractSender {
     /**
      * disconnect
      *
-     * @todo Implement this org.apache.catalina.tribes.transport.IDataSender method
+     * TODO Implement this org.apache.catalina.tribes.transport.IDataSender method
      */
     @Override
     public void disconnect() {
@@ -328,7 +328,7 @@ public class NioSender extends AbstractSender {
     *
     * @param data ChannelMessage
     * @throws IOException
-    * @todo Implement this org.apache.catalina.tribes.transport.IDataSender method
+    * TODO Implement this org.apache.catalina.tribes.transport.IDataSender method
     */
    public synchronized void setMessage(byte[] data) throws IOException {
        setMessage(data,0,data.length);

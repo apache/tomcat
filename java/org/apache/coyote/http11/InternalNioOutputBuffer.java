@@ -199,7 +199,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
      * @param flip boolean
      * @return int
      * @throws IOException
-     * @todo Fix non blocking write properly
+     * TODO Fix non blocking write properly
      */
     private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
         if ( flip ) bytebuffer.flip();

@@ -89,7 +89,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
      * @param fields Class fields
      * @param methods Class methods
      * @param attributes Class attributes
-     * @param source Read from file or generated in memory?
      */
     public JavaClass(int class_name_index, int superclass_name_index, String file_name, int major,
             int minor, int access_flags, ConstantPool constant_pool, int[] interfaces,

@@ -483,7 +483,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
     }
 
     /**
-     * @todo implement state transfer
+     * TODO implement state transfer
      * @param msg Serializable
      * @return Serializable - null if no reply should be sent
      */

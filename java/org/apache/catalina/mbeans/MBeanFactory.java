@@ -639,8 +639,6 @@ public class MBeanFactory {
      * @param deployOnStartup Deploy on server startup?
      * @param deployXML Should we deploy Context XML config files property?
      * @param unpackWARs Should we unpack WARs when auto deploying?
-     * @param xmlNamespaceAware Should we turn on/off XML namespace awareness?
-     * @param xmlValidation Should we turn on/off XML validation?        
      *
      * @exception Exception if an MBean cannot be created or registered
      */

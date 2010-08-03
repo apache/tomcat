@@ -118,7 +118,7 @@ public class StandardJarScanner implements JarScanner {
      * @param callback      The handler to process any JARs found
      * @param jarsToSkip    List of JARs to ignore. If this list is null, a
      *                      default list will be read from the system property
-     *                      defined by {@link #SKIP_JARS_PROPERTY} 
+     *                      defined by {@link Constants#SKIP_JARS_PROPERTY} 
      */
     @Override
     public void scan(ServletContext context, ClassLoader classloader,

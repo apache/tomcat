@@ -17,7 +17,9 @@
 <!-- $Id$ -->
 <html>
   <head>
-    <title>Overview of the org.apache.commons.fileupload component</title>
+    <title>
+      Overview of the org.apache.tomcat.util.http.fileupload component
+    </title>
   </head>
   <body>
     <p><b>NOTE:</b> This code has been copied from commons-fileupload 1.2.1 and
@@ -34,14 +36,12 @@
       While this package provides the generic functionality for file uploads,
       these classes are not typically used directly. Instead, normal usage
       involves one of the provided extensions of
-      {@link org.apache.commons.fileupload.FileUpload FileUpload} such as
-      {@link org.apache.commons.fileupload.servlet.ServletFileUpload ServletFileUpload}
-      or
-      {@link org.apache.commons.fileupload.portlet.PortletFileUpload PortletFileUpload},
+      {@link org.apache.tomcat.util.http.fileupload.FileUpload FileUpload} such as
+      {@link org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload ServletFileUpload}
       together with a factory for 
-      {@link org.apache.commons.fileupload.FileItem FileItem} instances,
+      {@link org.apache.tomcat.util.http.fileupload.FileItem FileItem} instances,
       such as
-      {@link org.apache.commons.fileupload.disk.DiskFileItemFactory DiskFileItemFactory}.
+      {@link org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory DiskFileItemFactory}.
     </p>
     <p>
       The following is a brief example of typical usage in a servlet, storing

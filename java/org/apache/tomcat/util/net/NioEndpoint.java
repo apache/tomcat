@@ -367,7 +367,6 @@ public class NioEndpoint extends AbstractEndpoint {
     protected AtomicInteger pollerRotater = new AtomicInteger(0);
     /**
      * Return an available poller in true round robin fashion
-     * @return
      */
     public Poller getPoller0() {
         int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;

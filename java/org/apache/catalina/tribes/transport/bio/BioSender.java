@@ -28,7 +28,6 @@ import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.Constants;
-import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.util.StringManager;
 
@@ -89,7 +88,7 @@ public class BioSender extends AbstractSender {
 
     /**
      * Connect other cluster member receiver 
-     * @see org.apache.catalina.tribes.transport.IDataSender#connect()
+     * @see org.apache.catalina.tribes.transport.DataSender#connect()
      */
     @Override
     public  void connect() throws IOException {
@@ -100,7 +99,7 @@ public class BioSender extends AbstractSender {
     /**
      * disconnect and close socket
      * 
-     * @see IDataSender#disconnect()
+     * @see org.apache.catalina.tribes.transport.DataSender#disconnect()
      */
     @Override
     public  void disconnect() {
@@ -114,10 +113,7 @@ public class BioSender extends AbstractSender {
     }
 
     /**
-     * Send message
-     * 
-     * @see org.apache.catalina.tribes.transport.IDataSender#sendMessage(,
-     *      ChannelMessage)
+     * Send message.
      */
     public  void sendMessage(byte[] data, boolean waitForAck) throws IOException {
         IOException exception = null;
@@ -197,10 +193,9 @@ public class BioSender extends AbstractSender {
      }
 
     /**
-     * close socket
+     * Close socket.
      * 
-     * @see DataSender#disconnect()
-     * @see DataSender#closeSocket()
+     * @see #disconnect()
      */
     protected void closeSocket() {
         if(isConnected()) {
@@ -232,7 +227,7 @@ public class BioSender extends AbstractSender {
      * 
      * @see #closeSocket()
      * @see #openSocket()
-     * @see #writeData(ChannelMessage)
+     * @see #sendMessage(byte[], boolean)
      * 
      * @param data
      *            data to send
@@ -251,9 +246,8 @@ public class BioSender extends AbstractSender {
     }
     
     /**
-     * Wait for Acknowledgment from other server
+     * Wait for Acknowledgement from other server.
      * FIXME Please, not wait only for three characters, better control that the wait ack message is correct.
-     * @param timeout
      * @throws java.io.IOException
      * @throws java.net.SocketTimeoutException
      */

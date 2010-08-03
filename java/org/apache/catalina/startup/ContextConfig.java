@@ -1554,7 +1554,6 @@ public class ContextConfig
      * @param filename  Name of the file (possibly with one or more leading path
      *                  segments) to read
      * @param path      Location that filename is relative to 
-     * @return
      */
     protected InputSource getWebXmlSource(String filename, String path) {
         File file = new File(filename);

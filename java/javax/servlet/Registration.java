@@ -34,7 +34,7 @@ public interface Registration {
      * 
      * @param name
      * @param value
-     * @return
+     * @return TODO
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      */
@@ -45,7 +45,7 @@ public interface Registration {
     /**
      * 
      * @param initParameters
-     * @return
+     * @return TODO
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      */

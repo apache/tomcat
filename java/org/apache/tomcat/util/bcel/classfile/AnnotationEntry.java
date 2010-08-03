@@ -49,7 +49,6 @@ public class AnnotationEntry implements Constants, Serializable {
      * @param file
      * @param constant_pool
      * @param isRuntimeVisible
-     * @return
      * @throws IOException
      */
     public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException {
