@@ -44,12 +44,26 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct Javadoc errors. (markt)
+      </fix>
+      <add>
+        Provide Javadoc for Servlet 3.0 API, JSP 2.2 API and EL 2.2 API.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
         Extend Checkstyle validation checks to check for tabs in nearly all text
         files. (markt) 
       </add>
+      <update>
+        Update to Commons Daemon from 1.0.2 to 1.0.3.(markt)  
+      </update>
     </changelog>
   </subsection>
 </section>
