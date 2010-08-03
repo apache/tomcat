@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
       <artifactId>ecj</artifactId>
-      <version>3.5.1</version>
+      <version>3.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
