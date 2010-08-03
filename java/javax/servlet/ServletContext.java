@@ -678,7 +678,6 @@ public interface ServletContext {
     /**
      * @param <T>
      * @param t
-     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public <T extends EventListener> void addListener(T t);

@@ -451,7 +451,7 @@ public class Cookie implements Cloneable, Serializable {
     }
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public boolean isHttpOnly() {
