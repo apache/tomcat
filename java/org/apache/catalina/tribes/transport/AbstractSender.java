@@ -99,14 +99,14 @@ public abstract class AbstractSender implements DataSender {
      * connect
      *
      * @throws IOException
-     * @todo Implement this org.apache.catalina.tribes.transport.DataSender method
+     * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
      */
     public abstract void connect() throws IOException;
 
     /**
      * disconnect
      *
-     * @todo Implement this org.apache.catalina.tribes.transport.DataSender method
+     * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
      */
     public abstract void disconnect();
 
@@ -114,7 +114,7 @@ public abstract class AbstractSender implements DataSender {
      * keepalive
      *
      * @return boolean
-     * @todo Implement this org.apache.catalina.tribes.transport.DataSender method
+     * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
      */
     public boolean keepalive() {
         boolean disconnect = false;

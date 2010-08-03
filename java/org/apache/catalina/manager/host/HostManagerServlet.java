@@ -267,12 +267,11 @@ public class HostManagerServlet
 
 
     /**
-     * extract boolean value from checkbox with default
+     * Extract boolean value from checkbox with default.
      * @param request
      * @param parameter
      * @param theDefault
      * @param htmlMode
-     * @return
      */
     protected boolean booleanParameter(HttpServletRequest request,
             String parameter, boolean theDefault, boolean htmlMode) {

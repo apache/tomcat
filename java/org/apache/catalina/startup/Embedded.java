@@ -96,7 +96,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  * To initiate a normal shutdown, call the <code>stop()</code> method of
  * this object.
  * <p>
- * @see org.apache.catalina.startup.Catalina#main For a complete example
+ * @see org.apache.catalina.startup.Bootstrap#main For a complete example
  * of how Tomcat is set up and launched as an Embedded application.
  *
  * @author Craig R. McClanahan

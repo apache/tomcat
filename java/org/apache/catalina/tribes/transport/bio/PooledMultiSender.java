@@ -61,7 +61,7 @@ public class PooledMultiSender extends PooledSender {
      * getNewDataSender
      *
      * @return DataSender
-     * @todo Implement this org.apache.catalina.tribes.transport.PooledSender
+     * TODO Implement this org.apache.catalina.tribes.transport.PooledSender
      *   method
      */
     @Override
