@@ -53,6 +53,11 @@
         Provide Javadoc for Servlet 3.0 API, JSP 2.2 API and EL 2.2 API.
         (markt)
       </add>
+      <fix>
+        Remove second copy of RUNNING.txt from the full-docs distribution. Some
+        unpacking utilities can't handle multiple copies of a file with the same
+        name in a directory. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
