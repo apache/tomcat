@@ -35,6 +35,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.file.Matcher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -134,6 +135,13 @@ public class StandardJarScanner implements JarScanner {
         } else {
             ignoredJars = jarsToSkip;
         }
+        Set<String[]> ignoredJarsTokens = new HashSet<String[]>();
+        for (String pattern: ignoredJars) {
+            if (log.isDebugEnabled()) {
+                log.debug("Tokenizing " + pattern);
+            }
+            ignoredJarsTokens.add(Matcher.tokenizePathAsArray(pattern));
+        }
 
         // Scan WEB-INF/lib
         Set<String> dirList = context.getResourcePaths(Constants.WEB_INF_LIB);
@@ -141,16 +149,26 @@ public class StandardJarScanner implements JarScanner {
             Iterator<String> it = dirList.iterator();
             while (it.hasNext()) {
                 String path = it.next();
+                if (log.isDebugEnabled()) {
+                    log.debug("Matching path '" + path + "'");
+                }
                 if (path.endsWith(Constants.JAR_EXT) &&
-                        !ignoredJars.contains(
-                                path.substring(path.lastIndexOf('/')+1))) {
+                        !Matcher.matchPath(ignoredJarsTokens,
+                            path.substring(path.lastIndexOf('/')+1))) {
                     // Need to scan this JAR
+                    if (log.isDebugEnabled()) {
+                        log.debug("Scanning jar " + path);
+                    }
                     URL url = null;
                     try {
                         url = context.getResource(path);
                         process(callback, url);
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
+                    }
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Didn't scan jar " + path);
                     }
                 }
             }
@@ -174,14 +192,25 @@ public class StandardJarScanner implements JarScanner {
                         
                         // Skip JARs with known not to be interesting and JARs
                         // in WEB-INF/lib we have already scanned
-                        if (!(ignoredJars.contains(jarName) ||
+                        if (log.isDebugEnabled()) {
+                            log.debug("Matching jar '" + jarName + "'");
+                        }
+                        if (jarName != null &&
+                            !(Matcher.matchPath(ignoredJarsTokens, jarName) ||
                                 urls[i].toString().contains(
                                         Constants.WEB_INF_LIB + jarName))) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Scanning jar " + jarName);
+                            }
                             try {
                                 process(callback, urls[i]);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString(
                                         "jarScan.classloaderFail",urls[i]), ioe);
+                            }
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Didn't scan jar " + jarName);
                             }
                         }
                     }
