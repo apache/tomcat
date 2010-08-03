@@ -424,7 +424,7 @@ public interface HttpServletRequest extends ServletRequest {
 
     /**
      * @param response
-     * @return
+     * @return TODO
      * @throws IOException
      * @throws ServletException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -455,7 +455,7 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Return a collection of all uploaded Parts.
      * 
-     * @return
+     * @return A collection of all uploaded Parts.
      * @throws IOException
      *             if an I/O error occurs
      * @throws IllegalStateException
@@ -472,7 +472,7 @@ public interface HttpServletRequest extends ServletRequest {
      * of all Parts.
      * 
      * @param name
-     * @return
+     * @return The named Part or null if the Part does not exist
      * @throws IOException
      *             if an I/O error occurs
      * @throws IllegalStateException

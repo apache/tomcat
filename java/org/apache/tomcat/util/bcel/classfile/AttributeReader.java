@@ -51,8 +51,6 @@ public interface AttributeReader {
      @return The user-defined AttributeReader should take this data and use
      it to construct an attribute.  In the case of errors, a null can be
      returned which will cause the parsing of the class file to fail.
-
-     @see Attribute#addAttributeReader( String, AttributeReader )
      */
     public Attribute createAttribute( int name_index, int length, java.io.DataInputStream file,
             ConstantPool constant_pool );

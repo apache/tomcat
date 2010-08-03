@@ -25,34 +25,28 @@ package org.apache.tomcat.util.bcel;
  */
 public interface Constants {
 
-    /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
+  /** One of the access flags for fields, methods, or classes.
    */
   public final static short ACC_FINAL        = 0x0010;
 
   /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
    */
   public final static short ACC_INTERFACE    = 0x0200;
 
   /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
    */
   public final static short ACC_ABSTRACT     = 0x0400;
 
   /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
    */
   public final static short ACC_ENUM         = 0x4000;
 
   // Applies to classes compiled by new compilers only
   /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
    */
   public final static short ACC_SUPER        = 0x0020;
 
   /** One of the access flags for fields, methods, or classes.
-   *  @see #ACC_PUBLIC
    */
   public final static short MAX_ACC_FLAG     = ACC_ENUM;
 

@@ -1215,8 +1215,6 @@ public interface Context extends Container {
     
     /**
      * Is this Context paused whilst it is reloaded?
-     * 
-     * @return
      */
     public boolean getPaused();
 

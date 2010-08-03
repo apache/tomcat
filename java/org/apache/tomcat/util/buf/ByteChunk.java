@@ -828,7 +828,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
      * @param end   The point to stop searching in the byte array
-     * @param c     The list of bytes to search for 
+     * @param b     The list of bytes to search for 
      * @return      The position of the first instance a byte that is not
      *                  in the list of bytes to search for or -1 if no such byte
      *                  is found.

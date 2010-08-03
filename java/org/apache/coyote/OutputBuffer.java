@@ -33,11 +33,11 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public interface OutputBuffer {
 
 
-    /** Write the response. The caller ( tomcat ) owns the chunks.
+    /**
+     * Write the response. The caller ( tomcat ) owns the chunks.
      *
      * @param chunk data to write
      * @param response used to allow buffers that can be shared by multiple responses.
-     * @return
      * @throws IOException
      */
     public int doWrite(ByteChunk chunk, Response response)

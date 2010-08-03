@@ -1139,7 +1139,6 @@ public class ExpiresFilter extends FilterBase {
      *            can be <code>null</code>
      * @param separator
      *            can be <code>null</code>
-     * @return
      */
     protected static String substringBefore(String str, String separator) {
         if (str == null || str.isEmpty() || separator == null) {

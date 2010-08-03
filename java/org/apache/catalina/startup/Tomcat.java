@@ -84,7 +84,7 @@ import org.apache.catalina.session.StandardManager;
  * see setters for doc. It can be used for simple tests and
  * demo.
  * 
- * @see TestTomcat for examples on how to use this
+ * @see <a href="http://svn.apache.org/repos/asf/tomcat/trunk/test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
  * @author Costin Manolache
  */
 public class Tomcat {
