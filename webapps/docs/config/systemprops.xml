@@ -73,6 +73,13 @@
       <code>true</code> will be used.</p>
     </property>
 
+    <property name="org.apache.el.parser.SKIP_IDENTIFIER_CHECK">
+      <p>If <code>true</code>, when parsing expressions, identifiers will not be
+      checked to ensure that they conform to the Java Language Specification for
+      Java identifiers. If not specified, the default value of
+      <code>false</code> will be used.</p>
+    </property>
+
   </properties>
 </section>
 
