@@ -21,16 +21,17 @@ package org.apache.tomcat.util.file;
 import java.io.File;
 import java.util.Locale;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>This is a utility class used by selectors and DirectoryScanner. The
- * functionality more properly belongs just to selectors, but unfortunately
- * DirectoryScanner exposed these as protected methods. Thus we have to
- * support any subclasses of DirectoryScanner that may access these methods.
+ * <p>This is a utility class to match file globs.
+ * The class has been derived from
+ * org.apache.tools.ant.types.selectors.SelectorUtils.
  * </p>
- * <p>This is a Singleton.</p>
+ * <p>All methods are static.</p>
  */
 public final class Matcher {
 
@@ -39,7 +40,6 @@ public final class Matcher {
      */
     public static final String DEEP_TREE_MATCH = "**";
 
-    private static final Matcher instance = new Matcher();
     private static final String OS_NAME =
         System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
     private static final String PATH_SEP =
@@ -48,26 +48,20 @@ public final class Matcher {
     private static final boolean ON_DOS = isDos();
 
     /**
-     * Private Constructor
+     * The string resources for this package.
      */
-    private Matcher() {
-    }
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
-    /**
-     * Retrieves the instance of the Singleton.
-     * @return singleton instance
-     */
-    public static Matcher getInstance() {
-        return instance;
-    }
+    private static final Log log = LogFactory.getLog(Matcher.class);
 
     /**
      * Tests whether or not a given path matches any pattern in the given set.
      *
      * If you need to call this method multiple times with the same 
-     * pattern you should rather use TokenizedPath
+     * pattern you should rather pre parse the pattern using tokenizePathAsArray.
      *
-     * @see TokenizedPath
+     * @see #tokenizePathAsArray
      * 
      * @param patternSet The pattern set to match against. Must not be
      *                <code>null</code>.
@@ -91,9 +85,9 @@ public final class Matcher {
      * Tests whether or not a given path matches a given pattern.
      *
      * If you need to call this method multiple times with the same 
-     * pattern you should rather use TokenizedPath
+     * pattern you should rather pre parse the pattern using tokenizePathAsArray.
      *
-     * @see TokenizedPath
+     * @see #tokenizePathAsArray
      * 
      * @param pattern The pattern to match against. Must not be
      *                <code>null</code>.
@@ -112,9 +106,9 @@ public final class Matcher {
      * Tests whether or not a given path matches a given pattern.
      * 
      * If you need to call this method multiple times with the same 
-     * pattern you should rather use TokenizedPattern
+     * pattern you should rather pre parse the pattern using tokenizePathAsArray.
      *
-     * @see TokenizedPattern
+     * @see #tokenizePathAsArray
      * 
      * @param pattern The pattern to match against. Must not be
      *                <code>null</code>.
@@ -133,10 +127,9 @@ public final class Matcher {
     }
 
     /**
-     * Core implementation of matchPath.  It is isolated so that it
-     * can be called from TokenizedPattern.
+     * Core implementation of matchPath using an already tokenized pattern.
      */
-    static boolean matchPath(String[] tokenizedPattern, String[] strDirs,
+    public static boolean matchPath(String[] tokenizedPattern, String[] strDirs,
                              boolean isCaseSensitive) {
         int patIdxStart = 0;
         int patIdxEnd = tokenizedPattern.length - 1;
@@ -420,7 +413,7 @@ public final class Matcher {
     }
 
     /**
-     * Breaks a path up into a Vector of path elements, tokenizing on
+     * Breaks a path up into a array of path elements, tokenizing on
      * <code>File.separator</code>.
      *
      * @param path Path to tokenize. Must not be <code>null</code>.
@@ -428,6 +421,9 @@ public final class Matcher {
      * @return a String array of path elements from the tokenized path
      */
     public static String[] tokenizePathAsArray(String path) {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("matcher.tokenize", path));
+        }
         String root = null;
         if (isAbsolutePath(path)) {
             String[] s = dissect(path);
