@@ -25,7 +25,7 @@ import java.util.Enumeration;
  * to a filter during initialization.
  * 
  * @see Filter
- * @sinceServlet 2.3
+ * @since Servlet 2.3
  */
 public interface FilterConfig {
 
@@ -42,7 +42,7 @@ public interface FilterConfig {
      * @return {@link ServletContext} object, used by the caller to interact
      *         with its servlet container
      * 
-     * @seeServletContext
+     * @see ServletContext
      */
     public ServletContext getServletContext();
 
