@@ -265,7 +265,7 @@ public class ParameterParser {
      * Extracts a map of name/value pairs from the given array of
      * characters. Names are expected to be unique.
      *
-     * @param chars the array of characters that contains a sequence of
+     * @param inputChars the array of characters that contains a sequence of
      * name/value pairs
      * @param separator the name/value pairs separator
      *
@@ -282,7 +282,7 @@ public class ParameterParser {
      * Extracts a map of name/value pairs from the given array of
      * characters. Names are expected to be unique.
      *
-     * @param chars the array of characters that contains a sequence of
+     * @param inputChars the array of characters that contains a sequence of
      * name/value pairs
      * @param offset - the initial offset.
      * @param length - the length.

@@ -44,6 +44,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     protected HashMap<Member, BioSender> bioSenders =
         new HashMap<Member, BioSender>();
 
+    @Override
     public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         byte[] data = XByteBuffer.createDataPackage((ChannelData)msg);
         BioSender[] senders = setupForSend(destination);

@@ -38,7 +38,7 @@ public interface FilterRegistration extends Registration {
             boolean isMatchAfter, String... servletNames);
     /**
      * 
-     * @return
+     * @return TODO
      */
     public Collection<String> getServletNameMappings();
     
@@ -56,7 +56,7 @@ public interface FilterRegistration extends Registration {
 
     /**
      * 
-     * @return
+     * @return TODO
      */
     public Collection<String> getUrlPatternMappings();
     

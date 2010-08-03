@@ -135,7 +135,7 @@ public final class Streams {
 
     /**
      * This convenience method allows to read a
-     * {@link org.apache.commons.fileupload.FileItemStream}'s
+     * {@link org.apache.tomcat.util.http.fileupload.FileItemStream}'s
      * content into a string. The platform's default character encoding
      * is used for converting bytes into characters.
      * @param pStream The input stream to read.
@@ -151,7 +151,7 @@ public final class Streams {
 
     /**
      * This convenience method allows to read a
-     * {@link org.apache.commons.fileupload.FileItemStream}'s
+     * {@link org.apache.tomcat.util.http.fileupload.FileItemStream}'s
      * content into a string, using the given character encoding.
      * @param pStream The input stream to read.
      * @param pEncoding The character encoding, typically "UTF-8".

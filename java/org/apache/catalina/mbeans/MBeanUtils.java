@@ -1623,7 +1623,6 @@ public class MBeanUtils {
      * Service.
      * 
      * @param service 
-     * @return
      */
     public static String getDomain(Service service) {
         
@@ -1656,7 +1655,6 @@ public class MBeanUtils {
      * Container.
      * 
      * @param container
-     * @return
      */
     public static String getDomain(Container container) {
         

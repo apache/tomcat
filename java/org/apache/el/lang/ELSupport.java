@@ -173,11 +173,6 @@ public class ELSupport {
         }
     }
 
-    /**
-     * @param obj
-     * @param type
-     * @return
-     */
     public final static Enum<?> coerceToEnum(final Object obj, Class type) {
         if (obj == null || "".equals(obj)) {
             return null;

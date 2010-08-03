@@ -427,13 +427,13 @@ public interface ServletRequest {
     public int getLocalPort();
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public ServletContext getServletContext();
 
     /**
-     * @return
+     * @return TODO
      * @throws java.lang.IllegalStateException
      *             If async is not supported for this request
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -443,7 +443,7 @@ public interface ServletRequest {
     /**
      * @param servletRequest
      * @param servletResponse
-     * @return
+     * @return TODO
      * @throws java.lang.IllegalStateException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -451,26 +451,26 @@ public interface ServletRequest {
             ServletResponse servletResponse);
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public boolean isAsyncStarted();
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public boolean isAsyncSupported();
 
     /**
-     * @return
+     * @return TODO
      * @throws java.lang.IllegalStateException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public AsyncContext getAsyncContext();
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public DispatcherType getDispatcherType();

@@ -177,7 +177,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
      * memberAdded
      *
      * @param member Member
-     * @todo Implement this org.apache.catalina.tribes.MembershipListener
+     * TODO Implement this org.apache.catalina.tribes.MembershipListener
      *   method
      */
     public void memberAdded(Member member) {
@@ -191,7 +191,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
      * memberDisappeared
      *
      * @param member Member
-     * @todo Implement this org.apache.catalina.tribes.MembershipListener
+     * TODO Implement this org.apache.catalina.tribes.MembershipListener
      *   method
      */
     public void memberDisappeared(Member member) {

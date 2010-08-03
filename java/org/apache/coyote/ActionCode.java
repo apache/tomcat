@@ -171,7 +171,7 @@ public final class ActionCode {
      */
     public static final ActionCode ACTION_ASYNC_COMPLETE = new ActionCode(27);
     /**
-     * Callback for an async call to {@link javax.servlet.ServletRequest#setAsyncTimeout(long)}
+     * Callback for an async call to {@link javax.servlet.AsyncContext#setTimeout(long)}
      */
     public static final ActionCode ACTION_ASYNC_SETTIMEOUT = new ActionCode(28);
     

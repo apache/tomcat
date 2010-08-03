@@ -106,7 +106,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * getMessageListener
      *
      * @return MessageListener
-     * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
+     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     public MessageListener getMessageListener() {
         return listener;
@@ -115,7 +115,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     /**
      *
      * @return The port
-     * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
+     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     public int getPort() {
         return port;
@@ -142,7 +142,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * setMessageListener
      *
      * @param listener MessageListener
-     * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
+     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     public void setMessageListener(MessageListener listener) {
         this.listener = listener;
@@ -239,7 +239,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @param socket
      * @param portstart
      * @param retries
-     * @return
+     * @return int
      * @throws IOException
      */
     protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {

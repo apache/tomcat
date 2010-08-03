@@ -301,27 +301,27 @@ public interface HttpServletResponse extends ServletResponse {
     public void setStatus(int sc, String sm);
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public int getStatus();
 
     /**
      * @param name
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public String getHeader(String name);
 
     /**
      * @param name
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Collection<String> getHeaders(String name);
 
     /**
-     * @return
+     * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Collection<String> getHeaderNames();
