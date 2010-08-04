@@ -71,7 +71,7 @@
   <subsection name="Standard Implementation">
 
     <p>The standard implementation of <strong>Jar Scanner</strong> is
-    <strong>org.apache.catalina.deploy.DefaultJarScanner</strong>.
+    <strong>org.apache.tomcat.util.scan.StandardJarScanner</strong>.
     It supports the following additional attributes (in addition to the
     common attributes listed above):</p>
 
