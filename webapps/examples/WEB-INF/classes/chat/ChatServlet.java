@@ -70,6 +70,7 @@ public class ChatServlet
      * @throws IOException
      * @throws ServletException
      */
+    @Override
     public void event(CometEvent event)
         throws IOException, ServletException {
 
@@ -216,6 +217,7 @@ public class ChatServlet
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
          */
+        @Override
         public void run() {
 
             // Loop until we receive a shutdown command

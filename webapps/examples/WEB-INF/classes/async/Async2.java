@@ -38,6 +38,7 @@ public class Async2 extends HttpServlet {
         final AsyncContext actx = req.startAsync();
         actx.setTimeout(30*1000);
         Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     Thread.currentThread().setName("Async2-Thread");
