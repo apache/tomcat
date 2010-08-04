@@ -46,7 +46,7 @@ ${StrRep}
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_RIGHT
   !define MUI_HEADERIMAGE_BITMAP header.bmp
-  !define MUI_WELCOMEFINISHPAGE_BITMAP side_left.bmp 
+  !define MUI_WELCOMEFINISHPAGE_BITMAP side_left.bmp
   !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\webapps\ROOT\RELEASE-NOTES.txt"
   !define MUI_FINISHPAGE_RUN $INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe
   !define MUI_FINISHPAGE_RUN_PARAMETERS //MR//Tomcat@VERSION_MAJOR@
@@ -514,37 +514,37 @@ FunctionEnd
 Function findJVMPath
 
   ClearErrors
-  
+
   ;Step one: Is this a JRE path (Program Files\Java\XXX)
   StrCpy $1 "$JavaHome"
-  
+
   StrCpy $2 "$1\bin\hotspot\jvm.dll"
   IfFileExists "$2" FoundJvmDll
   StrCpy $2 "$1\bin\server\jvm.dll"
   IfFileExists "$2" FoundJvmDll
-  StrCpy $2 "$1\bin\client\jvm.dll"  
+  StrCpy $2 "$1\bin\client\jvm.dll"
   IfFileExists "$2" FoundJvmDll
   StrCpy $2 "$1\bin\classic\jvm.dll"
   IfFileExists "$2" FoundJvmDll
 
   ;Step two: Is this a JDK path (Program Files\XXX\jre)
   StrCpy $1 "$JavaHome\jre"
-  
+
   StrCpy $2 "$1\bin\hotspot\jvm.dll"
   IfFileExists "$2" FoundJvmDll
   StrCpy $2 "$1\bin\server\jvm.dll"
   IfFileExists "$2" FoundJvmDll
-  StrCpy $2 "$1\bin\client\jvm.dll"  
+  StrCpy $2 "$1\bin\client\jvm.dll"
   IfFileExists "$2" FoundJvmDll
   StrCpy $2 "$1\bin\classic\jvm.dll"
   IfFileExists "$2" FoundJvmDll
 
   ClearErrors
   ;Step tree: Read defaults from registry
-  
+
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$1" "RuntimeLib"
-  
+
   IfErrors 0 FoundJvmDll
   StrCpy $2 ""
 
@@ -606,12 +606,12 @@ Function configure
   Push $R2
   Call xmlEscape
   Pop $R2
-  
+
   StrCmp $R1 "" +4 0  ; Blank user - do not add anything to tomcat-users.xml
   StrCmp $R2 "" +3 0  ; Blank password - do not add anything to tomcat-users.xml
-  StrCpy $R5 '<user name="$R1" password="$R2" roles="admin,manager" />'
+  StrCpy $R5 '<user name="$R1" password="$R2" roles="admin-gui,manager-gui" />'
   DetailPrint 'Admin user added: "$R1"'
-  
+
 Silent:
   DetailPrint 'HTTP/1.1 Connector configured on port "$R0"'
 
@@ -633,7 +633,7 @@ Silent:
   DetailPrint "server.xml written"
 
   ; Build final tomcat-users.xml
-  
+
   Delete "$INSTDIR\conf\tomcat-users.xml"
   FileOpen $R9 "$INSTDIR\conf\tomcat-users.xml" w
   ; File will be written using current windows codepage
@@ -734,16 +734,16 @@ Section Uninstall
   IfSilent Removed 0
 
   ; if $INSTDIR was removed, skip these next ones
-  IfFileExists "$INSTDIR" 0 Removed 
+  IfFileExists "$INSTDIR" 0 Removed
     MessageBox MB_YESNO|MB_ICONQUESTION \
       "Remove all files in your Tomcat @VERSION_MAJOR_MINOR@ directory? (If you have anything  \
  you created that you want to keep, click No)" IDNO Removed
     RMDir /r "$INSTDIR\webapps\ROOT" ; this would be skipped if the user hits no
     RMDir "$INSTDIR\webapps"
-    Delete "$INSTDIR\*.*" 
+    Delete "$INSTDIR\*.*"
     RMDir /r "$INSTDIR"
     Sleep 500
-    IfFileExists "$INSTDIR" 0 Removed 
+    IfFileExists "$INSTDIR" 0 Removed
       MessageBox MB_OK|MB_ICONEXCLAMATION \
                  "Note: $INSTDIR could not be removed."
   Removed:
