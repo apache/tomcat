@@ -74,13 +74,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Fix repgrssion that prevented running with a security manager enabled.
+        Fix regression that prevented running with a security manager enabled.
         (markt)
       </fix>
-      <update>
-        Allow glob patterns in the <code>jarsToSkip</code> configuration and add
-        some debug logging to the jar scanner. (rjung)
-      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
