@@ -178,6 +178,7 @@ public class CompositeELResolver extends ELResolver {
             }
         }
 
+        @Override
         public boolean hasNext() {          
             if (this.next != null)
                 return true;
@@ -195,6 +196,7 @@ public class CompositeELResolver extends ELResolver {
             return hasNext();
         }
 
+        @Override
         public FeatureDescriptor next() {
             if (!hasNext())
                 throw new NoSuchElementException();
@@ -204,6 +206,7 @@ public class CompositeELResolver extends ELResolver {
 
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

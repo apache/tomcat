@@ -16,8 +16,10 @@
 */
 package examples;
 
-import javax.servlet.jsp.*;
 import java.io.IOException;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspTagException;
 
 /**
  * Example1: the simplest tag

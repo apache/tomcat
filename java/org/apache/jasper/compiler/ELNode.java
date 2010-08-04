@@ -17,7 +17,10 @@
 
 package org.apache.jasper.compiler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.jsp.tagext.FunctionInfo;
 import org.apache.jasper.JasperException;
 

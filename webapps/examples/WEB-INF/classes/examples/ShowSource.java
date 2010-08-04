@@ -16,12 +16,14 @@
 */
 package examples;
 
-
-import javax.servlet.jsp.*;
-import javax.servlet.jsp.tagext.*;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspTagException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.TagSupport;
 
 /**
  * Display the sources of the JSP file.

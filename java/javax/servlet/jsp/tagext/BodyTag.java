@@ -16,7 +16,8 @@
  */
 package javax.servlet.jsp.tagext;
 
-import javax.servlet.jsp.*;
+import javax.servlet.jsp.JspException;
+
 
 /**
  * The BodyTag interface extends IterationTag by defining additional methods
