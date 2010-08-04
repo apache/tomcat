@@ -769,16 +769,6 @@ public class SimpleTcpCluster extends LifecycleBase
     public void send(ClusterMessage msg) {
         send(msg, null);
     }
-
-    /**
-     * send message to all cluster members same cluster domain
-     * 
-     * @see org.apache.catalina.ha.CatalinaCluster#send(org.apache.catalina.ha.ClusterMessage)
-     */
-    public void sendClusterDomain(ClusterMessage msg) {
-        send(msg,null);
-    } 
-
     
     /**
      * send a cluster message to one member

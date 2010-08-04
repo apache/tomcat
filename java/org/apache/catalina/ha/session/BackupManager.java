@@ -82,16 +82,6 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
     public void messageDataReceived(ClusterMessage msg) {
     }
 
-    public boolean doDomainReplication() {
-        return false;
-    }
-
-    /**
-     * @param sendClusterDomainOnly The sendClusterDomainOnly to set.
-     */
-    public void setDomainReplication(boolean sendClusterDomainOnly) {
-    }
-
     public void setExpireSessionsOnShutdown(boolean expireSessionsOnShutdown)
     {
         mExpireSessionsOnShutdown = expireSessionsOnShutdown;

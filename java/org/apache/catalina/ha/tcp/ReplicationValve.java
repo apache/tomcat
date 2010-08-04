@@ -539,11 +539,7 @@ public class ReplicationValve
     protected void send(ClusterManager manager, CatalinaCluster cluster, String sessionId) {
         ClusterMessage msg = manager.requestCompleted(sessionId);
         if (msg != null) {
-            if(manager.doDomainReplication()) {
-                cluster.sendClusterDomain(msg);
-            } else {
-                cluster.send(msg);
-            }
+            cluster.send(msg);
             if(doStatistics())
                 nrOfSendRequests++;
         }
