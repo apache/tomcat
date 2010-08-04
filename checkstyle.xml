@@ -32,6 +32,7 @@
     
     <!-- Imports -->
     <module name="IllegalImport"/>
+    <module name="AvoidStarImport"/>
     <!--
     Do not use - does not take account of imports required for Javadocs
     <module name="UnusedImports"/>

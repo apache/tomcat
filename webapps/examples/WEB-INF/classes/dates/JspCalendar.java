@@ -16,7 +16,8 @@
 */
 package dates;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
 
 public class JspCalendar {
     Calendar  calendar = null;

@@ -16,11 +16,13 @@
  */
 package org.apache.catalina.tribes.test.channel;
 
-import junit.framework.*;
-import org.apache.catalina.tribes.group.*;
+import junit.framework.TestCase;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.group.GroupChannel;
 
 /**
  * <p>Title: </p> 

@@ -17,8 +17,10 @@
 
 package org.apache.tomcat.util.net;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * Default server socket factory. Doesn't do much except give us
