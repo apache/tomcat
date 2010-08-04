@@ -202,7 +202,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         Selector tmpsel = selector;
         Set<SelectionKey> keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
         if ( keys == null ) return;
-        for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext(); ) {
+        for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
             SelectionKey key = iter.next();
             try {
 //                if (key.interestOps() == SelectionKey.OP_READ) {
