@@ -17,8 +17,10 @@
 
 package org.apache.jasper.compiler;
 
-import java.util.*;
-import java.io.*;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import javax.servlet.ServletContext;
 
 import org.apache.jasper.JasperException;

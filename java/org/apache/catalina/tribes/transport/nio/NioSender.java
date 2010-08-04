@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -33,7 +34,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 import java.io.EOFException;
-import java.net.*;
 
 /**
  * This class is NOT thread safe and should never be used with more than one thread at a time
