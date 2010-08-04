@@ -1042,7 +1042,7 @@ public class ApplicationContext
      *         in web.xml, a web-fragment or annotated with {@link WebListener}.
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
-            Class <? extends Servlet> servletClass)
+            Class<? extends Servlet> servletClass)
     throws IllegalStateException {
 
         return addServlet(servletName, servletClass.getName(), null);
@@ -1430,7 +1430,7 @@ public class ApplicationContext
 
     @Override
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-        Map<String, ApplicationServletRegistration > result =
+        Map<String, ApplicationServletRegistration> result =
             new HashMap<String, ApplicationServletRegistration>();
         
         Container[] wrappers = context.findChildren();
