@@ -21,7 +21,6 @@ import javax.naming.NameNotFoundException;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.naming.resources.ProxyDirContext;
 
 /**
  * Unit test for the {@link ProxyDirContext}.

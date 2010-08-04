@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.catalina.deploy.WebXml;
-
 import junit.framework.TestCase;
 
 /**
