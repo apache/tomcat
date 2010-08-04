@@ -31,8 +31,18 @@
     <module name="IllegalInstantiation"/>
     
     <!-- Imports -->
-    <module name="IllegalImport"/>
     <module name="AvoidStarImport"/>
+    <module name="AvoidStaticImport"/>
+    <module name="IllegalImport"/>
+    <!-- Will trigger ~600 errors
+    <module name="ImportOrder">
+        <property name="groups" value="java,javax,async,jsp2,junit,org,util"/>
+        <property name="ordered" value="true"/>
+        <property name="separated" value="true"/>
+        <property name="option" value="above"/>
+    </module>
+    -->
+    <module name="RedundantImport"/>
     <!--
     Do not use - does not take account of imports required for Javadocs
     <module name="UnusedImports"/>

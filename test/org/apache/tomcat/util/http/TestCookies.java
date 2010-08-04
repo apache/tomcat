@@ -17,15 +17,10 @@
 
 package org.apache.tomcat.util.http; 
 
-import org.apache.tomcat.util.http.Cookies;
-import org.apache.tomcat.util.http.ServerCookie;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-
-import java.lang.Exception;
 
 
 public class TestCookies extends TestCase {

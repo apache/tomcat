@@ -19,7 +19,6 @@ package org.apache.catalina.authenticator;
 import java.security.Principal;
 
 import org.apache.catalina.Session;
-import org.apache.catalina.authenticator.Constants;
 
 /**
  * A class that represents entries in the cache of authenticated users.

@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.valves.ValveBase;
 
 /**
  * {@link RemoteIpValve} Tests

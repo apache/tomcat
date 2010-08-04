@@ -15,9 +15,8 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.tribes.ChannelException;
@@ -79,7 +78,7 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
                 stableCount++;
             }
             try {
-                MILLISECONDS.sleep(250);
+                TimeUnit.MILLISECONDS.sleep(250);
             } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

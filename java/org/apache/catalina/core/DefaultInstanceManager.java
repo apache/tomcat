@@ -19,18 +19,18 @@
 package org.apache.catalina.core;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.Properties;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
-import java.io.InputStream;
-import java.io.IOException;
+import java.security.PrivilegedExceptionAction;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -40,16 +40,15 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import javax.xml.ws.WebServiceRef;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
+import javax.xml.ws.WebServiceRef;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
-import org.apache.catalina.core.Constants;
-import org.apache.tomcat.util.res.StringManager;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * @version $Id$
