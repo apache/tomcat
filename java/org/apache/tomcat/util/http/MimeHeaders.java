@@ -374,7 +374,7 @@ class NamesEnumerator implements Enumeration<String> {
 
     private void findNext() {
         next=null;
-        for(  ; pos< size; pos++ ) {
+        for(; pos< size; pos++ ) {
             next=headers.getName( pos ).toString();
             for( int j=0; j<pos ; j++ ) {
                 if( headers.getName( j ).equalsIgnoreCase( next )) {
@@ -424,7 +424,7 @@ class ValuesEnumerator implements Enumeration<String> {
 
     private void findNext() {
         next=null;
-        for( ; pos< size; pos++ ) {
+        for(; pos< size; pos++ ) {
             MessageBytes n1=headers.getName( pos );
             if( n1.equalsIgnoreCase( name )) {
                 next=headers.getValue( pos );
