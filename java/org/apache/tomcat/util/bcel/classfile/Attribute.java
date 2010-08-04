@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.classfile.ConstantUtf8;
 
 /**
  * Abstract super class for <em>Attribute</em> objects. Currently the
