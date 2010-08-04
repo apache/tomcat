@@ -35,6 +35,24 @@
 
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
+<section name="Tomcat 7.0.3 (markt)">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the class name of the default JAR scanner in the documentaiton
+        web application. (rjung) 
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Correct the user names created by the Windows installer for the Manager
+        and Host Manager applications. (mturk)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.2 (markt)">
   <subsection name="Catalina">
     <changelog>
