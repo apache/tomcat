@@ -652,7 +652,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         if (b1 == null || b2 == null || b2.length > len) {
             return false;
         }
-        for (int i = start, j = 0; i < end && j < b2.length; ) {
+        for (int i = start, j = 0; i < end && j < b2.length;) {
             if (b1[i++] != b2[j++]) 
                 return false;
         }
@@ -690,7 +690,7 @@ public final class ByteChunk implements Cloneable, Serializable {
             if( buff[i] != first ) continue;
             // found first char, now look for a match
             int myPos=i+1;
-            for( int srcPos=srcOff + 1; srcPos< srcEnd; ) {
+            for( int srcPos=srcOff + 1; srcPos< srcEnd;) {
                 if( buff[myPos++] != src.charAt( srcPos++ ))
                     continue mainLoop;
             }
