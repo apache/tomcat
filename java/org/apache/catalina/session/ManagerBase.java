@@ -233,7 +233,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ------------------------------------------------------------- Security classes
 
 
-    private class PrivilegedSetRandomFile implements PrivilegedAction<DataInputStream>{
+    private class PrivilegedSetRandomFile implements PrivilegedAction<DataInputStream> {
         
         public PrivilegedSetRandomFile(String s) {
             devRandomSource = s;
