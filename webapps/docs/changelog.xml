@@ -36,6 +36,23 @@
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.3 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Allow glob patterns in the <code>jarsToSkip</code> configuration and add
+        some debug logging to the jar scanner. (rjung)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Remove domainReplication attribute from ClusterManager. 
+        If you send session to only same domain, use DomainFilterInterceptor. 
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
@@ -64,15 +81,6 @@
         Allow glob patterns in the <code>jarsToSkip</code> configuration and add
         some debug logging to the jar scanner. (rjung)
       </update>
-    </changelog>
-  </subsection>
-  <subsection name="Cluster">
-    <changelog>
-      <fix>
-        Remove domainReplication attribute from ClusterManager. 
-        If you send session to only same domain, use DomainFilterInterceptor. 
-        (kfujino)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
