@@ -18,7 +18,9 @@
 package org.apache.jasper;
 
 import java.io.File;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;

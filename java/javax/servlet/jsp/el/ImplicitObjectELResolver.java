@@ -561,14 +561,17 @@ public class ImplicitObjectELResolver extends ELResolver {
                 this.key = key;
             }
 
+            @Override
             public String getKey() {
                 return this.key;
             }
 
+            @Override
             public V getValue() {
                 return getAttribute(this.key);
             }
 
+            @Override
             public V setValue(Object value) {
                 if (value == null) {
                     removeAttribute(this.key);

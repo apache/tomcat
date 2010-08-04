@@ -65,6 +65,7 @@ public class SimpleTagSupport implements SimpleTag {
      *     an error writing to the output stream
      * @see SimpleTag#doTag()
      */ 
+    @Override
     public void doTag() throws JspException, IOException {
         // NOOP by default
     }
@@ -77,6 +78,7 @@ public class SimpleTagSupport implements SimpleTag {
      *
      * @param parent the tag that encloses this tag
      */
+    @Override
     public void setParent( JspTag parent ) {
         this.parentTag = parent;
     }
@@ -86,6 +88,7 @@ public class SimpleTagSupport implements SimpleTag {
      *
      * @return the parent of this tag
      */ 
+    @Override
     public JspTag getParent() {
         return this.parentTag;
     }
@@ -98,6 +101,7 @@ public class SimpleTagSupport implements SimpleTag {
      * @param pc the page context for this invocation
      * @see SimpleTag#setJspContext
      */
+    @Override
     public void setJspContext( JspContext pc ) {
         this.jspContext = pc;
     }
@@ -120,6 +124,7 @@ public class SimpleTagSupport implements SimpleTag {
      *     not called at all.
      * @see SimpleTag#setJspBody
      */ 
+    @Override
     public void setJspBody( JspFragment jspBody ) {
         this.jspBody = jspBody;
     }

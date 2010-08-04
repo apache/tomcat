@@ -56,6 +56,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * Called by the servlet container to indicate to a servlet that the servlet
      * is being taken out of service. See {@link Servlet#destroy}.
      */
+    @Override
     public void destroy() {
         // NOOP by default
     }
@@ -74,6 +75,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * @return String a <code>String</code> containing the value of the
      *         initialization parameter
      */
+    @Override
     public String getInitParameter(String name) {
         return getServletConfig().getInitParameter(name);
     }
@@ -90,6 +92,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * @return Enumeration an enumeration of <code>String</code> objects
      *         containing the names of the servlet's initialization parameters
      */
+    @Override
     public Enumeration<String> getInitParameterNames() {
         return getServletConfig().getInitParameterNames();
     }
@@ -100,6 +103,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * @return ServletConfig the <code>ServletConfig</code> object that
      *         initialized this servlet
      */
+    @Override
     public ServletConfig getServletConfig() {
         return config;
     }
@@ -114,6 +118,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * @return ServletContext the <code>ServletContext</code> object passed to
      *         this servlet by the <code>init</code> method
      */
+    @Override
     public ServletContext getServletContext() {
         return getServletConfig().getServletContext();
     }
@@ -126,6 +131,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * 
      * @return String information about this servlet, by default an empty string
      */
+    @Override
     public String getServletInfo() {
         return "";
     }
@@ -146,6 +152,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      *                normal operation
      * @see UnavailableException
      */
+    @Override
     public void init(ServletConfig config) throws ServletException {
         this.config = config;
         this.init();
@@ -214,6 +221,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * @exception IOException
      *                if an input or output exception occurs
      */
+    @Override
     public abstract void service(ServletRequest req, ServletResponse res)
             throws ServletException, IOException;
 
@@ -223,6 +231,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * 
      * @return the name of this servlet instance
      */
+    @Override
     public String getServletName() {
         return config.getServletName();
     }

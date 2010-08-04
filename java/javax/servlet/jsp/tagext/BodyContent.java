@@ -19,7 +19,8 @@ package javax.servlet.jsp.tagext;
 import java.io.Reader;
 import java.io.Writer;
 import java.io.IOException;
-import javax.servlet.jsp.*;
+
+import javax.servlet.jsp.JspWriter;
 
 /**
  * An encapsulation of the evaluation of the body of an action so it is

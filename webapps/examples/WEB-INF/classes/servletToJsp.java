@@ -14,7 +14,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import javax.servlet.http.*;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class servletToJsp extends HttpServlet {
 
