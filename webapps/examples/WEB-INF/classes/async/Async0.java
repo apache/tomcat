@@ -45,6 +45,7 @@ public class Async0 extends HttpServlet {
             final AsyncContext actx = req.startAsync();
             actx.setTimeout(Long.MAX_VALUE);
             Runnable run = new Runnable() {
+                @Override
                 public void run() {
                     try {
                         req.setAttribute("dispatch", Boolean.TRUE);
