@@ -30,6 +30,8 @@ import javax.servlet.jsp.JspWriter;
  */
 public class BodyTagSupport extends TagSupport implements BodyTag {
 
+    private static final long serialVersionUID = -7235752615580319833L;
+
     /**
      * Default constructor, all subclasses are required to only define a public
      * constructor with the same signature, and to call the superclass
@@ -77,6 +79,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      * @see #doInitBody()
      * @see BodyTag#setBodyContent
      */
+    @Override
     public void setBodyContent(BodyContent b) {
         this.bodyContent = b;
     }
@@ -91,6 +94,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      * @see #doAfterBody
      * @see BodyTag#doInitBody
      */
+    @Override
     public void doInitBody() throws JspException {
         // NOOP by default
     }

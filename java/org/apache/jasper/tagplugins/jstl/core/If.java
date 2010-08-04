@@ -18,7 +18,8 @@
 
 package org.apache.jasper.tagplugins.jstl.core;
 
-import org.apache.jasper.compiler.tagplugin.*;
+import org.apache.jasper.compiler.tagplugin.TagPlugin;
+import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
 public final class If implements TagPlugin {
     
