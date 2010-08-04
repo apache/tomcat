@@ -47,5 +47,11 @@
     Do not use - does not take account of imports required for Javadocs
     <module name="UnusedImports"/>
     -->
+    
+    <!-- Whitespace -->
+    <!-- Can't handle HashMap<String,Class<?>[]>
+    https://sourceforge.net/tracker/?func=detail&aid=3039718&group_id=29721&atid=397078
+    <module name="GenericWhitespace"/>
+    -->
   </module>
 </module>
