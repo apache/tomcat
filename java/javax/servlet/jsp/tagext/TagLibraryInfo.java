@@ -16,8 +16,6 @@
  */
 package javax.servlet.jsp.tagext;
 
-import javax.servlet.jsp.tagext.TagInfo;
-import javax.servlet.jsp.tagext.TagFileInfo;
 
 /**
  * Translation-time information associated with a taglib directive, and its

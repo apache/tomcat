@@ -22,15 +22,14 @@ import java.lang.reflect.Method;
 import java.util.Date;
 
 import javax.el.ELException;
-import javax.el.ValueExpression;
 import javax.el.FunctionMapper;
+import javax.el.ValueExpression;
 
-import org.apache.el.ExpressionFactoryImpl;
+import junit.framework.TestCase;
+
 import org.apache.el.lang.ELSupport;
 import org.apache.jasper.compiler.TestAttributeParser;
 import org.apache.jasper.el.ELContextImpl;
-
-import junit.framework.TestCase;
 
 /**
  * Tests the EL engine directly. Similar tests may be found in

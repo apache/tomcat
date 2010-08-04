@@ -17,15 +17,13 @@
 
 package org.apache.catalina.valves;
 
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
-
+import java.io.IOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import javax.servlet.ServletException;
 
-import org.apache.catalina.valves.ValveBase;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
