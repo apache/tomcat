@@ -38,6 +38,7 @@ public class Async1 extends HttpServlet {
         final AsyncContext actx = req.startAsync();
         actx.setTimeout(30*1000);
         Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     String path = "/jsp/async/async1.jsp";

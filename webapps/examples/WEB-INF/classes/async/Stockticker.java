@@ -59,6 +59,7 @@ public class Stockticker implements Runnable {
             }
         }
 
+        @Override
         public void run() {
             try {
 
