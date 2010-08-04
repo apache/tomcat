@@ -68,6 +68,7 @@ public class CompressionFilter implements Filter{
      * @param filterConfig The filter configuration object
      */
 
+    @Override
     public void init(FilterConfig filterConfig) {
 
         config = filterConfig;
@@ -101,6 +102,7 @@ public class CompressionFilter implements Filter{
     /**
     * Take this filter out of service.
     */
+    @Override
     public void destroy() {
 
         this.config = null;
@@ -124,6 +126,7 @@ public class CompressionFilter implements Filter{
      * (<code>chain.doFilter()</code>), <br>
      **/
 
+    @Override
     public void doFilter ( ServletRequest request, ServletResponse response,
                         FilterChain chain ) throws IOException, ServletException {
 

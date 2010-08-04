@@ -69,6 +69,7 @@ public final class ExampleFilter implements Filter {
     /**
      * Take this filter out of service.
      */
+    @Override
     public void destroy() {
 
         this.attribute = null;
@@ -88,6 +89,7 @@ public final class ExampleFilter implements Filter {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain)
         throws IOException, ServletException {
@@ -112,6 +114,7 @@ public final class ExampleFilter implements Filter {
      *
      * @param fConfig The filter configuration object
      */
+    @Override
     public void init(FilterConfig fConfig) throws ServletException {
 
         this.filterConfig = fConfig;
