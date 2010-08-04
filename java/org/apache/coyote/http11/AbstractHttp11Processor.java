@@ -708,7 +708,7 @@ public abstract class AbstractHttp11Processor {
             if (Ascii.toLower(buff[i]) != first) continue;
             // found first char, now look for a match
             int myPos = i+1;
-            for (int srcPos = 1; srcPos < srcEnd; ) {
+            for (int srcPos = 1; srcPos < srcEnd;) {
                 if (Ascii.toLower(buff[myPos++]) != b[srcPos++])
                     break;
                 if (srcPos == srcEnd) return i - start; // found it

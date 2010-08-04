@@ -673,7 +673,7 @@ public class Tomcat {
         ctx.setSessionTimeout(30);
         
         // MIME mappings
-        for (int i = 0; i < DEFAULT_MIME_MAPPINGS.length; ) {
+        for (int i = 0; i < DEFAULT_MIME_MAPPINGS.length;) {
             ctx.addMimeMapping(DEFAULT_MIME_MAPPINGS[i++],
                     DEFAULT_MIME_MAPPINGS[i++]);
         }

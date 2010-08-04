@@ -1328,7 +1328,7 @@ public class NioEndpoint extends AbstractEndpoint {
             //timeout
             Set<SelectionKey> keys = selector.keys();
             int keycount = 0;
-            for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext(); ) {
+            for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
                 SelectionKey key = iter.next();
                 keycount++;
                 try {
