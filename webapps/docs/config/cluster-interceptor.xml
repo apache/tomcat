@@ -96,6 +96,17 @@
    </attributes>
   </subsection>
 
+  <subsection name="org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor Attributes">
+   <attributes>
+     <attribute name="domain" required="true">
+       The logical cluster domain that this Interceptor accepts.
+       Two different type of values are possible:<br/>
+       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes 
+       using ISO-8859-1 encoding.<br/>
+       2. byte array in string form, for example {216,123,12,3}<br/>
+     </attribute>
+   </attributes>
+  </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor Attributes">
    <attributes>
      <attribute name="className" required="true">

@@ -78,18 +78,6 @@ public interface ClusterManager extends Manager {
    public CatalinaCluster getCluster();
 
    public void setCluster(CatalinaCluster cluster);
-   
-   /**
-    * @return Manager send only to same cluster domain.
-    * @since 5.5.10
-    */
-   public boolean doDomainReplication();
-
-   /**
-    * @param domainReplication Flag value.
-    * @since 5.5.10
-    */
-   public void setDomainReplication(boolean domainReplication);
 
    public ReplicationStream getReplicationStream(byte[] data) throws IOException;
 

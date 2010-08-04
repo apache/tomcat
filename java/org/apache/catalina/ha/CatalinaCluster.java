@@ -77,13 +77,6 @@ public interface CatalinaCluster extends Cluster {
      * @param dest Member
      */
     public void send(ClusterMessage msg, Member dest);
-    
-    /**
-     * Sends a message to a all members at local cluster domain
-     *
-     * @param msg ClusterMessage
-     */
-    public void sendClusterDomain(ClusterMessage msg);
 
     /**
      * Returns that cluster has members.
