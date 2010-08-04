@@ -402,11 +402,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             CatalinaCluster cluster = dmanager.getCluster();
             ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
             if (msg != null) {
-                if(dmanager.doDomainReplication()) {
-                    cluster.sendClusterDomain(msg);
-                } else {
-                    cluster.send(msg);
-                }
+                cluster.send(msg);
             }
         }
 

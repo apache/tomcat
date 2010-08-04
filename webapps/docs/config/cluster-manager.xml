@@ -87,13 +87,6 @@
   </subsection> 
   <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
     <attributes>
-      <attribute name="domainReplication" required="false">
-        Set to true if you wish sessions to be replicated only to members that
-        have the same logical domain set. If set to false, session replication
-        will ignore the domain setting the 
-        <code><a href="cluster-membership.html">&lt;Membership&gt;</a></code>
-        element.
-      </attribute>
       <attribute name="expireSessionsOnShutdown" required="false">
         When a web application is being shutdown, Tomcat issues an expire call
         to each session to notify all the listeners. If you wish for all
