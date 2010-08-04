@@ -201,7 +201,7 @@ public class ClusterSingleSignOn
 
             msg.setAction(SingleSignOnMessage.ADD_SESSION);
 
-            cluster.sendClusterDomain(msg);
+            cluster.send(msg);
 
             if (containerLog.isDebugEnabled())
                 containerLog.debug("SingleSignOnMessage Send with action "
@@ -241,7 +241,7 @@ public class ClusterSingleSignOn
 
             msg.setAction(SingleSignOnMessage.DEREGISTER_SESSION);
 
-            cluster.sendClusterDomain(msg);
+            cluster.send(msg);
             if (containerLog.isDebugEnabled())
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
@@ -275,7 +275,7 @@ public class ClusterSingleSignOn
                                         ssoId, null);
             msg.setAction(SingleSignOnMessage.LOGOUT_SESSION);
 
-            cluster.sendClusterDomain(msg);
+            cluster.send(msg);
             if (containerLog.isDebugEnabled())
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
@@ -317,7 +317,7 @@ public class ClusterSingleSignOn
             msg.setUsername(username);
             msg.setPassword(password);
 
-            cluster.sendClusterDomain(msg);
+            cluster.send(msg);
             if (containerLog.isDebugEnabled())
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
@@ -375,7 +375,7 @@ public class ClusterSingleSignOn
             msg.setUsername(username);
             msg.setPassword(password);
 
-            cluster.sendClusterDomain(msg);
+            cluster.send(msg);
             if (containerLog.isDebugEnabled())
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
@@ -415,7 +415,7 @@ public class ClusterSingleSignOn
 
             msg.setAction(SingleSignOnMessage.REMOVE_SESSION);
 
-            cluster.sendClusterDomain(msg);
+            cluster.send(msg);
             if (containerLog.isDebugEnabled())
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());

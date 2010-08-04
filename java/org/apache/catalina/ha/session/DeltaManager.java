@@ -100,7 +100,6 @@ public class DeltaManager extends ClusterManagerBase{
     private volatile boolean stateTransfered = false ;
     private int stateTransferTimeout = 60;
     private boolean sendAllSessions = true;
-    private boolean sendClusterDomainOnly = true ;
     private int sendAllSessionsSize = 1000 ;
     
     /**
@@ -346,20 +345,6 @@ public class DeltaManager extends ClusterManagerBase{
     }
     
     /**
-     * @return Returns the sendClusterDomainOnly.
-     */
-    public boolean doDomainReplication() {
-        return sendClusterDomainOnly;
-    }
-    
-    /**
-     * @param sendClusterDomainOnly The sendClusterDomainOnly to set.
-     */
-    public void setDomainReplication(boolean sendClusterDomainOnly) {
-        this.sendClusterDomainOnly = sendClusterDomainOnly;
-    }
-
-    /**
      * @return Returns the stateTimestampDrop.
      */
     public boolean isStateTimestampDrop() {
@@ -511,10 +496,7 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected void send(SessionMessage msg) {
         if(cluster != null) {
-            if(doDomainReplication())
-                cluster.sendClusterDomain(msg);
-            else
-                cluster.send(msg);
+            cluster.send(msg);
         }
     }
 
@@ -1234,7 +1216,7 @@ public class DeltaManager extends ClusterManagerBase{
      *            requesting node
      */
     protected void messageReceived(SessionMessage msg, Member sender) {
-        if(doDomainReplication() && !checkSenderDomain(msg,sender)) {
+        if(!checkSenderDomain(msg,sender)) {
             return;
         }
         ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
@@ -1492,7 +1474,6 @@ public class DeltaManager extends ClusterManagerBase{
         result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
         result.stateTransferTimeout = stateTransferTimeout;
         result.sendAllSessions = sendAllSessions;
-        result.sendClusterDomainOnly = sendClusterDomainOnly ;
         result.sendAllSessionsSize = sendAllSessionsSize;
         result.sendAllSessionsWaitTime = sendAllSessionsWaitTime ; 
         result.receiverQueue = receiverQueue ;
