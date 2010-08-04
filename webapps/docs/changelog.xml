@@ -48,6 +48,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Remove domainReplication attribute from ClusterManager. 
+        If you send session to only same domain, use DomainFilterInterceptor. 
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

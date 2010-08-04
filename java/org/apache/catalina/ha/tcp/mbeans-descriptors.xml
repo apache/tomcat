@@ -79,16 +79,6 @@
         type="org.apache.catalina.ha.ClusterMessage"/>
     </operation>
     <operation
-      name="sendClusterDomain"
-      description="send message to all cluster members with same domain"
-      impact="ACTION"
-      returnType="void">
-      <parameter
-        name="message"
-        description="replication message"
-        type="org.apache.catalina.ha.ClusterMessage"/>
-    </operation>
-    <operation
       name="start"
       description="Start the cluster"
       impact="ACTION"
