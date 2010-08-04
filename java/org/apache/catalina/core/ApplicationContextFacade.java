@@ -490,7 +490,7 @@ public final class ApplicationContextFacade
 
 
     public ServletRegistration.Dynamic addServlet(String servletName,
-            Class <? extends Servlet> servletClass) {
+            Class<? extends Servlet> servletClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged(
                     "addServlet", new Object[]{servletName, servletClass.getName()});
