@@ -184,14 +184,14 @@ public class StandardJarScanner implements JarScanner {
                         // Extract the jarName if there is one to be found
                         String jarName = getJarName(urls[i]);
                         
-                        // Skip JARs with known not to be interesting and JARs
+                        // Skip JARs known not to be interesting and JARs
                         // in WEB-INF/lib we have already scanned
                         if (jarName != null &&
                             !(Matcher.matchPath(ignoredJarsTokens, jarName) ||
                                 urls[i].toString().contains(
                                         Constants.WEB_INF_LIB + jarName))) {
                             if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("jarScan.classloaderJarScan", jarName));
+                                log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
                             try {
                                 process(callback, urls[i]);
@@ -201,7 +201,7 @@ public class StandardJarScanner implements JarScanner {
                             }
                         } else {
                             if (log.isTraceEnabled()) {
-                                log.trace(sm.getString("jarScan.classloaderJarNoScan", jarName));
+                                log.trace(sm.getString("jarScan.classloaderJarNoScan", urls[i]));
                             }
                         }
                     }
