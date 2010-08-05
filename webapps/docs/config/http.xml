@@ -922,7 +922,10 @@
     <attribute name="truststorePass" required="false">
       <p>The password to access the trust store. The default is the value of the
       <code>javax.net.ssl.trustStorePassword</code> system property. If that
-      property is null, no trust store password will be configured.</p>
+      property is null, no trust store password will be configured. If an
+      invalid trust store password is specified, a warning will be logged and an
+      attempt will be made to access the trust store without a password which
+      will skip validation of the trust store contents.</p>
     </attribute>
 
     <attribute name="truststoreProvider" required="false">
