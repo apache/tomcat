@@ -19,10 +19,11 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.net.Socket;
 
+import javax.net.ssl.SSLSession;
+
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
-import javax.net.ssl.SSLSession;
 
 /* JSSEImplementation:
 
