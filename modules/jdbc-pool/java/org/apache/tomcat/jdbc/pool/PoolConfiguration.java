@@ -522,8 +522,27 @@ public interface PoolConfiguration {
      * @param validationQuery the query used for validation or null if no validation is performed
      */
     public void setValidationQuery(String validationQuery);
-
     
+    /**
+     * Return the name of the optional validator class - may be null.
+     *  
+     * @return the name of the optional validator class - may be null
+     */
+    public String getValidatorClassName();
+    
+    /**
+     * Set the name for an optional validator class which will be used in place of test queries. If set to
+     * null, standard validation will be used.
+     * 
+     * @param className the name of the optional validator class
+     */
+    public void setValidatorClassName(String className);
+    
+    /**
+     * @return the optional validator object - may be null
+     */
+    public Validator getValidator();
+
     /**
      * avoid excess validation, only run validation at most at this frequency - time in milliseconds. 
      * If a connection is due for validation, but has been validated previously 

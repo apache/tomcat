@@ -29,6 +29,7 @@ import javax.management.NotificationListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.Validator;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean  {
@@ -276,6 +277,22 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     public String getValidationQuery() {
         return getPoolProperties().getValidationQuery();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getValidatorClassName() {
+        return getPoolProperties().getValidatorClassName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Validator getValidator() {
+        return getPoolProperties().getValidator();
     }
 
     public boolean isAccessToUnderlyingConnectionAllowed() {
@@ -557,48 +574,56 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
     
     /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getSuspectTimeout() {
-       return getPoolProperties().getSuspectTimeout(); 
-   }
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValidatorClassName(String className) {
+        getPoolProperties().setValidatorClassName(className);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void setSuspectTimeout(int seconds) {
-       //no op
-   }
-   
-   /** 
-    * {@inheritDoc}
-    */
-   public void setDataSource(Object ds) {
-       getPoolProperties().setDataSource(ds);
-   }
-   
-   /** 
-    * {@inheritDoc}
-    */
-   public Object getDataSource() {
-       return getPoolProperties().getDataSource();
-   }
-   
-   
-   /** 
-    * {@inheritDoc}
-    */
-   public void setDataSourceJNDI(String jndiDS) {
-       //noop
-   }
-   
-   /** 
-    * {@inheritDoc}
-    */
-   public String getDataSourceJNDI() {
-       return getPoolProperties().getDataSourceJNDI();
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSuspectTimeout() {
+        return getPoolProperties().getSuspectTimeout(); 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSuspectTimeout(int seconds) {
+        //no op
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void setDataSource(Object ds) {
+        getPoolProperties().setDataSource(ds);
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public Object getDataSource() {
+        return getPoolProperties().getDataSource();
+    }
+
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void setDataSourceJNDI(String jndiDS) {
+        //noop
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public String getDataSourceJNDI() {
+        return getPoolProperties().getDataSourceJNDI();
+    }
 
 }

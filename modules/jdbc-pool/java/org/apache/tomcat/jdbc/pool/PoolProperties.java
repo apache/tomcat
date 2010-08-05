@@ -51,6 +51,8 @@ public class PoolProperties implements PoolConfiguration {
     protected int minIdle = initialSize;
     protected int maxWait = 30000;
     protected String validationQuery;
+    protected String validatorClassName;
+    protected Validator validator;
     protected boolean testOnBorrow = false;
     protected boolean testOnReturn = false;
     protected boolean testWhileIdle = false;
@@ -336,6 +338,22 @@ public class PoolProperties implements PoolConfiguration {
     @Override
     public String getValidationQuery() {
         return validationQuery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getValidatorClassName() {
+        return validatorClassName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Validator getValidator() {
+        return validator;
     }
 
     /** 
@@ -629,6 +647,34 @@ public class PoolProperties implements PoolConfiguration {
     @Override
     public void setValidationQuery(String validationQuery) {
         this.validationQuery = validationQuery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValidatorClassName(String className) {
+        this.validatorClassName = className;
+        
+        validator = null;
+        
+        if (className == null) {
+            return;
+        }
+        
+        try {
+            Class<Validator> validatorClass = (Class<Validator>)Class.forName(className);
+            validator = validatorClass.newInstance();
+        } catch (ClassNotFoundException e) {
+            log.warn("The class "+className+" cannot be found.", e);
+        } catch (ClassCastException e) {
+            log.warn("The class "+className+" does not implement the Validator interface.", e);
+        } catch (InstantiationException e) {
+            log.warn("An object of class "+className+" cannot be instantiated. Make sure that "+
+                     "it includes an implicit or explicit no-arg constructor.", e);
+        } catch (IllegalAccessException e) {
+            log.warn("The class "+className+" or its no-arg constructor are inaccessible.", e);
+        }
     }
 
     /** 
