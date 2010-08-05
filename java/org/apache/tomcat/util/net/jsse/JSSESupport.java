@@ -74,6 +74,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         this.session = session;
     }
 
+    @Override
     public String getCipherSuite() throws IOException {
         // Look up the current SSLSession
         if (session == null)
@@ -81,13 +82,14 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         return session.getCipherSuite();
     }
 
+    @Override
     public Object[] getPeerCertificateChain() 
         throws IOException {
         return getPeerCertificateChain(false);
     }
 
-    protected java.security.cert.X509Certificate [] getX509Certificates(SSLSession session) 
-        throws IOException {
+    protected java.security.cert.X509Certificate [] getX509Certificates(
+            SSLSession session) {
         Certificate [] certs=null;
         try {
             certs = session.getPeerCertificates();
@@ -110,7 +112,8 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
                         CertificateFactory.getInstance("X.509");
                     ByteArrayInputStream stream =
                         new ByteArrayInputStream(buffer);
-                    x509Certs[i] = (java.security.cert.X509Certificate) cf.generateCertificate(stream);
+                    x509Certs[i] = (java.security.cert.X509Certificate)
+                            cf.generateCertificate(stream);
                 } catch(Exception ex) { 
                     log.info("Error translating cert " + certs[i], ex);
                     return null;
@@ -124,6 +127,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         return x509Certs;
     }
 
+    @Override
     public Object[] getPeerCertificateChain(boolean force)
         throws IOException {
         // Look up the current SSLSession
@@ -195,6 +199,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     /**
      * Copied from <code>org.apache.catalina.valves.CertificateValve</code>
      */
+    @Override
     public Integer getKeySize() 
         throws IOException {
         // Look up the current SSLSession
@@ -224,6 +229,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         return keySize;
     }
 
+    @Override
     public String getSessionId()
         throws IOException {
         // Look up the current SSLSession
@@ -246,6 +252,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
 
     private static class Listener implements HandshakeCompletedListener {
         volatile boolean completed = false;
+        @Override
         public void handshakeCompleted(HandshakeCompletedEvent event) {
             completed = true;
         }
@@ -257,6 +264,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     /**
      * Invalidate the session this support object is associated with.
      */
+    @Override
     public void invalidateSession() {
         session.invalidate();
     }
