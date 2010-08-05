@@ -390,6 +390,14 @@ public class DataSourceProxy implements PoolConfiguration {
         this.poolProperties.setValidationQuery(validationQuery);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValidatorClassName(String className) {
+        this.poolProperties.setValidatorClassName(className);
+    }
+
     /** 
      * {@inheritDoc}
      */
@@ -816,6 +824,22 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public String getValidationQuery() {
         return getPoolProperties().getValidationQuery();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getValidatorClassName() {
+        return getPoolProperties().getValidatorClassName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Validator getValidator() {
+        return getPoolProperties().getValidator();
     }
 
     /** 

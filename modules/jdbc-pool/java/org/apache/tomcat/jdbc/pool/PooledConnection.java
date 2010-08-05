@@ -362,21 +362,29 @@ public class PooledConnection {
             return true;
         }
 
-        String query = (VALIDATE_INIT==validateAction && (poolProperties.getInitSQL()!=null))?poolProperties.getInitSQL():sql;
+        //Don't bother validating if already have recently enough
+        long now = System.currentTimeMillis();
+        if (validateAction!=VALIDATE_INIT &&
+            poolProperties.getValidationInterval() > 0 &&
+            (now - this.lastValidated) <
+            poolProperties.getValidationInterval()) {
+            return true;
+        }
 
-        if (query==null) query = poolProperties.getValidationQuery();
+        if (poolProperties.getValidator() != null) {
+            return poolProperties.getValidator().validate(connection, validateAction);
+        }
+        
+        String query = sql;
+        
+        if (validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null) {
+            query = poolProperties.getInitSQL();
+        }
 
         if (query == null) {
-            //no validation possible
-            return true;
+            query = poolProperties.getValidationQuery();
         }
-        long now = System.currentTimeMillis();
-        if (this.poolProperties.getValidationInterval() > 0 &&
-            (validateAction!=VALIDATE_INIT) &&    
-            (now - this.lastValidated) <
-            this.poolProperties.getValidationInterval()) {
-            return true;
-        }
+        
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
