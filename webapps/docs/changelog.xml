@@ -44,6 +44,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Follow up to <bug>48545</bug>. Make JSSE connectors more tolerant of a
+        incorrect trust store password. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

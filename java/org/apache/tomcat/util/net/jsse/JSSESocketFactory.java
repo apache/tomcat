@@ -28,6 +28,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathParameters;
@@ -60,18 +61,12 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
-  1. Make the JSSE's jars available, either as an installed
-     extension (copy them into jre/lib/ext) or by adding
-     them to the Tomcat classpath.
-  2. keytool -genkey -alias tomcat -keyalg RSA
-     Use "changeit" as password ( this is the default we use )
- */
-
 /**
- * SSL server socket factory. It _requires_ a valid RSA key and
- * JSSE. 
- *
+ * SSL server socket factory. It <b>requires</b> a valid RSA key and
+ * JSSE.<br/>
+ * keytool -genkey -alias tomcat -keyalg RSA</br>
+ * Use "changeit" as password (this is the default we use).
+ * 
  * @author Harish Prabandham
  * @author Costin Manolache
  * @author Stefan Freyr Stefansson
@@ -342,8 +337,23 @@ public class JSSESocketFactory
         }
 
         if (truststoreFile != null){
-            trustStore = getStore(truststoreType, truststoreProvider,
-                    truststoreFile, truststorePassword);
+            try {
+                trustStore = getStore(truststoreType, truststoreProvider,
+                        truststoreFile, truststorePassword);
+            } catch (IOException ioe) {
+                Throwable cause = ioe.getCause();
+                if (cause instanceof UnrecoverableKeyException) {
+                    // Log a warning we had a password issue
+                    log.warn(sm.getString("jsse.invalid_truststore_password"),
+                            cause);
+                    // Re-try
+                    trustStore = getStore(truststoreType, truststoreProvider,
+                            truststoreFile, null);
+                } else {
+                    // Something else went wrong - re-throw
+                    throw ioe;
+                }
+            }
         }
 
         return trustStore;
@@ -374,7 +384,7 @@ public class JSSESocketFactory
             }
             
             char[] storePass = null;
-            if (pass != null) {
+            if (pass != null && !"".equals(pass)) {
                 storePass = pass.toCharArray(); 
             }
             ks.load(istream, storePass);
@@ -383,9 +393,9 @@ public class JSSESocketFactory
                     fnfe.getMessage()), fnfe);
             throw fnfe;
         } catch (IOException ioe) {
-            log.error(sm.getString("jsse.keystore_load_failed", type, path,
-                    ioe.getMessage()), ioe);
-            throw ioe;      
+            // May be expected when working with a trust store
+            // Re-throw. Caller will catch and log as required
+            throw ioe;
         } catch(Exception ex) {
             String msg = sm.getString("jsse.keystore_load_failed", type, path,
                     ex.getMessage());
