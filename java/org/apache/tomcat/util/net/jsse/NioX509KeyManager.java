@@ -43,44 +43,50 @@ public class NioX509KeyManager extends X509ExtendedKeyManager {
         this.serverKeyAlias = serverKeyAlias;
     }
 
-    public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+    @Override
+    public String chooseClientAlias(String[] keyType, Principal[] issuers,
+            Socket socket) {
         return delegate.chooseClientAlias(keyType, issuers, socket);
     }
 
-    public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-        if (serverKeyAlias!=null) {
+    @Override
+    public String chooseServerAlias(String keyType, Principal[] issuers,
+            Socket socket) {
+        if (serverKeyAlias != null) {
             return serverKeyAlias;
-        } else {
-            return delegate.chooseServerAlias(keyType, issuers, socket);
         }
+
+        return delegate.chooseServerAlias(keyType, issuers, socket);
     }
 
+    @Override
     public X509Certificate[] getCertificateChain(String alias) {
         return delegate.getCertificateChain(alias);
     }
 
+    @Override
     public String[] getClientAliases(String keyType, Principal[] issuers) {
         return delegate.getClientAliases(keyType, issuers);
     }
 
+    @Override
     public PrivateKey getPrivateKey(String alias) {
         return delegate.getPrivateKey(alias);
     }
 
+    @Override
     public String[] getServerAliases(String keyType, Principal[] issuers) {
         return delegate.getServerAliases(keyType, issuers);
     }
 
     @Override
-    public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {
+    public String chooseEngineServerAlias(String keyType, Principal[] issuers,
+            SSLEngine engine) {
         if (serverKeyAlias!=null) {
             return serverKeyAlias;
-        } else {
-            return super.chooseEngineServerAlias(keyType, issuers, engine);
         }
-    }
 
-    
-    
+        return super.chooseEngineServerAlias(keyType, issuers, engine);
+    }
     
 }
