@@ -67,6 +67,10 @@
         Correct the class name of the default JAR scanner in the documentaiton
         web application. (rjung) 
       </fix>
+      <fix>
+        <bug>49585</bug>: Update JSVC documentation to reflect new packaging
+        of Commons Daemon. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
