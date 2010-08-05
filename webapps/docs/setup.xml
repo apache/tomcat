@@ -107,13 +107,13 @@
 
 <source>
     cd $CATALINA_HOME/bin
-    tar xvfz jsvc.tar.gz
-    cd jsvc-src
+    tar xvfz commons-deamon-native.tar.gz
+    cd commons-daemon-1.0.x-native-src/unix
     autoconf
     ./configure
     make
-    cp jsvc ..
-    cd ..
+    cp jsvc ../..
+    cd ../..
 </source>
 
     <p>Tomcat can then be run as a daemon using the following commands.</p>
@@ -133,17 +133,18 @@
        information. In particular, the <code>-debug</code> option is useful
        to debug issues running jsvc.</p>
 
-    <p>The file <code>$CATALINA_HOME/bin/jsvc/native/tomcat.sh</code> can be 
-       used as a template for starting Tomcat automatically at boot time from 
-       <code>/etc/init.d</code>.  The file is currently setup for running 
-       Tomcat 4.1.x, so it is necessary to edit it and change the classname 
-       from <code>BootstrapService</code> to <code>Bootstrap</code>.</p>
+    <p>The file <code>
+       $CATALINA_HOME/bin/commons-daemon-1.0.x-native-src/unix/native/Tomcat5.sh
+       </code> can be used as a template for starting Tomcat automatically at
+       boot time from <code>/etc/init.d</code>. The file is currently setup for
+       running Tomcat 5.5.x, so it will be necessary to edit it a little.</p>
 
     <p>Note that the Commons-Daemon JAR file must be on your runtime classpath 
-       to run Tomcat in this manner.  The Commons-Daemon JAR file is in the Class-Path 
-       entry of the bootstrap.jar manifest, but if you get a ClassNotFoundException 
-       or a NoClassDefFoundError for a Commons-Daemon class, add the Commons-Daemon 
-       JAR to the -cp argument when launching jsvc.</p> 
+       to run Tomcat in this manner.  The Commons-Daemon JAR file is in the
+       Class-Path entry of the bootstrap.jar manifest, but if you get a
+       ClassNotFoundException or a NoClassDefFoundError for a Commons-Daemon
+       class, add the Commons-Daemon JAR to the -cp argument when launching
+       jsvc.</p> 
 
   </section>
 
