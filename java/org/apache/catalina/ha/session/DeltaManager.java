@@ -1436,13 +1436,15 @@ public class DeltaManager extends ClusterManagerBase{
     protected void handleCHANGE_SESSION_ID(SessionMessage msg,Member sender) throws IOException {
         counterReceive_EVT_CHANGE_SESSION_ID++;
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
-        String newSessionID = deserializeSessionId(msg.getSession());
-        session.setPrimarySession(false);
-        if(notifySessionListenersOnReplication) {
-            session.setId(newSessionID);
-        } else {
-            session.setIdInternal(newSessionID);
-            add(session);
+        if (session != null) {
+            String newSessionID = deserializeSessionId(msg.getSession());
+            session.setPrimarySession(false);
+            if (notifySessionListenersOnReplication) {
+                session.setId(newSessionID);
+            } else {
+                session.setIdInternal(newSessionID);
+                add(session);
+            }
         }
     }
 
