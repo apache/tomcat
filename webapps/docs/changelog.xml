@@ -63,6 +63,9 @@
         If you send session to only same domain, use DomainFilterInterceptor. 
         (kfujino)
       </fix>
+      <fix>
+        Add Null check when CHANGE_SESSION_ID message received. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
