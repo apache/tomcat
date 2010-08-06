@@ -109,7 +109,6 @@
     cd $CATALINA_HOME/bin
     tar xvfz commons-deamon-native.tar.gz
     cd commons-daemon-1.0.x-native-src/unix
-    autoconf
     ./configure
     make
     cp jsvc ../..
