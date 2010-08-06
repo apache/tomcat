@@ -1674,6 +1674,8 @@ public class ContextConfig
         for(WebXml fragment : fragments) {
             if (!fragment.isMetadataComplete()) {
                 WebXml annotations = new WebXml();
+                // no impact on distributable
+                annotations.setDistributable(true);
                 URL url = fragment.getURL();
                 processAnnotationsUrl(url, annotations);
                 Set<WebXml> set = new HashSet<WebXml>();

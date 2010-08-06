@@ -42,6 +42,10 @@
         Allow glob patterns in the <code>jarsToSkip</code> configuration and add
         some debug logging to the jar scanner. (rjung)
       </update>
+      <fix>
+        <bug>49714</bug>: The annotation process of Jar doesn't influence 
+        distributable element of web.xml. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
