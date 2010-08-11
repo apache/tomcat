@@ -1022,56 +1022,89 @@
     <mkdir dir="${tomcat.extras.sources}"/>
     <mkdir dir="${tomcat.embed}"/>
     <mkdir dir="${tomcat.embed.sources}"/>
+    <mkdir dir="${tomcat.extras}/logging"/>
     <mkdir dir="${tomcat.extras}/webservices"/>
   </target>
 
-  <target name="extras-commons-logging"
-          depends="extras-prepare,compile,build-manifests"
-          description="Build JULI for log4j extras package">
+  <target name="extras-commons-logging-prepare"
+          depends="extras-prepare"
+          description="Prepare to build web services extras package">
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${commons-logging-src.loc}"/>
-      <param name="destfile" value="${tomcat.extras}/logging/commons-logging-src.tar.gz"/>
-      <param name="destdir" value="${tomcat.extras}/logging/"/>
+      <param name="destfile" value="${commons-logging-src.tar.gz}"/>
+      <param name="destdir" value="${commons-logging.home}"/>
     </antcall>
-    <gunzip src="${tomcat.extras}/logging/commons-logging-src.tar.gz"
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${avalon-framework.loc}"/>
+      <param name="destfile" value="${avalon-framework.jar}"/>
+      <param name="destdir" value="${avalon-framework.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${log4j.loc}"/>
+      <param name="destfile" value="${log4j.jar}"/>
+      <param name="destdir" value="${log4j.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${logkit.loc}"/>
+      <param name="destfile" value="${logkit.jar}"/>
+      <param name="destdir" value="${logkit.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${servletapi.loc}"/>
+      <param name="destfile" value="${servletapi.jar}"/>
+      <param name="destdir" value="${servletapi.home}"/>
+    </antcall>
+
+  </target>
+
+  <target name="extras-commons-logging"
+          depends="extras-commons-logging-prepare,compile,build-manifests"
+          description="Build JULI for log4j extras package">
+
+    <gunzip src="${commons-logging-src.tar.gz}"
       dest="${tomcat.extras}/logging/commons-logging-src.tar"/>
     <untar src="${tomcat.extras}/logging/commons-logging-src.tar"
       dest="${tomcat.extras}/logging/"/>
 
-    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/commons"
+    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/commons"
         encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
             value="org.apache.juli" />
     </replace>
-    <mkdir dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/juli" />
-    <move todir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/juli">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/commons" />
+    <mkdir dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/juli" />
+    <move todir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/juli">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/commons" />
     </move>
 
-    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
+    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src"
       encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
         value="org.apache.juli" />
       <replacefilter token="org/apache/commons/"
         value="org/apache/juli/" />
     </replace>
-    <copy tofile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
-      file="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build.xml" />
+    <copy tofile="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build2.xml"
+      file="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build.xml" />
 
-    <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
-         dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
-         target="getlibs" />
-    <copy todir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/lib" />
+    <copy todir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src">
+      <fileset file="${avalon-framework.jar}" />
+      <fileset file="${log4j.jar}" />
+      <fileset file="${logkit.jar}" />
+      <fileset file="${servletapi.jar}" />
     </copy>
-    <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
-         dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
+
+    <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build2.xml"
+         dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src"
          target="compile" />
 
     <jar jarfile="${tomcat-juli-extras.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes">
         <include name="org/apache/juli/logging/*.class" />
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" />
         <include name="org/apache/juli/logging/impl/WeakHashtable*.class" />
@@ -1098,7 +1131,7 @@
     </antcall>
 
     <jarIt jarfile="${tomcat-juli-adapters.jar}"
-      filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes"
+      filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes"
       filesId="files.tomcat-extras-juli-adapters" />
     <antcall target="md5sum">
       <param name="file" value="${tomcat-juli-adapters.jar}" />
@@ -1107,7 +1140,7 @@
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java">
         <include name="org/apache/juli/logging/*.java" />
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.java" />
         <include name="org/apache/juli/logging/impl/WeakHashtable*.java" />
@@ -1130,7 +1163,7 @@
         fullpath="META-INF/LICENSE" />
     </jar>
     <jarIt jarfile="${tomcat-juli-adapters-src.jar}"
-      filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java"
+      filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java"
       filesId="files.tomcat-extras-juli-adapters" />
 
   </target>
@@ -1215,7 +1248,7 @@
 
     <jar jarfile="${tomcat-embed-log4j.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes">
         <include name="org/apache/juli/logging/*.class" />
         <include name="org/apache/juli/logging/impl/*.class" />
         <!-- Javadoc and i18n exclusions -->
@@ -1236,7 +1269,7 @@
     
     <jar jarfile="${tomcat-embed-log4j-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java">
         <include name="org/apache/juli/logging/*.java" />
         <include name="org/apache/juli/logging/impl/*.java" />
         <!-- Javadoc and i18n exclusions -->
