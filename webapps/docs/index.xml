@@ -172,8 +172,8 @@ the development of the <em>Apache Tomcat</em> project.</p>
 <li><a href="changelog.html"><strong>Changelog</strong></a> - Details the
     changes made to Apache Tomcat.
     </li>
-<li><a href="status.html"><strong>Status</strong></a> - Apache Tomcat development
-    status.
+<li><a href="http://wiki.apache.org/tomcat/TomcatVersions"><strong>Status</strong></a> -
+    Apache Tomcat development status.
     </li>
 <li><a href="developers.html"><strong>Developers</strong></a> - List of active
     Apache Tomcat contributors.
