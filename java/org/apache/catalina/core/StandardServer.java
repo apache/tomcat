@@ -691,7 +691,9 @@ public final class StandardServer extends LifecycleMBeanBase
         onameStringCache = register(new StringCache(), "type=StringCache");
 
         // Register the MBeanFactory
-        onameMBeanFactory = register(new MBeanFactory(), "type=MBeanFactory");
+        MBeanFactory factory = new MBeanFactory();
+        factory.setContainer(this);
+        onameMBeanFactory = register(factory, "type=MBeanFactory");
         
         // Register the naming resources
         onameNamingResoucres = register(globalNamingResources,
