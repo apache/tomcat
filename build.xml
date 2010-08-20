@@ -495,7 +495,7 @@
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
 
-    <!-- JSP 2.1 Implementation JAR File -->
+    <!-- JSP 2.2 Implementation JAR File -->
     <jarIt jarfile="${jsp-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jsp-api"
@@ -503,7 +503,7 @@
       notice="${tomcat.manifests}/jsp-api.jar.notice"
       license="${tomcat.manifests}/jsp-api.jar.license" />
 
-    <!-- JSP 2.1 EL Implementation JAR File -->
+    <!-- JSP 2.2 EL Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.el-api"
