@@ -688,7 +688,7 @@ public class MBeanFactory {
             String defaultHost, String baseDir) throws Exception{
 
         if (!(container instanceof Server)) {
-            throw new Exception();
+            throw new Exception("Container not Server");
         }
         
         StandardEngine engine = new StandardEngine();
