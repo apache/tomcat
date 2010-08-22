@@ -20,11 +20,11 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.transport.bio.util.FastQueue;
 import org.apache.catalina.tribes.transport.bio.util.LinkObject;
-import org.apache.catalina.tribes.UniqueId;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

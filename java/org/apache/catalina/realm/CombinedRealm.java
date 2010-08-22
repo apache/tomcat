@@ -18,7 +18,6 @@
 package org.apache.catalina.realm;
 
 import java.security.Principal;
-
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.LinkedList;

@@ -32,9 +32,9 @@ import java.util.Random;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResources;
@@ -42,11 +42,11 @@ import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringCache;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

@@ -18,16 +18,17 @@
 
 package org.apache.naming.factory;
 
-import org.apache.naming.EjbRef;
+import java.util.Hashtable;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.Name;
-import javax.naming.Reference;
 import javax.naming.RefAddr;
+import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
-import java.util.Hashtable;
-import java.util.Properties;
+
+import org.apache.naming.EjbRef;
 
 /**
  * Object factory for EJBs.

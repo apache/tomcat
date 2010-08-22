@@ -17,6 +17,7 @@
 package org.apache.catalina.ha;
 
 import java.io.Serializable;
+
 import org.apache.catalina.tribes.Member;
 
 

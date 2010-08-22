@@ -16,8 +16,8 @@
  */
 package org.apache.tomcat.util.http.fileupload;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * <p>Abstracts access to the request information needed for file uploads. This

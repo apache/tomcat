@@ -18,12 +18,13 @@ package org.apache.catalina.tribes.test.membership;
 
 import java.util.ArrayList;
 
+import junit.framework.TestCase;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
-import junit.framework.TestCase;
 
 public class TestMemberArrival
     extends TestCase {

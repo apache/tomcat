@@ -20,6 +20,7 @@ package org.apache.catalina.mbeans;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import javax.management.MBeanException;
 
 import org.apache.catalina.Container;

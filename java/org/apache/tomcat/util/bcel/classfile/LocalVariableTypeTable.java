@@ -20,7 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import  org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Constants;
 
 // The new table is used when generic types are about...
 

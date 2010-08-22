@@ -16,15 +16,17 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ListIterator;
+
 import javax.servlet.jsp.tagext.PageData;
+
+import org.apache.jasper.JasperException;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
-import org.apache.jasper.JasperException;
 
 /**
  * An implementation of <tt>javax.servlet.jsp.tagext.PageData</tt> which

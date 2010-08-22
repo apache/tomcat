@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.catalina.filters.ExpiresFilter.XHttpServletResponse;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

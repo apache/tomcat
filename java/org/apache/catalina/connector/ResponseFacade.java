@@ -32,8 +32,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Facade class that wraps a Coyote response object. 

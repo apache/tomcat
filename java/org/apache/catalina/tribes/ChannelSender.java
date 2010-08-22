@@ -17,6 +17,8 @@
 
 package org.apache.catalina.tribes;
 
+import java.io.IOException;
+
 
 /**
  * ChannelReceiver Interface<br>

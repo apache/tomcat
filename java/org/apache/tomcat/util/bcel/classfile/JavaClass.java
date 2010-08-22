@@ -20,6 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 

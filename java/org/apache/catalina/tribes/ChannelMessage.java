@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes;
 
 import java.io.Serializable;
+
 import org.apache.catalina.tribes.io.XByteBuffer;
 
 /**

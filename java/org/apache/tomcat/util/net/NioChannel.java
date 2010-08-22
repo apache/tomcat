@@ -21,13 +21,13 @@ package org.apache.tomcat.util.net;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
+import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
-import java.nio.channels.Selector;
-import java.nio.channels.SelectionKey;
-import org.apache.tomcat.util.MutableInteger;
 
 /**
  * 

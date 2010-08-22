@@ -20,6 +20,7 @@ package org.apache.catalina;
 
 
 import java.util.EventObject;
+
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;

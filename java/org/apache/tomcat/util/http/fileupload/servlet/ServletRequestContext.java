@@ -16,8 +16,9 @@
  */
 package org.apache.tomcat.util.http.fileupload.servlet;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.http.fileupload.RequestContext;

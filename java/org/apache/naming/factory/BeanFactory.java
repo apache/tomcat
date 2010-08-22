@@ -17,21 +17,21 @@
 
 package org.apache.naming.factory;
 
-import java.util.Hashtable;
-import java.util.Enumeration;
-import javax.naming.Name;
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.naming.Reference;
-import javax.naming.RefAddr;
-import javax.naming.spi.ObjectFactory;
-import org.apache.naming.ResourceRef;
-
-import java.beans.Introspector;
 import java.beans.BeanInfo;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-
 import java.lang.reflect.Method;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.RefAddr;
+import javax.naming.Reference;
+import javax.naming.spi.ObjectFactory;
+
+import org.apache.naming.ResourceRef;
 
 /**
  * Object factory for any Resource conforming to the JavaBean spec.

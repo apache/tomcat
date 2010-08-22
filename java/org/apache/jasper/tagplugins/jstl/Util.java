@@ -18,8 +18,6 @@
 
 package org.apache.jasper.tagplugins.jstl;
 
-import org.apache.jasper.Constants;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,6 +32,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
+
+import org.apache.jasper.Constants;
 
 /**
  * Util contains some often used consts, static methods and embedded class

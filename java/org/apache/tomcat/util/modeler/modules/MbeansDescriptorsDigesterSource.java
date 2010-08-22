@@ -26,11 +26,11 @@ import java.util.List;
 
 import javax.management.ObjectName;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 public class MbeansDescriptorsDigesterSource extends ModelerSource
 {

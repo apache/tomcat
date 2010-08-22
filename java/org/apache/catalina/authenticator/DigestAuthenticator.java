@@ -28,7 +28,6 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
