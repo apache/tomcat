@@ -73,7 +73,7 @@ public class TagSupport implements IterationTag, Serializable {
      */
     public static final Tag findAncestorWithClass(Tag from,
             // TCK signature test fails with generics
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("rawtypes")
             Class klass) {
         boolean isInterface = false;
 

@@ -231,7 +231,7 @@ public class BeanELResolver extends ELResolver {
         }
 
         // Can't use Class<?> because API needs to match specification
-        public @SuppressWarnings("unchecked") Class getPropertyType() {
+        public @SuppressWarnings("rawtypes") Class getPropertyType() {
             return this.type;
         }
 
