@@ -227,7 +227,7 @@ public final class AstValue extends SimpleNode {
     @Override
     // Interface el.parser.Node uses raw types (and is auto-generated)
     public MethodInfo getMethodInfo(EvaluationContext ctx, 
-            @SuppressWarnings("unchecked") Class[] paramTypes)
+            @SuppressWarnings("rawtypes") Class[] paramTypes)
             throws ELException {
         Target t = getTarget(ctx);
         Method m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
@@ -238,7 +238,7 @@ public final class AstValue extends SimpleNode {
     @Override
     // Interface el.parser.Node uses a raw type (and is auto-generated)
     public Object invoke(EvaluationContext ctx, 
-            @SuppressWarnings("unchecked") Class[] paramTypes,
+            @SuppressWarnings("rawtypes") Class[] paramTypes,
             Object[] paramValues) throws ELException {
         
         Target t = getTarget(ctx);

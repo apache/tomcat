@@ -121,7 +121,7 @@ public class ImplicitObjectELResolver extends ELResolver {
     }
 
     @Override
-    @SuppressWarnings("unchecked") // TCK signature test fails with generics
+    @SuppressWarnings({ "unchecked", "rawtypes" }) // TCK signature test fails with generics
     public Class getType(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
