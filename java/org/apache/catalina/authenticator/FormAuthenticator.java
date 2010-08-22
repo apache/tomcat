@@ -401,7 +401,8 @@ public class FormAuthenticator
      * @param request The request to be restored
      * @param session The session containing the saved information
      */
-    protected boolean restoreRequest(Request request, Session session) {
+    protected boolean restoreRequest(Request request, Session session)
+            throws IOException {
 
         // Retrieve and remove the SavedRequest object from our session
         SavedRequest saved = (SavedRequest)
@@ -447,6 +448,13 @@ public class FormAuthenticator
         request.getCoyoteRequest().getParameters().setQueryStringEncoding(
                 request.getConnector().getURIEncoding());
 
+        // Swallow any request body since we will be replacing it
+        byte[] buffer = new byte[4096];
+        InputStream is = request.getInputStream();
+        while (is.read(buffer) >= 0) {
+            // Ignore request body
+        }
+        
         if ("POST".equalsIgnoreCase(saved.getMethod())) {
             ByteChunk body = saved.getBody();
             

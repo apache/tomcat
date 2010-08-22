@@ -78,6 +78,10 @@ public abstract class SimpleHttpClient {
         useContinue = theUseContinueFlag;
     }
 
+    public boolean getUseContinue() {
+        return useContinue;
+    }
+
     public void setRequestPause(int theRequestPause) {
         requestPause = theRequestPause;
     }
@@ -183,6 +187,8 @@ public abstract class SimpleHttpClient {
         request = null;
         requestPause = 1000;
         
+        useContinue = false;
+
         responseLine = null;
         responseHeaders = new ArrayList<String>();
         responseBody = null;
