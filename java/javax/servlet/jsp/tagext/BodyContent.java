@@ -16,9 +16,9 @@
  */
 package javax.servlet.jsp.tagext;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.io.IOException;
 
 import javax.servlet.jsp.JspWriter;
 

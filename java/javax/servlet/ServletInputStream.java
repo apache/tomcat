@@ -16,8 +16,8 @@
  */
 package javax.servlet;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Provides an input stream for reading binary data from a client request,
