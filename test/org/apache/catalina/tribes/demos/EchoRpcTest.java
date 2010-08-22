@@ -18,12 +18,12 @@ package org.apache.catalina.tribes.demos;
 
 import java.io.Serializable;
 
-import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
-import org.apache.catalina.tribes.group.RpcChannel;
+import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.Response;
+import org.apache.catalina.tribes.group.RpcCallback;
+import org.apache.catalina.tribes.group.RpcChannel;
 
 
 /**

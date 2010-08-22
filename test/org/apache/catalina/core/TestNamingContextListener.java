@@ -24,8 +24,8 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.deploy.ContextEnvironment;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestNamingContextListener extends TomcatBaseTest {
 

@@ -21,9 +21,10 @@ package org.apache.catalina;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import javax.servlet.ServletException;
+
 import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
+import javax.servlet.ServletException;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;

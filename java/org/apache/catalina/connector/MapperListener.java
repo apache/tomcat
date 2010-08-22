@@ -29,9 +29,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
 import org.apache.tomcat.util.http.mapper.Mapper;
-
 import org.apache.tomcat.util.res.StringManager;
 
 

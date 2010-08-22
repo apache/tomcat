@@ -27,9 +27,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.catalina.realm.GenericPrincipal;
-
 import junit.framework.TestCase;
+
+import org.apache.catalina.realm.GenericPrincipal;
 
 public class TestSerializablePrincipal extends TestCase {
 

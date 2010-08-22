@@ -16,8 +16,9 @@
  */
 package org.apache.catalina.tribes;
 
-import org.apache.catalina.tribes.util.Arrays;
 import java.io.Serializable;
+
+import org.apache.catalina.tribes.util.Arrays;
 
 /**
  * <p>Title: Represents a globally unique Id</p>

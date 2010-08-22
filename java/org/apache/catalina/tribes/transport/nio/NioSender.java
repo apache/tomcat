@@ -17,6 +17,7 @@
 
 package org.apache.catalina.tribes.transport.nio;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -27,13 +28,11 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
+import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
-import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
-import java.io.EOFException;
 
 /**
  * This class is NOT thread safe and should never be used with more than one thread at a time

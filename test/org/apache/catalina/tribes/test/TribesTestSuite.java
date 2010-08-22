@@ -16,8 +16,12 @@
  */
 package org.apache.catalina.tribes.test;
 
-import org.apache.catalina.tribes.test.channel.TestChannelStartStop;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.apache.catalina.tribes.test.channel.TestChannelOptionFlag;
+import org.apache.catalina.tribes.test.channel.TestChannelStartStop;
 import org.apache.catalina.tribes.test.channel.TestDataIntegrity;
 import org.apache.catalina.tribes.test.channel.TestMulticastPackages;
 import org.apache.catalina.tribes.test.channel.TestRemoteProcessException;
@@ -26,14 +30,10 @@ import org.apache.catalina.tribes.test.interceptors.TestNonBlockingCoordinator;
 import org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor;
 import org.apache.catalina.tribes.test.io.TestSenderConnections;
 import org.apache.catalina.tribes.test.io.TestSerialization;
-import org.apache.catalina.tribes.test.membership.TestMemberSerialization;
 import org.apache.catalina.tribes.test.membership.TestDomainFilter;
 import org.apache.catalina.tribes.test.membership.TestMemberArrival;
+import org.apache.catalina.tribes.test.membership.TestMemberSerialization;
 import org.apache.catalina.tribes.test.membership.TestTcpFailureDetector;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 public class TribesTestSuite
     extends TestCase {

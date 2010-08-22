@@ -16,16 +16,17 @@
  */
 package org.apache.catalina.tribes.demos;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.Channel;
-import java.util.Properties;
 import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.catalina.tribes.util.Arrays;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import org.apache.catalina.tribes.util.UUIDGenerator;
 
 public class MembersWithProperties implements MembershipListener{
     Channel channel;

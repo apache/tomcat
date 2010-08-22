@@ -19,13 +19,12 @@ package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
 
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.HexUtils;
-
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 
 /**
  * Chunked input filter. Parses chunked data according to

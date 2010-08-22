@@ -17,8 +17,8 @@
 
 package org.apache.catalina.ha.deploy;
 
-import org.apache.catalina.tribes.Member;
 import org.apache.catalina.ha.ClusterMessageBase;
+import org.apache.catalina.tribes.Member;
 
 /**
  * Contains the data for a file being transferred over TCP, this is 

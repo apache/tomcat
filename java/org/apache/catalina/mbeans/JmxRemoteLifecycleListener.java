@@ -39,9 +39,9 @@ import javax.rmi.ssl.SslRMIServerSocketFactory;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This listener fixes the port used by JMX/RMI Server making things much

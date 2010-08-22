@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.jasper.Constants;
-import org.apache.jasper.JasperException;
-
 import javax.el.ExpressionFactory;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
+
+import org.apache.jasper.Constants;
+import org.apache.jasper.JasperException;
 
 /**
  * A repository for various info about the translation unit under compilation.

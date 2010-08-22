@@ -17,9 +17,9 @@
 
 package org.apache.naming.resources;
 
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Encapsulates the contents of a resource.

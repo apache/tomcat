@@ -20,8 +20,8 @@ package org.apache.catalina.comet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 
 /**
  * This interface should be implemented by servlets which would like to handle

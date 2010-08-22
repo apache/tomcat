@@ -17,8 +17,8 @@
 
 package org.apache.jasper.compiler;
 
-import org.xml.sax.Attributes;
 import org.apache.jasper.JasperException;
+import org.xml.sax.Attributes;
 
 class Dumper {
 

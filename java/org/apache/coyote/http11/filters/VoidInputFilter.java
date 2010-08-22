@@ -19,11 +19,10 @@ package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
 
-import org.apache.tomcat.util.buf.ByteChunk;
-
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Void input filter, which returns -1 when attempting a read. Used with a GET,

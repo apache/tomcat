@@ -18,11 +18,11 @@
 
 package org.apache.catalina.startup;
 
-import org.xml.sax.Attributes;
+import java.util.HashMap;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
-import java.util.HashMap;
+import org.xml.sax.Attributes;
 
 /**
  * Rule that uses the introspection utils to set properties.

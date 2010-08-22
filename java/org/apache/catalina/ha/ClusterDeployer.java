@@ -24,9 +24,10 @@ package org.apache.catalina.ha;
  * @author Filip Hanik
  * @version $Id$
  */
-import org.apache.catalina.LifecycleException;
 import java.io.IOException;
 import java.net.URL;
+
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.tribes.ChannelListener;
 
 public interface ClusterDeployer extends ChannelListener {

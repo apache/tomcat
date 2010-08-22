@@ -16,22 +16,23 @@
  */
 package org.apache.catalina.ha.context;
 
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.ha.CatalinaCluster;
-import org.apache.catalina.tribes.tipis.ReplicatedMap;
-import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.Loader;
-import org.apache.catalina.core.ApplicationContext;
-import org.apache.catalina.Globals;
-import javax.servlet.ServletContext;
 import java.util.AbstractMap;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.ServletContext;
+
+import org.apache.catalina.Globals;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Loader;
+import org.apache.catalina.core.ApplicationContext;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.ha.CatalinaCluster;
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
+import org.apache.catalina.tribes.tipis.ReplicatedMap;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

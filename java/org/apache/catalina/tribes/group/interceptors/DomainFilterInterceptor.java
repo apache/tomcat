@@ -15,12 +15,13 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.util.Arrays;
+
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
-import java.util.Arrays;
 
 /**
  * <p>Title: Member domain filter interceptor </p>

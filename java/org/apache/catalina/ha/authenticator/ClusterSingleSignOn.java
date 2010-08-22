@@ -21,8 +21,8 @@ package org.apache.catalina.ha.authenticator;
 
 import java.security.Principal;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Cluster;
+import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;

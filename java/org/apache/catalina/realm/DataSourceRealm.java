@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import javax.naming.Context;
 import javax.sql.DataSource;
 
-import org.apache.naming.ContextBindings;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.naming.ContextBindings;
 
 /**
 *

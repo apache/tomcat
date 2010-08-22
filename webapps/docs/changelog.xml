@@ -93,6 +93,9 @@
       <fix>
         Correct the Eclipse compiler dependency in the Jasper POM. (markt)
       </fix>
+      <add>
+        Extend Checkstyle validation checks to check import order. (markt) 
+      </add>
     </changelog>
   </subsection>
 </section>

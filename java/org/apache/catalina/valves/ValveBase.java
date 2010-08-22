@@ -34,8 +34,8 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

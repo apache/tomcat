@@ -16,28 +16,28 @@
  */
 package org.apache.catalina.tribes.demos;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
+import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor;
 import org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor;
 import org.apache.catalina.tribes.group.interceptors.GzipInterceptor;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.OrderInterceptor;
+import org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor;
+import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
+import org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor;
 import org.apache.catalina.tribes.membership.McastService;
+import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
-import org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
-import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
-import org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor;
-import java.util.ArrayList;
-import org.apache.catalina.tribes.membership.MemberImpl;
-import org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor;
-import org.apache.catalina.tribes.Member;
 
 /**
  * <p>Title: </p>

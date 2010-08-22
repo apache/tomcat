@@ -16,9 +16,10 @@
  */
 package org.apache.catalina.tribes.group;
 
-import org.apache.catalina.tribes.Member;
-import java.util.Comparator;
 import java.util.Arrays;
+import java.util.Comparator;
+
+import org.apache.catalina.tribes.Member;
 
 /**
  * <p>Title: Membership - Absolute Order</p>

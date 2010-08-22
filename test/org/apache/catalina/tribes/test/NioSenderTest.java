@@ -17,14 +17,15 @@
 package org.apache.catalina.tribes.test;
 
 import java.nio.channels.SelectionKey;
-import java.util.Iterator;
 import java.nio.channels.Selector;
-import org.apache.catalina.tribes.transport.nio.NioSender;
-import org.apache.catalina.tribes.membership.MemberImpl;
+import java.util.Iterator;
+
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
-import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.transport.nio.NioSender;
 
 /**
  * <p>Title: </p>

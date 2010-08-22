@@ -33,8 +33,8 @@ import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
