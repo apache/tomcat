@@ -26,116 +26,155 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestFormAuthenticator extends TomcatBaseTest {
 
-    public void testExpect100Continue() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        Context ctx =
-            tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
-        MapRealm realm = new MapRealm();
-        realm.addUser("tomcat", "tomcat");
-        realm.addUserRole("tomcat", "tomcat");
-        ctx.setRealm(realm);
+    public void testGet() throws Exception {
+        doTest("GET", "GET", false);
+    }
 
-        tomcat.start();
+    public void testPostNoContinue() throws Exception {
+        doTest("POST", "GET", false);
+    }
 
-        Expect100ContinueClient client = new Expect100ContinueClient();
-        client.setPort(getPort());
-        
+    public void testPostWithContinue() throws Exception {
+        doTest("POST", "GET", true);
+    }
+
+    // Bug 49779
+    public void testPostNoContinuePostRedirect() throws Exception {
+        doTest("POST", "POST", false);
+    }
+
+    // Bug 49779
+    public void testPostWithContinuePostRedirect() throws Exception {
+        doTest("POST", "POST", true);
+    }
+
+
+    private void doTest(String resourceMethod, String redirectMethod,
+            boolean useContinue) throws Exception {
+        FormAuthClient client = new FormAuthClient();
+
         // First request for authenticated resource 
-        Exception e = client.doRequest(null);
-        assertNull(e);
+        client.setUseContinue(useContinue);
+        client.doResourceRequest(resourceMethod);
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
-        
-        String sessionID = client.getSessionId();
+        client.reset();
         
         // Second request for the login page
-        client.reset();
-        e = client.doRequest(sessionID);
-        assertNull(e);
+        client.setUseContinue(useContinue);
+        client.doLoginRequest();
         assertTrue(client.isResponse302());
         assertTrue(client.isResponseBodyOK());
+        client.reset();
 
         // Third request - follow the redirect
-        client.reset();
-        e = client.doRequest(sessionID);
-        assertNull(e);
+        client.doResourceRequest(redirectMethod);
+        if ("POST".equals(redirectMethod)) {
+            client.setUseContinue(useContinue);
+        }
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
-
-        // Session ID changes after successful authentication
-        sessionID = client.getSessionId();
+        client.reset();
 
         // Subsequent requests - direct to the resource
         for (int i = 0; i < 5; i++) {
-            client.reset();
-            e = client.doRequest(sessionID);
-            assertNull(e);
+            client.setUseContinue(useContinue);
+            client.doResourceRequest(resourceMethod);
             assertTrue(client.isResponse200());
             assertTrue(client.isResponseBodyOK());
+            client.reset();
         }
     }
-    
-    private final class Expect100ContinueClient extends SimpleHttpClient {
 
+
+    private final class FormAuthClient extends SimpleHttpClient {
+
+        private static final String LOGIN_PAGE = "j_security_check";
+
+        private String protectedPage = "index.jsp";
+        private String protectedLocation = "/examples/jsp/security/protected/";
         private int requestCount = 0;
+        private String sessionId = null;
 
-        private Exception doRequest(String sessionId) {
-            try {
-                String request[] = new String[2];
-                if (requestCount == 1) {
-                    request[0] =
-                            "POST /examples/jsp/security/protected/j_security_check HTTP/1.1" + CRLF;
-                } else if (requestCount == 2) {
-                    request[0] =
-                            "GET /examples/jsp/security/protected/index.jsp HTTP/1.1" + CRLF;
-                } else {
-                    request[0] =
-                            "POST /examples/jsp/security/protected/index.jsp HTTP/1.1" + CRLF;
-                }
+        private FormAuthClient() throws Exception {
+            Tomcat tomcat = getTomcatInstance();
+            File appDir = new File(getBuildDirectory(), "webapps/examples");
+            Context ctx =
+                tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+            
+            MapRealm realm = new MapRealm();
+            realm.addUser("tomcat", "tomcat");
+            realm.addUserRole("tomcat", "tomcat");
+            ctx.setRealm(realm);
 
+            setPort(getPort());
+
+            tomcat.start();
+        }
+        
+        private void doResourceRequest(String method) throws Exception {
+            String request[] = new String[2];
+            request [0] = method + " " + protectedLocation + protectedPage + 
+                    " HTTP/1.1" + CRLF;
+            request[0] = request[0] + 
+                    "Host: localhost" + CRLF +
+                    "Connection: close" + CRLF;
+            if (getUseContinue()) {
                 request[0] = request[0] + 
-                        "Host: localhost" + CRLF +
-                        "Expect: 100-continue" + CRLF +
-                        "Connection: close" + CRLF;
-                
-                if (sessionId != null) {
-                    request[0] = request[0] +
-                            "Cookie: JSESSIONID=" + sessionId + CRLF;
-                }
-                
-                if (requestCount == 1) {
-                    request[0] = request[0] +
-                            "Content-Type: application/x-www-form-urlencoded" + CRLF +
-                            "Content-length: 35" + CRLF +
-                            CRLF;
-                    request[1] = "j_username=tomcat&j_password=tomcat";
-                } else if (requestCount ==2) {
-                    request[1] = CRLF;
-                } else {
-                    request[0] = request[0] +
-                            "Content-Type: application/x-www-form-urlencoded" + CRLF +
-                            "Content-length: 7" + CRLF +
-                            CRLF;
-                    request[1] = "foo=bar";
-                }
-
-                setRequest(request);
-                if (requestCount != 2) {
-                    setUseContinue(true);
-                }
-                
-                connect();
-                processRequest();
-                disconnect();
-                
-                requestCount++;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return e;
+                        "Expect: 100-continue" + CRLF;
             }
-            return null;
+            if (sessionId != null) {
+                request[0] = request[0] +
+                        "Cookie: JSESSIONID=" + sessionId + CRLF;
+            }
+            if ("POST".equals(method)) {
+                request[0] = request[0] +
+                        "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                        "Content-length: 7" + CRLF +
+                        CRLF;
+                request[1] = "foo=bar";
+            } else {
+                request[1] = CRLF;
+            }
+            doRequest(request);
+        }
+
+        private void doLoginRequest() throws Exception {
+            String request[] = new String[2];
+            request [0] = "POST " + protectedLocation + LOGIN_PAGE + 
+                    " HTTP/1.1" + CRLF;
+            request[0] = request[0] + 
+                    "Host: localhost" + CRLF +
+                    "Connection: close" + CRLF;
+            if (getUseContinue()) {
+                request[0] = request[0] + 
+                        "Expect: 100-continue" + CRLF;
+            }
+            if (sessionId != null) {
+                request[0] = request[0] +
+                        "Cookie: JSESSIONID=" + sessionId + CRLF;
+            }
+            request[0] = request[0] +
+                    "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                    "Content-length: 35" + CRLF +
+                    CRLF;
+            request[1] = "j_username=tomcat&j_password=tomcat";
+            
+            doRequest(request);
+        }
+
+        private void doRequest(String request[]) throws Exception {
+            setRequest(request);
+            
+            connect();
+            processRequest();
+            String newSessionId = getSessionId();
+            if (newSessionId != null) {
+                sessionId = newSessionId;
+            }
+            disconnect();
+            
+            requestCount++;
         }
 
         @Override
