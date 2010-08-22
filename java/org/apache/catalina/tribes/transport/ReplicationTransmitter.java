@@ -21,8 +21,8 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelSender;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
+import org.apache.catalina.tribes.util.StringManager;
 
 /**
  * Transmit message to other cluster members

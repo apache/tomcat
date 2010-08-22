@@ -22,13 +22,13 @@ import java.lang.reflect.Method;
 import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 
+import junit.framework.TestCase;
+
 import org.apache.el.ExpressionFactoryImpl;
 import org.apache.el.TestELEvaluation;
 import org.apache.el.TestELInJsp;
 import org.apache.el.TesterFunctions;
 import org.apache.jasper.el.ELContextImpl;
-
-import junit.framework.TestCase;
 
 /**
  * Test the EL processing from JSP attributes. Similar tests may be found in

@@ -33,9 +33,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
+import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 

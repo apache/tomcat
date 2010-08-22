@@ -18,10 +18,9 @@
 
 package org.apache.catalina.startup;
 
-import org.xml.sax.Attributes;
-
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
+import org.xml.sax.Attributes;
 
 /**
  * Rule that uses the introspection utils to set properties of a context 

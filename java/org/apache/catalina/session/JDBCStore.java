@@ -17,14 +17,6 @@
 
 package org.apache.catalina.session;
 
-import org.apache.catalina.Container;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Loader;
-import org.apache.catalina.Session;
-import org.apache.catalina.util.CustomObjectInputStream;
-import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.ExceptionUtils;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -40,6 +32,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
+
+import org.apache.catalina.Container;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Loader;
+import org.apache.catalina.Session;
+import org.apache.catalina.util.CustomObjectInputStream;
+import org.apache.catalina.util.LifecycleBase;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Implementation of the <code>Store</code> interface that stores

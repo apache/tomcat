@@ -16,23 +16,24 @@
  */
 package org.apache.catalina.tribes.test.interceptors;
 
-import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.group.GroupChannel;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-import org.apache.catalina.tribes.ChannelListener;
 import java.io.Serializable;
-import org.apache.catalina.tribes.group.interceptors.OrderInterceptor;
-import org.apache.catalina.tribes.group.ChannelInterceptorBase;
-import org.apache.catalina.tribes.ChannelMessage;
-import org.apache.catalina.tribes.group.InterceptorPayload;
-import org.apache.catalina.tribes.ChannelException;
-
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelListener;
+import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.group.interceptors.OrderInterceptor;
 
 public class TestOrderInterceptor extends TestCase {
 

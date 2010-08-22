@@ -17,15 +17,15 @@
 
 package org.apache.catalina.ha.session;
 
-import org.apache.catalina.ha.ClusterManager;
-import org.apache.catalina.session.ManagerBase;
-import org.apache.catalina.Loader;
-import org.apache.catalina.Manager;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import org.apache.catalina.tribes.io.ReplicationStream;
+
 import org.apache.catalina.Container;
+import org.apache.catalina.Loader;
+import org.apache.catalina.Manager;
+import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.session.ManagerBase;
+import org.apache.catalina.tribes.io.ReplicationStream;
 
 /**
  * 

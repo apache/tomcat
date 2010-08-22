@@ -16,15 +16,16 @@
  */
 package org.apache.catalina.tribes.test.transport;
 
-import java.text.DecimalFormat;
-import org.apache.catalina.tribes.transport.nio.NioSender;
-import org.apache.catalina.tribes.membership.MemberImpl;
-import java.nio.channels.Selector;
-import org.apache.catalina.tribes.Member;
-import java.nio.channels.SelectionKey;
-import java.util.Iterator;
 import java.math.BigDecimal;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Iterator;
+
+import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.transport.nio.NioSender;
 
 public class SocketNioValidateSend {
 

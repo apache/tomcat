@@ -19,11 +19,12 @@
 package org.apache.catalina.realm;
 
 
-import java.security.Principal;
 import java.io.File;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;

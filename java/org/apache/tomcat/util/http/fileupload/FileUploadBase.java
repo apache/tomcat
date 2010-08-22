@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.tomcat.util.http.fileupload.MultipartStream.ItemInputStream;
 import org.apache.tomcat.util.http.fileupload.util.Closeable;
 import org.apache.tomcat.util.http.fileupload.util.FileItemHeadersImpl;

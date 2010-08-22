@@ -20,12 +20,12 @@ package org.apache.catalina.tribes.membership;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.catalina.tribes.Member;
-import java.util.Comparator;
 
 /**
  * A <b>membership</b> implementation using simple multicast.

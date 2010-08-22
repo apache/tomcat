@@ -21,14 +21,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
-import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.AbstractSender;
-import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.transport.MultiPointSender;
 
 /**
  *

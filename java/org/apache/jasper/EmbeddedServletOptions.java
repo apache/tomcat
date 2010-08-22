@@ -26,10 +26,10 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 
-import org.apache.jasper.compiler.TldLocationsCache;
 import org.apache.jasper.compiler.JspConfig;
-import org.apache.jasper.compiler.TagPluginManager;
 import org.apache.jasper.compiler.Localizer;
+import org.apache.jasper.compiler.TagPluginManager;
+import org.apache.jasper.compiler.TldLocationsCache;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;

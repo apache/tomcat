@@ -40,24 +40,24 @@ import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterValve;
+import org.apache.catalina.ha.jmx.ClusterJmxHelper;
+import org.apache.catalina.ha.session.ClusterSessionListener;
 import org.apache.catalina.ha.session.DeltaManager;
+import org.apache.catalina.ha.session.JvmRouteBinderValve;
+import org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener;
 import org.apache.catalina.ha.util.IDynamicProperty;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
+import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.catalina.ha.session.ClusterSessionListener;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
-import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
-import org.apache.catalina.ha.session.JvmRouteBinderValve;
-import org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener;
-import org.apache.catalina.ha.jmx.ClusterJmxHelper;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A <b>Cluster </b> implementation using simple multicast. Responsible for

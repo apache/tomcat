@@ -16,14 +16,14 @@
  */
 package org.apache.catalina.tribes.io;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.util.UUIDGenerator;
-import org.apache.catalina.tribes.Channel;
-import java.sql.Timestamp;
 
 /**
  * The <code>ChannelData</code> object is used to transfer a message through the 

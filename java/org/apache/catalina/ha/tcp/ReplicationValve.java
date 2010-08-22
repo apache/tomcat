@@ -18,16 +18,19 @@
 package org.apache.catalina.ha.tcp;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.Context;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
@@ -36,10 +39,8 @@ import org.apache.catalina.ha.ClusterSession;
 import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.session.DeltaSession;
-import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>Implementation of a Valve that logs interesting contents from the

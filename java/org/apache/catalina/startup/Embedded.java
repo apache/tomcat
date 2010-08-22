@@ -45,11 +45,11 @@ import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

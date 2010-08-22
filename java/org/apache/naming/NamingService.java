@@ -17,13 +17,13 @@
 
 package org.apache.naming;
 
-import javax.naming.Context;
+import javax.management.AttributeChangeNotification;
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
-import javax.management.MBeanServer;
-import javax.management.MBeanRegistration;
-import javax.management.AttributeChangeNotification;
-import javax.management.Notification;
+import javax.naming.Context;
 
 /**
  * Implementation of the NamingService JMX MBean.

@@ -19,14 +19,16 @@
 package org.apache.naming.java;
 
 import java.util.Hashtable;
-import javax.naming.Name;
+
 import javax.naming.Context;
+import javax.naming.Name;
 import javax.naming.NamingException;
-import javax.naming.spi.ObjectFactory;
 import javax.naming.spi.InitialContextFactory;
-import org.apache.naming.SelectorContext;
-import org.apache.naming.NamingContext;
+import javax.naming.spi.ObjectFactory;
+
 import org.apache.naming.ContextBindings;
+import org.apache.naming.NamingContext;
+import org.apache.naming.SelectorContext;
 
 /**
  * Context factory for the "java:" namespace.

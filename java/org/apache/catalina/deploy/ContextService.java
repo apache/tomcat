@@ -18,8 +18,8 @@
 
 package org.apache.catalina.deploy;
 
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Representation of a web service reference for a web application, as

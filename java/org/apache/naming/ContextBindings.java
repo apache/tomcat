@@ -19,8 +19,9 @@
 package org.apache.naming;
 
 import java.util.Hashtable;
-import javax.naming.NamingException;
+
 import javax.naming.Context;
+import javax.naming.NamingException;
 
 /**
  * Handles the associations :

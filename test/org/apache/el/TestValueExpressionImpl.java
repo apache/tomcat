@@ -22,9 +22,9 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 
-import org.apache.jasper.el.ELContextImpl;
-
 import junit.framework.TestCase;
+
+import org.apache.jasper.el.ELContextImpl;
 
 public class TestValueExpressionImpl extends TestCase {
 

@@ -19,12 +19,13 @@
 package org.apache.catalina.deploy;
 
 
-import org.apache.catalina.util.RequestUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.servlet.DispatcherType;
+
+import org.apache.catalina.util.RequestUtil;
 
 
 /**

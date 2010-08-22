@@ -19,8 +19,8 @@ package org.apache.tomcat.util.buf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.

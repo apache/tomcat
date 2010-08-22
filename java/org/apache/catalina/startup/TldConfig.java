@@ -42,8 +42,8 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
