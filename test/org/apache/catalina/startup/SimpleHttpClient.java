@@ -42,11 +42,16 @@ public abstract class SimpleHttpClient {
     
     public static final String CRLF = "\r\n";
 
+    public static final String INFO_100 = "HTTP/1.1 100";
     public static final String OK_200 = "HTTP/1.1 200";
+    public static final String REDIRECT_302 = "HTTP/1.1 302";
     public static final String FAIL_404 = "HTTP/1.1 404";
     public static final String FAIL_50X = "HTTP/1.1 50";
     public static final String FAIL_500 = "HTTP/1.1 500";
     public static final String FAIL_501 = "HTTP/1.1 501";
+    
+    private static final String SESSION_COOKIE_HEADER_PREFIX =
+        "Set-Cookie: JSESSIONID=";
     
     private Socket socket;
     private Writer writer;
@@ -54,6 +59,7 @@ public abstract class SimpleHttpClient {
     private int port = 8080;
     
     private String[] request;
+    private boolean useContinue = false;
     private int requestPause = 1000;
     
     private String responseLine;
@@ -68,6 +74,10 @@ public abstract class SimpleHttpClient {
         request = theRequest;
     }
     
+    public void setUseContinue(boolean theUseContinueFlag) {
+        useContinue = theUseContinueFlag;
+    }
+
     public void setRequestPause(int theRequestPause) {
         requestPause = theRequestPause;
     }
@@ -82,6 +92,17 @@ public abstract class SimpleHttpClient {
 
     public String getResponseBody() {
         return responseBody;
+    }
+
+    public String getSessionId() {
+        for (String header : responseHeaders) {
+            if (header.startsWith(SESSION_COOKIE_HEADER_PREFIX)) {
+                header = header.substring(SESSION_COOKIE_HEADER_PREFIX.length());
+                header = header.substring(0, header.indexOf(';'));
+                return header;
+            }
+        }
+        return null;
     }
 
     public void connect() throws UnknownHostException, IOException {
@@ -111,6 +132,18 @@ public abstract class SimpleHttpClient {
 
         // Read the response
         responseLine = readLine();
+
+        // Is a 100 continue response expected?
+        if (useContinue) {
+            if (isResponse100()) {
+                // Skip the blank after the 100 Continue response 
+                readLine();
+                // Now get the final response
+                responseLine = readLine();
+            } else {
+                throw new IOException("No 100 Continue response");
+            }
+        }
         
         // Put the headers into the map
         String line = readLine();
@@ -155,10 +188,18 @@ public abstract class SimpleHttpClient {
         responseBody = null;
     }
     
+    public boolean isResponse100() {
+        return getResponseLine().startsWith(INFO_100);
+    }
+    
     public boolean isResponse200() {
         return getResponseLine().startsWith(OK_200);
     }
-    
+
+    public boolean isResponse302() {
+        return getResponseLine().startsWith(REDIRECT_302);
+    }
+
     public boolean isResponse404() {
         return getResponseLine().startsWith(FAIL_404);
     }
