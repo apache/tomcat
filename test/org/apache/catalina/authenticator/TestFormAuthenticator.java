@@ -26,7 +26,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestFormAuthenticator extends TomcatBaseTest {
 
-    public void testBug49779() throws Exception {
+    public void testExpect100Continue() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         Context ctx =
@@ -39,7 +39,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
         tomcat.start();
 
-        Bug49779ClientStage1 client = new Bug49779ClientStage1();
+        Expect100ContinueClient client = new Expect100ContinueClient();
         client.setPort(getPort());
         
         // First request for authenticated resource 
@@ -77,7 +77,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         }
     }
     
-    private final class Bug49779ClientStage1 extends SimpleHttpClient {
+    private final class Expect100ContinueClient extends SimpleHttpClient {
 
         private int requestCount = 0;
 
