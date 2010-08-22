@@ -17,12 +17,12 @@
 
 package javax.servlet.http;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 
 /**
  * Extends the {@link javax.servlet.ServletRequest} interface to provide request
