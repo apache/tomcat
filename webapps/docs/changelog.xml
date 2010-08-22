@@ -50,6 +50,10 @@
         <bug>49757</bug>: Correct some generics warnings. Based on a patch
         provided by Gábor. (markt)
       </fix>
+      <fix>
+        Provide 100 Continue responses at appropriate points during FORM
+        authentication if client indicates that they are expected. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
