@@ -487,6 +487,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param msg Serializable
      * @return Serializable - null if no reply should be sent
      */
+    @Override
     public Serializable replyRequest(Serializable msg, final Member sender) {
         if (! (msg instanceof MapMessage))return null;
         MapMessage mapmsg = (MapMessage) msg;
@@ -544,6 +545,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param msg Serializable
      * @param sender Member
      */
+    @Override
     public void leftOver(Serializable msg, Member sender) {
         //left over membership messages
         if (! (msg instanceof MapMessage))return;
@@ -563,6 +565,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
     }
 
+    @Override
     public void messageReceived(Serializable msg, Member sender) {
         if (! (msg instanceof MapMessage)) return;
 
@@ -654,6 +657,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         } //end if
     }
 
+    @Override
     public boolean accept(Serializable msg, Member sender) {
         boolean result = false;
         if (msg instanceof MapMessage) {
@@ -714,10 +718,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         return result.toArray(new Member[result.size()]);
     }
 
+    @Override
     public void memberAdded(Member member) {
         //do nothing
     }
 
+    @Override
     public void memberDisappeared(Member member) {
         boolean removed = false;
         synchronized (mapMembers) {
@@ -797,6 +803,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 
     protected abstract Member[] publishEntryInfo(Object key, Object value) throws ChannelException;
     
+    @Override
     public void heartbeat() {
         try {
             ping(accessTimeout);
@@ -1096,7 +1103,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 //------------------------------------------------------------------------------
 //                Map Entry class
 //------------------------------------------------------------------------------
-    public static class MapEntry implements Map.Entry {
+    public static class MapEntry implements Map.Entry<Object,Object> {
         private boolean backup;
         private boolean proxy;
         private Member[] backupNodes;
@@ -1167,16 +1174,19 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return primary;
         }
 
+        @Override
         public Object getValue() {
             return value;
         }
 
+        @Override
         public Object setValue(Object value) {
             Object old = this.value;
             this.value = value;
             return old;
         }
 
+        @Override
         public Object getKey() {
             return key;
         }
