@@ -17,8 +17,8 @@
 package javax.servlet.http;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
