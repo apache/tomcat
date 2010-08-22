@@ -16,9 +16,9 @@
  */
 package javax.servlet;
 
-import java.io.OutputStream;
-import java.io.IOException;
 import java.io.CharConversionException;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
