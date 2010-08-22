@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 public @interface EJB {
    String name() default "";
    String description() default "";
-   @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
+   @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
    Class beanInterface() default java.lang.Object.class;
    String beanName() default "";
    String mappedName() default "";

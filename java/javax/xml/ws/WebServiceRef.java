@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
 
 public @interface WebServiceRef {
     public String name() default "";
-    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
+    @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     public Class type() default java.lang.Object.class;
-    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
+    @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     public Class value() default java.lang.Object.class;
     public String wsdlLocation() default "";
     public String mappedName() default "";

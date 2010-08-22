@@ -83,7 +83,7 @@ public abstract class ExpressionEvaluator {
      *                Thrown if parsing errors were found.
      */
     public abstract Expression parseExpression(String expression,
-            @SuppressWarnings("unchecked")// TCK signature fails with generics
+            @SuppressWarnings("rawtypes")// TCK signature fails with generics
             Class expectedType, FunctionMapper fMapper) throws ELException;
 
     /**
@@ -109,7 +109,7 @@ public abstract class ExpressionEvaluator {
      */
     public abstract Object evaluate(
             String expression,
-            @SuppressWarnings("unchecked")// TCK signature fails with generics
+            @SuppressWarnings("rawtypes")// TCK signature fails with generics
             Class expectedType, VariableResolver vResolver,
             FunctionMapper fMapper) throws ELException;
 }
