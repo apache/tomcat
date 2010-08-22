@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
@@ -34,10 +35,9 @@ import org.apache.catalina.ha.ClusterDeployer;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
-import org.apache.tomcat.util.modeler.Registry;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 /**

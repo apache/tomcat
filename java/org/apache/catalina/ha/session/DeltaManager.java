@@ -37,6 +37,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.ha.CatalinaCluster;
+import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.tribes.Member;
@@ -44,7 +45,6 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.catalina.ha.ClusterManager;
 
 /**
  * The DeltaManager manages replicated sessions by only replicating the deltas

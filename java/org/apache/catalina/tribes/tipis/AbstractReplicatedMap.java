@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -45,7 +46,6 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *

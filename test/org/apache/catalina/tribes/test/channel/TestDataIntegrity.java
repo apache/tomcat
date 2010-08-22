@@ -16,10 +16,11 @@
  */
 package org.apache.catalina.tribes.test.channel;
 
-import junit.framework.TestCase;
 import java.io.Serializable;
-import java.util.Random;
 import java.util.Arrays;
+import java.util.Random;
+
+import junit.framework.TestCase;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;

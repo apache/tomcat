@@ -40,10 +40,10 @@ import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

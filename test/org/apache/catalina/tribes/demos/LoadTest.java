@@ -20,12 +20,12 @@ import java.io.Serializable;
 import java.util.Random;
 
 import org.apache.catalina.tribes.ByteMessage;
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.Channel;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

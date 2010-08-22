@@ -21,11 +21,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.tomcat.util.buf.ByteChunk;
-
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.OutputFilter;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Gzip output filter.

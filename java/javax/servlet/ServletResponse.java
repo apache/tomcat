@@ -18,6 +18,7 @@ package javax.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /**

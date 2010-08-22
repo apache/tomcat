@@ -19,6 +19,8 @@ package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -26,20 +28,17 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 import org.apache.catalina.tribes.io.ObjectReader;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
-import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
-import java.util.LinkedList;
-import java.util.Set;
-import java.nio.channels.CancelledKeyException;
-import java.nio.channels.ClosedSelectorException;
 
 /**
  * @author Filip Hanik

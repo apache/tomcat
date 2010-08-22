@@ -17,11 +17,12 @@
 
 package org.apache.catalina.tribes.group;
 
-import java.io.ObjectInput;
-import java.io.Serializable;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serializable;
+
 import org.apache.catalina.tribes.util.Arrays;
 
 /**

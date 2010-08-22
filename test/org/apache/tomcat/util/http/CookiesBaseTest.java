@@ -25,8 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 
 /**
  * Base Test case for {@link Cookies}. <b>Note</b> because of the use of

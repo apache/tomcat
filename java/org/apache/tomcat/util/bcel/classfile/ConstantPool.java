@@ -20,6 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+
 import org.apache.tomcat.util.bcel.Constants;
 
 /**

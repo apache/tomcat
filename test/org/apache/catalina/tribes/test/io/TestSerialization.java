@@ -16,8 +16,9 @@
  */
 package org.apache.catalina.tribes.test.io;
 
-import org.apache.catalina.tribes.io.XByteBuffer;
 import junit.framework.TestCase;
+
+import org.apache.catalina.tribes.io.XByteBuffer;
 
 public class TestSerialization extends TestCase {
     @Override

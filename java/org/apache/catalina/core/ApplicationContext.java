@@ -60,6 +60,7 @@ import javax.servlet.http.HttpSessionListener;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -71,13 +72,12 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.mapper.MappingData;
-import org.apache.catalina.Globals;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

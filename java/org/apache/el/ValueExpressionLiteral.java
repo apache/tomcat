@@ -19,12 +19,11 @@ package org.apache.el;
 
 import java.io.Externalizable;
 import java.io.IOException;
-import javax.el.ELContext;
-import javax.el.PropertyNotWritableException;
-
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import javax.el.ELContext;
+import javax.el.PropertyNotWritableException;
 import javax.el.ValueExpression;
 
 import org.apache.el.lang.ELSupport;

@@ -17,9 +17,10 @@
 
 package org.apache.catalina.ha.deploy;
 
+import java.io.Serializable;
+
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
-import java.io.Serializable;
 public class UndeployMessage implements ClusterMessage,Serializable {
     private Member address;
     private long timestamp;

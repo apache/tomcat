@@ -16,10 +16,10 @@
  */
 package org.apache.catalina.util;
 
-import java.util.Iterator;
-import java.util.jar.Manifest;
-import java.util.jar.Attributes;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  *  Representation of a Manifest file and its available extensions and

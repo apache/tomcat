@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestCookiesDisallowEquals extends TomcatBaseTest{
 

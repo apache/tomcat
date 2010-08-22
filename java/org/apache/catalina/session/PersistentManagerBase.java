@@ -30,9 +30,8 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
-import org.apache.catalina.util.LifecycleBase;
-
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 /**

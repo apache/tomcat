@@ -19,10 +19,9 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 
-import org.apache.tomcat.util.buf.ByteChunk;
-
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Output filter.

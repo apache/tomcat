@@ -16,8 +16,8 @@
  */
 
 package org.apache.catalina.tribes.transport;
-import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 
 /**

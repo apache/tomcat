@@ -19,6 +19,7 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+
 import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 

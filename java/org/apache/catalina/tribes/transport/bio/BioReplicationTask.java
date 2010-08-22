@@ -17,16 +17,17 @@
 
 package org.apache.catalina.tribes.transport.bio;
 
-import org.apache.catalina.tribes.io.ObjectReader;
-import org.apache.catalina.tribes.transport.Constants;
-import org.apache.catalina.tribes.transport.AbstractRxTask;
-import java.net.Socket;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.catalina.tribes.io.ListenCallback;
+import java.net.Socket;
+
 import org.apache.catalina.tribes.ChannelMessage;
-import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.BufferPool;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.ListenCallback;
+import org.apache.catalina.tribes.io.ObjectReader;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

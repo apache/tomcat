@@ -17,8 +17,9 @@
 
 package org.apache.catalina.tribes.transport;
 
-import org.apache.catalina.tribes.Member;
 import java.util.HashMap;
+
+import org.apache.catalina.tribes.Member;
 
 
 /**

@@ -20,11 +20,12 @@ package org.apache.catalina.ha.backend;
 
 /* for MBean to read ready and busy */
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.ObjectInstance;
 import java.util.Iterator;
 import java.util.Set;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
 
 import org.apache.tomcat.util.modeler.Registry;
 
