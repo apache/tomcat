@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -45,6 +45,10 @@
       <fix>
         <bug>49714</bug>: The annotation process of Jar doesn't influence 
         distributable element of web.xml. (kfujino)
+      </fix>
+      <fix>
+        <bug>49757</bug>: Correct some generics warnings. Based on a patch
+        provided by Gábor. (markt)
       </fix>
     </changelog>
   </subsection>
