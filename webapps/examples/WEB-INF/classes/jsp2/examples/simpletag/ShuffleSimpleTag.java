@@ -18,10 +18,11 @@
 
 package jsp2.examples.simpletag;
 
+import java.io.IOException;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.JspFragment;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
-import java.io.IOException;
 
 /**
  * SimpleTag handler that accepts takes three attributes of type

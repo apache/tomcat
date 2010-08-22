@@ -25,12 +25,12 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

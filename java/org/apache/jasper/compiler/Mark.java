@@ -16,9 +16,10 @@
  */
 package org.apache.jasper.compiler;
 
-import java.util.Stack;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Stack;
+
 import org.apache.jasper.JspCompilationContext;
 
 /**

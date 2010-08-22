@@ -24,10 +24,10 @@ import java.util.Iterator;
 import javax.servlet.ServletContext;
 
 import org.apache.jasper.JasperException;
-import org.apache.jasper.xmlparser.ParserUtils;
-import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
+import org.apache.jasper.xmlparser.ParserUtils;
+import org.apache.jasper.xmlparser.TreeNode;
 
 /**
  * Manages tag plugin optimizations.

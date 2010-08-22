@@ -31,14 +31,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import junit.framework.TestCase;
+
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.AprLifecycleListener;
-
+import org.apache.catalina.core.StandardServer;
 import org.apache.tomcat.util.buf.ByteChunk;
-
-import junit.framework.TestCase;
 
 /**
  * Base test case that provides a Tomcat instance for each test - mainly so we

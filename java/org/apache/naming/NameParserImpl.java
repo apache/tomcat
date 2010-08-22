@@ -18,10 +18,10 @@
 
 package org.apache.naming;
 
-import javax.naming.NameParser;
-import javax.naming.Name;
-import javax.naming.NamingException;
 import javax.naming.CompositeName;
+import javax.naming.Name;
+import javax.naming.NameParser;
+import javax.naming.NamingException;
 
 /**
  * Parses names.

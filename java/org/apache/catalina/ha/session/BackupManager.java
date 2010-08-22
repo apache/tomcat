@@ -27,10 +27,9 @@ import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
+import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.catalina.util.LifecycleBase;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

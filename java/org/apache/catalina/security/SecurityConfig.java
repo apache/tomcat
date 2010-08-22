@@ -17,6 +17,7 @@
 package org.apache.catalina.security;
 
 import java.security.Security;
+
 import org.apache.catalina.startup.CatalinaProperties;
 
 /**

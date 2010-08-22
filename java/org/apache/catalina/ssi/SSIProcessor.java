@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.StringTokenizer;
+
 import org.apache.catalina.util.IOTools;
 /**
  * The entry point to SSI processing. This class does the actual parsing,

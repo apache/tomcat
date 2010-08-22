@@ -61,12 +61,12 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

@@ -16,11 +16,12 @@
  */
 package org.apache.catalina.tribes.test.transport;
 
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.math.BigDecimal;
+
 import org.apache.catalina.tribes.io.XByteBuffer;
 
 public class SocketTribesReceive {

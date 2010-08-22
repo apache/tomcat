@@ -15,9 +15,10 @@
  */
 package org.apache.catalina.tribes.test.channel;
 
+import junit.framework.TestCase;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.group.GroupChannel;
-import junit.framework.TestCase;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 
 /**

@@ -17,13 +17,13 @@
 
 package org.apache.catalina.ha.authenticator;
 
-import java.util.Map;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.catalina.Session;
+import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
-import org.apache.catalina.ha.ClusterListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 

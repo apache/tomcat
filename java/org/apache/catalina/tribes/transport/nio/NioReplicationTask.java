@@ -19,24 +19,23 @@ package org.apache.catalina.tribes.transport.nio;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.CancelledKeyException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.WritableByteChannel;
 
-import org.apache.catalina.tribes.io.ObjectReader;
-import org.apache.catalina.tribes.transport.Constants;
-import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.ChannelMessage;
-import org.apache.catalina.tribes.io.ListenCallback;
-import org.apache.catalina.tribes.io.ChannelData;
-import org.apache.catalina.tribes.io.BufferPool;
-import java.nio.channels.CancelledKeyException;
-
 import org.apache.catalina.tribes.ChannelReceiver;
-import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.RemoteProcessException;
+import org.apache.catalina.tribes.UniqueId;
+import org.apache.catalina.tribes.io.BufferPool;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.ListenCallback;
+import org.apache.catalina.tribes.io.ObjectReader;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.util.Logs;
 
 /**

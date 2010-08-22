@@ -19,9 +19,9 @@
 package org.apache.catalina.deploy;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.Serializable;
 
 import javax.servlet.Filter;
 

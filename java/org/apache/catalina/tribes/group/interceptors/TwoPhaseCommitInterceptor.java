@@ -17,16 +17,16 @@
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
-import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.catalina.tribes.util.Arrays;
-import org.apache.catalina.tribes.UniqueId;
-import java.util.Map;
+import org.apache.catalina.tribes.util.UUIDGenerator;
 
 /**
  * <p>Title: </p>

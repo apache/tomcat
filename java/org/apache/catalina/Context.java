@@ -26,9 +26,6 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
-import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.util.http.mapper.Mapper;
-
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -37,6 +34,8 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.CharsetMapper;
+import org.apache.tomcat.JarScanner;
+import org.apache.tomcat.util.http.mapper.Mapper;
 
 
 /**

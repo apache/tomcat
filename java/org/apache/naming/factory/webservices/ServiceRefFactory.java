@@ -19,38 +19,36 @@
 
 package org.apache.naming.factory.webservices;
 
-import java.net.URL;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
-import javax.naming.spi.ObjectFactory;
-import javax.naming.Reference;
 import javax.naming.RefAddr;
-
+import javax.naming.Reference;
+import javax.naming.spi.ObjectFactory;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-
 import javax.xml.namespace.QName;
+import javax.xml.rpc.Service;
+import javax.xml.rpc.ServiceFactory;
 import javax.xml.rpc.handler.Handler;
 import javax.xml.rpc.handler.HandlerChain;
 import javax.xml.rpc.handler.HandlerInfo;
 import javax.xml.rpc.handler.HandlerRegistry;
-import javax.xml.rpc.Service;
-import javax.xml.rpc.ServiceFactory;
 
 import org.apache.naming.HandlerRef;
 import org.apache.naming.ServiceRef;

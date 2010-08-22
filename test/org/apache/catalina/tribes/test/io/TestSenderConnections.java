@@ -16,17 +16,18 @@
  */
 package org.apache.catalina.tribes.test.io;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+import junit.framework.TestCase;
 
 import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
-import junit.framework.TestCase;
-import org.apache.catalina.tribes.ChannelListener;
-import java.io.Serializable;
-import java.util.Random;
-import java.util.HashMap;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
 public class TestSenderConnections extends TestCase {

@@ -15,9 +15,11 @@
  */
 package org.apache.catalina.tribes.test.membership;
 
-import junit.framework.TestCase;
-import org.apache.catalina.tribes.membership.MemberImpl;
 import java.util.Arrays;
+
+import junit.framework.TestCase;
+
+import org.apache.catalina.tribes.membership.MemberImpl;
 
 /**
  * <p>Title: </p>

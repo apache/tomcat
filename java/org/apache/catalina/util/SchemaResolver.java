@@ -20,8 +20,8 @@ package org.apache.catalina.util;
 import java.util.HashMap;
 
 import org.apache.tomcat.util.digester.Digester;
-import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**

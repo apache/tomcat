@@ -16,8 +16,10 @@
  */
 package org.apache.catalina.tribes.util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
@@ -25,10 +27,8 @@ import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
-import java.io.UnsupportedEncodingException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import java.util.StringTokenizer;
 
 /**
  * @author Filip Hanik

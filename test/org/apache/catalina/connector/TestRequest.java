@@ -33,9 +33,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**

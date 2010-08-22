@@ -53,12 +53,11 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
-import org.apache.catalina.util.Enumerator;
-import org.apache.tomcat.util.res.StringManager;
-
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.Enumerator;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Standard implementation of the <b>Session</b> interface.  This object is

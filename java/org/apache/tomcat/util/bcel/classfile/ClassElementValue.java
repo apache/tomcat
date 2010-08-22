@@ -19,6 +19,7 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+
 import org.apache.tomcat.util.bcel.Constants;
 
 public class ClassElementValue extends ElementValue

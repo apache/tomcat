@@ -19,14 +19,13 @@
 package org.apache.catalina.startup;
 
 
-import org.apache.tomcat.util.digester.Digester;
-import org.apache.tomcat.util.digester.RuleSetBase;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
-import java.lang.reflect.InvocationTargetException;
+import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.digester.RuleSetBase;
 public class ClusterRuleSetFactory {
     
     public static final Log log = LogFactory.getLog(ClusterRuleSetFactory.class);

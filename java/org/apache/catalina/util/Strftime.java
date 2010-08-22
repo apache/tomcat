@@ -18,9 +18,9 @@
 package org.apache.catalina.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Properties;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.TimeZone;
 
 /**

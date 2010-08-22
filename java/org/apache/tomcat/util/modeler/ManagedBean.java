@@ -35,7 +35,7 @@ import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
 import javax.management.ServiceNotFoundException;
-//import javax.management.modelmbean.InvalidTargetObjectTypeException;
+import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 
 /**

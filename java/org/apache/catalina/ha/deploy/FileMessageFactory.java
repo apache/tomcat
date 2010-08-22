@@ -18,10 +18,10 @@
 package org.apache.catalina.ha.deploy;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;

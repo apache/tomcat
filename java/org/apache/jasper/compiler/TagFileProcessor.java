@@ -19,9 +19,9 @@ package org.apache.jasper.compiler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.HashMap;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -35,8 +35,8 @@ import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.jasper.runtime.JspSourceDependent;
+import org.apache.jasper.servlet.JspServletWrapper;
 
 /**
  * 1. Processes and extracts the directive info in a tag file. 2. Compiles and

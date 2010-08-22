@@ -16,13 +16,13 @@
  */
 package org.apache.catalina.tribes.transport.bio;
 
+import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.DataSender;
-import org.apache.catalina.tribes.transport.PooledSender;
-import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.transport.MultiPointSender;
-import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.transport.PooledSender;
 
 /**
  * <p>Title: </p>
