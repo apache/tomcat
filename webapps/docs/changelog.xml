@@ -106,6 +106,10 @@
       <add>
         Extend Checkstyle validation checks to check import order. (markt) 
       </add>
+      <fix>
+        <bug>49758</bug>: Fix generics warnings exposed by a fix in Eclipse 3.6.
+        Patch provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

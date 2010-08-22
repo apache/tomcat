@@ -32,7 +32,7 @@ public @interface Resource {
         APPLICATION
     }
     public String name() default "";
-    @SuppressWarnings("unchecked") // Can't use Class<?> because API needs to match specification
+    @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     public Class type() default Object.class;
     public AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
     public boolean shareable() default true;

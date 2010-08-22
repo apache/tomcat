@@ -350,7 +350,7 @@ public class DirContextURLConnection
     /**
      * Get object content.
      */
-    @SuppressWarnings("unchecked") // overridden method uses raw type Class[]
+    @SuppressWarnings("rawtypes") // overridden method uses raw type Class[]
     @Override
     public Object getContent(Class[] classes)
         throws IOException {

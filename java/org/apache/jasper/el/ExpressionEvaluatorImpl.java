@@ -36,7 +36,7 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
 
     @Override
     public Expression parseExpression(String expression,
-            @SuppressWarnings("unchecked") // API does not use generics
+            @SuppressWarnings("rawtypes") // API does not use generics
             Class expectedType,
             FunctionMapper fMapper) throws ELException {
         try {
@@ -54,7 +54,7 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
 
     @Override
     public Object evaluate(String expression,
-            @SuppressWarnings("unchecked") // API does not use generics
+            @SuppressWarnings("rawtypes") // API does not use generics
             Class expectedType,
             VariableResolver vResolver, FunctionMapper fMapper)
             throws ELException {
