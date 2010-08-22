@@ -40,7 +40,7 @@ public abstract class ELContext {
     }
     
     // Can't use Class<?> because API needs to match specification
-    public Object getContext(@SuppressWarnings("unchecked") Class key) {
+    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
         if (this.map == null) {
             return null;
         }
@@ -48,7 +48,7 @@ public abstract class ELContext {
     }
     
     // Can't use Class<?> because API needs to match specification
-    public void putContext(@SuppressWarnings("unchecked") Class key,
+    public void putContext(@SuppressWarnings("rawtypes") Class key,
             Object contextObject) throws NullPointerException {
         if (key == null || contextObject == null) {
             throw new NullPointerException();
