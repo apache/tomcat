@@ -24,7 +24,9 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -135,9 +137,20 @@ public class TestTomcat extends TomcatBaseTest {
      */
     public static final class MapRealm extends RealmBase {
         private Map<String,String> users = new HashMap<String,String>();
+        private Map<String,List<String>> roles =
+            new HashMap<String,List<String>>();
         
         public void addUser(String username, String password) {
             users.put(username, password);
+        }
+
+        public void addUserRole(String username, String role) {
+            List<String> userRoles = roles.get(username);
+            if (userRoles == null) {
+                userRoles = new ArrayList<String>();
+                roles.put(username, userRoles);
+            }
+            userRoles.add(role);
         }
 
         @Override
@@ -152,7 +165,8 @@ public class TestTomcat extends TomcatBaseTest {
 
         @Override
         protected Principal getPrincipal(String username) {
-            return new GenericPrincipal(username, getPassword(username));
+            return new GenericPrincipal(username, getPassword(username),
+                    roles.get(username));
         }
         
     }
