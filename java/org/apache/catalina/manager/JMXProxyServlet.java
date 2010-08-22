@@ -43,16 +43,17 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Costin Manolache
  */
 public class JMXProxyServlet extends HttpServlet  {
-    // ----------------------------------------------------- Instance Variables
+    
+    private static final long serialVersionUID = 1L;
 
+    // ----------------------------------------------------- Instance Variables
     /**
      * MBean server.
      */
     protected MBeanServer mBeanServer = null;
     protected Registry registry;
+
     // --------------------------------------------------------- Public Methods
-
-
     /**
      * Initialize this servlet.
      */
@@ -187,7 +188,7 @@ public class JMXProxyServlet extends HttpServlet  {
                     if( value==null ) continue;
                     String valueString;
                     try {
-                        Class c = value.getClass();
+                        Class<?> c = value.getClass();
                         if (c.isArray()) {
                             int len = Array.getLength(value);
                             StringBuilder sb = new StringBuilder("Array[" +
