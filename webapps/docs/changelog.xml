@@ -43,6 +43,10 @@
         some debug logging to the jar scanner. (rjung)
       </update>
       <fix>
+        <bug>49670</bug>: Restore SSO functionality that was broken by Lifecycle
+        refactoring. (markt)
+      </fix>
+      <fix>
         <bug>49714</bug>: The annotation process of Jar doesn't influence 
         distributable element of web.xml. (kfujino)
       </fix>
