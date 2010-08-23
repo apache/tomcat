@@ -47,6 +47,11 @@
         distributable element of web.xml. (kfujino)
       </fix>
       <fix>
+        <bug>49721</bug>: Alls JAR in a web application should be searched for
+        resources, not just those with a web-fragment.xml that is going to be
+        processed. (markt)
+      </fix>
+      <fix>
         <bug>47950</bug>: Align <code>WebappClassLoader.validate()</code>
         implementation with Javadoc and ensure that <code>javax.servlet.*</code>
         classes can not be loaded by a <code>WebappClassLoader</code> instance.
