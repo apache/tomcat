@@ -208,6 +208,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Return the Java class loader to be used by this Container.
      */
+    @Override
     public ClassLoader getClassLoader() {
 
         return classLoader;
@@ -218,6 +219,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Return the Container with which this Logger has been associated.
      */
+    @Override
     public Container getContainer() {
 
         return (container);
@@ -230,6 +232,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param container The associated Container
      */
+    @Override
     public void setContainer(Container container) {
 
         // Deregister from the old Container (if any)
@@ -254,6 +257,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * Return the "follow standard delegation model" flag used to configure
      * our ClassLoader.
      */
+    @Override
     public boolean getDelegate() {
 
         return (this.delegate);
@@ -267,6 +271,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param delegate The new flag
      */
+    @Override
     public void setDelegate(boolean delegate) {
 
         boolean oldDelegate = this.delegate;
@@ -282,6 +287,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -314,6 +320,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Return the reloadable flag for this Loader.
      */
+    @Override
     public boolean getReloadable() {
 
         return (this.reloadable);
@@ -326,6 +333,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param reloadable The new reloadable flag
      */
+    @Override
     public void setReloadable(boolean reloadable) {
 
         // Process this property change
@@ -363,6 +371,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param listener The listener to add
      */
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
 
         support.addPropertyChangeListener(listener);
@@ -375,6 +384,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param repository Repository to be added
      */
+    @Override
     public void addRepository(String repository) {
 
         if (log.isDebugEnabled())
@@ -404,6 +414,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         if (reloadable && modified()) {
             try {
@@ -430,6 +441,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * For security reason, returns a clone of the Array (since 
      * String are immutable).
      */
+    @Override
     public String[] findRepositories() {
 
         return repositories.clone();
@@ -482,6 +494,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * Has the internal repository associated with this Loader been modified,
      * such that the loaded classes should be reloaded?
      */
+    @Override
     public boolean modified() {
         return classLoader != null ? classLoader.modified() : false ;
     }
@@ -502,6 +515,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
 
         support.removePropertyChangeListener(listener);
@@ -668,6 +682,7 @@ public class WebappLoader extends LifecycleMBeanBase
      *
      * @param event The property change event that has occurred
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
 
         // Validate the source of this event
