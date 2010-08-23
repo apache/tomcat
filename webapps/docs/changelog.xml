@@ -76,6 +76,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>49726</bug>: Specifying a default content type via a JSP property
+        group should not prevent a page from setting some other content type.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
