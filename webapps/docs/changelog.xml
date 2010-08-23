@@ -80,6 +80,10 @@
       <fix>
         Add Null check when CHANGE_SESSION_ID message received. (kfujino)
       </fix>
+      <fix>
+        Add support for LAST_ACCESS_AT_START system property to DeltaSession. 
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
