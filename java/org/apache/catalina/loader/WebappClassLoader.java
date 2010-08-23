@@ -148,6 +148,7 @@ public class WebappClassLoader
             this.path = path;
         }
 
+        @Override
         public ResourceEntry run() {
             return findResourceInternal(name, path);
         }
@@ -164,6 +165,7 @@ public class WebappClassLoader
             this.clazz = clazz;
         }
 
+        @Override
         public ClassLoader run() {       
             return clazz.getClassLoader();
         }           
@@ -574,16 +576,18 @@ public class WebappClassLoader
      * If there is a Java SecurityManager create a read FilePermission
      * or JndiPermission for the file directory path.
      *
-     * @param path file directory path
+     * @param filepath file directory path
      */
-    public void addPermission(String path) {
-        if (path == null) {
+    public void addPermission(String filepath) {
+        if (filepath == null) {
             return;
         }
 
+        String path = filepath;
+
         if (securityManager != null) {
             Permission permission = null;
-            if( path.startsWith("jndi:") || path.startsWith("jar:jndi:") ) {
+            if (path.startsWith("jndi:") || path.startsWith("jar:jndi:")) {
                 if (!path.endsWith("/")) {
                     path = path + "/";
                 }
@@ -1287,6 +1291,7 @@ public class WebappClassLoader
                     // Ignore
                 }
             } catch (NamingException e) {
+                // Ignore
             }
         }
 
@@ -1762,7 +1767,9 @@ public class WebappClassLoader
      *
      * @param listener The listener to add
      */
+    @Override
     public void addLifecycleListener(LifecycleListener listener) {
+        // NOOP
     }
 
 
@@ -1770,6 +1777,7 @@ public class WebappClassLoader
      * Get the lifecycle listeners associated with this lifecycle. If this 
      * Lifecycle has no listeners registered, a zero-length array is returned.
      */
+    @Override
     public LifecycleListener[] findLifecycleListeners() {
         return new LifecycleListener[0];
     }
@@ -1780,7 +1788,9 @@ public class WebappClassLoader
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removeLifecycleListener(LifecycleListener listener) {
+        // NOOP
     }
 
 
@@ -1789,6 +1799,7 @@ public class WebappClassLoader
      * 
      * @return The current state of the source component.
      */
+    @Override
     public LifecycleState getState() {
         return LifecycleState.NEW;
     }
@@ -1805,6 +1816,7 @@ public class WebappClassLoader
      *
      * @exception LifecycleException if a lifecycle error occurs
      */
+    @Override
     public void start() throws LifecycleException {
 
         started = true;
@@ -1830,6 +1842,7 @@ public class WebappClassLoader
      *
      * @exception LifecycleException if a lifecycle error occurs
      */
+    @Override
     public void stop() throws LifecycleException {
 
         // Clearing references should be done before setting started to
@@ -2904,6 +2917,7 @@ public class WebappClassLoader
                 }
 
             } catch (NamingException e) {
+                // Ignore
             }
         }
 
@@ -2992,12 +3006,14 @@ public class WebappClassLoader
                                                     is.close();
                                                 }
                                             } catch (IOException e) {
+                                                // Ignore
                                             }
                                             try {
                                                 if (os != null) {
                                                     os.close();
                                                 }
                                             } catch (IOException e) {
+                                                // Ignore
                                             }
                                         }
                                     }
@@ -3273,10 +3289,9 @@ public class WebappClassLoader
         }
         if(encoded) {
             return getURI(realFile);
-        } else {
-            return realFile.toURI().toURL();
         }
-
+        
+        return realFile.toURI().toURL();
     }
 
 
