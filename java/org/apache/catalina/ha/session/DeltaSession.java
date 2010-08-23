@@ -349,7 +349,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         }
         if (maxInactiveInterval >= 0) {
             long timeNow = System.currentTimeMillis();
-            int timeIdle = (int) ( (timeNow - thisAccessedTime) / 1000L);
+            int timeIdle;
+            if (LAST_ACCESS_AT_START) {
+                timeIdle = (int) ((timeNow - lastAccessedTime) / 1000L);
+            } else {
+                timeIdle = (int) ((timeNow - thisAccessedTime) / 1000L);
+            }
             if (isPrimarySession()) {
                 if (timeIdle >= maxInactiveInterval) {
                     expire(true);
