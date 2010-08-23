@@ -27,4 +27,11 @@
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
+  <jsp-config>
+    <jsp-property-group>
+      <default-content-type>text/plain</default-content-type>
+      <url-pattern>/bug49726a.jsp</url-pattern>
+      <url-pattern>/bug49726b.jsp</url-pattern>
+    </jsp-property-group>
+  </jsp-config>
 </web-app>
