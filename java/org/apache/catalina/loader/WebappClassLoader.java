@@ -3206,6 +3206,8 @@ public class WebappClassLoader
             return false;
         if (name.startsWith("java."))
             return false;
+        if (name.startsWith("javax.servlet."))
+            return false;
 
         return true;
 

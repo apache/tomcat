@@ -47,6 +47,12 @@
         distributable element of web.xml. (kfujino)
       </fix>
       <fix>
+        <bug>47950</bug>: Align <code>WebappClassLoader.validate()</code>
+        implementation with Javadoc and ensure that <code>javax.servlet.*</code>
+        classes can not be loaded by a <code>WebappClassLoader</code> instance.
+        Patch provided by pid. (markt)
+      </fix>
+      <fix>
         <bug>49757</bug>: Correct some generics warnings. Based on a patch
         provided by Gábor. (markt)
       </fix>
