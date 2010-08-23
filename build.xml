@@ -422,6 +422,7 @@
         <exclude name="**/*.mdl"/>
         <!-- Exclude these else Gump runs validate on them -->
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
+        <exclude name="**/tomcat-deps/**"/>
       </fileset>
     </checkstyle>
   </target>
