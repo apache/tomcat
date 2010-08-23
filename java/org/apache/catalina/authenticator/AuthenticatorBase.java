@@ -37,7 +37,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
-import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
@@ -841,11 +840,7 @@ public abstract class AuthenticatorBase extends ValveBase
         // path, if there is one
         Container parent = context.getParent();
         while ((sso == null) && (parent != null)) {
-            if (!(parent instanceof Pipeline)) {
-                parent = parent.getParent();
-                continue;
-            }
-            Valve valves[] = ((Pipeline) parent).getValves();
+            Valve valves[] = parent.getPipeline().getValves();
             for (int i = 0; i < valves.length; i++) {
                 if (valves[i] instanceof SingleSignOn) {
                     sso = (SingleSignOn) valves[i];
