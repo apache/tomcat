@@ -25,5 +25,6 @@ package org.apache.catalina.loader;
  * @version $Id$
  */
 public interface StandardClassLoaderMBean {
+    // Marker interface
 }
 
