@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -1269,7 +1270,18 @@ public class ContextConfig
             
             // Step 8. Look for static resources packaged in JARs
             if (ok) {
-                processResourceJARs(orderedFragments);
+                // Spec does not define an order.
+                // Use ordered JARs followed by remaining JARs
+                Set<WebXml> resourceJars = new LinkedHashSet<WebXml>();
+                for (WebXml fragment : orderedFragments) {
+                    resourceJars.add(fragment);
+                }
+                for (WebXml fragment : fragments.values()) {
+                    if (!resourceJars.contains(fragment)) {
+                        resourceJars.add(fragment);
+                    }
+                }
+                processResourceJARs(resourceJars);
             }
             
             // Step 9. Apply the ServletContainerInitializer config to the
