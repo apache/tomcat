@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Policy;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -93,6 +94,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
          this.keepAliveProtection = keepAliveProtection;
      }
     
+     /**
+      * Protect against the memory leak caused when the first call to
+      * <code>javax.security.auth.Policy</code> is triggered by a web
+      * application. This first call populate a static variable with a reference
+      * to the context class loader. Defaults to <code>true</code>.
+      */
+     private boolean securityPolicyProtection = true;
+     public boolean iSsecurityPolicyProtection() {
+         return securityPolicyProtection;
+     }
+     public void setSecurityPolicyProtection(boolean securityPolicyProtection) {
+         this.securityPolicyProtection = securityPolicyProtection;
+     }
+     
     /**
      * Protect against the memory leak, when the initialization of the
      * Java Cryptography Architecture is triggered by initializing
@@ -211,6 +226,19 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
             }
             
+            /*
+             * Calling getPolicy retains a static reference to the context class
+             * loader.
+             */
+            if (securityPolicyProtection) {
+                try {
+                    Policy.getPolicy();
+                } catch(SecurityException e) {
+                    // Ignore. Don't need call to getPolicy() to be successful,
+                    // just need to trigger static initializer.
+                }
+            }
+
             /*
              * Creating a MessageDigest during web application startup
              * initializes the Java Cryptography Architecture. Under certain
