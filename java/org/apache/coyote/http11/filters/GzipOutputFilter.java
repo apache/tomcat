@@ -41,6 +41,13 @@ public class GzipOutputFilter implements OutputFilter {
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 
+    /**
+     * Logger.
+     */
+    protected static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(GzipOutputFilter.class);
+
+
     // ----------------------------------------------------- Static Initializer
 
 
@@ -81,7 +88,7 @@ public class GzipOutputFilter implements OutputFilter {
     public int doWrite(ByteChunk chunk, Response res)
         throws IOException {
         if (compressionStream == null) {
-            compressionStream = new GZIPOutputStream(fakeOutputStream);
+            compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
         }
         compressionStream.write(chunk.getBytes(), chunk.getStart(), 
                                 chunk.getLength());
@@ -91,6 +98,23 @@ public class GzipOutputFilter implements OutputFilter {
 
     // --------------------------------------------------- OutputFilter Methods
 
+    /**
+     * Added to allow flushing to happen for the gzip'ed outputstream
+     */
+    public void flush() {
+        if (compressionStream != null) {
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Flushing the compression stream!");
+                }
+                compressionStream.flush();
+            } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Ignored exception while flushing gzip filter", e);
+                }
+            }
+        }
+    }
 
     /**
      * Some filters need additional parameters from the response. All the 
@@ -117,7 +141,7 @@ public class GzipOutputFilter implements OutputFilter {
     public long end()
         throws IOException {
         if (compressionStream == null) {
-            compressionStream = new GZIPOutputStream(fakeOutputStream);
+            compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
         }
         compressionStream.finish();
         compressionStream.close();
