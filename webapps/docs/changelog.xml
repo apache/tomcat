@@ -75,6 +75,10 @@
         response by repeating the POST request including a request body. Any
         request body provided at this point is now swallowed. (markt)  
       </fix>
+      <fix>
+        CSRF prevention filter did not correctly handle URLs that used anchors.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
