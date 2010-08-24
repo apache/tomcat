@@ -23,6 +23,7 @@ import java.security.PrivilegedAction;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -103,6 +104,12 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
+    
+    /**
+     * Logger.
+     */
+    protected static org.apache.juli.logging.Log log
+        = org.apache.juli.logging.LogFactory.getLog(AbstractOutputBuffer.class);
 
     // ------------------------------------------------------------- Properties
 
@@ -220,6 +227,19 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
             // set the filters accordingly.
             response.action(ActionCode.ACTION_COMMIT, null);
 
+        }
+        
+        // go through the filters and if there is gzip filter
+        // invoke it to flush
+        for (int i = 0; i <= lastActiveFilter; i++) {
+            if (activeFilters[i] instanceof GzipOutputFilter) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Flushing the gzip filter at position " + i +
+                            " of the filter chain...");
+                }
+                ((GzipOutputFilter) activeFilters[i]).flush();
+                break;
+            }
         }
     }
     
