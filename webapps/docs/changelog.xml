@@ -84,6 +84,11 @@
         CSRF prevention filter did not correctly handle URLs that used anchors.
         (markt)
       </fix>
+      <fix>
+        Fix memory leak on web application stopped caused by failed to
+        de-register the web application's Servlets with the MBean server.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
