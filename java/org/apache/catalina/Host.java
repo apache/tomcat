@@ -148,24 +148,6 @@ public interface Host extends Container {
     public void setDeployOnStartup(boolean deployOnStartup);
 
 
-    /**
-     * Return the canonical, fully qualified, name of the virtual host
-     * this Container represents.
-     */
-    public String getName();
-
-
-    /**
-     * Set the canonical, fully qualified, name of the virtual host
-     * this Container represents.
-     *
-     * @param name Virtual host name
-     *
-     * @exception IllegalArgumentException if name is null
-     */
-    public void setName(String name);
-
-
     // --------------------------------------------------------- Public Methods
 
 
