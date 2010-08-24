@@ -101,7 +101,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
       * to the context class loader. Defaults to <code>true</code>.
       */
      private boolean securityPolicyProtection = true;
-     public boolean iSsecurityPolicyProtection() {
+     public boolean isSecurityPolicyProtection() {
          return securityPolicyProtection;
      }
      public void setSecurityPolicyProtection(boolean securityPolicyProtection) {
