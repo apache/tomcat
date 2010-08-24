@@ -308,13 +308,18 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                     socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
                 }
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
-                    //no data available yet, since we might have read part
-                    //of the request line, we can't recycle the processor
+                    // Haven't finished reading the request so keep the socket
+                    // open
                     openSocket = true;
-                    recycle = false;
+                    // Check to see if we have read any of the request line yet
                     if (inputBuffer.getParsingRequestLinePhase()<2) {
-                        //keep alive timeout here
+                        // No data read, OK to recycle the processor
+                        // Continue to use keep alive timeout
                         if (keepAliveTimeout>0) ka.setTimeout(keepAliveTimeout);
+                    } else {
+                        // Started to read request line. Need to keep processor
+                        // associated with socket
+                        recycle = false;
                     }
                     break;
                 }
