@@ -92,6 +92,11 @@
         Follow up to <bug>48545</bug>. Make JSSE connectors more tolerant of a
         incorrect trust store password. (markt)
       </add>
+      <fix>
+        Fix some edge cases in the NIO connector when handling requests that are
+        not received all at the same time and the socket needs to be returned to
+        the poller. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
