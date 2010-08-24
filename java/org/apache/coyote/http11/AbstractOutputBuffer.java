@@ -108,7 +108,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     /**
      * Logger.
      */
-    protected static org.apache.juli.logging.Log log
+    private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(AbstractOutputBuffer.class);
 
     // ------------------------------------------------------------- Properties
