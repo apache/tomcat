@@ -796,6 +796,12 @@ public abstract class AuthenticatorBase extends ValveBase
                 cookie.setDomain(ssoDomain);
             }
 
+            // Configure httpOnly on SSO cookie using same rules as session cookies
+            if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
+                    request.getContext().getUseHttpOnly()) {
+                cookie.setHttpOnly(true);
+            }
+            
             response.addCookie(cookie);
 
             // Register this principal with our SSO valve
