@@ -2032,12 +2032,7 @@ public class Request
      * Return the query string associated with this request.
      */
     public String getQueryString() {
-        String queryString = coyoteRequest.queryString().toString();
-        if (queryString == null || queryString.equals("")) {
-            return null;
-        }
-
-        return queryString;
+        return coyoteRequest.queryString().toString();
     }
 
 
