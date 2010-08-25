@@ -201,6 +201,51 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /**
+     * Test case for
+     * <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=38113">bug
+     * 38118</a>.
+     */
+    public void testBug38113() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        // Add the Servlet
+        Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
+        ctx.addServletMapping("/", "servlet");
+        
+        tomcat.start();
+
+        // No query string
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("QueryString=null", res.toString());
+        
+        // Query string
+        res = getUrl("http://localhost:" + getPort() + "/?a=b");
+        assertEquals("QueryString=a=b", res.toString());
+
+        // Empty string
+        res = getUrl("http://localhost:" + getPort() + "/?");
+        assertEquals("QueryString=", res.toString());
+    }
+    
+    private static final class EchoQueryStringServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            PrintWriter pw = resp.getWriter();
+            pw.print("QueryString=" + req.getQueryString());
+        }
+    }
+
+    /**
      * Test case for {@link Request#login(String, String)} and
      * {@link Request#logout()}.
      */
@@ -227,7 +272,6 @@ public class TestRequest extends TomcatBaseTest {
         tomcat.start();
         
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-
         assertEquals(LoginLogoutServlet.OK, res.toString());
     }
     
