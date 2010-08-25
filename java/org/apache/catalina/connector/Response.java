@@ -948,11 +948,15 @@ public class Response
     public void addCookie(final Cookie cookie) {
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included || isCommitted())
             return;
 
-        addCookieInternal(cookie);
-
+        final StringBuffer sb = generateCookieString(cookie);
+        //if we reached here, no exception, cookie is valid
+        // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
+        // RFC2965 is not supported by browsers and the Servlet spec
+        // asks for 2109.
+        addHeader("Set-Cookie", sb.toString());
     }
 
     /**
@@ -984,24 +988,6 @@ public class Response
         }
         
         
-    }
-    /**
-     * Add the specified Cookie to those that will be included with
-     * this Response.
-     *
-     * @param cookie    Cookie to be added
-     */
-    public void addCookieInternal(final Cookie cookie) {
-
-        if (isCommitted())
-            return;
-
-        final StringBuffer sb = generateCookieString(cookie);
-        //if we reached here, no exception, cookie is valid
-        // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
-        // RFC2965 is not supported by browsers and the Servlet spec
-        // asks for 2109.
-        addHeader("Set-Cookie", sb.toString());
     }
 
     public StringBuffer generateCookieString(final Cookie cookie) {
