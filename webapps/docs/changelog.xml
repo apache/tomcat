@@ -61,7 +61,11 @@
         processed. (markt)
       </fix>
       <fix>
-        <bug>47950</bug>: Align <code>WebappClassLoader.validate()</code>
+        <bug>49749</bug>: Single sign on cookies should have httpOnly flag set
+        using same rules as session cookies. (markt)
+      </fix>
+      <fix>
+        <bug>49750</bug>: Align <code>WebappClassLoader.validate()</code>
         implementation with Javadoc and ensure that <code>javax.servlet.*</code>
         classes can not be loaded by a <code>WebappClassLoader</code> instance.
         Patch provided by pid. (markt)
