@@ -127,9 +127,10 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      */
     public void setCookieDomain(String cookieDomain) {
         if (cookieDomain != null && cookieDomain.trim().length() == 0) {
-            cookieDomain = null;
+            this.cookieDomain = null;
+        } else {
+            this.cookieDomain = cookieDomain;
         }
-        this.cookieDomain = cookieDomain;
     }
 
     /**
@@ -373,16 +374,16 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         }
 
         SingleSignOnEntry sso = lookup(ssoId);
-        if ( sso == null )
+        if (sso == null)
             return;
 
-        sso.removeSession( session );
+        sso.removeSession(session);
 
         // see if we are the last session, if so blow away ssoId
         Session sessions[] = sso.findSessions();
-        if ( sessions == null || sessions.length == 0 ) {
+        if (sessions == null || sessions.length == 0) {
             synchronized (cache) {
-                sso = cache.remove(ssoId);
+                cache.remove(ssoId);
             }
         }
 
