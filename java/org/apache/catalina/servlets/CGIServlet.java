@@ -1591,8 +1591,7 @@ public final class CGIServlet extends HttpServlet {
             }
 
             /* original content/structure of this section taken from
-             * http://developer.java.sun.com/developer/
-             *                               bugParade/bugs/4216884.html
+             * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4216884
              * with major modifications by Martin Dengler
              */
             Runtime rt = null;
@@ -1648,8 +1647,7 @@ public final class CGIServlet extends HttpServlet {
 
                 /* we want to wait for the process to exit,  Process.waitFor()
                  * is useless in our situation; see
-                 * http://developer.java.sun.com/developer/
-                 *                               bugParade/bugs/4223650.html
+                 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4223650
                  */
 
                 boolean isRunning = true;

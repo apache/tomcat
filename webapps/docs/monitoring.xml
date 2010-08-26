@@ -45,8 +45,8 @@
   <section name="Enabling JMX Remote">
 
     <p>The Sun website includes the list of options and how to configure JMX Remote on Java 5:
-        <a href="http://java.sun.com/j2se/1.6.0/docs/guide/management/agent.html">
-        http://java.sun.com/j2se/1.6.0/docs/guide/management/agent.html</a>.
+        <a href="http://download.oracle.com/javase/6/docs/technotes/guides/management/agent.html">
+        http://download.oracle.com/javase/6/docs/technotes/guides/management/agent.html</a>.
     </p>
     <p>The following is a quick configuration guide for Java 6:</p>
     <p>Add the following parameters to your Tomcat startup script:

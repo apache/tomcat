@@ -64,7 +64,7 @@
             administration tool and its documentation).</li>
         <li><strong>Java location</strong>: The installer will use the registry
             or the JAVA_HOME environment variable to determine the base path
-            of a J2SE 6 JRE.
+            of a Java SE 6 JRE.
             </li>
         <li><strong>Tray icon</strong>: When Tomcat is run as a service, there
             will not be any tray icon present when Tomcat is running. Note that
