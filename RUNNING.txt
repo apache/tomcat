@@ -21,28 +21,30 @@ $Id$
             Running The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ===================================================
 
-Apache Tomcat @VERSION_MAJOR_MINOR@ requires the Java 2 Standard Edition Runtime
+Apache Tomcat @VERSION_MAJOR_MINOR@ requires the Java Standard Edition Runtime
 Environment (JRE) version 6.0 or later.
 
 =============================
 Running With JRE 6.0 Or Later
 =============================
 
-(1) Download and Install the J2SE Runtime Environment (JRE)
+(1) Download and Install the Java SE Runtime Environment (JRE)
 
-(1.1) Download the Java 2 Standard Edition Runtime Environment (JRE),
-      release version 6.0 or later, from http://java.sun.com/j2se.
+(1.1) Download the Java SE Runtime Environment (JRE),
+      release version 6.0 or later, from
+      http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 (1.2) Install the JRE according to the instructions included with the
       release.
+
 (1.3) Set an environment variable named JRE_HOME to the pathname of
       the directory into which you installed the JRE, e.g. c:\jre6.0
       or /usr/local/java/jre6.0.
 
 NOTE: You may also use the full JDK rather than just the JRE. In this
       case set your JAVA_HOME environment variable to the pathname of
-      the directory into which you installed the JDK, e.g. c:\j2sdk6.0
-      or /usr/local/java/j2sdk6.0.
+      the directory into which you installed the JDK, e.g. c:\jdk6.0
+      or /usr/local/java/jdk6.0.
 
 
 (2) Download and Install the Tomcat Binary Distribution

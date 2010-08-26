@@ -471,19 +471,19 @@
       </attribute>      
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
-        <a href="http://java.sun.com/j2se/1.6.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://download.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>      
       <attribute name="socket.performanceLatency" required="false">
         <p>(int)The second value for the performance settings. See
-        <a href="http://java.sun.com/j2se/1.6.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://download.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>      
       <attribute name="socket.performanceBandwidth" required="false">
         <p>(int)The third value for the performance settings. See
-        <a href="http://java.sun.com/j2se/1.6.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://download.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute> 

@@ -34,7 +34,7 @@ do the following:
 
 * Download a Java Development Kit (JDK) release (version 1.6.x or later) from:
 
-    http://java.sun.com/j2se/
+    http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 * Install the JDK according to the instructions included with the release.
 
@@ -118,7 +118,7 @@ using your SVN client.
 (4) Rebuilds
 
 For a quick rebuild of only modified code you can use:
-   
+
     cd ${tomcat.source}
     ant
 
