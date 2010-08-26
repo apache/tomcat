@@ -1025,7 +1025,7 @@ valid user, consisting of the following attributes:</p>
         <p><strong>JAASRealm</strong> is an implementation of the Tomcat
 6 <code>Realm</code> interface that authenticates users through the Java
 Authentication &amp; Authorization Service (JAAS) framework which is now
-provided as part of the standard J2SE API.</p>
+provided as part of the standard Java SE API.</p>
         <p>Using JAASRealm gives the developer the ability to combine
 practically any conceivable security realm with Tomcat's CMA. </p>
         <p>JAASRealm is prototype for Tomcat of the JAAS-based
@@ -1047,9 +1047,9 @@ integration with the CMA as implemented by Tomcat.
         <ol>
           <li>Write your own LoginModule, User and Role classes based
 on JAAS (see 
-<a href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/GeneralAcnOnly.html">the
+<a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/tutorials/GeneralAcnOnly.html">the
 JAAS Authentication Tutorial</a> and 
-<a href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/JAASLMDevGuide.html">the JAAS Login Module 
+<a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/JAASLMDevGuide.html">the JAAS Login Module 
 Developer's Guide</a>) to be managed by the JAAS Login
 Context (<code>javax.security.auth.login.LoginContext</code>)
 When developing your LoginModule, note that JAASRealm's built-in <code>CallbackHandler</code>
@@ -1064,7 +1064,7 @@ Regardless, the first Principal returned is <em>always</em> treated as the user 
           <li>Place the compiled classes on Tomcat's classpath
           </li>
           <li>Set up a login.config file for Java (see <a
- href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS
+ href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS
 LoginConfig file</a>) and tell Tomcat where to find it by specifying
 its location to the JVM, for instance by setting the environment
 variable: <code>JAVA_OPTS=$JAVA_OPTS -Djava.security.auth.login.config==$CATALINA_BASE/conf/jaas.config</code></li>
