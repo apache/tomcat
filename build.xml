@@ -1449,7 +1449,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../servletapi"/>
       <link href="../jspapi"/>
       <link href="../elapi"/>
-      <link href="http://java.sun.com/j2se/1.6.0/docs/api/"/>
+      <link href="http://download.oracle.com/javase/6/docs/api/"/>
       <link href="http://commons.apache.org/io/api-release/"/>
       <link href="http://download-llnw.oracle.com/javaee/6/api/"/>
     </javadoc>
