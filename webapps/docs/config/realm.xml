@@ -597,7 +597,7 @@
       <attribute name="appName" required="true">
        <p>The name of the application as configured in your login configuration
        file 
-       (<a href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS LoginConfig</a>).</p>
+       (<a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS LoginConfig</a>).</p>
       </attribute>
 
       <attribute name="userClassNames" required="true">
