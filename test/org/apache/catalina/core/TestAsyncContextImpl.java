@@ -17,9 +17,12 @@
 
 package org.apache.catalina.core;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -308,4 +311,70 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    public void testTimeout() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        // Create the folder that will trigger the redirect
+        File foo = new File(docBase, "async");
+        if (!foo.exists() && !foo.mkdirs()) {
+            fail("Unable to create async directory in docBase");
+        }
+        
+        Context ctx = tomcat.addContext("/", docBase.getAbsolutePath());
+
+        TimeoutServlet timeout = new TimeoutServlet();
+
+        Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/async", "time");
+
+        tomcat.start();
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
+        assertEquals("OK", res.toString());
+    }
+    
+    private static class TimeoutServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+                throws ServletException, IOException {
+            if (req.isAsyncSupported()) {
+                resp.getWriter().print("OK");
+                final AsyncContext ac = req.startAsync();
+                ac.setTimeout(2000);
+                
+                ac.addListener(new TimeoutListener());
+            } else
+                resp.getWriter().print("FAIL: Async unsupported");
+        }
+    }
+
+    private static class TimeoutListener implements AsyncListener {
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            event.getAsyncContext().complete();
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // NOOP
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // NOOP
+        }
+        
+    }
 }
