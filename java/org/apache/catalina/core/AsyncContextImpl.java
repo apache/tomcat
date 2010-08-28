@@ -51,7 +51,7 @@ public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
         NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT,
-        ERROR_DISPATCHING
+        TIMING_OUT_NEED_COMPLETE, ERROR_DISPATCHING
     }
     
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
@@ -82,13 +82,19 @@ public class AsyncContextImpl implements AsyncContext {
         }
         if (state.get()==AsyncState.COMPLETING) {
             //do nothing
-        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING) ||
-                   state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
+        } else if (state.compareAndSet(AsyncState.DISPATCHED,
+                           AsyncState.COMPLETING) ||
+                   state.compareAndSet(AsyncState.STARTED,
+                           AsyncState.COMPLETING) ||
+                   state.compareAndSet(AsyncState.TIMING_OUT_NEED_COMPLETE,
+                           AsyncState.COMPLETING)) {
             AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
+            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,
+                    dispatched);
             if (!dispatched.get()) doInternalComplete(false);
         } else {
-            throw new IllegalStateException("Complete not allowed. Invalid state:"+state.get());
+            throw new IllegalStateException(
+                    "Complete not allowed. Invalid state:"+state.get());
         }
        
     }
@@ -296,10 +302,14 @@ public class AsyncContextImpl implements AsyncContext {
     }
     
     public void doInternalDispatch() throws ServletException, IOException {
-        if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.COMPLETING)) {
+        if (this.state.compareAndSet(AsyncState.TIMING_OUT,
+                AsyncState.TIMING_OUT_NEED_COMPLETE)) {
             log.debug("TIMING OUT!");
             boolean listenerInvoked = false;
-            for (AsyncListenerWrapper listener : listeners) {
+            List<AsyncListenerWrapper> listenersCopy =
+                new ArrayList<AsyncListenerWrapper>();
+            listenersCopy.addAll(listeners);
+            for (AsyncListenerWrapper listener : listenersCopy) {
                 listener.fireOnTimeout(event);
                 listenerInvoked = true;
             }
