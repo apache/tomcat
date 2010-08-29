@@ -132,6 +132,7 @@ public class AsyncContextImpl implements AsyncContext {
             final HttpServletRequest servletRequest = (HttpServletRequest)getRequest();
             final HttpServletResponse servletResponse = (HttpServletResponse)getResponse();
             Runnable run = new Runnable() {
+                @Override
                 public void run() {
                     DispatcherType type = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
                     try {
@@ -397,10 +398,12 @@ public class AsyncContextImpl implements AsyncContext {
         state.set(st);
     }
     
+    @Override
     public long getTimeout() {
         return timeout;
     }
     
+    @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
@@ -476,6 +479,7 @@ public class AsyncContextImpl implements AsyncContext {
             this.cl = cl;
         }
 
+        @Override
         public Void run() {
             Thread.currentThread().setContextClassLoader(cl);
             return null;
@@ -485,6 +489,7 @@ public class AsyncContextImpl implements AsyncContext {
     private static class PrivilegedGetTccl
             implements PrivilegedAction<ClassLoader> {
 
+        @Override
         public ClassLoader run() {
             return Thread.currentThread().getContextClassLoader();
         }
