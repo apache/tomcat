@@ -318,10 +318,12 @@ public class AsyncContextImpl implements AsyncContext {
                 // Listener should have called complete
                 if (state.get() != AsyncState.NOT_STARTED) {
                     ((HttpServletResponse)servletResponse).setStatus(500);
+                    state.set(AsyncState.COMPLETING);
                     doInternalComplete(true);
                 }
             } else {
                 // No listeners, container calls complete
+                state.set(AsyncState.COMPLETING);
                 doInternalComplete(false);
             }
         } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.COMPLETING)) {
