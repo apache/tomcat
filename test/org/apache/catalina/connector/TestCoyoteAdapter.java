@@ -19,8 +19,6 @@ package org.apache.catalina.connector;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -106,10 +104,6 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("/", "servlet");
 
-        // Set the logging to debug for this class whilst we debug Gump failures
-        Logger.getLogger(CoyoteAdapter.class.getName()).setLevel(Level.ALL);
-        Logger.getLogger("").getHandlers()[0].setLevel(Level.ALL);
-        
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + path);
