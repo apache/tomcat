@@ -436,15 +436,15 @@ class Validator {
                 new JspUtil.ValidAttribute("prefix", true) };
 
         private static final JspUtil.ValidAttribute[] includeActionAttrs = {
-                new JspUtil.ValidAttribute("page", true, true),
+                new JspUtil.ValidAttribute("page", true),
                 new JspUtil.ValidAttribute("flush") };
 
         private static final JspUtil.ValidAttribute[] paramActionAttrs = {
                 new JspUtil.ValidAttribute("name", true),
-                new JspUtil.ValidAttribute("value", true, true) };
+                new JspUtil.ValidAttribute("value", true) };
 
-        private static final JspUtil.ValidAttribute[] forwardActionAttrs = { new JspUtil.ValidAttribute(
-                "page", true, true) };
+        private static final JspUtil.ValidAttribute[] forwardActionAttrs = {
+                new JspUtil.ValidAttribute("page", true) };
 
         private static final JspUtil.ValidAttribute[] getPropertyAttrs = {
                 new JspUtil.ValidAttribute("name", true),
@@ -453,7 +453,7 @@ class Validator {
         private static final JspUtil.ValidAttribute[] setPropertyAttrs = {
                 new JspUtil.ValidAttribute("name", true),
                 new JspUtil.ValidAttribute("property", true),
-                new JspUtil.ValidAttribute("value", false, true),
+                new JspUtil.ValidAttribute("value", false),
                 new JspUtil.ValidAttribute("param") };
 
         private static final JspUtil.ValidAttribute[] useBeanAttrs = {
@@ -461,7 +461,7 @@ class Validator {
                 new JspUtil.ValidAttribute("scope"),
                 new JspUtil.ValidAttribute("class"),
                 new JspUtil.ValidAttribute("type"),
-                new JspUtil.ValidAttribute("beanName", false, true) };
+                new JspUtil.ValidAttribute("beanName", false) };
 
         private static final JspUtil.ValidAttribute[] plugInAttrs = {
                 new JspUtil.ValidAttribute("type", true),
@@ -469,12 +469,12 @@ class Validator {
                 new JspUtil.ValidAttribute("codebase"),
                 new JspUtil.ValidAttribute("align"),
                 new JspUtil.ValidAttribute("archive"),
-                new JspUtil.ValidAttribute("height", false, true),
+                new JspUtil.ValidAttribute("height", false),
                 new JspUtil.ValidAttribute("hspace"),
                 new JspUtil.ValidAttribute("jreversion"),
                 new JspUtil.ValidAttribute("name"),
                 new JspUtil.ValidAttribute("vspace"),
-                new JspUtil.ValidAttribute("width", false, true),
+                new JspUtil.ValidAttribute("width", false),
                 new JspUtil.ValidAttribute("nspluginurl"),
                 new JspUtil.ValidAttribute("iepluginurl") };
 
