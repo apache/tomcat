@@ -119,6 +119,11 @@
         group should not prevent a page from setting some other content type.
         (markt)
       </fix>
+      <fix>
+        <bug>49799</bug>: The new <code>omit</code> attribute for
+        <code>jsp:attribute</code> elements now supports the use of expressions
+        and expression language. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
