@@ -255,17 +255,9 @@ public class JspUtil {
 
         boolean mandatory;
 
-        boolean rtexprvalue; // not used now
-
-        public ValidAttribute(String name, boolean mandatory,
-                boolean rtexprvalue) {
+        public ValidAttribute(String name, boolean mandatory) {
             this.name = name;
             this.mandatory = mandatory;
-            this.rtexprvalue = rtexprvalue;
-        }
-
-        public ValidAttribute(String name, boolean mandatory) {
-            this(name, mandatory, false);
         }
 
         public ValidAttribute(String name) {
