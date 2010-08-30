@@ -1866,7 +1866,7 @@ abstract class Node implements TagConstants {
 
         // True if this attribute should be omitted from the output if
         // used with a <jsp:element>, otherwise false
-        private boolean omit = false;
+        private JspAttribute omit;
 
         private ChildInfo childInfo;
 
@@ -1889,10 +1889,6 @@ abstract class Node implements TagConstants {
             if ("false".equals(this.getAttributeValue("trim"))) {
                 // (if null or true, leave default of true)
                 trim = false;
-            }
-            if ("true".equals(this.getAttributeValue("omit"))) {
-                // (if null or false, leave default of false)
-                omit = true;
             }
             childInfo = new ChildInfo();
             name = this.getAttributeValue("name");
@@ -1933,7 +1929,11 @@ abstract class Node implements TagConstants {
             return trim;
         }
 
-        public boolean isOmit() {
+        public void setOmit(JspAttribute omit) {
+            this.omit = omit;
+        }
+        
+        public JspAttribute getOmit() {
             return omit;
         }
 

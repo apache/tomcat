@@ -20,6 +20,9 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagData;
@@ -211,7 +214,40 @@ public class TestGenerator extends TomcatBaseTest {
             return time;
         }
     }
-    
+
+    public void testBug49799() throws Exception {
+
+        String[] expected = { "<p style=\"color:red\">00-Red</p>",
+                              "<p>01-Not Red</p>",
+                              "<p style=\"color:red\">02-Red</p>",
+                              "<p>03-Not Red</p>",
+                              "<p style=\"color:red\">04-Red</p>",
+                              "<p>05-Not Red</p>"};
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        Map<String,List<String>> headers = new HashMap<String,List<String>>();
+        
+        getUrl("http://localhost:" + getPort() + "/test/bug49799.jsp", res,
+                headers);
+
+        // Check request completed
+        String result = res.toString();
+        String[] lines = result.split("\n|\r|\r\n");
+        int i = 0;
+        for (String line : lines) {
+            if (line.length() > 0) {
+                assertEquals(expected[i], line);
+                i++;
+            }
+        }
+    }
+
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
