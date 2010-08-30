@@ -1861,20 +1861,30 @@ class Generator {
             Hashtable<String,String> map = new Hashtable<String,String>();
             Node.JspAttribute[] attrs = n.getJspAttributes();
             for (int i = 0; attrs != null && i < attrs.length; i++) {
-                String attrStr = null;
+                String value = null;
+                String nvp = null;
                 if (attrs[i].isNamedAttribute()) {
-                    if (attrs[i].getNamedAttributeNode().isOmit()) {
-                        // Skip this attribute - JSP.5-7
+                    NamedAttribute attr = attrs[i].getNamedAttributeNode();
+                    Node.JspAttribute omitAttr = attr.getOmit();
+                    String omit = attributeValue(omitAttr, false, boolean.class);
+                    if ("true".equals(omit)) {
                         continue;
                     }
-                    attrStr = generateNamedAttributeValue(attrs[i]
-                            .getNamedAttributeNode());
+                    value = generateNamedAttributeValue(
+                            attrs[i].getNamedAttributeNode());
+                    if ("false".equals(omit)) {
+                        nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
+                                value + " + \"\\\"\"";
+                    } else {
+                        nvp = " + (Boolean.valueOf(" + omit + ")?\"\":\" " + attrs[i].getName() +
+                                "=\\\"\" + " + value + " + \"\\\"\")";
+                    }
                 } else {
-                    attrStr = attributeValue(attrs[i], false, Object.class);
+                    value = attributeValue(attrs[i], false, Object.class);
+                    nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
+                            value + " + \"\\\"\"";
                 }
-                String s = " + \" " + attrs[i].getName() + "=\\\"\" + "
-                        + attrStr + " + \"\\\"\"";
-                map.put(attrs[i].getName(), s);
+                map.put(attrs[i].getName(), nvp);
             }
 
             // Write begin tag, using XML-style 'name' attribute as the
