@@ -185,19 +185,9 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * The shutdown signal to our background thread
-     */
-    protected boolean stopped = false;
-
-    /**
      * Flag to use IP-based virtual hosting.
      */
     protected boolean useIPVHosts = false;
-
-    /**
-     * The background thread.
-     */
-    protected Thread thread = null;
 
 
     /**

@@ -145,15 +145,6 @@
           description="Comma-separated list of SSL protocol variants to be enabled"
                  type="java.lang.String"/>
                  
-    <attribute   name="stopped"
-          description="Has this component been stopped?"
-                 type="boolean"
-            writeable="false"/>
-
-    <attribute   name="strategy"
-          description="Thread pool strategy"
-                 type="java.lang.String"/>
-
     <!-- Common -->
     <attribute   name="tcpNoDelay"
           description="Should we use TCP no delay?"
