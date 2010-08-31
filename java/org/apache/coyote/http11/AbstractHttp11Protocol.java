@@ -53,7 +53,9 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
      * The adapter, used to call the connector.
      */
     protected Adapter adapter;
+    @Override
     public void setAdapter(Adapter adapter) { this.adapter = adapter; }
+    @Override
     public Adapter getAdapter() { return adapter; }
 
     
@@ -63,6 +65,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     /**
      * Pass config info
      */
+    @Override
     public void setAttribute(String name, Object value) {
         if (getLog().isTraceEnabled()) {
             getLog().trace(sm.getString("http11protocol.setattribute", name, value));
@@ -70,10 +73,12 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         attributes.put(name, value);
     }
 
+    @Override
     public Object getAttribute(String key) {
         return attributes.get(key);
     }
 
+    @Override
     public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
@@ -116,6 +121,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     }
     
     
+    @Override
     public void pause() throws Exception {
         try {
             endpoint.pause();
@@ -127,6 +133,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
             getLog().info(sm.getString("http11protocol.pause", getName()));
     }
 
+    @Override
     public void resume() throws Exception {
         try {
             endpoint.resume();
@@ -138,6 +145,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
             getLog().info(sm.getString("http11protocol.resume", getName()));
     }
 
+    @Override
     public void destroy() throws Exception {
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("http11protocol.stop", getName()));
@@ -302,6 +310,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public void setServer( String server ) { this.server = server; }
     public String getServer() { return server; }
     
+    @Override
     public Executor getExecutor() { return endpoint.getExecutor(); }
     public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
     
@@ -391,12 +400,11 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         return endpoint.getAllowUnsafeLegacyRenegotiation();
     }
     
+    @Override
     public abstract void init() throws Exception;
-    public abstract void start() throws Exception;
     
     // -------------------- JMX related methods --------------------
 
-    // *
     protected String domain;
     protected ObjectName oname;
     protected MBeanServer mserver;
@@ -409,6 +417,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         return domain;
     }
 
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
@@ -417,13 +426,19 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         return name;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
+    @Override
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
+    @Override
     public void postDeregister() {
+        // NOOP
     }
 
 
