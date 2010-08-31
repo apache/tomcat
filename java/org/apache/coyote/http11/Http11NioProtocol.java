@@ -48,7 +48,7 @@ import org.apache.tomcat.util.net.jsse.JSSEImplementation;
  * @author Costin Manolache
  * @author Filip Hanik
  */
-public class Http11NioProtocol extends AbstractHttp11Protocol {
+public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
     
