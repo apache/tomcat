@@ -956,7 +956,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         
         fireContainerEvent(REMOVE_CHILD_EVENT, child);
         
-        // child.setParent(null);
+        // Set child's parent to null to prevent a loop
+        child.setParent(null);
+        try {
+            child.destroy();
+        } catch (LifecycleException e) {
+            log.error("ContainerBase.removeChild: destroy: ", e);
+        }
 
     }
 
@@ -1091,9 +1097,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Remove children now this container is being destroyed
         for (Container child : findChildren()) {
-            child.destroy();
+            removeChild(child);
         }
 
+        // Required if the child is destroyed directly.
         if (parent != null) {
             parent.removeChild(this);
         }
