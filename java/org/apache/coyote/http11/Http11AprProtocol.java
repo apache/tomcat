@@ -72,6 +72,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
 
     /** Pass config info
      */
+    @Override
     public void setAttribute( String name, Object value ) {
         if( log.isTraceEnabled())
             log.trace(sm.getString("http11protocol.setattribute", name, value));
@@ -79,12 +80,14 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         attributes.put(name, value);
     }
 
+    @Override
     public Object getAttribute( String key ) {
         if( log.isTraceEnabled())
             log.trace(sm.getString("http11protocol.getattribute", key));
         return attributes.get(key);
     }
 
+    @Override
     public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
@@ -93,12 +96,15 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
      * The adapter, used to call the connector.
      */
     protected Adapter adapter;
+    @Override
     public void setAdapter(Adapter adapter) { this.adapter = adapter; }
+    @Override
     public Adapter getAdapter() { return adapter; }
 
 
     /** Start the protocol
      */
+    @Override
     public void init() throws Exception {
         endpoint.setName(getName());
         endpoint.setHandler(cHandler);
@@ -117,6 +123,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     ObjectName tpOname;
     ObjectName rgOname;
 
+    @Override
     public void start() throws Exception {
         if( this.domain != null ) {
             try {
@@ -143,6 +150,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             log.info(sm.getString("http11protocol.start", getName()));
     }
 
+    @Override
     public void pause() throws Exception {
         try {
             endpoint.pause();
@@ -154,6 +162,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             log.info(sm.getString("http11protocol.pause", getName()));
     }
 
+    @Override
     public void resume() throws Exception {
         try {
             endpoint.resume();
@@ -165,6 +174,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             log.info(sm.getString("http11protocol.resume", getName()));
     }
 
+    @Override
     public void destroy() throws Exception {
         if(log.isInfoEnabled())
             log.info(sm.getString("http11protocol.stop", getName()));
@@ -200,6 +210,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     public int getProcessorCache() { return this.processorCache; }
     public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
+    @Override
     public Executor getExecutor() { return endpoint.getExecutor(); }
     public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
     
@@ -521,6 +532,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             this.proto = proto;
         }
 
+        @Override
         public SocketState event(long socket, SocketStatus status) {
             Http11AprProcessor result = connections.get(Long.valueOf(socket));
             
@@ -567,6 +579,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             return state;
         }
         
+        @Override
         public SocketState process(long socket) {
             Http11AprProcessor processor = recycledProcessors.poll();
             try {
@@ -613,6 +626,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             return SocketState.CLOSED;
         }
 
+        @Override
         public SocketState asyncDispatch(long socket, SocketStatus status) {
             Http11AprProcessor result = connections.get(Long.valueOf(socket));
             
@@ -730,6 +744,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         return domain;
     }
 
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
@@ -738,12 +753,15 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         return name;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
     }
 
+    @Override
     public void preDeregister() throws Exception {
     }
 
+    @Override
     public void postDeregister() {
     }
 }
