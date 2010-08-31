@@ -58,7 +58,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
@@ -931,12 +930,6 @@ public class ContextConfig
         Container[] children = context.findChildren();
         for (i = 0; i < children.length; i++) {
             context.removeChild(children[i]);
-            try {
-                children[i].destroy();
-            } catch (LifecycleException e) {
-                log.warn(sm.getString("contentConfig.destroyChildFailed",
-                        children[1].getName(), context.getName()), e);
-            }
         }
 
         // Removing application parameters

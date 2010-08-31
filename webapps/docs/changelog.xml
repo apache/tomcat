@@ -97,6 +97,11 @@
         de-register the web application's Servlets with the MBean server.
         (markt)
       </fix>
+      <update>
+        More tweaks to the Lifecycle refactoring to ensure that when a component
+        is being destroyed, the destroy method is only called once on each
+        child component. (markt) 
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
