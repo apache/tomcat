@@ -90,6 +90,7 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     
+    @Override
     public synchronized final void init() throws LifecycleException {
         if (!state.equals(LifecycleState.NEW)) {
             invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
@@ -245,6 +246,7 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void stopInternal() throws LifecycleException;
 
 
+    @Override
     public synchronized final void destroy() throws LifecycleException {
         if (LifecycleState.DESTROYED.equals(state)) {
 
@@ -277,6 +279,7 @@ public abstract class LifecycleBase implements Lifecycle {
     /**
      * {@inheritDoc}
      */
+    @Override
     public LifecycleState getState() {
         return state;
     }
