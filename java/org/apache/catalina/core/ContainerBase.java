@@ -139,6 +139,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             this.child = child;
         }
 
+        @Override
         public Void run() {
             addChildInternal(child);
             return null;
@@ -285,6 +286,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * the thread will invoke the executePeriodic method on this container 
      * and all its children.
      */
+    @Override
     public int getBackgroundProcessorDelay() {
         return backgroundProcessorDelay;
     }
@@ -297,6 +299,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param delay The delay in seconds between the invocation of 
      *              backgroundProcess methods
      */
+    @Override
     public void setBackgroundProcessorDelay(int delay) {
         backgroundProcessorDelay = delay;
     }
@@ -307,6 +310,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
         return this.getClass().getName();
     }
@@ -317,6 +321,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * no associated Loader, return the Loader associated with our parent
      * Container (if any); otherwise, return <code>null</code>.
      */
+    @Override
     public Loader getLoader() {
 
         if (loader != null)
@@ -333,6 +338,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param loader The newly associated loader
      */
+    @Override
     public synchronized void setLoader(Loader loader) {
 
         // Change components if necessary
@@ -372,6 +378,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Return the Logger for this Container.
      */
+    @Override
     public Log getLogger() {
 
         if (logger != null)
@@ -387,6 +394,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * no associated Manager, return the Manager associated with our parent
      * Container (if any); otherwise return <code>null</code>.
      */
+    @Override
     public Manager getManager() {
 
         if (manager != null)
@@ -403,6 +411,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param manager The newly associated Manager
      */
+    @Override
     public synchronized void setManager(Manager manager) {
 
         // Change components if necessary
@@ -442,6 +451,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Return an object which may be utilized for mapping to this component.
      */
+    @Override
     public Object getMappingObject() {
         return this;
     }
@@ -452,6 +462,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * no associated Cluster, return the Cluster associated with our parent
      * Container (if any); otherwise return <code>null</code>.
      */
+    @Override
     public Cluster getCluster() {
         if (cluster != null)
             return (cluster);
@@ -468,6 +479,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param cluster The newly associated Cluster
      */
+    @Override
     public synchronized void setCluster(Cluster cluster) {
         // Change components if necessary
         Cluster oldCluster = this.cluster;
@@ -508,6 +520,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Container.  Within the set of child containers belonging to a particular
      * parent, Container names must be unique.
      */
+    @Override
     public String getName() {
 
         return (name);
@@ -526,6 +539,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *  added to the children of a parent Container (after which the name
      *  may not be changed)
      */
+    @Override
     public void setName(String name) {
 
         String oldName = this.name;
@@ -563,6 +577,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Return the Container for which this Container is a child, if there is
      * one.  If there is no defined parent, return <code>null</code>.
      */
+    @Override
     public Container getParent() {
 
         return (parent);
@@ -581,6 +596,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @exception IllegalArgumentException if this Container refuses to become
      *  attached to the specified Container
      */
+    @Override
     public void setParent(Container container) {
 
         Container oldParent = this.parent;
@@ -595,6 +611,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * This call is meaningful only <strong>after</strong> a Loader has
      * been configured.
      */
+    @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null)
             return (parentClassLoader);
@@ -615,6 +632,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param parent The new parent class loader
      */
+    @Override
     public void setParentClassLoader(ClassLoader parent) {
         ClassLoader oldParentClassLoader = this.parentClassLoader;
         this.parentClassLoader = parent;
@@ -628,6 +646,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Return the Pipeline object that manages the Valves associated with
      * this Container.
      */
+    @Override
     public Pipeline getPipeline() {
 
         return (this.pipeline);
@@ -640,6 +659,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * no associated Realm, return the Realm associated with our parent
      * Container (if any); otherwise return <code>null</code>.
      */
+    @Override
     public Realm getRealm() {
 
         if (realm != null)
@@ -656,6 +676,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param realm The newly associated Realm
      */
+    @Override
     public synchronized void setRealm(Realm realm) {
 
         // Change components if necessary
@@ -698,6 +719,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
       * resources associated with our parent Container (if any); otherwise
       * return <code>null</code>.
      */
+    @Override
     public DirContext getResources() {
         if (resources != null)
             return (resources);
@@ -714,6 +736,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param resources The newly associated DirContext
      */
+    @Override
     public synchronized void setResources(DirContext resources) {
         // Called from StandardContext.setResources()
         //              <- StandardContext.start() 
@@ -754,6 +777,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @exception IllegalStateException if this Container does not support
      *  child Containers
      */
+    @Override
     public void addChild(Container child) {
         if (Globals.IS_SECURITY_ENABLED) {
             PrivilegedAction<Void> dp =
@@ -806,6 +830,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param listener The listener to add
      */
+    @Override
     public void addContainerListener(ContainerListener listener) {
 
         synchronized (listeners) {
@@ -820,6 +845,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param listener The listener to add
      */
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
 
         support.addPropertyChangeListener(listener);
@@ -833,6 +859,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param name Name of the child Container to be retrieved
      */
+    @Override
     public Container findChild(String name) {
 
         if (name == null)
@@ -848,6 +875,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Return the set of children Containers associated with this Container.
      * If this Container has no children, a zero-length array is returned.
      */
+    @Override
     public Container[] findChildren() {
 
         synchronized (children) {
@@ -863,6 +891,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * If this Container has no registered container listeners, a zero-length
      * array is returned.
      */
+    @Override
     public ContainerListener[] findContainerListeners() {
 
         synchronized (listeners) {
@@ -889,6 +918,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @exception ServletException if a ServletException was thrown
      *  while processing this request
      */
+    @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 
@@ -903,6 +933,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param child Existing child Container to be removed
      */
+    @Override
     public void removeChild(Container child) {
 
         if (child == null) {
@@ -935,6 +966,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removeContainerListener(ContainerListener listener) {
 
         synchronized (listeners) {
@@ -949,6 +981,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
 
         support.removePropertyChangeListener(listener);
@@ -1074,6 +1107,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * parent. If there is no parent and still none is found, use the NoOp
      * access log.
      */
+    @Override
     public void logAccess(Request request, Response response, long time,
             boolean useDefault) {
         
@@ -1091,6 +1125,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
     }
 
+    @Override
     public AccessLog getAccessLog() {
         
         if (accessLogScanComplete) {
@@ -1139,6 +1174,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         
         if (!getState().isAvailable())
@@ -1196,6 +1232,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param type Event type
      * @param data Event data
      */
+    @Override
     public void fireContainerEvent(String type, Object data) {
 
         if (listeners.size() < 1)
@@ -1310,6 +1347,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected class ContainerBackgroundProcessor implements Runnable {
 
+        @Override
         public void run() {
             while (!threadDone) {
                 try {
