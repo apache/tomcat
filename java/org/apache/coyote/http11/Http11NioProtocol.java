@@ -256,10 +256,12 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
             this.proto = proto;
         }
         
+        @Override
         public void releaseCaches() {
             recycledProcessors.clear();
         }
         
+        @Override
         public void release(SocketChannel socket) {
             if (log.isDebugEnabled()) 
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
@@ -280,6 +282,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
                 log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
         }
         
+        @Override
         public void release(NioChannel socket) {
             Http11NioProcessor result = connections.remove(socket);
             if ( result != null ) {
@@ -288,6 +291,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
             }
         }
 
+        @Override
         public SocketState event(NioChannel socket, SocketStatus status) {
             Http11NioProcessor result = connections.get(socket);
             NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
@@ -339,6 +343,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol {
             return state;
         }
 
+        @Override
         public SocketState process(NioChannel socket) {
             Http11NioProcessor processor = null;
             try {
