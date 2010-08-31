@@ -45,7 +45,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     protected ObjectName tpOname = null;
     protected ObjectName rgOname = null;
 
-    protected AbstractEndpoint endpoint=null;
+    protected AbstractEndpoint endpoint = null;
     
     protected SSLImplementation sslImplementation = null;
     
@@ -75,6 +75,8 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
 
     @Override
     public Object getAttribute(String key) {
+        if (getLog().isTraceEnabled())
+            getLog().trace(sm.getString("http11protocol.getattribute", key));
         return attributes.get(key);
     }
 
@@ -159,6 +161,10 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
     public void setSSLEnabled(boolean SSLEnabled) { endpoint.setSSLEnabled(SSLEnabled);}    
     
+    /**
+     * This field indicates if the protocol is secure from the perspective of
+     * the client (= https is used).
+     */
     private boolean secure;
     public boolean getSecure() { return secure; }
     public void setSecure(boolean b) { 
@@ -169,7 +175,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     /**
      * Processor cache.
      */
-    private int processorCache = 200;
+    private int processorCache;
     public int getProcessorCache() { return this.processorCache; }
     public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
@@ -203,7 +209,11 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
             setMaxKeepAliveRequests(1);
         }
     }
-    
+
+    /**
+     * The number of seconds Tomcat will wait for a subsequent request
+     * before closing the connection.
+     */
     public void setKeepAliveTimeout(int keepAliveTimeout) {
         endpoint.setKeepAliveTimeout(keepAliveTimeout);
     }
@@ -375,7 +385,4 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public void postDeregister() {
         // NOOP
     }
-
-
-    
 }

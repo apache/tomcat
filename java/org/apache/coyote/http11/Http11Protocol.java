@@ -55,7 +55,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
     
     @Override
-    public Log getLog() { return log; }
+    protected Log getLog() { return log; }
 
 
     // ------------------------------------------------------------ Constructor
@@ -63,32 +63,23 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
     public Http11Protocol() {
         endpoint = new JIoEndpoint();
+        cHandler = new Http11ConnectionHandler(this);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        //setServerSoTimeout(Constants.DEFAULT_SERVER_SOCKET_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
-        
+        setProcessorCache(200);
     }
 
     
     // ----------------------------------------------------------------- Fields
 
-
-    protected Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+    protected Http11ConnectionHandler cHandler;
 
 
     protected ServerSocketFactory socketFactory = null;
    
 
-
     // ----------------------------------------- ProtocolHandler Implementation
-    // *
-
-
-
-
-
-
 
     @Override
     public void init() throws Exception {

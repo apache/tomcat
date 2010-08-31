@@ -115,6 +115,10 @@
         not received all at the same time and the socket needs to be returned to
         the poller. (markt)
       </fix>
+      <update>
+        Further work to reduce the code duplication in the HTTP connectors.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
