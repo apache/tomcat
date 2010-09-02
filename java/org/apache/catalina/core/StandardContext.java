@@ -5048,6 +5048,10 @@ public class StandardContext extends ContainerBase
     private void resetContext() throws Exception {
         // Restore the original state ( pre reading web.xml in start )
         // If you extend this - override this method and make sure to clean up
+        
+        // Don't reset anything that is read from a <Context.../> element since
+        // <Context .../> elements are read at initialisation will not be read
+        // again for this object
         children = new HashMap<String, Container>();
         startupTime = 0;
         startTime = 0;
