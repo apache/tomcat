@@ -45,6 +45,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Role;
@@ -461,10 +462,10 @@ public class ManagerServlet
         String appBase = ((Host) context.getParent()).getAppBase();
         deployed = new File(appBase);
         if (!deployed.isAbsolute()) {
-            deployed = new File(System.getProperty("catalina.base"),
+            deployed = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                                 appBase);
         }
-        configBase = new File(System.getProperty("catalina.base"), "conf");
+        configBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         Container container = context;
         Container host = null;
         Container engine = null;
@@ -1425,7 +1426,7 @@ public class ManagerServlet
 
         File file = new File(host.getAppBase());
         if (!file.isAbsolute())
-            file = new File(System.getProperty("catalina.base"),
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                             host.getAppBase());
         try {
             appBase = file.getCanonicalFile();

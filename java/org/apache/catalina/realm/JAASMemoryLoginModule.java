@@ -35,6 +35,7 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.authenticator.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -339,7 +340,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         // Validate the existence of our configuration file
         File file = new File(pathname);
         if (!file.isAbsolute())
-            file = new File(System.getProperty("catalina.base"), pathname);
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
         if (!file.exists() || !file.canRead()) {
             log.warn("Cannot load configuration file " + file.getAbsolutePath());
             return;
