@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import javax.management.ObjectName;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -857,7 +858,7 @@ public class Connector extends LifecycleMBeanBase  {
         protocolHandler.setAdapter(adapter);
 
         IntrospectionUtils.setProperty(protocolHandler, "jkHome",
-                                       System.getProperty("catalina.base"));
+                                       System.getProperty(Globals.CATALINA_BASE_PROP));
 
         try {
             protocolHandler.init();

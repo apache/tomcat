@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
@@ -289,7 +290,7 @@ public class MemoryRealm  extends RealmBase {
         // Validate the existence of our database file
         File file = new File(pathname);
         if (!file.isAbsolute())
-            file = new File(System.getProperty("catalina.base"), pathname);
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
         if (!file.exists() || !file.canRead())
             throw new LifecycleException
                 (sm.getString("memoryRealm.loadExist",

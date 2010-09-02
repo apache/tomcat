@@ -32,6 +32,7 @@ import javax.servlet.ServletException;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -539,10 +540,10 @@ public class Tomcat {
     
     protected void initBaseDir() {
         if (basedir == null) {
-            basedir = System.getProperty("catalina.base");
+            basedir = System.getProperty(Globals.CATALINA_BASE_PROP);
         }
         if (basedir == null) {
-            basedir = System.getProperty("catalina.home");
+            basedir = System.getProperty(Globals.CATALINA_HOME_PROP);
         }
         if (basedir == null) {
             // Create a temp dir.
@@ -558,8 +559,8 @@ public class Tomcat {
                 }
             }
         }
-        System.setProperty("catalina.home", basedir);
-        System.setProperty("catalina.base", basedir);
+        System.setProperty(Globals.CATALINA_HOME_PROP, basedir);
+        System.setProperty(Globals.CATALINA_BASE_PROP, basedir);
     }
 
     static String[] silences = new String[] {
