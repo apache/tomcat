@@ -22,6 +22,7 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
@@ -198,10 +199,10 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     public String getBaseDir() {
         if( baseDir==null ) {
-            baseDir=System.getProperty("catalina.base");
+            baseDir=System.getProperty(Globals.CATALINA_BASE_PROP);
         }
         if( baseDir==null ) {
-            baseDir=System.getProperty("catalina.home");
+            baseDir=System.getProperty(Globals.CATALINA_HOME_PROP);
         }
         return baseDir;
     }
