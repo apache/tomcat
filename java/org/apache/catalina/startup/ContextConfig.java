@@ -530,7 +530,7 @@ public class ContextConfig
         if( engineC instanceof StandardEngine ) {
             return ((StandardEngine)engineC).getBaseDir();
         }
-        return System.getProperty("catalina.base");
+        return System.getProperty(Globals.CATALINA_BASE_PROP);
     }
 
     
@@ -671,7 +671,7 @@ public class ContextConfig
             canonicalAppBase = canonicalAppBase.getCanonicalFile();
         } else {
             canonicalAppBase = 
-                new File(System.getProperty("catalina.base"), appBase)
+                new File(System.getProperty(Globals.CATALINA_BASE_PROP), appBase)
                 .getCanonicalFile();
         }
 
@@ -778,7 +778,7 @@ public class ContextConfig
             if (!docBaseFile.isAbsolute()) {
                 File file = new File(appBase);
                 if (!file.isAbsolute()) {
-                    file = new File(System.getProperty("catalina.base"), appBase);
+                    file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), appBase);
                 }
                 docBaseFile = new File(file, docBase);
             }
@@ -1145,7 +1145,7 @@ public class ContextConfig
      */
     protected File getConfigBase() {
         File configBase = 
-            new File(System.getProperty("catalina.base"), "conf");
+            new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         if (!configBase.exists()) {
             return null;
         }
