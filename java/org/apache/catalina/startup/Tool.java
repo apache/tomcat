@@ -23,6 +23,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -87,7 +88,7 @@ public final class Tool {
     /**
      * The pathname of our installation base directory.
      */
-    private static String catalinaHome = System.getProperty("catalina.home");
+    private static String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
 
 
     /**
@@ -120,7 +121,7 @@ public final class Tool {
 
         // Verify that "catalina.home" was passed.
         if (catalinaHome == null) {
-            log.error("Must set 'catalina.home' system property");
+            log.error("Must set '" + Globals.CATALINA_HOME_PROP + "' system property");
             System.exit(1);
         }
 

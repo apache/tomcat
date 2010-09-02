@@ -5138,7 +5138,7 @@ public class StandardContext extends ContainerBase
      * entire servlet container (i.e. the Engine container if present).
      */
     protected File engineBase() {
-        String base=System.getProperty("catalina.base");
+        String base=System.getProperty(Globals.CATALINA_BASE_PROP);
         if( base == null ) {
             StandardEngine eng=(StandardEngine)this.getParent().getParent();
             base=eng.getBaseDir();
@@ -5257,7 +5257,7 @@ public class StandardContext extends ContainerBase
      */
     public File getConfigBase() {
         File configBase = 
-            new File(System.getProperty("catalina.base"), "conf");
+            new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         if (!configBase.exists()) {
             return null;
         }

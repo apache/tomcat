@@ -102,6 +102,10 @@
         is being destroyed, the destroy method is only called once on each
         child component. (markt) 
       </update>
+      <update>
+        <bug>48967</bug>: Replace strings "catalina.base" and "catalina.home"
+        by globally defined constants. Patch provided by Marc Guillemot. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

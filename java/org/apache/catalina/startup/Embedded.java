@@ -28,6 +28,7 @@ import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -282,20 +283,20 @@ public class Embedded  extends StandardService {
         return await;
     }
 
-    public void setCatalinaHome( String s ) {
-        System.setProperty( "catalina.home", s);
+    public void setCatalinaHome(String s) {
+        System.setProperty(Globals.CATALINA_HOME_PROP, s);
     }
 
-    public void setCatalinaBase( String s ) {
-        System.setProperty( "catalina.base", s);
+    public void setCatalinaBase(String s) {
+        System.setProperty(Globals.CATALINA_BASE_PROP, s);
     }
 
     public String getCatalinaHome() {
-        return System.getProperty("catalina.home");
+        return System.getProperty(Globals.CATALINA_HOME_PROP);
     }
 
     public String getCatalinaBase() {
-        return System.getProperty("catalina.base");
+        return System.getProperty(Globals.CATALINA_BASE_PROP);
     }
 
 
@@ -902,21 +903,21 @@ public class Embedded  extends StandardService {
 
     protected void initDirs() {
 
-        String catalinaHome = System.getProperty("catalina.home");
+        String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
         if (catalinaHome == null) {
             // Backwards compatibility patch for J2EE RI 1.3
             String j2eeHome = System.getProperty("com.sun.enterprise.home");
             if (j2eeHome != null) {
                 catalinaHome=System.getProperty("com.sun.enterprise.home");
-            } else if (System.getProperty("catalina.base") != null) {
-                catalinaHome = System.getProperty("catalina.base");
+            } else if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
+                catalinaHome = System.getProperty(Globals.CATALINA_BASE_PROP);
             } else {
                 // Use IntrospectionUtils and guess the dir
                 catalinaHome = IntrospectionUtils.guessInstall
-                    ("catalina.home", "catalina.base", "catalina.jar");
+                    (Globals.CATALINA_HOME_PROP, Globals.CATALINA_BASE_PROP, "catalina.jar");
                 if (catalinaHome == null) {
                     catalinaHome = IntrospectionUtils.guessInstall
-                        ("tomcat.install", "catalina.home", "tomcat.jar");
+                        ("tomcat.install", Globals.CATALINA_HOME_PROP, "tomcat.jar");
                 }
             }
         }
@@ -933,14 +934,14 @@ public class Embedded  extends StandardService {
                     catalinaHome = home.getAbsolutePath();
                 }
             }
-            System.setProperty("catalina.home", catalinaHome);
+            System.setProperty(Globals.CATALINA_HOME_PROP, catalinaHome);
         }
 
-        if (System.getProperty("catalina.base") == null) {
-            System.setProperty("catalina.base",
+        if (System.getProperty(Globals.CATALINA_BASE_PROP) == null) {
+            System.setProperty(Globals.CATALINA_BASE_PROP,
                                catalinaHome);
         } else {
-            String catalinaBase = System.getProperty("catalina.base");
+            String catalinaBase = System.getProperty(Globals.CATALINA_BASE_PROP);
             File base = new File(catalinaBase);
             if (!base.isAbsolute()) {
                 try {
@@ -949,7 +950,7 @@ public class Embedded  extends StandardService {
                     catalinaBase = base.getAbsolutePath();
                 }
             }
-            System.setProperty("catalina.base", catalinaBase);
+            System.setProperty(Globals.CATALINA_BASE_PROP, catalinaBase);
         }
         
         String temp = System.getProperty("java.io.tmpdir");

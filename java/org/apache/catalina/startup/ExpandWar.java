@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -78,7 +79,7 @@ public class ExpandWar {
         // Make sure that there is no such directory already existing
         File appBase = new File(host.getAppBase());
         if (!appBase.isAbsolute()) {
-            appBase = new File(System.getProperty("catalina.base"),
+            appBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                                host.getAppBase());
         }
         if (!appBase.exists() || !appBase.isDirectory()) {
@@ -193,7 +194,7 @@ public class ExpandWar {
         // Make the appBase absolute
         File appBase = new File(host.getAppBase());
         if (!appBase.isAbsolute()) {
-            appBase = new File(System.getProperty("catalina.base"),
+            appBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                                host.getAppBase());
         }
         
