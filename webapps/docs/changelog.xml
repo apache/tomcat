@@ -161,6 +161,10 @@
         <bug>49585</bug>: Update JSVC documentation to reflect new packaging
         of Commons Daemon. (markt)
       </fix>
+      <update>
+        Update the Servlet, JSP and EL Javadoc links to link to the
+        specifications and the relevant part of the Java EE 6 Javadoc. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
