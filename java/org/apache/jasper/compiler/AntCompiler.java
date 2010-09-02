@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.StringTokenizer;
 
+import org.apache.catalina.Globals;
 import org.apache.jasper.JasperException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -74,8 +75,8 @@ public class AntCompiler extends Compiler {
         logger.setErrorPrintStream(System.err);
         logger.setMessageOutputLevel(Project.MSG_INFO);
         project.addBuildListener( logger);
-        if (System.getProperty("catalina.home") != null) {
-            project.setBasedir( System.getProperty("catalina.home"));
+        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null) {
+            project.setBasedir(System.getProperty(Globals.CATALINA_HOME_PROP));
         }
         
         if( options.getCompiler() != null ) {

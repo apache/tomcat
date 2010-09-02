@@ -31,6 +31,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -57,8 +58,8 @@ public final class Bootstrap {
     // -------------------------------------------------------------- Constants
 
 
-    protected static final String CATALINA_HOME_TOKEN = "${catalina.home}";
-    protected static final String CATALINA_BASE_TOKEN = "${catalina.base}";
+    protected static final String CATALINA_HOME_TOKEN = "${" + Globals.CATALINA_HOME_PROP + "}";
+    protected static final String CATALINA_BASE_TOKEN = "${" + Globals.CATALINA_BASE_PROP + "}";
 
 
     // ------------------------------------------------------- Static Variables
@@ -425,11 +426,11 @@ public final class Bootstrap {
     }
 
     public void setCatalinaHome(String s) {
-        System.setProperty( "catalina.home", s );
+        System.setProperty(Globals.CATALINA_HOME_PROP, s);
     }
 
     public void setCatalinaBase(String s) {
-        System.setProperty( "catalina.base", s );
+        System.setProperty(Globals.CATALINA_BASE_PROP, s);
     }
 
 
@@ -439,13 +440,13 @@ public final class Bootstrap {
      */
     private void setCatalinaBase() {
 
-        if (System.getProperty("catalina.base") != null)
+        if (System.getProperty(Globals.CATALINA_BASE_PROP) != null)
             return;
-        if (System.getProperty("catalina.home") != null)
-            System.setProperty("catalina.base",
-                               System.getProperty("catalina.home"));
+        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
+            System.setProperty(Globals.CATALINA_BASE_PROP,
+                               System.getProperty(Globals.CATALINA_HOME_PROP));
         else
-            System.setProperty("catalina.base",
+            System.setProperty(Globals.CATALINA_BASE_PROP,
                                System.getProperty("user.dir"));
 
     }
@@ -457,23 +458,23 @@ public final class Bootstrap {
      */
     private void setCatalinaHome() {
 
-        if (System.getProperty("catalina.home") != null)
+        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
             return;
         File bootstrapJar = 
             new File(System.getProperty("user.dir"), "bootstrap.jar");
         if (bootstrapJar.exists()) {
             try {
                 System.setProperty
-                    ("catalina.home", 
+                    (Globals.CATALINA_HOME_PROP, 
                      (new File(System.getProperty("user.dir"), ".."))
                      .getCanonicalPath());
             } catch (Exception e) {
                 // Ignore
-                System.setProperty("catalina.home",
+                System.setProperty(Globals.CATALINA_HOME_PROP,
                                    System.getProperty("user.dir"));
             }
         } else {
-            System.setProperty("catalina.home",
+            System.setProperty(Globals.CATALINA_HOME_PROP,
                                System.getProperty("user.dir"));
         }
 
@@ -484,7 +485,7 @@ public final class Bootstrap {
      * Get the value of the catalina.home environment variable.
      */
     public static String getCatalinaHome() {
-        return System.getProperty("catalina.home",
+        return System.getProperty(Globals.CATALINA_HOME_PROP,
                                   System.getProperty("user.dir"));
     }
 
@@ -493,7 +494,7 @@ public final class Bootstrap {
      * Get the value of the catalina.base environment variable.
      */
     public static String getCatalinaBase() {
-        return System.getProperty("catalina.base", getCatalinaHome());
+        return System.getProperty(Globals.CATALINA_BASE_PROP, getCatalinaHome());
     }
 
 

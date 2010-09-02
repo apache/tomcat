@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.KeyManagerFactory;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -466,7 +467,7 @@ public abstract class AbstractEndpoint {
     private String keystoreFile = System.getProperty("user.home")+"/.keystore";
     public String getKeystoreFile() { return keystoreFile;}
     public void setKeystoreFile(String s ) { 
-        String file = adjustRelativePath(s,System.getProperty("catalina.base"));
+        String file = adjustRelativePath(s, System.getProperty(Globals.CATALINA_BASE_PROP));
         this.keystoreFile = file; 
     }
 
@@ -513,7 +514,7 @@ public abstract class AbstractEndpoint {
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
     public String getTruststoreFile() {return truststoreFile;}
     public void setTruststoreFile(String s) {
-        String file = adjustRelativePath(s,System.getProperty("catalina.base"));
+        String file = adjustRelativePath(s, System.getProperty(Globals.CATALINA_BASE_PROP));
         this.truststoreFile = file;
     }
 

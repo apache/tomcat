@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
@@ -379,7 +380,7 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Construct a reader for the XML input file (if it exists)
                 File file = new File(pathname);
                 if (!file.isAbsolute()) {
-                    file = new File(System.getProperty("catalina.base"),
+                    file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                                     pathname);
                 }
                 if (!file.exists()) {
@@ -491,7 +492,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
         File file = new File(pathname);
         if (!file.isAbsolute()) {
-            file = new File(System.getProperty("catalina.base"),
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                             pathname);
         }
         File dir = file.getParentFile();
@@ -522,7 +523,7 @@ public class MemoryUserDatabase implements UserDatabase {
         File fileNew = new File(pathnameNew);
         if (!fileNew.isAbsolute()) {
             fileNew =
-                new File(System.getProperty("catalina.base"), pathnameNew);
+                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameNew);
         }
         PrintWriter writer = null;
         try {
@@ -578,13 +579,13 @@ public class MemoryUserDatabase implements UserDatabase {
         File fileOld = new File(pathnameOld);
         if (!fileOld.isAbsolute()) {
             fileOld =
-                new File(System.getProperty("catalina.base"), pathnameOld);
+                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameOld);
         }
         fileOld.delete();
         File fileOrig = new File(pathname);
         if (!fileOrig.isAbsolute()) {
             fileOrig =
-                new File(System.getProperty("catalina.base"), pathname);
+                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
         }
         if (fileOrig.exists()) {
             fileOld.delete();
