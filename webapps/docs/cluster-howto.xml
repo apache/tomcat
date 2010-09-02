@@ -116,8 +116,8 @@ should be completed:</p>
   <li>If you have defined custom cluster valves, make sure you have the <code>ReplicationValve</code>  defined as well under the Cluster element in server.xml</li>
   <li>If your Tomcat instances are running on the same machine, make sure the <code>tcpListenPort</code>
       attribute is unique for each instance, in most cases Tomcat is smart enough to resolve this on it's own by autodetecting available ports in the range 4000-4100</li>
-  <li>Make sure your <code>web.xml</code> has the <code>&lt;distributable/&gt;</code> element 
-      or set at your <code>&lt;Context distributable="true" /&gt;</code></li>
+  <li>Make sure your <code>web.xml</code> has the
+      <code>&lt;distributable/&gt;</code> element</li>
   <li>If you are using mod_jk, make sure that jvmRoute attribute is set at your Engine <code>&lt;Engine name="Catalina" jvmRoute="node01" &gt;</code>
       and that the jvmRoute attribute value matches your worker name in workers.properties</li>
   <li>Make sure that all nodes have the same time and sync with NTP service!</li>
