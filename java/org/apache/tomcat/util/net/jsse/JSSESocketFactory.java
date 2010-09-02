@@ -58,6 +58,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
+import org.apache.catalina.Globals;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -377,7 +378,7 @@ public class JSSESocketFactory
                     "".equalsIgnoreCase(path))) {
                 File keyStoreFile = new File(path);
                 if (!keyStoreFile.isAbsolute()) {
-                    keyStoreFile = new File(System.getProperty("catalina.base"),
+                    keyStoreFile = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                                             path);
                 }
                 istream = new FileInputStream(keyStoreFile);
@@ -636,7 +637,7 @@ public class JSSESocketFactory
 
         File crlFile = new File(crlf);
         if( !crlFile.isAbsolute() ) {
-            crlFile = new File(System.getProperty("catalina.base"), crlf);
+            crlFile = new File(System.getProperty(Globals.CATALINA_BASE_PROP), crlf);
         }
         Collection<? extends CRL> crls = null;
         InputStream is = null;

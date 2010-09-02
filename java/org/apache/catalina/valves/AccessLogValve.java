@@ -37,6 +37,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.AccessLog;
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
@@ -724,7 +725,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         // Create the directory if necessary
         File dir = new File(directory);
         if (!dir.isAbsolute())
-            dir = new File(System.getProperty("catalina.base"), directory);
+            dir = new File(System.getProperty(Globals.CATALINA_BASE_PROP), directory);
         dir.mkdirs();
 
         // Open the current log file

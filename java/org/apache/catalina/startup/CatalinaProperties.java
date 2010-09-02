@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.apache.catalina.Globals;
 import org.apache.tomcat.util.ExceptionUtils;
 
 
@@ -87,6 +88,11 @@ public class CatalinaProperties {
         InputStream is = null;
         Throwable error = null;
 
+        ClassLoader cl = CatalinaProperties.class.getClassLoader();
+        System.err.println("CatalinaProprties: cl=" + cl.toString());
+        if ((cl = cl.getParent()) != null) {
+            System.err.println("CatalinaProprties: parent cl=" + cl.toString());
+        }
         try {
             String configUrl = getConfigUrl();
             if (configUrl != null) {
@@ -150,7 +156,7 @@ public class CatalinaProperties {
      * Get the value of the catalina.home environment variable.
      */
     private static String getCatalinaHome() {
-        return System.getProperty("catalina.home",
+        return System.getProperty(Globals.CATALINA_HOME_PROP,
                                   System.getProperty("user.dir"));
     }
     
@@ -159,7 +165,7 @@ public class CatalinaProperties {
      * Get the value of the catalina.base environment variable.
      */
     private static String getCatalinaBase() {
-        return System.getProperty("catalina.base", getCatalinaHome());
+        return System.getProperty(Globals.CATALINA_BASE_PROP, getCatalinaHome());
     }
 
 
