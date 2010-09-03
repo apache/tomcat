@@ -50,6 +50,9 @@
       name="sessionIdAttribute"
       description="Name of attribute with sessionid value before turnover a session"
       type="java.lang.String"/>
+    <attribute name="stateName"
+      description="The name of the LifecycleState that this component is currently in"
+      type="java.lang.String"/>
     <operation
       name="start"
       description="Stops the Cluster JvmRouteBinderValve"
@@ -287,6 +290,9 @@
       description="Total number of replaced sessions that load from external nodes"
       type="long"
       writeable="false"/>
+    <attribute name="stateName"
+      description="The name of the LifecycleState that this component is currently in"
+      type="java.lang.String"/>
     <attribute
       name="stateTransfered"
       is="true"
@@ -511,6 +517,9 @@
       name="sessionMaxAliveTime"
       description="Longest time an expired session had been alive"
       type="int"/>
+    <attribute name="stateName"
+      description="The name of the LifecycleState that this component is currently in"
+      type="java.lang.String"/>
     <attribute
       name="randomFile"
       description="File source of random - /dev/urandom or a pipe"
