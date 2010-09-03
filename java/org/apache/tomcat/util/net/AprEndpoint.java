@@ -747,7 +747,6 @@ public class AprEndpoint extends AbstractEndpoint {
     // ------------------------------------------------------ Protected Methods
 
 
-
     /**
      * Process the specified connection.
      */
@@ -789,7 +788,6 @@ public class AprEndpoint extends AbstractEndpoint {
         }
         return true;
     }
-
 
 
     /**
@@ -1205,8 +1203,6 @@ public class AprEndpoint extends AbstractEndpoint {
     // ----------------------------------------------------- Worker Inner Class
 
 
-
-
     // ----------------------------------------------- SendfileData Inner Class
 
 
@@ -1544,7 +1540,6 @@ public class AprEndpoint extends AbstractEndpoint {
         public SocketState event(long socket, SocketStatus status);
         public SocketState asyncDispatch(long socket, SocketStatus status);
     }
-
 
 
     // ---------------------------------------------- SocketProcessor Inner Class

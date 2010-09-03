@@ -116,7 +116,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             log.info(sm.getString("http11protocol.start", getName()));
     }
 
- 
 
     // -------------------- Properties--------------------
     
@@ -474,8 +473,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
     }
-    
-
 
 
 }

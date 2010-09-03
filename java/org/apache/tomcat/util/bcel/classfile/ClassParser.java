@@ -79,12 +79,6 @@ public final class ClassParser {
     }
 
 
-    
-
-
-    
-
-
     /**
      * Parse the given Java class file and return an object that represents
      * the contained data, i.e., constants, methods, fields and commands.

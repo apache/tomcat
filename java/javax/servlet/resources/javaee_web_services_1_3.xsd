@@ -557,9 +557,8 @@
                 Example:
                     <port-component-name>EmployeeService
                     </port-component-name>
-              
-                
-              
+
+
 ]]>
             </xsd:documentation>
           </xsd:annotation>

@@ -291,9 +291,6 @@ public class NioReplicationTask extends AbstractRxTask {
     }
 
 
-
-
-
     /**
      * send a reply-acknowledgement (6,2,3), sends it doing a busy write, the ACK is so small
      * that it should always go to the buffer

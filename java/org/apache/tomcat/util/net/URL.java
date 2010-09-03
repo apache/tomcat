@@ -174,9 +174,6 @@ public final class URL implements Serializable {
     }
 
 
-
-
-
     /**
      * Create a URL object from the specified components.  The default port
      * number for the specified protocol will be used.

@@ -28,10 +28,8 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * 
  */
 public interface ChannelMessage extends Serializable {
-    
-    
-    
-    
+
+
     /**
      * Get the address that this message originated from.  
      * Almost always <code>Channel.getLocalMember(boolean)</code><br>

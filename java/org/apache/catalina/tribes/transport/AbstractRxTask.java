@@ -20,8 +20,6 @@ package org.apache.catalina.tribes.transport;
 import org.apache.catalina.tribes.io.ListenCallback;
 
 
-
-
 /**
  * @author Filip Hanik
  * @version $Id$

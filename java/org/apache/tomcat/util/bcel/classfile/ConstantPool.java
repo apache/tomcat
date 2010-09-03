@@ -42,9 +42,6 @@ public class ConstantPool implements Cloneable, Serializable {
     private Constant[] constant_pool;
 
 
-    
-
-
     /**
      * Read constants from given file stream.
      *
@@ -74,9 +71,6 @@ public class ConstantPool implements Cloneable, Serializable {
             }
         }
     }
-
-
-    
 
 
     /**
@@ -178,9 +172,6 @@ public class ConstantPool implements Cloneable, Serializable {
     }
 
 
-    
-
-
     /**
      * Get constant from constant pool.
      *
@@ -219,9 +210,6 @@ public class ConstantPool implements Cloneable, Serializable {
         }
         return c;
     }
-
-
-    
 
 
     /**
@@ -285,5 +273,4 @@ public class ConstantPool implements Cloneable, Serializable {
     }
 
 
-    
 }

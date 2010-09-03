@@ -19,8 +19,6 @@
 package org.apache.catalina;
 
 
-
-
 /**
  * Interface defining a listener for significant Session generated events.
  *

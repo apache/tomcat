@@ -153,8 +153,6 @@ public class SerializablePrincipal  implements java.io.Serializable {
     }
 
 
-
-
     /**
      * The set of roles associated with this user.
      */
@@ -171,8 +169,6 @@ public class SerializablePrincipal  implements java.io.Serializable {
     protected Principal userPrincipal = null;
     
     // --------------------------------------------------------- Public Methods
-
-
 
 
     /**

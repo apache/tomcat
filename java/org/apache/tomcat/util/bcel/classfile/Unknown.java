@@ -49,12 +49,6 @@ public final class Unknown extends Attribute {
     private static final Map unknown_attributes = new HashMap();
 
 
-    
-
-
-    
-
-
     /**
      * Create a non-standard attribute.
      *
@@ -105,9 +99,6 @@ public final class Unknown extends Attribute {
     }
 
 
-    
-
-
     /**
      * @return name of attribute.
      */
@@ -115,9 +106,6 @@ public final class Unknown extends Attribute {
     public final String getName() {
         return name;
     }
-
-
-    
 
 
     /**

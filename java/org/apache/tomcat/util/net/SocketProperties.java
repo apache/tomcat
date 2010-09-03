@@ -419,7 +419,6 @@ public class SocketProperties {
     public void setUnlockTimeout(int unlockTimeout) {
         this.unlockTimeout = unlockTimeout;
     }
-    
-    
+
 
 }

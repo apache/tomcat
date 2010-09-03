@@ -713,8 +713,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     }
 
 
-
-
     /**
      * Send a <code>Notification</code> to all registered listeners as a
      * <code>jmx.modelmbean.general</code> notification.
@@ -763,8 +761,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
         sendNotification(notification);
 
     }
-
-
 
 
     // ---------------------------------------- NotificationBroadcaster Methods

@@ -133,9 +133,8 @@ public class TestELEvaluation extends TestCase {
 
         assertEquals("\\$", evaluateExpression("${'\\\\$'}"));
         assertEquals("\\\\$", evaluateExpression("${'\\\\\\\\$'}"));
-        
-        
-        
+
+
         // Can use ''' inside '"' when quoting with '"' and vice versa without
         // escaping
         assertEquals("\\\"", evaluateExpression("${'\\\\\"'}"));
@@ -183,7 +182,6 @@ public class TestELEvaluation extends TestCase {
         }
         assertNotNull(e);
     }
-
 
 
     // ************************************************************************

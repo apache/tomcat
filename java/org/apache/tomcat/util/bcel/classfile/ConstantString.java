@@ -38,9 +38,6 @@ public final class ConstantString extends Constant implements ConstantObject {
     private int string_index; // Identical to ConstantClass except for this name
 
 
-    
-
-
     /** 
      * Initialize instance from file data.
      *
@@ -82,9 +79,6 @@ public final class ConstantString extends Constant implements ConstantObject {
     }
 
 
-    
-
-
     /**
      * @return String representation.
      */
@@ -94,8 +88,4 @@ public final class ConstantString extends Constant implements ConstantObject {
     }
 
 
-    
-
-
-    
 }

@@ -123,7 +123,6 @@ public class HttpChannelTest extends TestCase {
         responseTest("HTTP/1.1  200", "HTTP/1.1", "200", "");
         responseTest("HTTP/1.1", "HTTP/1.1", "", "");
     }
-    
-    
+
 
 }

@@ -44,8 +44,6 @@ public final class ByteSequence extends DataInputStream {
     }
 
 
-    
-
     private static final class ByteArrayStream extends ByteArrayInputStream {
 
         ByteArrayStream(byte[] bytes) {

@@ -202,9 +202,8 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     public static final void releaseReadableBuffer(ByteBuffer bb, BBucket bucket) {
         bucket.position(bb.position());
     }
-    
-    
-    
+
+
     public void readInterest(boolean b) throws IOException {
         ch.readInterest(b);
     }

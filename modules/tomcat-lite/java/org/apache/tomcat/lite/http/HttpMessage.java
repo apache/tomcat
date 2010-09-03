@@ -337,8 +337,7 @@ public abstract class HttpMessage {
             throws UnsupportedEncodingException {
         this.charEncoding = enc;
     }
-    
-    
+
 
     public void recycle() {
         commited = false;

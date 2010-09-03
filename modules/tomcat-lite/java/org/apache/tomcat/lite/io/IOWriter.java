@@ -185,9 +185,8 @@ public class IOWriter extends Writer {
         
         return i;
     }
-    
 
-    
+
     /**
      * Just send the chars to the byte[], without flushing down.
      * 

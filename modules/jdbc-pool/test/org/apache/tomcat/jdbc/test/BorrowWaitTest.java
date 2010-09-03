@@ -65,8 +65,6 @@ public class BorrowWaitTest extends DefaultTestCase {
         }
         con.close();
     }
-    
-    
-    
-    
+
+
 }

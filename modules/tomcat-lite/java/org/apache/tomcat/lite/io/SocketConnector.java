@@ -127,7 +127,6 @@ public class SocketConnector extends IOConnector {
     }
 
 
-    
     // TODO: suspendAccept(boolean)
     
 }

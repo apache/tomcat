@@ -93,7 +93,6 @@ public class DateTool {
         }
     };
 
-        
 
     public final static ThreadLocal<DateFormat> rfc1036Format = new ThreadLocal<DateFormat>() {
         @Override

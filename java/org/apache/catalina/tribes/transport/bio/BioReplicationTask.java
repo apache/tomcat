@@ -138,8 +138,6 @@ public class BioReplicationTask extends AbstractRxTask {
     }
 
 
-
-
     /**
      * send a reply-acknowledgment (6,2,3)
      * @param command
