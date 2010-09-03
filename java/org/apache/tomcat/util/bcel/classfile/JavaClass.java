@@ -37,6 +37,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  */
 public class JavaClass extends AccessFlags implements Cloneable, Comparable {
 
+    private static final long serialVersionUID = 7029227708237523236L;
     private String file_name;
     private String source_file_name = "<Unknown>";
     private String class_name;

@@ -32,6 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class AnnotationDefault extends Attribute
 {
+    private static final long serialVersionUID = 6715933396664171543L;
     ElementValue default_value;
 
     /**

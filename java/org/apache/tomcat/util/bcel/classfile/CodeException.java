@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class CodeException implements Cloneable, Constants, Serializable {
 
+    private static final long serialVersionUID = -6351674720658890686L;
     private int start_pc; // Range in the code the exception handler is
     private int end_pc; // active. start_pc is inclusive, end_pc exclusive
     private int handler_pc; /* Starting address of exception handler, i.e.,

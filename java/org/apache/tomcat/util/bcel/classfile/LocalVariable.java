@@ -34,6 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class LocalVariable implements Constants, Cloneable, Serializable {
 
+    private static final long serialVersionUID = -914189896372081589L;
     private int start_pc; // Range in which the variable is valid
     private int length;
     private int name_index; // Index in constant pool of variable name

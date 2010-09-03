@@ -30,6 +30,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public abstract class FieldOrMethod extends AccessFlags implements Cloneable {
 
+    private static final long serialVersionUID = -3383525930205542157L;
     protected int name_index; // Points to field name in constant pool 
     protected int signature_index; // Points to encoded signature
     protected int attributes_count; // No. of attributes

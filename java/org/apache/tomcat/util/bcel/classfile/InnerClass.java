@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class InnerClass implements Cloneable, Serializable {
 
+    private static final long serialVersionUID = -4964694103982806087L;
     private int inner_class_index;
     private int outer_class_index;
     private int inner_name_index;
