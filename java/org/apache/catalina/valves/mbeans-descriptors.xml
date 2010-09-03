@@ -86,6 +86,10 @@
                is="true"
                type="boolean"/>
 
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
+
     <attribute name="suffix"
                description="The suffix that is added to log file filenames"
                type="java.lang.String"/>
@@ -124,6 +128,10 @@
                description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
 
   </mbean>
 
@@ -251,6 +259,10 @@
                description="Should this be blocked interruptibly until a permit is availabl?"
                type="boolean"/>
                
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
+
   </mbean>
 
   <mbean name="RemoteAddrValve"
@@ -285,6 +297,10 @@
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
+
   </mbean>
 
   <mbean name="RemoteHostValve"
@@ -318,6 +334,10 @@
                description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
 
   </mbean>
 
@@ -371,6 +391,10 @@
                type="java.lang.String"
                writeable="false" />
                
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
+
     <attribute name="trustedProxies"
                description="Comma delimited list of trusted proxies"
                type="java.lang.String"

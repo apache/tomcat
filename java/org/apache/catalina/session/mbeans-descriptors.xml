@@ -111,6 +111,10 @@
           description="Longest time an expired session had been alive"
                  type="int" />
                  
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="randomFile"
           description="File source of random - /dev/urandom or a pipe"
                  type="java.lang.String"/>
@@ -306,6 +310,10 @@
           description="Longest time an expired session had been alive"
                  type="int" />
                  
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="randomFile"
           description="File source of random - /dev/urandom or a pipe"
                  type="java.lang.String"/>
