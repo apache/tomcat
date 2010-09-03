@@ -658,8 +658,6 @@ public class DiskFileItem
     }
 
 
-
-
     /**
      * Returns a string representation of this object.
      *

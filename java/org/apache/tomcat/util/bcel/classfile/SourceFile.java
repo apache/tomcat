@@ -39,9 +39,6 @@ public final class SourceFile extends Attribute {
     private int sourcefile_index;
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param name_index Index in constant pool to CONSTANT_Utf8
@@ -86,12 +83,6 @@ public final class SourceFile extends Attribute {
         super.dump(file);
         file.writeShort(sourcefile_index);
     }
-
-
-    
-
-
-    
 
 
     /**

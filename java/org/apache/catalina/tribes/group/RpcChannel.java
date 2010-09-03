@@ -174,7 +174,6 @@ public class RpcChannel implements ChannelListener{
     public void setRpcId(byte[] rpcId) {
         this.rpcId = rpcId;
     }
-    
 
 
     /**

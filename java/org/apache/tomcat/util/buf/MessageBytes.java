@@ -399,7 +399,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
     }
 
-    
 
     // -------------------- Hash code  --------------------
     @Override

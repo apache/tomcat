@@ -377,8 +377,7 @@ public class XByteBuffer
         byte[] result = new byte[length];
         return createDataPackage(data,0,data.length,result,0);
     }
-    
-    
+
 
 //    public static void fillDataPackage(byte[] data, int doff, int dlength, XByteBuffer buf) {
 //        int pkglen = getDataPackageLength(dlength);

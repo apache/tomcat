@@ -188,9 +188,6 @@ public abstract class PersistentManagerBase extends ManagerBase {
 
     // ------------------------------------------------------------- Properties
 
-    
-  
-
 
     /**
      * Indicates how many seconds old a session can get, after its last use in a
@@ -358,7 +355,6 @@ public abstract class PersistentManagerBase extends ManagerBase {
         return (this.store);
 
     }
-
 
 
     /**

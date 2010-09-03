@@ -75,8 +75,6 @@ public class CookieController {
 	*/
 
 
-
-
 	for (int hi = 0; hi<rcvVectorOfCookies.size(); hi++) {
 
 		String cookieValue = (String)rcvVectorOfCookies.elementAt(hi) ;
@@ -257,8 +255,6 @@ public class CookieController {
 		System.out.println("Exception : " +e );
 		return null;
 	}
-      
-
 
 
     }

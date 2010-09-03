@@ -123,8 +123,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
         }
 
     }
-    
-
 
 
     // --------------------------------------------------------- Public Methods
@@ -147,9 +145,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
         }
 
     }
-
-
-    
 
 
     /**
@@ -208,7 +203,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
     }
 
 
-
     // ------------------------------------------------------ Protected Methods
 
 
@@ -236,8 +230,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
 
     }
 
-
- 
 
     /**
      * Callback to write data from the buffer.

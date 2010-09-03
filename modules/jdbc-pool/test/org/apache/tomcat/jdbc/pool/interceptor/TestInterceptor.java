@@ -54,7 +54,6 @@ public class TestInterceptor extends JdbcInterceptor {
         instancecount.incrementAndGet();
         super.setProperties(properties);
     }
-    
-    
-    
+
+
 }

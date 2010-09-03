@@ -38,9 +38,6 @@ public final class LineNumber implements Cloneable, Serializable {
     private int line_number; // number in source file
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -61,9 +58,6 @@ public final class LineNumber implements Cloneable, Serializable {
     }
 
 
-    
-
-
     /**
      * Dump line number/pc pair to file stream in binary format.
      *
@@ -74,18 +68,6 @@ public final class LineNumber implements Cloneable, Serializable {
         file.writeShort(start_pc);
         file.writeShort(line_number);
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

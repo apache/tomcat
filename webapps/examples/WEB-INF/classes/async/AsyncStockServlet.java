@@ -50,8 +50,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     public AsyncStockServlet() {
         System.out.println("AsyncStockServlet created");
     }
-    
-    
+
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
@@ -71,7 +70,6 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
             resp.sendError(400,"Async is not supported.");
         }
     }
-
 
 
     @Override
@@ -120,7 +118,6 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     public void onTimeout(AsyncEvent event) throws IOException {
         event.getAsyncContext().complete();
     }
-
 
 
     @Override

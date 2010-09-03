@@ -61,9 +61,6 @@ public final class Method extends FieldOrMethod {
     }
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -74,12 +71,6 @@ public final class Method extends FieldOrMethod {
             ClassFormatException {
         super(file, constant_pool);
     }
-
-
-    
-
-
-    
 
 
     /**
@@ -121,9 +112,6 @@ public final class Method extends FieldOrMethod {
     }
 
 
-    
-
-
     /**
      * Return string representation close to declaration format,
      * `public static void main(String[] args) throws IOException', e.g.
@@ -159,21 +147,6 @@ public final class Method extends FieldOrMethod {
         }
         return buf.toString();
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

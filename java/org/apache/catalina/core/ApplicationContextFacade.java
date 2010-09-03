@@ -129,7 +129,6 @@ public final class ApplicationContextFacade
      * Wrapped application context.
      */
     private ApplicationContext context = null;
-    
 
 
     // ------------------------------------------------- ServletContext Methods

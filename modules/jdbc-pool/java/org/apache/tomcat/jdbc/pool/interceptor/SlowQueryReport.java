@@ -74,9 +74,8 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void setMaxQueries(int maxQueries) {
         this.maxQueries = maxQueries;
     }
-    
-    
-    
+
+
     @Override
     protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         String sql = super.reportFailedQuery(query, args, name, start, t);
@@ -181,9 +180,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             if (log.isDebugEnabled()) log.debug("Removing slow query, capacity reached:"+sql);
         } 
     }
-    
-    
-    
+
 
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
@@ -191,9 +188,6 @@ public class SlowQueryReport extends AbstractQueryReport  {
         if (parent!=null) 
             queries = SlowQueryReport.perPoolStats.get(parent.getName());
     }
-
-    
-
 
 
     @Override
@@ -210,9 +204,6 @@ public class SlowQueryReport extends AbstractQueryReport  {
             setMaxQueries(Integer.parseInt(p2.getValue()));
         }
     }
-
-
-
 
 
     /**

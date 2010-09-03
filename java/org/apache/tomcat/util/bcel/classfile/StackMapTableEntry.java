@@ -196,36 +196,6 @@ public final class StackMapTableEntry implements Cloneable {
     }
 
 
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
     /**
      * @return deep copy of this object
      */
@@ -238,11 +208,4 @@ public final class StackMapTableEntry implements Cloneable {
     }
 
 
-    
-
-
-    
-
-
-    
 }

@@ -238,9 +238,8 @@ public class IOBuffer {
         }
         hasDataLock.waitSignal(timeMs);
     }
-    
 
-    
+
     public boolean isAppendClosed() {
         return closeQueued;
     }
@@ -645,7 +644,6 @@ public class IOBuffer {
         }
     }
 
-    
 
     // ------ More utilities - for parsing request ( later )-------
 //  public final int skipBlank(ByteBuffer bb, int start) {

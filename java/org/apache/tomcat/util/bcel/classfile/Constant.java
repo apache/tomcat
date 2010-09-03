@@ -89,9 +89,6 @@ public abstract class Constant implements Cloneable, Serializable {
     }
 
 
-    
-
-
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -134,12 +131,6 @@ public abstract class Constant implements Cloneable, Serializable {
                 throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }
     }
-
-
-    
-
-
-    
 
 
     /**

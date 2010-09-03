@@ -45,8 +45,6 @@ dojo.addOnUnload(function() {
 	});
 
 
-
-
 function subscribe(box, symbol) {
 	if (box.checked) {
 		dojox.cometd.subscribe("/stock/"+symbol, onMsgEvent);

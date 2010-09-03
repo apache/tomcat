@@ -54,7 +54,6 @@ public class AsyncListenerWrapper {
     public void setListener(AsyncListener listener) {
         this.listener = listener;
     }
-    
-    
+
 
 }

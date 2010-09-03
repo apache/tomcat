@@ -139,8 +139,7 @@ public class SocksServer implements Runnable, IOConnector.ConnectedCallback {
         
     }
 
-    
-    
+
     public static class SocksServerConnection implements IOConnector.DataReceivedCallback, IOConnector.ConnectedCallback {
         
         protected SocksServer server;

@@ -39,9 +39,6 @@ public class LocalVariableTable extends Attribute {
     private LocalVariable[] local_variable_table; // variables
 
 
-    
-
-
     /**
      * @param name_index Index in constant pool to `LocalVariableTable'
      * @param length Content length in bytes
@@ -88,9 +85,6 @@ public class LocalVariableTable extends Attribute {
             local_variable_table[i].dump(file);
         }
     }
-
-
-    
 
 
     /** 
@@ -150,5 +144,4 @@ public class LocalVariableTable extends Attribute {
     }
 
 
-    
 }

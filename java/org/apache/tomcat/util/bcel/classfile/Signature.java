@@ -37,9 +37,6 @@ public final class Signature extends Attribute {
     private int signature_index;
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param name_index Index in constant pool to CONSTANT_Utf8
@@ -77,12 +74,6 @@ public final class Signature extends Attribute {
         super.dump(file);
         file.writeShort(signature_index);
     }
-
-
-    
-
-
-    
 
 
     /**

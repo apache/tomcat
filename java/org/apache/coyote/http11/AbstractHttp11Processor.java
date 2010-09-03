@@ -150,7 +150,6 @@ public abstract class AbstractHttp11Processor {
     protected String localName = null;
 
 
-
     /**
      * Local port to which the socket is connected
      */
@@ -365,10 +364,7 @@ public abstract class AbstractHttp11Processor {
         }
         return "off";
     }
-    
-    
 
- 
 
     /**
      * General use method
@@ -825,7 +821,6 @@ public abstract class AbstractHttp11Processor {
         }
         return true;
     }
-
 
 
 }

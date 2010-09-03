@@ -50,12 +50,8 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
     private Method[] methods; // methods defined in the class
     private Attribute[] attributes; // attributes defined in the class
     private AnnotationEntry[] annotations;   // annotations defined on the class
-    
-    
-    
-    
-    
-    
+
+
     //  Annotations are collected from certain attributes, don't do it more than necessary!
     private boolean annotationsOutOfDate = true;
     
@@ -146,30 +142,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
             interface_names[i] = Utility.compactClassName(str, false);
         }
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**
@@ -270,9 +242,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
         }
         return buf.toString();
     }
-
-
-    
 
 
     public final boolean isSuper() {

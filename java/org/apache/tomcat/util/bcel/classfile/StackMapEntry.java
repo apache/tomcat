@@ -121,36 +121,6 @@ public final class StackMapEntry implements Cloneable {
     }
 
 
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
     /**
      * @return deep copy of this object
      */
@@ -163,11 +133,4 @@ public final class StackMapEntry implements Cloneable {
     }
 
 
-    
-
-
-    
-
-
-    
 }

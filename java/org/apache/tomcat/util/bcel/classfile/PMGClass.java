@@ -37,9 +37,6 @@ public final class PMGClass extends Attribute {
     private int pmg_class_index, pmg_index;
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param name_index Index in constant pool to CONSTANT_Utf8
@@ -81,18 +78,6 @@ public final class PMGClass extends Attribute {
         file.writeShort(pmg_index);
         file.writeShort(pmg_class_index);
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

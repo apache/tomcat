@@ -772,7 +772,6 @@ public class JNDIRealm extends RealmBase {
         this.roleNested = roleNested;
 
     }
-     
 
 
     /**
@@ -1437,7 +1436,6 @@ public class JNDIRealm extends RealmBase {
      }
 
 
-
     /**
      * Check whether the credentials presented by the user match those
      * retrieved from the directory.
@@ -1525,7 +1523,6 @@ public class JNDIRealm extends RealmBase {
         return (validated);
 
     }
-
 
 
     /**
@@ -1762,7 +1759,6 @@ public class JNDIRealm extends RealmBase {
 
         return valueString;
     }
-
 
 
     /**

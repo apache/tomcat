@@ -65,9 +65,8 @@ import org.apache.juli.logging.LogFactory;
  */
 public class LazyReplicatedMap extends AbstractReplicatedMap {
     private static final Log log = LogFactory.getLog(LazyReplicatedMap.class);
-    
 
-    
+
 //------------------------------------------------------------------------------    
 //              CONSTRUCTORS / DESTRUCTORS
 //------------------------------------------------------------------------------   
@@ -105,9 +104,6 @@ public class LazyReplicatedMap extends AbstractReplicatedMap {
         }
 
 
-
-
-    
 //------------------------------------------------------------------------------    
 //              METHODS TO OVERRIDE    
 //------------------------------------------------------------------------------
@@ -181,9 +177,6 @@ public class LazyReplicatedMap extends AbstractReplicatedMap {
         } while ( !success && (firstIdx!=nextIdx));
         return backup;
     }
-    
-    
-
 
 
 }

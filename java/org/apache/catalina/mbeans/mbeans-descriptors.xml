@@ -241,8 +241,6 @@
     </operation>
 
 
-
-
     <operation   name="createStandardManager"
           description="Create a new StandardManager"
                impact="ACTION"
