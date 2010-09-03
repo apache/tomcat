@@ -905,7 +905,7 @@ public class AprEndpoint extends AbstractEndpoint {
             while (running) {
 
                 // Loop if endpoint is paused
-                while (paused) {
+                while (paused && running) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -913,6 +913,9 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                if (!running) {
+                    break;
+                }
                 try {
                     // Accept the next incoming connection from the server socket
                     long socket = Socket.accept(serverSock);
@@ -1058,7 +1061,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // Loop until we receive a shutdown command
             while (running) {
                 // Loop if endpoint is paused
-                while (paused) {
+                while (paused && running) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -1066,9 +1069,12 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                if (!running) {
+                    break;
+                }
                 if (keepAliveCount < 1 && addCount < 1) {
                     synchronized (this) {
-                        while (keepAliveCount < 1 && addCount < 1) {
+                        while (keepAliveCount < 1 && addCount < 1 && running) {
                             // Reset maintain time.
                             maintainTime = 0;
                             try {
@@ -1080,6 +1086,9 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                if (!running) {
+                    break;
+                }
                 try {
                     // Add sockets which are waiting to the poller
                     if (addCount > 0) {
@@ -1252,6 +1261,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 SendfileData data = addS.get(i);
                 Socket.destroy(data.socket);
             }
+            addS.clear();
             // Close all sockets still in the poller
             int rv = Poll.pollset(sendfilePollset, desc);
             if (rv > 0) {
@@ -1345,7 +1355,7 @@ public class AprEndpoint extends AbstractEndpoint {
             while (running) {
 
                 // Loop if endpoint is paused
-                while (paused) {
+                while (paused && running) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -1353,9 +1363,12 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                if (!running) {
+                    break;
+                }
                 if (sendfileCount < 1 && addCount < 1) {
                     synchronized (this) {
-                        while (sendfileCount < 1 && addS.size() < 1) {
+                        while (sendfileCount < 1 && addS.size() < 1 && running) {
                             // Reset maintain time.
                             maintainTime = 0;
                             try {
@@ -1367,6 +1380,9 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                if (!running) {
+                    break;
+                }
                 try {
                     // Add socket to the poller
                     if (addCount > 0) {
