@@ -35,7 +35,6 @@ public interface ClusterSession extends Session, HttpSession {
     * @param primarySession Flag value
     */
    public void setPrimarySession(boolean primarySession);
-   
-   
+
 
 }

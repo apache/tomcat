@@ -739,7 +739,6 @@ public class NioThread implements Runnable {
   }
 
 
-
   public void acceptor(NioChannelCallback cstate, 
                        int port, 
                        InetAddress inet, 
@@ -1141,9 +1140,8 @@ public class NioThread implements Runnable {
           }
       }
   }
-  
-  
-  
+
+
   protected boolean isSelectorThread() {
       return Thread.currentThread() == selectorThread;
   }

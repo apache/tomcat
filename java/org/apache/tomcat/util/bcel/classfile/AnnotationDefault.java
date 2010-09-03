@@ -80,7 +80,6 @@ public class AnnotationDefault extends Attribute
         default_value = defaultValue;
     }
 
-    
 
     @Override
     public Attribute copy(ConstantPool _constant_pool)

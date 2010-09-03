@@ -44,7 +44,6 @@ public abstract class ElementValue
         this.cpool = cpool;
     }
 
-    
 
     public abstract String stringifyValue();
 

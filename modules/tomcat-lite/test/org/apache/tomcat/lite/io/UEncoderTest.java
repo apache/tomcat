@@ -39,7 +39,6 @@ public class UEncoderTest extends TestCase {
         dec.urlEncode(uri, cc, enc);
         return cc.toString();
     }
-    
-    
+
 
 }

@@ -89,8 +89,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         
     }
 
-    
-    
+
     //==============================JMX STUFF========================    
     
     protected String poolName = null;
@@ -127,7 +126,6 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             registerJmx();
         }
     }
-
 
 
     @Override
@@ -201,9 +199,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public String getPoolName() {
         return poolName;
     }
-    
-    
-    
+
+
     public boolean isNotifyPool() {
         return notifyPool;
     }

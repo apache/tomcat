@@ -210,7 +210,6 @@ public class CBuffer extends CBucket implements Cloneable,
     }
 
 
-    
     /**
      * Append a string to the buffer
      */

@@ -280,7 +280,6 @@ public class NioEndpoint extends AbstractEndpoint {
         }
     };
 
-    
 
     // ------------------------------------------------------------- Properties
 
@@ -304,7 +303,6 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
-
     /**
      * Priority of the acceptor threads.
      */
@@ -320,17 +318,12 @@ public class NioEndpoint extends AbstractEndpoint {
     public int getPollerThreadPriority() { return pollerThreadPriority; }
 
 
-
     /**
      * Handling of accepted sockets.
      */
     protected Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
     public Handler getHandler() { return handler; }
-
-
-
-    
 
 
     /**
@@ -347,7 +340,6 @@ public class NioEndpoint extends AbstractEndpoint {
     protected int acceptorThreadCount = 1;
     public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
     public int getAcceptorThreadCount() { return acceptorThreadCount; }
-
 
 
     /**
@@ -372,8 +364,6 @@ public class NioEndpoint extends AbstractEndpoint {
         int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;
         return pollers[idx];
     }
-
-
 
 
     public void setSelectorPool(NioSelectorPool selectorPool) {
@@ -447,8 +437,6 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
-
-    
     /**
      * Return the state of the endpoint.
      *
@@ -704,9 +692,6 @@ public class NioEndpoint extends AbstractEndpoint {
     public byte[] getOomParachuteData() {
         return oomParachuteData;
     }
-
-
-    
 
 
     /**
@@ -1500,7 +1485,6 @@ public class NioEndpoint extends AbstractEndpoint {
         public void release(NioChannel socket);
         public void release(SocketChannel socket);
     }
-
 
 
     // ---------------------------------------------- SocketProcessor Inner Class

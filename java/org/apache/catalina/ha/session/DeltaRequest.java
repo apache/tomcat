@@ -257,7 +257,6 @@ public class DeltaRequest implements Externalizable {
             actions.addLast(info);
         }//for
     }
-        
 
 
     public void writeExternal(java.io.ObjectOutput out ) throws java.io.IOException {

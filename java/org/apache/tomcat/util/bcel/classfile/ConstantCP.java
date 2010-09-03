@@ -38,9 +38,6 @@ public abstract class ConstantCP extends Constant {
     protected int class_index, name_and_type_index;
 
 
-    
-
-
     /**
      * Initialize instance from file data.
      *
@@ -92,15 +89,6 @@ public abstract class ConstantCP extends Constant {
     public final int getNameAndTypeIndex() {
         return name_and_type_index;
     }
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

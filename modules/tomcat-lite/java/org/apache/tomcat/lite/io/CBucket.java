@@ -141,8 +141,6 @@ public class CBucket implements CharSequence, Comparable, Serializable {
     }
 
 
-    
-
     /**
      * Compares the message bytes to the specified String object.
      * 

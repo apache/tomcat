@@ -293,7 +293,6 @@ public interface Constants {
     "void", "array", "object", "unknown", "address"
   };
 
-  
 
   /**
    * Number of byte code operands for each opcode, i.e., number of bytes after the tag byte
@@ -482,9 +481,6 @@ public interface Constants {
     ILLEGAL_OPCODE, "impdep1", "impdep2"
   };
 
-  
-
-  
 
   /** Attributes and their corresponding names.
    */

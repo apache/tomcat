@@ -35,9 +35,6 @@ public class ClassElementValue extends ElementValue
         this.idx = idx;
     }
 
-    
-
-    
 
     @Override
     public String stringifyValue()

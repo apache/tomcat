@@ -101,7 +101,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * Selector pool, for blocking reads and blocking writes
      */
     protected NioSelectorPool pool;
-    
 
 
     // ------------------------------------------------------------- Properties
@@ -495,8 +494,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         // Reading the header name
         // Header name is always US-ASCII
         //
-        
-        
+
 
         while (headerParsePos == HeaderParsePosition.HEADER_NAME) {
 
@@ -648,8 +646,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         }
         return result;
     }
-
-
 
 
     // ------------------------------------------------------ Protected Methods

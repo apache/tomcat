@@ -309,9 +309,8 @@ public class HttpChannel extends IOChannel {
     public String getStatus() {
         return getResponse().getStatus() + " " + getResponse().getMessage();
     }
-    
-    
- 
+
+
     public String getTarget() {
         if (target == null) {
             return ":0"; // server mode ? 
@@ -488,7 +487,6 @@ public class HttpChannel extends IOChannel {
     }
 
 
-    
     /*
     The field-content does not include any leading or trailing LWS: 
     linear white space occurring before the first non-whitespace 

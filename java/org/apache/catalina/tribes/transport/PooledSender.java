@@ -206,7 +206,6 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             notinuse.clear();
             inuse.clear();
             notify();
-            
 
 
         }

@@ -89,9 +89,8 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     public StandardThreadExecutor() {
         //empty constructor for the digester
     }
-    
 
-    
+
     // ---------------------------------------------- Public Methods
     
     @Override
@@ -273,7 +272,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     }
 
 
-
     @Override
     public boolean resizePool(int corePoolSize, int maximumPoolSize) {
         if (executor == null)
@@ -283,7 +281,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         executor.setMaximumPoolSize(maximumPoolSize);
         return true;
     }
-
 
 
     @Override

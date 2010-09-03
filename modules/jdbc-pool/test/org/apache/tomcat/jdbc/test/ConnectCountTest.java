@@ -42,9 +42,8 @@ public class ConnectCountTest extends DefaultTestCase {
     protected long complete = Long.getLong("complete",20000);
     protected boolean printthread = Boolean.getBoolean("printthread");
     CountDownLatch latch = null;
-    
-    
-    
+
+
     @Override
     public org.apache.tomcat.jdbc.pool.DataSource createDefaultDataSource() {
         // TODO Auto-generated method stub
@@ -57,15 +56,13 @@ public class ConnectCountTest extends DefaultTestCase {
         ds.getPoolProperties().setMaxActive(10);
         return ds;
     }
-    
-    
+
 
     @Override
     protected void tearDown() throws Exception {
         Driver.reset();
         super.tearDown();
     }
-
 
 
     protected void printThreadResults(TestThread[] threads, String name, int active, int expected) {

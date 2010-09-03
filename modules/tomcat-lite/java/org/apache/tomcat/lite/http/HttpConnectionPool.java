@@ -267,9 +267,7 @@ public class HttpConnectionPool {
                     con = hcon;
                 }
             }
-            
-            
-            
+
 
             // we got a connection - make sure we're connected
             http11ConnectOrSend(httpCh, target, con, ssl);

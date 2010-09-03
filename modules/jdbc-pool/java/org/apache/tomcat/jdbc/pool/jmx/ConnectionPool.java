@@ -74,10 +74,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
     public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNETION ABANDONED";
-    
-    
-    
-     
+
+
     public MBeanNotificationInfo[] getNotificationInfo() { 
         MBeanNotificationInfo[] pres = super.getNotificationInfo();
         MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
@@ -179,9 +177,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     //=========================================================
     //  PROPERTIES / CONFIGURATION
     //=========================================================    
-    
-    
-    
+
+
     public String getConnectionProperties() {
         return getPoolProperties().getConnectionProperties();
     }

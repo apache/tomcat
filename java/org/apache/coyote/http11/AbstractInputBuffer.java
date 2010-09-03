@@ -39,8 +39,6 @@ public abstract class AbstractInputBuffer implements InputBuffer{
     // ----------------------------------------------------------- Constructors
 
 
-    
-
     // -------------------------------------------------------------- Variables
 
 
@@ -228,8 +226,6 @@ public abstract class AbstractInputBuffer implements InputBuffer{
     public void setSwallowInput(boolean swallowInput) {
         this.swallowInput = swallowInput;
     }
-
-    
 
 
     // --------------------------------------------------------- Public Methods

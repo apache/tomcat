@@ -547,9 +547,8 @@ public class WebXml {
     private URL uRL = null;
     public void setURL(URL url) { this.uRL = url; }
     public URL getURL() { return uRL; }
-    
-    
-    
+
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(32);

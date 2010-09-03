@@ -95,8 +95,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                  "\n\tMBytes/second:"+(size*cnt/time/1024f/1024f));
     }
 
-    
-    
+
     public LoadTest(ManagedChannel channel, 
                     boolean send,
                     int msgCount,
@@ -112,9 +111,8 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         this.statsInterval = stats;
         this.breakonChannelException = breakOnEx;
     }
-    
-    
-    
+
+
     public void run() {
         
         long counter = 0;
@@ -171,7 +169,6 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         endTest();
     }
 
-    
 
     /**
      * memberAdded
@@ -246,8 +243,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         System.out.println("} size:"+data.length);
     }
 
-    
-    
+
     public static class LoadMessage extends ByteMessage {
         
         public static byte[] outdata = new byte[size];

@@ -22,7 +22,6 @@ import java.util.Properties;
 import java.util.logging.LogManager;
 
 
-
 /**
  * Modified LogFactory: removed all discovery, hardcode a specific implementation
  * If you like a different logging implementation - use either the discovery-based
@@ -244,11 +243,7 @@ public /* abstract */ class LogFactory {
     }
 
 
-    
-
-
     // ------------------------------------------------------- Static Variables
-
 
 
     // --------------------------------------------------------- Static Methods

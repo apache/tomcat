@@ -85,7 +85,6 @@ public class FileUtils {
         }
     }
 
-    
 
     /**
      * Cleans a directory without deleting it.

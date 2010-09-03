@@ -38,7 +38,6 @@ public class TestInterceptorShortName extends DefaultTestCase {
         this.datasource.close();
         assertTrue("Pool should have been closed.",TestInterceptor.poolclosed);
     }
-    
-    
+
 
 }

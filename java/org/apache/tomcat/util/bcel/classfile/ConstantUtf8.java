@@ -38,9 +38,6 @@ public final class ConstantUtf8 extends Constant {
     private String bytes;
 
 
-    
-
-
     /**
      * Initialize instance from file data.
      *
@@ -51,9 +48,6 @@ public final class ConstantUtf8 extends Constant {
         super(Constants.CONSTANT_Utf8);
         bytes = file.readUTF();
     }
-
-
-    
 
 
     /**
@@ -75,9 +69,6 @@ public final class ConstantUtf8 extends Constant {
     public final String getBytes() {
         return bytes;
     }
-
-
-    
 
 
     /**

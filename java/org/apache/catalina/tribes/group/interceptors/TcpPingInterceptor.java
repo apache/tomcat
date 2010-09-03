@@ -179,7 +179,5 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         }
     }
 
-    
-    
 
 }

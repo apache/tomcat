@@ -153,7 +153,6 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
         super.heartbeat();
     }
 
-    
 
     public int getMaxSize() {
         return maxSize;
@@ -215,8 +214,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
             return (System.currentTimeMillis()-received)>expire;
         }
 
-        
-        
+
     }
     
     public static class FragKey {

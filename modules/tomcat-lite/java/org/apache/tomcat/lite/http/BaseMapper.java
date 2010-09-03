@@ -85,7 +85,6 @@ public class BaseMapper {
             addWrapper(contextMapElement, path, wrapper, jspWildCard);
         }
 
-        
 
         /**
          * Remove a wrapper from the context associated with this wrapper.

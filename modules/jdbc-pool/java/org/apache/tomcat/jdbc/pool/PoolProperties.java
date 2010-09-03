@@ -798,9 +798,8 @@ public class PoolProperties implements PoolConfiguration {
         result = result || (timer && getMinEvictableIdleTimeMillis()>0); 
         return result;
     }
-    
-    
-    
+
+
     public static class InterceptorDefinition {
         protected String className;
         protected Map<String,InterceptorProperty> properties = new HashMap<String,InterceptorProperty>();

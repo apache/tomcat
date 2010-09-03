@@ -50,8 +50,7 @@ public class AbsoluteOrder {
         super();
     }
 
-    
-    
+
     public static void absoluteOrder(Member[] members) {
         if ( members == null || members.length == 0 ) return;
         Arrays.sort(members,comp);

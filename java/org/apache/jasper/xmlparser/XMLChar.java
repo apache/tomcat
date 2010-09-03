@@ -967,9 +967,6 @@ public class XMLChar {
     } // isValidName(String):boolean
 
 
-
-
-
     // encodings
 
     /**

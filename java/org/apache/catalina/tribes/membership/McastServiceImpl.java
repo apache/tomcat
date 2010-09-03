@@ -238,8 +238,7 @@ public class McastServiceImpl
             socket.setTimeToLive(mcastTTL);
         }
     }
-    
-    
+
 
     /**
      * Start the service

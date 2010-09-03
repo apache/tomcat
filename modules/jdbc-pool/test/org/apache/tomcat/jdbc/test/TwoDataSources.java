@@ -58,9 +58,8 @@ public class TwoDataSources extends DefaultTestCase {
         }catch (Exception x) {
             assertTrue("Connection c2 should be working",false);
         }
-        
 
-        
+
     }
 
 }
