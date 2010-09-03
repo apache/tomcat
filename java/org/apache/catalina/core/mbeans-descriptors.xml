@@ -315,10 +315,6 @@
                description="Time (in milliseconds) it took to start this context"
                type="long"/>
           
-    <attribute name="state"
-               description="Current state of this component"
-               type="int"/>
-                     
     <attribute name="stateManageable"
                description="State management support for this managed object"
                is="true"
