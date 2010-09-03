@@ -25,6 +25,7 @@ public class ArrayElementValue extends ElementValue
     // For array types, this is the array
     private ElementValue[] evalues;
 
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
@@ -48,6 +49,7 @@ public class ArrayElementValue extends ElementValue
         this.evalues = datums;
     }
 
+    @Override
     public void dump(DataOutputStream dos) throws IOException
     {
         dos.writeByte(type); // u1 type of value (ARRAY == '[')
@@ -58,6 +60,7 @@ public class ArrayElementValue extends ElementValue
         }
     }
 
+    @Override
     public String stringifyValue()
     {
         StringBuffer sb = new StringBuffer();

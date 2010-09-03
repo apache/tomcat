@@ -38,6 +38,7 @@ public abstract class Constant implements Cloneable, Serializable {
     private static final long serialVersionUID = 2827409182154809454L;
     private static BCELComparator _cmp = new BCELComparator() {
 
+        @Override
         public boolean equals( Object o1, Object o2 ) {
             Constant THIS = (Constant) o1;
             Constant THAT = (Constant) o2;
@@ -45,6 +46,7 @@ public abstract class Constant implements Cloneable, Serializable {
         }
 
 
+        @Override
         public int hashCode( Object o ) {
             Constant THIS = (Constant) o;
             return THIS.toString().hashCode();
@@ -81,6 +83,7 @@ public abstract class Constant implements Cloneable, Serializable {
     /**
      * @return String representation.
      */
+    @Override
     public String toString() {
         return Constants.CONSTANT_NAMES[tag] + "[" + tag + "]";
     }
@@ -89,6 +92,7 @@ public abstract class Constant implements Cloneable, Serializable {
     
 
 
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -145,6 +149,7 @@ public abstract class Constant implements Cloneable, Serializable {
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals( Object obj ) {
         return _cmp.equals(this, obj);
     }
@@ -156,6 +161,7 @@ public abstract class Constant implements Cloneable, Serializable {
      * 
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return _cmp.hashCode(this);
     }
