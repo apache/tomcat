@@ -34,6 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantUtf8 extends Constant {
 
+    private static final long serialVersionUID = 8119001312020421976L;
     private String bytes;
 
 

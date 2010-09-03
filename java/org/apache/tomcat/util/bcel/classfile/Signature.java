@@ -33,6 +33,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class Signature extends Attribute {
 
+    private static final long serialVersionUID = 7493781777025829964L;
     private int signature_index;
 
 

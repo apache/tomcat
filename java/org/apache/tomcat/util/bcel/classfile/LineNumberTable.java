@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class LineNumberTable extends Attribute {
 
+    private static final long serialVersionUID = 6585122636118666124L;
     private int line_number_table_length;
     private LineNumber[] line_number_table; // Table of line/numbers pairs
 

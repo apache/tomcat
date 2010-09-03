@@ -33,6 +33,8 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class RuntimeInvisibleAnnotations extends Annotations
 {
+    private static final long serialVersionUID = -7962627688723310248L;
+
     /**
      * @param name_index
      *            Index pointing to the name <em>Code</em>

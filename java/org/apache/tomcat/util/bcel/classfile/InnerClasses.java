@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class InnerClasses extends Attribute {
 
+    private static final long serialVersionUID = 54179484605570305L;
     private InnerClass[] inner_classes;
     private int number_of_classes;
 

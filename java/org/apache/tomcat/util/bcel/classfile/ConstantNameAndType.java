@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantNameAndType extends Constant {
 
+    private static final long serialVersionUID = 1010506730811368756L;
     private int name_index; // Name of field/method
     private int signature_index; // and its signature.
 
