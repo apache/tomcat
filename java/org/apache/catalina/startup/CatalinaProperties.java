@@ -100,8 +100,8 @@ public class CatalinaProperties {
             try {
                 File home = new File(getCatalinaBase());
                 File conf = new File(home, "conf");
-                File properties = new File(conf, "catalina.properties");
-                is = new FileInputStream(properties);
+                File propsFile = new File(conf, "catalina.properties");
+                is = new FileInputStream(propsFile);
             } catch (Throwable t) {
                 handleThrowable(t);
             }
