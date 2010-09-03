@@ -542,10 +542,10 @@ public class AprEndpoint extends AbstractEndpoint {
             for (int i = 0; i < pollerThreadCount; i++) {
                 pollers[i] = new Poller(false);
                 pollers[i].init();
-                Thread pollerThread = new Thread(pollers[i], getName() + "-Poller-" + i);
-                pollerThread.setPriority(threadPriority);
-                pollerThread.setDaemon(true);
-                pollerThread.start();
+                pollers[i].setName(getName() + "-Poller-" + i);
+                pollers[i].setPriority(threadPriority);
+                pollers[i].setDaemon(true);
+                pollers[i].start();
             }
 
             // Start comet poller threads
@@ -553,10 +553,10 @@ public class AprEndpoint extends AbstractEndpoint {
             for (int i = 0; i < pollerThreadCount; i++) {
                 cometPollers[i] = new Poller(true);
                 cometPollers[i].init();
-                Thread pollerThread = new Thread(cometPollers[i], getName() + "-CometPoller-" + i);
-                pollerThread.setPriority(threadPriority);
-                pollerThread.setDaemon(true);
-                pollerThread.start();
+                cometPollers[i].setName(getName() + "-CometPoller-" + i);
+                cometPollers[i].setPriority(threadPriority);
+                cometPollers[i].setDaemon(true);
+                cometPollers[i].start();
             }
 
             // Start sendfile threads
@@ -565,10 +565,10 @@ public class AprEndpoint extends AbstractEndpoint {
                 for (int i = 0; i < sendfileThreadCount; i++) {
                     sendfiles[i] = new Sendfile();
                     sendfiles[i].init();
-                    Thread sendfileThread = new Thread(sendfiles[i], getName() + "-Sendfile-" + i);
-                    sendfileThread.setPriority(threadPriority);
-                    sendfileThread.setDaemon(true);
-                    sendfileThread.start();
+                    sendfiles[i].setName(getName() + "-Sendfile-" + i);
+                    sendfiles[i].setPriority(threadPriority);
+                    sendfiles[i].setDaemon(true);
+                    sendfiles[i].start();
                 }
             }
 
@@ -576,10 +576,10 @@ public class AprEndpoint extends AbstractEndpoint {
             acceptors = new Acceptor[acceptorThreadCount];
             for (int i = 0; i < acceptorThreadCount; i++) {
                 acceptors[i] = new Acceptor();
-                Thread acceptorThread = new Thread(acceptors[i], getName() + "-Acceptor-" + i);
-                acceptorThread.setPriority(threadPriority);
-                acceptorThread.setDaemon(getDaemon());
-                acceptorThread.start();
+                acceptors[i].setName(getName() + "-Acceptor-" + i);
+                acceptors[i].setPriority(threadPriority);
+                acceptors[i].setDaemon(getDaemon());
+                acceptors[i].start();
             }
 
         }
@@ -670,6 +670,16 @@ public class AprEndpoint extends AbstractEndpoint {
         if (running) {
             running = false;
             unlockAccept();
+            for (int i = 0; i < acceptors.length; i++) {
+                if (acceptors[i].isAlive()) {
+                    try {
+                        acceptors[i].interrupt();
+                        acceptors[i].join();
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+            }
             // Wait for polltime before doing anything, so that the poller threads
             // exit, otherwise parallel destruction of sockets which are still
             // in the poller can cause problems
@@ -682,26 +692,35 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             for (int i = 0; i < pollers.length; i++) {
                 pollers[i].destroy();
+                try {
+                    pollers[i].interrupt();
+                    pollers[i].join();
+                } catch (InterruptedException e) {
+                        // Ignore
+                }
             }
             pollers = null;
             for (int i = 0; i < cometPollers.length; i++) {
                 cometPollers[i].destroy();
+                try {
+                    cometPollers[i].interrupt();
+                    cometPollers[i].join();
+                } catch (InterruptedException e) {
+                        // Ignore
+                }
             }
             cometPollers = null;
             if (useSendfile) {
                 for (int i = 0; i < sendfiles.length; i++) {
                     sendfiles[i].destroy();
+                    try {
+                        sendfiles[i].interrupt();
+                        sendfiles[i].join();
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
                 }
                 sendfiles = null;
-            }
-            // Wait another polltime to make sure everything is shutdown else
-            // the JVM will crash when we terminate the APR library
-            try {
-                synchronized (this) {
-                    this.wait(pollTime / 1000);
-                }
-            } catch (InterruptedException e) {
-                // Ignore
             }
         }
         shutdownExecutor();
@@ -892,7 +911,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Server socket acceptor thread.
      */
-    protected class Acceptor implements Runnable {
+    protected class Acceptor extends Thread {
 
 
         /**
@@ -952,7 +971,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Poller class.
      */
-    public class Poller implements Runnable {
+    public class Poller extends Thread {
 
         protected long serverPollset = 0;
         protected long pool = 0;
@@ -999,7 +1018,7 @@ public class AprEndpoint extends AbstractEndpoint {
         /**
          * Destroy the poller.
          */
-        protected void destroy() {
+        public void destroy() {
             // Close all sockets in the add queue
             for (int i = 0; i < addCount; i++) {
                 if (comet) {
@@ -1216,7 +1235,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Sendfile class.
      */
-    public class Sendfile implements Runnable {
+    public class Sendfile extends Thread {
 
         protected long sendfilePollset = 0;
         protected long pool = 0;
@@ -1254,7 +1273,7 @@ public class AprEndpoint extends AbstractEndpoint {
         /**
          * Destroy the poller.
          */
-        protected void destroy() {
+        public void destroy() {
             // Close any socket remaining in the add queue
             addCount = 0;
             for (int i = (addS.size() - 1); i >= 0; i--) {
