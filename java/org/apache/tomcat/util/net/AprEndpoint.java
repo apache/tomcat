@@ -92,6 +92,9 @@ public class AprEndpoint extends AbstractEndpoint {
     protected long sslContext = 0;
 
 
+    private Acceptor acceptors[] = null;
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -570,8 +573,10 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
             // Start acceptor threads
+            acceptors = new Acceptor[acceptorThreadCount];
             for (int i = 0; i < acceptorThreadCount; i++) {
-                Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
+                acceptors[i] = new Acceptor();
+                Thread acceptorThread = new Thread(acceptors[i], getName() + "-Acceptor-" + i);
                 acceptorThread.setPriority(threadPriority);
                 acceptorThread.setDaemon(getDaemon());
                 acceptorThread.start();
