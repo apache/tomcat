@@ -54,6 +54,10 @@
       description="notify lifecycleListener from message transfer failure"
       is="true"
       type="boolean"/>
+    <attribute
+      name="stateName"
+      description="The name of the LifecycleState that this component is currently in"
+      type="java.lang.String"/>
     <operation
       name="setProperty"
       description="set a property to all cluster managers (with prefix 'manager.')"
@@ -146,6 +150,10 @@
     <attribute
       name="primaryIndicatorName"
       description="Request attribute name to indicate that request processing is at primary session node"
+      type="java.lang.String"/>
+    <attribute
+      name="stateName"
+      description="The name of the LifecycleState that this component is currently in"
       type="java.lang.String"/>
     <attribute
       name="totalSendTime"

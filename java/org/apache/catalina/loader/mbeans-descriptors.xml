@@ -49,6 +49,10 @@
              writeable="false" 
                  type="java.lang.String"/>
 
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="loaderRepositories"
           description="Repositories set in the real loader"
                  type="[Ljava.lang.String;"
@@ -99,6 +103,10 @@
              writeable="false" 
                  type="java.lang.String"/>
 
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="loaderRepositories"
           description="Repositories set in the real loader"
                  type="[Ljava.lang.String;"
@@ -144,6 +152,10 @@
     <attribute   name="searchExternalFirst"
           description="The searchExternalFirst flag for this Loader"
                  type="boolean"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
 
     <attribute   name="URLs"
           description="The URLs of this loader"

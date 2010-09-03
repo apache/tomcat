@@ -1807,6 +1807,15 @@ public class WebappClassLoader
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getStateName() {
+        return getState().toString();
+    }
+
+
     @Override
     public void init() {
         // NOOP
