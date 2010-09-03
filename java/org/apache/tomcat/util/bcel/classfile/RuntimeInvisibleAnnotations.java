@@ -50,7 +50,7 @@ public class RuntimeInvisibleAnnotations extends Annotations
                                 throws IOException
     {
         super(Constants.ATTR_RUNTIMEIN_VISIBLE_ANNOTATIONS, name_index, length,
-                file, constant_pool, false);
+                file, constant_pool);
     }
 
     /**
