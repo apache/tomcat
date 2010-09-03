@@ -233,8 +233,10 @@ public class WebappClassLoader
 
 
     /**
-     * Construct a new ClassLoader with no defined repositories and no
+     * Construct a new ClassLoader with no defined repositories and the given
      * parent ClassLoader.
+     *
+     * @param parent Our parent class loader
      */
     public WebappClassLoader(ClassLoader parent) {
 
