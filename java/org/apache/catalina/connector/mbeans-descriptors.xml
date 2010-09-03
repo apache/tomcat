@@ -145,6 +145,10 @@
           description="Comma-separated list of SSL protocol variants to be enabled"
                  type="java.lang.String"/>
                  
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <!-- Common -->
     <attribute   name="tcpNoDelay"
           description="Should we use TCP no delay?"

@@ -57,6 +57,10 @@
           description="The column in the user role table that names a role"
                  type="java.lang.String"/>
 
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="userCredCol"
           description="The column in the user table that holds the user's credentials"
                  type="java.lang.String"/>
@@ -118,6 +122,10 @@
                  
     <attribute   name="realmPath"
           description="The realm path"
+                 type="java.lang.String"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"/>
 
     <attribute   name="userClassNames"
@@ -185,6 +193,10 @@
                  
     <attribute   name="realmPath"
           description="The realm path"
+                 type="java.lang.String"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"/>
 
     <attribute   name="userCredCol"
@@ -305,6 +317,10 @@
           description="Should we search the entire subtree for matching memberships?"
                  type="boolean"/>
 
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="userBase"
           description="The base element for user searches"
                  type="java.lang.String"/>
@@ -371,6 +387,10 @@
           description="The realm path"
                  type="java.lang.String"/>
 
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"/>
+
     <attribute   name="validate"
           description="The 'validate certificate chains' flag."
                  type="boolean"/>
@@ -411,6 +431,10 @@
                  
     <attribute   name="realmPath"
           description="The realm path"
+                 type="java.lang.String"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"/>
 
     <attribute   name="validate"
@@ -454,6 +478,10 @@
             
     <attribute   name="realmPath"
           description="The realm path"
+                 type="java.lang.String"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"/>
 
     <attribute   name="validate"

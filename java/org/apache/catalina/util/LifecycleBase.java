@@ -286,6 +286,15 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getStateName() {
+        return getState().toString();
+    }
+
+
+    /**
      * Provides a mechanism for sub-classes to update the component state.
      * Calling this method will automatically fire any associated
      * {@link Lifecycle} event.
