@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class SourceFile extends Attribute {
 
+    private static final long serialVersionUID = 332346699609443704L;
     private int sourcefile_index;
 
 

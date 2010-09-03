@@ -32,6 +32,9 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class RuntimeInvisibleParameterAnnotations extends ParameterAnnotations {
 
+    private static final long serialVersionUID = -6819370369102352536L;
+
+
     /**
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes

@@ -34,6 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantFloat extends Constant implements ConstantObject {
 
+    private static final long serialVersionUID = 8301269629885378651L;
     private float bytes;
 
 

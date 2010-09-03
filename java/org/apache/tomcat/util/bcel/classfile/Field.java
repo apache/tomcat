@@ -32,6 +32,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  */
 public final class Field extends FieldOrMethod {
 
+    private static final long serialVersionUID = 2646214544240375238L;
     private static BCELComparator _cmp = new BCELComparator() {
 
         public boolean equals( Object o1, Object o2 ) {

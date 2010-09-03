@@ -50,7 +50,8 @@ import org.apache.tomcat.util.bcel.Constants;
 //  }
 // J5TODO: Needs some testing !
 public class LocalVariableTypeTable extends Attribute {
-  private int             local_variable_type_table_length; // Table of local
+  private static final long serialVersionUID = -5466082154076451597L;
+private int             local_variable_type_table_length; // Table of local
   private LocalVariable[] local_variable_type_table;        // variables
 
   public LocalVariableTypeTable(int name_index, int length,

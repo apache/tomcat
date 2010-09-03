@@ -44,6 +44,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class Code extends Attribute {
 
+    private static final long serialVersionUID = 8936843273318969602L;
     private int max_stack; // Maximum size of stack used by this method
     private int max_locals; // Number of local variables
     private int code_length; // Length of code in bytes

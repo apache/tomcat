@@ -34,6 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class Deprecated extends Attribute {
 
+    private static final long serialVersionUID = 8499975360019639912L;
     private byte[] bytes;
 
 

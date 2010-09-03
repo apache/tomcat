@@ -50,6 +50,8 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public abstract class Attribute implements Cloneable, Serializable
 {
+    private static final long serialVersionUID = 1514136303496688899L;
+
     protected int name_index; // Points to attribute name in constant pool
 
     protected int length; // Content length of attribute field
