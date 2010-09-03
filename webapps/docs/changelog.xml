@@ -106,6 +106,10 @@
         <bug>48967</bug>: Replace strings "catalina.base" and "catalina.home"
         by globally defined constants. Patch provided by Marc Guillemot. (rjung)
       </update>
+      <fix>
+        Keep the MBean names for web applications consistent between Tomcat 6
+        and Tomcat 7. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
