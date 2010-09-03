@@ -287,4 +287,11 @@ public interface Lifecycle {
      * @return The current state of the source component.
      */
     public LifecycleState getState();
+    
+    
+    /**
+     * Obtain a textual representation of the current component state. Useful
+     * for JMX.
+     */
+    public String getStateName();
 }

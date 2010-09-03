@@ -324,6 +324,10 @@
                is="true"
                type="boolean"
                writeable="false" />         
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
           
     <attribute name="staticResources"
                description="Static resources associated with the context."
@@ -486,7 +490,10 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>               
-      
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>      
   </mbean>
   
   <mbean name="StandardEngine"
@@ -530,6 +537,10 @@
     <attribute name="startChildren"
                description="Will children be started automatically when they are added."
                type="boolean"/>  
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
                
     <attribute name="valveObjectNames"
                description="ObjectNames for the valves associated with this container"
@@ -566,7 +577,10 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-      
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
   </mbean>
   
   <mbean name="StandardHost"
@@ -641,6 +655,10 @@
     <attribute name="startChildren"
                description="Will children be started automatically when they are added?"
                type="boolean"/>            
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
       
     <attribute name="unpackWARs"
                description="Unpack WARs property"
@@ -730,6 +748,9 @@
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
   </mbean>
 
   <mbean name="StandardServer"
@@ -762,6 +783,10 @@
       
     <attribute name="shutdown"
                description="Shutdown password"
+               type="java.lang.String"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"/>
    
     <operation name="await"
@@ -806,6 +831,10 @@
                description="ObjectNames of the engine"
                type="javax.management.ObjectName"
                writeable="false" />
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
 
     <operation name="addConnector"
                description="Add a new connector"
@@ -887,6 +916,10 @@
                description="Number of tasks waiting to be processed"
                type="int"
           writeable="false" />
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
                
     <attribute name="threadPriority"
                description="The thread priority for threads in this thread pool"
@@ -1003,6 +1036,10 @@
                type="boolean"
                writeable="false"/>
 
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
+
     <attribute name="statisticsProvider"
                description="Performance statistics support for this managed object"
                is="true"
@@ -1054,7 +1091,10 @@
                 description="Fully qualified class name of the managed object"
                 type="java.lang.String"
                 writeable="false"/>  
-                    
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"/>
   </mbean>
 
 </mbeans-descriptors>
