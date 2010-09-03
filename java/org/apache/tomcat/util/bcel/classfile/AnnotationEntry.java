@@ -39,7 +39,6 @@ public class AnnotationEntry implements Constants, Serializable {
     
     private int type_index;
     private ConstantPool constant_pool;
-    private boolean isRuntimeVisible;
 
     private List element_value_pairs;
     
@@ -51,9 +50,9 @@ public class AnnotationEntry implements Constants, Serializable {
      * @param isRuntimeVisible
      * @throws IOException
      */
-    public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool, boolean isRuntimeVisible) throws IOException {
+    public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool) throws IOException {
         
-        final AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool, isRuntimeVisible);
+        final AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool);
         final int num_element_value_pairs = (file.readUnsignedShort());
         annotationEntry.element_value_pairs = new ArrayList();
         for (int i = 0; i < num_element_value_pairs; i++) {
@@ -63,10 +62,9 @@ public class AnnotationEntry implements Constants, Serializable {
         return annotationEntry;
     }
 
-    public AnnotationEntry(int type_index, ConstantPool constant_pool, boolean isRuntimeVisible) {
+    public AnnotationEntry(int type_index, ConstantPool constant_pool) {
         this.type_index = type_index;
         this.constant_pool = constant_pool;
-        this.isRuntimeVisible = isRuntimeVisible;
     }
     
     /**
