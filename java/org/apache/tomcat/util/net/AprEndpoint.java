@@ -671,12 +671,21 @@ public class AprEndpoint extends AbstractEndpoint {
             running = false;
             unlockAccept();
             for (int i = 0; i < acceptors.length; i++) {
+                int c = 0;
                 while (acceptors[i].isAlive()) {
                     try {
                         acceptors[i].interrupt();
                         acceptors[i].join(1000);
                     } catch (InterruptedException e) {
                         // Ignore
+                    }
+                    if (c++ > 60) {
+                        // If the Acceptor is still running force
+                        // the hard socket close.
+                        if (serverSock != 0) {
+                            Socket.close(serverSock);
+                            serverSock = 0;
+                        }
                     }
                 }
             }
