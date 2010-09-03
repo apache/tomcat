@@ -82,7 +82,8 @@ public abstract class Attribute implements Cloneable, Serializable
         file.writeInt(length);
     }
 
-    private static final Map readers = new HashMap();
+    private static final Map<String,AttributeReader> readers =
+            new HashMap<String,AttributeReader>();
 
     /*
      * Class method reads one attribute from the input data stream. This method
@@ -124,7 +125,7 @@ public abstract class Attribute implements Cloneable, Serializable
         switch (tag)
         {
         case Constants.ATTR_UNKNOWN:
-            AttributeReader r = (AttributeReader) readers.get(name);
+            AttributeReader r = readers.get(name);
             if (r != null)
             {
                 return r.createAttribute(name_index, length, file,

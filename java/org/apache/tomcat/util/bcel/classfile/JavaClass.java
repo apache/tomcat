@@ -35,7 +35,8 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class JavaClass extends AccessFlags implements Cloneable, Comparable {
+public class JavaClass extends AccessFlags
+        implements Cloneable, Comparable<JavaClass> {
 
     private static final long serialVersionUID = 7029227708237523236L;
     private String file_name;
@@ -155,7 +156,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
         if (annotationsOutOfDate) { 
             // Find attributes that contain annotation data
             Attribute[] attrs = getAttributes();
-            List accumulatedAnnotations = new ArrayList();
+            List<AnnotationEntry> accumulatedAnnotations = new ArrayList<AnnotationEntry>();
             for (int i = 0; i < attrs.length; i++) {
                 Attribute attribute = attrs[i];
                 if (attribute instanceof Annotations) {
@@ -164,7 +165,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
                         accumulatedAnnotations.add(runtimeAnnotations.getAnnotationEntries()[j]);
                 }
             }
-            annotations = (AnnotationEntry[])accumulatedAnnotations.toArray(new AnnotationEntry[accumulatedAnnotations.size()]);
+            annotations = accumulatedAnnotations.toArray(new AnnotationEntry[accumulatedAnnotations.size()]);
             annotationsOutOfDate = false;
         }
         return annotations;
@@ -266,8 +267,8 @@ public class JavaClass extends AccessFlags implements Cloneable, Comparable {
      * This ordering is based on the class name
      */
     @Override
-    public int compareTo( Object obj ) {
-        return getClassName().compareTo(((JavaClass) obj).getClassName());
+    public int compareTo(JavaClass obj) {
+        return getClassName().compareTo(obj.getClassName());
     }
 
 
