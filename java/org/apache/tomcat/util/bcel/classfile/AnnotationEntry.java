@@ -40,7 +40,7 @@ public class AnnotationEntry implements Constants, Serializable {
     private int type_index;
     private ConstantPool constant_pool;
 
-    private List element_value_pairs;
+    private List<ElementValuePair> element_value_pairs;
     
     /**
      * Factory method to create an AnnotionEntry from a DataInputStream
@@ -54,7 +54,7 @@ public class AnnotationEntry implements Constants, Serializable {
         
         final AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool);
         final int num_element_value_pairs = (file.readUnsignedShort());
-        annotationEntry.element_value_pairs = new ArrayList();
+        annotationEntry.element_value_pairs = new ArrayList<ElementValuePair>();
         for (int i = 0; i < num_element_value_pairs; i++) {
             annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool),
                     constant_pool));
@@ -80,7 +80,7 @@ public class AnnotationEntry implements Constants, Serializable {
      */
     public ElementValuePair[] getElementValuePairs() {
         // TOFO return List
-        return (ElementValuePair[]) element_value_pairs.toArray(new ElementValuePair[element_value_pairs.size()]);
+        return element_value_pairs.toArray(new ElementValuePair[element_value_pairs.size()]);
     }
 
 
@@ -89,7 +89,7 @@ public class AnnotationEntry implements Constants, Serializable {
         dos.writeShort(type_index);    // u2 index of type name in cpool
         dos.writeShort(element_value_pairs.size()); // u2 element_value pair count
         for (int i = 0 ; i<element_value_pairs.size();i++) {
-            ElementValuePair envp = (ElementValuePair) element_value_pairs.get(i);
+            ElementValuePair envp = element_value_pairs.get(i);
             envp.dump(dos);
         }
     }

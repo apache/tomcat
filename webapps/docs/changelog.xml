@@ -110,6 +110,10 @@
         Keep the MBean names for web applications consistent between Tomcat 6
         and Tomcat 7. (markt) 
       </fix>
+      <fix>
+        <bug>49876</bug>: Fix the generics warnings in the copied Apache Jakarta
+        BCEL code. Based on a patch by Gábor. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -30,19 +30,19 @@ import org.apache.tomcat.util.bcel.util.ByteSequence;
  */
 public abstract class Utility {
 
-    private static int unwrap( ThreadLocal tl ) {
-        return ((Integer) tl.get()).intValue();
+    private static int unwrap( ThreadLocal<Integer> tl ) {
+        return tl.get().intValue();
     }
 
 
-    private static void wrap( ThreadLocal tl, int value ) {
+    private static void wrap( ThreadLocal<Integer> tl, int value ) {
         tl.set(new Integer(value));
     }
 
-    private static ThreadLocal consumed_chars = new ThreadLocal() {
-
+    private static ThreadLocal<Integer> consumed_chars =
+            new ThreadLocal<Integer>() {
         @Override
-        protected Object initialValue() {
+        protected Integer initialValue() {
             return new Integer(0);
         }
     };/* How many chars have been consumed
