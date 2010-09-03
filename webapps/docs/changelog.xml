@@ -111,6 +111,10 @@
         and Tomcat 7. (markt) 
       </fix>
       <fix>
+        <bug>49865</bug>: Tomcat failed to start if catalina.properties was not
+        present. (markt)
+      </fix>
+      <fix>
         <bug>49876</bug>: Fix the generics warnings in the copied Apache Jakarta
         BCEL code. Based on a patch by Gábor. (markt) 
       </fix>

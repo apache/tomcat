@@ -26,7 +26,6 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.catalina.Globals;
-import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
@@ -99,8 +98,7 @@ public class CatalinaProperties {
                 is = (new URL(configUrl)).openStream();
             }
         } catch (Throwable t) {
-            // TODO Throws NoClassDefFoundError for ExceptionUtils
-            ExceptionUtils.handleThrowable(t);
+            handleThrowable(t);
         }
 
         if (is == null) {
@@ -110,8 +108,7 @@ public class CatalinaProperties {
                 File properties = new File(conf, "catalina.properties");
                 is = new FileInputStream(properties);
             } catch (Throwable t) {
-                // TODO Throws NoClassDefFoundError for ExceptionUtils
-                ExceptionUtils.handleThrowable(t);
+                handleThrowable(t);
             }
         }
 
@@ -120,8 +117,7 @@ public class CatalinaProperties {
                 is = CatalinaProperties.class.getResourceAsStream
                     ("/org/apache/catalina/startup/catalina.properties");
             } catch (Throwable t) {
-                // TODO Throws NoClassDefFoundError for ExceptionUtils
-                ExceptionUtils.handleThrowable(t);
+                handleThrowable(t);
             }
         }
 
@@ -179,5 +175,15 @@ public class CatalinaProperties {
         return System.getProperty("catalina.config");
     }
 
+    // Copied from ExceptionUtils since that class is not visible during start
+    private static void handleThrowable(Throwable t) {
+        if (t instanceof ThreadDeath) {
+            throw (ThreadDeath) t;
+        }
+        if (t instanceof VirtualMachineError) {
+            throw (VirtualMachineError) t;
+        }
+        // All other instances of Throwable will be silently swallowed
+    }
 
 }
