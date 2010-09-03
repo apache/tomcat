@@ -30,8 +30,6 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantFieldref extends ConstantCP {
 
-    
-
 
     private static final long serialVersionUID = -8062332095934294437L;
 
@@ -46,5 +44,4 @@ public final class ConstantFieldref extends ConstantCP {
     }
 
 
-    
 }

@@ -107,9 +107,6 @@ public class JIoEndpoint extends AbstractEndpoint {
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
 
 
-
-
-    
     // ------------------------------------------------ Handler Inner Interface
 
 
@@ -289,8 +286,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
         
     }
-    
-    
+
 
     // -------------------- Public methods --------------------
 
@@ -452,8 +448,6 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
         initialized = false ;
     }
-
-  
 
 
     /**

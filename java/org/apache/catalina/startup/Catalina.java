@@ -350,8 +350,6 @@ public class Catalina {
         digester.addSetNext("Server/Service/Connector",
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
-        
-        
 
 
         digester.addObjectCreate("Server/Service/Connector/Listener",

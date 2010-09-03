@@ -481,10 +481,7 @@ public class Tomcat {
         return ctx;
     }
 
-    
-    
 
-    
     // ---------- Helper methods and classes -------------------
     
     /** 

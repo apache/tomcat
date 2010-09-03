@@ -40,9 +40,6 @@ public final class LineNumberTable extends Attribute {
     private LineNumber[] line_number_table; // Table of line/numbers pairs
 
 
-    
-
-
     /*
      * @param name_index Index of name
      * @param length Content length in bytes
@@ -91,9 +88,6 @@ public final class LineNumberTable extends Attribute {
     }
 
 
-    
-
-
     /**
      * @param line_number_table the line number entries for this table
      */
@@ -127,9 +121,6 @@ public final class LineNumberTable extends Attribute {
     }
 
 
-    
-
-
     /**
      * @return deep copy of this attribute
      */
@@ -145,5 +136,4 @@ public final class LineNumberTable extends Attribute {
     }
 
 
-    
 }

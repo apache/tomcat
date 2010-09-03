@@ -160,8 +160,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      */                                                 
     private static Class<?>[] classTypeUsedInEvent = 
         new Class[] { CometEvent.class };
-    
-    
+
 
     // ---------------------------------------------------- FilterChain Methods
 
@@ -512,7 +511,6 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
 
     // -------------------------------------------------------- Package Methods
-
 
 
     /**

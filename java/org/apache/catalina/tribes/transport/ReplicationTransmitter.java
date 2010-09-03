@@ -44,7 +44,6 @@ public class ReplicationTransmitter implements ChannelSender {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
-    
 
     public ReplicationTransmitter() {
     }
@@ -129,6 +128,5 @@ public class ReplicationTransmitter implements ChannelSender {
 
     // ------------------------------------------------------------- protected
 
-    
 
 }

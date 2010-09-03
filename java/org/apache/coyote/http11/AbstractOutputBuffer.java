@@ -72,7 +72,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     protected int pos;
 
 
-
     /**
      * Filter library.
      * Note: Filter[0] is always the "chunked" filter.
@@ -112,9 +111,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         = org.apache.juli.logging.LogFactory.getLog(AbstractOutputBuffer.class);
 
     // ------------------------------------------------------------- Properties
-
-
-
 
 
     /**
@@ -178,8 +174,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     }
 
 
-
-    
  // --------------------------------------------------- OutputBuffer Methods
 
 
@@ -386,7 +380,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         }
 
     } 
-    
 
 
     /**
@@ -581,7 +574,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         write(String.valueOf(i));
 
     }
-
 
 
 }

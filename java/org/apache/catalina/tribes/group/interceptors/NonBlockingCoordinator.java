@@ -635,10 +635,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 //============================================================================================================    
 //              HELPER CLASSES FOR COORDINATION
 //============================================================================================================
-    
-    
-   
-    
+
+
     public static class CoordinationMessage {
         //X{A-ldr, A-src, mbrs-A,B,C,D}
         protected XByteBuffer buf;
@@ -847,9 +845,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             return buf.toString();
         }
     }
-
-    
-
 
 
 }

@@ -535,10 +535,8 @@ public class AjpProcessor implements ActionHook {
             output = null;
             return SocketState.CLOSED;
         }
-        
-        
-        
-        
+
+
     }
 
     // ----------------------------------------------------- ActionHook Methods

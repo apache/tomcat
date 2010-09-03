@@ -155,7 +155,6 @@ public class SpdyConnection extends HttpConnector.HttpConnection
     }
 
 
-    
     /**
      * Frame received. Must consume all data for the frame.
      * 

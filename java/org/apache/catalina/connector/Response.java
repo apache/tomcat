@@ -819,8 +819,7 @@ public class Response
         isCharacterEncodingSet = true;
     }
 
-    
-    
+
     /**
      * Set the Locale that is appropriate for this response, including
      * setting the appropriate character encoding.

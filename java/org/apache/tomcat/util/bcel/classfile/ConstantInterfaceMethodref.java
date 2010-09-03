@@ -30,8 +30,6 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantInterfaceMethodref extends ConstantCP {
 
-    
-
 
     private static final long serialVersionUID = -8587605570227841891L;
 
@@ -46,5 +44,4 @@ public final class ConstantInterfaceMethodref extends ConstantCP {
     }
 
 
-    
 }

@@ -107,9 +107,6 @@ public class TestNonBlockingCoordinator extends TestCase {
         suite.addTestSuite(TestNonBlockingCoordinator.class);
         suite.run(new TestResult());
     }
-    
-    
-    
-    
+
 
 }

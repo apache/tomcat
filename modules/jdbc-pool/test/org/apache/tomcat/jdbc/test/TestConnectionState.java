@@ -77,8 +77,6 @@ public class TestConnectionState extends DefaultTestCase {
         c1 = d1.getConnection();
         assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
     }
-    
-    
 
 
 }

@@ -94,7 +94,6 @@ public class ClusterRuleSet extends RuleSetBase {
         digester.addSetNext(prefix + "Manager",
                             "setManagerTemplate",
                             "org.apache.catalina.ha.ClusterManager");
-        
 
 
         digester.addObjectCreate(prefix + "Channel",

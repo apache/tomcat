@@ -567,8 +567,6 @@ public abstract class AuthenticatorBase extends ValveBase
     // ------------------------------------------------------ Protected Methods
 
 
-
-
     /**
      * Associate the specified single sign on identifier with the
      * specified Session.

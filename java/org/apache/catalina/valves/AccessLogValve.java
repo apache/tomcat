@@ -954,8 +954,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write date and time, in Common Log Format - %t
      */
     protected class DateAndTimeElement implements AccessLogElement {
-        
-        
 
 
         public void addElement(StringBuilder buf, Date date, Request request,
@@ -1303,8 +1301,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             }
         }
     }
-
-
 
 
     /**

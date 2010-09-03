@@ -38,9 +38,6 @@ public final class ConstantClass extends Constant implements ConstantObject {
     private int name_index; // Identical to ConstantString except for the name
 
 
-    
-
-
     /**
      * Initialize instance from file data.
      *
@@ -81,15 +78,6 @@ public final class ConstantClass extends Constant implements ConstantObject {
     public final int getNameIndex() {
         return name_index;
     }
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

@@ -156,8 +156,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
     }
 
-    
-    
+
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         boolean process = process(this.types, method, false);
         if (process && args.length>0 && args[0] instanceof String) {

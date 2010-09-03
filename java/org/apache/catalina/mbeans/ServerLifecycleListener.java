@@ -597,8 +597,6 @@ public class ServerLifecycleListener
     }
 
 
-
-
     /**
      * Deregister the MBeans for the specified Connector and its nested
      * components.
@@ -931,8 +929,6 @@ public class ServerLifecycleListener
         }
 
     }
-
-
 
 
     /**

@@ -103,8 +103,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     protected NioSelectorPool pool;
 
 
-
-    
     // ------------------------------------------------------------- Properties
 
 
@@ -227,7 +225,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
         this.total = 0;
         return written;
     } 
-
 
 
     // ------------------------------------------------------ Protected Methods

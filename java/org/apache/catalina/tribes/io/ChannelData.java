@@ -76,9 +76,8 @@ public class ChannelData implements ChannelMessage {
     public ChannelData(boolean generateUUID) {
         if ( generateUUID ) generateUUID();
     }
-    
-    
-    
+
+
     /**
      * Creates a new channel data object with data
      * @param uniqueId - unique message id

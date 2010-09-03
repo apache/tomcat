@@ -211,9 +211,8 @@ public final class CookieSupport {
         if (value==null || value.length() < 2) return false;
         return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
     }
-    
 
-    
+
     // ------------------------------------------------------------- Constructor
     private CookieSupport() {
         // Utility class. Don't allow instances to be created.

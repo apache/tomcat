@@ -874,9 +874,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public void postDeregister() {
     }
 
-    
-    
-    
+
     // -------------------- DEPRECATED METHODS  --------------------
     // May still be used in tomcat 
     // Never part of an official release

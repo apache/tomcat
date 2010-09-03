@@ -92,9 +92,6 @@ public final class StackMapTable extends Attribute {
     }
 
 
-    
-
-
     /**
      * @param map Array of stack map entries
      */

@@ -464,7 +464,6 @@ public class Http11Connection extends HttpConnection
         }
     }
 
-    
 
     /**
      * Updates chunked, contentLength, remaining - based 
@@ -1078,9 +1077,8 @@ public class Http11Connection extends HttpConnection
             }
         }
     }
-    
-    
-    
+
+
     private void flushToNext(IOBuffer body, IOBuffer out) throws IOException {
         
         synchronized (this) {
