@@ -116,7 +116,7 @@ public abstract class ElementValue
         case '@': // Annotation
             // TODO isRuntimeVisible
             return new AnnotationElementValue(ANNOTATION, AnnotationEntry.read(
-                    dis, cpool, false), cpool);
+                    dis, cpool), cpool);
         case '[': // Array
             int numArrayVals = dis.readUnsignedShort();
             ElementValue[] evalues = new ElementValue[numArrayVals];
