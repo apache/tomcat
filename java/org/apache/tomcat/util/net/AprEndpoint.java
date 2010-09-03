@@ -683,7 +683,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         // If the Acceptor is still running force
                         // the hard socket close.
                         if (serverSock != 0) {
-                            Socket.close(serverSock);
+                            Socket.shutdown(serverSock, Socket.APR_SHUTDOWN_READ);
                             serverSock = 0;
                         }
                     }
