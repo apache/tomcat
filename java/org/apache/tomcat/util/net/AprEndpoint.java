@@ -671,59 +671,37 @@ public class AprEndpoint extends AbstractEndpoint {
             running = false;
             unlockAccept();
             for (int i = 0; i < acceptors.length; i++) {
-                if (acceptors[i].isAlive()) {
+                while (acceptors[i].isAlive()) {
                     try {
                         acceptors[i].interrupt();
-                        acceptors[i].join();
+                        acceptors[i].join(1000);
                     } catch (InterruptedException e) {
                         // Ignore
                     }
                 }
-            }
-            // Wait for polltime before doing anything, so that the poller threads
-            // exit, otherwise parallel destruction of sockets which are still
-            // in the poller can cause problems
-            try {
-                synchronized (this) {
-                    this.wait(pollTime / 1000);
-                }
-            } catch (InterruptedException e) {
-                // Ignore
             }
             for (int i = 0; i < pollers.length; i++) {
-                pollers[i].destroy();
-                if (pollers[i].isAlive()) {
-                    try {
-                       pollers[i].interrupt();
-                        pollers[i].join();
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
+                try {
+                    pollers[i].destroy();
+                } catch (Exception e) {
+                    // Ignore
                 }
             }
             pollers = null;
             for (int i = 0; i < cometPollers.length; i++) {
-                cometPollers[i].destroy();
-                if (cometPollers[i].isAlive()) {
-                    try {
-                        cometPollers[i].interrupt();
-                        cometPollers[i].join();
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
+                try {
+                    cometPollers[i].destroy();
+                } catch (Exception e) {
+                    // Ignore
                 }
             }
             cometPollers = null;
             if (useSendfile) {
                 for (int i = 0; i < sendfiles.length; i++) {
-                    sendfiles[i].destroy();
-                    if (sendfiles[i].isAlive()) {
-                        try {
-                            sendfiles[i].interrupt();
-                            sendfiles[i].join();
-                        } catch (InterruptedException e) {
-                            // Ignore
-                        }
+                    try {
+                        sendfiles[i].destroy();
+                    } catch (Exception e) {
+                        // Ignore
                     }
                 }
                 sendfiles = null;
@@ -1056,6 +1034,14 @@ public class AprEndpoint extends AbstractEndpoint {
             Pool.destroy(pool);
             keepAliveCount = 0;
             addCount = 0;
+            try {
+                while (this.isAlive()) {
+                    this.interrupt();
+                    this.join(1000);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            }
         }
 
         /**
@@ -1305,6 +1291,14 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             Pool.destroy(pool);
             sendfileData.clear();
+            try {
+                while (this.isAlive()) {
+                    this.interrupt();
+                    this.join(1000);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            }
         }
 
         /**
