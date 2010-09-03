@@ -5570,7 +5570,7 @@ public class StandardContext extends ContainerBase
     }
     
     private String getObjectKeyPropertiesNameOnly() {
-        StringBuilder result = new StringBuilder("name=");
+        StringBuilder result = new StringBuilder("name=//");
         String hostname = getParent().getName();
         if (hostname == null) {
             result.append("DEFAULT");
