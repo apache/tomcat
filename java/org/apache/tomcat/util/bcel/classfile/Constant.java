@@ -35,6 +35,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  */
 public abstract class Constant implements Cloneable, Serializable {
 
+    private static final long serialVersionUID = 2827409182154809454L;
     private static BCELComparator _cmp = new BCELComparator() {
 
         public boolean equals( Object o1, Object o2 ) {

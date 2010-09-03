@@ -38,6 +38,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class Synthetic extends Attribute {
 
+    private static final long serialVersionUID = -5129612853226360165L;
     private byte[] bytes;
 
 

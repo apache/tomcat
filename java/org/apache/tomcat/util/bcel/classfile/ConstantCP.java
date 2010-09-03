@@ -32,6 +32,7 @@ import java.io.IOException;
  */
 public abstract class ConstantCP extends Constant {
 
+    private static final long serialVersionUID = 7282382456501145526L;
     /** References to the constants containing the class and the field signature
      */
     protected int class_index, name_and_type_index;

@@ -37,6 +37,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class ConstantPool implements Cloneable, Serializable {
 
+    private static final long serialVersionUID = -6765503791185687014L;
     private int constant_pool_count;
     private Constant[] constant_pool;
 

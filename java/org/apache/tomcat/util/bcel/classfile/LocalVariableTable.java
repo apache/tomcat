@@ -34,6 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class LocalVariableTable extends Attribute {
 
+    private static final long serialVersionUID = -3904314258294133920L;
     private int local_variable_table_length; // Table of local
     private LocalVariable[] local_variable_table; // variables
 

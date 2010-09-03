@@ -33,6 +33,8 @@ public final class ConstantMethodref extends ConstantCP {
     
 
 
+    private static final long serialVersionUID = -7857009620954576086L;
+
     /**
      * Initialize instance from file data.
      *

@@ -34,6 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantDouble extends Constant implements ConstantObject {
 
+    private static final long serialVersionUID = 3450743772468544760L;
     private double bytes;
 
 
