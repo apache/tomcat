@@ -26,6 +26,7 @@ package org.apache.tomcat.util.bcel.classfile;
  */
 public abstract class AccessFlags implements java.io.Serializable {
 
+    private static final long serialVersionUID = 2548932939969293935L;
     protected int access_flags;
 
 

@@ -43,6 +43,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class Unknown extends Attribute {
 
+    private static final long serialVersionUID = -4152422704743201314L;
     private byte[] bytes;
     private String name;
     private static final Map unknown_attributes = new HashMap();

@@ -33,6 +33,7 @@ import java.io.Serializable;
  */
 public final class LineNumber implements Cloneable, Serializable {
 
+    private static final long serialVersionUID = 3393830630264494355L;
     private int start_pc; // Program Counter (PC) corresponds to line
     private int line_number; // number in source file
 

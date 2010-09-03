@@ -37,6 +37,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ExceptionTable extends Attribute {
 
+    private static final long serialVersionUID = -5109672682663772900L;
     private int number_of_exceptions; // Table of indices into
     private int[] exception_index_table; // constant pool
 

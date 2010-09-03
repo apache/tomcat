@@ -40,6 +40,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class StackMap extends Attribute {
 
+    private static final long serialVersionUID = 264958819110329590L;
     private int map_length;
     private StackMapEntry[] map; // Table of stack map entries
 

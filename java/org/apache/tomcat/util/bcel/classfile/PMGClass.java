@@ -33,6 +33,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class PMGClass extends Attribute {
 
+    private static final long serialVersionUID = -1876065562391587509L;
     private int pmg_class_index, pmg_index;
 
 
