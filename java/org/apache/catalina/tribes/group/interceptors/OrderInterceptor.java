@@ -28,7 +28,6 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
 
 
-
 /**
  *
  * The order interceptor guarantees that messages are received in the same order they were 
@@ -301,9 +300,8 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         public int getMsgNr() {
             return msgNr;
         }
-        
-        
-        
+
+
     }
 
     public void setExpire(long expire) {

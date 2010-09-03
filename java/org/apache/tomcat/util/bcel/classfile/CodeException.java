@@ -47,9 +47,6 @@ public final class CodeException implements Cloneable, Constants, Serializable {
      */
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -79,9 +76,6 @@ public final class CodeException implements Cloneable, Constants, Serializable {
     }
 
 
-    
-
-
     /**
      * Dump code exception to file stream in binary format.
      *
@@ -94,30 +88,6 @@ public final class CodeException implements Cloneable, Constants, Serializable {
         file.writeShort(handler_pc);
         file.writeShort(catch_type);
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**
@@ -143,9 +113,6 @@ public final class CodeException implements Cloneable, Constants, Serializable {
         }
         return start_pc + "\t" + end_pc + "\t" + handler_pc + "\t" + str;
     }
-
-
-    
 
 
     /**

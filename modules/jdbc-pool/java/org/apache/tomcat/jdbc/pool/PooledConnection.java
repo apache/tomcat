@@ -457,9 +457,7 @@ public class PooledConnection {
         this.timestamp = timestamp;
         setSuspect(false);
     }
-    
-    
-    
+
 
     public boolean isSuspect() {
         return suspect;

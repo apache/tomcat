@@ -40,9 +40,6 @@ public final class ConstantNameAndType extends Constant {
     private int signature_index; // and its signature.
 
 
-    
-
-
     /**
      * Initialize instance from file data.
      *
@@ -87,24 +84,12 @@ public final class ConstantNameAndType extends Constant {
     }
 
 
-    
-
-
     /**
      * @return Index in constant pool of field/method signature.
      */
     public final int getSignatureIndex() {
         return signature_index;
     }
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

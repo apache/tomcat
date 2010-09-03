@@ -323,7 +323,6 @@ public final class CGIServlet extends HttpServlet {
     }
 
 
-
     /**
      * Prints out important Servlet API and container information
      *
@@ -528,9 +527,7 @@ public final class CGIServlet extends HttpServlet {
         out.println("<hr>");
 
 
-
     }
-
 
 
     /**
@@ -550,7 +547,6 @@ public final class CGIServlet extends HttpServlet {
         throws IOException, ServletException {
         doGet(req, res);
     }
-
 
 
     /**
@@ -702,7 +698,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Uses the ServletContext to set some CGI variables
          *
@@ -714,7 +709,6 @@ public final class CGIServlet extends HttpServlet {
             this.webAppRootDir = context.getRealPath("/");
             this.tmpDir = (File) context.getAttribute(ServletContext.TEMPDIR);
         }
-
 
 
         /**
@@ -1244,7 +1238,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Gets derived command string
          *
@@ -1254,7 +1247,6 @@ public final class CGIServlet extends HttpServlet {
         protected String getCommand() {
             return command;
         }
-
 
 
         /**
@@ -1268,7 +1260,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Gets derived CGI environment
          *
@@ -1280,7 +1271,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Gets derived CGI query parameters
          *
@@ -1290,7 +1280,6 @@ public final class CGIServlet extends HttpServlet {
         protected ArrayList<String> getParameters() {
             return cmdLineParameters;
         }
-
 
 
         /**
@@ -1305,7 +1294,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Converts null strings to blank strings ("")
          *
@@ -1316,7 +1304,6 @@ public final class CGIServlet extends HttpServlet {
         protected String nullsToBlanks(String s) {
             return nullsToString(s, "");
         }
-
 
 
         /**
@@ -1331,7 +1318,6 @@ public final class CGIServlet extends HttpServlet {
                                        String subForNulls) {
             return (couldBeNull == null ? subForNulls : couldBeNull);
         }
-
 
 
         /**
@@ -1350,12 +1336,7 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
     } //class CGIEnvironment
-
-
-
-
 
 
     /**
@@ -1407,8 +1388,6 @@ public final class CGIServlet extends HttpServlet {
         private boolean readyToRun = false;
 
 
-
-
         /**
          *  Creates a CGIRunner and initializes its environment, working
          *  directory, and query parameters.
@@ -1433,7 +1412,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Checks & sets ready status
          */
@@ -1450,7 +1428,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Gets ready status
          *
@@ -1460,7 +1437,6 @@ public final class CGIServlet extends HttpServlet {
         protected boolean isReady() {
             return readyToRun;
         }
-
 
 
         /**
@@ -1476,7 +1452,6 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
-
         /**
          * Sets standard input to be passed on to the invoked cgi script
          *
@@ -1487,7 +1462,6 @@ public final class CGIServlet extends HttpServlet {
             this.stdin = stdin;
             updateReadyStatus();
         }
-
 
 
         /**
@@ -1514,7 +1488,6 @@ public final class CGIServlet extends HttpServlet {
             v.copyInto(strArr);
             return strArr;
         }
-
 
 
         /**

@@ -683,7 +683,6 @@ public class DeltaManager extends ClusterManagerBase{
 
     }
 
-    
 
     /**
      * Save any currently active sessions in the appropriate persistence

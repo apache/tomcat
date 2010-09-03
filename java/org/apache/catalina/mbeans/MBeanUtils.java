@@ -616,9 +616,8 @@ public class MBeanUtils {
         return (name);
 
     }
-    
-    
- 
+
+
     /**
      * Create an <code>ObjectName</code> for this
      * <code>Engine</code> object.

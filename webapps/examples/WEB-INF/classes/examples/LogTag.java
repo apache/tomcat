@@ -58,6 +58,4 @@ public class LogTag extends ExampleTagBase {
     }
 }
 
-    
-        
-    
+

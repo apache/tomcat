@@ -158,9 +158,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     }
     // ------------------------------------------------------------- Properties
 
-    
 
- 
     /**
      * Name of the socket factory.
      */

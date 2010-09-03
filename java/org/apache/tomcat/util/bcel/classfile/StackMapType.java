@@ -73,9 +73,6 @@ public final class StackMapType implements Cloneable {
     }
 
 
-    
-
-
     public void setIndex( int t ) {
         index = t;
     }
@@ -131,12 +128,6 @@ public final class StackMapType implements Cloneable {
     public final String toString() {
         return "(type=" + Constants.ITEM_NAMES[type] + printIndex() + ")";
     }
-
-
-    
-
-
-    
 
 
     /**

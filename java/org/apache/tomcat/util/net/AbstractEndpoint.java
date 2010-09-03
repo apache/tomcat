@@ -306,7 +306,6 @@ public abstract class AbstractEndpoint {
     public int getThreadPriority() { return threadPriority; }
 
 
-
     /**
      * Generic properties, introspected
      */
@@ -572,8 +571,7 @@ public abstract class AbstractEndpoint {
         allowUnsafeLegacyRenegotiation = s;
     }
 
-    
-    
+
     private String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
     private String[] sslEnabledProtocolsarr =  new String[0];
     public String[] getSslEnabledProtocolsArray() { return this.sslEnabledProtocolsarr;}

@@ -38,9 +38,6 @@ public final class ConstantValue extends Attribute {
     private int constantvalue_index;
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param name_index Name index in constant pool
@@ -79,12 +76,6 @@ public final class ConstantValue extends Attribute {
         super.dump(file);
         file.writeShort(constantvalue_index);
     }
-
-
-    
-
-
-    
 
 
     /**

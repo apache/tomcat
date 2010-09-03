@@ -139,9 +139,8 @@ public class HttpRequest extends HttpMessage {
     public Map<String, Object> attributes() {
         return attributes;
     }
-    
-    
-    
+
+
     public CBuffer method() {
         return methodMB;
     }

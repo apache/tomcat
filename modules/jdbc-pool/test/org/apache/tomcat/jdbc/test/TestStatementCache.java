@@ -39,8 +39,6 @@ public class TestStatementCache extends DefaultTestCase {
     }
 
 
-
-
     private void config(boolean cachePrepared, boolean cacheCallable, int max) {
         datasource.getPoolProperties().setJdbcInterceptors(TestStatementCacheInterceptor.class.getName()+
                 "(prepared="+cachePrepared+",callable="+cacheCallable+",max="+max+")");

@@ -42,9 +42,6 @@ public final class InnerClass implements Cloneable, Serializable {
     private int inner_access_flags;
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -71,9 +68,6 @@ public final class InnerClass implements Cloneable, Serializable {
     }
 
 
-    
-
-
     /**
      * Dump inner class attribute to file stream in binary format.
      *
@@ -86,30 +80,6 @@ public final class InnerClass implements Cloneable, Serializable {
         file.writeShort(inner_name_index);
         file.writeShort(inner_access_flags);
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

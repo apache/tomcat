@@ -40,9 +40,6 @@ public final class InnerClasses extends Attribute {
     private int number_of_classes;
 
 
-    
-
-
     /**
      * @param name_index Index in constant pool to CONSTANT_Utf8
      * @param length Content length in bytes
@@ -90,9 +87,6 @@ public final class InnerClasses extends Attribute {
             inner_classes[i].dump(file);
         }
     }
-
-
-    
 
 
     /**

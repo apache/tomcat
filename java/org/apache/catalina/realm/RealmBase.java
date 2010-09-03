@@ -268,7 +268,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     // --------------------------------------------------------- Public Methods
 
 
-    
     /**
      * Add a property change listener to this component.
      *
@@ -373,7 +372,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         return null;
     }
-
 
 
     /**

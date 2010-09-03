@@ -530,7 +530,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     // ----------------------------------------------HttpSession Public Methods
 
 
-
     /**
      * Remove the object bound with the specified name from this session. If the
      * session does not have an object bound with this name, this method does
@@ -759,7 +758,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     // -------------------------------------------------------- Private Methods
 
-    
 
     /**
      * Return the value of an attribute without a check for validity.

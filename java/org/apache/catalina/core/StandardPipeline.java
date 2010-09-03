@@ -231,9 +231,8 @@ public class StandardPipeline extends LifecycleBase
         sb.append(']');
         return sb.toString();
     }
-    
-    
-    
+
+
     // ------------------------------------------------------- Pipeline Methods
 
 

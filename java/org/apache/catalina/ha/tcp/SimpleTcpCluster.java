@@ -896,8 +896,6 @@ public class SimpleTcpCluster extends LifecycleBase
     }
 
 
-
-    
     // ------------------------------------------------------------- deprecated
 
     /**

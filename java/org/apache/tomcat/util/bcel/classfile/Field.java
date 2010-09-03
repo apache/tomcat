@@ -52,9 +52,6 @@ public final class Field extends FieldOrMethod {
     };
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -63,12 +60,6 @@ public final class Field extends FieldOrMethod {
             ClassFormatException {
         super(file, constant_pool);
     }
-
-
-    
-
-
-    
 
 
     /**
@@ -112,18 +103,6 @@ public final class Field extends FieldOrMethod {
         }
         return buf.toString();
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

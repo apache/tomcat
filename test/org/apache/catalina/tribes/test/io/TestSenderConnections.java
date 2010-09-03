@@ -127,7 +127,6 @@ public class TestSenderConnections extends TestCase {
         }
 
 
-        
     }
 
 }

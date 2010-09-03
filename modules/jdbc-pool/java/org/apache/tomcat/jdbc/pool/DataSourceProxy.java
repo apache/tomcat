@@ -57,7 +57,6 @@ public class DataSourceProxy implements PoolConfiguration {
         if (poolProperties == null) throw new NullPointerException("PoolConfiguration can not be null.");
         this.poolProperties = poolProperties;
     }
-    
 
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -193,8 +192,6 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
-
-    
 /*-----------------------------------------------------------------------*/
 //      PROPERTIES WHEN NOT USED WITH FACTORY
 /*------------------------------------------------------------------------*/

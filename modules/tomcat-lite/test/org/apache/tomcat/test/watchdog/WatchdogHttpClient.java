@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 
-
 public class WatchdogHttpClient {
     private static final String CRLF         = "\r\n";
     private static final int LINE_FEED       = 10;
@@ -213,8 +212,7 @@ public class WatchdogHttpClient {
         return sb.toString().getBytes();
     }
 
-    
-    
+
     /**
      * Read a line from the specified servlet input stream, and strip off
      * the trailing carriage return and newline (if any).  Return the remaining
@@ -301,8 +299,7 @@ public class WatchdogHttpClient {
         return headers;
     }
 
-    
-    
+
     /**
      * Private utility method to 'massage' a request string that
      * may or may not have replacement markers for the request parameters.
@@ -323,8 +320,7 @@ public class WatchdogHttpClient {
         client.requestURL = new URL( "http", client.host, client.port, addressString );
     }
 
-    
-    
+
     /**
      * <code>CRBufferedInputStream</code> is a modified version of
      * the java.io.BufferedInputStream class.  The fill code is 

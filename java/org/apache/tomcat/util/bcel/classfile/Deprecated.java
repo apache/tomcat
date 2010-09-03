@@ -38,9 +38,6 @@ public final class Deprecated extends Attribute {
     private byte[] bytes;
 
 
-    
-
-
     /**
      * @param name_index Index in constant pool to CONSTANT_Utf8
      * @param length Content length in bytes
@@ -85,12 +82,6 @@ public final class Deprecated extends Attribute {
             file.write(bytes, 0, length);
         }
     }
-
-
-    
-
-
-    
 
 
     /**

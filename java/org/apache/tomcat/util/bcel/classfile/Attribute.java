@@ -193,13 +193,6 @@ public abstract class Attribute implements Cloneable, Serializable
         return c.getBytes();
     }
 
-    
-
-    
-
-    
-
-    
 
     /**
      * @return Tag of attribute, i.e., its type. Value may not be altered, thus
@@ -210,9 +203,6 @@ public abstract class Attribute implements Cloneable, Serializable
         return tag;
     }
 
-    
-
-    
 
     /**
      * Use copy() if you want to have a deep copy(), i.e., with all references

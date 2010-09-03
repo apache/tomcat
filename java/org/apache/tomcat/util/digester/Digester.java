@@ -52,8 +52,6 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-
-
 /**
  * <p>A <strong>Digester</strong> processes an XML input stream by matching a
  * series of element nesting patterns to execute Rules that have been added
@@ -314,7 +312,6 @@ public class Digester extends DefaultHandler {
     protected boolean validating = false;
 
 
-    
     /**
      * Warn on missing attributes and elements.
      */

@@ -55,9 +55,6 @@ public final class Code extends Attribute {
     private Attribute[] attributes; // or LocalVariable
 
 
-    
-
-
     /**
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
@@ -141,12 +138,6 @@ public final class Code extends Attribute {
     }
 
 
-    
-
-
-    
-
-
     /**
      * @return LocalVariableTable of Code, if it has one
      */
@@ -158,18 +149,6 @@ public final class Code extends Attribute {
         }
         return null;
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**
@@ -224,12 +203,6 @@ public final class Code extends Attribute {
         this.exception_table = exception_table;
         exception_table_length = (exception_table == null) ? 0 : exception_table.length;
     }
-
-
-    
-
-
-    
 
 
     /**

@@ -232,7 +232,6 @@ should be completed:</p>
 </p>
 
 
-
 </section>
 
 <section name="Configuration Example">
@@ -615,10 +614,6 @@ should be completed:</p>
 </p>
 
 </section>
-
-
-
-
 
 
 <section name="Monitoring your Cluster with JMX">

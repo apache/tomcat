@@ -31,7 +31,6 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.util.Arrays;
 
 
-
 public class CoordinationDemo {
     static int CHANNEL_COUNT = 5;
     static int SCREEN_WIDTH = 120;
@@ -185,9 +184,8 @@ public class CoordinationDemo {
         statusLine.delete(0,statusLine.length());
         statusLine.append(status);
     }
-    
-    
-    
+
+
     public static void setEvents(String events) {
         java.util.Arrays.fill(VIEW_EVENTS,false);
         StringTokenizer t = new StringTokenizer(events,",");

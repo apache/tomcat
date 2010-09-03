@@ -1236,7 +1236,6 @@ public class StandardSession
     }
 
 
-
     /**
      * Bind an object to this session, using the specified name.  If an object
      * of the same name is already bound to this session, the object is
@@ -1671,7 +1670,6 @@ public class StandardSession
             ((StandardContext) context).fireContainerEvent(type, data);
         }
     }
-                                      
 
 
     /**
@@ -1851,7 +1849,6 @@ final class StandardSessionContext implements HttpSessionContext {
         return (null);
 
     }
-
 
 
 }

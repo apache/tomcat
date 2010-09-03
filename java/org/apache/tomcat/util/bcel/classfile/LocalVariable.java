@@ -45,9 +45,6 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
     private ConstantPool constant_pool;
 
 
-    
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -78,9 +75,6 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
     }
 
 
-    
-
-
     /**
      * Dump local variable to file stream in binary format.
      *
@@ -96,12 +90,6 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
     }
 
 
-    
-
-
-    
-
-
     /**
      * @return Variable name.
      */
@@ -110,9 +98,6 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
         c = (ConstantUtf8) constant_pool.getConstant(name_index, CONSTANT_Utf8);
         return c.getBytes();
     }
-
-
-    
 
 
     /**
@@ -125,36 +110,12 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
     }
 
 
-    
-
-
     /**
      * @return index of register where variable is stored
      */
     public final int getIndex() {
         return index;
     }
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

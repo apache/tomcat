@@ -100,7 +100,6 @@ public interface SessionMessage extends ClusterMessage, java.io.Serializable
      * @return the session ID for the session
      */
     public String getSessionID();
-    
 
 
 }//SessionMessage

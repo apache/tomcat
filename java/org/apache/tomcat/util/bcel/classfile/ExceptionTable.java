@@ -42,9 +42,6 @@ public final class ExceptionTable extends Attribute {
     private int[] exception_index_table; // constant pool
 
 
-    
-
-
     /**
      * @param name_index Index in constant pool
      * @param length Content length in bytes
@@ -91,15 +88,6 @@ public final class ExceptionTable extends Attribute {
             file.writeShort(exception_index_table[i]);
         }
     }
-
-
-    
-
-
-    
-
-
-    
 
 
     /**

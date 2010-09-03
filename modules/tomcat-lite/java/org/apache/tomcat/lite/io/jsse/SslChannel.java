@@ -359,7 +359,6 @@ class SslChannel extends IOChannel implements Runnable {
     }
 
 
-    
     // SSL handshake require slow tasks - that will need to be executed in a 
     // thread anyways. Better to keep it simple ( the code is very complex ) - 
     // and do the initial handshake in a thread, not in the IO thread.

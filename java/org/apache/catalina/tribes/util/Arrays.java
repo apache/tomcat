@@ -216,8 +216,7 @@ public class Arrays {
         return result;
     }
 
-    
- 
+
     public static byte[] convert(String s) {
         try {
             return s.getBytes("ISO-8859-1");
@@ -228,7 +227,4 @@ public class Arrays {
     }
 
 
-    
-    
-    
 }

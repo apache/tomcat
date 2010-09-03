@@ -47,9 +47,6 @@ public final class ConstantLong extends Constant implements ConstantObject {
     }
 
 
-    
-
-
     /** 
      * Initialize instance from file data.
      *
@@ -82,9 +79,6 @@ public final class ConstantLong extends Constant implements ConstantObject {
     }
 
 
-    
-
-
     /**
      * @return String representation.
      */
@@ -94,5 +88,4 @@ public final class ConstantLong extends Constant implements ConstantObject {
     }
 
 
-    
 }

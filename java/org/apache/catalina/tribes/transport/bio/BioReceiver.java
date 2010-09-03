@@ -93,9 +93,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         super.stop();
     }
 
-    
-    
-    
+
     protected void bind() throws IOException {
         // allocate an unbound server socket channel
         serverSocket = new ServerSocket();
@@ -103,9 +101,8 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         //serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
         bind(serverSocket,getPort(),getAutoBind());
     }
-    
-    
-    
+
+
     public void run() {
         try {
             listen();
