@@ -35,12 +35,14 @@ public class AnnotationElementValue extends ElementValue
         this.annotationEntry = annotationEntry;
     }
 
+    @Override
     public void dump(DataOutputStream dos) throws IOException
     {
         dos.writeByte(type); // u1 type of value (ANNOTATION == '@')
         annotationEntry.dump(dos);
     }
 
+    @Override
     public String stringifyValue()
     {
         StringBuffer sb = new StringBuffer();
@@ -48,6 +50,7 @@ public class AnnotationElementValue extends ElementValue
         return sb.toString();
     }
 
+    @Override
     public String toString()
     {
         return stringifyValue();

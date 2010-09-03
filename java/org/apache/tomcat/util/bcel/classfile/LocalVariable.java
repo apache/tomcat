@@ -160,6 +160,7 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
     /**
      * @return string representation.
      */
+    @Override
     public final String toString() {
         String name = getName(), signature = Utility.signatureToString(getSignature());
         return "LocalVariable(start_pc = " + start_pc + ", length = " + length + ", index = "

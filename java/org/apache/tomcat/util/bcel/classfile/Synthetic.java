@@ -84,6 +84,7 @@ public final class Synthetic extends Attribute {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         super.dump(file);
         if (length > 0) {
@@ -101,6 +102,7 @@ public final class Synthetic extends Attribute {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         StringBuffer buf = new StringBuffer("Synthetic");
         if (length > 0) {
@@ -113,6 +115,7 @@ public final class Synthetic extends Attribute {
     /**
      * @return deep copy of this attribute
      */
+    @Override
     public Attribute copy( ConstantPool _constant_pool ) {
         Synthetic c = (Synthetic) clone();
         if (bytes != null) {

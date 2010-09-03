@@ -56,12 +56,14 @@ public class RuntimeVisibleAnnotations extends Annotations
     /**
      * @return deep copy of this attribute
      */
+    @Override
     public Attribute copy(ConstantPool constant_pool)
     {
         Annotations c = (Annotations) clone();
         return c;
     }
 
+    @Override
     public final void dump(DataOutputStream dos) throws IOException
     {
         super.dump(dos);

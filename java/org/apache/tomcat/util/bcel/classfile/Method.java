@@ -36,6 +36,7 @@ public final class Method extends FieldOrMethod {
     private static final long serialVersionUID = -7447828891136739513L;
     private static BCELComparator _cmp = new BCELComparator() {
 
+        @Override
         public boolean equals( Object o1, Object o2 ) {
             Method THIS = (Method) o1;
             Method THAT = (Method) o2;
@@ -44,6 +45,7 @@ public final class Method extends FieldOrMethod {
         }
 
 
+        @Override
         public int hashCode( Object o ) {
             Method THIS = (Method) o;
             return THIS.getSignature().hashCode() ^ THIS.getName().hashCode();
@@ -128,6 +130,7 @@ public final class Method extends FieldOrMethod {
      *
      * @return String representation of the method.
      */
+    @Override
     public final String toString() {
         ConstantUtf8 c;
         String name, signature, access; // Short cuts to constant pool
@@ -180,6 +183,7 @@ public final class Method extends FieldOrMethod {
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals( Object obj ) {
         return _cmp.equals(this, obj);
     }
@@ -191,6 +195,7 @@ public final class Method extends FieldOrMethod {
      * 
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return _cmp.hashCode(this);
     }

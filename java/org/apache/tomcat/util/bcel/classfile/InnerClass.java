@@ -115,6 +115,7 @@ public final class InnerClass implements Cloneable, Serializable {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         return "InnerClass(" + inner_class_index + ", " + outer_class_index + ", "
                 + inner_name_index + ", " + inner_access_flags + ")";

@@ -40,6 +40,7 @@ public class EnumElementValue extends ElementValue
         this.valueIdx = valueIdx;
     }
 
+    @Override
     public void dump(DataOutputStream dos) throws IOException
     {
         dos.writeByte(type); // u1 type of value (ENUM_CONSTANT == 'e')
@@ -47,6 +48,7 @@ public class EnumElementValue extends ElementValue
         dos.writeShort(valueIdx); // u2
     }
 
+    @Override
     public String stringifyValue()
     {
         ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(valueIdx,
