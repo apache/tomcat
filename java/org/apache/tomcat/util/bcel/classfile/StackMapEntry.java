@@ -92,6 +92,7 @@ public final class StackMapEntry implements Cloneable {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("(offset=").append(byte_code_offset);

@@ -123,6 +123,7 @@ public final class Code extends Attribute {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         super.dump(file);
         file.writeShort(max_stack);
@@ -259,6 +260,7 @@ public final class Code extends Attribute {
     /**
      * @return String representation of code chunk.
      */
+    @Override
     public final String toString() {
         return toString(true);
     }
@@ -269,6 +271,7 @@ public final class Code extends Attribute {
      * 
      * @param _constant_pool the constant pool to duplicate
      */
+    @Override
     public Attribute copy( ConstantPool _constant_pool ) {
         Code c = (Code) clone();
         if (code != null) {

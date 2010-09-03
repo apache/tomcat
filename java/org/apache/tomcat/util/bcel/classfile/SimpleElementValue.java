@@ -41,12 +41,14 @@ public class SimpleElementValue extends ElementValue
     }
     
 
+    @Override
     public String toString()
     {
         return stringifyValue();
     }
 
     // Whatever kind of value it is, return it as a string
+    @Override
     public String stringifyValue()
     {
         switch (type)
@@ -97,6 +99,7 @@ public class SimpleElementValue extends ElementValue
         }
     }
 
+    @Override
     public void dump(DataOutputStream dos) throws IOException
     {
         dos.writeByte(type); // u1 kind of value

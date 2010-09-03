@@ -149,6 +149,7 @@ public final class StackMapTableEntry implements Cloneable {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("(");

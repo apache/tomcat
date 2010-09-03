@@ -75,6 +75,7 @@ public final class PMGClass extends Attribute {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         super.dump(file);
         file.writeShort(pmg_index);
@@ -117,6 +118,7 @@ public final class PMGClass extends Attribute {
     /**
      * @return String representation
      */
+    @Override
     public final String toString() {
         return "PMGClass(" + getPMGName() + ", " + getPMGClassName() + ")";
     }
@@ -125,6 +127,7 @@ public final class PMGClass extends Attribute {
     /**
      * @return deep copy of this attribute
      */
+    @Override
     public Attribute copy( ConstantPool _constant_pool ) {
         return (PMGClass) clone();
     }

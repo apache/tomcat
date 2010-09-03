@@ -82,6 +82,7 @@ public final class InnerClasses extends Attribute {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         super.dump(file);
         file.writeShort(number_of_classes);
@@ -106,6 +107,7 @@ public final class InnerClasses extends Attribute {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < number_of_classes; i++) {
@@ -118,6 +120,7 @@ public final class InnerClasses extends Attribute {
     /**
      * @return deep copy of this attribute
      */
+    @Override
     public Attribute copy( ConstantPool _constant_pool ) {
         InnerClasses c = (InnerClasses) clone();
         c.inner_classes = new InnerClass[number_of_classes];

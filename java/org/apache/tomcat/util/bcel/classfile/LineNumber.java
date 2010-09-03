@@ -91,6 +91,7 @@ public final class LineNumber implements Cloneable, Serializable {
     /**
      * @return String representation
      */
+    @Override
     public final String toString() {
         return "LineNumber(" + start_pc + ", " + line_number + ")";
     }

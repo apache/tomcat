@@ -220,6 +220,7 @@ public abstract class Attribute implements Cloneable, Serializable
      * 
      * @return shallow copy of this attribute
      */
+    @Override
     public Object clone()
     {
         Object o = null;
@@ -242,6 +243,7 @@ public abstract class Attribute implements Cloneable, Serializable
     /**
      * @return attribute name.
      */
+    @Override
     public String toString()
     {
         return Constants.ATTRIBUTE_NAMES[tag];
