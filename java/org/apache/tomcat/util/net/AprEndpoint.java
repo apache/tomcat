@@ -692,32 +692,38 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             for (int i = 0; i < pollers.length; i++) {
                 pollers[i].destroy();
-                try {
-                    pollers[i].interrupt();
-                    pollers[i].join();
-                } catch (InterruptedException e) {
+                if (pollers[i].isAlive()) {
+                    try {
+                       pollers[i].interrupt();
+                        pollers[i].join();
+                    } catch (InterruptedException e) {
                         // Ignore
+                    }
                 }
             }
             pollers = null;
             for (int i = 0; i < cometPollers.length; i++) {
                 cometPollers[i].destroy();
-                try {
-                    cometPollers[i].interrupt();
-                    cometPollers[i].join();
-                } catch (InterruptedException e) {
+                if (cometPollers[i].isAlive()) {
+                    try {
+                        cometPollers[i].interrupt();
+                        cometPollers[i].join();
+                    } catch (InterruptedException e) {
                         // Ignore
+                    }
                 }
             }
             cometPollers = null;
             if (useSendfile) {
                 for (int i = 0; i < sendfiles.length; i++) {
                     sendfiles[i].destroy();
-                    try {
-                        sendfiles[i].interrupt();
-                        sendfiles[i].join();
-                    } catch (InterruptedException e) {
-                        // Ignore
+                    if (sendfiles[i].isAlive()) {
+                        try {
+                            sendfiles[i].interrupt();
+                            sendfiles[i].join();
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
                     }
                 }
                 sendfiles = null;
