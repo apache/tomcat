@@ -82,11 +82,13 @@ public class AnnotationDefault extends Attribute
 
     
 
+    @Override
     public Attribute copy(ConstantPool _constant_pool)
     {
         throw new RuntimeException("Not implemented yet!");
     }
 
+    @Override
     public final void dump(DataOutputStream dos) throws IOException
     {
       super.dump(dos);

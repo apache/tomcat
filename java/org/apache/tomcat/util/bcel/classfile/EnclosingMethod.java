@@ -55,12 +55,14 @@ public class EnclosingMethod extends Attribute {
         methodIndex = methodIdx;
     }
 
+    @Override
     public Attribute copy(ConstantPool constant_pool) {
         throw new RuntimeException("Not implemented yet!");
         // is this next line sufficient?
         // return (EnclosingMethod)clone();
     }
     
+    @Override
     public final void dump(DataOutputStream file) throws IOException {
         super.dump(file);
         file.writeShort(classIndex);

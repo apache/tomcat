@@ -72,6 +72,7 @@ public final class Signature extends Attribute {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         super.dump(file);
         file.writeShort(signature_index);
@@ -96,6 +97,7 @@ public final class Signature extends Attribute {
     /**
      * @return String representation
      */
+    @Override
     public final String toString() {
         String s = getSignature();
         return "Signature(" + s + ")";
@@ -105,6 +107,7 @@ public final class Signature extends Attribute {
     /**
      * @return deep copy of this attribute
      */
+    @Override
     public Attribute copy( ConstantPool _constant_pool ) {
         return (Signature) clone();
     }

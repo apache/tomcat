@@ -41,6 +41,7 @@ public abstract class Utility {
 
     private static ThreadLocal consumed_chars = new ThreadLocal() {
 
+        @Override
         protected Object initialValue() {
             return new Integer(0);
         }
