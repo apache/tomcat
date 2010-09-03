@@ -91,7 +91,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected long sslContext = 0;
 
-    
+
     // ------------------------------------------------------------- Properties
 
 
@@ -101,7 +101,7 @@ public class AprEndpoint extends AbstractEndpoint {
     protected boolean deferAccept = true;
     public void setDeferAccept(boolean deferAccept) { this.deferAccept = deferAccept; }
     public boolean getDeferAccept() { return deferAccept; }
-    
+
 
     /**
      * Size of the socket poller.
@@ -340,7 +340,7 @@ public class AprEndpoint extends AbstractEndpoint {
         if (sendfiles == null) {
             return 0;
         }
-        
+
         int sendfileCount = 0;
         for (int i = 0; i < sendfiles.length; i++) {
             sendfileCount += sendfiles[i].getSendfileCount();
@@ -445,7 +445,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 sendfileThreadCount = 1;
             }
         }
-        
+
         // Delay accepting of new connections until data is available
         // Only Linux kernels 2.4 + have that implemented
         // on other platforms this call is noop and will return APR_ENOTIMPL.
@@ -457,7 +457,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
         // Initialize SSL if needed
         if (isSSLEnabled()) {
-            
+
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_ALL;
             if ("SSLv2".equalsIgnoreCase(SSLProtocol)) {
@@ -632,7 +632,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
             }
         }
-    }    
+    }
 
     /**
      * Pause the endpoint, which will make it stop accepting new sockets.
@@ -711,27 +711,27 @@ public class AprEndpoint extends AbstractEndpoint {
         if (running) {
             stop();
         }
-        
+
         // Destroy pool if it was initialised
         if (serverSockPool != 0) {
             Pool.destroy(serverSockPool);
             serverSockPool = 0;
         }
-        
+
         // Close server socket if it was initialised
         if (serverSock != 0) {
             Socket.close(serverSock);
             serverSock = 0;
         }
-        
+
         sslContext = 0;
-        
+
         // Close all APR memory pools and resources if initialised
         if (rootPool != 0) {
             Pool.destroy(rootPool);
             rootPool = 0;
         }
-        
+
         initialized = false;
     }
 
@@ -783,7 +783,7 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
 
-    
+
     /**
      * Allocate a new poller of the specified size.
      */
@@ -801,7 +801,7 @@ public class AprEndpoint extends AbstractEndpoint {
         }
     }
 
-    
+
     /**
      * Process given socket.
      */
@@ -819,7 +819,7 @@ public class AprEndpoint extends AbstractEndpoint {
         }
         return true;
     }
-    
+
 
     /**
      * Process given socket.
@@ -838,7 +838,7 @@ public class AprEndpoint extends AbstractEndpoint {
         }
         return true;
     }
-    
+
 
     /**
      * Process given socket for an event.
@@ -858,7 +858,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     } else {
                         Thread.currentThread().setContextClassLoader(
                                 getClass().getClassLoader());
-                    }                
+                    }
                     getExecutor().execute(proc);
                 } finally {
                     if (IS_SECURITY_ENABLED) {
@@ -879,7 +879,7 @@ public class AprEndpoint extends AbstractEndpoint {
         }
         return true;
     }
-    
+
 
     // --------------------------------------------------- Acceptor Inner Class
 
@@ -952,7 +952,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
         protected long[] addS;
         protected volatile int addCount = 0;
-        
+
         protected boolean comet = true;
 
         protected volatile int keepAliveCount = 0;
@@ -961,7 +961,7 @@ public class AprEndpoint extends AbstractEndpoint {
         public Poller(boolean comet) {
             this.comet = comet;
         }
-        
+
         /**
          * Create the poller. With some versions of APR, the maximum poller size will
          * be 62 (recompiling APR is necessary to remove this limitation).
@@ -1111,7 +1111,7 @@ public class AprEndpoint extends AbstractEndpoint {
                             // Check for failed sockets and hand this socket off to a worker
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
-                                    || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN))) 
+                                    || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN)))
                                     || (!comet && (!processSocket(desc[n*2+1])))) {
                                 // Close socket and clear pool
                                 if (comet) {
@@ -1164,7 +1164,7 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
         }
-        
+
     }
 
 
@@ -1208,7 +1208,7 @@ public class AprEndpoint extends AbstractEndpoint {
         protected long pool = 0;
         protected long[] desc;
         protected HashMap<Long, SendfileData> sendfileData;
-        
+
         protected volatile int sendfileCount;
         public int getSendfileCount() { return sendfileCount; }
 
@@ -1507,9 +1507,9 @@ public class AprEndpoint extends AbstractEndpoint {
      * and do the handshake.
      */
     protected class SocketWithOptionsProcessor implements Runnable {
-        
+
         protected long socket = 0;
-        
+
         public SocketWithOptionsProcessor(long socket) {
             this.socket = socket;
         }
@@ -1526,7 +1526,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
             } else {
                 // Process the request from this socket
-                if (!setSocketOptions(socket) 
+                if (!setSocketOptions(socket)
                         || handler.process(socket) == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     Socket.destroy(socket);
@@ -1535,10 +1535,10 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
         }
-        
+
     }
-    
-    
+
+
     // ---------------------------------------------- SocketProcessor Inner Class
 
 
@@ -1547,11 +1547,11 @@ public class AprEndpoint extends AbstractEndpoint {
      * external Executor thread pool.
      */
     protected class SocketProcessor implements Runnable {
-        
+
         protected long socket = 0;
         protected boolean async = false;
         protected SocketStatus status = SocketStatus.ERROR;
-        
+
         public SocketProcessor(long socket) {
             this.socket = socket;
             this.async = false;
@@ -1573,10 +1573,10 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
         }
-        
+
     }
-    
-    
+
+
     // --------------------------------------- SocketEventProcessor Inner Class
 
 
@@ -1585,10 +1585,10 @@ public class AprEndpoint extends AbstractEndpoint {
      * external Executor thread pool.
      */
     protected class SocketEventProcessor implements Runnable {
-        
+
         protected long socket = 0;
-        protected SocketStatus status = null; 
-        
+        protected SocketStatus status = null;
+
         public SocketEventProcessor(long socket, SocketStatus status) {
             this.socket = socket;
             this.status = status;
@@ -1604,9 +1604,9 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
         }
-        
+
     }
-    
+
     private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
         private ClassLoader cl;
@@ -1619,5 +1619,5 @@ public class AprEndpoint extends AbstractEndpoint {
             Thread.currentThread().setContextClassLoader(cl);
             return null;
         }
-    }    
+    }
 }
