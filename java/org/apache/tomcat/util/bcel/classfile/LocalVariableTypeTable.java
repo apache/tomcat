@@ -72,6 +72,7 @@ private int             local_variable_type_table_length; // Table of local
       local_variable_type_table[i] = new LocalVariable(dis, cpool);
   }
 
+  @Override
   public final void dump(DataOutputStream file) throws IOException
   {
     super.dump(file);
@@ -90,6 +91,7 @@ private int             local_variable_type_table_length; // Table of local
   /**
    * @return String representation.
    */ 
+  @Override
   public final String toString() {
     StringBuffer buf = new StringBuffer("");
 
@@ -105,6 +107,7 @@ private int             local_variable_type_table_length; // Table of local
   /**
    * @return deep copy of this attribute
    */
+  @Override
   public Attribute copy(ConstantPool constant_pool) {
     LocalVariableTypeTable c = (LocalVariableTypeTable)clone();
 

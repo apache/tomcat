@@ -68,6 +68,7 @@ public final class ConstantClass extends Constant implements ConstantObject {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         file.writeByte(tag);
         file.writeShort(name_index);
@@ -94,6 +95,7 @@ public final class ConstantClass extends Constant implements ConstantObject {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         return super.toString() + "(name_index = " + name_index + ")";
     }

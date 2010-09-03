@@ -82,6 +82,7 @@ public final class StackMapTable extends Attribute {
      * @param file Output file stream
      * @throws IOException
      */
+    @Override
     public final void dump( DataOutputStream file ) throws IOException {
         super.dump(file);
         file.writeShort(map_length);
@@ -106,6 +107,7 @@ public final class StackMapTable extends Attribute {
     /**
      * @return String representation.
      */
+    @Override
     public final String toString() {
         StringBuffer buf = new StringBuffer("StackMapTable(");
         for (int i = 0; i < map_length; i++) {
@@ -122,6 +124,7 @@ public final class StackMapTable extends Attribute {
     /**
      * @return deep copy of this attribute
      */
+    @Override
     public Attribute copy( ConstantPool _constant_pool ) {
         StackMapTable c = (StackMapTable) clone();
         c.map = new StackMapTableEntry[map_length];
