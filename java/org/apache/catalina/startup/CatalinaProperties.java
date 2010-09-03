@@ -87,11 +87,6 @@ public class CatalinaProperties {
         InputStream is = null;
         Throwable error = null;
 
-        ClassLoader cl = CatalinaProperties.class.getClassLoader();
-        System.err.println("CatalinaProprties: cl=" + cl.toString());
-        if ((cl = cl.getParent()) != null) {
-            System.err.println("CatalinaProprties: parent cl=" + cl.toString());
-        }
         try {
             String configUrl = getConfigUrl();
             if (configUrl != null) {
