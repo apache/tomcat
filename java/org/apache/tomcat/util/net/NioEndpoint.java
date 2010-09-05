@@ -437,28 +437,6 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
-    /**
-     * Return the state of the endpoint.
-     *
-     * @return true if the endpoint is running, false otherwise
-     */
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
-
-    /**
-     * Return the state of the endpoint.
-     *
-     * @return true if the endpoint is paused, false otherwise
-     */
-    @Override
-    public boolean isPaused() {
-        return paused;
-    }
-
-
     // ----------------------------------------------- Public Lifecycle Methods
 
 
@@ -595,33 +573,12 @@ public class NioEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Pause the endpoint, which will make it stop accepting new sockets.
-     */
-    @Override
-    public void pause() {
-        if (running && !paused) {
-            paused = true;
-            unlockAccept();
-        }
-    }
-
-
-    /**
-     * Resume the endpoint, which will make it start accepting new sockets
-     * again.
-     */
-    @Override
-    public void resume() {
-        if (running) {
-            paused = false;
-        }
-    }
-
-
-    /**
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     public void stop() {
+        if (!paused) {
+            pause();
+        }
         if (running) {
             running = false;
             unlockAccept();

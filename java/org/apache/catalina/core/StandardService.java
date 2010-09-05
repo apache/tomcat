@@ -377,13 +377,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * Retrieves executor by name, null if not found
-     * @param name String
+     * @param executorName String
      * @return Executor
      */
-    public Executor getExecutor(String name) {
+    public Executor getExecutor(String executorName) {
         synchronized (executors) {
             for (Executor executor: executors) {
-                if (name.equals(executor.getName()))
+                if (executorName.equals(executor.getName()))
                     return executor;
             }
         }
@@ -462,7 +462,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        // Stop our defined Connectors first
+        // Pause connectors first
         synchronized (connectors) {
             for (Connector connector: connectors) {
                 try {
@@ -475,13 +475,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
 
-        // Heuristic: Sleep for a while to ensure pause of the connector
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
-
         if(log.isInfoEnabled())
             log.info(sm.getString("standardService.stop.name", this.name));
         setState(LifecycleState.STOPPING);
@@ -492,14 +485,15 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 container.stop();
             }
         }
-        // FIXME pero -- Why container stop first? KeepAlive connections can send request! 
-        // Stop our defined Connectors first
+
+        // Now stop the connectors
         synchronized (connectors) {
             for (Connector connector: connectors) {
-                if (LifecycleState.INITIALIZED.equals(
+                if (!LifecycleState.STARTED.equals(
                         connector.getState())) {
-                    // If Service fails to start, connectors may not have been
-                    // started
+                    // Connectors only need stopping if they are currently
+                    // started. They may have failed to start or may have been
+                    // stopped (e.g. via a JMX call)
                     continue;
                 }
                 try {

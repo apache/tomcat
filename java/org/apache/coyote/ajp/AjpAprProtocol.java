@@ -218,9 +218,20 @@ public class AjpAprProtocol
             log.info(sm.getString("ajpprotocol.resume", getName()));
     }
 
-    public void destroy() throws Exception {
+    public void stop() throws Exception {
+        try {
+            endpoint.stop();
+        } catch (Exception ex) {
+            log.error(sm.getString("ajpprotocol.endpoint.stoperror"), ex);
+            throw ex;
+        }
         if (log.isInfoEnabled())
             log.info(sm.getString("ajpprotocol.stop", getName()));
+    }
+
+    public void destroy() throws Exception {
+        if (log.isInfoEnabled())
+            log.info(sm.getString("ajpprotocol.destroy", getName()));
         endpoint.destroy();
         if (tpOname!=null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);

@@ -916,6 +916,14 @@ public class Connector extends LifecycleMBeanBase  {
 
         setState(LifecycleState.STOPPING);
 
+        try {
+            protocolHandler.stop();
+        } catch (Exception e) {
+            throw new LifecycleException
+                (sm.getString
+                 ("coyoteConnector.protocolHandlerStopFailed", e));
+        }
+
         // MapperListener doesn't follow Lifecycle conventions
         mapperListener.destroy();
     }

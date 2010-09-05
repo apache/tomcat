@@ -299,7 +299,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         boolean recycle = true;
         final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
         
-        while (!error && keepAlive && !comet && !async) {
+        while (!error && keepAlive && !comet && !async && !endpoint.isPaused()) {
             //always default to our soTimeout
             ka.setTimeout(soTimeout);
             // Parsing the request header
@@ -448,15 +448,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         }//while
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (comet || async) {
-            if (error) {
-                recycle();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
+        if (error || endpoint.isPaused()) {
+            recycle();
+            return SocketState.CLOSED;
+        } else if (comet || async) {
+            return SocketState.LONG;
         } else {
-            if ( recycle ) {
+            if (recycle) {
                 recycle();
             }
             //return (openSocket) ? (SocketState.OPEN) : SocketState.CLOSED;
