@@ -135,6 +135,10 @@
         Further work to reduce the code duplication in the HTTP connectors.
         (markt)
       </update>
+      <fix>
+        Make sure acceptor threads are stopped when the connector is stopped.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

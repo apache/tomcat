@@ -918,6 +918,7 @@ public class AprEndpoint extends AbstractEndpoint {
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
          */
+        @Override
         public void run() {
 
             // Loop until we receive a shutdown command
