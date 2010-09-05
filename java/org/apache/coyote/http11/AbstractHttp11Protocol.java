@@ -148,9 +148,21 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void stop() throws Exception {
+        try {
+            endpoint.stop();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("http11protocol.endpoint.stoperror"), ex);
+            throw ex;
+        }
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("http11protocol.stop", getName()));
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.destroy", getName()));
         endpoint.destroy();
         if( tpOname!=null )
             Registry.getRegistry(null, null).unregisterComponent(tpOname);

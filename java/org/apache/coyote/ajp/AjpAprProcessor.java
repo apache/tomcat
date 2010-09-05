@@ -378,7 +378,7 @@ public class AjpAprProcessor implements ActionHook {
         boolean openSocket = true;
         boolean keptAlive = false;
 
-        while (started && !error) {
+        while (started && !error && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -474,14 +474,14 @@ public class AjpAprProcessor implements ActionHook {
         }
 
         // Add the socket to the poller
-        if (!error) {
+        if (!error && !endpoint.isPaused()) {
             endpoint.getPoller().add(socket);
         } else {
             openSocket = false;
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (!async || error)
+        if (!async || error || endpoint.isPaused())
              recycle();
 
         return openSocket;

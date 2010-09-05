@@ -430,11 +430,38 @@ public abstract class AbstractEndpoint {
         }
     }    
     
-    public abstract void pause();
-    public abstract void resume();
-    public abstract void start() throws Exception;
-    public abstract void destroy() throws Exception;
+    
     public abstract void init() throws Exception;
+    public abstract void start() throws Exception;
+    
+    /**
+     * Pause the endpoint, which will stop it accepting new connections.
+     */
+    public void pause() {
+        if (running && !paused) {
+            paused = true;
+            unlockAccept();
+            // Heuristic: Sleep for a while to ensure pause of the endpoint
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+    }
+    
+    /**
+     * Resume the endpoint, which will make it start accepting new connections
+     * again.
+     */
+    public void resume() {
+        if (running) {
+            paused = false;
+        }
+    }
+    
+    public abstract void stop() throws Exception;
+    public abstract void destroy() throws Exception;
     
     public String adjustRelativePath(String path, String relativeTo) {
         File f = new File(path);

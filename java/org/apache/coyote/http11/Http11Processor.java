@@ -181,7 +181,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
         boolean keptAlive = socketWrapper.isKeptAlive();
 
-        while (started && !error && keepAlive) {
+        while (started && !error && keepAlive && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -309,7 +309,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (error) {
+        if (error || endpoint.isPaused()) {
             recycle();
             return SocketState.CLOSED;
         } else if (async) {
