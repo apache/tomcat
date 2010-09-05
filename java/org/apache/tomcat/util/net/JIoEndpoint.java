@@ -409,21 +409,10 @@ public class JIoEndpoint extends AbstractEndpoint {
     }
 
     @Override
-    public void pause() {
-        if (running && !paused) {
-            paused = true;
-            unlockAccept();
-        }
-    }
-
-    @Override
-    public void resume() {
-        if (running) {
-            paused = false;
-        }
-    }
-
     public void stop() {
+        if (!paused) {
+            pause();
+        }
         if (running) {
             running = false;
             unlockAccept();
@@ -494,7 +483,10 @@ public class JIoEndpoint extends AbstractEndpoint {
         try {
             SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
-            getExecutor().execute(new SocketProcessor(wrapper));
+            // During shutdown, executor may be null - avoid NPE
+            if (running) {
+                getExecutor().execute(new SocketProcessor(wrapper));
+            }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;

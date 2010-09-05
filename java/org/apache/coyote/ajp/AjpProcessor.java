@@ -383,7 +383,7 @@ public class AjpProcessor implements ActionHook {
         // Error flag
         error = false;
 
-        while (started && !error) {
+        while (started && !error && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -483,7 +483,7 @@ public class AjpProcessor implements ActionHook {
             recycle();
 
         }
-        if (async && !error) {
+        if (async && !error && !endpoint.isPaused()) {
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
             return SocketState.LONG;
         } else {

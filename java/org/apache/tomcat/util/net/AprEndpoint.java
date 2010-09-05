@@ -640,33 +640,12 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
     /**
-     * Pause the endpoint, which will make it stop accepting new sockets.
-     */
-    @Override
-    public void pause() {
-        if (running && !paused) {
-            paused = true;
-            unlockAccept();
-        }
-    }
-
-
-    /**
-     * Resume the endpoint, which will make it start accepting new sockets
-     * again.
-     */
-    @Override
-    public void resume() {
-        if (running) {
-            paused = false;
-        }
-    }
-
-
-    /**
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     public void stop() {
+        if (!paused) {
+            pause();
+        }
         if (running) {
             running = false;
             unlockAccept();
@@ -822,7 +801,10 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocketWithOptions(long socket) {
         try {
-            getExecutor().execute(new SocketWithOptionsProcessor(socket));
+            // During shutdown, executor may be null - avoid NPE
+            if (running) {
+                getExecutor().execute(new SocketWithOptionsProcessor(socket));
+            }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;

@@ -143,6 +143,10 @@
         Make sure async timeout thread is stopped when the connector is stopped.
         (markt)
       </fix>
+      <fix>
+        <bug>49802</bug>: Re-factor connector pause, stop and destroy methods so
+        that calling any of those methods has the expected results. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
