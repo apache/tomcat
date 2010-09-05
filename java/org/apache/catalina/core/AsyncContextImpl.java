@@ -217,7 +217,7 @@ public class AsyncContextImpl implements AsyncContext {
                 }
             }
         } else {
-            throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
+            throw new IllegalStateException("Start not allowed. Invalid state:"+state.get());
         }
     }
     
@@ -298,10 +298,6 @@ public class AsyncContextImpl implements AsyncContext {
         return (state.get()==AsyncState.NOT_STARTED);
     }
 
-    public void setCompleted() {
-        this.state.set(AsyncState.NOT_STARTED);
-    }
-    
     public void doInternalDispatch() throws ServletException, IOException {
         if (this.state.compareAndSet(AsyncState.TIMING_OUT,
                 AsyncState.TIMING_OUT_NEED_COMPLETE)) {
@@ -408,7 +404,8 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
-        request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
+        request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_SETTIMEOUT,
+                Long.valueOf(timeout));
     }
     
     public void setTimeoutState() {
