@@ -118,6 +118,11 @@
         <bug>49876</bug>: Fix the generics warnings in the copied Apache Jakarta
         BCEL code. Based on a patch by Gábor. (markt) 
       </fix>
+      <fix>
+        <bug>49883</bug>: Ensure that the CombinedRealm returns a name for use
+        in log messages rather than throwing an
+        <code>UnsupportedOperationException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
