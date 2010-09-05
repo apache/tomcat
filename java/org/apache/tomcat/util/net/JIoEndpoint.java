@@ -128,9 +128,10 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     protected class AsyncTimeout implements Runnable {
         /**
-         * The background thread that listens for incoming TCP/IP connections and
-         * hands them off to an appropriate processor.
+         * The background thread that checks async requests and fires the
+         * timeout if there has been no activity.
          */
+        @Override
         public void run() {
 
             // Loop until we receive a shutdown command
@@ -152,7 +153,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
                 
                 // Loop if endpoint is paused
-                while (paused) {
+                while (paused && running) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
