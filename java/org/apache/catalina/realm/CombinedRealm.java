@@ -48,6 +48,10 @@ public class CombinedRealm extends RealmBase {
      */
     protected List<Realm> realms = new LinkedList<Realm>();
 
+    /**
+     * Descriptive information about this Realm implementation.
+     */
+    protected static final String name = "CombinedRealm";
 
     /**
      * Add a realm to the list of realms that will be used to authenticate
@@ -263,13 +267,7 @@ public class CombinedRealm extends RealmBase {
 
     @Override
     protected String getName() {
-        // This method should never be called
-        // Stack trace will show where this was called from
-        UnsupportedOperationException uoe =
-            new UnsupportedOperationException(
-                    sm.getString("combinedRealm.getName"));
-        log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
-        throw uoe;
+        return name;
     }
 
     @Override
