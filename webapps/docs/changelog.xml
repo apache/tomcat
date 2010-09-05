@@ -139,6 +139,10 @@
         Make sure acceptor threads are stopped when the connector is stopped.
         (markt)
       </fix>
+      <fix>
+        Make sure async timeout thread is stopped when the connector is stopped.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
