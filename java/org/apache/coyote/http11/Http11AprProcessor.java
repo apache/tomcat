@@ -220,7 +220,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         boolean keptAlive = false;
         boolean openSocket = false;
 
-        while (!error && keepAlive && !comet && !async) {
+        while (!error && keepAlive && !comet && !async && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -338,15 +338,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (comet  || async) {
-            if (error) {
-                inputBuffer.nextRequest();
-                outputBuffer.nextRequest();
-                recycle();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
+        if (error || endpoint.isPaused()) {
+            inputBuffer.nextRequest();
+            outputBuffer.nextRequest();
+            recycle();
+            return SocketState.CLOSED;
+        } else if (comet  || async) {
+            return SocketState.LONG;
         } else {
             recycle();
             return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;

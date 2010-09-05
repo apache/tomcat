@@ -82,6 +82,12 @@ public interface ProtocolHandler {
 
 
     /**
+     * Stop the protocol.
+     */
+    public void stop() throws Exception;
+
+
+    /**
      * Destroy the protocol (optional).
      */
     public void destroy() throws Exception;
