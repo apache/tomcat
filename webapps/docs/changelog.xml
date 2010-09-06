@@ -123,6 +123,10 @@
         in log messages rather than throwing an
         <code>UnsupportedOperationException</code>. (markt)
       </fix>
+      <fix>
+        Update the version numbers in ServerInfo defaults to Tomact 7.0.x.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
