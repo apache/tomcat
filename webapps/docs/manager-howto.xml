@@ -66,7 +66,7 @@ the following functions:</p>
     directory (unless it was deployed from file system).</li>
 </ul>
 
-<p>A default Tomcat installation includes the manager. To add an instance of the
+<p>A default Tomcat installation includes the Manager. To add an instance of the
 Manager web application <code>Context</code> to a new host install the
 <code>manager.xml</code> context configuration file in the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
@@ -137,7 +137,7 @@ depends on which <code>Realm</code> implementation you are using:</p>
 </source>
     which defines the username and password used by this individual to
     log on, and the role names he or she is associated with.  You can
-    add the <strong>manager</strong> role to the comma-delimited
+    add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
 <li><em>JDBCRealm</em> - Your user and role information is stored in
@@ -156,9 +156,9 @@ depends on which <code>Realm</code> implementation you are using:</p>
 described in the next section, you will be challenged to log on using
 BASIC authentication.  The username and password you enter do not matter,
 as long as they identify a valid user in the users database who possesses
-the role <strong>manager</strong>.</p>
+the role <strong>manager-script</strong>.</p>
 
-<p>In addition to the password restrictions the manager web application
+<p>In addition to the password restrictions the Manager web application
 could be restricted by the remote IP address or host by adding a
 <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.  Here is
 an example of restricting access to the localhost by IP address:</p>
@@ -305,7 +305,7 @@ This command is the logical opposite of the <code>/undeploy</code> command.</p>
 
 <p>This can be used to deploy a previous version of a web application, which
 has been deployed using the <code>tag</code> attribute. Note that the work
-directory for the manager webapp will contain the previously deployed WARs;
+directory for the Manager webapp will contain the previously deployed WARs;
 removing it would make the deployment fail.</p>
 <source>
 http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag
@@ -958,7 +958,7 @@ commands, you must perform the following setup operations:</p>
 <li>Add the <code>$ANT_HOME/bin</code> directory to your <code>PATH</code>
     environment variable.</li>
 <li>Configure at least one username/password combination in your Tomcat
-    user database that includes the <code>manager</code> role.</li>
+    user database that includes the <code>manager-script</code> role.</li>
 </ul>
 
 <p>To use custom tasks within Ant, you must declare them first with a
