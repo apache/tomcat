@@ -101,7 +101,7 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void dispatch() {
-        HttpServletRequest sr = (HttpServletRequest)getServletRequest();
+        HttpServletRequest sr = (HttpServletRequest)getRequest();
         String path = sr.getRequestURI();
         String cpath = sr.getContextPath();
         if (cpath.length()>1) path = path.substring(cpath.length());
@@ -171,12 +171,12 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public ServletRequest getRequest() {
-        return getServletRequest();
+        return servletRequest;
     }
 
     @Override
     public ServletResponse getResponse() {
-        return getServletResponse();
+        return servletResponse;
     }
 
     @Override
@@ -277,14 +277,6 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
 
-    public ServletRequest getServletRequest() {
-        return servletRequest;
-    }
-
-    public ServletResponse getServletResponse() {
-        return servletResponse;
-    }
-
     @Override
     public boolean hasOriginalRequestAndResponse() {
         return hasOriginalRequestAndResponse;
@@ -294,11 +286,7 @@ public class AsyncContextImpl implements AsyncContext {
         this.hasOriginalRequestAndResponse = hasOriginalRequestAndResponse;
     }
 
-    public boolean isCompleted() {
-        return (state.get()==AsyncState.NOT_STARTED);
-    }
-
-    public void doInternalDispatch() throws ServletException, IOException {
+    protected void doInternalDispatch() throws ServletException, IOException {
         if (this.state.compareAndSet(AsyncState.TIMING_OUT,
                 AsyncState.TIMING_OUT_NEED_COMPLETE)) {
             log.debug("TIMING OUT!");
@@ -360,8 +348,8 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
     
-    public void doInternalComplete(boolean error) {
-        if (isCompleted()) return;
+    private void doInternalComplete(boolean error) {
+        if (state.get()==AsyncState.NOT_STARTED) return;
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.NOT_STARTED)) {
             //this is the same as
             //request.startAsync().complete();
@@ -390,10 +378,6 @@ public class AsyncContextImpl implements AsyncContext {
     
     public AsyncState getState() {
         return state.get();
-    }
-    
-    protected void setState(AsyncState st) {
-        state.set(st);
     }
     
     @Override
