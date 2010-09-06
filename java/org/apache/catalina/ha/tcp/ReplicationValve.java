@@ -142,6 +142,7 @@ public class ReplicationValve
     /**
      * @return Returns the cluster.
      */
+    @Override
     public CatalinaCluster getCluster() {
         return cluster;
     }
@@ -149,6 +150,7 @@ public class ReplicationValve
     /**
      * @param cluster The cluster to set.
      */
+    @Override
     public void setCluster(CatalinaCluster cluster) {
         this.cluster = cluster;
     }
