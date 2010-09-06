@@ -67,11 +67,11 @@ public class ServerInfo {
             //Ignore
         }
         if (serverInfo == null)
-            serverInfo = "Apache Tomcat";
+            serverInfo = "Apache Tomcat 7.0.x-dev";
         if (serverBuilt == null)
             serverBuilt = "unknown";
         if (serverNumber == null)
-            serverNumber = "5.5.0.0";
+            serverNumber = "7.0.x";
         
     }
 
