@@ -117,11 +117,13 @@ public class TestSenderConnections extends TestCase {
             this.name = name;
         }
         
+        @Override
         public void messageReceived(Serializable msg, Member sender) {
             System.out.println("["+name+"] Received message:"+msg+" from " + sender.getName());
         }
 
     
+        @Override
         public boolean accept(Serializable msg, Member sender) {
             return true;
         }
