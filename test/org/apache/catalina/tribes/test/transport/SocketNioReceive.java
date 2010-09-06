@@ -69,6 +69,7 @@ public class SocketNioReceive {
         boolean first = true;
         
         
+        @Override
         public void messageReceived(ChannelMessage msg) {
             if (first) {
                 first = false;
@@ -83,6 +84,7 @@ public class SocketNioReceive {
             }
         }        
 
+        @Override
         public boolean accept(ChannelMessage msg) {
             synchronized (this) {accept++;}
             return true;

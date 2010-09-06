@@ -113,6 +113,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     }
 
 
+    @Override
     public void run() {
         
         long counter = 0;
@@ -177,6 +178,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
      * TODO Implement this org.apache.catalina.tribes.MembershipListener
      *   method
      */
+    @Override
     public void memberAdded(Member member) {
         log.info("Member added:"+member);
         synchronized (mutex) {
@@ -191,14 +193,17 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
      * TODO Implement this org.apache.catalina.tribes.MembershipListener
      *   method
      */
+    @Override
     public void memberDisappeared(Member member) {
         log.info("Member disappeared:"+member);
     }
     
+    @Override
     public boolean accept(Serializable msg, Member mbr){ 
        return (msg instanceof LoadMessage) || (msg instanceof ByteMessage);
     }
     
+    @Override
     public void messageReceived(Serializable msg, Member mbr){ 
         if ( receiveStart == 0 ) receiveStart = System.currentTimeMillis();
         if ( debug ) {

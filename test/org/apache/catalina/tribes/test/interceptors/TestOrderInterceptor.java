@@ -97,6 +97,7 @@ public class TestOrderInterceptor extends TestCase {
         final AtomicInteger value = new AtomicInteger(0);
         final Queue<Exception> exceptionQueue = new ConcurrentLinkedQueue<Exception>();
         Runnable run = new Runnable() {
+            @Override
             public void run() {
                 for (int i = 0; i < 100; i++) {
                     try {
@@ -153,6 +154,7 @@ public class TestOrderInterceptor extends TestCase {
         int cnt = 0;
         int total = 0;
         boolean fail = false;
+        @Override
         public synchronized void messageReceived(Serializable msg, Member sender) {
             total++;
             Integer i = (Integer)msg;
@@ -162,6 +164,7 @@ public class TestOrderInterceptor extends TestCase {
 
         }
 
+        @Override
         public boolean accept(Serializable msg, Member sender) {
             return (msg instanceof Integer);
         }
