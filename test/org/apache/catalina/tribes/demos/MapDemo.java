@@ -86,6 +86,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
      * will always return false since we rely on the 
      * lazy map to do all the messaging for us
      */
+    @Override
     public boolean accept(Serializable msg, Member source) {
         //simple refresh the table model
         table.dataModel.getValueAt(-1,-1);
@@ -98,6 +99,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
      * @param msg - the message received
      * @param source - the sending member
      */
+    @Override
     public void messageReceived(Serializable msg, Member source) {
         // NOOP
     }
@@ -105,6 +107,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
     /**
      * Invoked when a member is added to the group
      */
+    @Override
     public void memberAdded(Member member) {
         // NOOP
     }
@@ -112,6 +115,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
     /**
      * Invoked when a member leaves the group
      */
+    @Override
     public void memberDisappeared(Member member) {
         //just refresh the table model
         table.dataModel.getValueAt(-1,-1);
@@ -219,8 +223,10 @@ public class MapDemo implements ChannelListener, MembershipListener{
                                    "isProxy",
                                    "isBackup"};
 
+            @Override
             public int getColumnCount() { return columnNames.length; }
     
+            @Override
             public int getRowCount() {return map.sizeFull() +1; }
             
             public StringBuilder getMemberNames(Member[] members){
@@ -234,6 +240,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 return buf;
             }
             
+            @Override
             public Object getValueAt(int row, int col) {
                 if ( row==-1 ) {
                     update();
@@ -349,6 +356,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             return button;
         }
         
+        @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println(e.getActionCommand());
             if ( "add".equals(e.getActionCommand()) ) {

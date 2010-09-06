@@ -96,6 +96,7 @@ public class TestMemberArrival
         }
 
         public ArrayList<Member> members = new ArrayList<Member>();
+        @Override
         public void memberAdded(Member member) {
             if (!members.contains(member)) {
                 members.add(member);
@@ -107,6 +108,7 @@ public class TestMemberArrival
             }
         }
 
+        @Override
         public void memberDisappeared(Member member) {
             if (members.contains(member)) {
                 members.remove(member);

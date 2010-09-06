@@ -52,6 +52,7 @@ public class MembersWithProperties implements MembershipListener{
         return props;
     }
 
+    @Override
     public void memberAdded(Member member) {
         try {
             System.out.println("Received member added:"+member);
@@ -62,6 +63,7 @@ public class MembersWithProperties implements MembershipListener{
         }
     }
   
+    @Override
     public void memberDisappeared(Member member) {
         try {
             System.out.println("Received member disappeared:"+member);

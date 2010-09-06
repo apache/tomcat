@@ -141,6 +141,7 @@ public class TestTcpFailureDetector extends TestCase {
             this.name = name;
         }
         public ArrayList<Member> members = new ArrayList<Member>();
+        @Override
         public void memberAdded(Member member) {
             if ( !members.contains(member) ) {
                 members.add(member);
@@ -152,6 +153,7 @@ public class TestTcpFailureDetector extends TestCase {
             }
         }
         
+        @Override
         public void memberDisappeared(Member member) {
             if ( members.contains(member) ) {
                 members.remove(member);

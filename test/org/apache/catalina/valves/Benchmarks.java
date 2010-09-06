@@ -49,6 +49,7 @@ public class Benchmarks extends TestCase {
         private volatile long currentMillis = 0;
         private volatile Date currentDate = null;
 
+        @Override
         public void run() {
             getCurrentDate();
         }
@@ -83,6 +84,7 @@ public class Benchmarks extends TestCase {
 
         private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
 
+        @Override
         public void run() {
             getCurrentDate();
         }
@@ -118,6 +120,7 @@ public class Benchmarks extends TestCase {
 
         private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
 
+        @Override
         public void run() {
             getCurrentDate();
         }
@@ -152,6 +155,7 @@ public class Benchmarks extends TestCase {
             }
         };
 
+        @Override
         public void run() {
             getCurrentDate();
         }
@@ -209,6 +213,7 @@ public class Benchmarks extends TestCase {
         private SimpleDateFormat timeFormatter = new SimpleDateFormat(
                 "hh:mm:ss");
 
+        @Override
         public void run() {
             printDate();
         }
@@ -292,6 +297,7 @@ public class Benchmarks extends TestCase {
             }
         };
 
+        @Override
         public void run() {
             printDate();
         }
@@ -353,6 +359,7 @@ public class Benchmarks extends TestCase {
             }
         };
 
+        @Override
         public void run() {
             printDate();
         }
@@ -413,6 +420,7 @@ public class Benchmarks extends TestCase {
             }
         };
 
+        @Override
         public void run() {
             printDate();
         }
@@ -488,6 +496,7 @@ public class Benchmarks extends TestCase {
             this.test = test;
         }
 
+        @Override
         public void run() {
             for (int i = 0; i < count; i++) {
                 test.run();

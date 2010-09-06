@@ -40,10 +40,12 @@ public class ParamFilter implements Filter {
 
     private FilterConfig _filterConfig;
 
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         _filterConfig = filterConfig;
     }
 
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res,
             FilterChain chain) throws ServletException, IOException {
         PrintWriter out = res.getWriter();
@@ -51,6 +53,7 @@ public class ParamFilter implements Filter {
         chain.doFilter(req, res);
     }
 
+    @Override
     public void destroy() {
         // destroy
     }
