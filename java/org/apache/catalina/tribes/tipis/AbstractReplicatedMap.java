@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelException.FaultyMember;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Heartbeat;
 import org.apache.catalina.tribes.Member;
@@ -253,14 +254,22 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                                         channel.getLocalMember(false),
                                         null);
         if ( channel.getMembers().length > 0 ) {
-            //send a ping, wait for all nodes to reply
-            Response[] resp = rpcChannel.send(channel.getMembers(), 
-                                              msg, RpcChannel.ALL_REPLY, 
-                                              (channelSendOptions),
-                                              (int) accessTimeout);
-            for (int i = 0; i < resp.length; i++) {
-                memberAlive(resp[i].getSource());
-            } //for
+            try {
+                //send a ping, wait for all nodes to reply
+                Response[] resp = rpcChannel.send(channel.getMembers(), 
+                                                  msg, RpcChannel.ALL_REPLY, 
+                                                  (channelSendOptions),
+                                                  (int) accessTimeout);
+                for (int i = 0; i < resp.length; i++) {
+                    memberAlive(resp[i].getSource());
+                }
+            } catch (ChannelException ce) {
+                // Handle known failed membersq
+                FaultyMember[] faultyMembers = ce.getFaultyMembers();
+                for (FaultyMember faultyMember : faultyMembers) {
+                    memberDisappeared(faultyMember.getMember());
+                }
+            }            
         }
         //update our map of members, expire some if we didn't receive a ping back
         synchronized (mapMembers) {
