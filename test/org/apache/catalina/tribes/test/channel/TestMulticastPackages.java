@@ -171,10 +171,12 @@ public class TestMulticastPackages extends TestCase {
         public Listener() {
             Arrays.fill(nrs, 0);
         }
+        @Override
         public boolean accept(Serializable s, Member m) {
             return (s instanceof Data);
         }
 
+        @Override
         public void messageReceived(Serializable s, Member m) {
             try {
                 Data d = (Data)s;

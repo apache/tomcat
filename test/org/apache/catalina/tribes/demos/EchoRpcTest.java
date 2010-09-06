@@ -67,6 +67,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
      * TODO Implement this org.apache.catalina.tribes.tipis.RpcCallback
      *   method
      */
+    @Override
     public void leftOver(Serializable msg, Member sender) {
         System.out.println("Received a left over message from ["+sender.getName()+"] with data ["+msg+"]");
     }
@@ -79,11 +80,13 @@ public class EchoRpcTest implements RpcCallback, Runnable {
      * TODO Implement this org.apache.catalina.tribes.tipis.RpcCallback
      *   method
      */
+    @Override
     public Serializable replyRequest(Serializable msg, Member sender) {
         System.out.println("Received a reply request message from ["+sender.getName()+"] with data ["+msg+"]");
         return "Reply("+name+"):"+msg;
     }
     
+    @Override
     public void run() {
         long counter = 0;
         while (counter<count) {

@@ -41,13 +41,16 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestTomcatSSL extends TomcatBaseTest {
     static TrustManager[] trustAllCerts = new TrustManager[] { 
         new X509TrustManager() { 
+            @Override
             public X509Certificate[] getAcceptedIssuers() { 
                 return null;
             }
+            @Override
             public void checkClientTrusted(X509Certificate[] certs,
                     String authType) {
                 // NOOP - Trust everything
             }
+            @Override
             public void checkServerTrusted(X509Certificate[] certs,
                     String authType) {
                 // NOOP - Trust everything
