@@ -1033,6 +1033,11 @@ public class DeltaManager extends ClusterManagerBase{
         DeltaSession session = null;
         try {
             session = (DeltaSession) findSession(sessionId);
+            if (session == null) {
+                // A parallel request has called session.invalidate() which has
+                // remove the session from the Manager.
+                return null;
+            }
             DeltaRequest deltaRequest = session.getDeltaRequest();
             session.lock();
             SessionMessage msg = null;
