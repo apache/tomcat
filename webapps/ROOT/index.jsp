@@ -105,7 +105,7 @@
         <img src="tomcat.gif" alt="The Mighty Tomcat - MEOW!"/>
     </div>
     <div class="fl">
-        <h1>Apache Tomcat @VERSION@</h1>
+        <h1>Apache Tomcat <%=request.getServletContext().getServerInfo() =></h1>
     </div>
     <div class="fr">
         <img src="asf-logo-wide.gif" alt="The Apache Software Foundation"/>
