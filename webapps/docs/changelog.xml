@@ -202,6 +202,11 @@
         Update the Servlet, JSP and EL Javadoc links to link to the
         specifications and the relevant part of the Java EE 6 Javadoc. (markt)
       </update>
+      <fix>
+        Update a few places in the docs where the Manager documentation referred
+        to the old role name of manager rather than than the new manager-script.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
