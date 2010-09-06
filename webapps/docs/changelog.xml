@@ -186,6 +186,11 @@
         Add support for LAST_ACCESS_AT_START system property to DeltaSession. 
         (kfujino)
       </fix>
+      <fix>
+        Avoid a NPE in the DeltaManager when a parallel request invalidates the
+        session before the current request has a chance to send the replication
+        message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
