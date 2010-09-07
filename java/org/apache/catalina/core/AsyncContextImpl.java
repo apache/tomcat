@@ -40,6 +40,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 /**
@@ -70,7 +71,7 @@ public class AsyncContextImpl implements AsyncContext {
     
     public AsyncContextImpl(Request request) {
         if (log.isDebugEnabled()) {
-            log.debug("AsyncContext created["+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+            logDebug("Constructor");
         }
         this.request = request;
     }
@@ -78,7 +79,7 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void complete() {
         if (log.isDebugEnabled()) {
-            log.debug("AsyncContext Complete Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+            logDebug("complete   ");
         }
         if (state.get()==AsyncState.COMPLETING) {
             //do nothing
@@ -116,7 +117,7 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void dispatch(ServletContext context, String path) {
         if (log.isDebugEnabled()) {
-            log.debug("AsyncContext Dispatch Called["+state.get()+"; "+path+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+            logDebug("dispatch   ");
         }
 
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
@@ -182,7 +183,7 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void start(final Runnable run) {
         if (log.isDebugEnabled()) {
-            log.debug("AsyncContext Start Called["+state.get()+"; "+request.getRequestURI()+"?"+request.getQueryString()+"]", new DebugException());
+            logDebug("start      ");
         }
 
         if (state.get() ==  AsyncState.STARTED) {
@@ -253,6 +254,9 @@ public class AsyncContextImpl implements AsyncContext {
     }
     
     public void recycle() {
+        if (log.isDebugEnabled()) {
+            logDebug("recycle    ");
+        }
         servletRequest = null;
         servletResponse = null;
         listeners.clear();
@@ -287,6 +291,9 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     protected void doInternalDispatch() throws ServletException, IOException {
+        if (log.isDebugEnabled()) {
+            logDebug("intDispatch");
+        }
         if (this.state.compareAndSet(AsyncState.TIMING_OUT,
                 AsyncState.TIMING_OUT_NEED_COMPLETE)) {
             log.debug("TIMING OUT!");
@@ -349,6 +356,9 @@ public class AsyncContextImpl implements AsyncContext {
     }
     
     private void doInternalComplete(boolean error) {
+        if (log.isDebugEnabled()) {
+            logDebug("intComplete");
+        }
         if (state.get()==AsyncState.NOT_STARTED) return;
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.NOT_STARTED)) {
             //this is the same as
@@ -406,7 +416,62 @@ public class AsyncContextImpl implements AsyncContext {
         this.servletResponse = response;
         event = new AsyncEvent(this, request, response); 
     }
-    
+
+    private void logDebug(String method) {
+        String rHashCode;
+        String crHashCode;
+        String rpHashCode;
+        String stage;
+        StringBuilder uri = new StringBuilder();
+        if (request == null) {
+            rHashCode = "null";
+            crHashCode = "null";
+            rpHashCode = "null";
+            stage = "-";
+            uri.append("N/A");
+        } else {
+            rHashCode = Integer.toHexString(request.hashCode());
+            org.apache.coyote.Request coyoteRequest = request.getCoyoteRequest();
+            if (coyoteRequest == null) {
+                crHashCode = "null";
+                rpHashCode = "null";
+                stage = "-";
+            } else {
+                crHashCode = Integer.toHexString(coyoteRequest.hashCode());
+                RequestInfo rp = coyoteRequest.getRequestProcessor();
+                if (rp == null) {
+                    rpHashCode = "null";
+                    stage = "-";
+                } else {
+                    rpHashCode = Integer.toHexString(rp.hashCode());
+                    stage = Integer.toString(rp.getStage());
+                }
+            }
+            uri.append(request.getRequestURI());
+            if (request.getQueryString() != null) {
+                uri.append('?');
+                uri.append(request.getQueryString());
+            }
+        }
+        String threadName = Thread.currentThread().getName();
+        int len = threadName.length();
+        if (len > 20) {
+            threadName = threadName.substring(len - 20, len);
+        }
+        String msg = String.format(
+                "Request: %1$8s  CoyoteRequest: %2$8s  " +
+                "RequestProcessor: %3$8s  Stage: %4$s  Thread: %5$20s  " +
+                "State: %6$20s  Method: %7$11s  URI: %8$s",
+                rHashCode, crHashCode,
+                rpHashCode, stage, Thread.currentThread().getName(),
+                state, method, uri);
+        if (log.isTraceEnabled()) {
+            log.trace(msg, new DebugException());
+        } else {
+            log.debug(msg);
+        }
+    }
+
     private static class DebugException extends Exception {
         private static final long serialVersionUID = 1L;
     }
