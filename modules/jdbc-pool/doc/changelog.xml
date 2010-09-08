@@ -31,6 +31,8 @@
 <section name="Tomcat JDBC Connection Pool 1.0.9.0">
   <subsection name="pool">
     <changelog>
+      <update><rev>995083</rev> Update to Tomcat 6.0.29 (for JULI). (markt)
+      </update>
       <update><rev>992409</rev> Code clean-up. Reduce sequences of three or more
       blank lines to two blank lines. (markt)</update>
       <add><rev>952811</rev> <bug>48814</bug> Add Validator interface and allow
