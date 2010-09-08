@@ -266,6 +266,17 @@
       </p>
     </attribute>
     
+    <attribute name="validatorClassName" required="false">
+      <p>(String) The name of a class which implements the
+         <code>org.apache.tomcat.jdbc.pool.Validator</code> interface and
+         provides a no-arg constructor (may be implicit). If specified, the
+         class will be used to create a Validator instance which is then used
+         instead of any validation query to validate connections. The default
+         value is <code>null</code>. An example value is
+         <code>com.mycompany.project.SimpleValidator</code>.
+      </p>
+    </attribute>
+    
     <attribute name="timeBetweenEvictionRunsMillis" required="false">
       <p>(int) The number of milliseconds to sleep between runs of the idle connection validation/cleaner thread. 
          This value should not be set under 1 second. It dictates how often we check for idle, abandoned connections, and how often 
