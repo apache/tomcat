@@ -485,6 +485,7 @@ public class DefaultInstanceManager implements InstanceManager {
             throws NamingException, IllegalAccessException, InvocationTargetException {
 
         if (!method.getName().startsWith("set")
+                || method.getName().length() < 4
                 || method.getParameterTypes().length != 1
                 || !method.getReturnType().getName().equals("void")) {
             throw new IllegalArgumentException("Invalid method resource injection annotation");
@@ -498,7 +499,7 @@ public class DefaultInstanceManager implements InstanceManager {
             lookedupResource = context.lookup(name);
         } else {
             lookedupResource = context.lookup(
-                    clazz.getName() + "/" + method.getName().substring(3));
+                    clazz.getName() + "/" + getName(method));
         }
 
         accessibility = method.isAccessible();
@@ -506,4 +507,16 @@ public class DefaultInstanceManager implements InstanceManager {
         method.invoke(instance, lookedupResource);
         method.setAccessible(accessibility);
     }
+
+        public static String getName(Method setter) {
+            StringBuilder name = new StringBuilder(setter.getName());
+
+            // remove 'set'
+            name.delete(0, 3);
+
+            // lowercase first char
+            name.setCharAt(0, Character.toLowerCase(name.charAt(0)));
+
+            return name.toString();
+        }
 }
