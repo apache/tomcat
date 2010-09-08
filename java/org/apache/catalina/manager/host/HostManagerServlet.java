@@ -149,6 +149,7 @@ public class HostManagerServlet
     /**
      * Return the Wrapper with which we are associated.
      */
+    @Override
     public Wrapper getWrapper() {
 
         return (this.wrapper);
@@ -161,6 +162,7 @@ public class HostManagerServlet
      *
      * @param wrapper The new wrapper
      */
+    @Override
     public void setWrapper(Wrapper wrapper) {
 
         this.wrapper = wrapper;
