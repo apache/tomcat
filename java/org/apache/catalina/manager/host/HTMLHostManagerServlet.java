@@ -377,14 +377,6 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args[1] = "unpackWARs";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        args[0] = sm.getString("htmlHostManagerServlet.addXmlNamespaceAware");
-        args[1] = "xmlNamespaceAware";
-        args[2] = "";
-        writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        args[0] = sm.getString("htmlHostManagerServlet.addXmlValidation");
-        args[1] = "xmlValidation";
-        args[2] = "";
-        writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
 
         args[0] = sm.getString("htmlHostManagerServlet.addManager");
         args[1] = "manager";
