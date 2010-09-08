@@ -27,7 +27,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a pooled connection
@@ -40,10 +39,6 @@ public class PooledConnection {
      * Logger
      */
     private static final Log log = LogFactory.getLog(PooledConnection.class);
-    /**
-     * Instance counter
-     */
-    protected static AtomicInteger counter = new AtomicInteger(01);
 
     /**
      * Validate when connection is borrowed flag
@@ -100,10 +95,6 @@ public class PooledConnection {
      */
     private volatile long lastValidated = System.currentTimeMillis();
     /**
-     * The instance number for this connection
-     */
-    private int instanceCount = 0;
-    /**
      * The parent
      */
     protected ConnectionPool parent;
@@ -127,7 +118,6 @@ public class PooledConnection {
      * @param parent - the parent connection pool
      */
     public PooledConnection(PoolConfiguration prop, ConnectionPool parent) {
-        instanceCount = counter.addAndGet(1);
         poolProperties = prop;
         this.parent = parent;
     }
