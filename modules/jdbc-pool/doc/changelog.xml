@@ -28,13 +28,47 @@
   </properties>
 
 <body>
-<section name="Tomcat JDBC Connection Pool">
+<section name="Tomcat JDBC Connection Pool 1.0.9.0">
   <subsection name="pool">
     <changelog>
-      <update><rev>720253</rev>Document how to use interceptors</update> 
-      <update><rev>717972</rev>Added an interceptor that will clean up non closed statements when a connection is returned to the pool. (<code>org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer</code>)</update>
-      <update><rev>713763</rev>Improve connection state handling</update>
-      <fix><bug></bug> <rev>713763</rev>Improve connection state handling</fix>
+      <update><rev>992409</rev> Code clean-up. Reduce sequences of three or more
+      blank lines to two blank lines. (markt)</update>
+      <add><rev>952811</rev> <bug>48814</bug> Add Validator interface and allow
+      users to configure a Validator class name. Patch provided by Matt Passell.
+      (markt)</add>
+      <update><rev>948073</rev> Code clean-up. Remove unused imports. (markt)
+      </update>
+      <fix><rev>943434</rev> <bug>49224</bug> Only try setting the username and
+      password if they are non-null. Patch provided by Matt Passell. (markt)
+      </fix>
+      <fix><rev>943032</rev> <bug>49269</bug> Set maxIdle to maxActive by
+      default to prevent warning on start when maxIdle > maxActive. Patch
+      provided by Matt Passell. (markt)</fix>
+      <fix><rev>940574</rev> <bug>49241</bug> Don&apos;t ignore the
+      suspectTimeout property. (fhanik)</fix>
+      <fix><rev>939320</rev> Fix svn:keywords for property replacement.
+      (kkolinko)</fix>
+      <add><rev>931550</rev>, <rev>934651</rev>, <rev>934677</rev> Add a
+      statement cache. (fhanik)</add>
+      <update><rev>919076</rev> Improve XA support. (fhanik)</update>
+      <fix><rev>915940</rev> <bug>48392</bug> Add an interceptor to wrap
+      Statements and ResultSets to prevent access to the physical connection.
+      (fhanik)</fix>
+      <fix><rev>912026</rev> Call <code>setTransactionIsolation()</code> before
+      anything else as some drivers require this to be the first call. (fhanik)
+      </fix>
+      <update><rev>900017</rev> Update Javadoc for XADataSource. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat JDBC Connection Pool prior to 1.0.9.0 (incomplete)">
+  <subsection name="pool">
+    <changelog>
+      <update><rev>720253</rev> Document how to use interceptors</update> 
+      <update><rev>717972</rev> Added an interceptor that will clean up non closed statements when a connection is returned to the pool. (<code>org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer</code>)</update>
+      <update><rev>713763</rev> Improve connection state handling</update>
+      <fix><rev>713763</rev> Improve connection state handling</fix>
     </changelog>
   </subsection>
 </section>
