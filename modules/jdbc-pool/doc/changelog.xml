@@ -31,13 +31,18 @@
 <section name="Tomcat JDBC Connection Pool 1.0.9.0">
   <subsection name="pool">
     <changelog>
+      <fix><rev>995091</rev> <bug>49831</bug> Make sure pooled XAConnections are
+      closed when the connection pool shuts down. Patch provided by Daniel
+      Mikusa. (markt)</fix>
+      <update><rev>995087</rev> Code clean-up. Remove some unused code. (markt)
+      </update>
       <update><rev>995083</rev> Update to Tomcat 6.0.29 (for JULI). (markt)
       </update>
       <update><rev>992409</rev> Code clean-up. Reduce sequences of three or more
       blank lines to two blank lines. (markt)</update>
-      <add><rev>952811</rev> <bug>48814</bug> Add Validator interface and allow
-      users to configure a Validator class name. Patch provided by Matt Passell.
-      (markt)</add>
+      <add><rev>952811</rev>, <rev>995095</rev> <bug>48814</bug> Add Validator
+      interface and allow users to configure a Validator class name. Patch
+      provided by Matt Passell. (markt)</add>
       <update><rev>948073</rev> Code clean-up. Remove unused imports. (markt)
       </update>
       <fix><rev>943434</rev> <bug>49224</bug> Only try setting the username and
