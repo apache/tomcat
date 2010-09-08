@@ -112,16 +112,19 @@ public class DefaultInstanceManager implements InstanceManager {
         this.injectionMap = injectionMap;
     }
 
+    @Override
     public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException, ClassNotFoundException {
         Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
         return newInstance(clazz.newInstance(), clazz);
     }
 
+    @Override
     public Object newInstance(final String className, final ClassLoader classLoader) throws IllegalAccessException, NamingException, InvocationTargetException, InstantiationException, ClassNotFoundException {
         Class<?> clazz = classLoader.loadClass(className);
         return newInstance(clazz.newInstance(), clazz);
     }
 
+    @Override
     public void newInstance(Object o) 
             throws IllegalAccessException, InvocationTargetException, NamingException {
         newInstance(o, o.getClass());
@@ -136,6 +139,7 @@ public class DefaultInstanceManager implements InstanceManager {
         return instance;
     }
 
+    @Override
     public void destroyInstance(Object instance) throws IllegalAccessException, InvocationTargetException {
         if (!ignoreAnnotations) {
             preDestroy(instance, instance.getClass());
@@ -162,6 +166,7 @@ public class DefaultInstanceManager implements InstanceManager {
         if (Globals.IS_SECURITY_ENABLED) {
             methods = AccessController.doPrivileged(
                     new PrivilegedAction<Method[]>(){
+                @Override
                 public Method[] run(){
                     return clazz.getDeclaredMethods();
                 }
@@ -215,6 +220,7 @@ public class DefaultInstanceManager implements InstanceManager {
         if (Globals.IS_SECURITY_ENABLED) {
             methods = AccessController.doPrivileged(
                     new PrivilegedAction<Method[]>(){
+                @Override
                 public Method[] run(){
                     return clazz.getDeclaredMethods();
                 }
@@ -275,6 +281,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 final Class<?> clazz2 = clazz;
                 fields = AccessController.doPrivileged(
                         new PrivilegedAction<Field[]>(){
+                    @Override
                     public Field[] run(){
                         return clazz2.getDeclaredFields();
                     }
@@ -318,6 +325,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 final Class<?> clazz2 = clazz;
                 methods = AccessController.doPrivileged(
                         new PrivilegedAction<Method[]>(){
+                    @Override
                     public Method[] run(){
                         return clazz2.getDeclaredMethods();
                     }
@@ -372,6 +380,7 @@ public class DefaultInstanceManager implements InstanceManager {
             try {
                 clazz = AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
 
+                    @Override
                     public Class<?> run() throws Exception {
                         return loadClass(className, classLoader);
                     }
