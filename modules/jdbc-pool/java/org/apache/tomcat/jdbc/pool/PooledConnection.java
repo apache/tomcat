@@ -265,7 +265,11 @@ public class PooledConnection {
         if (connection != null) {
             try {
                 parent.disconnectEvent(this, finalize);
-                connection.close();
+                if (xaConnection == null) {
+                    connection.close();
+                } else {
+                    xaConnection.close();
+                }
             }catch (Exception ignore) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to close underlying SQL connection",ignore);
