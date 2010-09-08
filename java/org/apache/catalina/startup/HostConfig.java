@@ -152,18 +152,6 @@ public class HostConfig
     
 
     /**
-     * Attribute value used to turn on/off XML validation
-     */
-    protected boolean xmlValidation = false;
-
-
-    /**
-     * Attribute value used to turn on/off XML namespace awareness.
-     */
-    protected boolean xmlNamespaceAware = false;
-
-
-    /**
      * The <code>Digester</code> instance used to parse context descriptors.
      */
     protected static Digester digester = createDigester();
@@ -287,44 +275,6 @@ public class HostConfig
     }
     
     
-     /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlValidation true to enable xml instance validation
-     */
-    public void setXmlValidation(boolean xmlValidation){
-        this.xmlValidation = xmlValidation;
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    public boolean getXmlValidation(){
-        return xmlValidation;
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
-     *
-     */
-    public boolean getXmlNamespaceAware(){
-        return xmlNamespaceAware;
-    }
-
-
-    /**
-     * Set the namespace-aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlNamespaceAware true to enable namespace awareness
-     */
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware){
-        this.xmlNamespaceAware=xmlNamespaceAware;
-    }    
-
-
     // --------------------------------------------------------- Public Methods
 
 
