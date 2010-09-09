@@ -459,12 +459,10 @@ public class AsyncContextImpl implements AsyncContext {
             threadName = threadName.substring(len - 20, len);
         }
         String msg = String.format(
-                "Request: %1$8s  CoyoteRequest: %2$8s  " +
-                "RequestProcessor: %3$8s  Stage: %4$s  Thread: %5$20s  " +
-                "State: %6$20s  Method: %7$11s  URI: %8$s",
-                rHashCode, crHashCode,
-                rpHashCode, stage, Thread.currentThread().getName(),
-                state, method, uri);
+                "Req: %1$8s  CReq: %2$8s  RP: %3$8s  Stage: %4$s  " +
+                "Thread: %5$20s  State: %6$20s  Method: %7$11s  URI: %8$s",
+                rHashCode, crHashCode, rpHashCode, stage,
+                Thread.currentThread().getName(), state, method, uri);
         if (log.isTraceEnabled()) {
             log.trace(msg, new DebugException());
         } else {
