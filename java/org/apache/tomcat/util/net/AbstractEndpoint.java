@@ -27,7 +27,6 @@ import javax.net.ssl.KeyManagerFactory;
 
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -600,11 +599,9 @@ public abstract class AbstractEndpoint {
     }
 
 
-    private String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
     private String[] sslEnabledProtocolsarr =  new String[0];
     public String[] getSslEnabledProtocolsArray() { return this.sslEnabledProtocolsarr;}
     public void setSslEnabledProtocols(String s) {
-        this.sslEnabledProtocols = s;
         StringTokenizer t = new StringTokenizer(s,",");
         sslEnabledProtocolsarr = new String[t.countTokens()];
         for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
