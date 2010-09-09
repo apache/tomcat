@@ -887,6 +887,11 @@ public class AprEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
     // --------------------------------------------------- Acceptor Inner Class
 
 
