@@ -538,6 +538,11 @@ public class JIoEndpoint extends AbstractEndpoint {
     protected ConcurrentLinkedQueue<SocketWrapper<Socket>> waitingRequests =
         new ConcurrentLinkedQueue<SocketWrapper<Socket>>();
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
     private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
         private ClassLoader cl;
