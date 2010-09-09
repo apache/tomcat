@@ -403,16 +403,16 @@ public class PoolProperties implements PoolConfiguration {
                     int propIndex = interceptorValues[i].indexOf("(");
                     int endIndex = interceptorValues[i].indexOf(")");
                     if (propIndex<0 || endIndex<0 || endIndex <= propIndex) {
-                        definitions[i] = new InterceptorDefinition(interceptorValues[i]);
+                        definitions[i] = new InterceptorDefinition(interceptorValues[i].trim());
                     } else {
-                        String name = interceptorValues[i].substring(0,propIndex);
+                        String name = interceptorValues[i].substring(0,propIndex).trim();
                         definitions[i] = new InterceptorDefinition(name);
                         String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length()-1);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
                             int pidx = props[j].indexOf("=");
-                            String propName = props[j].substring(0,pidx);
-                            String propValue = props[j].substring(pidx+1);
+                            String propName = props[j].substring(0,pidx).trim();
+                            String propValue = props[j].substring(pidx+1).trim();
                             definitions[i].addProperty(new InterceptorProperty(propName,propValue));
                         }
                     }
