@@ -747,6 +747,10 @@ public class NioEndpoint extends AbstractEndpoint {
         return true;
     }
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
 
     // --------------------------------------------------- Acceptor Inner Class
 

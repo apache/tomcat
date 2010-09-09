@@ -42,7 +42,6 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * @author Remy Maucherat
  */
 public abstract class AbstractEndpoint {
-    private static final Log log = LogFactory.getLog(AbstractEndpoint.class);
     
     // -------------------------------------------------------------- Constants
     protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
@@ -318,7 +317,7 @@ public abstract class AbstractEndpoint {
                 return IntrospectionUtils.setProperty(this,name,value,false);
             }
         }catch ( Exception x ) {
-            log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
+            getLog().error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
             return false;
         }
     }
@@ -408,16 +407,16 @@ public abstract class AbstractEndpoint {
             s.setSoTimeout(getSocketProperties().getSoTimeout());
             // TODO Consider hard-coding to s.setSoLinger(true,0)
             s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-            if (log.isDebugEnabled()) {
-                log.debug("About to unlock socket for:"+saddr);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("About to unlock socket for:"+saddr);
             }
             s.connect(saddr,getSocketProperties().getUnlockTimeout());
-            if (log.isDebugEnabled()) {
-                log.debug("Socket unlock completed for:"+saddr);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Socket unlock completed for:"+saddr);
             }
         } catch(Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.debug.unlock", "" + getPort()), e);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("endpoint.debug.unlock", "" + getPort()), e);
             }
         } finally {
             if (s != null) {
@@ -470,7 +469,7 @@ public abstract class AbstractEndpoint {
             f = new File(path);
         }
         if (!f.exists()) {
-            log.warn("configured file:["+path+"] does not exist.");
+            getLog().warn("configured file:["+path+"] does not exist.");
         }
         return path;
     }
@@ -480,6 +479,8 @@ public abstract class AbstractEndpoint {
         return val;
     }
     
+    protected abstract Log getLog();
+
     // --------------------  SSL related properties --------------------
 
     private String algorithm = KeyManagerFactory.getDefaultAlgorithm();
