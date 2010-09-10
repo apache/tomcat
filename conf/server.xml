@@ -117,9 +117,6 @@
                resourceName="UserDatabase"/>
       </Realm>
 
-      <!-- Define the default virtual host
-           Note: XML Schema validation will not work with Xerces 2.2.
-       -->
       <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="true">
 
