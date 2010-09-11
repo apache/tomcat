@@ -19,18 +19,27 @@
 package org.apache.catalina.startup;
 
 
-import org.apache.catalina.Lifecycle;
+import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleListener;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
 
 
 /**
- * <p>Rule that creates a new <code>LifecycleListener</code> instance,
- * and associates it with the top object on the stack (which must
- * implement <code>LifecycleListener</code>).</p>
+ * Rule that creates a new {@link LifecycleListener} and associates it with the
+ * top object on the stack which must implement {@link Container}. The
+ * implementation class to be used is determined by:
+ * <ol>
+ * <li>Does the top element on the stack specify an implementation class using
+ *     the attribute specified when this rule was created?</li>
+ * <li>Does the parent {@link Container} of the {@link Container} on the top of
+ *     the stack specify an implementation class using the attribute specified
+ *     when this rule was created?</li>
+ * <li>Use the default implementation class specified when this rule was
+ *     created.</li>
+ * </ol>
  */
-
 public class LifecycleListenerRule extends Rule {
 
 
@@ -83,21 +92,43 @@ public class LifecycleListenerRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
-        // Instantiate a new LifecyleListener implementation object
-        String className = listenerClass;
+        Container c = (Container) digester.peek();
+        Container p = null;
+        Object obj = digester.peek(1);
+        if (obj instanceof Container) {
+            p = (Container) obj;
+        }
+
+        String className = null;
+        
+        // Check the container for the specified attribute
         if (attributeName != null) {
             String value = attributes.getValue(attributeName);
             if (value != null)
                 className = value;
         }
+
+        // Check the container's parent for the specified attribute
+        if (p != null && className == null) {
+            String configClass =
+                (String) IntrospectionUtils.getProperty(p, attributeName);
+            if (configClass != null && configClass.length() > 0) {
+                className = configClass;
+            }
+        }
+        
+        // Use the default
+        if (className == null) {
+            className = listenerClass;
+        }
+        
+        // Instantiate a new LifecyleListener implementation object
         Class<?> clazz = Class.forName(className);
         LifecycleListener listener =
             (LifecycleListener) clazz.newInstance();
 
         // Add this LifecycleListener to our associated component
-        Lifecycle lifecycle = (Lifecycle) digester.peek();
-        lifecycle.addLifecycleListener(listener);
-
+        c.addLifecycleListener(listener);
     }
 
 
