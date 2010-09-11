@@ -132,8 +132,8 @@ commons-dbcp.home=${base.path}/commons-dbcp-1.4-src
 commons-dbcp-src.loc=${base-commons.loc}/dbcp/source/commons-dbcp-1.4-src.tar.gz
 
 # ----- Commons Pool, version 1.1 or later -----
-commons-pool.home=${base.path}/commons-pool-1.5.4-src
-commons-pool-src.loc=${base-commons.loc}/pool/source/commons-pool-1.5.4-src.tar.gz
+commons-pool.home=${base.path}/commons-pool-1.5.5-src
+commons-pool-src.loc=${base-commons.loc}/pool/source/commons-pool-1.5.5-src.tar.gz
 
 # ----- NSIS, version 2.0 or later -----
 nsis.home=${base.path}/nsis-2.46

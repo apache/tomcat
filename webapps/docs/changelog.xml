@@ -238,6 +238,9 @@
         <bug>49758</bug>: Fix generics warnings exposed by a fix in Eclipse 3.6.
         Patch provided by sebb. (markt)
       </fix>
+      <update>
+        Update commons pool to 1.5.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
