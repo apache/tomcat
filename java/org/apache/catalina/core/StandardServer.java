@@ -40,6 +40,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.mbeans.MBeanUtils;
+import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ServerInfo;
@@ -156,6 +157,8 @@ public final class StandardServer extends LifecycleMBeanBase
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     private boolean stopAwait = false;
+    
+    private Catalina catalina = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -297,6 +300,23 @@ public final class StandardServer extends LifecycleMBeanBase
     }
 
 
+    /**
+     * Return the outer Catalina startup/shutdown component if present.
+     */
+    @Override
+    public Catalina getCatalina() {
+        return catalina;
+    }
+    
+    
+    /**
+     * Set the outer Catalina startup/shutdown component if present.
+     */
+    @Override
+    public void setCatalina(Catalina catalina) {
+        this.catalina = catalina;
+    }
+    
     // --------------------------------------------------------- Server Methods
 
 
@@ -719,6 +739,17 @@ public final class StandardServer extends LifecycleMBeanBase
         unregister(onameNamingResoucres);
         
         super.destroyInternal();
+    }
+
+    /**
+     * Return the parent class loader for this component.
+     */
+    @Override
+    public ClassLoader getParentClassLoader() {
+        if (catalina != null) {
+            return (catalina.getParentClassLoader());
+        }
+        return (ClassLoader.getSystemClassLoader());
     }
 
     private ObjectName onameStringCache;
