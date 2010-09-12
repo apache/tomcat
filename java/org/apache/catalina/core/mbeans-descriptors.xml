@@ -107,16 +107,20 @@
                description="Object names of all children"
                type="[Ljavax.management.ObjectName;"/>
                
-    <attribute name="clearReferenceStatic"
+    <attribute name="clearReferencesStatic"
                description="Should Tomcat attempt to null out any static or final fields from loaded classes when a web application is stopped as a work around for apparent garbage collection bugs and application coding errors?"
                type="boolean"/>
                
-    <attribute name="clearReferenceStopThreads"
+    <attribute name="clearReferencesStopThreads"
                description="Should Tomcat attempt to terminate threads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
                
-    <attribute name="clearReferenceStopThreadLocals"
+    <attribute name="clearReferencesThreadLocals"
                description="Should Tomcat attempt to clear any ThreadLocal objects that are instances of classes loaded by this class loader. "
+               type="boolean"/>
+               
+    <attribute name="clearReferencesStopTimerThreads"
+               description="Should Tomcat attempt to terminate TimerThreads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
                
     <attribute name="configFilePath"
@@ -174,19 +178,10 @@
                type="java.lang.String"
                writeable="false" />
       
-    <attribute name="engineName"
-               description="Name of the engine domain, if different from the context domain"
-               type="java.lang.String"/>
-
     <attribute name="eventProvider"
                description="Event provider support for this managed object"
                is="true"
                type="boolean"
-               writeable="false" />
-          
-    <attribute name="hostName"
-               description="The host name."
-               type="java.lang.String"
                writeable="false" />
           
     <attribute name="ignoreAnnotations"
@@ -205,7 +200,7 @@
                description="Associated loader."
                type="org.apache.catalina.Loader" />
                
-    <attribute name="logEffectiveWebxml"
+    <attribute name="logEffectiveWebXml"
                description="Should the effective web.xml be logged when the context starts?"
                type="boolean" />
       
