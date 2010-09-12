@@ -462,15 +462,16 @@ public abstract class AbstractEndpoint {
     public abstract void destroy() throws Exception;
     
     public String adjustRelativePath(String path, String relativeTo) {
-        File f = new File(path);
+        String newPath = path;
+        File f = new File(newPath);
         if ( !f.isAbsolute()) {
-            path = relativeTo + File.separator + path;
-            f = new File(path);
+            newPath = relativeTo + File.separator + newPath;
+            f = new File(newPath);
         }
         if (!f.exists()) {
-            getLog().warn("configured file:["+path+"] does not exist.");
+            getLog().warn("configured file:["+newPath+"] does not exist.");
         }
-        return path;
+        return newPath;
     }
     
     public String defaultIfNull(String val, String defaultValue) {

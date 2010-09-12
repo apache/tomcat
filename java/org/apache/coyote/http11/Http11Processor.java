@@ -325,7 +325,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     }
     
     
-    public SocketState asyncDispatch(SocketStatus status) throws IOException {
+    public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
         try {
@@ -405,6 +405,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
      * @param actionCode Type of the action
      * @param param Action parameter
      */
+    @Override
     public void action(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.ACTION_COMMIT) {
