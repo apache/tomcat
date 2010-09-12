@@ -135,6 +135,12 @@
         Ensure that Context elements defined in server.xml use any configClass
         setting specified in the parent Host element. (markt)
       </fix>
+      <fix>
+        GSOC 2010. Enable the creation of Services, Engines, Connectors, Hosts
+        and Contexts via JMX from a minimal server.xml that contains only a
+        Server element. Based on a patch by Chamith Buddhika. (markt)
+      </fix>
+      
     </changelog>
   </subsection>
   <subsection name="Coyote">

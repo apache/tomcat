@@ -174,11 +174,12 @@ public class Catalina {
      * @param parentClassLoader The shared extensions class loader.
      */
     public void setParentClassLoader(ClassLoader parentClassLoader) {
-
         this.parentClassLoader = parentClassLoader;
-
     }
 
+    public ClassLoader getParentClassLoader() {
+        return parentClassLoader;
+    }
 
     public void setServer(Server server) {
         this.server = server;
@@ -527,6 +528,8 @@ public class Catalina {
                                + getConfigFile() + ": " , e);
             return;
         }
+
+        getServer().setCatalina(this);
 
         // Stream redirection
         initStreams();

@@ -84,6 +84,11 @@ public interface Service extends Lifecycle {
      */
     public void setServer(Server server);
 
+    /**
+     * Return the parent class loader.
+     */
+    public ClassLoader getParentClassLoader();
+    
     // --------------------------------------------------------- Public Methods
 
 
