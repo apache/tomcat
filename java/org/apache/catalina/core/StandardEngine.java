@@ -26,10 +26,12 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
+import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.JAASRealm;
+import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
@@ -332,6 +334,19 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
     }
 
+
+    /**
+     * Return the parent class loader for this component.
+     */
+    @Override
+    public ClassLoader getParentClassLoader() {
+        if (parentClassLoader != null)
+            return (parentClassLoader);
+        if (service != null) {
+            return (service.getParentClassLoader());
+        }
+        return (ClassLoader.getSystemClassLoader());
+    }
 
     // -------------------- JMX registration  --------------------
 

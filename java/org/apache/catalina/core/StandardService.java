@@ -579,6 +579,17 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         super.destroyInternal();
     }
 
+    /**
+     * Return the parent class loader for this component.
+     */
+    @Override
+    public ClassLoader getParentClassLoader() {
+        if (server != null) {
+            return (server.getParentClassLoader());
+        }
+        return (ClassLoader.getSystemClassLoader());
+    }
+
     @Override
     protected String getDomainInternal() {
         

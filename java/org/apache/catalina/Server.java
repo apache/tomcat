@@ -19,6 +19,7 @@
 package org.apache.catalina;
 
 import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.startup.Catalina;
 
 /**
  * A <code>Server</code> element represents the entire Catalina
@@ -115,7 +116,23 @@ public interface Server extends Lifecycle {
      */
     public void setShutdown(String shutdown);
 
+    
+    /**
+     * Return the parent class loader.
+     */
+    public ClassLoader getParentClassLoader();
 
+    
+    /**
+     * Return the outer Catalina startup/shutdown component if present.
+     */
+    public Catalina getCatalina();
+    
+    /**
+     * Set the outer Catalina startup/shutdown component if present.
+     */
+    public void setCatalina(Catalina catalina);
+    
     // --------------------------------------------------------- Public Methods
 
 
