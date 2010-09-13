@@ -251,6 +251,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             new ConcurrentHashMap<Long, Http11AprProcessor>();
         protected ConcurrentLinkedQueue<Http11AprProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11AprProcessor>() {
+            private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11AprProcessor processor) {
@@ -396,21 +397,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 // Call the appropriate event
                 try {
                     state = result.asyncDispatch(socket, status);
-                } catch (java.net.SocketException e) {
-                    // SocketExceptions are normal
-                    Http11AprProtocol.log.debug
-                        (sm.getString
-                            ("http11protocol.proto.socketexception.debug"), e);
-                } catch (java.io.IOException e) {
-                    // IOExceptions are normal
-                    Http11AprProtocol.log.debug
-                        (sm.getString
-                            ("http11protocol.proto.ioexception.debug"), e);
-                }
-                // Future developers: if you discover any other
-                // rare-but-nonfatal exceptions, catch them here, and log as
+                // Future developers: if you discover any rare-but-nonfatal
+                // exceptions, catch them here, and log as per {@link #event()}
                 // above.
-                catch (Throwable e) {
+                } catch (Throwable e) {
                     // any other exception or error is odd. Here we log it
                     // with "ERROR" level, so it will show up even on
                     // less-than-verbose logs.
