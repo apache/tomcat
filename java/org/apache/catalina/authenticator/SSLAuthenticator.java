@@ -133,7 +133,7 @@ public class SSLAuthenticator
             request.getAttribute(Globals.CERTIFICATES_ATTR);
         if ((certs == null) || (certs.length < 1)) {
             request.getCoyoteRequest().action
-                              (ActionCode.ACTION_REQ_SSL_CERTIFICATE, null);
+                              (ActionCode.REQ_SSL_CERTIFICATE, null);
             certs = (X509Certificate[])
                 request.getAttribute(Globals.CERTIFICATES_ATTR);
         }

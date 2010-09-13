@@ -192,7 +192,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeaders) and 
             // set the filters accordingly.
-            response.action(ActionCode.ACTION_COMMIT, null);
+            response.action(ActionCode.COMMIT, null);
 
         }
 
@@ -219,7 +219,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeader) and 
             // set the filters accordingly.
-            response.action(ActionCode.ACTION_COMMIT, null);
+            response.action(ActionCode.COMMIT, null);
 
         }
         
@@ -306,7 +306,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeader) and 
             // set the filters accordingly.
-            response.action(ActionCode.ACTION_COMMIT, null);
+            response.action(ActionCode.COMMIT, null);
 
         }
 
