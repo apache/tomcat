@@ -94,7 +94,7 @@ public class RequestInfo  {
     }
 
     public String getRemoteAddr() {
-        req.action(ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE, null);
+        req.action(ActionCode.REQ_HOST_ADDR_ATTRIBUTE, null);
         return req.remoteAddr().toString();
     }
 

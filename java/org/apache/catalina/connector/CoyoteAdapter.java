@@ -221,7 +221,7 @@ public class CoyoteAdapter implements Adapter {
                     error = true;
                     connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                 }
-                res.action(ActionCode.ACTION_COMET_END, null);
+                res.action(ActionCode.COMET_END, null);
             } else if (!error && read && request.getAvailable()) {
                 // If this was a read and not all bytes have been read, or if no data
                 // was read from the connector, then it is an error
@@ -285,7 +285,7 @@ public class CoyoteAdapter implements Adapter {
                     }
                 } else if (impl.getState()==AsyncContextImpl.AsyncState.STARTED){
                     //TODO SERVLET3 - async
-                    res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                    res.action(ActionCode.ASYNC_START, request.getAsyncContext());
                     async = true;
                     break;
                 } else if (impl.getState()==AsyncContextImpl.AsyncState.NOT_STARTED){
@@ -311,11 +311,11 @@ public class CoyoteAdapter implements Adapter {
                         // Invoke a read event right away if there are available bytes
                         if (event(req, res, SocketStatus.OPEN)) {
                             comet = true;
-                            res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                            res.action(ActionCode.COMET_BEGIN, null);
                         }
                     } else {
                         comet = true;
-                        res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                        res.action(ActionCode.COMET_BEGIN, null);
                     }
                 } else {
                     // Clear the filter chain, as otherwise it will not be reset elsewhere
@@ -325,7 +325,7 @@ public class CoyoteAdapter implements Adapter {
             }
             if (!async && !comet) {
                 response.finishResponse();
-                req.action(ActionCode.ACTION_POST_REQUEST , null);
+                req.action(ActionCode.POST_REQUEST , null);
             }
 
         } catch (IOException e) {
@@ -406,11 +406,11 @@ public class CoyoteAdapter implements Adapter {
                             // Invoke a read event right away if there are available bytes
                             if (event(req, res, SocketStatus.OPEN)) {
                                 comet = true;
-                                res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                                res.action(ActionCode.COMET_BEGIN, null);
                             }
                         } else {
                             comet = true;
-                            res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                            res.action(ActionCode.COMET_BEGIN, null);
                         }
                     } else {
                         // Clear the filter chain, as otherwise it will not be reset elsewhere
@@ -422,17 +422,17 @@ public class CoyoteAdapter implements Adapter {
             }
             AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
             if (asyncConImpl!=null && asyncConImpl.getState()==AsyncContextImpl.AsyncState.STARTED) {
-                res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                res.action(ActionCode.ASYNC_START, request.getAsyncContext());
                 async = true;
             } else if (request.isAsyncDispatching()) {
                 asyncDispatch(req, res, SocketStatus.OPEN);
                 if (request.isAsyncStarted()) {
                     async = true;
-                    res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                    res.action(ActionCode.ASYNC_START, request.getAsyncContext());
                 }
             } else if (!comet) {
                 response.finishResponse();
-                req.action(ActionCode.ACTION_POST_REQUEST , null);
+                req.action(ActionCode.POST_REQUEST , null);
             }
 
         } catch (IOException e) {
@@ -587,7 +587,7 @@ public class CoyoteAdapter implements Adapter {
             serverName = req.localName();
             if (serverName.isNull()) {
                 // well, they did ask for it
-                res.action(ActionCode.ACTION_REQ_LOCAL_NAME_ATTRIBUTE, null);
+                res.action(ActionCode.REQ_LOCAL_NAME_ATTRIBUTE, null);
             }
         } else {
             serverName = req.serverName();

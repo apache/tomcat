@@ -314,7 +314,7 @@ public class OutputBuffer extends Writer
         doFlush = false;
 
         if (realFlush) {
-            coyoteResponse.action(ActionCode.ACTION_CLIENT_FLUSH, 
+            coyoteResponse.action(ActionCode.CLIENT_FLUSH, 
                                   coyoteResponse);
             // If some exception occurred earlier, or if some IOE occurred
             // here, notify the servlet with an IOE

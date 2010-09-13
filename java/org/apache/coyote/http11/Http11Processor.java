@@ -384,7 +384,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.ACTION_CLOSE) {
+        if (actionCode == ActionCode.CLOSE) {
             // Close
             async = false;
             // End the processing of the current request, and stop any further
@@ -397,15 +397,15 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 error = true;
             }
 
-        } else if (actionCode == ActionCode.ACTION_START) {
+        } else if (actionCode == ActionCode.START) {
 
             started = true;
 
-        } else if (actionCode == ActionCode.ACTION_STOP) {
+        } else if (actionCode == ActionCode.STOP) {
 
             started = false;
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_ATTRIBUTE ) {
+        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
             try {
                 if (sslSupport != null) {
@@ -431,7 +431,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 log.warn(sm.getString("http11processor.socket.ssl"), e);
             }
 
-        } else if (actionCode == ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             if ((remoteAddr == null) && (socket != null)) {
                 InetAddress inetAddr = socket.getSocket().getInetAddress();
@@ -441,7 +441,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             }
             request.remoteAddr().setString(remoteAddr);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCAL_NAME_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
 
             if ((localName == null) && (socket != null)) {
                 InetAddress inetAddr = socket.getSocket().getLocalAddress();
@@ -451,7 +451,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             }
             request.localName().setString(localName);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_HOST_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
             if ((remoteHost == null) && (socket != null)) {
                 InetAddress inetAddr = socket.getSocket().getInetAddress();
@@ -468,28 +468,28 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             }
             request.remoteHost().setString(remoteHost);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCAL_ADDR_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             if (localAddr == null)
                localAddr = socket.getSocket().getLocalAddress().getHostAddress();
 
             request.localAddr().setString(localAddr);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_REMOTEPORT_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
 
             if ((remotePort == -1 ) && (socket !=null)) {
                 remotePort = socket.getSocket().getPort();
             }
             request.setRemotePort(remotePort);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCALPORT_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
 
             if ((localPort == -1 ) && (socket !=null)) {
                 localPort = socket.getSocket().getLocalPort();
             }
             request.setLocalPort(localPort);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_CERTIFICATE) {
+        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
             if( sslSupport != null) {
                 /*
                  * Consume and buffer the request body, so that it does not
@@ -510,7 +510,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             //TODO SERVLET3 - async
             AtomicBoolean dispatch = (AtomicBoolean)param;
             RequestInfo rp = request.getRequestProcessor();
@@ -520,13 +520,13 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             } else {
                 dispatch.set(false);
             }
-        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
             if (param==null) return;
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
             socket.setTimeout(timeout);
-        } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
+        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             RequestInfo rp = request.getRequestProcessor();
             AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling

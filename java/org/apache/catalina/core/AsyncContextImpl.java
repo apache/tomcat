@@ -90,7 +90,7 @@ public class AsyncContextImpl implements AsyncContext {
                    state.compareAndSet(AsyncState.TIMING_OUT_NEED_COMPLETE,
                            AsyncState.COMPLETING)) {
             AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,
+            request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE,
                     dispatched);
             if (!dispatched.get()) doInternalComplete(false);
         } else {
@@ -152,7 +152,7 @@ public class AsyncContextImpl implements AsyncContext {
             };
             this.dispatch = run;
             AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
+            request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, dispatched );
             if (!dispatched.get()) {
                 try {
                     doInternalDispatch();
@@ -398,7 +398,7 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
-        request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_SETTIMEOUT,
+        request.getCoyoteRequest().action(ActionCode.ASYNC_SETTIMEOUT,
                 Long.valueOf(timeout));
     }
     

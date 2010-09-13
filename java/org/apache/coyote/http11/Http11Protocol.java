@@ -246,7 +246,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 if (processor == null) {
                     processor = createProcessor();
                 }
-                processor.action(ActionCode.ACTION_START, null);
+                processor.action(ActionCode.START, null);
 
                 if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
                     processor.setSSLSupport
@@ -290,7 +290,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 //                processor.recycle();
 
                 if (recycle) {
-                    processor.action(ActionCode.ACTION_STOP, null);
+                    processor.action(ActionCode.STOP, null);
                     recycledProcessors.offer(processor);
                 }
             }

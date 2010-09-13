@@ -411,7 +411,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.ACTION_CLOSE) {
+        if (actionCode == ActionCode.CLOSE) {
             // Close
 
             // End the processing of the current request, and stop any further
@@ -426,7 +426,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 error = true;
             }
 
-        } else if (actionCode == ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             // Get remote host address
             if (remoteAddr == null && (socket != 0)) {
@@ -439,7 +439,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
             request.remoteAddr().setString(remoteAddr);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCAL_NAME_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
 
             // Get local host name
             if (localName == null && (socket != 0)) {
@@ -452,7 +452,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
             request.localName().setString(localName);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_HOST_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
             // Get remote host name
             if (remoteHost == null && (socket != 0)) {
@@ -465,7 +465,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
             request.remoteHost().setString(remoteHost);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCAL_ADDR_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             // Get local host address
             if (localAddr == null && (socket != 0)) {
@@ -479,7 +479,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
 
             request.localAddr().setString(localAddr);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_REMOTEPORT_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
 
             // Get remote port
             if (remotePort == -1 && (socket != 0)) {
@@ -493,7 +493,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
             request.setRemotePort(remotePort);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCALPORT_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
 
             // Get local port
             if (localPort == -1 && (socket != 0)) {
@@ -507,7 +507,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
             request.setLocalPort(localPort);
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_ATTRIBUTE ) {
+        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
             if (ssl && (socket != 0)) {
                 try {
@@ -549,7 +549,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 }
             }
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_CERTIFICATE) {
+        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
 
             if (ssl && (socket != 0)) {
                 // Consume and buffer the request body, so that it does not
@@ -587,17 +587,17 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 }
             }
 
-        } else if (actionCode == ActionCode.ACTION_AVAILABLE) {
+        } else if (actionCode == ActionCode.AVAILABLE) {
             request.setAvailable(inputBuffer.available());
-        } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
+        } else if (actionCode == ActionCode.COMET_BEGIN) {
             comet = true;
-        } else if (actionCode == ActionCode.ACTION_COMET_END) {
+        } else if (actionCode == ActionCode.COMET_END) {
             comet = false;
-        } else if (actionCode == ActionCode.ACTION_COMET_CLOSE) {
+        } else if (actionCode == ActionCode.COMET_CLOSE) {
             //no op
-        } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
+        } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
-        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
           //TODO SERVLET3 - async - that is bit hacky -
             AtomicBoolean dispatch = (AtomicBoolean)param;
             RequestInfo rp = request.getRequestProcessor();
@@ -607,13 +607,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             } else {
                 dispatch.set(false);
             }
-        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
             if (param==null) return;
             if (socket==0) return;
             long timeout = ((Long)param).longValue();
             Socket.timeoutSet(socket, timeout * 1000);
-        } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
+        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             RequestInfo rp = request.getRequestProcessor();
             AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
