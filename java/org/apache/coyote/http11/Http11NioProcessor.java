@@ -514,6 +514,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
      * @param actionCode Type of the action
      * @param param Action parameter
      */
+    @Override
     public void action(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.ACTION_COMMIT) {
@@ -1047,7 +1048,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    protected void prepareResponse() throws IOException {
+    protected void prepareResponse() {
 
         boolean entityBody = true;
         contentDelimitation = false;
