@@ -349,7 +349,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     processor = createProcessor();
                 }
 
-                processor.action(ActionCode.ACTION_START, null);
+                processor.action(ActionCode.START, null);
 
                 SocketState state = processor.process(socket);
                 if (state == SocketState.LONG) {
