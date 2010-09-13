@@ -29,15 +29,14 @@ import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
-import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -123,11 +122,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
     protected boolean cometClose = false;
     
     /**
-     * Async used
-     */
-    protected boolean async = false;
-
-    /**
      * SSL enabled ?
      */
     protected boolean ssl = false;
@@ -147,6 +141,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
     
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Expose the endpoint.
+     */
+    @Override
+    protected AbstractEndpoint getEndpoint() {
+        return endpoint;
+    }
 
 
     // --------------------------------------------------------- Public Methods
@@ -464,32 +465,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
     }
 
 
-    public void endRequest() {
-
-        // Finish the handling of the request
-        try {
-            inputBuffer.endRequest();
-        } catch (IOException e) {
-            error = true;
-        } catch (Throwable t) {
-            log.error(sm.getString("http11processor.request.finish"), t);
-            // 500 - Internal Server Error
-            response.setStatus(500);
-            adapter.log(request, response, 0);
-            error = true;
-        }
-        try {
-            outputBuffer.endRequest();
-        } catch (IOException e) {
-            error = true;
-        } catch (Throwable t) {
-            log.error(sm.getString("http11processor.response.finish"), t);
-            error = true;
-        }
-
-    }
-
-
     public void recycle() {
         inputBuffer.recycle();
         outputBuffer.recycle();
@@ -515,53 +490,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
      * @param param Action parameter
      */
     @Override
-    public void action(ActionCode actionCode, Object param) {
+    public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.ACTION_COMMIT) {
-            // Commit current response
-
-            if (response.isCommitted())
-                return;
-
-            // Validate and write response headers
-            
-            try {
-                prepareResponse();
-                outputBuffer.commit();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-
-        } else if (actionCode == ActionCode.ACTION_ACK) {
-
-            // Acknowledge request
-
-            // Send a 100 status back if it makes sense (response not committed
-            // yet, and client specified an expectation for 100-continue)
-
-            if ((response.isCommitted()) || !expectation)
-                return;
-
-            inputBuffer.setSwallowInput(true);
-            try {
-                outputBuffer.sendAck();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-
-        } else if (actionCode == ActionCode.ACTION_CLIENT_FLUSH) {
-
-            try {
-                outputBuffer.flush();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-                response.setErrorException(e);
-            }
-
-        } else if (actionCode == ActionCode.ACTION_CLOSE) {
+        if (actionCode == ActionCode.ACTION_CLOSE) {
             // Close
 
             // End the processing of the current request, and stop any further
@@ -588,18 +519,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.ACTION_RESET) {
-
-            // Reset response
-
-            // Note: This must be called before the response is committed
-
-            outputBuffer.reset();
-
-        } else if (actionCode == ActionCode.ACTION_CUSTOM) {
-
-            // Do nothing
 
         } else if (actionCode == ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE) {
 
@@ -711,16 +630,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                 }
             }
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SET_BODY_REPLAY) {
-            ByteChunk body = (ByteChunk) param;
-
-            InputFilter savedBody = new SavedRequestInputFilter(body);
-            savedBody.setRequest(request);
-
-            InternalNioInputBuffer internalBuffer = (InternalNioInputBuffer)
-                request.getInputBuffer();
-            internalBuffer.addActiveFilter(savedBody);
-
         } else if (actionCode == ActionCode.ACTION_AVAILABLE) {
             request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
@@ -744,9 +653,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
                 attach.setTimeout(timeout);
-        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
-            //TODO SERVLET3 - async
-            async = true;
         } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
           //TODO SERVLET3 - async
             AtomicBoolean dispatch = (AtomicBoolean)param;
@@ -1044,158 +950,21 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
     }
 
-    /**
-     * When committing the response, we have to validate the set of headers, as
-     * well as setup the response filters.
-     */
-    protected void prepareResponse() {
-
-        boolean entityBody = true;
-        contentDelimitation = false;
-
-        OutputFilter[] outputFilters = outputBuffer.getFilters();
-
-        if (http09 == true) {
-            // HTTP/0.9
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.IDENTITY_FILTER]);
-            return;
-        }
-
-        int statusCode = response.getStatus();
-        if ((statusCode == 204) || (statusCode == 205)
-            || (statusCode == 304)) {
-            // No entity body
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.VOID_FILTER]);
-            entityBody = false;
+    @Override
+    protected boolean prepareSendfile(OutputFilter[] outputFilters) {
+        String fileName = (String) request.getAttribute("org.apache.tomcat.sendfile.filename");
+        if (fileName != null) {
+            // No entity body sent here
+            outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
+            sendfileData = new NioEndpoint.SendfileData();
+            sendfileData.fileName = fileName;
+            sendfileData.pos = ((Long) request.getAttribute("org.apache.tomcat.sendfile.start")).longValue();
+            sendfileData.length = ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue() - sendfileData.pos;
+            return true;
         }
-
-        MessageBytes methodMB = request.method();
-        if (methodMB.equals("HEAD")) {
-            // No entity body
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.VOID_FILTER]);
-            contentDelimitation = true;
-        }
-        
-        // Sendfile support
-        if (this.endpoint.getUseSendfile()) {
-            String fileName = (String) request.getAttribute("org.apache.tomcat.sendfile.filename");
-            if (fileName != null) {
-                // No entity body sent here
-                outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
-                contentDelimitation = true;
-                sendfileData = new NioEndpoint.SendfileData();
-                sendfileData.fileName = fileName;
-                sendfileData.pos = ((Long) request.getAttribute("org.apache.tomcat.sendfile.start")).longValue();
-                sendfileData.length = ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue() - sendfileData.pos;
-            }
-        }
-
-
-
-        // Check for compression
-        boolean useCompression = false;
-        if (entityBody && (compressionLevel > 0) && (sendfileData == null)) {
-            useCompression = isCompressable();
-            // Change content-length to -1 to force chunking
-            if (useCompression) {
-                response.setContentLength(-1);
-            }
-        }
-
-        MimeHeaders headers = response.getMimeHeaders();
-        if (!entityBody) {
-            response.setContentLength(-1);
-        } else {
-            String contentType = response.getContentType();
-            if (contentType != null) {
-                headers.setValue("Content-Type").setString(contentType);
-            }
-            String contentLanguage = response.getContentLanguage();
-            if (contentLanguage != null) {
-                headers.setValue("Content-Language")
-                    .setString(contentLanguage);
-            }
-        }
-
-        long contentLength = response.getContentLengthLong();
-        if (contentLength != -1) {
-            headers.setValue("Content-Length").setLong(contentLength);
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.IDENTITY_FILTER]);
-            contentDelimitation = true;
-        } else {
-            if (entityBody && http11) {
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.CHUNKED_FILTER]);
-                contentDelimitation = true;
-                headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
-            } else {
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.IDENTITY_FILTER]);
-            }
-        }
-
-        if (useCompression) {
-            outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
-            headers.setValue("Content-Encoding").setString("gzip");
-            // Make Proxies happy via Vary (from mod_deflate)
-            MessageBytes vary = headers.getValue("Vary");
-            if (vary == null) {
-                // Add a new Vary header
-                headers.setValue("Vary").setString("Accept-Encoding");
-            } else if (vary.equals("*")) {
-                // No action required
-            } else {
-                // Merge into current header
-                headers.setValue("Vary").setString(
-                        vary.getString() + ",Accept-Encoding");
-            }
-        }
-
-        // Add date header
-        headers.setValue("Date").setString(FastHttpDateFormat.getCurrentDate());
-
-        // FIXME: Add transfer encoding header
-
-        if ((entityBody) && (!contentDelimitation)) {
-            // Mark as close the connection after the request, and add the
-            // connection: close header
-            keepAlive = false;
-        }
-
-        // If we know that the request is bad this early, add the
-        // Connection: close header.
-        keepAlive = keepAlive && !statusDropsConnection(statusCode);
-        if (!keepAlive) {
-            headers.addValue(Constants.CONNECTION).setString(Constants.CLOSE);
-        } else if (!http11 && !error) {
-            headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
-        }
-
-        // Build the response header
-        outputBuffer.sendStatus();
-
-        // Add server header
-        if (server != null) {
-            // Always overrides anything the app might set
-            headers.setValue("Server").setString(server);
-        } else if (headers.getValue("Server") == null) {
-            // If app didn't set the header, use the default
-            outputBuffer.write(Constants.SERVER_BYTES);
-        }
-
-        int size = headers.size();
-        for (int i = 0; i < size; i++) {
-            outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
-        }
-        outputBuffer.endHeaders();
-
+        return false;
     }
-
 
     /**
      * Specialized utility method: find a sequence of lower case bytes inside

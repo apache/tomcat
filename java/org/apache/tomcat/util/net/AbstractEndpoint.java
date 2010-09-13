@@ -480,6 +480,7 @@ public abstract class AbstractEndpoint {
     }
     
     protected abstract Log getLog();
+    public abstract boolean getUseSendfile();
 
     // --------------------  SSL related properties --------------------
 
