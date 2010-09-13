@@ -107,8 +107,17 @@ public class JIoEndpoint extends AbstractEndpoint {
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
 
 
-    // ------------------------------------------------ Handler Inner Interface
+    /**
+     * Is sendfile available
+     */
+    @Override
+    public boolean getUseSendfile() {
+        // Not supported
+        return false;
+    }
 
+
+    // ------------------------------------------------ Handler Inner Interface
 
     /**
      * Bare bones interface used for socket processing. Per thread data is to be
