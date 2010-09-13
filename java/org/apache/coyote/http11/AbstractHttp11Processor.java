@@ -844,7 +844,7 @@ public abstract class AbstractHttp11Processor {
      */
     public final void action(ActionCode actionCode, Object param) {
         
-        if (actionCode == ActionCode.ACTION_COMMIT) {
+        if (actionCode == ActionCode.COMMIT) {
             // Commit current response
 
             if (response.isCommitted())
@@ -858,7 +858,7 @@ public abstract class AbstractHttp11Processor {
                 // Set error flag
                 error = true;
             }
-        } else if (actionCode == ActionCode.ACTION_ACK) {
+        } else if (actionCode == ActionCode.ACK) {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
@@ -873,7 +873,7 @@ public abstract class AbstractHttp11Processor {
                 // Set error flag
                 error = true;
             }
-        } else if (actionCode == ActionCode.ACTION_CLIENT_FLUSH) {
+        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
 
             try {
                 getOutputBuffer().flush();
@@ -883,17 +883,17 @@ public abstract class AbstractHttp11Processor {
                 response.setErrorException(e);
             }
 
-        } else if (actionCode == ActionCode.ACTION_RESET) {
+        } else if (actionCode == ActionCode.RESET) {
             // Reset response
             // Note: This must be called before the response is committed
 
             getOutputBuffer().reset();
 
-        } else if (actionCode == ActionCode.ACTION_CUSTOM) {
+        } else if (actionCode == ActionCode.CUSTOM) {
             // Do nothing
             // TODO Remove this action
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SET_BODY_REPLAY) {
+        } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
             ByteChunk body = (ByteChunk) param;
             
             InputFilter savedBody = new SavedRequestInputFilter(body);
@@ -902,7 +902,7 @@ public abstract class AbstractHttp11Processor {
             AbstractInputBuffer internalBuffer = (AbstractInputBuffer)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
-        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
+        } else if (actionCode == ActionCode.ASYNC_START) {
             async = true;
         } else {
             actionInternal(actionCode, param);

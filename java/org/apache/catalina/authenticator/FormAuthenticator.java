@@ -460,7 +460,7 @@ public class FormAuthenticator
             
             if (body != null) {
                 request.getCoyoteRequest().action
-                    (ActionCode.ACTION_REQ_SET_BODY_REPLAY, body);
+                    (ActionCode.REQ_SET_BODY_REPLAY, body);
     
                 // Set content type
                 MessageBytes contentType = MessageBytes.newInstance();

@@ -922,7 +922,7 @@ public class Request
         if(attr != null)
             return attr;
         if( isSSLAttribute(name) ) {
-            coyoteRequest.action(ActionCode.ACTION_REQ_SSL_ATTRIBUTE, 
+            coyoteRequest.action(ActionCode.REQ_SSL_ATTRIBUTE, 
                                  coyoteRequest);
             attr = coyoteRequest.getAttribute(Globals.CERTIFICATES_ATTR);
             if( attr != null) {
@@ -1224,7 +1224,7 @@ public class Request
     public String getRemoteAddr() {
         if (remoteAddr == null) {
             coyoteRequest.action
-                (ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
+                (ActionCode.REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
             remoteAddr = coyoteRequest.remoteAddr().toString();
         }
         return remoteAddr;
@@ -1240,7 +1240,7 @@ public class Request
                 remoteHost = getRemoteAddr();
             } else {
                 coyoteRequest.action
-                    (ActionCode.ACTION_REQ_HOST_ATTRIBUTE, coyoteRequest);
+                    (ActionCode.REQ_HOST_ATTRIBUTE, coyoteRequest);
                 remoteHost = coyoteRequest.remoteHost().toString();
             }
         }
@@ -1254,7 +1254,7 @@ public class Request
     public int getRemotePort(){
         if (remotePort == -1) {
             coyoteRequest.action
-                (ActionCode.ACTION_REQ_REMOTEPORT_ATTRIBUTE, coyoteRequest);
+                (ActionCode.REQ_REMOTEPORT_ATTRIBUTE, coyoteRequest);
             remotePort = coyoteRequest.getRemotePort();
         }
         return remotePort;    
@@ -1267,7 +1267,7 @@ public class Request
     public String getLocalName(){
         if (localName == null) {
             coyoteRequest.action
-                (ActionCode.ACTION_REQ_LOCAL_NAME_ATTRIBUTE, coyoteRequest);
+                (ActionCode.REQ_LOCAL_NAME_ATTRIBUTE, coyoteRequest);
             localName = coyoteRequest.localName().toString();
         }
         return localName;
@@ -1280,7 +1280,7 @@ public class Request
     public String getLocalAddr(){
         if (localAddr == null) {
             coyoteRequest.action
-                (ActionCode.ACTION_REQ_LOCAL_ADDR_ATTRIBUTE, coyoteRequest);
+                (ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE, coyoteRequest);
             localAddr = coyoteRequest.localAddr().toString();
         }
         return localAddr;    
@@ -1294,7 +1294,7 @@ public class Request
     public int getLocalPort(){
         if (localPort == -1){
             coyoteRequest.action
-                (ActionCode.ACTION_REQ_LOCALPORT_ATTRIBUTE, coyoteRequest);
+                (ActionCode.REQ_LOCALPORT_ATTRIBUTE, coyoteRequest);
             localPort = coyoteRequest.getLocalPort();
         }
         return localPort;
@@ -2381,11 +2381,11 @@ public class Request
     }
 
     public void cometClose() {
-        coyoteRequest.action(ActionCode.ACTION_COMET_CLOSE,getEvent());
+        coyoteRequest.action(ActionCode.COMET_CLOSE,getEvent());
     }
     
     public void setCometTimeout(long timeout) {
-        coyoteRequest.action(ActionCode.ACTION_COMET_SETTIMEOUT,new Long(timeout));
+        coyoteRequest.action(ActionCode.COMET_SETTIMEOUT,new Long(timeout));
     }
     
     /**
