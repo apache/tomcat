@@ -353,7 +353,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     }
 
     /* Copied from the AjpProcessor.java */
-    public SocketState asyncDispatch(long socket, SocketStatus status) throws IOException {
+    public SocketState asyncDispatch(long socket, SocketStatus status) {
 
         // Setting up the socket
         this.socket = socket;
@@ -439,6 +439,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
      * @param actionCode Type of the action
      * @param param Action parameter
      */
+    @Override
     public void action(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.ACTION_COMMIT) {
