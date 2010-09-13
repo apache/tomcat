@@ -253,7 +253,7 @@ public class InputBuffer extends Reader
             available = cb.getLength();
         }
         if (available == 0) {
-            coyoteRequest.action(ActionCode.ACTION_AVAILABLE, null);
+            coyoteRequest.action(ActionCode.AVAILABLE, null);
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
         return available;

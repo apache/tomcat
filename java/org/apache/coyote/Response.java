@@ -297,17 +297,17 @@ public final class Response {
             throw new IllegalStateException();
         }
         
-        action(ActionCode.ACTION_RESET, this);
+        action(ActionCode.RESET, this);
     }
 
 
     public void finish() throws IOException {
-        action(ActionCode.ACTION_CLOSE, this);
+        action(ActionCode.CLOSE, this);
     }
 
 
     public void acknowledge() throws IOException {
-        action(ActionCode.ACTION_ACK, this);
+        action(ActionCode.ACK, this);
     }
 
 
@@ -376,7 +376,7 @@ public final class Response {
      *  interceptors to fix headers.
      */
     public void sendHeaders() throws IOException {
-        action(ActionCode.ACTION_COMMIT, this);
+        action(ActionCode.COMMIT, this);
         commited = true;
     }
 

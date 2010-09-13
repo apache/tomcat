@@ -541,7 +541,7 @@ public class AjpAprProcessor implements ActionHook {
      */
     public void action(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.ACTION_COMMIT) {
+        if (actionCode == ActionCode.COMMIT) {
 
             if (response.isCommitted())
                 return;
@@ -554,7 +554,7 @@ public class AjpAprProcessor implements ActionHook {
                 error = true;
             }
 
-        } else if (actionCode == ActionCode.ACTION_CLIENT_FLUSH) {
+        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
 
             if (!response.isCommitted()) {
                 // Validate and write response headers
@@ -579,7 +579,7 @@ public class AjpAprProcessor implements ActionHook {
                 error = true;
             }
 
-        } else if (actionCode == ActionCode.ACTION_CLOSE) {
+        } else if (actionCode == ActionCode.CLOSE) {
             // Close
             async = false;
 
@@ -593,15 +593,15 @@ public class AjpAprProcessor implements ActionHook {
                 error = true;
             }
 
-        } else if (actionCode == ActionCode.ACTION_START) {
+        } else if (actionCode == ActionCode.START) {
 
             started = true;
 
-        } else if (actionCode == ActionCode.ACTION_STOP) {
+        } else if (actionCode == ActionCode.STOP) {
 
             started = false;
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_ATTRIBUTE ) {
+        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
             if (!certificates.isNull()) {
                 ByteChunk certData = certificates.getByteChunk();
@@ -634,7 +634,7 @@ public class AjpAprProcessor implements ActionHook {
                 request.setAttribute(AbstractEndpoint.CERTIFICATE_KEY, jsseCerts);
             }
 
-        } else if (actionCode == ActionCode.ACTION_REQ_HOST_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
             // Get remote host name using a DNS resolution
             if (request.remoteHost().isNull()) {
@@ -646,12 +646,12 @@ public class AjpAprProcessor implements ActionHook {
                 }
             }
 
-        } else if (actionCode == ActionCode.ACTION_REQ_LOCAL_ADDR_ATTRIBUTE) {
+        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             // Copy from local name for now, which should simply be an address
             request.localAddr().setString(request.localName().toString());
 
-        } else if (actionCode == ActionCode.ACTION_REQ_SET_BODY_REPLAY) {
+        } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
 
             // Set the given bytes as the content
             ByteChunk bc = (ByteChunk) param;
@@ -662,9 +662,9 @@ public class AjpAprProcessor implements ActionHook {
             empty = false;
             replay = true;
 
-        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
+        } else if (actionCode == ActionCode.ASYNC_START) {
             async = true;
-        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             AtomicBoolean dispatch = (AtomicBoolean)param;
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
@@ -673,12 +673,12 @@ public class AjpAprProcessor implements ActionHook {
             } else {
                 dispatch.set(false);
             }        
-        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) return;
             if (socket==0) return;
             long timeout = ((Long)param).longValue();
             Socket.timeoutSet(socket, timeout * 1000); 
-        } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
+        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
            RequestInfo rp = request.getRequestProcessor();
             AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling

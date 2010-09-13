@@ -351,7 +351,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     processor = createProcessor();
                 }
 
-                processor.action(ActionCode.ACTION_START, null);
+                processor.action(ActionCode.START, null);
                 
                 if (proto.endpoint.isSSLEnabled() && (proto.sslImplementation != null)) {
                     if (socket instanceof SecureNioChannel) {
