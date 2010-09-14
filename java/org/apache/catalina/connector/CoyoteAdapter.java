@@ -138,6 +138,7 @@ public class CoyoteAdapter implements Adapter {
      * 
      * @return false to indicate an error, expected or not
      */
+    @Override
     public boolean event(org.apache.coyote.Request req, 
             org.apache.coyote.Response res, SocketStatus status) {
 
@@ -248,12 +249,15 @@ public class CoyoteAdapter implements Adapter {
         }
     }
     
-    public boolean asyncDispatch(org.apache.coyote.Request req,org.apache.coyote.Response res, SocketStatus status) throws Exception {
+    @Override
+    public boolean asyncDispatch(org.apache.coyote.Request req,
+            org.apache.coyote.Response res, SocketStatus status) throws Exception {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request == null) {
-            throw new IllegalStateException("Dispatch may only happen on an existing request.");
+            throw new IllegalStateException(
+                    "Dispatch may only happen on an existing request.");
         }
         boolean comet = false;
         boolean async = false;
@@ -353,6 +357,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Service method.
      */
+    @Override
     public void service(org.apache.coyote.Request req, 
                         org.apache.coyote.Response res)
         throws Exception {
@@ -456,6 +461,7 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    @Override
     public void log(org.apache.coyote.Request req,
             org.apache.coyote.Response res, long time) {
 
