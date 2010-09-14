@@ -21,6 +21,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 import java.util.Locale;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
@@ -1027,4 +1028,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         this.sslSupport = sslSupport;
     }
 
+    @Override
+    protected Executor getExecutor() {
+        return endpoint.getExecutor();
+    }
 }
