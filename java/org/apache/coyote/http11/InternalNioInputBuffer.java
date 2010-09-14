@@ -396,7 +396,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         socket.getBufHandler().getReadBuffer().clear();
         if ( block ) {
             Selector selector = null;
-            try { selector = getSelectorPool().get(); }catch ( IOException x ) {}
+            try {
+                selector = getSelectorPool().get();
+            } catch ( IOException x ) {
+                // Ignore
+            }
             try {
                 NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                 if ( att == null ) throw new IOException("Key must be cancelled.");
@@ -569,6 +573,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
                     }
 
                     if (buf[pos] == Constants.CR) {
+                        // Skip
                     } else if (buf[pos] == Constants.LF) {
                         eol = true;
                     } else if (buf[pos] == Constants.SP) {
@@ -706,6 +711,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         /**
          * Read bytes into the specified chunk.
          */
+        @Override
         public int doRead(ByteChunk chunk, Request req ) 
             throws IOException {
 
