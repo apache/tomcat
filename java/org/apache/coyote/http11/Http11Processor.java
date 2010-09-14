@@ -361,10 +361,9 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     }
 
     
-    public void recycle() {
+    @Override
+    protected void recycleInternal() {
         // Recycle
-        inputBuffer.recycle();
-        outputBuffer.recycle();
         this.socket = null;
         async = false;
         // Recycle ssl info
