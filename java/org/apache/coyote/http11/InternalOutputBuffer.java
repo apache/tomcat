@@ -234,6 +234,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
     /**
      * Callback to write data from the buffer.
      */
+    @Override
     public void realWriteBytes(byte cbuf[], int off, int len)
         throws IOException {
         if (len > 0) {
@@ -256,6 +257,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
         /**
          * Write chunk.
          */
+        @Override
         public int doWrite(ByteChunk chunk, Response res) 
             throws IOException {
 

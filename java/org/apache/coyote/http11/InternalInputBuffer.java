@@ -255,6 +255,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
         throws IOException {
 
         while (parseHeader()) {
+            // Loop until we run out of headers
         }
 
         parsingHeader = false;
@@ -269,6 +270,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
      * @return false after reading a blank line (which indicates that the
      * HTTP header parsing is done
      */
+    @SuppressWarnings("null") // headerValue cannot be null
     public boolean parseHeader()
         throws IOException {
 
@@ -376,6 +378,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
                 }
 
                 if (buf[pos] == Constants.CR) {
+                    // Skip
                 } else if (buf[pos] == Constants.LF) {
                     eol = true;
                 } else if (buf[pos] == Constants.SP) {
@@ -489,6 +492,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
         /**
          * Read bytes into the specified chunk.
          */
+        @Override
         public int doRead(ByteChunk chunk, Request req ) 
             throws IOException {
 
