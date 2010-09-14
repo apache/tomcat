@@ -1589,10 +1589,8 @@ public class Request
             throw new IllegalStateException("Not supported.");
         }
         
-        if (asyncContext==null) {
+        if (asyncContext == null) {
             asyncContext = new AsyncContextImpl(this);
-        } else if (asyncContext.isStarted()) {
-            throw new IllegalStateException("Already started.");
         }
         
         asyncContext.setStarted(getContext(), request, response,
