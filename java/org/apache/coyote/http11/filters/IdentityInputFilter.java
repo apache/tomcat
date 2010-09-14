@@ -105,6 +105,7 @@ public class IdentityInputFilter implements InputFilter {
      * whichever is greater. If the filter does not do request body length
      * control, the returned value should be -1.
      */
+    @Override
     public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
@@ -143,6 +144,7 @@ public class IdentityInputFilter implements InputFilter {
     /**
      * Read the content length from the request.
      */
+    @Override
     public void setRequest(Request request) {
         contentLength = request.getContentLengthLong();
         remaining = contentLength;
@@ -152,6 +154,7 @@ public class IdentityInputFilter implements InputFilter {
     /**
      * End the current request.
      */
+    @Override
     public long end()
         throws IOException {
 
@@ -174,6 +177,7 @@ public class IdentityInputFilter implements InputFilter {
     /**
      * Amount of bytes still available in a buffer.
      */
+    @Override
     public int available() {
         return 0;
     }
@@ -182,6 +186,7 @@ public class IdentityInputFilter implements InputFilter {
     /**
      * Set the next buffer in the filter pipeline.
      */
+    @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
     }
@@ -190,6 +195,7 @@ public class IdentityInputFilter implements InputFilter {
     /**
      * Make the filter ready to process the next request.
      */
+    @Override
     public void recycle() {
         contentLength = -1;
         remaining = 0;
@@ -201,6 +207,7 @@ public class IdentityInputFilter implements InputFilter {
      * Return the name of the associated encoding; Here, the value is 
      * "identity".
      */
+    @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
     }
