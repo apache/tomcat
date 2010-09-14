@@ -503,6 +503,7 @@ public class Response
      * Return the content type that was set or calculated for this response,
      * or <code>null</code> if no content type was set.
      */
+    @Override
     public String getContentType() {
         return (coyoteResponse.getContentType());
     }
@@ -541,6 +542,7 @@ public class Response
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void flushBuffer() 
         throws IOException {
         outputBuffer.flush();
@@ -550,6 +552,7 @@ public class Response
     /**
      * Return the actual buffer size used for this Response.
      */
+    @Override
     public int getBufferSize() {
         return outputBuffer.getBufferSize();
     }
@@ -558,6 +561,7 @@ public class Response
     /**
      * Return the character encoding used for this Response.
      */
+    @Override
     public String getCharacterEncoding() {
         return (coyoteResponse.getCharacterEncoding());
     }
@@ -570,6 +574,7 @@ public class Response
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public ServletOutputStream getOutputStream() 
         throws IOException {
 
@@ -589,6 +594,7 @@ public class Response
     /**
      * Return the Locale assigned to this response.
      */
+    @Override
     public Locale getLocale() {
         return (coyoteResponse.getLocale());
     }
@@ -601,6 +607,7 @@ public class Response
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public PrintWriter getWriter() 
         throws IOException {
 
@@ -637,6 +644,7 @@ public class Response
     /**
      * Has the output of this response already been committed?
      */
+    @Override
     public boolean isCommitted() {
         return (coyoteResponse.isCommitted());
     }
@@ -648,6 +656,7 @@ public class Response
      * @exception IllegalStateException if this response has already
      *  been committed
      */
+    @Override
     public void reset() {
 
         if (included)
@@ -667,6 +676,7 @@ public class Response
      * @exception IllegalStateException if the response has already
      *  been committed
      */
+    @Override
     public void resetBuffer() {
         resetBuffer(false);
     }
@@ -708,6 +718,7 @@ public class Response
      * @exception IllegalStateException if this method is called after
      *  output has been committed for this response
      */
+    @Override
     public void setBufferSize(int size) {
 
         if (isCommitted() || !outputBuffer.isNew())
@@ -724,6 +735,7 @@ public class Response
      *
      * @param length The new content length
      */
+    @Override
     public void setContentLength(int length) {
 
         if (isCommitted())
@@ -746,6 +758,7 @@ public class Response
      *
      * @param type The new content type
      */
+    @Override
     @SuppressWarnings("deprecation") // isSpace (deprecated) cannot be replaced by isWhiteSpace
     public void setContentType(String type) {
 
@@ -801,6 +814,7 @@ public class Response
      *
      * @param charset String containing the name of the character encoding.
      */
+    @Override
     public void setCharacterEncoding(String charset) {
 
         if (isCommitted())
@@ -826,6 +840,7 @@ public class Response
      *
      * @param locale The new locale
      */
+    @Override
     public void setLocale(Locale locale) {
 
         if (isCommitted())
@@ -866,6 +881,7 @@ public class Response
      *
      * @param name Header name to look up
      */
+    @Override
     public String getHeader(String name) {
         return coyoteResponse.getMimeHeaders().getHeader(name);
     }
@@ -874,6 +890,7 @@ public class Response
     /**
      * Return an Iterable of all the header names set for this response.
      */
+    @Override
     public Collection<String> getHeaderNames() {
 
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
@@ -893,6 +910,7 @@ public class Response
      *
      * @param name Header name to look up
      */
+    @Override
     public Collection<String> getHeaders(String name) {
 
         Enumeration<String> enumeration =
@@ -917,6 +935,7 @@ public class Response
     /**
      * Return the HTTP status code associated with this Response.
      */
+    @Override
     public int getStatus() {
         return coyoteResponse.getStatus();
     }
@@ -944,6 +963,7 @@ public class Response
      *
      * @param cookie Cookie to be added
      */
+    @Override
     public void addCookie(final Cookie cookie) {
 
         // Ignore any call from an included servlet
@@ -995,6 +1015,7 @@ public class Response
         //from the appendCookieValue invocation
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                @Override
                 public Void run(){
                     ServerCookie.appendCookieValue
                         (sb, cookie.getVersion(), cookie.getName(), 
@@ -1022,6 +1043,7 @@ public class Response
      * @param name Name of the header to set
      * @param value Date value to be set
      */
+    @Override
     public void addDateHeader(String name, long value) {
 
         if (name == null || name.length() == 0) {
@@ -1053,6 +1075,7 @@ public class Response
      * @param name Name of the header to set
      * @param value Value to be set
      */
+    @Override
     public void addHeader(String name, String value) {
 
         if (name == null || name.length() == 0 || value == null) {
@@ -1077,6 +1100,7 @@ public class Response
      * @param name Name of the header to set
      * @param value Integer value to be set
      */
+    @Override
     public void addIntHeader(String name, int value) {
 
         if (name == null || name.length() == 0) {
@@ -1100,6 +1124,7 @@ public class Response
      *
      * @param name Name of the header to check
      */
+    @Override
     public boolean containsHeader(String name) {
         // Need special handling for Content-Type and Content-Length due to
         // special handling of these in coyoteResponse
@@ -1125,6 +1150,7 @@ public class Response
      *
      * @param url URL to be encoded
      */
+    @Override
     public String encodeRedirectURL(String url) {
 
         if (isEncodeable(toAbsolute(url))) {
@@ -1145,6 +1171,7 @@ public class Response
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeRedirectURL()</code> instead.
      */
+    @Override
     @Deprecated
     public String encodeRedirectUrl(String url) {
         return (encodeRedirectURL(url));
@@ -1157,6 +1184,7 @@ public class Response
      *
      * @param url URL to be encoded
      */
+    @Override
     public String encodeURL(String url) {
         
         String absolute = toAbsolute(url);
@@ -1182,6 +1210,7 @@ public class Response
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeURL()</code> instead.
      */
+    @Override
     @Deprecated
     public String encodeUrl(String url) {
         return (encodeURL(url));
@@ -1218,6 +1247,7 @@ public class Response
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendError(int status) 
         throws IOException {
         sendError(status, null);
@@ -1234,6 +1264,7 @@ public class Response
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendError(int status, String message) 
         throws IOException {
 
@@ -1273,6 +1304,7 @@ public class Response
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendRedirect(String location) 
         throws IOException {
 
@@ -1308,6 +1340,7 @@ public class Response
      * @param name Name of the header to set
      * @param value Date value to be set
      */
+    @Override
     public void setDateHeader(String name, long value) {
 
         if (name == null || name.length() == 0) {
@@ -1339,6 +1372,7 @@ public class Response
      * @param name Name of the header to set
      * @param value Value to be set
      */
+    @Override
     public void setHeader(String name, String value) {
 
         if (name == null || name.length() == 0 || value == null) {
@@ -1363,6 +1397,7 @@ public class Response
      * @param name Name of the header to set
      * @param value Integer value to be set
      */
+    @Override
     public void setIntHeader(String name, int value) {
 
         if (name == null || name.length() == 0) {
@@ -1386,6 +1421,7 @@ public class Response
      *
      * @param status The new HTTP status
      */
+    @Override
     public void setStatus(int status) {
         setStatus(status, null);
     }
@@ -1401,6 +1437,7 @@ public class Response
      *  has been deprecated due to the ambiguous meaning of the message
      *  parameter.
      */
+    @Override
     @Deprecated
     public void setStatus(int status, String message) {
 
@@ -1459,6 +1496,7 @@ public class Response
             return (
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
 
+                @Override
                 public Boolean run(){
                     return new Boolean(doIsEncodeable(hreq, session, location));
                 }
@@ -1565,6 +1603,7 @@ public class Response
                         try{
                             encodedURI = AccessController.doPrivileged( 
                                 new PrivilegedExceptionAction<String>(){                                
+                                    @Override
                                     public String run() throws IOException{
                                         return urlEncoder.encodeURL(frelativePath);
                                     }

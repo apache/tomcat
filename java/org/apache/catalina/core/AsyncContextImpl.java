@@ -272,10 +272,15 @@ public class AsyncContextImpl implements AsyncContext {
                 state.get() == AsyncState.DISPATCHING);
     }
 
-    public void setStarted(Context context) {
+    public void setStarted(Context context, ServletRequest request,
+            ServletResponse response, boolean hasOriginalRequestAndResponse) {
         if (state.compareAndSet(AsyncState.NOT_STARTED, AsyncState.STARTED) ||
                 state.compareAndSet(AsyncState.DISPATCHED, AsyncState.STARTED)) {
             this.context = context;
+            this.servletRequest = request;
+            this.servletResponse = response;
+            this.hasOriginalRequestAndResponse = hasOriginalRequestAndResponse;
+            this.event = new AsyncEvent(this, request, response); 
         } else {
             throw new IllegalStateException("Start illegal. Invalid state: "+state.get());
         }
@@ -284,10 +289,6 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public boolean hasOriginalRequestAndResponse() {
         return hasOriginalRequestAndResponse;
-    }
-
-    public void setHasOriginalRequestAndResponse(boolean hasOriginalRequestAndResponse) {
-        this.hasOriginalRequestAndResponse = hasOriginalRequestAndResponse;
     }
 
     protected void doInternalDispatch() throws ServletException, IOException {
@@ -411,12 +412,6 @@ public class AsyncContextImpl implements AsyncContext {
         state.set(AsyncState.ERROR_DISPATCHING);
     }
     
-    public void init(ServletRequest request, ServletResponse response) {
-        this.servletRequest = request;
-        this.servletResponse = response;
-        event = new AsyncEvent(this, request, response); 
-    }
-
     private void logDebug(String method) {
         String rHashCode;
         String crHashCode;
