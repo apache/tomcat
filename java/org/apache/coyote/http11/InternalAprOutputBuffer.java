@@ -247,6 +247,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
         /**
          * Write chunk.
          */
+        @Override
         public int doWrite(ByteChunk chunk, Response res) 
             throws IOException {
 

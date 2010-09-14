@@ -184,6 +184,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
      * @return number of bytes written
      * @throws IOException an underlying I/O error occurred
      */
+    @Override
     public int doWrite(ByteChunk chunk, Response res) 
         throws IOException {
 
@@ -367,6 +368,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
            AccessController.doPrivileged(
                 new PrivilegedAction<Void>(){
+                    @Override
                     public Void run(){
                         buf[pos++] = Constants.CR;
                         buf[pos++] = Constants.LF;
