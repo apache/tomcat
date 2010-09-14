@@ -59,6 +59,7 @@ public class VoidInputFilter implements InputFilter {
      * 
      * @return number of bytes written by the filter
      */
+    @Override
     public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
@@ -73,6 +74,7 @@ public class VoidInputFilter implements InputFilter {
     /**
      * Set the associated request.
      */
+    @Override
     public void setRequest(Request request) {
         // NOOP: Request isn't used so ignore it
     }
@@ -81,6 +83,7 @@ public class VoidInputFilter implements InputFilter {
     /**
      * Set the next buffer in the filter pipeline.
      */
+    @Override
     public void setBuffer(InputBuffer buffer) {
         // NOOP: No body to read
     }
@@ -89,6 +92,7 @@ public class VoidInputFilter implements InputFilter {
     /**
      * Make the filter ready to process the next request.
      */
+    @Override
     public void recycle() {
         // NOOP: Nothing to recycle
     }
@@ -98,6 +102,7 @@ public class VoidInputFilter implements InputFilter {
      * Return the name of the associated encoding; Here, the value is 
      * "void".
      */
+    @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
     }
@@ -112,6 +117,7 @@ public class VoidInputFilter implements InputFilter {
      * missing bytes, which would indicate an error. 
      * Note: It is recommended that extra bytes be swallowed by the filter.
      */
+    @Override
     public long end()
         throws IOException {
         return 0;
@@ -121,6 +127,7 @@ public class VoidInputFilter implements InputFilter {
     /**
      * Amount of bytes still available in a buffer.
      */
+    @Override
     public int available() {
         return 0;
     }

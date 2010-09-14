@@ -95,6 +95,7 @@ public class IdentityOutputFilter implements OutputFilter {
      * 
      * @return number of bytes written by the filter
      */
+    @Override
     public int doWrite(ByteChunk chunk, Response res)
         throws IOException {
 
@@ -140,6 +141,7 @@ public class IdentityOutputFilter implements OutputFilter {
      * necessary reading can occur in that method, as this method is called
      * after the response header processing is complete.
      */
+    @Override
     public void setResponse(Response response) {
         contentLength = response.getContentLengthLong();
         remaining = contentLength;
@@ -149,6 +151,7 @@ public class IdentityOutputFilter implements OutputFilter {
     /**
      * Set the next buffer in the filter pipeline.
      */
+    @Override
     public void setBuffer(OutputBuffer buffer) {
         this.buffer = buffer;
     }
@@ -158,6 +161,7 @@ public class IdentityOutputFilter implements OutputFilter {
      * End the current request. It is acceptable to write extra bytes using
      * buffer.doWrite during the execution of this method.
      */
+    @Override
     public long end()
         throws IOException {
 
@@ -171,6 +175,7 @@ public class IdentityOutputFilter implements OutputFilter {
     /**
      * Make the filter ready to process the next request.
      */
+    @Override
     public void recycle() {
         contentLength = -1;
         remaining = 0;
@@ -181,6 +186,7 @@ public class IdentityOutputFilter implements OutputFilter {
      * Return the name of the associated encoding; Here, the value is 
      * "identity".
      */
+    @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
     }

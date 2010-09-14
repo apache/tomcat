@@ -72,6 +72,7 @@ public class BufferedInputFilter implements InputFilter {
     /**
      * Reads the request body and buffers it.
      */
+    @Override
     public void setRequest(Request request) {
         // save off the Request body
         try {
@@ -87,6 +88,7 @@ public class BufferedInputFilter implements InputFilter {
     /**
      * Fills the given ByteChunk with the buffered request body.
      */
+    @Override
     public int doRead(ByteChunk chunk, Request request) throws IOException {
         if (hasRead || buffered.getLength() <= 0) {
             return -1;
@@ -98,10 +100,12 @@ public class BufferedInputFilter implements InputFilter {
         return chunk.getLength();
     }
 
+    @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
     }
 
+    @Override
     public void recycle() {
         if (buffered != null) {
             if (buffered.getBuffer().length > 65536) {
@@ -115,14 +119,17 @@ public class BufferedInputFilter implements InputFilter {
         buffer = null;
     }
 
+    @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
     }
 
+    @Override
     public long end() throws IOException {
         return 0;
     }
 
+    @Override
     public int available() {
         return buffered.getLength();
     }
