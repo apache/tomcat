@@ -892,12 +892,16 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                     if ( dest!=null && dest.length >0) {
                         getChannel().send(dest, msg, getChannelSendOptions());
                     }
+                    if ( entry.getValue() != null && entry.getValue() instanceof ReplicatedMapEntry ) {
+                        ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
+                        val.setOwner(getMapOwner());   
+                    }
                 }
                 entry.setPrimary(channel.getLocalMember(false));
                 entry.setBackupNodes(backup);
                 entry.setBackup(false);
                 entry.setProxy(false);
-
+                getMapOwner().objectMadePrimay(key, entry.getValue());
 
             } catch (Exception x) {
                 log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);
@@ -905,12 +909,6 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
         if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" result:"+entry.getValue());
-        if ( entry.getValue() != null && entry.getValue() instanceof ReplicatedMapEntry ) {
-            ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
-            //hack, somehow this is not being set above
-            val.setOwner(getMapOwner());
-            
-        }
         return entry.getValue();
     }    
 
