@@ -465,9 +465,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
     }
 
 
-    public void recycle() {
-        inputBuffer.recycle();
-        outputBuffer.recycle();
+    @Override
+    public void recycleInternal() {
         this.socket = null;
         this.cometClose = false;
         this.comet = false;
