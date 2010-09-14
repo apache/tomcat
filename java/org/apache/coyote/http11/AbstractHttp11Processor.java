@@ -1081,4 +1081,12 @@ public abstract class AbstractHttp11Processor {
         }
 
     }
+    
+    public final void recycle() {
+        getInputBuffer().recycle();
+        getOutputBuffer().recycle();
+        recycleInternal();
+    }
+    
+    protected abstract void recycleInternal();
 }

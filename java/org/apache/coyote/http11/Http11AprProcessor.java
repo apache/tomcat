@@ -391,10 +391,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         
     }
 
-    
-    public void recycle() {
-        inputBuffer.recycle();
-        outputBuffer.recycle();
+
+    @Override
+    public void recycleInternal() {
         this.socket = 0;
     }
     
