@@ -114,6 +114,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
             DeltaSession session = (DeltaSession)value;
             synchronized (session) {
                 session.access();
+                session.setPrimarySession(true);
                 session.endAccess();
             }
         }
