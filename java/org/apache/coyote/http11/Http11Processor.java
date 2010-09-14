@@ -22,6 +22,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Locale;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
@@ -838,4 +839,8 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         outputBuffer.setSocketBuffer(socketBuffer);
     }
 
+    @Override
+    protected Executor getExecutor() {
+        return endpoint.getExecutor();
+    }
 }

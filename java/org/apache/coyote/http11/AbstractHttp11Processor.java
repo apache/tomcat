@@ -18,6 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -1089,4 +1090,6 @@ public abstract class AbstractHttp11Processor {
     }
     
     protected abstract void recycleInternal();
+    
+    protected abstract Executor getExecutor();
 }

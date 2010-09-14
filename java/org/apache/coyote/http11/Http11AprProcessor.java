@@ -23,6 +23,7 @@ import java.io.InterruptedIOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
@@ -914,5 +915,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     @Override
     protected AbstractOutputBuffer getOutputBuffer() {
         return outputBuffer;
+    }
+    
+    @Override
+    protected Executor getExecutor() {
+        return endpoint.getExecutor();
     }
 }
