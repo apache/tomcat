@@ -210,6 +210,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
         protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors = new ConcurrentLinkedQueue<Http11NioProcessor>() {
+            private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11NioProcessor processor) {
