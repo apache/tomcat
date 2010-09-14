@@ -65,6 +65,7 @@ public class VoidOutputFilter implements OutputFilter {
      * 
      * @return number of bytes written by the filter
      */
+    @Override
     public int doWrite(ByteChunk chunk, Response res)
         throws IOException {
 
@@ -81,6 +82,7 @@ public class VoidOutputFilter implements OutputFilter {
      * necessary reading can occur in that method, as this method is called
      * after the response header processing is complete.
      */
+    @Override
     public void setResponse(Response response) {
         // NOOP: No need for parameters from response in this filter
     }
@@ -89,6 +91,7 @@ public class VoidOutputFilter implements OutputFilter {
     /**
      * Set the next buffer in the filter pipeline.
      */
+    @Override
     public void setBuffer(OutputBuffer buffer) {
         this.buffer = buffer;
     }
@@ -97,6 +100,7 @@ public class VoidOutputFilter implements OutputFilter {
     /**
      * Make the filter ready to process the next request.
      */
+    @Override
     public void recycle() {
         // NOOP: Nothing to recycle
     }
@@ -106,6 +110,7 @@ public class VoidOutputFilter implements OutputFilter {
      * Return the name of the associated encoding; Here, the value is 
      * "identity".
      */
+    @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
     }
@@ -120,6 +125,7 @@ public class VoidOutputFilter implements OutputFilter {
      * missing bytes, which would indicate an error. 
      * Note: It is recommended that extra bytes be swallowed by the filter.
      */
+    @Override
     public long end()
         throws IOException {
         return 0;
