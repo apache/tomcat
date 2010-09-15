@@ -605,12 +605,13 @@ public class ConnectionPool {
      * @return a PooledConnection that has been connected
      * @throws SQLException
      */
-    protected PooledConnection createConnection(long now, PooledConnection con) throws SQLException {
+    protected PooledConnection createConnection(long now,
+            PooledConnection notUsed) throws SQLException {
         //no connections where available we'll create one
+        PooledConnection con = create();
         boolean error = false;
         try {
             //connect and validate the connection
-            con = create();
             con.lock();
             con.connect();
             if (con.validate(PooledConnection.VALIDATE_INIT)) {
@@ -640,6 +641,7 @@ public class ConnectionPool {
                 throw ex;
             }
         } finally {
+            // con can never be null here
             if (error ) {
                 release(con);
             }
