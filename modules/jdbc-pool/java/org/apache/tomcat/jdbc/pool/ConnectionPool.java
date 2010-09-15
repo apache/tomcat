@@ -466,9 +466,6 @@ public class ConnectionPool {
             }
             //release the connection
             release(con);
-            //we've asynchronously reduced the number of connections
-            //we could have threads stuck in idle.poll(timeout) that will never be notified
-            if (waitcount.get()>0) idle.offer(new PooledConnection(poolProperties,this));
         } finally {
             con.unlock();
         }
@@ -516,6 +513,12 @@ public class ConnectionPool {
             }
         } finally {
             con.unlock();
+        }
+        // we've asynchronously reduced the number of connections
+        // we could have threads stuck in idle.poll(timeout) that will never be
+        // notified
+        if (waitcount.get() > 0) {
+            idle.offer(new PooledConnection(poolProperties, this));
         }
     }
 
