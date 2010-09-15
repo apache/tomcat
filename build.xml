@@ -33,7 +33,7 @@
   <property file="${user.home}/build.properties"/>
   <property file="${basedir}/build.properties"/>
   <property file="${basedir}/build.properties.default"/>
-  <property name="version"               value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}.${version.patch}-${version.suffix}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
   <!-- Project Properties -->
