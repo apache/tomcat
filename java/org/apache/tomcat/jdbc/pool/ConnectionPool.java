@@ -604,7 +604,7 @@ public class ConnectionPool {
     /**
      * Creates a JDBC connection and tries to connect to the database.
      * @param now timestamp of when this was called
-     * @param con the previous pooled connection - argument not used
+     * @param notUsed Argument not used
      * @return a PooledConnection that has been connected
      * @throws SQLException
      */
