@@ -31,6 +31,9 @@
 <section name="Tomcat JDBC Connection Pool 1.0.9.0">
   <subsection name="pool">
     <changelog>
+      <fix><rev>997321</rev></fix> Ensure threads borrowing connections do not
+      get stuck waiting for a new connection if a connection is released in
+      another thread. (markt)
       <fix><rev>995432</rev></fix> Make interceptor class names, property names
       and property values tolerant of whitespace by trimming the values before
       use. (markt)
