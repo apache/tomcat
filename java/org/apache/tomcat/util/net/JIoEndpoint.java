@@ -31,7 +31,6 @@ import java.util.concurrent.RejectedExecutionException;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 
@@ -68,23 +67,6 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Generic properties - currently only socket.xxx properties
-     */
-    @Override
-    public boolean setProperty(String name, String value) {
-        final String socketName = "socket.";
-        try {
-            if (name.startsWith(socketName)) {
-                return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
-            }
-            return super.setProperty(name, value);
-        } catch ( Exception x ) {
-            log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
-            return false;
-        }
-    }
-    
     /**
      * Acceptor thread count.
      */
