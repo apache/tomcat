@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ObjectName;
 
-import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
