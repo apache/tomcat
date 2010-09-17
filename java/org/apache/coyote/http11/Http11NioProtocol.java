@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.ObjectName;
 
-import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
@@ -352,8 +351,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     processor = createProcessor();
                 }
 
-                processor.action(ActionCode.START, null);
-                
                 if (proto.endpoint.isSSLEnabled() && (proto.sslImplementation != null)) {
                     if (socket instanceof SecureNioChannel) {
                         SecureNioChannel ch = (SecureNioChannel)socket;
