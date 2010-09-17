@@ -237,7 +237,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         @Override
         public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
             Http11Processor processor = connections.remove(socket);
-            boolean recycle = true;
             try {
                 if (processor == null) {
                     processor = recycledProcessors.poll();
@@ -247,8 +246,9 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 }
 
                 if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
-                    processor.setSSLSupport
-                        (proto.sslImplementation.getSSLSupport(socket.getSocket()));
+                    processor.setSSLSupport(
+                            proto.sslImplementation.getSSLSupport(
+                                    socket.getSocket()));
                 } else {
                     processor.setSSLSupport(null);
                 }
@@ -257,22 +257,20 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
-                    recycle = false;
                 } else {
                     connections.remove(socket);
                     socket.setAsync(false);
+                    recycledProcessors.offer(processor);
                 }
                 return state;
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
-                Http11Protocol.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.socketexception.debug"), e);
+                log.debug(sm.getString(
+                        "http11protocol.proto.socketexception.debug"), e);
             } catch (java.io.IOException e) {
                 // IOExceptions are normal
-                Http11Protocol.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.ioexception.debug"), e);
+                log.debug(sm.getString(
+                        "http11protocol.proto.ioexception.debug"), e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -281,16 +279,9 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                Http11Protocol.log.error
-                    (sm.getString("http11protocol.proto.error"), e);
-            } finally {
-                //       if(proto.adapter != null) proto.adapter.recycle();
-                //                processor.recycle();
-
-                if (recycle) {
-                    recycledProcessors.offer(processor);
-                }
+                log.error(sm.getString("http11protocol.proto.error"), e);
             }
+            recycledProcessors.offer(processor);
             return SocketState.CLOSED;
         }
         

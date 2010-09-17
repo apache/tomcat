@@ -340,10 +340,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         @Override
         public SocketState process(NioChannel socket) {
-            Http11NioProcessor processor = null;
+            Http11NioProcessor processor = connections.remove(socket);
             try {
-                processor = connections.remove(socket);
-                
                 if (processor == null) {
                     processor = recycledProcessors.poll();
                 }
@@ -351,15 +349,16 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     processor = createProcessor();
                 }
 
-                if (proto.endpoint.isSSLEnabled() && (proto.sslImplementation != null)) {
-                    if (socket instanceof SecureNioChannel) {
-                        SecureNioChannel ch = (SecureNioChannel)socket;
-                        processor.setSslSupport(proto.sslImplementation.getSSLSupport(ch.getSslEngine().getSession()));
-                    }else processor.setSslSupport(null);
+                if (proto.isSSLEnabled() &&
+                        (proto.sslImplementation != null)
+                        && (socket instanceof SecureNioChannel)) {
+                    SecureNioChannel ch = (SecureNioChannel)socket;
+                    processor.setSslSupport(
+                            proto.sslImplementation.getSSLSupport(
+                                    ch.getSslEngine().getSession()));
                 } else {
                     processor.setSslSupport(null);
                 }
-
 
                 SocketState state = processor.process(socket);
                 if (state == SocketState.LONG) {
@@ -389,14 +388,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
             } catch (java.net.SocketException e) {
                 // SocketExceptions are normal
-                Http11NioProtocol.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.socketexception.debug"), e);
+                log.debug(sm.getString(
+                        "http11protocol.proto.socketexception.debug"), e);
             } catch (java.io.IOException e) {
                 // IOExceptions are normal
-                Http11NioProtocol.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.ioexception.debug"), e);
+                log.debug(sm.getString(
+                        "http11protocol.proto.ioexception.debug"), e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -405,8 +402,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                Http11NioProtocol.log.error
-                    (sm.getString("http11protocol.proto.error"), e);
+                log.error(sm.getString("http11protocol.proto.error"), e);
             }
             recycledProcessors.offer(processor);
             return SocketState.CLOSED;
