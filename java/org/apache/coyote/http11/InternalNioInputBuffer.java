@@ -378,7 +378,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
             byte[] tmp = new byte[newsize];
             System.arraycopy(buf,0,tmp,0,buf.length);
             buf = tmp;
-            tmp = null;
         }
     }
     
