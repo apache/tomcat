@@ -171,12 +171,6 @@ public class AjpProcessor implements ActionHook {
 
 
     /**
-     * State flag.
-     */
-    protected boolean started = false;
-
-
-    /**
      * Error flag.
      */
     protected boolean error = false;
@@ -383,7 +377,7 @@ public class AjpProcessor implements ActionHook {
         // Error flag
         error = false;
 
-        while (started && !error && !endpoint.isPaused()) {
+        while (!error && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -595,14 +589,6 @@ public class AjpProcessor implements ActionHook {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.START) {
-
-            started = true;
-
-        } else if (actionCode == ActionCode.STOP) {
-
-            started = false;
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
