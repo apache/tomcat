@@ -3217,7 +3217,7 @@ public class WebappClassLoader
 
     /**
      * Validate a classname. As per SRV.9.7.2, we must restrict loading of 
-     * classes from J2SE (java.*) and classes of the servlet API 
+     * classes from J2SE (java.*) and most classes of the servlet API 
      * (javax.servlet.*). That should enhance robustness and prevent a number
      * of user error (where an older version of servlet.jar would be present
      * in /WEB-INF/lib).
@@ -3227,13 +3227,25 @@ public class WebappClassLoader
      */
     protected boolean validate(String name) {
 
-        if (name == null)
+        // Need to be careful with order here
+        if (name == null) {
+            // Can't load a class without a name
             return false;
-        if (name.startsWith("java."))
+        }
+        if (name.startsWith("java.")) {
+            // Must never load java.* classes
             return false;
-        if (name.startsWith("javax.servlet."))
+        }
+        if (name.startsWith("javax.servlet.jsp.jstl")) {
+            // OK for web apps to package JSTL
+            return true;
+        }
+        if (name.startsWith("javax.servlet.")) {
+            // Web apps should never package any other Servlet or JSP classes
             return false;
+        }
 
+        // Assume everything else is OK
         return true;
 
     }
