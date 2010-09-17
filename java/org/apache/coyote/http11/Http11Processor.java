@@ -105,12 +105,6 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
     
     /**
-     * State flag.
-     */
-    protected boolean started = false;
-
-
-    /**
      * Socket associated with the current connection.
      */
     protected SocketWrapper<Socket> socket;
@@ -184,7 +178,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
         boolean keptAlive = socketWrapper.isKeptAlive();
 
-        while (started && !error && keepAlive && !endpoint.isPaused()) {
+        while (!error && keepAlive && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -396,14 +390,6 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.START) {
-
-            started = true;
-
-        } else if (actionCode == ActionCode.STOP) {
-
-            started = false;
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
