@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ObjectName;
 
-import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
@@ -246,7 +245,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 if (processor == null) {
                     processor = createProcessor();
                 }
-                processor.action(ActionCode.START, null);
 
                 if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
                     processor.setSSLSupport
@@ -290,7 +288,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 //                processor.recycle();
 
                 if (recycle) {
-                    processor.action(ActionCode.STOP, null);
                     recycledProcessors.offer(processor);
                 }
             }
