@@ -120,11 +120,6 @@ public class NioEndpoint extends AbstractEndpoint {
     long lastParachuteCheck = System.currentTimeMillis();
     
     /**
-     * Keep track of how many threads are in use
-     */
-    protected AtomicInteger activeSocketProcessors = new AtomicInteger(0);
-    
-    /**
      * 
      */
     protected volatile CountDownLatch stopLatch = null;
@@ -1469,7 +1464,6 @@ public class NioEndpoint extends AbstractEndpoint {
         }
          
         public void run() {
-            NioEndpoint.this.activeSocketProcessors.addAndGet(1);
             SelectionKey key = null;
             try {
                 key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
@@ -1543,7 +1537,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 status = null;
                 //return to cache
                 processorCache.offer(this);
-                NioEndpoint.this.activeSocketProcessors.addAndGet(-1);            }
+            }
         }
 
     }
