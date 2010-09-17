@@ -52,6 +52,7 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
@@ -1478,11 +1479,11 @@ public class NioEndpoint extends AbstractEndpoint {
                     handshake = -1;
                 }
                 if ( handshake == 0 ) {
+                    SocketState state = SocketState.OPEN;
                     // Process the request from this socket
-                    boolean closed = (status==null)?(handler.process(socket)==Handler.SocketState.CLOSED) :
-                        (handler.event(socket,status)==Handler.SocketState.CLOSED);
+                    state = (status==null)?handler.process(socket):handler.event(socket,status);
 
-                    if (closed) {
+                    if (state == SocketState.CLOSED) {
                         // Close socket and pool
                         try {
                             KeyAttachment ka = null;
