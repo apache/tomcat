@@ -44,9 +44,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
 
 
     // ----------------------------------------------------------- Constructors
-    int bbufLimit = 0;
-    
-    
     /**
      * Default constructor.
      */
@@ -65,13 +62,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
 
         buf = new byte[headerBufferSize];
         
-        if (headerBufferSize < (8 * 1024)) {
-            bbufLimit = 6 * 1500;    
-        } else {
-            bbufLimit = (headerBufferSize / 1500 + 1) * 1500;
-        }
-        //bbuf = ByteBuffer.allocateDirect(bbufLimit);
-
         outputStreamOutputBuffer = new SocketOutputBuffer();
 
         filterLibrary = new OutputFilter[0];

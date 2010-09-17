@@ -534,7 +534,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                         request.setAttribute(AbstractEndpoint.CERTIFICATE_KEY, certs);
                     }
                     // User key size
-                    sslO = new Integer(SSLSocket.getInfoI(socket, SSL.SSL_INFO_CIPHER_USEKEYSIZE));
+                    sslO = Integer.valueOf(SSLSocket.getInfoI(socket,
+                            SSL.SSL_INFO_CIPHER_USEKEYSIZE));
                     request.setAttribute(AbstractEndpoint.KEY_SIZE_KEY, sslO);
 
                     // SSL session ID
