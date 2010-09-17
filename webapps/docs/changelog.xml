@@ -140,7 +140,10 @@
         and Contexts via JMX from a minimal server.xml that contains only a
         Server element. Based on a patch by Chamith Buddhika. (markt)
       </fix>
-      
+      <fix>
+        <bug>49909</bug>: Fix a regression introduced with the fix for
+        <bug>47950</bug> that prevented JSTL classes being loaded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
