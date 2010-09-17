@@ -391,7 +391,6 @@ public class AjpProtocol
                 if (processor == null) {
                     processor = createProcessor();
                 }
-                processor.action(ActionCode.START, null);
 
                 SocketState state = socket.isAsync()?processor.asyncDispatch(status):processor.process(socket);
                 if (state == SocketState.LONG) {
@@ -423,7 +422,6 @@ public class AjpProtocol
                 AjpProtocol.log.error
                     (sm.getString("ajpprotocol.proto.error"), e);
             } finally {
-                processor.action(ActionCode.STOP, null);
                 recycledProcessors.offer(processor);
             }
             return SocketState.CLOSED;
