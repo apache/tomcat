@@ -40,8 +40,6 @@ public enum ActionCode {
 
     CUSTOM,
     RESET,
-    START,
-    STOP,
     WEBAPP,
 
     /**

@@ -396,8 +396,6 @@ public class AjpAprProtocol
                     processor = createProcessor();
                 }
 
-                processor.action(ActionCode.START, null);
-
                 if (processor.process(socket)) {
                     connections.put(Long.valueOf(socket), processor);
                     return SocketState.OPEN;
@@ -427,7 +425,6 @@ public class AjpAprProtocol
                 AjpAprProtocol.log.error
                     (sm.getString("ajpprotocol.proto.error"), e);
             } finally {
-                processor.action(ActionCode.STOP, null);
                 recycledProcessors.offer(processor);
             }
             return SocketState.CLOSED;
