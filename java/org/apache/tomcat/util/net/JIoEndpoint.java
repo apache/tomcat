@@ -193,18 +193,20 @@ public class JIoEndpoint extends AbstractEndpoint {
                             // Ignore
                         }
                     }
-                }catch ( IOException x ) {
-                    if ( running ) log.error(sm.getString("endpoint.accept.fail"), x);
+                } catch (IOException x) {
+                    if (running) {
+                        log.error(sm.getString("endpoint.accept.fail"), x);
+                    }
+                } catch (NullPointerException npe) {
+                    if (running) {
+                        log.error(sm.getString("endpoint.accept.fail"), npe);
+                    }
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
-
                 // The processor will recycle itself when it finishes
-
             }
-
         }
-
     }
 
 
