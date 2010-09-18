@@ -580,6 +580,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Stop the endpoint. This will cause all processing threads to stop.
      */
+    @Override
     public void stop() {
         if (!paused) {
             pause();
@@ -643,6 +644,7 @@ public class NioEndpoint extends AbstractEndpoint {
         return selectorPool;
     }
 
+    @Override
     public boolean getUseSendfile() {
         return useSendfile;
     }
@@ -793,7 +795,8 @@ public class NioEndpoint extends AbstractEndpoint {
                     //TODO FIXME - this is currently a blocking call, meaning we will be blocking
                     //further accepts until there is a thread available.
                     if ( running && (!paused) && socket != null ) {
-                        //processSocket(socket);
+                        // setSocketOptions() will add channel to the poller
+                        // if successful
                         if (!setSocketOptions(socket)) {
                             try {
                                 socket.socket().close();
