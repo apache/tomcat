@@ -31,7 +31,6 @@ public class SocketWrapper<E> {
     protected volatile int keepAliveLeft = 100;
     protected boolean async = false;
     protected boolean keptAlive = false;
-    protected boolean initialized = false;
     public AtomicBoolean processing = new AtomicBoolean(false);
     
     public SocketWrapper(E socket) {
@@ -58,7 +57,4 @@ public class SocketWrapper<E> {
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}
     public void setKeptAlive(boolean keptAlive) {this.keptAlive = keptAlive;}
-    public boolean isInitialized() {return initialized;}
-    public void setInitialized(boolean initialized) {this.initialized = initialized;}
-    
 }
