@@ -17,8 +17,6 @@
 
 package org.apache.tomcat.util.net;
 
-import java.io.OutputStreamWriter;
-import java.net.InetSocketAddress;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
