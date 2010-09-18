@@ -587,59 +587,6 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Unlock the server socket accept using a bogus connection.
-     */
-    @Override
-    protected void unlockAccept() {
-        java.net.Socket s = null;
-        InetSocketAddress saddr = null;
-        try {
-            // Need to create a connection to unlock the accept();
-            if (getAddress() == null) {
-                saddr = new InetSocketAddress("localhost", getPort());
-            } else {
-                saddr = new InetSocketAddress(getAddress(),getPort());
-            }
-            s = new java.net.Socket();
-            s.setSoTimeout(getSocketProperties().getSoTimeout());
-            // TODO Consider hard-coding to s.setSoLinger(true,0)
-            s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-            if (log.isDebugEnabled()) {
-                log.debug("About to unlock socket for:"+saddr);
-            }
-            s.connect(saddr,getSocketProperties().getUnlockTimeout());
-            /*
-             * In the case of a deferred accept / accept filters we need to
-             * send data to wake up the accept. Send OPTIONS * to bypass even
-             * BSD accept filters. The Acceptor will discard it.
-             */
-            if (deferAccept) {
-                OutputStreamWriter sw;
-
-                sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                sw.write("OPTIONS * HTTP/1.0\r\n" +
-                         "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                sw.flush();
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("Socket unlock completed for:"+saddr);
-            }
-        } catch(Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.debug.unlock", "" + getPort()), e);
-            }
-        } finally {
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
-    }
-
-    /**
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     public void stop() {
