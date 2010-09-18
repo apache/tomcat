@@ -196,8 +196,19 @@ public class JIoEndpoint extends AbstractEndpoint {
                 try {
                     // Accept the next incoming connection from the server socket
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
-                    // Hand this socket off to an appropriate processor
-                    if (!processSocket(socket)) {
+                    
+                    // Configure the socket
+                    if (setSocketOptions(socket)) {
+                        // Hand this socket off to an appropriate processor
+                        if (!processSocket(socket)) {
+                            // Close socket right away
+                            try {
+                                socket.close();
+                            } catch (IOException e) {
+                                // Ignore
+                            }
+                        }
+                    } else {
                         // Close socket right away
                         try {
                             socket.close();
@@ -255,11 +266,17 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
                 
                 SocketState state = SocketState.OPEN;
-                // Process the request from this socket
-                if ( (!socket.isInitialized()) && (!setSocketOptions(socket.getSocket())) ) { 
+
+                try {
+                    // SSL handshake
+                    serverSocketFactory.handshake(socket.getSocket());
+                } catch (Throwable t) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("endpoint.err.handshake"), t);
+                    }
+                    // Tell to close the socket
                     state = SocketState.CLOSED;
                 }
-                socket.setInitialized(true);
 
                 if ( (state != SocketState.CLOSED) ) {
                     state = (status==null)?handler.process(socket):handler.process(socket,status);
@@ -448,11 +465,11 @@ public class JIoEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Set the options for the current socket.
+     * Configure the socket.
      */
     protected boolean setSocketOptions(Socket socket) {
-        // Process the connection
-        
+        serverSocketFactory.initSocket(socket);
+
         try {
             // 1: Set socket options: timeout, linger, etc
             socketProperties.setProperties(socket);
@@ -468,25 +485,15 @@ public class JIoEndpoint extends AbstractEndpoint {
             // Close the socket
             return false;
         }
-        try {
-            // 2: SSL handshake
-            serverSocketFactory.handshake(socket);
-        } catch (Throwable t) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.err.handshake"), t);
-            }
-            // Tell to close the socket
-            return false;
-        }
         return true;
     }
 
-    
+
     /**
      * Process given socket.
      */
     protected boolean processSocket(Socket socket) {
-        serverSocketFactory.initSocket(socket);
+        // Process the request from this socket
         try {
             SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
