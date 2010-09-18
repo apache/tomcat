@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.StringTokenizer;
@@ -303,7 +304,8 @@ public abstract class AbstractEndpoint {
     public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
     public int getThreadPriority() { return threadPriority; }
 
-
+    protected abstract boolean getDeferAccept();
+    
     /**
      * Generic properties, introspected
      */
@@ -410,6 +412,19 @@ public abstract class AbstractEndpoint {
                 getLog().debug("About to unlock socket for:"+saddr);
             }
             s.connect(saddr,getSocketProperties().getUnlockTimeout());
+            if (getDeferAccept()) {
+                /*
+                 * In the case of a deferred accept / accept filters we need to
+                 * send data to wake up the accept. Send OPTIONS * to bypass
+                 * even BSD accept filters. The Acceptor will discard it.
+                 */
+                OutputStreamWriter sw;
+
+                sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
+                sw.write("OPTIONS * HTTP/1.0\r\n" +
+                         "User-Agent: Tomcat wakeup connection\r\n\r\n");
+                sw.flush();
+            }
             if (getLog().isDebugEnabled()) {
                 getLog().debug("Socket unlock completed for:"+saddr);
             }
