@@ -953,10 +953,6 @@ public class NioEndpoint extends AbstractEndpoint {
             }
         }
         
-        public void wakeup() {
-            selector.wakeup();
-        }
-
         /**
          * Add specified socket and associated pool to the poller. The socket will
          * be added to a temporary array, and polled first after a maximum amount
