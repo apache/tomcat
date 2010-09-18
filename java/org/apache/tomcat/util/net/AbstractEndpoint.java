@@ -489,11 +489,6 @@ public abstract class AbstractEndpoint {
         return newPath;
     }
     
-    public String defaultIfNull(String val, String defaultValue) {
-        if (val==null) return defaultValue;
-        return val;
-    }
-    
     protected abstract Log getLog();
     public abstract boolean getUseSendfile();
 
