@@ -1542,11 +1542,6 @@ public class AprEndpoint extends AbstractEndpoint {
             this.socket = socket;
             this.async = false;
         }
-        public SocketProcessor(long socket, boolean asyn, SocketStatus status) {
-            this.socket = socket;
-            this.async = asyn;
-            this.status = status;
-        }
 
         public void run() {
 
