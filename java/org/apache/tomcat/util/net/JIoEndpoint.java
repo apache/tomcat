@@ -180,8 +180,11 @@ public class JIoEndpoint extends AbstractEndpoint {
                     }
                 }
 
-                // Accept the next incoming connection from the server socket
+                if (!running) {
+                    break;
+                }
                 try {
+                    // Accept the next incoming connection from the server socket
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
                     serverSocketFactory.initSocket(socket);
                     // Hand this socket off to an appropriate processor
