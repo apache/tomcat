@@ -196,7 +196,6 @@ public class JIoEndpoint extends AbstractEndpoint {
                 try {
                     // Accept the next incoming connection from the server socket
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
-                    serverSocketFactory.initSocket(socket);
                     // Hand this socket off to an appropriate processor
                     if (!processSocket(socket)) {
                         // Close socket right away
@@ -487,6 +486,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      * Process given socket.
      */
     protected boolean processSocket(Socket socket) {
+        serverSocketFactory.initSocket(socket);
         try {
             SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
