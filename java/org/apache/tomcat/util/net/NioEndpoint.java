@@ -761,8 +761,10 @@ public class NioEndpoint extends AbstractEndpoint {
          */
         @Override
         public void run() {
+            
             // Loop until we receive a shutdown command
             while (running) {
+                
                 // Loop if endpoint is paused
                 while (paused && running) {
                     try {
@@ -770,6 +772,10 @@ public class NioEndpoint extends AbstractEndpoint {
                     } catch (InterruptedException e) {
                         // Ignore
                     }
+                }
+
+                if (!running) {
+                    break;
                 }
                 try {
                     // Accept the next incoming connection from the server socket
