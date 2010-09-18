@@ -99,6 +99,16 @@ public class JIoEndpoint extends AbstractEndpoint {
     }
 
 
+    /**
+     * Is deferAccept supported?
+     */
+    @Override
+    public boolean getDeferAccept() {
+        // Not supported
+        return false;
+    }
+
+
     // ------------------------------------------------ Handler Inner Interface
 
     /**

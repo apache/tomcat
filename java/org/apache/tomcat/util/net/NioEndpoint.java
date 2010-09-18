@@ -374,6 +374,15 @@ public class NioEndpoint extends AbstractEndpoint {
         this.useSendfile = useSendfile;
     }
 
+    /**
+     * Is deferAccept supported?
+     */
+    @Override
+    public boolean getDeferAccept() {
+        // Not supported
+        return false;
+    }
+
     public void setOomParachute(int oomParachute) {
         this.oomParachute = oomParachute;
     }
