@@ -240,13 +240,13 @@
       <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
       <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
       <li>The <code>tldNamespaceAware</code> attribute of any
-          <a href="context.html">Context</a> element</li>.
+          <a href="context.html">Context</a> element.</li>
       <li>The <code>tldValidation</code> attribute of any
-          <a href="context.html">Context</a> element</li>.
+          <a href="context.html">Context</a> element.</li>
       <li>The <code>xmlNamespaceAware</code> attribute of any
-          <a href="context.html">Context</a> element</li>.
+          <a href="context.html">Context</a> element.</li>
       <li>The <code>xmlValidation</code> attribute of any
-          <a href="context.html">Context</a> element</li>.
+          <a href="context.html">Context</a> element.</li>
       </ul>
       </p>
       <p>Note that changing a number of the above defaults is likely to break
