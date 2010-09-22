@@ -198,9 +198,9 @@ tens of JARs. On fast servers, this will allow sub-second recompilation cycles
 for even large JSP  pages.</p>
 
 <p>Apache Ant, which was used in previous Tomcat releases, can be used instead
-of the new compiler by simply removing the <code>lib/ecj-*.jar</code> file, 
-and placing the <code>ant.jar</code> file from the latest Ant distribution in
-the <code>lib</code> folder.</p>
+of the new compiler by simply removing the <code>lib/ecj-*.jar</code> file,
+and placing the <code>ant.jar</code> and <code>ant-launcher.jar</code> files
+from the latest Ant distribution in the <code>lib</code> folder.</p>
 
 </section>
 
