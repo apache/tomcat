@@ -37,7 +37,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         if (ctx instanceof StandardContext) {
             ((StandardContext) ctx).setClearReferencesStopTimerThreads(true);

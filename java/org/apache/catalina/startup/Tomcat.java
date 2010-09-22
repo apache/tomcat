@@ -193,7 +193,7 @@ public class Tomcat {
      *  
      * TODO: add the rest
      *
-     *  @param contextPath "/" for root context.
+     *  @param contextPath "" for root context.
      *  @param baseDir base dir for the context, for static files. Must exist, 
      *  relative to the server home
      */
