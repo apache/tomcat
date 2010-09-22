@@ -81,7 +81,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         // Add the Servlet
         CharsetServlet servlet = new CharsetServlet(mode);
