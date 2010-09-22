@@ -124,7 +124,7 @@
         <code>UnsupportedOperationException</code>. (markt)
       </fix>
       <fix>
-        Update the version numbers in ServerInfo defaults to Tomact 7.0.x.
+        Update the version numbers in ServerInfo defaults to Tomcat 7.0.x.
         (markt)
       </fix>
       <fix>
