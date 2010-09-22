@@ -200,8 +200,7 @@ for even large JSP  pages.</p>
 <p>Apache Ant, which was used in previous Tomcat releases, can be used instead
 of the new compiler by simply removing the <code>lib/ecj-*.jar</code> file, 
 and placing the <code>ant.jar</code> file from the latest Ant distribution in
-the <code>lib</code> folder.  If you do this, you also need to use the "javac"
-argument to catalina.sh.</p>
+the <code>lib</code> folder.</p>
 
 </section>
 
