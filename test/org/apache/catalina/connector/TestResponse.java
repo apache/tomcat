@@ -45,7 +45,7 @@ public class TestResponse extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
-        Context ctx = tomcat.addContext("/", docBase.getAbsolutePath());
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "servlet", new Bug49598Servlet());
         ctx.addServletMapping("/", "servlet");

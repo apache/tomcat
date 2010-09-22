@@ -57,7 +57,7 @@ public class TestBug49158 extends CookiesBaseTest {
     public static void addServlets(Tomcat tomcat) {
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, path, new TestBug49158Servlet());
         ctx.addServletMapping("/"+path, path);

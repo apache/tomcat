@@ -77,7 +77,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
             fail("Unable to create foo directory in docBase");
         }
         
-        Context ctx = tomcat.addContext("/", docBase.getAbsolutePath());
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("/", "servlet");
@@ -99,7 +99,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("/", "servlet");

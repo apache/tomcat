@@ -211,7 +211,7 @@ public class TestRequest extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
@@ -255,7 +255,7 @@ public class TestRequest extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         LoginConfig config = new LoginConfig();
         config.setAuthMethod("BASIC");

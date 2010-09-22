@@ -37,7 +37,7 @@ public class TestProxyDirContext extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.setCacheTTL(500);
         tomcat.start();
         

@@ -40,7 +40,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         org.apache.catalina.Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();

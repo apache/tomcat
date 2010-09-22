@@ -36,7 +36,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");      
         // Must have a real docBase - just use temp
         StandardContext ctx = 
-            (StandardContext)tomcat.addContext("/",  appDir.getAbsolutePath());
+            (StandardContext)tomcat.addContext("",  appDir.getAbsolutePath());
 
         VirtualWebappLoader loader = new VirtualWebappLoader();
          
