@@ -183,7 +183,7 @@ public class TestTomcat extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         org.apache.catalina.Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         // You can customize the context by calling 
         // its API
         
@@ -242,7 +242,7 @@ public class TestTomcat extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         org.apache.catalina.Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         
         // You can customise the context by calling its API
         
@@ -272,7 +272,7 @@ public class TestTomcat extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         org.apache.catalina.Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         
         // You can customise the context by calling its API
         

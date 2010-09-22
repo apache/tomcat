@@ -42,7 +42,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Bug49528Servlet servlet = new Bug49528Servlet();
         
@@ -72,7 +72,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Bug49567Servlet servlet = new Bug49567Servlet();
         
@@ -106,7 +106,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         AsyncStartNoCompleteServlet servlet =
             new AsyncStartNoCompleteServlet();
@@ -134,7 +134,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         // Must have a real docBase - just use temp
         Context ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         AsyncStartWithCompleteServlet servlet =
             new AsyncStartWithCompleteServlet();
@@ -324,7 +324,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             fail("Unable to create async directory in docBase");
         }
         
-        Context ctx = tomcat.addContext("/", docBase.getAbsolutePath());
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         TimeoutServlet timeout = new TimeoutServlet();
 
