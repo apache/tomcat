@@ -39,7 +39,7 @@ public class TestStandardContextAliases extends TomcatBaseTest {
 
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctx.setAliases("/WEB-INF/lib=" + lib.getCanonicalPath());
