@@ -29,7 +29,7 @@
     <author email="rjung@apache.org">Rainer Jung</author>
     <author email="kkolinko@apache.org">Konstantin Kolinko</author>
     <author email="pero@apache.org">Peter Rossbach</author>
-    <author email="kfujino@apache.org">Keiichi Fujino</author>    
+    <author email="kfujino@apache.org">Keiichi Fujino</author>
     <title>Changelog</title>
   </properties>
 
@@ -56,7 +56,7 @@
         if it times out. (markt)
       </fix>
       <fix>
-        <bug>49714</bug>: The annotation process of Jar doesn't influence 
+        <bug>49714</bug>: The annotation process of Jar doesn't influence
         distributable element of web.xml. (kfujino)
       </fix>
       <fix>
@@ -86,7 +86,7 @@
         <bug>49779</bug>: Improve handling of POST requests and FORM
         authentication, particularly when the user agent responds to the 302
         response by repeating the POST request including a request body. Any
-        request body provided at this point is now swallowed. (markt)  
+        request body provided at this point is now swallowed. (markt)
       </fix>
       <fix>
         CSRF prevention filter did not correctly handle URLs that used anchors.
@@ -100,7 +100,7 @@
       <update>
         More tweaks to the Lifecycle refactoring to ensure that when a component
         is being destroyed, the destroy method is only called once on each
-        child component. (markt) 
+        child component. (markt)
       </update>
       <update>
         <bug>48967</bug>: Replace strings "catalina.base" and "catalina.home"
@@ -108,7 +108,7 @@
       </update>
       <fix>
         Keep the MBean names for web applications consistent between Tomcat 6
-        and Tomcat 7. (markt) 
+        and Tomcat 7. (markt)
       </fix>
       <fix>
         <bug>49865</bug>: Tomcat failed to start if catalina.properties was not
@@ -116,7 +116,7 @@
       </fix>
       <fix>
         <bug>49876</bug>: Fix the generics warnings in the copied Apache Jakarta
-        BCEL code. Based on a patch by Gábor. (markt) 
+        BCEL code. Based on a patch by Gábor. (markt)
       </fix>
       <fix>
         <bug>49883</bug>: Ensure that the CombinedRealm and LockOutRealm return
@@ -125,7 +125,7 @@
       </fix>
       <fix>
         Update the version numbers in ServerInfo defaults to Tomact 7.0.x.
-        (markt) 
+        (markt)
       </fix>
       <fix>
         <bug>49892</bug>: Correct JNDI name for method resource injections.
@@ -148,6 +148,9 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <update>
+        Wait for the connectors to exit before closing them down. (mturk)
+      </update>
       <add>
         Follow up to <bug>48545</bug>. Make JSSE connectors more tolerant of a
         incorrect trust store password. (markt)
@@ -196,15 +199,15 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
-        Remove domainReplication attribute from ClusterManager. 
-        If you send session to only same domain, use DomainFilterInterceptor. 
+        Remove domainReplication attribute from ClusterManager.
+        If you send session to only same domain, use DomainFilterInterceptor.
         (kfujino)
       </fix>
       <fix>
         Add Null check when CHANGE_SESSION_ID message received. (kfujino)
       </fix>
       <fix>
-        Add support for LAST_ACCESS_AT_START system property to DeltaSession. 
+        Add support for LAST_ACCESS_AT_START system property to DeltaSession.
         (kfujino)
       </fix>
       <fix>
@@ -213,7 +216,7 @@
         message. (markt)
       </fix>
       <fix>
-        <bug>49924</bug>: When non-primary node changes into a primary node, 
+        <bug>49924</bug>: When non-primary node changes into a primary node,
         make sure isPrimarySession is changed to true. (kfujino)
       </fix>
     </changelog>
@@ -249,7 +252,7 @@
         Correct the Eclipse compiler dependency in the Jasper POM. (markt)
       </fix>
       <add>
-        Extend Checkstyle validation checks to check import order. (markt) 
+        Extend Checkstyle validation checks to check import order. (markt)
       </add>
       <fix>
         <bug>49758</bug>: Fix generics warnings exposed by a fix in Eclipse 3.6.
@@ -290,10 +293,10 @@
     <changelog>
       <add>
         Extend Checkstyle validation checks to check for tabs in nearly all text
-        files. (markt) 
+        files. (markt)
       </add>
       <update>
-        Update Commons Daemon from 1.0.2 to 1.0.3.(markt)  
+        Update Commons Daemon from 1.0.2 to 1.0.3.(markt)
       </update>
       <update>
         Update Eclipse JDT Core Batch Compiler (ecj.jar) from 3.5.1 to 3.6.
@@ -318,7 +321,7 @@
         When using a Loader configured with
         <code>searchExternalFirst=&quot;true&quot;</code> failure to find the
         class in an external repository should not prevent searching of the
-        local repositories. (markt) 
+        local repositories. (markt)
       </fix>
       <add>
         Add entryPoint support to the CSRF prevention filter. (markt)
@@ -431,17 +434,17 @@
         configurable. (markt)
       </fix>
       <fix>
-        Avoid NullPointerException, when copyXML=true and META-INF/context.xml 
+        Avoid NullPointerException, when copyXML=true and META-INF/context.xml
         does not exist. (kfujino)
       </fix>
       <fix>
         <bug>49598</bug>: When session is changed and the session cookie is
         replaced, ensure that the new Set-Cookie header overwrites the old
-        Set-Cookie header. (markt) 
+        Set-Cookie header. (markt)
       </fix>
       <fix>
         Create a thread to trigger asynchronous timeouts when using the BIO
-        connector, change the default timeout to 10s (was infinite) and make the 
+        connector, change the default timeout to 10s (was infinite) and make the
         default timeout configurable using the <code>asyncTimeout</code>
         attribute on the connector. (pero/markt)
       </fix>
@@ -570,7 +573,7 @@
       <add>
         Provide the HTML Manager application with the ability to differentiate
         between primary, backup and proxy sessions. Note that proxy sessions are
-        only shown if enabled in web.xml. (markt) 
+        only shown if enabled in web.xml. (markt)
       </add>
     </changelog>
   </subsection>
@@ -630,7 +633,7 @@
       </update>
       <fix>
         <rev>651977</rev> Add some missing control checks to
-        <code>ThreadWithAttributes</code>. (markt) 
+        <code>ThreadWithAttributes</code>. (markt)
       </fix>
       <add>
         <rev>677640</rev> Add a startup class that does not require any
@@ -661,7 +664,7 @@
       </add>
       <add>
         <rev>723889</rev> Provide the ability to configure the Executor job
-        queue size and a timeout for adding jobs to the queue. (fhanik) 
+        queue size and a timeout for adding jobs to the queue. (fhanik)
       </add>
       <add>
         Add support for aliases to StandardContext. This allows content from
@@ -671,7 +674,7 @@
       <update>
         Provide clearer definition of Lifecycle interface, particularly start
         and stop, and align components that implement Lifecycle with this
-        definition. (markt)  
+        definition. (markt)
       </update>
       <add>
         <bug>48662</bug>: Provide a new option to control the copying of context
@@ -782,7 +785,7 @@
       <add>
         A number of additional roles were added to the Manager and Host Manager
         applications to separate out permissions for the HTML interface, the
-        text interface and the JMX proxy. (markt) 
+        text interface and the JMX proxy. (markt)
       </add>
       <add>
         CSRF protection was added to the Manager and Host Manager applications.
