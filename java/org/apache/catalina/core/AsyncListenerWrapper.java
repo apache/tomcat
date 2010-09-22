@@ -30,19 +30,23 @@ public class AsyncListenerWrapper {
 
     private AsyncListener listener = null;
     
+    
+    public void fireOnStartAsync(AsyncEvent event) throws IOException {
+        listener.onStartAsync(event);
+    }
+
+    
     public void fireOnComplete(AsyncEvent event) throws IOException {
-        // TODO SERVLET3 - async
         listener.onComplete(event);
     }
 
 
     public void fireOnTimeout(AsyncEvent event) throws IOException {
-        // TODO SERVLET3 - async 
         listener.onTimeout(event);
     }
+
     
     public void fireOnError(AsyncEvent event) throws IOException {
-        // TODO SERVLET3 - async 
         listener.onError(event);
     }
 
@@ -51,6 +55,7 @@ public class AsyncListenerWrapper {
         return listener;
     }
 
+    
     public void setListener(AsyncListener listener) {
         this.listener = listener;
     }
