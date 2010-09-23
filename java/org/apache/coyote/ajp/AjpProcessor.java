@@ -719,7 +719,7 @@ public class AjpProcessor implements ActionHook {
         // Translate the HTTP method code to a String.
         byte methodCode = requestHeaderMessage.getByte();
         if (methodCode != Constants.SC_M_JK_STORED) {
-            String methodName = Constants.methodTransArray[methodCode - 1];
+            String methodName = Constants.getMethodForCode(methodCode - 1);
             request.method().setString(methodName);
         }
 
@@ -753,7 +753,7 @@ public class AjpProcessor implements ActionHook {
             isc &= 0xFF00;
             if(0xA000 == isc) {
                 requestHeaderMessage.getInt(); // To advance the read position
-                hName = Constants.headerTransArray[hId - 1];
+                hName = Constants.getHeaderForCode(hId - 1);
                 vMB = headers.addValue(hName);
             } else {
                 // reset hId -- if the header currently being read
