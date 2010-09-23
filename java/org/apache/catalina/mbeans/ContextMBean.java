@@ -166,7 +166,7 @@ public class ContextMBean extends ContainerMBean {
      * Return the filter definition for the specified filter name, if any;
      * otherwise return <code>null</code>.
      *
-     * @param filterName Filter name to look up
+     * @param name Filter name to look up
      */
     public String findFilterDef(String name) throws MBeanException {
         
