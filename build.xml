@@ -206,6 +206,7 @@
     <include name="**/*.jsp"/>
     <include name="**/*.jspf"/>
     <include name="**/*.jspx"/>
+    <include name="**/*.launch"/>
     <include name="**/*.license"/>
     <include name="**/*.manifest"/>
     <include name="**/*.mdl"/>
