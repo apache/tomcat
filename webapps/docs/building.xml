@@ -23,7 +23,7 @@
     &project;
 
     <properties>
-      <author>Remy Maucherat</author>
+      <author>Remy Maucherat, Tim Whittington</author>
       <title>Building Tomcat</title>
     </properties>
 
@@ -36,16 +36,17 @@
 <section name="Introduction">
 
 <p>
-Building Apache Tomcat from SVN is very easy, and is the first step to contributing to
-Tomcat. The following is a step by step TODO list.
+Building Apache Tomcat from source is very easy, and is the first step to contributing to
+Tomcat. The following is a step by step guide.
 </p>
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) release (version 1.6.x or later)">
+<section name="Download a Java Development Kit (JDK) 1.6 or later">
 
 <p>
-The Sun JDK can be downloaded
+Tomcat requires a JDK (version 1.6 or later) to be installed.
+<br/>The Sun JDK can be downloaded
 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</a>.
 </p>
 
@@ -66,15 +67,15 @@ Download a binary distribution of Ant 1.8.1 or later from
 <p>
 Unpack the binary distribution into a convenient location so that the
 Ant release resides in its own directory (conventionally named
-"apache-ant-1.8.x").  For the purposes of the remainder of this document,
-the symbolic name "${ant.home}" is used to refer to the full pathname of
- the release directory.
+<code>apache-ant-1.8.x</code>).  For the remainder of this guide,
+the symbolic name <code>${ant.home}</code> is used to refer to the full pathname of
+ the Ant installation directory directory.
 </p>
 
 <p>
-Create an ANT_HOME environment variable to point the directory ${ant.home}, 
+<b>IMPORTANT</b>: Create an ANT_HOME environment variable to point the directory <code>${ant.home}</code>, 
 and modify the PATH environment variable to include directory
-"${ant.home}/bin" in its list.  This makes the "ant" command line script
+<code>${ant.home}/bin</code> in its list.  This makes the <code>ant</code> command line script
 available, which will be used to actually perform the build.
 </p>
 
@@ -83,29 +84,27 @@ available, which will be used to actually perform the build.
 <section name="Checkout or obtain the source code for Tomcat 7.0">
 
   <p>
-  Tomcat SVN repository URL:
-  <code>http://svn.apache.org/repos/asf/tomcat/tc7.0.x/</code>
+  Tomcat SVN repository URL: 
+  <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">http://svn.apache.org/repos/asf/tomcat/trunk/</a>
   </p>
-  
   <p>
-  Download a source package from:
-  <code>http://tomcat.apache.org/download-70.cgi</code>
-  </p>
-  
-  <p>
-  Checkout the source using SVN, selecting the desired version or
-  branch (current development source is at 
-  <code>http://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/</code>), or 
-  unpack the source package. The location where the source has been
-  placed will be referred as ${tomcat.source}.
+  Tomcat source packages: 
+  <a href="http://tomcat.apache.org/download-70.cgi">http://tomcat.apache.org/download-70.cgi</a>.
   </p>
 
+  <p>
+  Checkout the source using SVN, or download and unpack a source package. 
+  For the remainder of this guide, the symbolic name <code>${tomcat.source}</code> is used to refer to the 
+  location where the source has been placed.
+  </p>
+ 
 </section>
 
 <section name="Building Tomcat">
 
 <p>
-Use the following commands:
+Use the following commands to build Tomcat:
+<br/>
 <code><br/>
     cd ${tomcat.source}<br/>
     ant<br/>
@@ -113,13 +112,13 @@ Use the following commands:
 </p>
 
 <p>
-NOTE: Users accessing the Internet through a proxy must use a properties
-  file to indicate to Ant the proxy configuration. Read below.
+<b>NOTE:</b> Users accessing the Internet through a proxy must use a properties
+  file to indicate to Ant the proxy configuration. Read below for details.
 </p>
 
 <p>
-WARNING: Running this command will download binaries to the 
-  <code>/usr/share/java</code> directory. 
+<b>WARNING:</b> Running this command will download binary binaries to the 
+  <code>/usr/share/java</code> directory by default. 
   Make sure this is appropriate to do so on your computer. On Windows, 
   this usually corresponds to the <code>C:\usr\share\java</code> directory, 
   unless Cygwin is used. Read below to customize the directory used 
@@ -127,8 +126,9 @@ WARNING: Running this command will download binaries to the
 </p>
 
 <p>
-The build can be controlled by creating a ${tomcat.source}/build.properties
-  file, and adding the following content to it:
+  The build can be controlled by creating a <code>${tomcat.source}/build.properties</code>
+  file and adding the following content to it:
+<br/>
 <code><br/>
     # ----- Proxy setup -----<br/>
     # Uncomment if using a proxy server.<br/>
@@ -143,84 +143,96 @@ The build can be controlled by creating a ${tomcat.source}/build.properties
 </code>
 </p>
 
+<p>
+Once the build has completed successfully, a usable Tomcat installation will have been
+produced in the <code>${tomcat.source}/output/build</code> directory, and can be started
+and stopped with the usual scripts.
+</p>
 </section>
 
 <section name="Building with Eclipse">
 
 <p>
-<b>Important:</b>
-This is not a supported means of building Tomcat; this information is
+<b>IMPORTANT:</b> This is not a supported means of building Tomcat; this information is
 provided without warranty :-).
-The only supported means of building Tomcat is with the "ant build"
-described above.
+The only supported means of building Tomcat is with the Ant build described above.
 However, some developers like to work on Java code with a Java IDE,
 and the following steps have been used by some developers.
 </p>
 
 <p>
-Note that you <b>must</b> complete all the above steps to fetch
-the repositories and build some JAR files the first time.
-After you have completed the above steps, you can set up a
-series of Eclipse 4 projects.
-<b>Note</b> that this will not let you build everything under Eclipse;
+<b>NOTE:</b> You <b>must</b> complete all the above steps to fetch
+dependency libraries and build Tomcat before you can setup an Eclipse project and start
+using it.
+</p>
+<p>
+<b>NOTE:</b> This will not let you build everything under Eclipse;
 the build process requires use of Ant for the many stages that aren't
 simple Java compilations.
 However, it will allow you to view and edit the Java code,
 get warnings, reformat code, perform refactorings, run Tomcat
 under the IDE, and so on.
 </p>
+<p>
+Complete the download of all third party dependencies required to compile the Tomcat
+source in Eclipse:
+<br/>
+<code><br/>
+    cd ${tomcat.source}<br/>
+    ant extras<br/>
+</code>
+</p>
+<p>
+Sample Eclipse project and classpath files are provided in the root directory of the source tree.
+The sample files are named <code>eclipse.project</code> and <code>eclipse.classpath</code>, and must
+be copied to <code>.project</code> and <code>.classpath</code> respectively before proceeding.
+</p>
 
 <p>
-Use Windows-&gt;Preferences and then Java-&gt;Build Path-&gt;Classpath
-Variables to add two new Classpath variables:
+Start Eclipse and create a new Workspace.
+</p>
+
+<p>
+Open the <em>Preferences</em> dialog and then select <em>Java-&gt;Build Path-&gt;Classpath
+Variables</em> to add two new <em>Classpath Variables</em>:
 </p>
 
 <p>
 <table border="1">
- <tr><td>TOMCAT_LIBS_BASE</td><td>the base path where the binary dependencies have been downloaded</td></tr>
+ <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
+  setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
  <tr><td>ANT_HOME</td><td>the base path of Ant 1.8.1 or later</td></tr>
 </table>
 </p>
 
 <p>
-Use File-&gt;Import and chose &quot;Existing Projects into Workspace&quot;.
-From there import the root directory where you have checked out tomcat.
+Use <em>File-&gt;Import</em> and choose <em>Existing Projects into Workspace</em>.
+From there choose the root directory of the Tomcat source tree (<code>${tomcat.source}</code>)
+and import the Tomcat project located there.
 </p>
 
 <p>
-Eclipse .project and .classpath files are provided in to root directory of tomcat repository
-should allow Eclipse to find all source trees and jars, and
-hopefully compile without problems. <b>Note</b> that these
-files assume you are using Eclipse with a 6.0 or later JDK.
+You may see errors in your problems tab at this point about missing build path dependencies.
+If this happens you have forgotten to execute the <code>ant extras</code> build to download 
+these dependencies.
 </p>
 
 <p>
-To run Tomcat without a special IDE plug-in, you can simply use Run-&gt;Run...
-enter "org.apache.catalina.startup.Catalina" as the main class,
-"start" as program arguments, and
-"-Dcatalina.home=..." (with the name of your build directory) 
-as VM arguments.
-</p>
-
-<p>
-Note also that due to the way the Tomcat source is assembled
-from several SVN projects, you may not be able to use the Eclipse
-SVN client to update (nor to commit, if you are a committer).
-Use the external SVN client of your choice, then use the
-Eclipse PackageExplorer or Navigator "Refresh" context menu item
-to tell Eclipse that you've updated the files.
+<code>Start Tomcat</code> and <code>Stop Tomcat</code> launch configurations are provided in the
+root directory of the source tree and will be available in the <em>Run-&gt;Run Configurations</em>
+dialog. Use these to start and stop Tomcat from Eclipse. 
+<br/>If you want to configure these yourself (or are using a different IDE) 
+then use <code>org.apache.catalina.startup.Catalina</code> as the main class,
+<code>start</code>/<code>stop</code> as program arguments, and specify <code>-Dcatalina.home=...</code> 
+(with the name of your build directory) as VM arguments.
 </p>
 
 </section>
 
 <section name="Building with other IDEs">
 <p>
-The same caveats apply as for Eclipse, above.
-</p>
-
-<p>
-The same general idea should work in most IDEs; it has been reported
-to work in Idea, for example.
+The same general approach should work for most IDEs; it has been reported
+to work in IntelliJ IDEA, for example.
 </p>
 
 </section>
