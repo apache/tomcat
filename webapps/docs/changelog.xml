@@ -30,6 +30,7 @@
     <author email="kkolinko@apache.org">Konstantin Kolinko</author>
     <author email="pero@apache.org">Peter Rossbach</author>
     <author email="kfujino@apache.org">Keiichi Fujino</author>
+    <author email="timw@apache.org">Tim Whittington</author>    
     <title>Changelog</title>
   </properties>
 
@@ -260,6 +261,10 @@
       </fix>
       <update>
         Update commons pool to 1.5.5. (markt)
+      </update>
+      <update>
+        <bug>49955</bug>: Improvement and correction of Building Tomcat guide.
+        Based on a patch from Wesley Acheson. (timw)
       </update>
     </changelog>
   </subsection>
