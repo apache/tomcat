@@ -120,7 +120,7 @@ public final class Constants {
     public static final int  MAX_SEND_SIZE = MAX_PACKET_SIZE - SEND_HEAD_LEN;
 
     // Translates integer codes to names of HTTP methods
-    public static final String []methodTransArray = {
+    private static final String [] methodTransArray = {
             "OPTIONS",
             "GET",
             "HEAD",
@@ -149,6 +149,16 @@ public final class Constants {
             "BASELINE-CONTROL",
             "MKACTIVITY"
     };
+    
+    /**
+     * Converts an AJP coded HTTP method to the method name.
+     * @param code the coded value
+     * @return the string value of the method
+     */
+	public static final String getMethodForCode(final int code) {
+		return methodTransArray[code];
+	}
+
     public static final int SC_M_JK_STORED = (byte) 0xFF;
 
     // id's for common request headers
@@ -170,7 +180,7 @@ public final class Constants {
     public static final byte SC_A_SSL_KEY_SIZE  = 11; // XXX ???
 
     // Translates integer codes to request header names
-    public static final String []headerTransArray = {
+    private static final String [] headerTransArray = {
             "accept",
             "accept-charset",
             "accept-encoding",
@@ -187,8 +197,17 @@ public final class Constants {
             "user-agent"
     };
 
+    /**
+     * Converts an AJP coded HTTP request header to the header name.
+     * @param code the coded value
+     * @return the string value of the header name
+     */
+	public static final String getHeaderForCode(final int code) {
+		return headerTransArray[code];
+	}
+
     // Translates integer codes to response header names
-    public static final String []responseTransArray = {
+    private static final String [] responseTransArray = {
             "Content-Type",
             "Content-Language",
             "Content-Length",
@@ -201,6 +220,15 @@ public final class Constants {
             "Status",
             "WWW-Authenticate"
     };
+    
+    /**
+     * Converts an AJP coded response header name to the HTTP response header name.
+     * @param code the coded value
+     * @return the string value of the header
+     */
+	public static final String getResponseHeaderForCode(final int code) {
+		return responseTransArray[code];
+	}
 
     private static final Hashtable<String,Integer>  responseTransHash =
         new Hashtable<String,Integer>(20);
@@ -209,7 +237,7 @@ public final class Constants {
         try {
             int i;
             for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
-                responseTransHash.put(responseTransArray[i],
+                responseTransHash.put(getResponseHeaderForCode(i),
                                       new Integer(0xA001 + i));
             }
         }
