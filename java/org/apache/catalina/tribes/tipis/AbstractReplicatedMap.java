@@ -144,6 +144,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 //------------------------------------------------------------------------------
     
     public static interface MapOwner {
+        // a typo, should have been "objectMadePrimary"
         public void objectMadePrimay(Object key, Object value);
     }
 
