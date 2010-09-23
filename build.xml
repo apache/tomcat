@@ -599,7 +599,7 @@
 
   </target>
 
-  <target name="build-docs">
+  <target name="build-docs" description="Builds all documentation from XML sources">
 
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
