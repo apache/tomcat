@@ -74,6 +74,7 @@
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
+  <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
 
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
@@ -970,7 +971,7 @@
   
   <target name="test-apr-exists" description="Checks for APR lib"
           if="${execute.test.apr}">
-    <available file="${tomcat.build}/bin/native" property="apr.exists" />
+    <available file="${test.apr.loc}" property="apr.exists" />
   </target>
 
   <macrodef name="runtests"
@@ -983,7 +984,7 @@
     <sequential>
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
 
-        <jvmarg value="-Djava.library.path=${tomcat.build}/bin/native"/>
+        <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
 
         <classpath refid="tomcat.test.classpath" />
 
