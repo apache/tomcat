@@ -172,7 +172,7 @@ public class ContainerMBean extends BaseModelMBean {
     /**
      * Remove an existing Valve.
      *
-     * @param name MBean Name of the component to remove
+     * @param valveName MBean Name of the Valve to remove
      *
      * @exception MBeanException if a component cannot be removed
      */
@@ -242,7 +242,7 @@ public class ContainerMBean extends BaseModelMBean {
     /**
      * Remove a LifecycleEvent listeners from this component.
      *
-     * @param listener The ClassName of the listeners to be removed. 
+     * @param type The ClassName of the listeners to be removed. 
      * Note that all the listeners having given ClassName will be removed. 
      */
     public void removeLifeCycleListeners(String type) throws MBeanException{
