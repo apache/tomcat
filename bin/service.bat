@@ -44,12 +44,30 @@ echo The tomcat.exe was not found...
 echo The CATALINA_HOME environment variable is not defined correctly.
 echo This environment variable is needed to run this program
 goto end
-rem Make sure prerequisite environment variables are set
-if not "%JAVA_HOME%" == "" goto okHome
-echo The JAVA_HOME environment variable is not defined
-echo This environment variable is needed to run this program
-goto end
 :okHome
+rem Make sure prerequisite environment variables are set
+if not "%JAVA_HOME%" == "" goto gotJdkHome
+if not "%JRE_HOME%" == "" goto gotJreHome
+echo Neither the JAVA_HOME nor the JRE_HOME environment variable is defined
+echo Service will try to guess them from the registry.
+goto okJavaHome
+:gotJreHome
+if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
+if not exist "%JRE_HOME%\bin\javaw.exe" goto noJavaHome
+goto okJavaHome
+:gotJdkHome
+if not exist "%JAVA_HOME%\jre\bin\java.exe" goto noJavaHome
+if not exist "%JAVA_HOME%\jre\bin\javaw.exe" goto noJavaHome
+if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
+if not "%JRE_HOME%" == "" goto okJavaHome
+set "JRE_HOME=%JAVA_HOME%\jre"
+goto okJavaHome
+:noJavaHome
+echo The JAVA_HOME environment variable is not defined correctly
+echo This environment variable is needed to run this program
+echo NB: JAVA_HOME should point to a JDK not a JRE
+goto end
+:okJavaHome
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
@@ -105,6 +123,7 @@ echo Installing the service '%SERVICE_NAME%' ...
 echo Using CATALINA_HOME:    "%CATALINA_HOME%"
 echo Using CATALINA_BASE:    "%CATALINA_BASE%"
 echo Using JAVA_HOME:        "%JAVA_HOME%"
+echo Using JRE_HOME:         "%JRE_HOME%"
 
 rem Use the environment variables as an example
 rem Each command line option is prefixed with PR_
@@ -114,10 +133,10 @@ set "PR_INSTALL=%EXECUTABLE%"
 set "PR_LOGPATH=%CATALINA_BASE%\logs"
 set "PR_CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_BASE%\bin\tomcat-juli.jar;%CATALINA_HOME%\bin\tomcat-juli.jar"
 rem Set the server jvm from JAVA_HOME
-set "PR_JVM=%JAVA_HOME%\jre\bin\server\jvm.dll"
+set "PR_JVM=%JRE_HOME%\bin\server\jvm.dll"
 if exist "%PR_JVM%" goto foundJvm
 rem Set the client jvm from JAVA_HOME
-set "PR_JVM=%JAVA_HOME%\jre\bin\client\jvm.dll"
+set "PR_JVM=%JRE_HOME%\bin\client\jvm.dll"
 if exist "%PR_JVM%" goto foundJvm
 set PR_JVM=auto
 :foundJvm
