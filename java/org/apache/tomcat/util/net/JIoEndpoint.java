@@ -524,9 +524,23 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
     }
     
+    
+    /**
+     * Process an existing async connection. If processing is required, passes
+     * the wrapped socket to an executor for processing.
+     * 
+     * @param socket    The socket associated with the client.
+     * @param status    Only OPEN and TIMEOUT are used. The others are used for
+     *                  Comet requests that are not supported by the BIO (JIO)
+     *                  Connector.
+     * @return          <code>true</code> if the socket is passed to the
+     *                  executor, <code>false</code> if something went wrong.
+     *                  Returning <code>false</code> is an indication to close
+     *                  the socket immediately.
+     */
     public boolean processSocket(SocketWrapper<Socket> socket, SocketStatus status) {
         try {
-            if (status == SocketStatus.OPEN || status == SocketStatus.STOP || status == SocketStatus.TIMEOUT) {
+            if (status == SocketStatus.OPEN || status == SocketStatus.TIMEOUT) {
                 if (waitingRequests.remove(socket)) {
                     SocketProcessor proc = new SocketProcessor(socket,status);
                     ClassLoader loader = Thread.currentThread().getContextClassLoader();
