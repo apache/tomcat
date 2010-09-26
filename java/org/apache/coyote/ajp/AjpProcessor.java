@@ -660,7 +660,7 @@ public class AjpProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
                 dispatch.set(true);
-                endpoint.processSocket(this.socket, SocketStatus.STOP);
+                endpoint.processSocket(this.socket, SocketStatus.OPEN);
             } else {
                 dispatch.set(false);
             }
