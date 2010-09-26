@@ -508,11 +508,10 @@ public class JIoEndpoint extends AbstractEndpoint {
             SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
             // During shutdown, executor may be null - avoid NPE
-            if (running) {
-                getExecutor().execute(new SocketProcessor(wrapper));
-                return true;
+            if (!running) {
+                return false;
             }
-            return false;
+            getExecutor().execute(new SocketProcessor(wrapper));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -522,6 +521,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             log.error(sm.getString("endpoint.process.fail"), t);
             return false;
         }
+        return true;
     }
     
     
@@ -552,6 +552,10 @@ public class JIoEndpoint extends AbstractEndpoint {
                     } else {
                         Thread.currentThread().setContextClassLoader(
                                 getClass().getClassLoader());
+                    }
+                    // During shutdown, executor may be null - avoid NPE
+                    if (!running) {
+                        return false;
                     }
                     getExecutor().execute(proc);
                 }finally {
