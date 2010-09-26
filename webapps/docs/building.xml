@@ -222,7 +222,7 @@ these dependencies.
 root directory of the source tree and will be available in the <em>Run-&gt;Run Configurations</em>
 dialog. Use these to start and stop Tomcat from Eclipse. 
 <br/>If you want to configure these yourself (or are using a different IDE) 
-then use <code>org.apache.catalina.startup.Catalina</code> as the main class,
+then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
 <code>start</code>/<code>stop</code> as program arguments, and specify <code>-Dcatalina.home=...</code> 
 (with the name of your build directory) as VM arguments.
 </p>
