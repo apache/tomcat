@@ -129,6 +129,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Cache for SocketProcessor objects
      */
     protected ConcurrentLinkedQueue<SocketProcessor> processorCache = new ConcurrentLinkedQueue<SocketProcessor>() {
+        private static final long serialVersionUID = 1L;
         protected AtomicInteger size = new AtomicInteger(0);
         @Override
         public boolean offer(SocketProcessor sc) {
@@ -166,6 +167,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Cache for key attachment objects
      */
     protected ConcurrentLinkedQueue<KeyAttachment> keyCache = new ConcurrentLinkedQueue<KeyAttachment>() {
+        private static final long serialVersionUID = 1L;
         protected AtomicInteger size = new AtomicInteger(0);
         @Override
         public boolean offer(KeyAttachment ka) {
@@ -203,6 +205,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Cache for poller events
      */
     protected ConcurrentLinkedQueue<PollerEvent> eventCache = new ConcurrentLinkedQueue<PollerEvent>() {
+        private static final long serialVersionUID = 1L;
         protected AtomicInteger size = new AtomicInteger(0);
         @Override
         public boolean offer(PollerEvent pe) {
@@ -240,6 +243,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
+        private static final long serialVersionUID = 1L;
         protected AtomicInteger size = new AtomicInteger(0);
         protected AtomicInteger bytes = new AtomicInteger(0);
         @Override
@@ -857,6 +861,7 @@ public class NioEndpoint extends AbstractEndpoint {
             reset(null, null, 0);
         }
     
+        @Override
         public void run() {
             if ( interestOps == OP_REGISTER ) {
                 try {
@@ -1039,6 +1044,7 @@ public class NioEndpoint extends AbstractEndpoint {
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
          */
+        @Override
         public void run() {
             // Loop until we receive a shutdown command
             while (running) {
@@ -1436,8 +1442,11 @@ public class NioEndpoint extends AbstractEndpoint {
             }
         }
         
+        @Override
         public ByteBuffer expand(ByteBuffer buffer, int remaining) {return buffer;}
+        @Override
         public ByteBuffer getReadBuffer() {return readbuf;}
+        @Override
         public ByteBuffer getWriteBuffer() {return writebuf;}
 
     }
@@ -1478,6 +1487,7 @@ public class NioEndpoint extends AbstractEndpoint {
             this.status = status;
         }
          
+        @Override
         public void run() {
             SelectionKey key = null;
             try {
