@@ -43,8 +43,6 @@ public class NioSelectorPool {
     public NioSelectorPool() {
     }
     
-    protected static int threadCount = 0;
-    
     private static final Log log = LogFactory.getLog(NioSelectorPool.class);
 
     protected final static boolean SHARED =
