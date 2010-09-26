@@ -93,7 +93,6 @@ public abstract class AbstractEndpoint {
     public static final String SSL_ATTR_KEYSTORE_PROVIDER = "keystoreProvider";
     public static final String SSL_ATTR_SSL_PROTOCOL = "sslProtocol";
     public static final String SSL_ATTR_CIPHERS = "ciphers";
-    public static final String SSL_ATTR_CIPHERS_ARRAY = "ciphersArray";
     public static final String SSL_ATTR_KEY_ALIAS = "keyAlias";
     public static final String SSL_ATTR_KEY_PASS = "keyPass";
     public static final String SSL_ATTR_TRUSTSTORE_FILE = "truststoreFile";
