@@ -490,7 +490,17 @@ public class JIoEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Process given socket.
+     * Process a new connection from a new client. Wraps the socket so
+     * keep-alive and other attributes can be tracked and then passes the socket
+     * to the executor for processing.
+     * 
+     * @param socket    The socket associated with the client.
+     * 
+     * @return          <code>true</code> if the socket is passed to the
+     *                  executor, <code>false</code> if something went wrong or
+     *                  if the endpoint is shutting down. Returning
+     *                  <code>false</code> is an indication to close the socket
+     *                  immediately.
      */
     protected boolean processSocket(Socket socket) {
         // Process the request from this socket
@@ -500,7 +510,9 @@ public class JIoEndpoint extends AbstractEndpoint {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
                 getExecutor().execute(new SocketProcessor(wrapper));
+                return true;
             }
+            return false;
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -510,7 +522,6 @@ public class JIoEndpoint extends AbstractEndpoint {
             log.error(sm.getString("endpoint.process.fail"), t);
             return false;
         }
-        return true;
     }
     
     public boolean processSocket(SocketWrapper<Socket> socket, SocketStatus status) {
