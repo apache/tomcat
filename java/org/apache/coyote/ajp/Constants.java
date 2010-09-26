@@ -155,9 +155,9 @@ public final class Constants {
      * @param code the coded value
      * @return the string value of the method
      */
-	public static final String getMethodForCode(final int code) {
-		return methodTransArray[code];
-	}
+    public static final String getMethodForCode(final int code) {
+        return methodTransArray[code];
+    }
 
     public static final int SC_M_JK_STORED = (byte) 0xFF;
 
@@ -202,9 +202,9 @@ public final class Constants {
      * @param code the coded value
      * @return the string value of the header name
      */
-	public static final String getHeaderForCode(final int code) {
-		return headerTransArray[code];
-	}
+    public static final String getHeaderForCode(final int code) {
+        return headerTransArray[code];
+    }
 
     // Translates integer codes to response header names
     private static final String [] responseTransArray = {
@@ -226,9 +226,9 @@ public final class Constants {
      * @param code the coded value
      * @return the string value of the header
      */
-	public static final String getResponseHeaderForCode(final int code) {
-		return responseTransArray[code];
-	}
+    public static final String getResponseHeaderForCode(final int code) {
+        return responseTransArray[code];
+    }
 
     private static final Hashtable<String,Integer>  responseTransHash =
         new Hashtable<String,Integer>(20);
