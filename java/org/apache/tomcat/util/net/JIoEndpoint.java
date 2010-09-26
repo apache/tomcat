@@ -540,28 +540,26 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     public boolean processSocket(SocketWrapper<Socket> socket, SocketStatus status) {
         try {
-            if (status == SocketStatus.OPEN || status == SocketStatus.TIMEOUT) {
-                if (waitingRequests.remove(socket)) {
-                    SocketProcessor proc = new SocketProcessor(socket,status);
-                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                    try {
-                        //threads should not be created by the webapp classloader
-                        if (Globals.IS_SECURITY_ENABLED) {
-                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                    getClass().getClassLoader());
-                            AccessController.doPrivileged(pa);
-                        } else {
-                            Thread.currentThread().setContextClassLoader(
-                                    getClass().getClassLoader());
-                        }
-                        getExecutor().execute(proc);
-                    }finally {
-                        if (Globals.IS_SECURITY_ENABLED) {
-                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                            AccessController.doPrivileged(pa);
-                        } else {
-                            Thread.currentThread().setContextClassLoader(loader);
-                        }
+            if (waitingRequests.remove(socket)) {
+                SocketProcessor proc = new SocketProcessor(socket,status);
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                try {
+                    //threads should not be created by the webapp classloader
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                getClass().getClassLoader());
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(
+                                getClass().getClassLoader());
+                    }
+                    getExecutor().execute(proc);
+                }finally {
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(loader);
                     }
                 }
             }
