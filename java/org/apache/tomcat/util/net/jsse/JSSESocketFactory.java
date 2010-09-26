@@ -83,7 +83,6 @@ public class JSSESocketFactory
 
     // Defaults - made public where re-used
     static String defaultProtocol = "TLS";
-    static boolean defaultClientAuth = false;
     static String defaultKeystoreType = "JKS";
     private static final String defaultKeystoreFile
         = System.getProperty("user.home") + "/.keystore";
@@ -96,7 +95,6 @@ public class JSSESocketFactory
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
 
     protected boolean initialized;
-    protected String clientAuth = "false";
     protected SSLServerSocketFactory sslProxy = null;
     protected String[] enabledCiphers;
     protected boolean allowUnsafeLegacyRenegotiation = false;
