@@ -36,6 +36,7 @@ import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.ExecutorFactory;
+import org.apache.jasper.util.ExceptionUtils;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -420,7 +421,8 @@ public class McastServiceImpl
                                 if (data[i]!=null && !member.equals(data[i].getAddress())) {
                                     msgservice.messageReceived(data[i]);
                                 }
-                            }catch (Throwable t) {
+                            } catch (Throwable t) {
+                                ExceptionUtils.handleThrowable(t);
                                 log.error("Unable to receive broadcast message.",t);
                             }
                         }
