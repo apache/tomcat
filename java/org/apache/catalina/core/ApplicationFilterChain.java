@@ -40,6 +40,7 @@ import org.apache.catalina.comet.CometFilterChain;
 import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -259,6 +260,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                               filter, request, response, e);
                 throw e;
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 if (filter != null)
                     support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
                                               filter, request, response, e);
@@ -319,6 +321,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                       servlet, request, response, e);
             throw e;
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
                                       servlet, request, response, e);
             throw new ServletException
@@ -448,6 +451,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                             */
                 throw e;
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 /*if (filter != null)
                     support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
                             filter, event, e);*/
@@ -499,6 +503,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                     */
             throw e;
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             /*
             support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
                     servlet, request, response, e);

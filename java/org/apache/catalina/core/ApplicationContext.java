@@ -72,6 +72,7 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -281,6 +282,7 @@ public class ApplicationContext
                 mapuri = mapuri.substring(0, slash);
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             return (null);
         }
 
@@ -769,6 +771,7 @@ public class ApplicationContext
                 context.fireContainerEvent("afterContextAttributeRemoved",
                                            listener);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 context.fireContainerEvent("afterContextAttributeRemoved",
                                            listener);
                 // FIXME - should we do anything besides log these?
@@ -845,6 +848,7 @@ public class ApplicationContext
                                                listener);
                 }
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (replaced)
                     context.fireContainerEvent("afterContextAttributeReplaced",
                                                listener);

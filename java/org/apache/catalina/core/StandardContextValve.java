@@ -34,6 +34,7 @@ import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -187,6 +188,7 @@ final class StandardContextValve
                         listener.requestInitialized(event);
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
                                      instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
@@ -216,6 +218,7 @@ final class StandardContextValve
                         listener.requestDestroyed(event);
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
                                      instances[j].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();

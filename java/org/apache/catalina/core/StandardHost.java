@@ -35,6 +35,7 @@ import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.jasper.util.ExceptionUtils;
 
 
 /**
@@ -763,6 +764,7 @@ public class StandardHost extends ContainerBase implements Host {
                     getPipeline().addValve(valve);
                 }
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString
                     ("standardHost.invalidErrorReportValveClass", 
                      errorReportValveClass), t);

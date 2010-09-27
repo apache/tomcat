@@ -36,6 +36,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.coyote.ActionCode;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -322,6 +323,7 @@ public class FormAuthenticator
         try {
             disp.forward(request.getRequest(), response);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             String msg = sm.getString("formAuthenticator.forwardLoginFail");
             log.warn(msg, t);
             request.setAttribute(Globals.EXCEPTION_ATTR, t);
@@ -351,6 +353,7 @@ public class FormAuthenticator
         try {
             disp.forward(request.getRequest(), response);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             String msg = sm.getString("formAuthenticator.forwardErrorFail");
             log.warn(msg, t);
             request.setAttribute(Globals.EXCEPTION_ATTR, t);
