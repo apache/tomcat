@@ -39,6 +39,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
+import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
@@ -723,6 +724,7 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             if (log.isDebugEnabled()) {
                 if (step == 2) {
                     log.debug(sm.getString("endpoint.err.handshake"), t);
@@ -770,6 +772,7 @@ public class AprEndpoint extends AbstractEndpoint {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -791,6 +794,7 @@ public class AprEndpoint extends AbstractEndpoint {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -834,6 +838,7 @@ public class AprEndpoint extends AbstractEndpoint {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -873,6 +878,7 @@ public class AprEndpoint extends AbstractEndpoint {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -945,6 +951,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         destroySocket(socket);
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     if (running) log.error(sm.getString("endpoint.accept.fail"), t);
                 }
 
@@ -1230,6 +1237,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         }
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.poll.error"), t);
                 }
 
@@ -1560,6 +1568,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         }
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.poll.error"), t);
                 }
             }

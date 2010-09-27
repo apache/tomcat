@@ -17,6 +17,8 @@
 
 package org.apache.tomcat.jni;
 
+import org.apache.tomcat.util.ExceptionUtils;
+
 /** Library
  *
  * @author Mladen Turk
@@ -43,6 +45,7 @@ public final class Library {
                 loaded = true;
             }
             catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 String name = System.mapLibraryName(NAMES[i]);
                 String path = System.getProperty("java.library.path");
                 String sep = System.getProperty("path.separator");
