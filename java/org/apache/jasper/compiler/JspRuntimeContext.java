@@ -40,6 +40,7 @@ import org.apache.jasper.Options;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.util.JspQueue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -338,6 +339,7 @@ public final class JspRuntimeContext {
                 } catch (FileNotFoundException ex) {
                     ctxt.incrementRemoved();
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     jsw.getServletContext().log("Background compile failed",
                                                 t);
                 }
