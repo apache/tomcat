@@ -47,6 +47,7 @@ import javax.xml.ws.WebServiceRef;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -409,7 +410,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 return clazz;
             }
         } catch (Throwable t) {
-            //ignore
+            ExceptionUtils.handleThrowable(t);
         }
         return classLoader.loadClass(className);
     }

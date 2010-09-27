@@ -51,6 +51,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.ProxyDirContext;
@@ -1382,6 +1383,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 }
                 container.backgroundProcess();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error("Exception invoking periodic operation: ", t);
             } finally {
                 Thread.currentThread().setContextClassLoader(cl);

@@ -823,6 +823,7 @@ public class StandardWrapper extends ContainerBase
                         } catch (ServletException e) {
                             throw e;
                         } catch (Throwable e) {
+                            ExceptionUtils.handleThrowable(e);
                             throw new ServletException
                                 (sm.getString("standardWrapper.allocate"), e);
                         }
@@ -857,6 +858,7 @@ public class StandardWrapper extends ContainerBase
                     } catch (ServletException e) {
                         throw e;
                     } catch (Throwable e) {
+                        ExceptionUtils.handleThrowable(e);
                         throw new ServletException
                             (sm.getString("standardWrapper.allocate"), e);
                     }
@@ -1083,6 +1085,7 @@ public class StandardWrapper extends ContainerBase
                 throw new ServletException
                     (sm.getString("standardWrapper.notServlet", actualClass), e);
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 unavailable(null);
 
                 // Added extra log statement for Bugzilla 36630:
@@ -1198,6 +1201,7 @@ public class StandardWrapper extends ContainerBase
             // said so, so do not call unavailable(null).
             throw f;
         } catch (Throwable f) {
+            ExceptionUtils.handleThrowable(f);
             getServletContext().log("StandardWrapper.Throwable", f );
             instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
                                               servlet, f);
@@ -1371,6 +1375,7 @@ public class StandardWrapper extends ContainerBase
             }
 
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             instanceSupport.fireInstanceEvent
               (InstanceEvent.AFTER_DESTROY_EVENT, instance, t);
             instance = null;
@@ -1418,6 +1423,7 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 instancePool = null;
                 nInstances = 0;
                 unloading = false;
@@ -1613,6 +1619,7 @@ public class StandardWrapper extends ContainerBase
                 this.getClass().getClassLoader().loadClass(classname);
             return (ContainerServlet.class.isAssignableFrom(clazz));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             return (false);
         }
 

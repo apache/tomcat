@@ -47,6 +47,7 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.InstanceSupport;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -647,6 +648,7 @@ final class ApplicationDispatcher
                              wrapper.getName()), StandardWrapper.getRootCause(e));
             servletException = e;
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException",
                              wrapper.getName()), e);
             servletException = new ServletException
@@ -721,6 +723,7 @@ final class ApplicationDispatcher
             if (filterChain != null)
                 filterChain.release();
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
                              wrapper.getName()), e);
             // FIXME: Exception handling needs to be similar to what is in the StandardWrapperValue
@@ -736,6 +739,7 @@ final class ApplicationDispatcher
                              wrapper.getName()), e);
             servletException = e;
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             wrapper.getLogger().error(sm.getString("applicationDispatcher.deallocateException",
                              wrapper.getName()), e);
             servletException = new ServletException

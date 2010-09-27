@@ -34,6 +34,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -233,6 +234,7 @@ public class CoyoteAdapter implements Adapter {
             }
             return (!error);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             if (!(t instanceof IOException)) {
                 log.error(sm.getString("coyoteAdapter.service"), t);
             }
@@ -306,6 +308,7 @@ public class CoyoteAdapter implements Adapter {
             success = false;
             // Ignore
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             success = false;
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
@@ -406,6 +409,7 @@ public class CoyoteAdapter implements Adapter {
         } catch (IOException e) {
             // Ignore
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
