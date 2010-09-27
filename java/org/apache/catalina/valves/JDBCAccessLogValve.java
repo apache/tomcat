@@ -539,6 +539,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
                 Class<?> clazz = Class.forName(driverName);
                 driver = (Driver) clazz.newInstance();
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 throw new SQLException(e.getMessage());
             }
         }

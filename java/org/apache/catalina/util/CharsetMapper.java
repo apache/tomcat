@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.jasper.util.ExceptionUtils;
+
 
 
 /**
@@ -75,6 +77,7 @@ public class CharsetMapper {
             map.load(stream);
             stream.close();
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             throw new IllegalArgumentException(t.toString());
         }
     }

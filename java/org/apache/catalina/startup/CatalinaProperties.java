@@ -122,6 +122,7 @@ public class CatalinaProperties {
                 properties.load(is);
                 is.close();
             } catch (Throwable t) {
+                handleThrowable(t);
                 error = t;
             }
         }

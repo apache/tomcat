@@ -37,6 +37,7 @@ import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.util.StringManager;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -318,12 +319,8 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             } catch (java.nio.channels.CancelledKeyException nx) {
                 log.warn("Replication client disconnected, error when polling key. Ignoring client.");
             } catch (Throwable x) {
-                try {
-                    log.error("Unable to process request in NioReceiver", x);
-                }catch ( Throwable tx ) {
-                    //in case an out of memory error, will affect the logging framework as well
-                    tx.printStackTrace();
-                }
+                ExceptionUtils.handleThrowable(x);
+                log.error("Unable to process request in NioReceiver", x);
             }
 
         }

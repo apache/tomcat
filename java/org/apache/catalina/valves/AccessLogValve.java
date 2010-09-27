@@ -44,6 +44,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.coyote.RequestInfo;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -606,6 +607,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             try {
                 holder.renameTo(new File(newFileName));
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 log.error("rotate failed", e);
             }
 
@@ -676,6 +678,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     try {
                         close();
                     } catch (Throwable e) {
+                        ExceptionUtils.handleThrowable(e);
                         log.info("at least this wasn't swallowed", e);
                     }
 
@@ -712,6 +715,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         try {
             index = Integer.parseInt(month) - 1;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             index = 0;  // Can not happen, in theory
         }
         return (months[index]);
@@ -880,6 +884,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             try {
                 init = InetAddress.getLocalHost().getHostAddress();
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 init = "127.0.0.1";
             }
             LOCAL_ADDR_VALUE = init;

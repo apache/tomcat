@@ -33,6 +33,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -98,6 +99,7 @@ public final class Bootstrap {
             catalinaLoader = createClassLoader("server", commonLoader);
             sharedLoader = createClassLoader("shared", commonLoader);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("Class loader creation threw exception", t);
             System.exit(1);
         }
@@ -391,6 +393,7 @@ public final class Bootstrap {
             try {
                 bootstrap.init();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 t.printStackTrace();
                 return;
             }
@@ -420,6 +423,7 @@ public final class Bootstrap {
                 log.warn("Bootstrap: command \"" + command + "\" does not exist.");
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             t.printStackTrace();
         }
 

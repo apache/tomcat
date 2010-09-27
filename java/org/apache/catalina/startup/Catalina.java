@@ -36,6 +36,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.security.SecurityConfig;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
@@ -611,6 +612,7 @@ public class Catalina {
                 }
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This will fail on JDK 1.2. Ignoring, as Tomcat can run
             // fine without the shutdown hook.
         }
@@ -643,6 +645,7 @@ public class Catalina {
                 }
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This will fail on JDK 1.2. Ignoring, as Tomcat can run
             // fine without the shutdown hook.
         }
@@ -804,6 +807,7 @@ public class Catalina {
                     Catalina.this.stop();
                 }
             } catch (Throwable ex) {
+                ExceptionUtils.handleThrowable(ex);
                 log.error(sm.getString("catalina.shutdownHookFail"), ex);
             } finally {
                 // If JULI is used, shut JULI down *after* the server shuts down
