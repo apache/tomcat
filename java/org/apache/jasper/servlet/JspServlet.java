@@ -34,6 +34,7 @@ import org.apache.jasper.Options;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.security.SecurityUtil;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.PeriodicEventListener;
@@ -93,6 +94,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 Object[] args = { config, context };
                 options = (Options) ctor.newInstance(args);
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 // Need to localize this.
                 log.warn("Failed to load engineOptionsClass", e);
                 // Use the default Options implementation
@@ -269,6 +271,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         } catch (IOException e) {
             throw e;
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             throw new ServletException(e);
         }
 

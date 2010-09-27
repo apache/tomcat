@@ -31,6 +31,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 
@@ -164,6 +165,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                             try {
                                 in.close();
                             } catch (Throwable t) {
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
