@@ -21,6 +21,8 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.apache.jasper.util.ExceptionUtils;
+
 /**
  * Class responsible for converting error codes to corresponding localized
  * error messages.
@@ -36,6 +38,7 @@ public class Localizer {
         bundle = ResourceBundle.getBundle(
             "org.apache.jasper.resources.LocalStrings");
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             t.printStackTrace();
         }
     }

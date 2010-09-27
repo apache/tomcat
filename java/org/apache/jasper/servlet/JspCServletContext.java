@@ -226,6 +226,7 @@ public class JspCServletContext implements ServletContext {
             return
                 (getResource(path).getFile().replace('/', File.separatorChar));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             return (null);
         }
 
@@ -263,6 +264,7 @@ public class JspCServletContext implements ServletContext {
         try {
             is = url.openStream();
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             url = null;
         } finally {
             if (is != null) {
@@ -289,6 +291,7 @@ public class JspCServletContext implements ServletContext {
         try {
             return (getResource(path).openStream());
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             return (null);
         }
 

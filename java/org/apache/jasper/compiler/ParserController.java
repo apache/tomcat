@@ -25,6 +25,7 @@ import java.util.jar.JarFile;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.XMLEncodingDetector;
 import org.xml.sax.Attributes;
 
@@ -252,7 +253,9 @@ class ParserController implements TagConstants {
         if (jarFile != null) {
             try {
                 jarFile.close();
-            } catch (Throwable t) {}
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+            }
         }
 
         baseDirStack.pop();
