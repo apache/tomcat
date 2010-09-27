@@ -156,7 +156,7 @@ public final class NamingService
                                    + ".java.javaURLContextFactory");
             }
             
-        } catch (Throwable t) {
+        } catch (Exception e) {
             state = STOPPED;
             notification = new AttributeChangeNotification
                 (this, sequenceNumber++, System.currentTimeMillis(), 
@@ -198,11 +198,9 @@ public final class NamingService
             System.setProperty(Context.URL_PKG_PREFIXES, oldUrlValue);
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY, oldIcValue);
             
-        } catch (Throwable t) {
-            
+        } catch (Exception e) {
             // FIXME
-            t.printStackTrace();
-            
+            e.printStackTrace();
         }
         
         state = STOPPED;
