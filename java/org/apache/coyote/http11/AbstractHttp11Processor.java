@@ -39,6 +39,7 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Ascii;
@@ -1082,6 +1083,7 @@ public abstract class AbstractHttp11Processor {
         } catch (IOException e) {
             error = true;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("http11processor.request.finish"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
@@ -1093,6 +1095,7 @@ public abstract class AbstractHttp11Processor {
         } catch (IOException e) {
             error = true;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("http11processor.response.finish"), t);
             error = true;
         }

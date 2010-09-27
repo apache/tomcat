@@ -30,6 +30,7 @@ import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -171,6 +172,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         try {
             socket.getSocket().setSoTimeout(soTimeout);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.debug(sm.getString("http11processor.socket.timeout"), t);
             error = true;
         }
@@ -203,6 +205,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 error = true;
                 break;
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.header.parse"), t);
                 }
@@ -218,6 +221,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 try {
                     prepareRequest();
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("http11processor.request.prepare"), t);
                     }
@@ -249,6 +253,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("http11processor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
@@ -269,6 +274,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 if (!isAsync())
                     endRequest();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("http11processor.request.finish"), t);
                 // 500 - Internal Server Error
                 response.setStatus(500);
@@ -278,6 +284,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             try {
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("http11processor.response.finish"), t);
                 error = true;
             }
@@ -330,6 +337,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);

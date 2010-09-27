@@ -34,6 +34,7 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
@@ -409,6 +410,7 @@ public class AjpAprProcessor implements ActionHook {
                 error = true;
                 break;
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.debug(sm.getString("ajpprocessor.header.error"), t);
                 // 400 - Bad Request
                 response.setStatus(400);
@@ -421,6 +423,7 @@ public class AjpAprProcessor implements ActionHook {
             try {
                 prepareRequest();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.debug(sm.getString("ajpprocessor.request.prepare"), t);
                 // 400 - Internal Server Error
                 response.setStatus(400);
@@ -436,6 +439,7 @@ public class AjpAprProcessor implements ActionHook {
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("ajpprocessor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
@@ -453,6 +457,7 @@ public class AjpAprProcessor implements ActionHook {
                 try {
                     finish();
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     error = true;
                 }
             }
@@ -498,6 +503,7 @@ public class AjpAprProcessor implements ActionHook {
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
