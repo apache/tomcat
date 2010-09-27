@@ -122,8 +122,6 @@ public class JIoEndpoint extends AbstractEndpoint {
     }
 
 
-    // --------------------------------------------------- Acceptor Inner Class
-
     /**
      * Async timeout thread
      */
@@ -165,6 +163,9 @@ public class JIoEndpoint extends AbstractEndpoint {
             }
         }
     }
+
+    
+    // --------------------------------------------------- Acceptor Inner Class
     /**
      * Server socket acceptor thread.
      */
@@ -199,15 +200,15 @@ public class JIoEndpoint extends AbstractEndpoint {
                     
                     // Configure the socket
                     if (setSocketOptions(socket)) {
-                        // Hand this socket off to an appropriate processor
-                        if (!processSocket(socket)) {
-                            // Close socket right away
-                            try {
-                                socket.close();
-                            } catch (IOException e) {
-                                // Ignore
-                            }
+                    // Hand this socket off to an appropriate processor
+                    if (!processSocket(socket)) {
+                        // Close socket right away
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            // Ignore
                         }
+                    }
                     } else {
                         // Close socket right away
                         try {
@@ -258,56 +259,58 @@ public class JIoEndpoint extends AbstractEndpoint {
         @Override
         public void run() {
             boolean launch = false;
-            try {
-                
-                if (!socket.processing.compareAndSet(false, true)) {
-                    log.error("Unable to process socket. Invalid state.");
-                    return;
-                }
-                
-                SocketState state = SocketState.OPEN;
-
+            synchronized (socket) {
                 try {
-                    // SSL handshake
-                    serverSocketFactory.handshake(socket.getSocket());
-                } catch (Throwable t) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("endpoint.err.handshake"), t);
-                    }
-                    // Tell to close the socket
-                    state = SocketState.CLOSED;
-                }
+                    SocketState state = SocketState.OPEN;
 
-                if ( (state != SocketState.CLOSED) ) {
-                    state = (status==null)?handler.process(socket):handler.process(socket,status);
-                }
-                if (state == SocketState.CLOSED) {
-                    // Close socket
-                    if (log.isTraceEnabled()) {
-                        log.trace("Closing socket:"+socket);
-                    }
                     try {
-                        socket.getSocket().close();
-                    } catch (IOException e) {
-                        // Ignore
+                        // SSL handshake
+                        serverSocketFactory.handshake(socket.getSocket());
+                    } catch (Throwable t) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("endpoint.err.handshake"), t);
+                        }
+                        // Tell to close the socket
+                        state = SocketState.CLOSED;
                     }
-                } else if (state == SocketState.OPEN){
-                    socket.setKeptAlive(true);
-                    socket.access();
-                    //keepalive connection
-                    //TODO - servlet3 check async status, we may just be in a hold pattern
-                    launch = true;
-                } else if (state == SocketState.LONG) {
-                    socket.access();
-                    waitingRequests.add(socket);
+                        
+                    if ( (state != SocketState.CLOSED) ) {
+                        state = (status==null)?handler.process(socket):handler.process(socket,status);
+                    }
+                    if (state == SocketState.CLOSED) {
+                        // Close socket
+                        if (log.isTraceEnabled()) {
+                            log.trace("Closing socket:"+socket);
+                        }
+                        try {
+                            socket.getSocket().close();
+                        } catch (IOException e) {
+                            // Ignore
+                        }
+                    } else if (state == SocketState.ASYNC_END ||
+                            state == SocketState.OPEN){
+                        socket.setKeptAlive(true);
+                        socket.access();
+                        launch = true;
+                    } else if (state == SocketState.LONG) {
+                        socket.access();
+                        waitingRequests.add(socket);
+                    }
+                } finally {
+                    if (launch) {
+                        try {
+                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN));
+                        } catch (NullPointerException npe) {
+                            if (running) {
+                                log.error(sm.getString("endpoint.launch.fail"),
+                                        npe);
+                            }
+                        }
+                    }
                 }
-            } finally {
-                socket.processing.set(false);
-                if (launch) getExecutor().execute(new SocketProcessor(socket));
-                socket = null;
             }
+            socket = null;
             // Finish up this request
-            
         }
         
     }
@@ -469,7 +472,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     protected boolean setSocketOptions(Socket socket) {
         serverSocketFactory.initSocket(socket);
-
+        
         try {
             // 1: Set socket options: timeout, linger, etc
             socketProperties.setProperties(socket);
@@ -488,7 +491,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         return true;
     }
 
-
+    
     /**
      * Process a new connection from a new client. Wraps the socket so
      * keep-alive and other attributes can be tracked and then passes the socket

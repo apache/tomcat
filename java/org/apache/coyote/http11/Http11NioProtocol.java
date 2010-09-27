@@ -18,6 +18,8 @@
 package org.apache.coyote.http11;
 
 import java.nio.channels.SocketChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -288,18 +290,18 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         @Override
         public SocketState event(NioChannel socket, SocketStatus status) {
-            Http11NioProcessor result = connections.get(socket);
+            Http11NioProcessor processor = connections.get(socket);
             NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             att.setAsync(false); //no longer check for timeout
             SocketState state = SocketState.CLOSED; 
-            if (result != null) {
-                if (log.isDebugEnabled()) log.debug("Http11NioProcessor.error="+result.error);
+            if (processor != null) {
+                if (log.isDebugEnabled()) log.debug("Http11NioProcessor.error="+processor.error);
                 // Call the appropriate event
                 try {
-                    if (result.async) {
-                        state = result.asyncDispatch(status);
+                    if (processor.comet) {
+                        state = processor.event(status);
                     } else {
-                        state = result.event(status);
+                        state = processor.asyncDispatch(status);
                     }
                 } catch (java.net.SocketException e) {
                     // SocketExceptions are normal
@@ -322,14 +324,21 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     Http11NioProtocol.log.error
                         (sm.getString("http11protocol.proto.error"), e);
                 } finally {
-                    if (state != SocketState.LONG) {
+                    if (processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                    if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
                         connections.remove(socket);
-                        recycledProcessors.offer(result);
+                        recycledProcessors.offer(processor);
                         if (state == SocketState.OPEN) {
                             socket.getPoller().add(socket);
                         }
+                    } else if (state == SocketState.ASYNC_END) {
+                        // No further work required
+                    } else if (state == SocketState.LONG) {
+                        att.setAsync(true); // Re-enable timeouts
                     } else {
-                        if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
+                        if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
                         //add correct poller events here based on Comet stuff
                         socket.getPoller().add(socket,att.getCometOps());
                     }
@@ -369,12 +378,18 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     if (processor.comet) {
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         socket.getPoller().add(socket,att.getCometOps());
-                    } else if (processor.async) {
+                    } else if (processor.isAsync()) {
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         att.setAsync(true);
+                        // longPoll may change socket state (e.g. to trigger a
+                        // complete or dispatch)
+                        state = processor.asyncPostProcess();
                     } else {
                         socket.getPoller().add(socket);
                     }
+                }
+                if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
+                    // Already done all we need to do.
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
@@ -434,12 +449,26 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     try {
                         registerCount.addAndGet(1);
                         if (log.isDebugEnabled()) log.debug("Register ["+processor+"] count="+registerCount.get());
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        final RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
-                        ObjectName rpName = new ObjectName
+                        final ObjectName rpName = new ObjectName
                             (proto.getDomain() + ":type=RequestProcessor,worker="
                              + proto.getName() + ",name=HttpRequest" + count++);
-                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                                @Override
+                                public Void run() {
+                                    try {
+                                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                                    } catch (Exception e) {
+                                        log.warn("Error registering request");
+                                    }
+                                    return null;
+                                }
+                            });
+                        } else {
+                            Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        }
                         rp.setRpName(rpName);
                     } catch (Exception e) {
                         log.warn("Error registering request");

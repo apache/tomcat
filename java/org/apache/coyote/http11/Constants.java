@@ -211,5 +211,9 @@ public final class Constants {
      */
     public static final String POST = "POST";
 
-
+    /**
+     * Has security been turned on?
+     */
+    public static final boolean IS_SECURITY_ENABLED =
+        (System.getSecurityManager() != null);
 }

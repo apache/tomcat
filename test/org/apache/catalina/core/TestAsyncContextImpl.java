@@ -24,6 +24,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -177,7 +178,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             result  = new StringBuilder();
             result.append('1');
             result.append(req.isAsyncStarted());
-            req.startAsync();
+            req.startAsync().setTimeout(10000);
             result.append('2');
             result.append(req.isAsyncStarted());
             
@@ -305,13 +306,22 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 throws ServletException, IOException {
             
             AsyncContext actxt = req.startAsync();
+            actxt.setTimeout(3000);
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
             actxt.complete();
         }
     }
 
-    public void testTimeout() throws Exception {
+    public void testTimeoutListenerComplete() throws Exception {
+        doTestTimeout(true);
+    }
+    
+    public void testTimeoutListenerNoComplete() throws Exception {
+        doTestTimeout(false);
+    }
+    
+    private void doTestTimeout(boolean completeOnTimeout) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
         
@@ -326,7 +336,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
-        TimeoutServlet timeout = new TimeoutServlet();
+        TimeoutServlet timeout = new TimeoutServlet(completeOnTimeout);
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
         wrapper.setAsyncSupported(true);
@@ -334,47 +344,383 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         tomcat.start();
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
-        assertEquals("OK", res.toString());
+        StringBuilder expected = new StringBuilder();
+        expected.append("TimeoutServletGet-onTimeout-");
+        if (!completeOnTimeout) {
+            expected.append("onError-");
+        }
+        expected.append("onComplete-");
+        assertEquals(expected.toString(), res.toString());
     }
     
     private static class TimeoutServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
+        private boolean completeOnTimeout;
+        
+        public TimeoutServlet(boolean completeOnTimeout) {
+            this.completeOnTimeout = completeOnTimeout;
+        }
+        
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
                 throws ServletException, IOException {
             if (req.isAsyncSupported()) {
-                resp.getWriter().print("OK");
+                resp.getWriter().print("TimeoutServletGet-");
                 final AsyncContext ac = req.startAsync();
-                ac.setTimeout(2000);
+                ac.setTimeout(3000);
                 
-                ac.addListener(new TimeoutListener());
+                ac.addListener(new TrackingListener(false, completeOnTimeout));
             } else
                 resp.getWriter().print("FAIL: Async unsupported");
         }
     }
 
-    private static class TimeoutListener implements AsyncListener {
+    public void testDispatchSingle() throws Exception {
+        doTestDispatch(1, false);
+    }
+    
+    public void testDispatchDouble() throws Exception {
+        doTestDispatch(2, false);
+    }
+    
+    public void testDispatchMultiple() throws Exception {
+        doTestDispatch(5, false);
+    }
+    
+    public void testDispatchWithThreadSingle() throws Exception {
+        doTestDispatch(1, true);
+    }
+    
+    public void testDispatchWithThreadDouble() throws Exception {
+        doTestDispatch(2, true);
+    }
+    
+    public void testDispatchWithThreadMultiple() throws Exception {
+        doTestDispatch(5, true);
+    }
+    
+    private void doTestDispatch(int iter, boolean useThread) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        DispatchingServlet dispatch = new DispatchingServlet(false, false);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/stage1", "dispatch");
+
+        NonAsyncServlet nonasync = new NonAsyncServlet();
+        Wrapper wrapper2 = Tomcat.addServlet(ctx, "nonasync", nonasync);
+        wrapper2.setAsyncSupported(true);
+        ctx.addServletMapping("/stage2", "nonasync");
+
+        tomcat.start();
+        
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/stage1?iter=");
+        url.append(iter);
+        if (useThread) {
+            url.append("&useThread=y");
+        }
+        ByteChunk res = getUrl(url.toString());
+        
+        StringBuilder expected = new StringBuilder();
+        int loop = iter;
+        while (loop > 0) {
+            expected.append("DispatchingServletGet-");
+            loop--;
+        }
+        expected.append("NonAsyncServletGet-");
+        assertEquals(expected.toString(), res.toString());
+    }
+    
+    private static class DispatchingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        private static final String ITER_PARAM = "iter";
+        private boolean addTrackingListener = false;
+        private boolean completeOnError = false;
+        
+        public DispatchingServlet(boolean addTrackingListener,
+                boolean completeOnError) {
+            this.addTrackingListener = addTrackingListener;
+            this.completeOnError = completeOnError;
+        }
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.getWriter().write("DispatchingServletGet-");
+            resp.flushBuffer();
+            final int iter = Integer.parseInt(req.getParameter(ITER_PARAM)) - 1;
+            final AsyncContext ctxt = req.startAsync();
+            if (addTrackingListener) {
+                TrackingListener listener =
+                    new TrackingListener(completeOnError, true); 
+                ctxt.addListener(listener);
+            }
+            Runnable run = new Runnable() {
+                @Override
+                public void run() {
+                    if (iter > 0) {
+                        ctxt.dispatch("/stage1?" + ITER_PARAM + "=" + iter);
+                    } else {
+                        ctxt.dispatch("/stage2");
+                    }
+                }
+            };
+            if ("y".equals(req.getParameter("useThread"))) {
+                new Thread(run).start();
+            } else {
+                run.run();
+            }
+        }
+    }
+
+    private static class NonAsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.getWriter().write("NonAsyncServletGet-");
+            resp.flushBuffer();
+        }
+    }
+    
+    public void testListeners() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        TrackingServlet tracking = new TrackingServlet();
+        Wrapper wrapper = Tomcat.addServlet(ctx, "tracking", tracking);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/stage1", "tracking");
+
+        TimeoutServlet timeout = new TimeoutServlet(true);
+        Wrapper wrapper2 = Tomcat.addServlet(ctx, "timeout", timeout);
+        wrapper2.setAsyncSupported(true);
+        ctx.addServletMapping("/stage2", "timeout");
+
+        tomcat.start();
+        
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/stage1");
+
+        ByteChunk res = getUrl(url.toString());
+        
+        assertEquals(
+                "DispatchingServletGet-DispatchingServletGet-onStartAsync-" +
+                "TimeoutServletGet-onStartAsync-onTimeout-onComplete-",
+                res.toString());
+    }
+
+    private static class TrackingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        
+        private static volatile boolean first = true;
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.getWriter().write("DispatchingServletGet-");
+            resp.flushBuffer();
+
+            final boolean first = TrackingServlet.first;
+            TrackingServlet.first = false;
+
+            final AsyncContext ctxt = req.startAsync();
+            TrackingListener listener = new TrackingListener(false, true); 
+            ctxt.addListener(listener);
+            ctxt.setTimeout(3000);
+
+            Runnable run = new Runnable() {
+                @Override
+                public void run() {
+                    if (first) {
+                        ctxt.dispatch("/stage1");
+                    } else {
+                        ctxt.dispatch("/stage2");
+                    }
+                }
+            };
+            if ("y".equals(req.getParameter("useThread"))) {
+                new Thread(run).start();
+            } else {
+                run.run();
+            }
+        }
+    }
+
+    private static class TrackingListener implements AsyncListener {
+        
+        private boolean completeOnError;
+        private boolean completeOnTimeout;
+        
+        public TrackingListener(boolean completeOnError,
+                boolean completeOnTimeout) {
+            this.completeOnError = completeOnError;
+            this.completeOnTimeout = completeOnTimeout;
+        }
 
         @Override
         public void onComplete(AsyncEvent event) throws IOException {
-            // NO-OP
+            ServletResponse resp = event.getAsyncContext().getResponse(); 
+            resp.getWriter().write("onComplete-");
+            resp.flushBuffer();
         }
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
-            event.getAsyncContext().complete();
+            ServletResponse resp = event.getAsyncContext().getResponse(); 
+            resp.getWriter().write("onTimeout-");
+            resp.flushBuffer();
+            if (completeOnTimeout){
+                event.getAsyncContext().complete();
+            }
         }
 
         @Override
         public void onError(AsyncEvent event) throws IOException {
-            // NOOP
+            ServletResponse resp = event.getAsyncContext().getResponse(); 
+            resp.getWriter().write("onError-");
+            resp.flushBuffer();
+            if (completeOnError) {
+                event.getAsyncContext().complete();
+            }
         }
 
         @Override
         public void onStartAsync(AsyncEvent event) throws IOException {
-            // NOOP
+            ServletResponse resp = event.getAsyncContext().getResponse(); 
+            resp.getWriter().write("onStartAsync-");
+            resp.flushBuffer();
         }
+    }
+    
+    public void testDispatchErrorSingle() throws Exception {
+        doTestDispatchError(1, false, false);
+    }
+    
+    public void testDispatchErrorDouble() throws Exception {
+        doTestDispatchError(2, false, false);
+    }
+    
+    public void testDispatchErrorMultiple() throws Exception {
+        doTestDispatchError(5, false, false);
+    }
+    
+    public void testDispatchErrorWithThreadSingle() throws Exception {
+        doTestDispatchError(1, true, false);
+    }
+    
+    public void testDispatchErrorWithThreadDouble() throws Exception {
+        doTestDispatchError(2, true, false);
+    }
+    
+    public void testDispatchErrorWithThreadMultiple() throws Exception {
+        doTestDispatchError(5, true, false);
+    }
+    
+    public void testDispatchErrorSingleThenComplete() throws Exception {
+        doTestDispatchError(1, false, true);
+    }
+    
+    public void testDispatchErrorDoubleThenComplete() throws Exception {
+        doTestDispatchError(2, false, true);
+    }
+    
+    public void testDispatchErrorMultipleThenComplete() throws Exception {
+        doTestDispatchError(5, false, true);
+    }
+    
+    public void testDispatchErrorWithThreadSingleThenComplete()
+            throws Exception {
+        doTestDispatchError(1, true, true);
+    }
+    
+    public void testDispatchErrorWithThreadDoubleThenComplete()
+            throws Exception {
+        doTestDispatchError(2, true, true);
+    }
+    
+    public void testDispatchErrorWithThreadMultipleThenComplete()
+            throws Exception {
+        doTestDispatchError(5, true, true);
+    }
+    
+    private void doTestDispatchError(int iter, boolean useThread,
+            boolean completeOnError)
+            throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
         
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        DispatchingServlet dispatch =
+            new DispatchingServlet(true, completeOnError);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/stage1", "dispatch");
+
+        ErrorServlet error = new ErrorServlet();
+        Tomcat.addServlet(ctx, "error", error);
+        ctx.addServletMapping("/stage2", "error");
+
+        tomcat.start();
+        
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/stage1?iter=");
+        url.append(iter);
+        if (useThread) {
+            url.append("&useThread=y");
+        }
+        ByteChunk res = getUrl(url.toString());
+        
+        StringBuilder expected = new StringBuilder();
+        int loop = iter;
+        while (loop > 0) {
+            expected.append("DispatchingServletGet-");
+            if (loop != iter) {
+                expected.append("onStartAsync-");
+            }
+            loop--;
+        }
+        expected.append("ErrorServletGet-onError-onComplete-");
+        assertEquals(expected.toString(), res.toString());
+    }
+    
+    private static class ErrorServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.getWriter().write("ErrorServletGet-");
+            resp.flushBuffer();
+            throw new ServletException("Opps.");
+        }
     }
 }

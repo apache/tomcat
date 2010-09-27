@@ -125,6 +125,11 @@
         <code>UnsupportedOperationException</code>. (markt)
       </fix>
       <fix>
+        <bug>49884</bug>: Fix occassional NullPointerException on async
+        complete(). This resulted in a major refactoring of the async
+        implementation to address a number of threading issues. (markt)
+      </fix>
+      <fix>
         Update the version numbers in ServerInfo defaults to Tomcat 7.0.x.
         (markt)
       </fix>
