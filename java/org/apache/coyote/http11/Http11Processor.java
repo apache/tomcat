@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Locale;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
@@ -265,9 +264,9 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 // This way uploading a 100GB file doesn't tie up the thread 
                 // if the servlet has rejected it.
                 
-                if(error && !async)
+                if(error && !isAsync())
                     inputBuffer.setSwallowInput(false);
-                if (!async)
+                if (!isAsync())
                     endRequest();
             } catch (Throwable t) {
                 log.error(sm.getString("http11processor.request.finish"), t);
@@ -296,7 +295,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             // will reset it
             // thrA.setParam(null);
             // Next request
-            if (!async || error) {
+            if (!isAsync() || error) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }
@@ -309,7 +308,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         if (error || endpoint.isPaused()) {
             recycle();
             return SocketState.CLOSED;
-        } else if (async) {
+        } else if (isAsync()) {
             return SocketState.LONG;
         } else {
             if (!keepAlive) {
@@ -343,7 +342,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
         if (error) {
             recycle();
             return SocketState.CLOSED;
-        } else if (async) {
+        } else if (isAsync()) {
             return SocketState.LONG;
         } else {
             recycle();
@@ -360,7 +359,6 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     protected void recycleInternal() {
         // Recycle
         this.socket = null;
-        async = false;
         // Recycle ssl info
         sslSupport = null;
     }
@@ -380,7 +378,6 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
 
         if (actionCode == ActionCode.CLOSE) {
             // Close
-            async = false;
             // End the processing of the current request, and stop any further
             // transactions with the client
 
@@ -497,33 +494,19 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 }
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            //TODO SERVLET3 - async
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
-                dispatch.set(true);
+            if (asyncComplete()) {
                 endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
-            } else {
-                dispatch.set(false);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-          //TODO SERVLET3 - async
-            if (param==null) return;
+            if (param == null) return;
             long timeout = ((Long)param).longValue();
-            //if we are not piggy backing on a worker thread, set the timeout
+            // if we are not piggy backing on a worker thread, set the timeout
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            RequestInfo rp = request.getRequestProcessor();
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
+            if (asyncDispatch()) {
                 endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
-                dispatch.set(true);
-            } else { 
-                dispatch.set(true);
             }
         }
-
-
     }
 
 

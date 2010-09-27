@@ -47,6 +47,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -188,7 +189,7 @@ public class AjpAprProcessor implements ActionHook {
     /**
      * Socket associated with the current connection.
      */
-    protected long socket;
+    protected SocketWrapper<Long> socket;
 
 
     /**
@@ -355,15 +356,16 @@ public class AjpAprProcessor implements ActionHook {
      *
      * @throws IOException error during an I/O operation
      */
-    public boolean process(long socket)
+    public boolean process(SocketWrapper<Long> socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
         this.socket = socket;
-        Socket.setrbb(this.socket, inputBuffer);
-        Socket.setsbb(this.socket, outputBuffer);
+        long socketRef = socket.getSocket().longValue();
+        Socket.setrbb(socketRef, inputBuffer);
+        Socket.setsbb(socketRef, outputBuffer);
 
         // Error flag
         error = false;
@@ -388,7 +390,7 @@ public class AjpAprProcessor implements ActionHook {
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
                 if (type == Constants.JK_AJP13_CPING_REQUEST) {
-                    if (Socket.sendb(socket, pongMessageBuffer, 0,
+                    if (Socket.sendb(socketRef, pongMessageBuffer, 0,
                             pongMessageBuffer.position()) < 0) {
                         error = true;
                     }
@@ -469,7 +471,7 @@ public class AjpAprProcessor implements ActionHook {
 
         // Add the socket to the poller
         if (!error && !endpoint.isPaused()) {
-            endpoint.getPoller().add(socket);
+            endpoint.getPoller().add(socketRef);
         } else {
             openSocket = false;
         }
@@ -483,7 +485,8 @@ public class AjpAprProcessor implements ActionHook {
     }
 
     /* Copied from the AjpProcessor.java */
-    public SocketState asyncDispatch(long socket, SocketStatus status) throws IOException {
+    public SocketState asyncDispatch(SocketWrapper<Long> socket,
+            SocketStatus status) throws IOException {
 
         // Setting up the socket
         this.socket = socket;
@@ -535,6 +538,8 @@ public class AjpAprProcessor implements ActionHook {
      */
     public void action(ActionCode actionCode, Object param) {
 
+        long socketRef = socket.getSocket().longValue();
+        
         if (actionCode == ActionCode.COMMIT) {
 
             if (response.isCommitted())
@@ -564,7 +569,7 @@ public class AjpAprProcessor implements ActionHook {
             try {
                 flush();
                 // Send explicit flush message
-                if (Socket.sendb(socket, flushMessageBuffer, 0,
+                if (Socket.sendb(socketRef, flushMessageBuffer, 0,
                                  flushMessageBuffer.position()) < 0) {
                     error = true;                    
                 }
@@ -661,14 +666,14 @@ public class AjpAprProcessor implements ActionHook {
             }        
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) return;
-            if (socket==0) return;
+            if (socketRef==0) return;
             long timeout = ((Long)param).longValue();
-            Socket.timeoutSet(socket, timeout * 1000); 
+            Socket.timeoutSet(socketRef, timeout * 1000); 
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
            RequestInfo rp = request.getRequestProcessor();
             AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
-                endpoint.getPoller().add(this.socket);
+                endpoint.getPoller().add(socketRef);
                 dispatch.set(true);
             } else {
                 dispatch.set(true);
@@ -1127,7 +1132,7 @@ public class AjpAprProcessor implements ActionHook {
         int nRead;
         while (inputBuffer.remaining() < n) {
             nRead = Socket.recvbb
-                (socket, inputBuffer.limit(),
+                (socket.getSocket().longValue(), inputBuffer.limit(),
                         inputBuffer.capacity() - inputBuffer.limit());
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
@@ -1160,7 +1165,7 @@ public class AjpAprProcessor implements ActionHook {
         int nRead;
         while (inputBuffer.remaining() < n) {
             nRead = Socket.recvbb
-                (socket, inputBuffer.limit(),
+                (socket.getSocket().longValue(), inputBuffer.limit(),
                     inputBuffer.capacity() - inputBuffer.limit());
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
@@ -1224,7 +1229,7 @@ public class AjpAprProcessor implements ActionHook {
         }
 
         // Request more data immediately
-        Socket.sendb(socket, getBodyMessageBuffer, 0,
+        Socket.sendb(socket.getSocket().longValue(), getBodyMessageBuffer, 0,
                 getBodyMessageBuffer.position());
 
         boolean moreData = receive();
@@ -1305,7 +1310,7 @@ public class AjpAprProcessor implements ActionHook {
     protected void flush()
         throws IOException {
         if (outputBuffer.position() > 0) {
-            if (Socket.sendbb(socket, 0, outputBuffer.position()) < 0) {
+            if (Socket.sendbb(socket.getSocket().longValue(), 0, outputBuffer.position()) < 0) {
                 throw new IOException(sm.getString("ajpprocessor.failedsend"));
             }
             outputBuffer.clear();

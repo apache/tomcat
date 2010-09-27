@@ -78,7 +78,7 @@ public abstract class AbstractEndpoint {
      */
     public static interface Handler {
         public enum SocketState {
-            OPEN, CLOSED, LONG
+            OPEN, CLOSED, LONG, ASYNC_END
         }
     }
     

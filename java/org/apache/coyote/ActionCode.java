@@ -133,18 +133,61 @@ public enum ActionCode {
 
     /**
      * Callback for an async call to
+     * {@link javax.servlet.AsyncContext#dispatch()}
+     */
+    ASYNC_DISPATCH,
+
+    /**
+     * Callback to indicate the the actual dispatch has started and that the
+     * async state needs change.
+     */
+    ASYNC_DISPATCHED,
+
+    /**
+     * Callback for an async call to
+     * {@link javax.servlet.AsyncContext#start()}
+     */
+    ASYNC_RUN,
+
+    /**
+     * Callback for an async call to
      * {@link javax.servlet.AsyncContext#complete()}
      */
     ASYNC_COMPLETE,
+    
+    /**
+     * Callback to trigger the processing of an async timeout
+     */
+    ASYNC_TIMEOUT,
+    
+    /**
+     * Callback to trigger the error processing
+     */
+    ASYNC_ERROR,
+    
     /**
      * Callback for an async call to
      * {@link javax.servlet.AsyncContext#setTimeout(long)}
      */
     ASYNC_SETTIMEOUT,
+    
+    /**
+     * Callback to determine if async processing is in progress 
+     */
+    ASYNC_IS_ASYNC,
+    
+    /**
+     * Callback to determine if async dispatch is in progress
+     */
+    ASYNC_IS_STARTED,
 
     /**
-     * Callback for an async call to
-     * {@link javax.servlet.AsyncContext#dispatch()}
+     * Callback to determine if async dispatch is in progress
      */
-    ASYNC_DISPATCH,
+    ASYNC_IS_DISPATCHING,
+
+    /**
+     * Callback to determine if async is timing out
+     */
+    ASYNC_IS_TIMINGOUT
 }
