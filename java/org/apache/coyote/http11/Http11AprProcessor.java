@@ -24,7 +24,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
@@ -47,6 +46,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 
 /**
@@ -124,7 +124,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     /**
      * Socket associated with the current connection.
      */
-    protected long socket = 0;
+    protected SocketWrapper<Long> socket = null;
 
 
     /**
@@ -186,7 +186,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
      *
      * @throws IOException error during an I/O operation
      */
-    public SocketState process(long socket)
+    public SocketState process(SocketWrapper<Long> socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -201,13 +201,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
 
         // Setting up the socket
         this.socket = socket;
-        inputBuffer.setSocket(socket);
-        outputBuffer.setSocket(socket);
+        long socketRef = socket.getSocket().longValue();
+        inputBuffer.setSocket(socketRef);
+        outputBuffer.setSocket(socketRef);
 
         // Error flag
         error = false;
         comet = false;
-        async = false;
         keepAlive = true;
 
         int keepAliveLeft = maxKeepAliveRequests;
@@ -216,12 +216,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         boolean keptAlive = false;
         boolean openSocket = false;
 
-        while (!error && keepAlive && !comet && !async && !endpoint.isPaused()) {
+        while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    Socket.timeoutSet(socket, soTimeout * 1000);
+                    Socket.timeoutSet(socketRef, soTimeout * 1000);
                 }
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     // This means that no data is available right now
@@ -229,13 +229,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                     // and the method should return true
                     openSocket = true;
                     // Add the socket to the poller
-                    endpoint.getPoller().add(socket);
+                    endpoint.getPoller().add(socketRef);
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
                 keptAlive = true;
                 if (!disableUploadTimeout) {
-                    Socket.timeoutSet(socket, timeout * 1000);
+                    Socket.timeoutSet(socketRef, timeout * 1000);
                 }
                 inputBuffer.parseHeaders();
             } catch (IOException e) {
@@ -296,7 +296,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
 
             // Finish the handling of the request
-            if (!comet && !async) {
+            if (!comet && !isAsync()) {
                 // If we know we are closing the connection, don't drain input.
                 // This way uploading a 100GB file doesn't tie up the thread 
                 // if the servlet has rejected it.
@@ -312,7 +312,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             }
             request.updateCounters();
 
-            if (!comet && !async) {
+            if (!comet && !isAsync()) {
                 // Next request
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
@@ -320,7 +320,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
-                sendfileData.socket = socket;
+                sendfileData.socket = socketRef;
                 sendfileData.keepAlive = keepAlive;
                 if (!endpoint.getSendfile().add(sendfileData)) {
                     openSocket = true;
@@ -335,11 +335,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (error || endpoint.isPaused()) {
-            inputBuffer.nextRequest();
-            outputBuffer.nextRequest();
             recycle();
             return SocketState.CLOSED;
-        } else if (comet  || async) {
+        } else if (comet  || isAsync()) {
             return SocketState.LONG;
         } else {
             recycle();
@@ -349,12 +347,14 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     }
 
     /* Copied from the AjpProcessor.java */
-    public SocketState asyncDispatch(long socket, SocketStatus status) {
+    public SocketState asyncDispatch(SocketWrapper<Long> socket,
+            SocketStatus status) {
 
         // Setting up the socket
         this.socket = socket;
-        inputBuffer.setSocket(socket);
-        outputBuffer.setSocket(socket);
+        long socketRef = socket.getSocket().longValue();
+        inputBuffer.setSocket(socketRef);
+        outputBuffer.setSocket(socketRef);
 
         RequestInfo rp = request.getRequestProcessor();
         try {
@@ -372,30 +372,25 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (async) {
-            if (error) {
-                response.setStatus(500);
-                request.updateCounters();
-                recycle();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
-        } else {
-            if (error) {
-                response.setStatus(500);
-            }
-            request.updateCounters();
+        if (error) {
             recycle();
             return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
+        } else {
+            recycle();
+            if (!keepAlive) {
+                return SocketState.CLOSED;
+            } else {
+                return SocketState.OPEN;
+            }
         }
-        
     }
 
 
     @Override
     public void recycleInternal() {
-        this.socket = 0;
+        this.socket = null;
     }
     
 
@@ -411,6 +406,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
+        long socketRef = socket.getSocket().longValue();
+        
         if (actionCode == ActionCode.CLOSE) {
             // Close
 
@@ -418,7 +415,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             // transactions with the client
 
             comet = false;
-            async = false;
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {
@@ -429,9 +425,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             // Get remote host address
-            if (remoteAddr == null && (socket != 0)) {
+            if (remoteAddr == null && (socketRef != 0)) {
                 try {
-                    long sa = Address.get(Socket.APR_REMOTE, socket);
+                    long sa = Address.get(Socket.APR_REMOTE, socketRef);
                     remoteAddr = Address.getip(sa);
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.info"), e);
@@ -442,9 +438,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
 
             // Get local host name
-            if (localName == null && (socket != 0)) {
+            if (localName == null && (socketRef != 0)) {
                 try {
-                    long sa = Address.get(Socket.APR_LOCAL, socket);
+                    long sa = Address.get(Socket.APR_LOCAL, socketRef);
                     localName = Address.getnameinfo(sa, 0);
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.info"), e);
@@ -455,9 +451,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
             // Get remote host name
-            if (remoteHost == null && (socket != 0)) {
+            if (remoteHost == null && (socketRef != 0)) {
                 try {
-                    long sa = Address.get(Socket.APR_REMOTE, socket);
+                    long sa = Address.get(Socket.APR_REMOTE, socketRef);
                     remoteHost = Address.getnameinfo(sa, 0);
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.info"), e);
@@ -468,9 +464,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             // Get local host address
-            if (localAddr == null && (socket != 0)) {
+            if (localAddr == null && (socketRef != 0)) {
                 try {
-                    long sa = Address.get(Socket.APR_LOCAL, socket);
+                    long sa = Address.get(Socket.APR_LOCAL, socketRef);
                     localAddr = Address.getip(sa);
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.info"), e);
@@ -482,9 +478,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
 
             // Get remote port
-            if (remotePort == -1 && (socket != 0)) {
+            if (remotePort == -1 && (socketRef != 0)) {
                 try {
-                    long sa = Address.get(Socket.APR_REMOTE, socket);
+                    long sa = Address.get(Socket.APR_REMOTE, socketRef);
                     Sockaddr addr = Address.getInfo(sa);
                     remotePort = addr.port;
                 } catch (Exception e) {
@@ -496,9 +492,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
 
             // Get local port
-            if (localPort == -1 && (socket != 0)) {
+            if (localPort == -1 && (socketRef != 0)) {
                 try {
-                    long sa = Address.get(Socket.APR_LOCAL, socket);
+                    long sa = Address.get(Socket.APR_LOCAL, socketRef);
                     Sockaddr addr = Address.getInfo(sa);
                     localPort = addr.port;
                 } catch (Exception e) {
@@ -509,24 +505,24 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
-            if (ssl && (socket != 0)) {
+            if (ssl && (socketRef != 0)) {
                 try {
                     // Cipher suite
-                    Object sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_CIPHER);
+                    Object sslO = SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_CIPHER);
                     if (sslO != null) {
                         request.setAttribute(AbstractEndpoint.CIPHER_SUITE_KEY, sslO);
                     }
                     // Get client certificate and the certificate chain if present
                     // certLength == -1 indicates an error
-                    int certLength = SSLSocket.getInfoI(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-                    byte[] clientCert = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
+                    int certLength = SSLSocket.getInfoI(socketRef, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
+                    byte[] clientCert = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT);
                     X509Certificate[] certs = null;
                     if (clientCert != null  && certLength > -1) {
                         certs = new X509Certificate[certLength + 1];
                         CertificateFactory cf = CertificateFactory.getInstance("X.509");
                         certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
                         for (int i = 0; i < certLength; i++) {
-                            byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
+                            byte[] data = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
                             certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
                         }
                     }
@@ -534,12 +530,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                         request.setAttribute(AbstractEndpoint.CERTIFICATE_KEY, certs);
                     }
                     // User key size
-                    sslO = Integer.valueOf(SSLSocket.getInfoI(socket,
+                    sslO = Integer.valueOf(SSLSocket.getInfoI(socketRef,
                             SSL.SSL_INFO_CIPHER_USEKEYSIZE));
                     request.setAttribute(AbstractEndpoint.KEY_SIZE_KEY, sslO);
 
                     // SSL session ID
-                    sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_SESSION_ID);
+                    sslO = SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_SESSION_ID);
                     if (sslO != null) {
                         request.setAttribute(AbstractEndpoint.SESSION_ID_KEY, sslO);
                     }
@@ -552,7 +548,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
 
         } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
 
-            if (ssl && (socket != 0)) {
+            if (ssl && (socketRef != 0)) {
                 // Consume and buffer the request body, so that it does not
                 // interfere with the client's handshake messages
                 InputFilter[] inputFilters = inputBuffer.getFilters();
@@ -560,22 +556,22 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
                 try {
                     // Configure connection to require a certificate
-                    SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE,
+                    SSLSocket.setVerify(socketRef, SSL.SSL_CVERIFY_REQUIRE,
                             endpoint.getSSLVerifyDepth());
                     // Renegotiate certificates
-                    if (SSLSocket.renegotiate(socket) == 0) {
+                    if (SSLSocket.renegotiate(socketRef) == 0) {
                         // Don't look for certs unless we know renegotiation worked.
                         // Get client certificate and the certificate chain if present
                         // certLength == -1 indicates an error 
-                        int certLength = SSLSocket.getInfoI(socket,SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-                        byte[] clientCert = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
+                        int certLength = SSLSocket.getInfoI(socketRef,SSL.SSL_INFO_CLIENT_CERT_CHAIN);
+                        byte[] clientCert = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT);
                         X509Certificate[] certs = null;
                         if (clientCert != null && certLength > -1) {
                             certs = new X509Certificate[certLength + 1];
                             CertificateFactory cf = CertificateFactory.getInstance("X.509");
                             certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
                             for (int i = 0; i < certLength; i++) {
-                                byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
+                                byte[] data = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
                                 certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
                             }
                         }
@@ -599,29 +595,16 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-          //TODO SERVLET3 - async - that is bit hacky -
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
-                dispatch.set(true);
-                endpoint.getHandler().asyncDispatch(this.socket, SocketStatus.STOP);
-            } else {
-                dispatch.set(false);
+            if (asyncComplete()) {
+                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-          //TODO SERVLET3 - async
             if (param==null) return;
-            if (socket==0) return;
             long timeout = ((Long)param).longValue();
-            Socket.timeoutSet(socket, timeout * 1000);
+            socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            RequestInfo rp = request.getRequestProcessor();
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
-                endpoint.getPoller().add(this.socket);
-                dispatch.set(true);
-            } else {
-                dispatch.set(true);
+            if (asyncDispatch()) {
+                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             }
         }
         

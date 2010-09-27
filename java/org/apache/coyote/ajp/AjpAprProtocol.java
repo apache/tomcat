@@ -42,6 +42,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -337,8 +338,8 @@ public class AjpAprProtocol
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
 
-        protected ConcurrentHashMap<Long, AjpAprProcessor> connections =
-            new ConcurrentHashMap<Long, AjpAprProcessor>();
+        protected ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor> connections =
+            new ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor>();
 
         protected ConcurrentLinkedQueue<AjpAprProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<AjpAprProcessor>() {
@@ -384,11 +385,11 @@ public class AjpAprProtocol
         }
 
         // FIXME: Support for this could be added in AJP as well
-        public SocketState event(long socket, SocketStatus status) {
+        public SocketState event(SocketWrapper<Long> socket, SocketStatus status) {
             return SocketState.CLOSED;
         }
         
-        public SocketState process(long socket) {
+        public SocketState process(SocketWrapper<Long> socket) {
             AjpAprProcessor processor = recycledProcessors.poll();
             try {
 
@@ -397,7 +398,7 @@ public class AjpAprProtocol
                 }
 
                 if (processor.process(socket)) {
-                    connections.put(Long.valueOf(socket), processor);
+                    connections.put(socket, processor);
                     return SocketState.OPEN;
                 } else {
                     // recycledProcessors.offer(processor);
@@ -431,9 +432,9 @@ public class AjpAprProtocol
         }
 
         // FIXME: Support for this could be added in AJP as well
-        public SocketState asyncDispatch(long socket, SocketStatus status) {
+        public SocketState asyncDispatch(SocketWrapper<Long> socket, SocketStatus status) {
 
-            AjpAprProcessor result = connections.get(Long.valueOf(socket));
+            AjpAprProcessor result = connections.get(socket);
             
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
@@ -462,10 +463,10 @@ public class AjpAprProtocol
                         (sm.getString("ajpprotocol.proto.error"), e);
                 } finally {
                     if (state != SocketState.LONG) {
-                        connections.remove(Long.valueOf(socket));
+                        connections.remove(socket);
                         recycledProcessors.offer(result);
                         if (state == SocketState.OPEN) {
-                            proto.endpoint.getPoller().add(socket);
+                            proto.endpoint.getPoller().add(socket.getSocket().longValue());
                         }
                     }
                 }

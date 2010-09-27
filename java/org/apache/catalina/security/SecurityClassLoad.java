@@ -38,6 +38,7 @@ public final class SecurityClassLoad {
         }
         
         loadCorePackage(loader);
+        loadCoyotePackage(loader);
         loadLoaderPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
@@ -62,9 +63,6 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
             "AsyncContextImpl");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$AsyncState");
         loader.loadClass
             (basePackage +
             "AsyncContextImpl$DebugException");
@@ -129,6 +127,13 @@ public final class SecurityClassLoad {
     }
     
     
+    private final static void loadCoyotePackage(ClassLoader loader)
+            throws Exception {
+        String basePackage = "org.apache.coyote.";
+        loader.loadClass(basePackage + "http11.AbstractOutputBuffer$1");
+    }
+
+
     private final static void loadJavaxPackage(ClassLoader loader)
         throws Exception {
         loader.loadClass("javax.servlet.http.Cookie");
@@ -221,13 +226,16 @@ public final class SecurityClassLoad {
     private final static void loadTomcatPackage(ClassLoader loader)
         throws Exception {
         String basePackage = "org.apache.tomcat.";
-        loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
-        loader.loadClass
-            (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(
                 basePackage + "util.http.FastHttpDateFormat");
         clazz.newInstance();
+        loader.loadClass(basePackage + "util.http.HttpMessages");
+        loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
+        loader.loadClass
+            (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
+        loader.loadClass
+            (basePackage + "util.net.AprEndpoint$PrivilegedSetTccl");
     }
 }
 

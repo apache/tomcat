@@ -16,22 +16,17 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-
 public class SocketWrapper<E> {
     
     protected volatile E socket;
     
     protected volatile long lastAccess = -1;
-    protected volatile boolean currentAccess = false;
     protected long timeout = -1;
     protected boolean error = false;
     protected long lastRegistered = 0;
     protected volatile int keepAliveLeft = 100;
     protected boolean async = false;
     protected boolean keptAlive = false;
-    public AtomicBoolean processing = new AtomicBoolean(false);
     
     public SocketWrapper(E socket) {
         this.socket = socket;
@@ -46,8 +41,6 @@ public class SocketWrapper<E> {
     public long getLastAccess() { return lastAccess; }
     public void access() { access(System.currentTimeMillis()); }
     public void access(long access) { lastAccess = access; }
-    public boolean getCurrentAccess() { return currentAccess; }
-    public void setCurrentAccess(boolean access) { currentAccess = access; }
     public void setTimeout(long timeout) {this.timeout = timeout;}
     public long getTimeout() {return this.timeout;}
     public boolean getError() { return error; }

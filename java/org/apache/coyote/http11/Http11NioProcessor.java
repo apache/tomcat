@@ -22,7 +22,6 @@ import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 import java.util.Locale;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
@@ -236,11 +235,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                         Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
                         if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
                     } else {
-                        //reset the timeout
-                        if (keepAlive && keepAliveTimeout>0) {
-                            attach.setTimeout(keepAliveTimeout);
-                        } else {
-                            attach.setTimeout(soTimeout);
+                        if (isAsyncDispatching()) {
+                            //reset the timeout
+                            if (keepAlive && keepAliveTimeout>0) {
+                                attach.setTimeout(keepAliveTimeout);
+                            } else {
+                                attach.setTimeout(soTimeout);
+                            }
                         }
                     }
 
@@ -261,7 +262,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         if (error) {
             recycle();
             return SocketState.CLOSED;
-        } else if (!comet) {
+        } else if (!comet && !isAsync()) {
             recycle();
             return (keepAlive)?SocketState.OPEN:SocketState.CLOSED;
         } else {
@@ -291,7 +292,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         error = false;
         keepAlive = true;
         comet = false;
-        async = false;
         
         long soTimeout = endpoint.getSoTimeout();
         int keepAliveTimeout = endpoint.getKeepAliveTimeout();
@@ -301,7 +301,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         boolean recycle = true;
         final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
         
-        while (!error && keepAlive && !comet && !async && !endpoint.isPaused()) {
+        while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
             //always default to our soTimeout
             ka.setTimeout(soTimeout);
             // Parsing the request header
@@ -412,7 +412,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             }
 
             // Finish the handling of the request
-            if (!comet && !async) {
+            if (!comet && !isAsync()) {
                 // If we know we are closing the connection, don't drain input.
                 // This way uploading a 100GB file doesn't tie up the thread 
                 // if the servlet has rejected it.
@@ -428,7 +428,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             }
             request.updateCounters();
 
-            if (!comet && !async) {
+            if (!comet && !isAsync()) {
                 // Next request
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
@@ -453,7 +453,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         if (error || endpoint.isPaused()) {
             recycle();
             return SocketState.CLOSED;
-        } else if (comet || async) {
+        } else if (comet || isAsync()) {
             return SocketState.LONG;
         } else {
             if (recycle) {
@@ -494,13 +494,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
         if (actionCode == ActionCode.CLOSE) {
             // Close
-
             // End the processing of the current request, and stop any further
             // transactions with the client
 
             comet = false;
             cometClose = true;
-            async = false;
             SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
@@ -654,17 +652,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
                 attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-          //TODO SERVLET3 - async
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
-                dispatch.set(true);
-                endpoint.processSocket(this.socket, SocketStatus.STOP, true);
-            } else {
-                dispatch.set(false);
+            if (asyncComplete()) {
+                endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-          //TODO SERVLET3 - async
             if (param==null) return;
             if (socket==null || socket.getAttachment(false)==null) return;
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
@@ -672,13 +663,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             //if we are not piggy backing on a worker thread, set the timeout
             attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            RequestInfo rp = request.getRequestProcessor();
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
+            if (asyncDispatch()) {
                 endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
-                dispatch.set(true);
-            } else { 
-                dispatch.set(true);
             }
         }
     }
