@@ -27,6 +27,7 @@ import java.util.jar.JarFile;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -570,6 +571,7 @@ class JspReader {
                                    longName, encoding);
             }
         } catch (Throwable ex) {
+            ExceptionUtils.handleThrowable(ex);
             log.error("Exception parsing file ", ex);
             // Pop state being constructed:
             popFile();

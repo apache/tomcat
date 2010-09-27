@@ -42,6 +42,7 @@ import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.runtime.InstanceManagerFactory;
 import org.apache.jasper.runtime.JspSourceDependent;
 import org.apache.jasper.util.Entry;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -261,6 +262,7 @@ public class JspServletWrapper {
                 return ((JspSourceDependent) target).getDependants();
             }
         } catch (Throwable ex) {
+            ExceptionUtils.handleThrowable(ex);
         }
         return null;
     }

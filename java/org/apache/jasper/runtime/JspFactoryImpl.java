@@ -29,6 +29,7 @@ import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -112,7 +113,7 @@ public class JspFactoryImpl extends JspFactory {
                     needsSession, bufferSize, autoflush);
             return pc;
         } catch (Throwable ex) {
-            /* FIXME: need to do something reasonable here!! */
+            ExceptionUtils.handleThrowable(ex);
             log.fatal("Exception initializing page context", ex);
             return null;
         }
