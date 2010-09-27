@@ -32,6 +32,7 @@ import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.jasper.util.ExceptionUtils;
 
 
 
@@ -149,6 +150,7 @@ public class ClusterSingleSignOn
                         "There is no Cluster for ClusterSingleSignOn");
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(
                     "ClusterSingleSignOn exception during clusterLoad " + t);
         }

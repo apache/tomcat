@@ -834,6 +834,7 @@ public class ManagerServlet
                 writer.println(sm.getString("managerServlet.deployFailed", displayPath));
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.install[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                     t.toString()));
@@ -917,6 +918,7 @@ public class ManagerServlet
             writer.println
                 (sm.getString("managerServlet.reloaded", displayPath));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.reload[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
@@ -961,6 +963,7 @@ public class ManagerServlet
                 clazz = Class.forName(type);
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.resources[" + type + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
@@ -1000,6 +1003,7 @@ public class ManagerServlet
                 }
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.resources[" + type + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
@@ -1081,6 +1085,7 @@ public class ManagerServlet
             props.append(System.getProperty("java.vm.vendor"));
             writer.println(props.toString());
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             getServletContext().log("ManagerServlet.serverinfo",t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
@@ -1178,6 +1183,7 @@ public class ManagerServlet
                 writer.println(sm.getString("managerServlet.sessiontimeout.expired",
                                             "" + idle,"" + expired));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.sessions[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
@@ -1254,6 +1260,7 @@ public class ManagerServlet
                 writer.println
                     (sm.getString("managerServlet.startFailed", displayPath));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             getServletContext().log
                 (sm.getString("managerServlet.startFailed", displayPath), t);
             writer.println
@@ -1300,6 +1307,7 @@ public class ManagerServlet
             context.stop();
             writer.println(sm.getString("managerServlet.stopped", displayPath));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.stop[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
@@ -1375,6 +1383,7 @@ public class ManagerServlet
             writer.println(sm.getString("managerServlet.undeployed",
                                         displayPath));
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.undeploy[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
                                         t.toString()));
