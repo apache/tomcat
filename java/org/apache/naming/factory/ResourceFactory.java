@@ -98,12 +98,12 @@ public class ResourceFactory
                 if (factoryClass != null) {
                     try {
                         factory = (ObjectFactory) factoryClass.newInstance();
-                    } catch (Throwable t) {
-                        if (t instanceof NamingException)
-                            throw (NamingException) t;
+                    } catch (Exception e) {
+                        if (e instanceof NamingException)
+                            throw (NamingException) e;
                         NamingException ex = new NamingException
                             ("Could not create resource factory instance");
-                        ex.initCause(t);
+                        ex.initCause(e);
                         throw ex;
                     }
                 }
@@ -116,10 +116,10 @@ public class ResourceFactory
                         factory = (ObjectFactory) 
                             Class.forName(javaxSqlDataSourceFactoryClassName)
                             .newInstance();
-                    } catch (Throwable t) {
+                    } catch (Exception e) {
                         NamingException ex = new NamingException
                             ("Could not create resource factory instance");
-                        ex.initCause(t);
+                        ex.initCause(e);
                         throw ex;
                     }
                 } else if (ref.getClassName().equals("javax.mail.Session")) {
