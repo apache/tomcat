@@ -315,7 +315,7 @@ public class TldLocationsCache {
                             try {
                                 stream.close();
                             } catch (Throwable t) {
-                                // do nothing
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
@@ -351,7 +351,7 @@ public class TldLocationsCache {
                             try {
                                 stream.close();
                             } catch (Throwable t) {
-                                // do nothing
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
@@ -440,7 +440,7 @@ public class TldLocationsCache {
                 try {
                     stream.close();
                 } catch (Throwable t) {
-                    // do nothing
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         }
