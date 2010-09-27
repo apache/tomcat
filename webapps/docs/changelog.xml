@@ -39,6 +39,10 @@
 <section name="Tomcat 7.0.3 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>48644</bug>: Review all instances of catching Throwable and
+        re-throw where appropriate. (markt)
+      </fix>
       <update>
         Allow glob patterns in the <code>jarsToSkip</code> configuration and add
         some debug logging to the jar scanner. (rjung)
