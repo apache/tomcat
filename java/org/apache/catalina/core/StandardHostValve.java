@@ -38,6 +38,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -471,7 +472,7 @@ final class StandardHostValve
             return (true);
 
         } catch (Throwable t) {
-
+            ExceptionUtils.handleThrowable(t);
             // Report our failure to process this custom page
             container.getLogger().error("Exception Processing " + errorPage, t);
             return (false);

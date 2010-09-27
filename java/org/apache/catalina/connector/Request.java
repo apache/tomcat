@@ -75,6 +75,7 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -1449,9 +1450,10 @@ public class Request
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
-                attributes.put( Globals.EXCEPTION_ATTR, t );
+                attributes.put(Globals.EXCEPTION_ATTR, t);
             }
         }
     }
@@ -1535,6 +1537,7 @@ public class Request
                     listener.attributeAdded(event);
                 }
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
                 attributes.put( Globals.EXCEPTION_ATTR, t );
