@@ -31,6 +31,7 @@ import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
@@ -156,6 +157,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
@@ -242,6 +244,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 error = true;
                 break;
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.header.parse"), t);
                 }
@@ -257,6 +260,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 try {
                     prepareRequest();
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("http11processor.request.prepare"), t);
                     }
@@ -287,6 +291,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("http11processor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
@@ -363,6 +368,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
