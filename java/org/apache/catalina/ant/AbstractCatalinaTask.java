@@ -20,6 +20,7 @@ package org.apache.catalina.ant;
 
 
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -262,27 +263,27 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 // or error line will be logged twice
                 throw new BuildException(error);
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             if (isFailOnError()) {
-                throw new BuildException(t);
+                throw new BuildException(e);
             } else {
-                handleErrorOutput(t.getMessage());
+                handleErrorOutput(e.getMessage());
             }
         } finally {
             closeRedirector();
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (Throwable u) {
-                    ExceptionUtils.handleThrowable(u);
+                } catch (IOException ioe) {
+                    // Ignore
                 }
                 reader = null;
             }
             if (istream != null) {
                 try {
                     istream.close();
-                } catch (Throwable u) {
-                    ExceptionUtils.handleThrowable(u);
+                } catch (IOException ioe) {
+                    // Ignore
                 }
                 istream = null;
             }
