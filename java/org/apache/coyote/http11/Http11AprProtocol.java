@@ -17,6 +17,8 @@
 
 package org.apache.coyote.http11;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +34,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -246,8 +249,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
         
-        protected ConcurrentHashMap<Long, Http11AprProcessor> connections =
-            new ConcurrentHashMap<Long, Http11AprProcessor>();
+        protected ConcurrentHashMap<SocketWrapper<Long>, Http11AprProcessor> connections =
+            new ConcurrentHashMap<SocketWrapper<Long>, Http11AprProcessor>();
         protected ConcurrentLinkedQueue<Http11AprProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11AprProcessor>() {
             private static final long serialVersionUID = 1L;
@@ -294,8 +297,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
 
         @Override
-        public SocketState event(long socket, SocketStatus status) {
-            Http11AprProcessor result = connections.get(Long.valueOf(socket));
+        public SocketState event(SocketWrapper<Long> socket, SocketStatus status) {
+            Http11AprProcessor result = connections.get(socket);
             
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
@@ -324,16 +327,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                                 "http11protocol.proto.error"), e);
                     } finally {
                         if (state != SocketState.LONG) {
-                            connections.remove(Long.valueOf(socket));
+                            connections.remove(socket);
                             recycledProcessors.offer(result);
                             if (state == SocketState.OPEN) {
-                                ((AprEndpoint)proto.endpoint).getPoller().add(socket);
+                                ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
                             }
                         } else {
-                            ((AprEndpoint)proto.endpoint).getCometPoller().add(socket);
+                            ((AprEndpoint)proto.endpoint).getCometPoller().add(socket.getSocket().longValue());
                         }
                     }
-                } else if (result.async) {
+                } else if (result.isAsync()) {
                     state = asyncDispatch(socket, status);
                 }
             }
@@ -341,7 +344,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
         
         @Override
-        public SocketState process(long socket) {
+        public SocketState process(SocketWrapper<Long> socket) {
             Http11AprProcessor processor = recycledProcessors.poll();
             try {
                 if (processor == null) {
@@ -350,11 +353,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
                 SocketState state = processor.process(socket);
                 if (state == SocketState.LONG) {
-                    // Associate the connection with the processor. The next request 
-                    // processed by this thread will use either a new or a recycled
-                    // processor.
-                    connections.put(Long.valueOf(socket), processor);
-                    ((AprEndpoint)proto.endpoint).getCometPoller().add(socket);
+                    // Check if the post processing is going to change the state
+                    state = processor.asyncPostProcess();
+                }
+                if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
+                    // Need to make socket available for next processing cycle
+                    // but no need for the poller
+                    connections.put(socket, processor);
                 } else {
                     recycledProcessors.offer(processor);
                 }
@@ -386,8 +391,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
 
         @Override
-        public SocketState asyncDispatch(long socket, SocketStatus status) {
-            Http11AprProcessor result = connections.get(Long.valueOf(socket));
+        public SocketState asyncDispatch(SocketWrapper<Long> socket, SocketStatus status) {
+            Http11AprProcessor result = connections.get(socket);
             
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
@@ -404,11 +409,14 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     Http11AprProtocol.log.error
                         (sm.getString("http11protocol.proto.error"), e);
                 } finally {
-                    if (state != SocketState.LONG) {
-                        connections.remove(Long.valueOf(socket));
+                    if (state == SocketState.LONG && result.isAsync()) {
+                        state = result.asyncPostProcess();
+                    }
+                    if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
+                        connections.remove(socket);
                         recycledProcessors.offer(result);
                         if (state == SocketState.OPEN) {
-                            ((AprEndpoint)proto.endpoint).getPoller().add(socket);
+                            ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
                         }
                     }
                 }
@@ -440,15 +448,29 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 synchronized (this) {
                     try {
                         long count = registerCount.incrementAndGet();
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        final RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
-                        ObjectName rpName = new ObjectName
+                        final ObjectName rpName = new ObjectName
                             (proto.getDomain() + ":type=RequestProcessor,worker="
                                 + proto.getName() + ",name=HttpRequest" + count);
                         if (log.isDebugEnabled()) {
                             log.debug("Register " + rpName);
                         }
-                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                                @Override
+                                public Void run() {
+                                    try {
+                                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                                    } catch (Exception e) {
+                                        log.warn("Error registering request");
+                                    }
+                                    return null;
+                                }
+                            });
+                        } else {
+                            Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        }
                         rp.setRpName(rpName);
                     } catch (Exception e) {
                         log.warn("Error registering request");

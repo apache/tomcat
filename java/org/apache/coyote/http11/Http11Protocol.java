@@ -17,7 +17,10 @@
 
 package org.apache.coyote.http11;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -257,6 +260,9 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
+                    // longPoll may change socket state (e.g. to trigger a
+                    // complete or dispatch)
+                    return processor.asyncPostProcess();
                 } else {
                     connections.remove(socket);
                     socket.setAsync(false);
@@ -310,15 +316,29 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 synchronized (this) {
                     try {
                         long count = registerCount.incrementAndGet();
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        final RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
-                        ObjectName rpName = new ObjectName
+                        final ObjectName rpName = new ObjectName
                             (proto.getDomain() + ":type=RequestProcessor,worker="
                                 + proto.getName() + ",name=HttpRequest" + count);
                         if (log.isDebugEnabled()) {
                             log.debug("Register " + rpName);
                         }
-                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                                @Override
+                                public Void run() {
+                                    try {
+                                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                                    } catch (Exception e) {
+                                        log.warn("Error registering request");
+                                    }
+                                    return null;
+                                }
+                            });
+                        } else {
+                            Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        }
                         rp.setRpName(rpName);
                     } catch (Exception e) {
                         log.warn("Error registering request");

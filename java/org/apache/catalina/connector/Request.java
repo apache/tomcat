@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
@@ -1613,12 +1614,20 @@ public class Request
         if (asyncContext == null) {
             return false;
         }
-        
-        return (asyncContext.getState()==AsyncContextImpl.AsyncState.DISPATCHING ||
-                asyncContext.getState()==AsyncContextImpl.AsyncState.TIMING_OUT  ||
-                asyncContext.getState()==AsyncContextImpl.AsyncState.STARTED     ||
-                asyncContext.getState()==AsyncContextImpl.AsyncState.ERROR_DISPATCHING ||
-                asyncContext.getState()==AsyncContextImpl.AsyncState.COMPLETING);
+
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteRequest.action(ActionCode.ASYNC_IS_DISPATCHING, result);
+        return result.get();
+    }
+
+    public boolean isAsync() {
+        if (asyncContext == null) {
+            return false;
+        }
+
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteRequest.action(ActionCode.ASYNC_IS_ASYNC, result);
+        return result.get();
     }
 
     @Override

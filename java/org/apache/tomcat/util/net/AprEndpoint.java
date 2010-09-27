@@ -21,6 +21,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.juli.logging.Log;
@@ -93,6 +95,9 @@ public class AprEndpoint extends AbstractEndpoint {
     private Acceptor acceptors[] = null;
 
 
+    protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
+        new ConcurrentLinkedQueue<SocketWrapper<Long>>();
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -101,6 +106,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean deferAccept = true;
     public void setDeferAccept(boolean deferAccept) { this.deferAccept = deferAccept; }
+    @Override
     public boolean getDeferAccept() { return deferAccept; }
 
 
@@ -142,6 +148,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean useSendfile = Library.APR_HAS_SENDFILE;
     public void setUseSendfile(boolean useSendfile) { this.useSendfile = useSendfile; }
+    @Override
     public boolean getUseSendfile() { return useSendfile; }
 
 
@@ -580,6 +587,12 @@ public class AprEndpoint extends AbstractEndpoint {
                 acceptors[i].start();
             }
 
+            // Start async timeout thread
+            Thread timeoutThread = new Thread(new AsyncTimeout(),
+                    getName() + "-AsyncTimeout");
+            timeoutThread.setPriority(threadPriority);
+            timeoutThread.setDaemon(true);
+            timeoutThread.start();
         }
     }
 
@@ -587,6 +600,7 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Stop the endpoint. This will cause all processing threads to stop.
      */
+    @Override
     public void stop() {
         if (!paused) {
             pause();
@@ -748,7 +762,9 @@ public class AprEndpoint extends AbstractEndpoint {
         try {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
-                getExecutor().execute(new SocketWithOptionsProcessor(socket));
+                SocketWrapper<Long> wrapper =
+                    new SocketWrapper<Long>(Long.valueOf(socket));
+                getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
@@ -768,7 +784,9 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(long socket) {
         try {
-            getExecutor().execute(new SocketProcessor(socket));
+            SocketWrapper<Long> wrapper =
+                new SocketWrapper<Long>(Long.valueOf(socket));
+            getExecutor().execute(new SocketProcessor(wrapper, null));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -789,8 +807,10 @@ public class AprEndpoint extends AbstractEndpoint {
         try {
             if (status == SocketStatus.OPEN || status == SocketStatus.STOP ||
                     status == SocketStatus.TIMEOUT) {
+                SocketWrapper<Long> wrapper =
+                    new SocketWrapper<Long>(Long.valueOf(socket));
                 SocketEventProcessor proc =
-                    new SocketEventProcessor(socket, status);
+                    new SocketEventProcessor(wrapper, status);
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 try {
                     if (IS_SECURITY_ENABLED) {
@@ -810,6 +830,45 @@ public class AprEndpoint extends AbstractEndpoint {
                         Thread.currentThread().setContextClassLoader(loader);
                     }
                 }            }
+        } catch (RejectedExecutionException x) {
+            log.warn("Socket processing request was rejected for:"+socket,x);
+            return false;
+        } catch (Throwable t) {
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean processSocketAsync(SocketWrapper<Long> socket,
+            SocketStatus status) {
+        try {
+            synchronized (socket) {
+                if (waitingRequests.remove(socket)) {
+                    SocketProcessor proc = new SocketProcessor(socket, status);
+                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                    try {
+                        if (IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                    getClass().getClassLoader());
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(
+                                    getClass().getClassLoader());
+                        }
+                        getExecutor().execute(proc);
+                    } finally {
+                        if (IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(loader);
+                        }
+                    }
+                }
+            }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -898,9 +957,50 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
 
+    /**
+     * Async timeout thread
+     */
+    protected class AsyncTimeout implements Runnable {
+        /**
+         * The background thread that checks async requests and fires the
+         * timeout if there has been no activity.
+         */
+        @Override
+        public void run() {
+
+            // Loop until we receive a shutdown command
+            while (running) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                long now = System.currentTimeMillis();
+                Iterator<SocketWrapper<Long>> sockets =
+                    waitingRequests.iterator();
+                while (sockets.hasNext()) {
+                    SocketWrapper<Long> socket = sockets.next();
+                    long access = socket.getLastAccess();
+                    if ((now-access)>socket.getTimeout()) {
+                        processSocketAsync(socket,SocketStatus.TIMEOUT);
+                    }
+                }
+                
+                // Loop if endpoint is paused
+                while (paused && running) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    
     // ----------------------------------------------------- Poller Inner Class
-
-
     /**
      * Poller class.
      */
@@ -951,6 +1051,7 @@ public class AprEndpoint extends AbstractEndpoint {
         /**
          * Destroy the poller.
          */
+        @Override
         public void destroy() {
             // Close all sockets in the add queue
             for (int i = 0; i < addCount; i++) {
@@ -1015,6 +1116,7 @@ public class AprEndpoint extends AbstractEndpoint {
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
          */
+        @Override
         public void run() {
 
             long maintainTime = 0;
@@ -1212,6 +1314,7 @@ public class AprEndpoint extends AbstractEndpoint {
         /**
          * Destroy the poller.
          */
+        @Override
         public void destroy() {
             // Close any socket remaining in the add queue
             addCount = 0;
@@ -1314,6 +1417,7 @@ public class AprEndpoint extends AbstractEndpoint {
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
          */
+        @Override
         public void run() {
 
             long maintainTime = 0;
@@ -1478,14 +1582,15 @@ public class AprEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(long socket);
-        public SocketState event(long socket, SocketStatus status);
-        public SocketState asyncDispatch(long socket, SocketStatus status);
+        public SocketState process(SocketWrapper<Long> socket);
+        public SocketState event(SocketWrapper<Long> socket,
+                SocketStatus status);
+        public SocketState asyncDispatch(SocketWrapper<Long> socket,
+                SocketStatus status);
     }
 
 
     // ---------------------------------------------- SocketProcessor Inner Class
-
 
     /**
      * This class is the equivalent of the Worker, but will simply use in an
@@ -1494,29 +1599,32 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected class SocketWithOptionsProcessor implements Runnable {
 
-        protected long socket = 0;
+        protected SocketWrapper<Long> socket = null;
 
-        public SocketWithOptionsProcessor(long socket) {
+        public SocketWithOptionsProcessor(SocketWrapper<Long> socket) {
             this.socket = socket;
         }
 
+        @Override
         public void run() {
 
-            if (!deferAccept) {
-                if (setSocketOptions(socket)) {
-                    getPoller().add(socket);
+            synchronized (socket) {
+                if (!deferAccept) {
+                    if (setSocketOptions(socket.getSocket().longValue())) {
+                        getPoller().add(socket.getSocket().longValue());
+                    } else {
+                        // Close socket and pool
+                        destroySocket(socket.getSocket().longValue());
+                        socket = null;
+                    }
                 } else {
-                    // Close socket and pool
-                    destroySocket(socket);
-                    socket = 0;
-                }
-            } else {
-                // Process the request from this socket
-                if (!setSocketOptions(socket)
-                        || handler.process(socket) == Handler.SocketState.CLOSED) {
-                    // Close socket and pool
-                    destroySocket(socket);
-                    socket = 0;
+                    // Process the request from this socket
+                    if (!setSocketOptions(socket.getSocket().longValue())
+                            || handler.process(socket) == Handler.SocketState.CLOSED) {
+                        // Close socket and pool
+                        destroySocket(socket.getSocket().longValue());
+                        socket = null;
+                    }
                 }
             }
 
@@ -1534,27 +1642,34 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected class SocketProcessor implements Runnable {
 
-        protected long socket = 0;
-        protected boolean async = false;
-        protected SocketStatus status = SocketStatus.ERROR;
+        protected SocketWrapper<Long> socket = null;
+        protected SocketStatus status = null;
 
-        public SocketProcessor(long socket) {
+        public SocketProcessor(SocketWrapper<Long> socket,
+                SocketStatus status) {
             this.socket = socket;
-            this.async = false;
+            this.status = status;
         }
 
+        @Override
         public void run() {
-
-            // Process the request from this socket
-            Handler.SocketState state = async?handler.asyncDispatch(socket, status):handler.process(socket);
-            if (state == Handler.SocketState.CLOSED) {
-                // Close socket and pool
-                destroySocket(socket);
-                socket = 0;
+            synchronized (socket) {
+                // Process the request from this socket
+                Handler.SocketState state = (status==null)?handler.process(socket):handler.asyncDispatch(socket, status);
+                if (state == Handler.SocketState.CLOSED) {
+                    // Close socket and pool
+                    destroySocket(socket.getSocket().longValue());
+                    socket = null;
+                } else if (state == Handler.SocketState.LONG) {
+                    socket.access();
+                    waitingRequests.add(socket);
+                } else if (state == Handler.SocketState.ASYNC_END) {
+                    socket.access();
+                    SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN);
+                    getExecutor().execute(proc);
+                }
             }
-
         }
-
     }
 
 
@@ -1567,25 +1682,27 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected class SocketEventProcessor implements Runnable {
 
-        protected long socket = 0;
+        protected SocketWrapper<Long> socket = null;
         protected SocketStatus status = null;
 
-        public SocketEventProcessor(long socket, SocketStatus status) {
+        public SocketEventProcessor(SocketWrapper<Long> socket,
+                SocketStatus status) {
             this.socket = socket;
             this.status = status;
         }
 
+        @Override
         public void run() {
-
-            // Process the request from this socket
-            if (handler.event(socket, status) == Handler.SocketState.CLOSED) {
-                // Close socket and pool
-                destroySocket(socket);
-                socket = 0;
+            synchronized (socket) {
+                // Process the request from this socket
+                Handler.SocketState state = handler.event(socket, status);
+                if (state == Handler.SocketState.CLOSED) {
+                    // Close socket and pool
+                    destroySocket(socket.getSocket().longValue());
+                    socket = null;
+                }
             }
-
         }
-
     }
 
     private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
@@ -1596,6 +1713,7 @@ public class AprEndpoint extends AbstractEndpoint {
             this.cl = cl;
         }
 
+        @Override
         public Void run() {
             Thread.currentThread().setContextClassLoader(cl);
             return null;
