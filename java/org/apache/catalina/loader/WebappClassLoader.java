@@ -70,6 +70,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.jasper.servlet.JasperLoader;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.naming.JndiPermission;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
@@ -2105,6 +2106,7 @@ public class WebappClassLoader
                                     }
                                 }
                             } catch (Throwable t) {
+                                ExceptionUtils.handleThrowable(t);
                                 if (log.isDebugEnabled()) {
                                     log.debug("Could not set field " + field.getName() 
                                             + " to null in class " + clazz.getName(), t);
@@ -2113,6 +2115,7 @@ public class WebappClassLoader
                         }
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     if (log.isDebugEnabled()) {
                         log.debug("Could not clean fields for class " + clazz.getName(), t);
                     }
@@ -2162,6 +2165,7 @@ public class WebappClassLoader
                     }
                 }
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
                     log.debug("Could not set field " + field.getName() 
                             + " to null in object instance of class " 
@@ -3273,7 +3277,7 @@ public class WebappClassLoader
                 } else {
                     clazz = Class.forName(triggers[i]);
                 }
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 clazz = null;
             }
             if (clazz == null)
