@@ -31,6 +31,7 @@ import javax.management.ObjectName;
 
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -282,6 +283,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             // rare-but-nonfatal exceptions, catch them here, and log as
             // above.
             catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
