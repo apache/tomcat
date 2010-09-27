@@ -55,6 +55,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
 import org.apache.naming.resources.Resource;
@@ -568,6 +569,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 // Log and continue anyway, this is not critical
                 log.error("Error registering jndi stream handler", e);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // This is likely a dual registration
                 log.info("Dual registration of jndi stream handler: " 
                          + t.getMessage());
@@ -622,6 +624,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 .registerComponent(classLoader, cloname, null);
 
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error( "LifecycleException ", t );
             throw new LifecycleException("start: ", t);
         }
@@ -666,8 +669,8 @@ public class WebappLoader extends LifecycleMBeanBase
                 (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,path="
                  + path + ",host=" + ctx.getParent().getName());
             Registry.getRegistry(null, null).unregisterComponent(cloname);
-        } catch (Throwable t) {
-            log.error( "LifecycleException ", t );
+        } catch (Exception e) {
+            log.error("LifecycleException ", e);
         }
 
         classLoader = null;

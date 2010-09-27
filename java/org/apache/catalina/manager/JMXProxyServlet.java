@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -207,6 +208,7 @@ public class JMXProxyServlet extends HttpServlet  {
                                         sb.append(escape(item.toString()));
                                     }
                                     catch (Throwable t) {
+                                        ExceptionUtils.handleThrowable(t);
                                         sb.append("NON-STRINGABLE VALUE");
                                     }
                                 }
@@ -222,7 +224,7 @@ public class JMXProxyServlet extends HttpServlet  {
                         writer.println( attName + ": " + valueString);
                     }
                     catch (Throwable t) {
-                        // Ignore
+                        ExceptionUtils.handleThrowable(t);
                     }
                 }
             } catch (Exception e) {
