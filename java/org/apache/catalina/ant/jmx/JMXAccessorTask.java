@@ -351,11 +351,11 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     // or error line will be logged twice
                     throw new BuildException(error);
                 }
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 if (isFailOnError()) {
-                    throw new BuildException(t);
+                    throw new BuildException(e);
                 } else {
-                    handleErrorOutput(t.getMessage());
+                    handleErrorOutput(e.getMessage());
                 }
             } finally {
                 closeRedirector();
