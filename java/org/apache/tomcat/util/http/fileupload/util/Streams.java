@@ -119,14 +119,14 @@ public final class Streams {
             if (in != null) {
                 try {
                     in.close();
-                } catch (Throwable t) {
+                } catch (IOException ioe) {
                     /* Ignore me */
                 }
             }
             if (pClose  &&  out != null) {
                 try {
                     out.close();
-                } catch (Throwable t) {
+                } catch (IOException ioe) {
                     /* Ignore me */
                 }
             }

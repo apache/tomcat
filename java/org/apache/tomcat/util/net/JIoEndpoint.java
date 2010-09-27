@@ -31,6 +31,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 
@@ -226,6 +227,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         log.error(sm.getString("endpoint.accept.fail"), npe);
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
                 // The processor will recycle itself when it finishes
@@ -267,6 +269,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         // SSL handshake
                         serverSocketFactory.handshake(socket.getSocket());
                     } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("endpoint.err.handshake"), t);
                         }
@@ -484,6 +487,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             // Close the socket
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("endpoint.err.unexpected"), t);
             // Close the socket
             return false;
@@ -519,6 +523,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -572,6 +577,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
