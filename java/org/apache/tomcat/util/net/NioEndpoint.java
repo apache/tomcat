@@ -51,6 +51,7 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
@@ -408,6 +409,7 @@ public class NioEndpoint extends AbstractEndpoint {
             try {
                 log.fatal(oomParachuteMsg);
             }catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 System.err.println(oomParachuteMsg);
             }
             lastParachuteCheck = System.currentTimeMillis();
@@ -702,9 +704,12 @@ public class NioEndpoint extends AbstractEndpoint {
             }
             getPoller0().register(channel);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             try {
                 log.error("",t);
-            }catch ( Throwable tt){}
+            } catch (Throwable tt) {
+                ExceptionUtils.handleThrowable(t);
+            }
             // Tell to close the socket
             return false;
         }
@@ -750,6 +755,7 @@ public class NioEndpoint extends AbstractEndpoint {
             log.warn("Socket processing request was rejected for:"+socket,rx);
             return false;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -827,10 +833,15 @@ public class NioEndpoint extends AbstractEndpoint {
                             try {
                                 System.err.println(oomParachuteMsg);
                                 oomt.printStackTrace();
-                            }catch (Throwable letsHopeWeDontGetHere){}
-                        }catch (Throwable letsHopeWeDontGetHere){}
+                            }catch (Throwable letsHopeWeDontGetHere){
+                                ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                            }
+                        }catch (Throwable letsHopeWeDontGetHere){
+                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                        }
                     }
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
             }//while
@@ -1038,6 +1049,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
                 if (ka!=null) ka.reset();
             } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 if ( log.isDebugEnabled() ) log.error("",e);
                 // Ignore
             }
@@ -1097,6 +1109,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         if ( wakeupCounter == null || selector == null ) throw x;
                         continue;
                     } catch (Throwable x) {
+                        ExceptionUtils.handleThrowable(x);
                         log.error("",x);
                         continue;
                     }
@@ -1127,7 +1140,9 @@ public class NioEndpoint extends AbstractEndpoint {
                         try {
                             System.err.println(oomParachuteMsg);
                             oomt.printStackTrace();
-                        }catch (Throwable letsHopeWeDontGetHere){}
+                        }catch (Throwable letsHopeWeDontGetHere){
+                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                        }
                     }
                 }
             }//while
@@ -1189,6 +1204,7 @@ public class NioEndpoint extends AbstractEndpoint {
             } catch ( CancelledKeyException ckx ) {
                 cancelledKey(sk, SocketStatus.ERROR,false);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error("",t);
             }
             return result;
@@ -1557,7 +1573,9 @@ public class NioEndpoint extends AbstractEndpoint {
                         try {
                             System.err.println(oomParachuteMsg);
                             oomt.printStackTrace();
-                        }catch (Throwable letsHopeWeDontGetHere){}
+                        }catch (Throwable letsHopeWeDontGetHere){
+                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                        }
                     }
                 }catch ( Throwable t ) {
                     log.error("",t);

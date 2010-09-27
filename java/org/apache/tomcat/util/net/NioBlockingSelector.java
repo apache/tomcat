@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
@@ -328,6 +329,7 @@ public class NioBlockingSelector {
                         if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
                         continue;
                     } catch (Throwable x) {
+                        ExceptionUtils.handleThrowable(x);
                         log.error("",x);
                         continue;
                     }

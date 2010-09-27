@@ -37,6 +37,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
@@ -100,6 +101,7 @@ public class Digester extends DefaultHandler {
                     sources[0] = src;
                     initialized = true;
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     LogFactory.getLog("org.apache.commons.digester.Digester").
                         error("Unable to load property source["+className+"].",t);
                 }
