@@ -597,13 +597,13 @@ public class HostManagerServlet
             host.start();
             writer.println
                 (sm.getString("hostManagerServlet.started", name));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             getServletContext().log
-                (sm.getString("hostManagerServlet.startFailed", name), t);
+                (sm.getString("hostManagerServlet.startFailed", name), e);
             writer.println
                 (sm.getString("hostManagerServlet.startFailed", name));
             writer.println(sm.getString("hostManagerServlet.exception",
-                                        t.toString()));
+                                        e.toString()));
             return;
         }
         
@@ -656,13 +656,13 @@ public class HostManagerServlet
             host.stop();
             writer.println
                 (sm.getString("hostManagerServlet.stopped", name));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             getServletContext().log
-                (sm.getString("hostManagerServlet.stopFailed", name), t);
+                (sm.getString("hostManagerServlet.stopFailed", name), e);
             writer.println
                 (sm.getString("hostManagerServlet.stopFailed", name));
             writer.println(sm.getString("hostManagerServlet.exception",
-                                        t.toString()));
+                                        e.toString()));
             return;
         }
         

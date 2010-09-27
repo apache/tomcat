@@ -54,7 +54,6 @@ import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
 
 /**
@@ -786,13 +785,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         
         // Set our properties from the initialization parameters
         String value = null;
-        try {
-            value = getServletConfig().getInitParameter("showProxySessions");
-            showProxySessions = Boolean.parseBoolean(value);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-        }
-
+        value = getServletConfig().getInitParameter("showProxySessions");
+        showProxySessions = Boolean.parseBoolean(value);
     }   
 
     // ------------------------------------------------ Sessions administration
