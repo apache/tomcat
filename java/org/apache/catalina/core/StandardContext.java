@@ -96,6 +96,7 @@ import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextBindings;
@@ -1203,6 +1204,7 @@ public class StandardContext extends ContainerBase
                 Class<?> clazz = Class.forName(charsetMapperClass);
                 this.charsetMapper = (CharsetMapper) clazz.newInstance();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 this.charsetMapper = new CharsetMapper();
             }
         }
@@ -2944,6 +2946,7 @@ public class StandardContext extends ContainerBase
             try {
                 wrapper = (Wrapper) wrapperClass.newInstance();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error("createWrapper", t);
                 return (null);
             }
@@ -2959,6 +2962,7 @@ public class StandardContext extends ContainerBase
                       (InstanceListener) clazz.newInstance();
                     wrapper.addInstanceListener(listener);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error("createWrapper", t);
                     return (null);
                 }
@@ -2973,6 +2977,7 @@ public class StandardContext extends ContainerBase
                         (LifecycleListener) clazz.newInstance();
                     wrapper.addLifecycleListener(listener);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error("createWrapper", t);
                     return (null);
                 }
@@ -2987,6 +2992,7 @@ public class StandardContext extends ContainerBase
                       (ContainerListener) clazz.newInstance();
                     wrapper.addContainerListener(listener);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.error("createWrapper", t);
                     return (null);
                 }
@@ -4194,6 +4200,7 @@ public class StandardContext extends ContainerBase
                         new ApplicationFilterConfig(this, filterDefs.get(name));
                     filterConfigs.put(name, filterConfig);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     getLogger().error
                         (sm.getString("standardContext.filterStart", name), t);
                     ok = false;
@@ -4267,6 +4274,7 @@ public class StandardContext extends ContainerBase
             try {
                 results[i] = instanceManager.newInstance(listeners[i]);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 getLogger().error
                     (sm.getString("standardContext.applicationListener",
                                   listeners[i]), t);
@@ -4323,6 +4331,7 @@ public class StandardContext extends ContainerBase
                 listener.contextInitialized(event);
                 fireContainerEvent("afterContextInitialized", listener);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 fireContainerEvent("afterContextInitialized", listener);
                 getLogger().error
                     (sm.getString("standardContext.listenerStart",
@@ -4362,6 +4371,7 @@ public class StandardContext extends ContainerBase
                         listener.contextDestroyed(event);
                         fireContainerEvent("afterContextDestroyed", listener);
                     } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         fireContainerEvent("afterContextDestroyed", listener);
                         getLogger().error
                             (sm.getString("standardContext.listenerStop",
@@ -4372,6 +4382,7 @@ public class StandardContext extends ContainerBase
                 try {
                     getInstanceManager().destroyInstance(listeners[j]);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     getLogger().error
                        (sm.getString("standardContext.listenerStop",
                             listeners[j].getClass().getName()), t);
@@ -4390,6 +4401,7 @@ public class StandardContext extends ContainerBase
                 try {
                     getInstanceManager().destroyInstance(listeners[j]);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     getLogger().error
                         (sm.getString("standardContext.listenerStop",
                             listeners[j].getClass().getName()), t);
@@ -4448,6 +4460,7 @@ public class StandardContext extends ContainerBase
             }
             this.resources = proxyDirContext;
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStart"), t);
             ok = false;
         }
@@ -4485,6 +4498,7 @@ public class StandardContext extends ContainerBase
                 }
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStop"), t);
             ok = false;
         }

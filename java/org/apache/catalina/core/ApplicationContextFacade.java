@@ -47,6 +47,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.jasper.util.ExceptionUtils;
 
 
 /**
@@ -238,6 +239,7 @@ public final class ApplicationContextFacade
                 return (Servlet) invokeMethod(context, "getServlet", 
                                               new Object[]{name});
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (t instanceof ServletException) {
                     throw (ServletException) t;
                 }
@@ -445,6 +447,7 @@ public final class ApplicationContextFacade
                 return (T) invokeMethod(context, "createFilter", 
                                               new Object[]{c});
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (t instanceof ServletException) {
                     throw (ServletException) t;
                 }
@@ -507,6 +510,7 @@ public final class ApplicationContextFacade
                 return (T) invokeMethod(context, "createServlet", 
                                               new Object[]{c});
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (t instanceof ServletException) {
                     throw (ServletException) t;
                 }
@@ -622,6 +626,7 @@ public final class ApplicationContextFacade
                 return (T) invokeMethod(context, "createListener", 
                                               new Object[]{c});
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (t instanceof ServletException) {
                     throw (ServletException) t;
                 }
@@ -771,9 +776,10 @@ public final class ApplicationContextFacade
             Method method = context.getClass().getMethod(methodName, clazz);
             return executeMethod(method,context,params);
         } catch (Exception ex){
-            try{
+            try {
                 handleException(ex);
-            }catch (Throwable t){
+            } catch (Throwable t){
+                ExceptionUtils.handleThrowable(t);
                 throw new RuntimeException(t.getMessage());
             }
             return null;
