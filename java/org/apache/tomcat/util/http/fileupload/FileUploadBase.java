@@ -340,7 +340,7 @@ public abstract class FileUploadBase {
                     FileItem fileItem = iterator.next();
                     try {
                         fileItem.delete();
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         // ignore it
                     }
                 }
