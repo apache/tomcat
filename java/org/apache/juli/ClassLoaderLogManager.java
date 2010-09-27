@@ -488,7 +488,9 @@ public class ClassLoaderLogManager extends LogManager {
         } finally {
             try {
                 is.close();
-            } catch (Throwable t) {}
+            } catch (IOException ioe) {
+                // Ignore
+            }
         }
         
         // Create handlers for the root logger of this classloader
