@@ -36,6 +36,7 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.res.StringManager;
@@ -154,6 +155,7 @@ final class StandardWrapperValve
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.allocateException",
                              wrapper.getName()), e);
             throwable = e;
@@ -179,6 +181,7 @@ final class StandardWrapperValve
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.acknowledgeException",
                              wrapper.getName()), e);
             throwable = e;
@@ -291,6 +294,7 @@ final class StandardWrapperValve
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             request.removeAttribute(Globals.JSP_FILE_ATTR);
             container.getLogger().error(sm.getString(
                     "standardWrapper.serviceException", wrapper.getName(),
@@ -316,6 +320,7 @@ final class StandardWrapperValve
                 wrapper.deallocate(servlet);
             }
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.deallocateException",
                              wrapper.getName()), e);
             if (throwable == null) {
@@ -332,6 +337,7 @@ final class StandardWrapperValve
                 wrapper.unload();
             }
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.unloadException",
                              wrapper.getName()), e);
             if (throwable == null) {
@@ -391,6 +397,7 @@ final class StandardWrapperValve
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.allocateException",
                              wrapper.getName()), e);
             throwable = e;
@@ -466,6 +473,7 @@ final class StandardWrapperValve
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             request.removeAttribute(Globals.JSP_FILE_ATTR);
             container.getLogger().error(sm.getString(
                     "standardWrapper.serviceException", wrapper.getName(),
@@ -485,6 +493,7 @@ final class StandardWrapperValve
                 wrapper.deallocate(servlet);
             }
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.deallocateException",
                              wrapper.getName()), e);
             if (throwable == null) {
@@ -501,6 +510,7 @@ final class StandardWrapperValve
                 wrapper.unload();
             }
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             container.getLogger().error(sm.getString("standardWrapper.unloadException",
                              wrapper.getName()), e);
             if (throwable == null) {
