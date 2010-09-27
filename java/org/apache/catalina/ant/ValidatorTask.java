@@ -100,11 +100,11 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
             is.setByteStream(stream);
             digester.parse(is);
             handleOutput("web.xml validated");
-        } catch (Throwable t) {
+        } catch (Exception e) {
             if (isFailOnError()) {
-                throw new BuildException("Validation failure", t);
+                throw new BuildException("Validation failure", e);
             } else {
-                handleErrorOutput("Validation failure: " + t);
+                handleErrorOutput("Validation failure: " + e);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);

@@ -196,11 +196,11 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                     try {
                         value = jmxServerConnection
                                 .getAttribute(oname, attName);
-                    } catch (Throwable t) {
+                    } catch (Exception e) {
                         if (isEcho())
                             handleErrorOutput("Error getting attribute "
                                     + oname + " " + pname + attName + " "
-                                    + t.toString());
+                                    + e.toString());
                         continue;
                     }
                     if (value == null)
