@@ -787,6 +787,7 @@ public class DeltaManager extends ClusterManagerBase{
             getAllClusterSessions();
 
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("deltaManager.managerLoad"), t);
         }
         

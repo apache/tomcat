@@ -92,7 +92,7 @@ public class ErrorPage implements Serializable {
 
         try {
             this.errorCode = Integer.parseInt(errorCode);
-        } catch (Throwable t) {
+        } catch (NumberFormatException nfe) {
             this.errorCode = 0;
         }
 
