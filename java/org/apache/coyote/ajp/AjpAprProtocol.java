@@ -36,6 +36,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
@@ -420,6 +421,7 @@ public class AjpAprProtocol
             // rare-but-nonfatal exceptions, catch them here, and log as
             // above.
             catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
@@ -456,6 +458,7 @@ public class AjpAprProtocol
                 // rare-but-nonfatal exceptions, catch them here, and log as
                 // above.
                 catch (Throwable e) {
+                    ExceptionUtils.handleThrowable(e);
                     // any other exception or error is odd. Here we log it
                     // with "ERROR" level, so it will show up even on
                     // less-than-verbose logs.
