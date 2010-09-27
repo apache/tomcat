@@ -265,7 +265,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                     memberAlive(resp[i].getSource());
                 }
             } catch (ChannelException ce) {
-                // Handle known failed membersq
+                // Handle known failed members
                 FaultyMember[] faultyMembers = ce.getFaultyMembers();
                 for (FaultyMember faultyMember : faultyMembers) {
                     memberDisappeared(faultyMember.getMember());
