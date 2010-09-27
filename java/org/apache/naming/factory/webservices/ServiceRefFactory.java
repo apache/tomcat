@@ -143,10 +143,10 @@ public class ServiceRefFactory
                         service = factory.createService( new URL(wsdlRefAddr),
                                 serviceQname );
                     }
-                } catch (Throwable t) {
+                } catch (Exception e) {
                     NamingException ex = new NamingException
                     ("Could not create service");
-                    ex.initCause(t);
+                    ex.initCause(e);
                     throw ex;
                 }
             } else {
@@ -175,10 +175,10 @@ public class ServiceRefFactory
                                 serviceInterfaceClass,
                                 new Properties() );
                     }
-                } catch (Throwable t) {
+                } catch (Exception e) {
                     NamingException ex = new NamingException
                     ("Could not create service");
-                    ex.initCause(t);
+                    ex.initCause(e);
                     throw ex;
                 }
             }
@@ -207,10 +207,10 @@ public class ServiceRefFactory
                         m.invoke(service, new Object[] {port.getName(), endpoint });
                         portComponentRef.put(endpoint, new QName(port.getName()));
                     }
-                } catch (Throwable t) {
+                } catch (Exception e) {
                     NamingException ex = new NamingException
                     ("Error while reading Wsdl File");
-                    ex.initCause(t);
+                    ex.initCause(e);
                     throw ex;
                 }
             }
