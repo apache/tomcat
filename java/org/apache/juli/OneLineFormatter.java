@@ -119,7 +119,7 @@ public class OneLineFormatter extends Formatter {
         int index;
         try {
             index = Integer.parseInt(month) - 1;
-        } catch (Throwable t) {
+        } catch (Exception e) {
             index = 0;  // Can not happen, in theory
         }
         return (months[index]);
