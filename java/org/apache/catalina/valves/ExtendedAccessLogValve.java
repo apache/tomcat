@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -180,6 +181,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if ("".equals(svalue))
                 return "-";
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             /* Log error */
             return "-";
         }
@@ -612,6 +614,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         try {
                             value = InetAddress.getLocalHost().getHostName();
                         } catch (Throwable e) {
+                            ExceptionUtils.handleThrowable(e);
                             value = "localhost";
                         }
                         buf.append(value);

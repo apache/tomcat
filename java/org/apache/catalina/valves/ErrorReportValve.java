@@ -254,6 +254,7 @@ public class ErrorReportValve extends ValveBase {
                 response.setContentType("text/html");
                 response.setCharacterEncoding("utf-8");
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled())
                     container.getLogger().debug("status.setContentType", t);
             }

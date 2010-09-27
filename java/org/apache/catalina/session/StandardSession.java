@@ -57,6 +57,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -405,6 +406,7 @@ public class StandardSession
                                        "afterSessionCreated",
                                        listener);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     try {
                         fireContainerEvent(context,
                                            "afterSessionCreated",
@@ -776,6 +778,7 @@ public class StandardSession
                                                "afterSessionDestroyed",
                                                listener);
                         } catch (Throwable t) {
+                            ExceptionUtils.handleThrowable(t);
                             try {
                                 fireContainerEvent(context,
                                                    "afterSessionDestroyed",
@@ -877,6 +880,7 @@ public class StandardSession
                     ((HttpSessionActivationListener)attribute)
                         .sessionWillPassivate(event);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     manager.getContainer().getLogger().error
                         (sm.getString("standardSession.attributeEvent"), t);
                 }
@@ -912,6 +916,7 @@ public class StandardSession
                     ((HttpSessionActivationListener)attribute)
                         .sessionDidActivate(event);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     manager.getContainer().getLogger().error
                         (sm.getString("standardSession.attributeEvent"), t);
                 }
@@ -1423,6 +1428,7 @@ public class StandardSession
                 ((HttpSessionBindingListener) unbound).valueUnbound
                     (new HttpSessionBindingEvent(getSession(), name));
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 manager.getContainer().getLogger().error
                     (sm.getString("standardSession.bindingEvent"), t);
             }
@@ -1467,6 +1473,7 @@ public class StandardSession
                                        listener);
                 }
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 try {
                     if (unbound != null) {
                         fireContainerEvent(context,
@@ -1764,6 +1771,7 @@ public class StandardSession
                                    "afterSessionAttributeRemoved",
                                    listener);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 try {
                     fireContainerEvent(context,
                                        "afterSessionAttributeRemoved",

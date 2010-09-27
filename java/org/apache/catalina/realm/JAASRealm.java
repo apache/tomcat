@@ -36,6 +36,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -390,6 +391,7 @@ public class JAASRealm
         try {
             loginContext = new LoginContext(appName, callbackHandler);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
             return (null);
         } finally {
@@ -427,6 +429,7 @@ public class JAASRealm
             log.warn(sm.getString("jaasRealm.loginException", username), e);
             return (null);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
             return (null);
         }

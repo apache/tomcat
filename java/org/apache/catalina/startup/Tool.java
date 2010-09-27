@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.apache.catalina.Globals;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -184,6 +185,7 @@ public final class Tool {
                  packed.toArray(new File[0]),
                  null);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("Class loader creation threw exception", t);
             System.exit(1);
         }
@@ -197,6 +199,7 @@ public final class Tool {
                 log.debug("Loading application class " + className);
             clazz = classLoader.loadClass(className);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("Exception creating instance of " + className, t);
             System.exit(1);
         }
@@ -213,6 +216,7 @@ public final class Tool {
             paramTypes[0] = params.getClass();
             method = clazz.getMethod(methodName, paramTypes);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("Exception locating main() method", t);
             System.exit(1);
         }
@@ -225,6 +229,7 @@ public final class Tool {
             paramValues[0] = params;
             method.invoke(null, paramValues);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("Exception calling main() method", t);
             System.exit(1);
         }
