@@ -2022,7 +2022,7 @@ public class WebappClassLoader
             }
             Class<?> lpClass =
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
-                    classBytes, 0, offset);
+                    classBytes, 0, offset, this.getClass().getProtectionDomain());
             Object obj = lpClass.newInstance();
             @SuppressWarnings("unchecked") // clearJdbcDriverRegistrations() returns List<String> 
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
