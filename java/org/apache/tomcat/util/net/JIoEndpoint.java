@@ -149,7 +149,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                     SocketWrapper<Socket> socket = sockets.next();
                     long access = socket.getLastAccess();
                     if ((now-access)>socket.getTimeout()) {
-                        processSocket(socket,SocketStatus.TIMEOUT);
+                        processSocketAsync(socket,SocketStatus.TIMEOUT);
                     }
                 }
                 
@@ -538,7 +538,8 @@ public class JIoEndpoint extends AbstractEndpoint {
      *                  Returning <code>false</code> is an indication to close
      *                  the socket immediately.
      */
-    public boolean processSocket(SocketWrapper<Socket> socket, SocketStatus status) {
+    public boolean processSocketAsync(SocketWrapper<Socket> socket,
+            SocketStatus status) {
         try {
             if (waitingRequests.remove(socket)) {
                 SocketProcessor proc = new SocketProcessor(socket,status);
