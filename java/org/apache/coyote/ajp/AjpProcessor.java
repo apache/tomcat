@@ -660,7 +660,7 @@ public class AjpProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
                 dispatch.set(true);
-                endpoint.processSocket(this.socket, SocketStatus.OPEN);
+                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             } else {
                 dispatch.set(false);
             }
@@ -674,7 +674,7 @@ public class AjpProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
-                endpoint.processSocket(this.socket, SocketStatus.OPEN);
+                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
                 dispatch.set(true);
             } else { 
                 dispatch.set(true);
