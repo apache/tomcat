@@ -811,10 +811,12 @@ public class NioEndpoint extends AbstractEndpoint {
                             }
                         } 
                     }
-                }catch (SocketTimeoutException sx) {
+                } catch (SocketTimeoutException sx) {
                     //normal condition
-                }catch ( IOException x ) {
-                    if ( running ) log.error(sm.getString("endpoint.accept.fail"), x);
+                } catch (IOException x) {
+                    if (running) {
+                        log.error(sm.getString("endpoint.accept.fail"), x);
+                    }
                 } catch (OutOfMemoryError oom) {
                     try {
                         oomParachuteData = null;
@@ -1352,7 +1354,6 @@ public class NioEndpoint extends AbstractEndpoint {
             this.socket = channel;
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
-            currentAccess = false;
             comet = false;
             timeout = soTimeout;
             error = false;
@@ -1489,82 +1490,96 @@ public class NioEndpoint extends AbstractEndpoint {
          
         @Override
         public void run() {
-            SelectionKey key = null;
-            try {
-                key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                int handshake = -1;
-                
+            boolean launch = false;
+            synchronized (socket) {
+                SelectionKey key = null;
                 try {
-                    if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
-                }catch ( IOException x ) {
-                    handshake = -1;
-                    if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
-                }catch ( CancelledKeyException ckx ) {
-                    handshake = -1;
-                }
-                if ( handshake == 0 ) {
-                    SocketState state = SocketState.OPEN;
-                    // Process the request from this socket
-                    state = (status==null)?handler.process(socket):handler.event(socket,status);
-
-                    if (state == SocketState.CLOSED) {
-                        // Close socket and pool
-                        try {
-                            KeyAttachment ka = null;
-                            if (key!=null) {
-                                ka = (KeyAttachment) key.attachment();
-                                if (ka!=null) ka.setComet(false);
-                                socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
-                            }
-                            if (socket!=null) nioChannels.offer(socket);
-                            socket = null;
-                            if ( ka!=null ) keyCache.offer(ka);
-                            ka = null;
-                        }catch ( Exception x ) {
-                            log.error("",x);
-                        }
-                    } 
-                } else if (handshake == -1 ) {
-                    KeyAttachment ka = null;
-                    if (key!=null) {
-                        ka = (KeyAttachment) key.attachment();
-                        socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
-                    }
-                    if (socket!=null) nioChannels.offer(socket);
-                    socket = null;
-                    if ( ka!=null ) keyCache.offer(ka);
-                    ka = null;
-                } else {
-                    final SelectionKey fk = key;
-                    final int intops = handshake;
-                    final KeyAttachment ka = (KeyAttachment)fk.attachment();
-                    ka.getPoller().add(socket,intops);
-                }
-            }catch(CancelledKeyException cx) {
-                socket.getPoller().cancelledKey(key,null,false);
-            } catch (OutOfMemoryError oom) {
-                try {
-                    oomParachuteData = null;
-                    socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
-                    releaseCaches();
-                    log.error("", oom);
-                }catch ( Throwable oomt ) {
+                    key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+                    int handshake = -1;
+                    
                     try {
-                        System.err.println(oomParachuteMsg);
-                        oomt.printStackTrace();
-                    }catch (Throwable letsHopeWeDontGetHere){}
+                        if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
+                    }catch ( IOException x ) {
+                        handshake = -1;
+                        if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
+                    }catch ( CancelledKeyException ckx ) {
+                        handshake = -1;
+                    }
+                    if ( handshake == 0 ) {
+                        SocketState state = SocketState.OPEN;
+                        // Process the request from this socket
+                        state = (status==null)?handler.process(socket):handler.event(socket,status);
+    
+                        if (state == SocketState.CLOSED) {
+                            // Close socket and pool
+                            try {
+                                KeyAttachment ka = null;
+                                if (key!=null) {
+                                    ka = (KeyAttachment) key.attachment();
+                                    if (ka!=null) ka.setComet(false);
+                                    socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
+                                }
+                                if (socket!=null) nioChannels.offer(socket);
+                                socket = null;
+                                if ( ka!=null ) keyCache.offer(ka);
+                                ka = null;
+                            }catch ( Exception x ) {
+                                log.error("",x);
+                            }
+                        } else if (state == SocketState.ASYNC_END) {
+                            launch = true;
+                        }
+                    } else if (handshake == -1 ) {
+                        KeyAttachment ka = null;
+                        if (key!=null) {
+                            ka = (KeyAttachment) key.attachment();
+                            socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
+                        }
+                        if (socket!=null) nioChannels.offer(socket);
+                        socket = null;
+                        if ( ka!=null ) keyCache.offer(ka);
+                        ka = null;
+                    } else {
+                        final SelectionKey fk = key;
+                        final int intops = handshake;
+                        final KeyAttachment ka = (KeyAttachment)fk.attachment();
+                        ka.getPoller().add(socket,intops);
+                    }
+                }catch(CancelledKeyException cx) {
+                    socket.getPoller().cancelledKey(key,null,false);
+                } catch (OutOfMemoryError oom) {
+                    try {
+                        oomParachuteData = null;
+                        socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                        releaseCaches();
+                        log.error("", oom);
+                    }catch ( Throwable oomt ) {
+                        try {
+                            System.err.println(oomParachuteMsg);
+                            oomt.printStackTrace();
+                        }catch (Throwable letsHopeWeDontGetHere){}
+                    }
+                }catch ( Throwable t ) {
+                    log.error("",t);
+                    socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                } finally {
+                    if (launch) {
+                        try {
+                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN));
+                        } catch (NullPointerException npe) {
+                            if (running) {
+                                log.error(sm.getString("endpoint.launch.fail"),
+                                        npe);
+                            }
+                        }
+                    }
+                    socket = null;
+                    status = null;
+                    //return to cache
+                    processorCache.offer(this);
                 }
-            }catch ( Throwable t ) {
-                log.error("",t);
-                socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
-            } finally {
-                socket = null;
-                status = null;
-                //return to cache
-                processorCache.offer(this);
             }
         }
-
     }
 
     // ----------------------------------------------- SendfileData Inner Class

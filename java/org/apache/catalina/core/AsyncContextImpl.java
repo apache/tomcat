@@ -22,7 +22,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -50,11 +49,6 @@ import org.apache.juli.logging.LogFactory;
  */
 public class AsyncContextImpl implements AsyncContext {
     
-    public static enum AsyncState {
-        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT,
-        TIMING_OUT_NEED_COMPLETE, ERROR_DISPATCHING
-    }
-    
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
     
     private ServletRequest servletRequest = null;
@@ -63,7 +57,6 @@ public class AsyncContextImpl implements AsyncContext {
     private boolean hasOriginalRequestAndResponse = true;
     private volatile Runnable dispatch = null;
     private Context context = null;
-    private AtomicReference<AsyncState> state = new AtomicReference<AsyncState>(AsyncState.NOT_STARTED);
     private long timeout = -1;
     private AsyncEvent event = null;
     
@@ -81,23 +74,46 @@ public class AsyncContextImpl implements AsyncContext {
         if (log.isDebugEnabled()) {
             logDebug("complete   ");
         }
-        if (state.get()==AsyncState.COMPLETING) {
-            //do nothing
-        } else if (state.compareAndSet(AsyncState.DISPATCHED,
-                           AsyncState.COMPLETING) ||
-                   state.compareAndSet(AsyncState.STARTED,
-                           AsyncState.COMPLETING) ||
-                   state.compareAndSet(AsyncState.TIMING_OUT_NEED_COMPLETE,
-                           AsyncState.COMPLETING)) {
-            AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE,
-                    dispatched);
-            if (!dispatched.get()) doInternalComplete(false);
-        } else {
-            throw new IllegalStateException(
-                    "Complete not allowed. Invalid state:"+state.get());
+        request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
+    }
+
+    public void fireOnComplete() {
+        List<AsyncListenerWrapper> listenersCopy =
+            new ArrayList<AsyncListenerWrapper>();
+        listenersCopy.addAll(listeners);
+        for (AsyncListenerWrapper listener : listenersCopy) {
+            try {
+                listener.fireOnComplete(event);
+            } catch (IOException ioe) {
+                log.warn("onComplete() failed for listener of type [" +
+                        listener.getClass().getName() + "]", ioe);
+            }
         }
-       
+    }
+    
+    public boolean timeout() throws IOException {
+        AtomicBoolean result = new AtomicBoolean();
+        request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
+        
+        if (result.get()) {
+            boolean listenerInvoked = false;
+            List<AsyncListenerWrapper> listenersCopy =
+                new ArrayList<AsyncListenerWrapper>();
+            listenersCopy.addAll(listeners);
+            for (AsyncListenerWrapper listener : listenersCopy) {
+                listener.fireOnTimeout(event);
+                listenerInvoked = true;
+            }
+            if (listenerInvoked) {
+                request.getCoyoteRequest().action(
+                        ActionCode.ASYNC_IS_TIMINGOUT, result);
+                return !result.get();
+            } else {
+                // No listeners, container calls complete
+                complete();
+            }
+        }
+        return true;
     }
 
     @Override
@@ -119,55 +135,37 @@ public class AsyncContextImpl implements AsyncContext {
         if (log.isDebugEnabled()) {
             logDebug("dispatch   ");
         }
-
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
-            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
-
-            if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
-                request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI()+"?"+request.getQueryString());
-                request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
-                request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
-                request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
-            }
-            final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
-            final HttpServletRequest servletRequest = (HttpServletRequest)getRequest();
-            final HttpServletResponse servletResponse = (HttpServletResponse)getResponse();
-            Runnable run = new Runnable() {
-                @Override
-                public void run() {
-                    DispatcherType type = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
-                    try {
-                        //piggy back on the request dispatcher to ensure that filters etc get called.
-                        //TODO SERVLET3 - async should this be include/forward or a new dispatch type
-                        //javadoc suggests include with the type of DispatcherType.ASYNC
-                        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
-                        requestDispatcher.include(servletRequest, servletResponse);
-                    }catch (Exception x) {
-                        //log.error("Async.dispatch",x);
-                        throw new RuntimeException(x);
-                    }finally {
-                        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, type);
-                    }
-                }
-            };
-            this.dispatch = run;
-            AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, dispatched );
-            if (!dispatched.get()) {
-                try {
-                    doInternalDispatch();
-                }catch (ServletException sx) {
-                    throw new RuntimeException(sx);
-                }catch (IOException ix) {
-                    throw new RuntimeException(ix);
-                }
-            }
-            if (state.get().equals(AsyncState.DISPATCHED)) {
-                complete();
-            }
-        } else {
-            throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
+        if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
+            request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI()+"?"+request.getQueryString());
+            request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
+            request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
+            request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
         }
+        final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
+        final HttpServletRequest servletRequest = (HttpServletRequest)getRequest();
+        final HttpServletResponse servletResponse = (HttpServletResponse)getResponse();
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
+                DispatcherType type = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
+                try {
+                    //piggy back on the request dispatcher to ensure that filters etc get called.
+                    //TODO SERVLET3 - async should this be include/forward or a new dispatch type
+                    //javadoc suggests include with the type of DispatcherType.ASYNC
+                    request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
+                    requestDispatcher.include(servletRequest, servletResponse);
+                }catch (Exception x) {
+                    //log.error("Async.dispatch",x);
+                    throw new RuntimeException(x);
+                }finally {
+                    request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, type);
+                }
+            }
+        };
+        
+        this.dispatch = run;
+        this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
     }
 
     @Override
@@ -186,40 +184,8 @@ public class AsyncContextImpl implements AsyncContext {
             logDebug("start      ");
         }
 
-        if (state.get() ==  AsyncState.STARTED) {
-            // Execute the runnable using a container thread from the
-            // Connector's thread pool. Use a wrapper to prevent a memory leak
-            Runnable wrapper = new RunnableWrapper(run, context);
-            ClassLoader oldCL;
-            if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-                oldCL = AccessController.doPrivileged(pa);
-            } else {
-                oldCL = Thread.currentThread().getContextClassLoader();
-            }
-            try {
-                if (Globals.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            this.getClass().getClassLoader());
-                    AccessController.doPrivileged(pa);
-                } else {
-                    Thread.currentThread().setContextClassLoader(
-                            this.getClass().getClassLoader());
-                }
-                request.getConnector().getProtocolHandler().getExecutor(
-                        ).execute(wrapper);
-            } finally {
-                if (Globals.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            oldCL);
-                    AccessController.doPrivileged(pa);
-                } else {
-                    Thread.currentThread().setContextClassLoader(oldCL);
-                }
-            }
-        } else {
-            throw new IllegalStateException("Start not allowed. Invalid state:"+state.get());
-        }
+        Runnable wrapper = new RunnableWrapper(run, context);
+        this.request.getCoyoteRequest().action(ActionCode.ASYNC_RUN, wrapper);
     }
     
     @Override
@@ -259,31 +225,43 @@ public class AsyncContextImpl implements AsyncContext {
         }
         servletRequest = null;
         servletResponse = null;
-        listeners.clear();
         hasOriginalRequestAndResponse = true;
-        state.set(AsyncState.NOT_STARTED);
         context = null;
         timeout = -1;
         event = null;
     }
 
     public boolean isStarted() {
-        return (state.get() == AsyncState.STARTED ||
-                state.get() == AsyncState.DISPATCHING);
+        AtomicBoolean result = new AtomicBoolean(false);
+        request.getCoyoteRequest().action(
+                ActionCode.ASYNC_IS_STARTED, result);
+        return result.get();
     }
 
     public void setStarted(Context context, ServletRequest request,
-            ServletResponse response, boolean hasOriginalRequestAndResponse) {
-        if (state.compareAndSet(AsyncState.NOT_STARTED, AsyncState.STARTED) ||
-                state.compareAndSet(AsyncState.DISPATCHED, AsyncState.STARTED)) {
-            this.context = context;
-            this.servletRequest = request;
-            this.servletResponse = response;
-            this.hasOriginalRequestAndResponse = hasOriginalRequestAndResponse;
-            this.event = new AsyncEvent(this, request, response); 
-        } else {
-            throw new IllegalStateException("Start illegal. Invalid state: "+state.get());
+            ServletResponse response, boolean originalRequestResponse) {
+        
+        this.request.getCoyoteRequest().action(
+                ActionCode.ASYNC_START, this);
+
+        this.context = context;
+        this.servletRequest = request;
+        this.servletResponse = response;
+        this.hasOriginalRequestAndResponse = originalRequestResponse;
+        this.event = new AsyncEvent(this, request, response);
+        
+        List<AsyncListenerWrapper> listenersCopy =
+            new ArrayList<AsyncListenerWrapper>();
+        listenersCopy.addAll(listeners);
+        for (AsyncListenerWrapper listener : listenersCopy) {
+            try {
+                listener.fireOnStartAsync(event);
+            } catch (IOException ioe) {
+                log.warn("onStartAsync() failed for listener of type [" +
+                        listener.getClass().getName() + "]", ioe);
+            }
         }
+        listeners.clear();
     }
 
     @Override
@@ -295,122 +273,53 @@ public class AsyncContextImpl implements AsyncContext {
         if (log.isDebugEnabled()) {
             logDebug("intDispatch");
         }
-        if (this.state.compareAndSet(AsyncState.TIMING_OUT,
-                AsyncState.TIMING_OUT_NEED_COMPLETE)) {
-            log.debug("TIMING OUT!");
-            boolean listenerInvoked = false;
-            List<AsyncListenerWrapper> listenersCopy =
-                new ArrayList<AsyncListenerWrapper>();
-            listenersCopy.addAll(listeners);
-            for (AsyncListenerWrapper listener : listenersCopy) {
-                listener.fireOnTimeout(event);
-                listenerInvoked = true;
+        try {
+            dispatch.run();
+        } catch (RuntimeException x) {
+            // doInternalComplete(true);
+            if (x.getCause() instanceof ServletException) {
+                throw (ServletException)x.getCause();
             }
-            if (listenerInvoked) {
-                // Listener should have called complete
-                if (state.get() != AsyncState.NOT_STARTED) {
-                    ((HttpServletResponse)servletResponse).setStatus(500);
-                    state.set(AsyncState.COMPLETING);
-                    doInternalComplete(true);
-                }
-            } else {
-                // No listeners, container calls complete
-                state.set(AsyncState.COMPLETING);
-                doInternalComplete(false);
+            if (x.getCause() instanceof IOException) {
+                throw (IOException)x.getCause();
             }
-        } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.COMPLETING)) {
-            log.debug("ON ERROR!");
-            boolean listenerInvoked = false;
-            for (AsyncListenerWrapper listener : listeners) {
-                try {
-                    listener.fireOnError(event);
-                }catch (IllegalStateException x) {
-                    log.debug("Listener invoked invalid state.",x);
-                }catch (Exception x) {
-                    log.debug("Exception during onError.",x);
-                }
-                listenerInvoked = true;
-            }
-            if (!listenerInvoked) {
-                ((HttpServletResponse)servletResponse).setStatus(500);
-            }
-            doInternalComplete(true);
-        
-        } else if (this.state.compareAndSet(AsyncState.DISPATCHING, AsyncState.DISPATCHED)) {
-            if (this.dispatch!=null) {
-                try {
-                    dispatch.run();
-                } catch (RuntimeException x) {
-                    doInternalComplete(true);
-                    if (x.getCause() instanceof ServletException) throw (ServletException)x.getCause();
-                    if (x.getCause() instanceof IOException) throw (IOException)x.getCause();
-                    throw new ServletException(x);
-                } finally {
-                    dispatch = null;
-                }
-            }
-        } else if (this.state.get()==AsyncState.COMPLETING) {
-            doInternalComplete(false);
-        } else {
-            throw new IllegalStateException("Dispatch illegal. Invalid state: "+state.get());
+            throw new ServletException(x);
         }
     }
-    
-    private void doInternalComplete(boolean error) {
-        if (log.isDebugEnabled()) {
-            logDebug("intComplete");
-        }
-        if (state.get()==AsyncState.NOT_STARTED) return;
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.NOT_STARTED)) {
-            //this is the same as
-            //request.startAsync().complete();
-            recycle();
-        } else if (state.compareAndSet(AsyncState.COMPLETING, AsyncState.NOT_STARTED)) {
-            for (AsyncListenerWrapper wrapper : listeners) {
-                try {
-                    wrapper.fireOnComplete(event);
-                }catch (IOException x) {
-                    //how does this propagate, or should it?
-                    //TODO SERVLET3 - async 
-                    log.error("",x);
-                }
-            }
-            try {
-                if (!error) getResponse().flushBuffer();
-            }catch (Exception x) {
-                log.error("",x);
-            }
-            recycle();
-            
-        } else { 
-            throw new IllegalStateException("Complete illegal. Invalid state:"+state.get());
-        }
-    }
-    
-    public AsyncState getState() {
-        return state.get();
-    }
+
     
     @Override
     public long getTimeout() {
         return timeout;
     }
-    
+
+
     @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ASYNC_SETTIMEOUT,
                 Long.valueOf(timeout));
     }
-    
-    public void setTimeoutState() {
-        state.set(AsyncState.TIMING_OUT);
-    }
-    
+
+
     public void setErrorState(Throwable t) {
         if (t!=null) request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
-        state.set(AsyncState.ERROR_DISPATCHING);
+        request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
+        AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(),
+                event.getSuppliedRequest(), event.getSuppliedResponse(), t);
+        List<AsyncListenerWrapper> listenersCopy =
+            new ArrayList<AsyncListenerWrapper>();
+        listenersCopy.addAll(listeners);
+        for (AsyncListenerWrapper listener : listenersCopy) {
+            try {
+                listener.fireOnError(errorEvent);
+            } catch (IOException ioe) {
+                log.warn("onStartAsync() failed for listener of type [" +
+                        listener.getClass().getName() + "]", ioe);
+            }
+        }
     }
+
     
     private void logDebug(String method) {
         String rHashCode;
@@ -457,7 +366,7 @@ public class AsyncContextImpl implements AsyncContext {
                 "Req: %1$8s  CReq: %2$8s  RP: %3$8s  Stage: %4$s  " +
                 "Thread: %5$20s  State: %6$20s  Method: %7$11s  URI: %8$s",
                 rHashCode, crHashCode, rpHashCode, stage,
-                Thread.currentThread().getName(), state, method, uri);
+                Thread.currentThread().getName(), "N/A", method, uri);
         if (log.isTraceEnabled()) {
             log.trace(msg, new DebugException());
         } else {
