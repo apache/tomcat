@@ -22,6 +22,8 @@ package org.apache.catalina.util;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.jasper.util.ExceptionUtils;
+
 
 /**
  * Simple utility module to make it easy to plug in the server identifier
@@ -64,7 +66,7 @@ public class ServerInfo {
             serverBuilt = props.getProperty("server.built");
             serverNumber = props.getProperty("server.number");
         } catch (Throwable t) {
-            //Ignore
+            ExceptionUtils.handleThrowable(t);
         }
         if (serverInfo == null)
             serverInfo = "Apache Tomcat 7.0.x-dev";

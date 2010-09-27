@@ -466,6 +466,7 @@ public class StandardManager extends ManagerBase {
         try {
             load();
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardManager.managerLoad"), t);
         }
 
@@ -492,6 +493,7 @@ public class StandardManager extends ManagerBase {
         try {
             unload();
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardManager.managerUnload"), t);
         }
 

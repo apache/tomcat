@@ -1072,6 +1072,7 @@ public class MBeanUtils {
             try {
                 mserver = Registry.getRegistry(null, null).getMBeanServer();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 t.printStackTrace(System.out);
                 System.exit(1);
             }

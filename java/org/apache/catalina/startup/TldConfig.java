@@ -437,7 +437,7 @@ public final class TldConfig  implements LifecycleListener {
                             try {
                                 stream.close();
                             } catch (Throwable t) {
-                                // do nothing
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
@@ -481,7 +481,7 @@ public final class TldConfig  implements LifecycleListener {
                             try {
                                 stream.close();
                             } catch (Throwable t) {
-                                // do nothing
+                                ExceptionUtils.handleThrowable(t);
                             }
                         }
                     }
@@ -560,7 +560,7 @@ public final class TldConfig  implements LifecycleListener {
                     try {
                         resourceStream.close();
                     } catch (Throwable t) {
-                        // do nothing
+                        ExceptionUtils.handleThrowable(t);
                     }
                 }
             }

@@ -48,6 +48,7 @@ import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.NamingResources;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -150,9 +151,8 @@ public class ServerLifecycleListener
                 log.error("createMBeans: MBeanException", e);
 
             } catch (Throwable t) {
-
+                ExceptionUtils.handleThrowable(t);
                 log.error("createMBeans: Throwable", t);
-
             }
 
              /*
@@ -180,9 +180,8 @@ public class ServerLifecycleListener
                 log.error("destroyMBeans: MBeanException", e);
 
             } catch (Throwable t) {
-
+                ExceptionUtils.handleThrowable(t);
                 log.error("destroyMBeans: Throwable", t);
-
             }
             // FIXME: RMI adaptor should be stopped; however, this is
             // undocumented in MX4J, and reports exist in the MX4J bug DB that
@@ -925,6 +924,7 @@ public class ServerLifecycleListener
                 e = t;
             log.error("processContainerAddChild: MBeanException", e);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("processContainerAddChild: Throwable", t);
         }
 
@@ -1060,6 +1060,7 @@ public class ServerLifecycleListener
                 e = t;
             log.error("processContainerRemoveChild: MBeanException", e);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error("processContainerRemoveChild: Throwable", t);
         }
 
