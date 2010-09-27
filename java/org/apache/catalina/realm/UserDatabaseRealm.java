@@ -33,6 +33,7 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.jasper.util.ExceptionUtils;
 
 
 /**
@@ -249,6 +250,7 @@ public class UserDatabaseRealm
                 ((StandardServer)getServer()).getGlobalNamingContext();
             database = (UserDatabase) context.lookup(resourceName);
         } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
             containerLog.error(sm.getString("userDatabaseRealm.lookup",
                                             resourceName),
                                e);

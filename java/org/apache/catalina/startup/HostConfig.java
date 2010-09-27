@@ -678,6 +678,7 @@ public class HostConfig
                 }
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("hostConfig.deployDescriptor.error",
                                    file), t);
         }
@@ -964,6 +965,7 @@ public class HostConfig
                 addWatchedResources(deployedApp, null, context);
             }
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("hostConfig.deployWar.error", file), t);
         }
         
@@ -1082,6 +1084,7 @@ public class HostConfig
             }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
         } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("hostConfig.deployDir.error", file), t);
         }
 
@@ -1164,12 +1167,14 @@ public class HostConfig
                     try {
                         host.removeChild(context);
                     } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         log.warn(sm.getString
                                  ("hostConfig.context.remove", app.name), t);
                     }
                     try {
                         context.destroy();
                     } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         log.warn(sm.getString
                                  ("hostConfig.context.destroy", app.name), t);
                     }
@@ -1220,12 +1225,14 @@ public class HostConfig
                 try {
                     host.removeChild(context);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.warn(sm.getString
                              ("hostConfig.context.remove", app.name), t);
                 }
                 try {
                     context.destroy();
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.warn(sm.getString
                              ("hostConfig.context.destroy", app.name), t);
                 }
@@ -1383,6 +1390,7 @@ public class HostConfig
             try {
                 host.removeChild(host.findChild(apps[i].name));
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.warn(sm.getString
                         ("hostConfig.context.remove", apps[i].name), t);
             }

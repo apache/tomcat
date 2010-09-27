@@ -437,6 +437,7 @@ public class ContextConfig
                 Class<?> authenticatorClass = Class.forName(authenticatorName);
                 authenticator = (Valve) authenticatorClass.newInstance();
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString(
                                     "contextConfig.authenticatorInstantiate",
                                     authenticatorName),
