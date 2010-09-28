@@ -188,6 +188,10 @@
         (markt)
       </fix>
       <fix>
+        <bug>49625</bug>: Ensure Vary header is set if response may be
+        compressed rather than only setting it if it is compressed. (markt)
+      </fix>
+      <fix>
         <bug>49802</bug>: Re-factor connector pause, stop and destroy methods so
         that calling any of those methods has the expected results. (markt)
       </fix>
