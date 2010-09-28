@@ -53,6 +53,10 @@
         provided by Jiong Wang. (markt)
       </fix>
       <fix>
+        <bug>49195</bug>: Don't report an error when shutting down a Windows
+        service for a Tomcat instance that has a disabled shutdown port. (markt)
+      </fix>
+      <fix>
         <bug>49209</bug>: Prevent possible AccessControlException during
         undeployment when running with a security manager. Patch provided by
         Sylvain Laurent.
