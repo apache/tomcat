@@ -323,7 +323,8 @@ elif [ "$1" = "start" ] ; then
       if [ -s "$CATALINA_PID" ]; then
         if [ -r "$CATALINA_PID" ]; then
           PID="`cat "$CATALINA_PID"`"
-          if ps -p $PID > /dev/null; then
+          ps -p $PID > /dev/null 2>&1
+          if [ $? -eq 0 ] ; then
             echo "Tomcat appears to still be running with PID $PID. Start aborted."
             exit 1
           else
