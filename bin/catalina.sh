@@ -237,6 +237,9 @@ if [ $have_tty -eq 1 ]; then
     echo "Using JRE_HOME:        $JRE_HOME"
   fi
   echo "Using CLASSPATH:       $CLASSPATH"
+  if [ ! -z "$CATALINA_PID" ]; then
+    echo "Using CATALINA_PID:    $CATALINA_PID"
+  fi
 fi
 
 if [ "$1" = "jpda" ] ; then
@@ -316,26 +319,29 @@ elif [ "$1" = "start" ] ; then
 
   if [ ! -z "$CATALINA_PID" ]; then
     if [ -f "$CATALINA_PID" ]; then
-      echo "Existing PID file ($CATALINA_PID) found during start."
+      echo "Existing PID file found during start."
       if [ -s "$CATALINA_PID" ]; then
-        PID="`cat "$CATALINA_PID"`"
-        if ps -p $PID > /dev/null; then
-          echo "Tomcat appears to still be running with PID $PID. Start aborted."
-          exit 1
-        else
-          if [ -w "$CATALINA_PID" ]; then
-            echo "Removing stale PID file."
-            rm "$CATALINA_PID"
-          else
-            echo "Unable to remove stale PID file. Start aborted."
+        if [ -r "$CATALINA_PID" ]; then
+          PID="`cat "$CATALINA_PID"`"
+          if ps -p $PID > /dev/null; then
+            echo "Tomcat appears to still be running with PID $PID. Start aborted."
             exit 1
+          else
+            echo "Removing stale PID file."
+            rm -f "$CATALINA_PID" 2>/dev/null
+            if [ $? != 0 ]; then
+              echo "Unable to remove stale PID file. Start aborted."
+              exit 1
+            fi
           fi
+        else
+          echo "Unable to read PID file. Start aborted."
+          exit 1
         fi
       else
-        if [ -w "$CATALINA_PID" ]; then
-          echo "Removing empty PID file."
-          rm "$CATALINA_PID"
-        else
+        echo "Removing empty PID file."
+        rm -f "$CATALINA_PID" 2>/dev/null
+        if [ $? != 0 ]; then
           echo "Unable to remove empty PID file. Start will continue."
         fi
       fi
@@ -370,7 +376,7 @@ elif [ "$1" = "start" ] ; then
 
   fi
 
-  if [ ! -z "$CATALINA_PID" ]; then
+  if [ ! -z "$CATALINA_PID" -a ! -e "$CATALINA_PID" ]; then
     echo $! > $CATALINA_PID
   fi
 
@@ -398,15 +404,15 @@ elif [ "$1" = "stop" ] ; then
       if [ -f "$CATALINA_PID" ]; then
         kill -0 `cat $CATALINA_PID` >/dev/null 2>&1
         if [ $? -gt 0 ]; then
-          echo "PID file ($CATALINA_PID) found but no matching process was found. Stop aborted."
+          echo "PID file found but no matching process was found. Stop aborted."
           exit 1
         fi
       else
-        echo "\$CATALINA_PID was set ($CATALINA_PID) but the specified file does not exist. Is Tomcat running? Stop aborted."
+        echo "\$CATALINA_PID was set but the specified file does not exist. Is Tomcat running? Stop aborted."
         exit 1
       fi
     else
-      echo "PID file ($CATALINA_PID) is empty and has been ignored."
+      echo "PID file is empty and has been ignored."
     fi
   fi
 
@@ -422,10 +428,9 @@ elif [ "$1" = "stop" ] ; then
       while [ $SLEEP -ge 0 ]; do 
         kill -0 `cat $CATALINA_PID` >/dev/null 2>&1
         if [ $? -gt 0 ]; then
-          if [ -w "$CATALINA_PID" ]; then
-            rm "$CATALINA_PID"
-          else
-            echo "Tomact stopped but PID file could not be removed ($CATALINA_PID)."
+          rm -f "$CATALINA_PID" 2>/dev/null
+          if [ $? != 0 ]; then
+            echo "Tomact stopped but the PID file could not be removed."
           fi
           break
         fi
@@ -449,10 +454,9 @@ elif [ "$1" = "stop" ] ; then
       if [ -f "$CATALINA_PID" ]; then
         echo "Killing: `cat $CATALINA_PID`"
         kill -9 `cat $CATALINA_PID`
-        if [ -w "$CATALINA_PID" ]; then
-          rm $CATALINA_PID
-        else
-          echo "Tomact was killed but PID file could not be removed ($CATALINA_PID)."
+        rm -f $CATALINA_PID 2>/dev/null
+        if [ $? != 0 ]; then
+          echo "Tomact was killed but the PID file could not be removed."
         fi
       fi
     fi
