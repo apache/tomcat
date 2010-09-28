@@ -640,24 +640,9 @@ public abstract class AbstractHttp11Processor {
 
 
     /**
-     * Check for compression
+     * Check if the resource could be compressed, if the client supports it.
      */
-    protected boolean isCompressable() {
-
-        // Nope Compression could works in HTTP 1.0 also
-        // cf: mod_deflate
-
-        // Compression only since HTTP 1.1
-        // if (! http11)
-        //    return false;
-
-        // Check if browser support gzip encoding
-        MessageBytes acceptEncodingMB =
-            request.getMimeHeaders().getValue("accept-encoding");
-
-        if ((acceptEncodingMB == null)
-            || (acceptEncodingMB.indexOf("gzip") == -1))
-            return false;
+    private boolean isCompressable() {
 
         // Check if content is not already gzipped
         MessageBytes contentEncodingMB =
@@ -665,6 +650,39 @@ public abstract class AbstractHttp11Processor {
 
         if ((contentEncodingMB != null)
             && (contentEncodingMB.indexOf("gzip") != -1))
+            return false;
+
+        // If force mode, always compress (test purposes only)
+        if (compressionLevel == 2)
+           return true;
+
+        // Check if sufficient length to trigger the compression
+        long contentLength = response.getContentLengthLong();
+        if ((contentLength == -1)
+            || (contentLength > compressionMinSize)) {
+            // Check for compatible MIME-TYPE
+            if (compressableMimeTypes != null) {
+                return (startsWithStringArray(compressableMimeTypes,
+                                              response.getContentType()));
+            }
+        }
+
+        return false;
+    }
+
+    
+    /**
+     * Check if compression should be used for this resource. Already checked
+     * that the resource could be compressed if the client supports it.
+     */
+    private boolean useCompression() {
+
+        // Check if browser support gzip encoding
+        MessageBytes acceptEncodingMB =
+            request.getMimeHeaders().getValue("accept-encoding");
+
+        if ((acceptEncodingMB == null)
+            || (acceptEncodingMB.indexOf("gzip") == -1))
             return false;
 
         // If force mode, always compress (test purposes only)
@@ -685,18 +703,7 @@ public abstract class AbstractHttp11Processor {
             }
         }
 
-        // Check if sufficient length to trigger the compression
-        long contentLength = response.getContentLengthLong();
-        if ((contentLength == -1)
-            || (contentLength > compressionMinSize)) {
-            // Check for compatible MIME-TYPE
-            if (compressableMimeTypes != null) {
-                return (startsWithStringArray(compressableMimeTypes,
-                                              response.getContentType()));
-            }
-        }
-
-        return false;
+        return true;
     }
 
     
@@ -973,9 +980,13 @@ public abstract class AbstractHttp11Processor {
         }
         
         // Check for compression
+        boolean isCompressable = false;
         boolean useCompression = false;
         if (entityBody && (compressionLevel > 0) && !sendingWithSendfile) {
-            useCompression = isCompressable();
+            isCompressable = isCompressable();
+            if (isCompressable) {
+                useCompression = useCompression();
+            }
             // Change content-length to -1 to force chunking
             if (useCompression) {
                 response.setContentLength(-1);
@@ -1018,6 +1029,9 @@ public abstract class AbstractHttp11Processor {
         if (useCompression) {
             getOutputBuffer().addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
             headers.setValue("Content-Encoding").setString("gzip");
+        }
+        // If it might be compressed, set the Vary header
+        if (isCompressable) {
             // Make Proxies happy via Vary (from mod_deflate)
             MessageBytes vary = headers.getValue("Vary");
             if (vary == null) {
