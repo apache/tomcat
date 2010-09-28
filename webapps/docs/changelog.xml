@@ -79,6 +79,10 @@
         processed. (markt)
       </fix>
       <fix>
+        <bug>49728</bug>: Improve PID file handling when another process is
+        managing the PID file and Tomcat does not have write access. (markt)
+      </fix>
+      <fix>
         <bug>49749</bug>: Single sign on cookies should have httpOnly flag set
         using same rules as session cookies. (markt)
       </fix>
