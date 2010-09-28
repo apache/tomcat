@@ -161,11 +161,6 @@ and the following steps have been used by some developers.
 </p>
 
 <p>
-<b>NOTE:</b> You <b>must</b> complete all the above steps to fetch
-dependency libraries and build Tomcat before you can setup an Eclipse project and start
-using it.
-</p>
-<p>
 <b>NOTE:</b> This will not let you build everything under Eclipse;
 the build process requires use of Ant for the many stages that aren't
 simple Java compilations.
@@ -174,18 +169,18 @@ get warnings, reformat code, perform refactorings, run Tomcat
 under the IDE, and so on.
 </p>
 <p>
-Complete the download of all third party dependencies required to compile the Tomcat
-source in Eclipse:
+Sample Eclipse project files and launch targets are provided in the 
+<code>res/ide-support/eclipse</code> directory of the source tree.
+The instructions below will automatically copy these into the required locations.
+</p>
+<p>
+An Ant target is provided as a convenience to download all binary dependencies, and to create
+the Eclipse project and classpath files in the root of the source tree.
 <br/>
 <code><br/>
     cd ${tomcat.source}<br/>
-    ant extras<br/>
+    ant ide-eclipse<br/>
 </code>
-</p>
-<p>
-Sample Eclipse project and classpath files are provided in the root directory of the source tree.
-The sample files are named <code>eclipse.project</code> and <code>eclipse.classpath</code>, and must
-be copied to <code>.project</code> and <code>.classpath</code> respectively before proceeding.
 </p>
 
 <p>
@@ -212,19 +207,28 @@ and import the Tomcat project located there.
 </p>
 
 <p>
-You may see errors in your problems tab at this point about missing build path dependencies.
-If this happens you have forgotten to execute the <code>ant extras</code> build to download 
-these dependencies.
+<code>start-tomcat</code> and <code>stop-tomcat</code> launch configurations are provided in
+<code>res/ide-support/eclipse</code> and will be available in the <em>Run-&gt;Run Configurations</em>
+dialog. Use these to start and stop Tomcat from Eclipse.
+<br/>If you want to configure these yourself (or are using a different IDE) 
+then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
+<code>start</code>/<code>stop</code> etc. as program arguments, and specify <code>-Dcatalina.home=...</code> 
+(with the name of your build directory) as VM arguments.
 </p>
 
 <p>
-<code>Start Tomcat</code> and <code>Stop Tomcat</code> launch configurations are provided in the
-root directory of the source tree and will be available in the <em>Run-&gt;Run Configurations</em>
-dialog. Use these to start and stop Tomcat from Eclipse. 
-<br/>If you want to configure these yourself (or are using a different IDE) 
-then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
-<code>start</code>/<code>stop</code> as program arguments, and specify <code>-Dcatalina.home=...</code> 
-(with the name of your build directory) as VM arguments.
+Tweaking a few formatting preferences will make it much easier to keep consistent with Tomcat 
+coding conventions (and have your contributions accepted):
+</p>
+<p>
+<table border="1">
+  <tr><td>Java -&gt; Code Style -> Formatter -&gt; Edit...</td>
+  <td>Tab policy: Spaces only<br/>Tab and Indentation size: 4</td></tr>
+  <tr><td>General -&gt; Editors -> Text Editors</td>
+  <td>Displayed tab width: 2<br/>Insert spaces for tabs<br/>Show whitespace characters (optional)</td></tr>
+  <tr><td>XML -&gt; XML Files -> Editor</td><td>Indent using spaces<br/>Indentation size: 2</td></tr>
+  <tr><td>Ant -&gt; Editor -> Formatter</td><td>Tab size: 2<br/>Use tab character instead of spaces: unchecked</td></tr>
+</table>
 </p>
 
 </section>
