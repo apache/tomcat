@@ -35,7 +35,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
@@ -99,7 +98,7 @@ public final class Bootstrap {
             catalinaLoader = createClassLoader("server", commonLoader);
             sharedLoader = createClassLoader("shared", commonLoader);
         } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
+            handleThrowable(t);
             log.error("Class loader creation threw exception", t);
             System.exit(1);
         }
@@ -393,7 +392,7 @@ public final class Bootstrap {
             try {
                 bootstrap.init();
             } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
+                handleThrowable(t);
                 t.printStackTrace();
                 return;
             }
@@ -423,7 +422,7 @@ public final class Bootstrap {
                 log.warn("Bootstrap: command \"" + command + "\" does not exist.");
             }
         } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
+            handleThrowable(t);
             t.printStackTrace();
         }
 
@@ -502,4 +501,14 @@ public final class Bootstrap {
     }
 
 
+    // Copied from ExceptionUtils since that class is not visible during start
+    private static void handleThrowable(Throwable t) {
+        if (t instanceof ThreadDeath) {
+            throw (ThreadDeath) t;
+        }
+        if (t instanceof VirtualMachineError) {
+            throw (VirtualMachineError) t;
+        }
+        // All other instances of Throwable will be silently swallowed
+    }
 }
