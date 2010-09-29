@@ -17,7 +17,6 @@
 
 package org.apache.coyote.http11;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -31,8 +30,8 @@ import javax.management.ObjectName;
 
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;

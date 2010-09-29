@@ -47,8 +47,8 @@ import javax.xml.ws.WebServiceRef;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
