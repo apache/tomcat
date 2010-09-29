@@ -25,6 +25,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.Processor;
@@ -50,7 +51,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Processor implements Processor {
+public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
     protected abstract Log getLog();
 
@@ -852,6 +853,7 @@ public abstract class AbstractHttp11Processor implements Processor {
      * @param actionCode Type of the action
      * @param param Action parameter
      */
+    @Override
     public final void action(ActionCode actionCode, Object param) {
         
         if (actionCode == ActionCode.COMMIT) {
