@@ -17,29 +17,12 @@
 
 package org.apache.coyote;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.concurrent.Executor;
 
 
 /**
- * Processor.
- *
- * Not really used, should be deprecated. 
- *
- * @author Remy Maucherat
+ * Common interface for processors of all protocols.
  */
 public interface Processor {
-
-
-    public void setAdapter(Adapter adapter);
-
-
-    public Adapter getAdapter();
-
-
-    public void process(InputStream input, OutputStream output)
-        throws IOException;
-
-
+    Executor getExecutor();
 }
