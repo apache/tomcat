@@ -503,7 +503,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                 }
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            if (asyncComplete()) {
+            if (asyncStateMachine.asyncComplete()) {
                 endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
@@ -512,7 +512,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
             // if we are not piggy backing on a worker thread, set the timeout
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncDispatch()) {
+            if (asyncStateMachine.asyncDispatch()) {
                 endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             }
         }
@@ -818,7 +818,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
     }
 
     @Override
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return endpoint.getExecutor();
     }
 }

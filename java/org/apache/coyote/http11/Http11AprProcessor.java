@@ -602,7 +602,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            if (asyncComplete()) {
+            if (asyncStateMachine.asyncComplete()) {
                 endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
@@ -610,7 +610,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
             long timeout = ((Long)param).longValue();
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncDispatch()) {
+            if (asyncStateMachine.asyncDispatch()) {
                 endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
             }
         }
@@ -909,7 +909,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor implements Actio
     }
     
     @Override
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return endpoint.getExecutor();
     }
 }
