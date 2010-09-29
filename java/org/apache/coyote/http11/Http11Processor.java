@@ -53,10 +53,11 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class Http11Processor extends AbstractHttp11Processor implements ActionHook {
 
-    /**
-     * Logger.
-     */
     private static final Log log = LogFactory.getLog(Http11Processor.class);
+    @Override
+    protected Log getLog() {
+        return log;
+    }
 
    // ------------------------------------------------------------ Constructor
 

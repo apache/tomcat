@@ -54,10 +54,11 @@ import org.apache.tomcat.util.net.SocketStatus;
  */
 public class Http11NioProcessor extends AbstractHttp11Processor implements ActionHook {
 
-    /**
-     * Logger.
-     */
     private static final Log log = LogFactory.getLog(Http11NioProcessor.class);
+    @Override
+    protected Log getLog() {
+        return log;
+    }
 
 
     /**
