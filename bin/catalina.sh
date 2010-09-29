@@ -431,7 +431,7 @@ elif [ "$1" = "stop" ] ; then
         if [ $? -gt 0 ]; then
           rm -f "$CATALINA_PID" >/dev/null 2>&1
           if [ $? != 0 ]; then
-            echo "Tomact stopped but the PID file could not be removed."
+            echo "Tomcat stopped but the PID file could not be removed."
           fi
           break
         fi
@@ -458,7 +458,7 @@ elif [ "$1" = "stop" ] ; then
         kill -9 $PID
         rm -f "$CATALINA_PID" >/dev/null 2>&1
         if [ $? != 0 ]; then
-          echo "Tomact was killed but the PID file could not be removed."
+          echo "Tomcat was killed but the PID file could not be removed."
         fi
       fi
     fi
