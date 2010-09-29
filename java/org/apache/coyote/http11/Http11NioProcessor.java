@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ActionHook;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
@@ -52,7 +51,7 @@ import org.apache.tomcat.util.net.SocketStatus;
  * @author Remy Maucherat
  * @author Filip Hanik
  */
-public class Http11NioProcessor extends AbstractHttp11Processor implements ActionHook {
+public class Http11NioProcessor extends AbstractHttp11Processor {
 
     private static final Log log = LogFactory.getLog(Http11NioProcessor.class);
     @Override
