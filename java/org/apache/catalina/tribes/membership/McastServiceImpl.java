@@ -36,7 +36,7 @@ import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.ExecutorFactory;
-import org.apache.jasper.util.ExceptionUtils;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * A <b>membership</b> implementation using simple multicast.

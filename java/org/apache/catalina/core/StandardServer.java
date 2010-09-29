@@ -44,9 +44,9 @@ import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringCache;
 import org.apache.tomcat.util.res.StringManager;
 
