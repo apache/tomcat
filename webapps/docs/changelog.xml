@@ -171,6 +171,10 @@
         <bug>49909</bug>: Fix a regression introduced with the fix for
         <bug>47950</bug> that prevented JSTL classes being loaded. (markt)
       </fix>
+      <fix>
+        <bug>50018</bug>: Fix some minor Javadoc errors in Jasper source.
+        Based on a patch by sebb. (timw)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

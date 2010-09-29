@@ -480,8 +480,8 @@ class TagFileProcessor {
      *            the tag name as specified in the TLD
      * @param path
      *            the path for the tagfile
-     * @param tagFileJarUrl
-     *            the url for the Jar containing the tag file 
+     * @param jarResource
+     *            the Jar resource containing the tag file 
      * @param tagLibInfo
      *            the TagLibraryInfo object associated with this TagInfo
      * @return a TagInfo object assembled from the directives in the tag file.
