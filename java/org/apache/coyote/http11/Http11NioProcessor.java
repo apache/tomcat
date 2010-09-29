@@ -238,7 +238,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
                         Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
                         if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
                     } else {
-                        if (isAsyncDispatching()) {
+                        if (asyncStateMachine.isAsyncDispatching()) {
                             //reset the timeout
                             if (keepAlive && keepAliveTimeout>0) {
                                 attach.setTimeout(keepAliveTimeout);
@@ -659,7 +659,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
                 attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            if (asyncComplete()) {
+            if (asyncStateMachine.asyncComplete()) {
                 endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
@@ -670,7 +670,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
             //if we are not piggy backing on a worker thread, set the timeout
             attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncDispatch()) {
+            if (asyncStateMachine.asyncDispatch()) {
                 endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
             }
         }
@@ -1022,7 +1022,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
     }
 
     @Override
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return endpoint.getExecutor();
     }
 }
