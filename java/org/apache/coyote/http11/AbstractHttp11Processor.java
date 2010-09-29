@@ -40,7 +40,6 @@ import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -53,10 +52,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Processor {
 
-    /**
-     * Logger.
-     */
-    private static final Log log = LogFactory.getLog(AbstractHttp11Processor.class);
+    protected abstract Log getLog();
 
     /**
      * The string manager for this package.
@@ -284,7 +280,7 @@ public abstract class AbstractHttp11Processor {
             noCompressionUserAgents =
                 addREArray(noCompressionUserAgents, nRule);
         } catch (PatternSyntaxException pse) {
-            log.error(sm.getString("http11processor.regexp.error", userAgent), pse);
+            getLog().error(sm.getString("http11processor.regexp.error", userAgent), pse);
         }
     }
 
@@ -454,7 +450,7 @@ public abstract class AbstractHttp11Processor {
             Pattern nRule = Pattern.compile(userAgent);
             restrictedUserAgents = addREArray(restrictedUserAgents, nRule);
         } catch (PatternSyntaxException pse) {
-            log.error(sm.getString("http11processor.regexp.error", userAgent), pse);
+            getLog().error(sm.getString("http11processor.regexp.error", userAgent), pse);
         }
     }
 
@@ -806,11 +802,11 @@ public abstract class AbstractHttp11Processor {
             } else if (obj instanceof OutputFilter) {
                 getOutputBuffer().addFilter((OutputFilter) obj);
             } else {
-                log.warn(sm.getString("http11processor.filter.unknown",
+                getLog().warn(sm.getString("http11processor.filter.unknown",
                         className));
             }
         } catch (Exception e) {
-            log.error(sm.getString(
+            getLog().error(sm.getString(
                     "http11processor.filter.error", className), e);
         }
     }
@@ -1098,7 +1094,7 @@ public abstract class AbstractHttp11Processor {
             error = true;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.finish"), t);
+            getLog().error(sm.getString("http11processor.request.finish"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
             adapter.log(request, response, 0);
@@ -1110,7 +1106,7 @@ public abstract class AbstractHttp11Processor {
             error = true;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.response.finish"), t);
+            getLog().error(sm.getString("http11processor.response.finish"), t);
             error = true;
         }
 
