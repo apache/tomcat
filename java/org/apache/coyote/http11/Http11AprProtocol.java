@@ -299,14 +299,14 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
         @Override
         public SocketState event(SocketWrapper<Long> socket, SocketStatus status) {
-            Http11AprProcessor result = connections.get(socket);
+            Http11AprProcessor processor = connections.get(socket);
             
             SocketState state = SocketState.CLOSED; 
-            if (result != null) {
-                if (result.comet) {
+            if (processor != null) {
+                if (processor.comet) {
                     // Call the appropriate event
                     try {
-                        state = result.event(status);
+                        state = processor.event(status);
                     } catch (java.net.SocketException e) {
                         // SocketExceptions are normal
                         Http11AprProtocol.log.debug(sm.getString(
@@ -330,7 +330,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     } finally {
                         if (state != SocketState.LONG) {
                             connections.remove(socket);
-                            recycledProcessors.offer(result);
+                            recycledProcessors.offer(processor);
                             if (state == SocketState.OPEN) {
                                 ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
                             }
@@ -338,7 +338,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                             ((AprEndpoint)proto.endpoint).getCometPoller().add(socket.getSocket().longValue());
                         }
                     }
-                } else if (result.isAsync()) {
+                } else if (processor.isAsync()) {
                     state = asyncDispatch(socket, status);
                 }
             }
