@@ -125,7 +125,7 @@ class ParserController implements TagConstants {
      *
      * @param inFileName The path to the resource to be included.
      * @param parent The parent node of the include directive.
-     * @param jarFileUrl The JAR file from which to read the included resource,
+     * @param jarResource The JAR file from which to read the included resource,
      * or null of the included resource is to be read from the filesystem
      */
     public Node.Nodes parse(String inFileName, Node parent,
@@ -142,7 +142,7 @@ class ParserController implements TagConstants {
      * This is invoked by the compiler 
      *
      * @param inFileName    The name of the tag file to be parsed.
-     * @param tagFileJarUrl The location of the tag file.
+     * @param jarResource The location of the tag file.
      */
     public Node.Nodes parseTagFileDirectives(String inFileName,
             JarResource jarResource)
@@ -168,7 +168,7 @@ class ParserController implements TagConstants {
      * @param directivesOnly true if the file to be parsed is a tag file and
      * we are only interested in the directives needed for constructing a
      * TagFileInfo.
-     * @param jarFile The JAR file from which to read the JSP page or tag file,
+     * @param jarResource The JAR file from which to read the JSP page or tag file,
      * or null if the JSP page or tag file is to be read from the filesystem
      */
     private Node.Nodes doParse(String inFileName,
