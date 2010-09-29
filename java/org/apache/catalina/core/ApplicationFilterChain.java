@@ -40,7 +40,7 @@ import org.apache.catalina.comet.CometFilterChain;
 import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
-import org.apache.jasper.util.ExceptionUtils;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**

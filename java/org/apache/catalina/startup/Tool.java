@@ -24,9 +24,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.apache.catalina.Globals;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**

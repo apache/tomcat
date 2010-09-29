@@ -33,9 +33,9 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**

@@ -35,7 +35,7 @@ import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.jasper.util.ExceptionUtils;
+import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
