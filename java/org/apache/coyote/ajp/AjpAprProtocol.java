@@ -442,20 +442,10 @@ public class AjpAprProtocol
                 // Call the appropriate event
                 try {
                     state = result.asyncDispatch(socket, status);
-                } catch (java.net.SocketException e) {
-                    // SocketExceptions are normal
-                    AjpAprProtocol.log.debug
-                        (sm.getString
-                            ("ajpprotocol.proto.socketexception.debug"), e);
-                } catch (java.io.IOException e) {
-                    // IOExceptions are normal
-                    AjpAprProtocol.log.debug
-                        (sm.getString
-                            ("ajpprotocol.proto.ioexception.debug"), e);
                 }
                 // Future developers: if you discover any other
                 // rare-but-nonfatal exceptions, catch them here, and log as
-                // above.
+                // debug.
                 catch (Throwable e) {
                     ExceptionUtils.handleThrowable(e);
                     // any other exception or error is odd. Here we log it
