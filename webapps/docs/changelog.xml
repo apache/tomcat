@@ -175,6 +175,11 @@
         <bug>50018</bug>: Fix some minor Javadoc errors in Jasper source.
         Based on a patch by sebb. (timw)
       </fix>
+      <fix>
+        <bug>50021</bug>: Correct a regression in the fix for <bug>46844</bug>
+        that may have caused additional problems during a failure at start up.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
