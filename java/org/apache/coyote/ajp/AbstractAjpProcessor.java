@@ -232,6 +232,13 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
                error = true;
            }
 
+           try {
+               flush();
+           } catch (IOException e) {
+               // Set error flag
+               error = true;
+           }
+
        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
 
            if (!response.isCommitted()) {
