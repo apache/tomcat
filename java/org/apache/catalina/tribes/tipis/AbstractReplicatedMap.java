@@ -902,7 +902,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 entry.setBackupNodes(backup);
                 entry.setBackup(false);
                 entry.setProxy(false);
-                getMapOwner().objectMadePrimay(key, entry.getValue());
+                if ( getMapOwner()!=null ) getMapOwner().objectMadePrimay(key, entry.getValue());
 
             } catch (Exception x) {
                 log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);
