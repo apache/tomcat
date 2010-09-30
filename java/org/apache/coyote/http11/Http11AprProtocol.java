@@ -369,14 +369,12 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
             } catch (java.net.SocketException e) {
                 // SocketExceptions are normal
-                Http11AprProtocol.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.socketexception.debug"), e);
+                log.debug(sm.getString(
+                        "http11protocol.proto.socketexception.debug"), e);
             } catch (java.io.IOException e) {
                 // IOExceptions are normal
-                Http11AprProtocol.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.ioexception.debug"), e);
+                log.debug(sm.getString(
+                        "http11protocol.proto.ioexception.debug"), e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -386,8 +384,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                Http11AprProtocol.log.error
-                    (sm.getString("http11protocol.proto.error"), e);
+                Http11AprProtocol.log.error(
+                        sm.getString("http11protocol.proto.error"), e);
             }
             recycledProcessors.offer(processor);
             return SocketState.CLOSED;
