@@ -22,11 +22,16 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
+import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
@@ -36,12 +41,13 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Base class for AJP Processor implementations.
  */
-public abstract class AbstractAjpProcessor implements ActionHook {
+public abstract class AbstractAjpProcessor implements ActionHook, Processor {
 
     protected abstract Log getLog();
 
@@ -52,12 +58,6 @@ public abstract class AbstractAjpProcessor implements ActionHook {
         StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Async used
-     */
-    protected boolean async = false;
 
 
     /**
@@ -170,6 +170,12 @@ public abstract class AbstractAjpProcessor implements ActionHook {
     protected boolean finished = false;
     
     
+    /**
+     * Track changes in state for async requests.
+     */
+    protected AsyncStateMachine asyncStateMachine = new AsyncStateMachine(this);
+
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -248,7 +254,6 @@ public abstract class AbstractAjpProcessor implements ActionHook {
 
        } else if (actionCode == ActionCode.CLOSE) {
            // Close
-           async = false;
            // End the processing of the current request, and stop any further
            // transactions with the client
 
@@ -320,6 +325,25 @@ public abstract class AbstractAjpProcessor implements ActionHook {
            empty = false;
            replay = true;
 
+       } else if (actionCode == ActionCode.ASYNC_START) {
+           asyncStateMachine.asyncStart((AsyncContextImpl) param);
+       } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
+           asyncStateMachine.asyncDispatched();
+       } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
+           AtomicBoolean result = (AtomicBoolean) param;
+           result.set(asyncStateMachine.asyncTimeout());
+       } else if (actionCode == ActionCode.ASYNC_RUN) {
+           asyncStateMachine.asyncRun((Runnable) param);
+       } else if (actionCode == ActionCode.ASYNC_ERROR) {
+           asyncStateMachine.asyncError();
+       } else if (actionCode == ActionCode.ASYNC_IS_STARTED) {
+           ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+       } else if (actionCode == ActionCode.ASYNC_IS_DISPATCHING) {
+           ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
+       } else if (actionCode == ActionCode.ASYNC_IS_ASYNC) {
+           ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
+       } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
+           ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
        }  else {
            actionInternal(actionCode, param);
        }
@@ -330,6 +354,24 @@ public abstract class AbstractAjpProcessor implements ActionHook {
    protected abstract void flush() throws IOException;
    protected abstract void finish() throws IOException;
    
+   
+   @Override
+   public abstract Executor getExecutor();
+
+   
+   public void recycle() {
+       asyncStateMachine.recycle();
+
+       // Recycle Request object
+       first = true;
+       endOfStream = false;
+       empty = true;
+       replay = false;
+       finished = false;
+       request.recycle();
+       response.recycle();
+       certificates.recycle();
+   }
    
    // ------------------------------------------------------ Connector Methods
 
@@ -735,6 +777,14 @@ public abstract class AbstractAjpProcessor implements ActionHook {
            throws IOException;
    
    
+   protected boolean isAsync() {
+       return asyncStateMachine.isAsync();
+   }
+   
+   protected SocketState asyncPostProcess() {
+       return asyncStateMachine.asyncPostProcess();
+   }
+
    // ------------------------------------- InputStreamInputBuffer Inner Class
 
 
