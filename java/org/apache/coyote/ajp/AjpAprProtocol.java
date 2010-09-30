@@ -481,9 +481,9 @@ public class AjpAprProtocol
                     if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
                         connections.remove(socket);
                         recycledProcessors.offer(result);
-                        //if (state == SocketState.OPEN) {
-                        //    proto.endpoint.getPoller().add(socket.getSocket().longValue());
-                        //}
+                        if (state == SocketState.OPEN) {
+                            proto.endpoint.getPoller().add(socket.getSocket().longValue());
+                        }
                     }
                 }
             }
