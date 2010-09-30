@@ -453,7 +453,6 @@ public class AjpAprProtocol
             return SocketState.CLOSED;
         }
 
-        // FIXME: Support for this could be added in AJP as well
         @Override
         public SocketState asyncDispatch(SocketWrapper<Long> socket, SocketStatus status) {
 
