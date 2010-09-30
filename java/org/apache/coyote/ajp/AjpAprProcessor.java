@@ -319,6 +319,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         }
 
+        // Add the socket to the poller
+        if (!error && !endpoint.isPaused()) {
+            if (!isAsync()) {
+                ((AprEndpoint)endpoint).getPoller().add(socketRef);
+            }
+        }
+
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
         
         if (error || endpoint.isPaused()) {
@@ -451,10 +458,10 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         // Add the end message
         if (outputBuffer.position() + endMessageArray.length > outputBuffer.capacity()) {
-            flush();
+            flush(false);
         }
         outputBuffer.put(endMessageArray);
-        flush();
+        flush(false);
 
     }
 
@@ -645,7 +652,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
      * Callback to write data from the buffer.
      */
     @Override
-    protected void flush() throws IOException {
+    protected void flush(boolean explicit) throws IOException {
         
         long socketRef = socket.getSocket().longValue();
         
@@ -656,11 +663,12 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
             outputBuffer.clear();
         }
         // Send explicit flush message
-        if (Socket.sendb(socketRef, flushMessageBuffer, 0,
-                flushMessageBuffer.position()) < 0) {
-            throw new IOException(sm.getString("ajpprocessor.failedflush"));
+        if (explicit) {
+            if (Socket.sendb(socketRef, flushMessageBuffer, 0,
+                    flushMessageBuffer.position()) < 0) {
+                throw new IOException(sm.getString("ajpprocessor.failedflush"));
+            }
         }
-
     }
 
 
@@ -705,7 +713,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
                 len -= thisTime;
                 if (outputBuffer.position() + thisTime +
                     Constants.H_SIZE + 4 > outputBuffer.capacity()) {
-                    flush();
+                    flush(false);
                 }
                 outputBuffer.put((byte) 0x41);
                 outputBuffer.put((byte) 0x42);

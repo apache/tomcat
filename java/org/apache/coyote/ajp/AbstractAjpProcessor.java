@@ -233,7 +233,7 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
            }
 
            try {
-               flush();
+               flush(false);
            } catch (IOException e) {
                // Set error flag
                error = true;
@@ -253,7 +253,7 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
            }
 
            try {
-               flush();
+               flush(true);
            } catch (IOException e) {
                // Set error flag
                error = true;
@@ -358,7 +358,7 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
    
    // Methods called by action()
    protected abstract void actionInternal(ActionCode actionCode, Object param);
-   protected abstract void flush() throws IOException;
+   protected abstract void flush(boolean tbd) throws IOException;
    protected abstract void finish() throws IOException;
    
    
