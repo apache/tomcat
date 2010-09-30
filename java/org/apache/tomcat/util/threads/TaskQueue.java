@@ -19,8 +19,8 @@ package org.apache.tomcat.util.threads;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 /**
  * As task queue specifically designed to run with a thread pool executor.
  * The task queue is optimised to properly utilize threads within 
@@ -65,7 +65,7 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
         //we are maxed out on threads, simply queue the object
         if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
         //we have idle threads, just add it to the queue
-        if (parent.getActiveCount()<(parent.getPoolSize())) return super.offer(o);
+        if (parent.getSubmittedCount()<(parent.getPoolSize())) return super.offer(o);
         //if we have less threads than maximum force creation of a new thread
         if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
         //if we reached here, we need to add it to the queue
