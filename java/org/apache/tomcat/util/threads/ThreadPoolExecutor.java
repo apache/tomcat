@@ -112,8 +112,10 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         }
     }
     
-    private static class RejectHandler implements java.util.concurrent.RejectedExecutionHandler {
-        public void rejectedExecution(Runnable r, java.util.concurrent.ThreadPoolExecutor executor) {
+    private static class RejectHandler implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r,
+                java.util.concurrent.ThreadPoolExecutor executor) {
             throw new RejectedExecutionException();
         }
         
