@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Same as a java.util.concurrent.ThreadPoolExecutor but implements a much more efficient
- * getActiveCount method, to be used to properly handle the work queue
+ * {@link #getSubmittedCount()} method, to be used to properly handle the work queue.
  * If a RejectedExecutionHandler is not specified a default one will be configured
  * and that one will always throw a RejectedExecutionException
  * @author fhanik
@@ -32,7 +32,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor {
     
-    private final AtomicInteger activeCount = new AtomicInteger(0);
+    /**
+     * The number of tasks submitted but not yet finished. This includes tasks
+     * in the queue and tasks that have been handed to a worker thread but the
+     * latter did not start executing the task yet.
+     * This number is always greater or equal to {@link #getActiveCount()}.
+     */
+    private final AtomicInteger submittedCount = new AtomicInteger(0);
     
     public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
@@ -53,17 +59,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
-        activeCount.decrementAndGet();
+        submittedCount.decrementAndGet();
     }
 
-    @Override
-    protected void beforeExecute(Thread t, Runnable r) {
-        activeCount.incrementAndGet();
-    }
-
-    @Override
-    public int getActiveCount() {
-        return activeCount.get();
+    public int getSubmittedCount() {
+        return submittedCount.get();
     }
     
     /**
@@ -88,6 +88,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * @throws NullPointerException if command or unit is null
      */
     public void execute(Runnable command, long timeout, TimeUnit unit) {
+        submittedCount.incrementAndGet();
         try {
             super.execute(command);
         } catch (RejectedExecutionException rx) {
@@ -95,13 +96,16 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                 final TaskQueue queue = (TaskQueue)super.getQueue();
                 try {
                     if (!queue.force(command, timeout, unit)) {
+                        submittedCount.decrementAndGet();
                         throw new RejectedExecutionException("Queue capacity is full.");
                     }
                 } catch (InterruptedException x) {
+                    submittedCount.decrementAndGet();
                     Thread.interrupted();
                     throw new RejectedExecutionException(x);
                 }
             } else {
+                submittedCount.decrementAndGet();
                 throw rx;
             }
             
