@@ -30,6 +30,9 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
+
+    private static final long serialVersionUID = 1L;
+
     private ThreadPoolExecutor parent = null;
 
     public TaskQueue() {
