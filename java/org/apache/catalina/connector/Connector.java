@@ -774,6 +774,15 @@ public class Connector extends LifecycleMBeanBase  {
         return useIPVHosts;
     }
 
+
+    public String getExecutorName() {
+        Object obj = protocolHandler.getExecutor();
+        if (obj instanceof org.apache.catalina.Executor) {
+            return ((org.apache.catalina.Executor) obj).getName();
+        }
+        return "Internal";
+    }
+
     // --------------------------------------------------------- Public Methods
 
 
