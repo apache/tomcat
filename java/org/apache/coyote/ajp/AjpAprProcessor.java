@@ -20,7 +20,7 @@ package org.apache.coyote.ajp;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -204,7 +204,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
      *
      * @throws IOException error during an I/O operation
      */
-    public boolean process(SocketWrapper<Long> socket)
+    public SocketState process(SocketWrapper<Long> socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -217,7 +217,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         // Error flag
         error = false;
-        async = false;
 
         boolean openSocket = true;
         boolean keptAlive = false;
@@ -295,7 +294,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
                 }
             }
 
-            if (async && !error) {
+            if (isAsync() && !error) {
                 break;
             }
 
@@ -323,17 +322,24 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         // Add the socket to the poller
         if (!error && !endpoint.isPaused()) {
-            ((AprEndpoint)endpoint).getPoller().add(socketRef);
+            if (!isAsync()) {
+                ((AprEndpoint)endpoint).getPoller().add(socketRef);
+            }
         } else {
             openSocket = false;
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (!async || error || endpoint.isPaused())
-             recycle();
-
-        return openSocket;
-
+        
+        if (error || endpoint.isPaused()) {
+            recycle();
+            return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
+        } else {
+            recycle();
+            return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
+        }
     }
 
 
@@ -360,9 +366,11 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (async) {
+        if (error) {
+            response.setStatus(500);
+        }
+        if (isAsync()) {
             if (error) {
-                response.setStatus(500);
                 request.updateCounters();
                 recycle();
                 return SocketState.CLOSED;
@@ -370,16 +378,24 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
                 return SocketState.LONG;
             }
         } else {
-            if (error) {
-                response.setStatus(500);
-            }
             request.updateCounters();
             recycle();
-            return SocketState.CLOSED;
+            if (error) {
+                return SocketState.CLOSED;
+            } else {
+                return SocketState.OPEN;
+            }
         }
         
     }
 
+    
+    @Override
+    public Executor getExecutor() {
+        return endpoint.getExecutor();
+    }
+    
+    
     // ----------------------------------------------------- ActionHook Methods
 
 
@@ -392,32 +408,19 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
     @Override
     protected void actionInternal(ActionCode actionCode, Object param) {
 
-        long socketRef = socket.getSocket().longValue();
-        
-        if (actionCode == ActionCode.ASYNC_START) {
-            async = true;
-        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
-                dispatch.set(true);
-                ((AprEndpoint)endpoint).getHandler().asyncDispatch(this.socket, SocketStatus.STOP);
-            } else {
-                dispatch.set(false);
-            }        
+        if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            if (asyncStateMachine.asyncComplete()) {
+                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
+            }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) return;
-            if (socketRef==0) return;
             long timeout = ((Long)param).longValue();
-            Socket.timeoutSet(socketRef, timeout * 1000); 
+            socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-           RequestInfo rp = request.getRequestProcessor();
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
-                ((AprEndpoint)endpoint).getPoller().add(socketRef);
-                dispatch.set(true);
-            } else {
-                dispatch.set(true);
+            if (asyncStateMachine.asyncDispatch()) {
+                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         }
 
@@ -637,17 +640,9 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
     /**
      * Recycle the processor.
      */
+    @Override
     public void recycle() {
-
-        // Recycle Request object
-        first = true;
-        endOfStream = false;
-        empty = true;
-        replay = false;
-        finished = false;
-        request.recycle();
-        response.recycle();
-        certificates.recycle();
+        super.recycle();
 
         inputBuffer.clear();
         inputBuffer.limit(0);
@@ -693,6 +688,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         /**
          * Write chunk.
          */
+        @Override
         public int doWrite(ByteChunk chunk, Response res)
             throws IOException {
 

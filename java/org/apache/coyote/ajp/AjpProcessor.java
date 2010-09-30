@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -304,7 +304,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
                 }
             }
             
-            if (async && !error) {
+            if (isAsync() && !error) {
                 break;
             }
 
@@ -329,11 +329,12 @@ public class AjpProcessor extends AbstractAjpProcessor {
             recycle();
 
         }
-        if (async && !error && !endpoint.isPaused()) {
-            rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+        
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (isAsync() && !error && !endpoint.isPaused()) {
             return SocketState.LONG;
         } else {
-            rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
             recycle();
             input = null;
             output = null;
@@ -361,7 +362,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (async) {
+        if (isAsync()) {
             if (error) {
                 response.setStatus(500);
                 request.updateCounters();
@@ -386,6 +387,13 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
     }
 
+    
+    @Override
+    public Executor getExecutor() {
+        return endpoint.getExecutor();
+    }
+    
+    
     // ----------------------------------------------------- ActionHook Methods
 
 
@@ -398,37 +406,22 @@ public class AjpProcessor extends AbstractAjpProcessor {
     @Override
     protected void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.ASYNC_START) {
-            //TODO SERVLET3 - async
-            async = true;
-        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-          //TODO SERVLET3 - async
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
-                dispatch.set(true);
-                ((JIoEndpoint)endpoint).processSocketAsync(this.socket, SocketStatus.OPEN);
-            } else {
-                dispatch.set(false);
+        if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            if (asyncStateMachine.asyncComplete()) {
+                ((JIoEndpoint)endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-          //TODO SERVLET3 - async
-            if (param==null) return;
+            if (param == null) return;
             long timeout = ((Long)param).longValue();
-            //if we are not piggy backing on a worker thread, set the timeout
+            // if we are not piggy backing on a worker thread, set the timeout
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            RequestInfo rp = request.getRequestProcessor();
-            AtomicBoolean dispatch = (AtomicBoolean)param;
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
-                ((JIoEndpoint)endpoint).processSocketAsync(this.socket, SocketStatus.OPEN);
-                dispatch.set(true);
-            } else { 
-                dispatch.set(true);
+            if (asyncStateMachine.asyncDispatch()) {
+                ((JIoEndpoint)endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         }
-
-
     }
 
 
@@ -581,25 +574,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
 
     /**
-     * Recycle the processor.
-     */
-    public void recycle() {
-
-        // Recycle Request object
-        first = true;
-        endOfStream = false;
-        empty = true;
-        replay = false;
-        finished = false;
-        request.recycle();
-        response.recycle();
-        certificates.recycle();
-        async = false;
-
-    }
-
-
-    /**
      * Callback to write data from the buffer.
      */
     @Override
@@ -623,6 +597,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
         /**
          * Write chunk.
          */
+        @Override
         public int doWrite(ByteChunk chunk, Response res)
             throws IOException {
 
