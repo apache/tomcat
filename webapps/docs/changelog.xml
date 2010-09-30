@@ -138,6 +138,11 @@
         and Tomcat 7. (markt)
       </fix>
       <fix>
+        <bug>49856</bug>: Add an executorName attribute to Connectors so it is
+        possible to trace ThreadPool to Connector to Executor via the JMX
+        interface. (markt)
+      </fix>
+      <fix>
         <bug>49865</bug>: Tomcat failed to start if catalina.properties was not
         present. (markt)
       </fix>
