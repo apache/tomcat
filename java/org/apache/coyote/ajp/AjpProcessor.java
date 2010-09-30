@@ -577,7 +577,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
      * Callback to write data from the buffer.
      */
     @Override
-    protected void flush() throws IOException {
+    protected void flush(boolean explicit) throws IOException {
         // Send the flush message
         output.write(flushMessageArray);
     }
