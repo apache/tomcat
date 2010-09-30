@@ -94,8 +94,8 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     // ---------------------------------------------- Public Methods
     
     @Override
-    protected void initInternal() {
-        // NOOP
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
     }
 
     
@@ -139,8 +139,8 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     
     @Override
-    protected void destroyInternal() {
-        // NOOP
+    protected void destroyInternal() throws LifecycleException {
+        super.destroyInternal();
     }
 
     
