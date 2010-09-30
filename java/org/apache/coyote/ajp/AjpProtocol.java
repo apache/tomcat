@@ -121,6 +121,7 @@ public class AjpProtocol
     /** 
      * Pass config info
      */
+    @Override
     public void setAttribute(String name, Object value) {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("ajpprotocol.setattribute", name, value));
@@ -128,6 +129,7 @@ public class AjpProtocol
         attributes.put(name, value);
     }
 
+    @Override
     public Object getAttribute(String key) {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("ajpprotocol.getattribute", key));
@@ -136,6 +138,7 @@ public class AjpProtocol
     }
 
 
+    @Override
     public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
@@ -144,11 +147,13 @@ public class AjpProtocol
     /**
      * The adapter, used to call the connector
      */
+    @Override
     public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
     }
 
 
+    @Override
     public Adapter getAdapter() {
         return adapter;
     }
@@ -156,6 +161,7 @@ public class AjpProtocol
 
     /** Start the protocol
      */
+    @Override
     public void init() throws Exception {
         endpoint.setName(getName());
         endpoint.setHandler(cHandler);
@@ -172,6 +178,7 @@ public class AjpProtocol
     }
 
 
+    @Override
     public void start() throws Exception {
         if (this.domain != null ) {
             try {
@@ -198,6 +205,7 @@ public class AjpProtocol
             log.info(sm.getString("ajpprotocol.start", getName()));
     }
 
+    @Override
     public void pause() throws Exception {
         try {
             endpoint.pause();
@@ -209,6 +217,7 @@ public class AjpProtocol
             log.info(sm.getString("ajpprotocol.pause", getName()));
     }
 
+    @Override
     public void resume() throws Exception {
         try {
             endpoint.resume();
@@ -220,6 +229,7 @@ public class AjpProtocol
             log.info(sm.getString("ajpprotocol.resume", getName()));
     }
 
+    @Override
     public void stop() throws Exception {
         try {
             endpoint.stop();
@@ -231,6 +241,7 @@ public class AjpProtocol
             log.info(sm.getString("ajpprotocol.stop", getName()));
     }
 
+    @Override
     public void destroy() throws Exception {
         if (log.isInfoEnabled())
             log.info(sm.getString("ajpprotocol.destroy", getName()));
@@ -260,6 +271,7 @@ public class AjpProtocol
     public int getProcessorCache() { return this.processorCache; }
     public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
+    @Override
     public Executor getExecutor() { return endpoint.getExecutor(); }
     public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
     
@@ -337,6 +349,7 @@ public class AjpProtocol
 
         protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<AjpProcessor>() {
+            private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(AjpProcessor processor) {
@@ -378,10 +391,12 @@ public class AjpProtocol
             this.proto = proto;
         }
         
+        @Override
         public SocketState process(SocketWrapper<Socket> socket) {
             return process(socket,SocketStatus.OPEN);
         }
 
+        @Override
         public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
             AjpProcessor processor = connections.remove(socket);
             try {
@@ -396,21 +411,23 @@ public class AjpProtocol
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
+                    // longPoll may change socket state (e.g. to trigger a
+                    // complete or dispatch)
+                    return processor.asyncPostProcess();
                 } else {
                     connections.remove(socket);
                     socket.setAsync(false);
+                    recycledProcessors.offer(processor);
                 }
                 return state;
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
-                AjpProtocol.log.debug
-                    (sm.getString
-                     ("ajpprotocol.proto.socketexception.debug"), e);
+                log.debug(sm.getString(
+                        "ajpprotocol.proto.socketexception.debug"), e);
             } catch (java.io.IOException e) {
                 // IOExceptions are normal
-                AjpProtocol.log.debug
-                    (sm.getString
-                     ("ajpprotocol.proto.ioexception.debug"), e);
+                log.debug(sm.getString(
+                        "ajpprotocol.proto.ioexception.debug"), e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -420,11 +437,9 @@ public class AjpProtocol
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                AjpProtocol.log.error
-                    (sm.getString("ajpprotocol.proto.error"), e);
-            } finally {
-                recycledProcessors.offer(processor);
+                log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
+            recycledProcessors.offer(processor);
             return SocketState.CLOSED;
         }
 
@@ -497,6 +512,7 @@ public class AjpProtocol
         return domain;
     }
 
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
@@ -505,14 +521,18 @@ public class AjpProtocol
         return name;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
+    @Override
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
+    @Override
     public void postDeregister() {
+        // NOOP
     }
-    
- 
 }
