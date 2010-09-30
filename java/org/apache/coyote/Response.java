@@ -35,14 +35,6 @@ import org.apache.tomcat.util.http.MimeHeaders;
  */
 public final class Response {
 
-
-    // ----------------------------------------------------------- Constructors
-
-
-    public Response() {
-    }
-
-
     // ----------------------------------------------------- Class Variables
 
     /**
@@ -301,12 +293,12 @@ public final class Response {
     }
 
 
-    public void finish() throws IOException {
+    public void finish() {
         action(ActionCode.CLOSE, this);
     }
 
 
-    public void acknowledge() throws IOException {
+    public void acknowledge() {
         action(ActionCode.ACK, this);
     }
 
@@ -375,7 +367,7 @@ public final class Response {
      *  Any implementation needs to notify ContextManager, to allow
      *  interceptors to fix headers.
      */
-    public void sendHeaders() throws IOException {
+    public void sendHeaders() {
         action(ActionCode.COMMIT, this);
         commited = true;
     }
