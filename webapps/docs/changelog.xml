@@ -230,6 +230,10 @@
         Various refactorings to reduce code duplication and unnecessary code in
         the connectors. (markt)
       </update>
+      <fix>
+        <bug>49860</bug>: Add support for trailing headers in chunked HTTP
+        requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
