@@ -66,6 +66,11 @@
         (markt)
       </fix>
       <fix>
+        <bug>49667</bug>: Ensure that using the JDBC driver memory leak
+        prevention code does not cause a one of the memory leaks it is meant to
+        avoid. (markt)
+      </fix>
+      <fix>
         <bug>49670</bug>: Restore SSO functionality that was broken by Lifecycle
         refactoring. (markt)
       </fix>
