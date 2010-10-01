@@ -306,6 +306,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Extras">
+    <changelog>
+      <fix>
+        <bug>49861</bug>: Don&apos;t log RMI ports formatted with commas for the
+        JMX remote listener. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
