@@ -286,6 +286,10 @@
         message. (markt)
       </fix>
       <fix>
+        <bug>49905</bug>: Prevent memory leak when using asynchronous session
+        replication. (markt) 
+      </fix>
+      <fix>
         <bug>49924</bug>: When non-primary node changes into a primary node,
         make sure isPrimarySession is changed to true. (kfujino)
       </fix>
