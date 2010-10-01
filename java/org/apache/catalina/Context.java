@@ -1217,5 +1217,10 @@ public interface Context extends Container {
      */
     public boolean getPaused();
 
+    
+    /**
+     * Is this context using version 2.2 of the Servlet spec?
+     */
+    boolean isServlet22();
 }
 

@@ -85,20 +85,6 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the context-relative URI of the JSP file for this servlet.
-     */
-    public String getJspFile();
-
-
-    /**
-     * Set the context-relative URI of the JSP file for this servlet.
-     *
-     * @param jspFile JSP file URI
-     */
-    public void setJspFile(String jspFile);
-
-
-    /**
      * Return the load-on-startup order value (negative value means
      * load on first call).
      */
