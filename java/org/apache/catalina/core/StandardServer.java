@@ -584,27 +584,17 @@ public final class StandardServer extends LifecycleMBeanBase
      * Write the configuration information for this entire <code>Server</code>
      * out to the server.xml configuration file.
      *
-     * @exception javax.management.InstanceNotFoundException if the managed resource object
-     *  cannot be found
-     * @exception javax.management.MBeanException if the initializer of the object throws
-     *  an exception, or persistence is not supported
-     * @exception javax.management.RuntimeOperationsException if an exception is reported
-     *  by the persistence mechanism
+     * @exception   javax.management.InstanceNotFoundException
+     *              if the managed resource object cannot be found
+     * @exception   javax.management.MBeanException
+     *              if the initializer of the object throws an exception, or
+     *              persistence is not supported
+     * @exception   javax.management.RuntimeOperationsException
+     *              if an exception is reported by the persistence mechanism
      */
     public synchronized void storeConfig() throws Exception {
-
-        ObjectName sname = null;    
-        try {
-           sname = new ObjectName("Catalina:type=StoreConfig");
-           if(mserver.isRegistered(sname)) {
-               mserver.invoke(sname, "storeConfig", null, null);            
-           } else
-               log.error("StoreConfig mbean not registered" + sname);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(t);
-        }
-
+        ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
+        mserver.invoke(sname, "storeConfig", null, null);            
     }
 
 

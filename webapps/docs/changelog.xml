@@ -187,6 +187,11 @@
         <bug>47950</bug> that prevented JSTL classes being loaded. (markt)
       </fix>
       <fix>
+        <bug>49915</bug>: Make error more obvious, particularly when accessed
+        via JConsole, if StandardServer.storeConfig() is called when there is
+        no StoreConfig implementation present. (markt)
+      </fix>
+      <fix>
         <bug>50018</bug>: Fix some minor Javadoc errors in Jasper source.
         Based on a patch by sebb. (timw)
       </fix>
