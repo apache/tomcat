@@ -1098,6 +1098,9 @@ public class NioEndpoint extends AbstractEndpoint {
                                         (after - before) < selectorTimeout/2) {
                                     jvmBugCount++;
                                     if (jvmBugCount > JVM_BUG_THRESHOLD) {
+                                        // TODO If bug 49890 shows no signs of
+                                        // update after a suitable period of
+                                        // time, remove the jvm bug code
                                         log.error(sm.getString(
                                                 "endpoint.err.jvmbug"));
                                     }
