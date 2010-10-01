@@ -1253,6 +1253,11 @@ public class ContextConfig
                 ok = webXml.merge(orderedFragments);
             }
 
+            // Step 6.5 Convert explicitly mentioned jsps to servlets
+            if (!false) {
+                convertJsps(webXml);
+            }
+
             // Step 7. Apply merged web.xml to Context
             if (ok) {
                 webXml.configureContext(context);
@@ -1302,7 +1307,38 @@ public class ContextConfig
             }
         } else {
             // Apply unmerged web.xml to Context
+            convertJsps(webXml);
             webXml.configureContext(context);
+        }
+    }
+
+    private void convertJsps(WebXml webXml) {
+        ServletDef jspServlet = webXml.getServlets().get("jsp");
+        for (ServletDef servletDef: webXml.getServlets().values()) {
+            if (servletDef.getJspFile() != null) {
+                convertJsp(servletDef, jspServlet);
+            }
+        }
+    }
+
+    private void convertJsp(ServletDef servletDef, ServletDef jspServletDef) {
+        servletDef.setServletClass(org.apache.catalina.core.Constants.JSP_SERVLET_CLASS);
+        String jspFile = servletDef.getJspFile();
+        servletDef.getParameterMap().put("jspFile", jspFile);
+        if ((jspFile != null) && !jspFile.startsWith("/")) {
+            if (context.isServlet22()) {
+                if(log.isDebugEnabled())
+                    log.debug(sm.getString("standardContext.wrapper.warning",
+                                       jspFile));
+                jspFile = "/" + jspFile;
+            } else {
+                throw new IllegalArgumentException
+                    (sm.getString("standardContext.wrapper.error", jspFile));
+            }
+        }
+        servletDef.setJspFile(null);
+        for (Map.Entry<String, String> initParam: jspServletDef.getParameterMap().entrySet()) {
+            servletDef.addInitParameter(initParam.getKey(), initParam.getValue());
         }
     }
 

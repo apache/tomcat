@@ -20,6 +20,10 @@ package org.apache.jasper.servlet;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -64,6 +68,9 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     private ServletConfig config;
     private Options options;
     private JspRuntimeContext rctxt;
+    //jspFile for a jsp configured explicitly as a servlet, in environments where this configuration is
+    //translated into an init-param for this servlet.
+    private String jspFile;
 
 
     /*
@@ -105,7 +112,36 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             options = new EmbeddedServletOptions(config, context);
         }
         rctxt = new JspRuntimeContext(context, options);
-        
+        if (config.getInitParameter("jspFile") != null) {
+            jspFile = config.getInitParameter("jspFile");
+            try {
+                if (null == context.getResource(jspFile)) {
+                    throw new ServletException("missing jspFile");
+                }
+            } catch (MalformedURLException e) {
+                throw new ServletException("Can not locate jsp file", e);
+            }
+            try {
+                serviceJspFile(null, null, jspFile, null, true);
+                if (SecurityUtil.isPackageProtectionEnabled()){
+                   AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
+                        public Object run() throws IOException, ServletException {
+                            serviceJspFile(null, null, jspFile, null, true);
+                            return null;
+                        }
+                    });
+                } else {
+                    serviceJspFile(null, null, jspFile, null, true);
+                }
+            } catch (IOException e) {
+                throw new ServletException("Could not precompile jsp: " + jspFile, e);
+            } catch (PrivilegedActionException e) {
+                Throwable t = e.getCause();
+                if (t instanceof ServletException) throw (ServletException)t;
+                throw new ServletException("Could not precompile jsp: " + jspFile, e);
+            }
+        }
+
         if (log.isDebugEnabled()) {
             log.debug(Localizer.getMessage("jsp.message.scratch.dir.is",
                     options.getScratchDir().toString()));
@@ -214,14 +250,15 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     public void service (HttpServletRequest request, 
                              HttpServletResponse response)
                 throws ServletException, IOException {
+        //jspFile may be configured as an init-param for this servlet instance
+        String jspUri = jspFile;
 
-        String jspUri = null;
-
-        String jspFile = (String) request.getAttribute(Constants.JSP_FILE);
-        if (jspFile != null) {
-            // JSP is specified via <jsp-file> in <servlet> declaration
-            jspUri = jspFile;
-        } else {
+        if (jspUri == null) {
+            // JSP specified via <jsp-file> in <servlet> declaration and supplied through
+            //custom servlet container code
+            jspUri = (String) request.getAttribute(Constants.JSP_FILE);
+        }
+        if (jspUri == null) {
             /*
              * Check to see if the requested JSP has been the target of a
              * RequestDispatcher.include()
