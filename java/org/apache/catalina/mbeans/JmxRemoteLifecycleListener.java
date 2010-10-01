@@ -167,6 +167,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     }
     
 
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // When the server starts, configure JMX/RMI
         if (Lifecycle.START_EVENT == event.getType()) {
@@ -284,6 +285,8 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
     public static class RmiClientLocalhostSocketFactory
     implements RMIClientSocketFactory, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private static final String FORCED_HOST = "localhost";
 
         private RMIClientSocketFactory factory = null;
@@ -292,6 +295,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             factory = theFactory;
         }
 
+        @Override
         public Socket createSocket(String host, int port) throws IOException {
             if (factory == null) {
                 return new Socket(FORCED_HOST, port);
