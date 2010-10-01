@@ -24,6 +24,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.transport.bio.util.LinkObject;
+import org.apache.catalina.tribes.util.TcclThreadFactory;
 
 /**
  * 
@@ -80,7 +81,9 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
     @Override
     public void startQueue() {
         if ( run ) return;
-        executor = new ThreadPoolExecutor(maxSpareThreads,maxThreads,keepAliveTime,TimeUnit.MILLISECONDS,runnablequeue);
+        executor = new ThreadPoolExecutor(maxSpareThreads, maxThreads,
+                keepAliveTime, TimeUnit.MILLISECONDS, runnablequeue,
+                new TcclThreadFactory());
         run = true;
     }
 
