@@ -664,11 +664,6 @@ final class ApplicationDispatcher
         
         // Call the service() method for the allocated servlet instance
         try {
-            String jspFile = wrapper.getJspFile();
-            if (jspFile != null)
-                request.setAttribute(Globals.JSP_FILE_ATTR, jspFile);
-            else
-                request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.BEFORE_DISPATCH_EVENT,
                                       servlet, request, response);
             // for includes/forwards
@@ -676,23 +671,19 @@ final class ApplicationDispatcher
                filterChain.doFilter(request, response);
              }
             // Servlet Service Method is called by the FilterChain
-            request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
         } catch (ClientAbortException e) {
-            request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             ioException = e;
         } catch (IOException e) {
-            request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException",
                              wrapper.getName()), e);
             ioException = e;
         } catch (UnavailableException e) {
-            request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException",
@@ -700,7 +691,6 @@ final class ApplicationDispatcher
             servletException = e;
             wrapper.unavailable(e);
         } catch (ServletException e) {
-            request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             Throwable rootCause = StandardWrapper.getRootCause(e);
@@ -710,7 +700,6 @@ final class ApplicationDispatcher
             }
             servletException = e;
         } catch (RuntimeException e) {
-            request.removeAttribute(Globals.JSP_FILE_ATTR);
             support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException",

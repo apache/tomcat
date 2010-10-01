@@ -2455,19 +2455,6 @@ public class StandardContext extends ContainerBase
             }
         }
 
-        String jspFile = wrapper.getJspFile();
-        if ((jspFile != null) && !jspFile.startsWith("/")) {
-            if (isServlet22()) {
-                if(log.isDebugEnabled())
-                    log.debug(sm.getString("standardContext.wrapper.warning", 
-                                       jspFile));
-                wrapper.setJspFile("/" + jspFile);
-            } else {
-                throw new IllegalArgumentException
-                    (sm.getString("standardContext.wrapper.error", jspFile));
-            }
-        }
-
         super.addChild(child);
 
         if (isJspServlet && oldJspServlet != null) {
@@ -5134,7 +5121,7 @@ public class StandardContext extends ContainerBase
     /**
      * Are we processing a version 2.2 deployment descriptor?
      */
-    protected boolean isServlet22() {
+    public boolean isServlet22() {
 
         if (this.publicId == null)
             return (false);

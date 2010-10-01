@@ -119,16 +119,6 @@ public final class Globals {
     public static final String ERROR_MESSAGE_ATTR =
         "javax.servlet.error.message";
 
-
-    /**
-     * The request attribute under which we expose the value of the
-     * <code>&lt;jsp-file&gt;</code> value associated with this servlet,
-     * if any.
-     */
-    public static final String JSP_FILE_ATTR =
-        "org.apache.catalina.jsp_file";
-
-
     /**
      * The request attribute under which we store the key size being used for
      * this SSL connection (as an object of type java.lang.Integer).

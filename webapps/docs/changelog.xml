@@ -269,6 +269,12 @@
         <code>jsp:attribute</code> elements now supports the use of expressions
         and expression language. (markt)
       </fix>
+      <fix>
+        <bug>49916</bug>: Switch to using an initialisation parameter to pass
+        JSP file information from Catalina to Jasper. This simplifies the
+        Catalina code as well as making it easier for Geronimo and others to
+        integrate Jasper. Patch provided by David Jencks. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
