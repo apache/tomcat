@@ -1079,7 +1079,6 @@ public class NioEndpoint extends AbstractEndpoint {
                         timeout(0, false);
                         break;
                     }
-                    int keyCount = 0;
                     try {
                         if ( !close ) {
                             if (wakeupCounter.get()>0) {
