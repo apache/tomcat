@@ -155,12 +155,6 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * The context-relative URI of the JSP file for this servlet.
-     */
-    protected String jspFile = null;
-
-
-    /**
      * The load-on-startup order value (negative value means load on
      * first call) for this servlet.
      */
@@ -364,35 +358,6 @@ public class StandardWrapper extends ContainerBase
     public InstanceSupport getInstanceSupport() {
 
         return (this.instanceSupport);
-
-    }
-
-
-    /**
-     * Return the context-relative URI of the JSP file for this servlet.
-     */
-    public String getJspFile() {
-
-        return (this.jspFile);
-
-    }
-
-
-    /**
-     * Set the context-relative URI of the JSP file for this servlet.
-     *
-     * @param jspFile JSP file URI
-     */
-    public void setJspFile(String jspFile) {
-
-        String oldJspFile = this.jspFile;
-        this.jspFile = jspFile;
-        support.firePropertyChange("jspFile", oldJspFile, this.jspFile);
-
-        // Each jsp-file needs to be represented by its own JspServlet and
-        // corresponding JspMonitoring mbean, because it may be initialized
-        // with its own init params
-        isJspServlet = true;
 
     }
 
@@ -1046,31 +1011,8 @@ public class StandardWrapper extends ContainerBase
         Servlet servlet;
         try {
             long t1=System.currentTimeMillis();
-            // If this "servlet" is really a JSP file, get the right class.
-            // HOLD YOUR NOSE - this is a kludge that avoids having to do special
-            // case Catalina-specific code in Jasper - it also requires that the
-            // servlet path be replaced by the <jsp-file> element content in
-            // order to be completely effective
-            String actualClass = servletClass;
-            if ((actualClass == null) && (jspFile != null)) {
-                Wrapper jspWrapper = (Wrapper)
-                    ((Context) getParent()).findChild(Constants.JSP_SERVLET_NAME);
-                if (jspWrapper != null) {
-                    actualClass = jspWrapper.getServletClass();
-                    // Merge init parameters
-                    String paramNames[] = jspWrapper.findInitParameters();
-                    for (int i = 0; i < paramNames.length; i++) {
-                        if (parameters.get(paramNames[i]) == null) {
-                            parameters.put
-                                (paramNames[i], 
-                                 jspWrapper.findInitParameter(paramNames[i]));
-                        }
-                    }
-                }
-            }
-
             // Complain if no servlet class has been specified
-            if (actualClass == null) {
+            if (servletClass == null) {
                 unavailable(null);
                 throw new ServletException
                     (sm.getString("standardWrapper.notClass", getName()));
@@ -1078,12 +1020,12 @@ public class StandardWrapper extends ContainerBase
 
             InstanceManager instanceManager = ((StandardContext)getParent()).getInstanceManager();
             try {
-                servlet = (Servlet) instanceManager.newInstance(actualClass);
+                servlet = (Servlet) instanceManager.newInstance(servletClass);
             } catch (ClassCastException e) {
                 unavailable(null);
                 // Restore the context ClassLoader
                 throw new ServletException
-                    (sm.getString("standardWrapper.notServlet", actualClass), e);
+                    (sm.getString("standardWrapper.notServlet", servletClass), e);
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 unavailable(null);
@@ -1091,12 +1033,12 @@ public class StandardWrapper extends ContainerBase
                 // Added extra log statement for Bugzilla 36630:
                 // http://issues.apache.org/bugzilla/show_bug.cgi?id=36630
                 if(log.isDebugEnabled()) {
-                    log.debug(sm.getString("standardWrapper.instantiate", actualClass), e);
+                    log.debug(sm.getString("standardWrapper.instantiate", servletClass), e);
                 }
 
                 // Restore the context ClassLoader
                 throw new ServletException
-                    (sm.getString("standardWrapper.instantiate", actualClass), e);
+                    (sm.getString("standardWrapper.instantiate", servletClass), e);
             }
 
             if (multipartConfigElement == null) {
@@ -1110,7 +1052,7 @@ public class StandardWrapper extends ContainerBase
 
             // Special handling for ContainerServlet instances
             if ((servlet instanceof ContainerServlet) &&
-                  (isContainerProvidedServlet(actualClass) ||
+                  (isContainerProvidedServlet(servletClass) ||
                     ((Context)getParent()).getPrivileged() )) {
                 ((ContainerServlet) servlet).setWrapper(this);
             }
@@ -1166,25 +1108,6 @@ public class StandardWrapper extends ContainerBase
                 servlet.init(facade);
             }
 
-            // Invoke jspInit on JSP pages
-            if ((loadOnStartup >= 0) && (jspFile != null)) {
-                // Invoking jspInit
-                DummyRequest req = new DummyRequest();
-                req.setServletPath(jspFile);
-                req.setQueryString(Constants.PRECOMPILE + "=true");
-                DummyResponse res = new DummyResponse();
-
-                if( Globals.IS_SECURITY_ENABLED) {
-                    Object[] args = new Object[]{req, res};
-                    SecurityUtil.doAsPrivilege("service",
-                                               servlet,
-                                               classTypeUsedInService,
-                                               args);
-                    args = null;
-                } else {
-                    servlet.service(req, res);
-                }
-            }
             instanceInitialized = true;
 
             instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
