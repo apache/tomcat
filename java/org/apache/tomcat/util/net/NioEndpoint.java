@@ -937,6 +937,9 @@ public class NioEndpoint extends AbstractEndpoint {
         
         protected volatile int keyCount = 0;
 
+        private static final int JVM_BUG_THRESHOLD = 16;
+        private volatile int jvmBugCount = 0; 
+        
         public Poller() throws IOException {
             this.selector = Selector.open();
         }
@@ -1088,7 +1091,17 @@ public class NioEndpoint extends AbstractEndpoint {
                             }else {
                                 keyCount = selector.keys().size();
                                 wakeupCounter.set(-1);
+                                long before = System.currentTimeMillis();
                                 keyCount = selector.select(selectorTimeout);
+                                long after = System.currentTimeMillis();
+                                if (keyCount == 0 &&
+                                        (after - before) < selectorTimeout/2) {
+                                    jvmBugCount++;
+                                    if (jvmBugCount > JVM_BUG_THRESHOLD) {
+                                        log.error(sm.getString(
+                                                "endpoint.err.jvmbug"));
+                                    }
+                                }
                             }
                             wakeupCounter.set(0);
                         }
