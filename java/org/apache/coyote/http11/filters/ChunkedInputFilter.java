@@ -17,6 +17,7 @@
 
 package org.apache.coyote.http11.filters;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import org.apache.coyote.InputBuffer;
@@ -25,6 +26,8 @@ import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  * Chunked input filter. Parses chunked data according to
@@ -95,12 +98,19 @@ public class ChunkedInputFilter implements InputFilter {
      */
     protected boolean endChunk = false;
 
+
     /**
      * Flag set to true if the next call to doRead() must parse a CRLF pair
      * before doing anything else.
      */
     protected boolean needCRLFParse = false;
 
+
+    /**
+     * Request being parsed.
+     */
+    private Request request;
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -177,7 +187,7 @@ public class ChunkedInputFilter implements InputFilter {
      */
     @Override
     public void setRequest(Request request) {
-        // NOOP: Request isn't used so ignore it
+        this.request = request;
     }
 
 
@@ -357,14 +367,163 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Parse end chunk data.
-     * FIXME: Handle trailers
      */
-    protected boolean parseEndChunk()
-        throws IOException {
+    protected void parseEndChunk() throws IOException {
 
-        return parseCRLF(); // FIXME
-
+        // Handle option trailer headers
+        while (parseHeader()) {
+            // Loop until we run out of headers
+        }
     }
 
+    
+    @SuppressWarnings("null") // headerValue cannot be null
+    private boolean parseHeader() throws IOException {
 
+        MimeHeaders headers = request.getMimeHeaders();
+
+        byte chr = 0;
+        while (true) {
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (readBytes() <0)
+                    throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
+            }
+
+            chr = buf[pos];
+    
+            if ((chr == Constants.CR) || (chr == Constants.LF)) {
+                if (chr == Constants.LF) {
+                    pos++;
+                    return false;
+                }
+            } else {
+                break;
+            }
+    
+            pos++;
+    
+        }
+    
+        // Mark the current buffer position
+        int start = pos;
+    
+        //
+        // Reading the header name
+        // Header name is always US-ASCII
+        //
+    
+        boolean colon = false;
+        MessageBytes headerValue = null;
+    
+        while (!colon) {
+    
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (readBytes() <0)
+                    throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
+            }
+    
+            if (buf[pos] == Constants.COLON) {
+                colon = true;
+                headerValue = headers.addValue(buf, start, pos - start);
+            }
+            chr = buf[pos];
+            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
+                buf[pos] = (byte) (chr - Constants.LC_OFFSET);
+            }
+    
+            pos++;
+    
+        }
+    
+        // Mark the current buffer position
+        start = pos;
+        int realPos = pos;
+    
+        //
+        // Reading the header value (which can be spanned over multiple lines)
+        //
+    
+        boolean eol = false;
+        boolean validLine = true;
+    
+        while (validLine) {
+    
+            boolean space = true;
+    
+            // Skipping spaces
+            while (space) {
+    
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (readBytes() <0)
+                        throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
+                }
+    
+                if ((buf[pos] == Constants.SP) || (buf[pos] == Constants.HT)) {
+                    pos++;
+                } else {
+                    space = false;
+                }
+    
+            }
+    
+            int lastSignificantChar = realPos;
+    
+            // Reading bytes until the end of the line
+            while (!eol) {
+    
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (readBytes() <0)
+                        throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
+                }
+    
+                if (buf[pos] == Constants.CR) {
+                    // Skip
+                } else if (buf[pos] == Constants.LF) {
+                    eol = true;
+                } else if (buf[pos] == Constants.SP) {
+                    buf[realPos] = buf[pos];
+                    realPos++;
+                } else {
+                    buf[realPos] = buf[pos];
+                    realPos++;
+                    lastSignificantChar = realPos;
+                }
+    
+                pos++;
+    
+            }
+    
+            realPos = lastSignificantChar;
+    
+            // Checking the first character of the new line. If the character
+            // is a LWS, then it's a multiline header
+    
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (readBytes() <0)
+                    throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
+            }
+    
+            chr = buf[pos];
+            if ((chr != Constants.SP) && (chr != Constants.HT)) {
+                validLine = false;
+            } else {
+                eol = false;
+                // Copying one extra space in the buffer (since there must
+                // be at least one space inserted between the lines)
+                buf[realPos] = chr;
+                realPos++;
+            }
+    
+        }
+    
+        // Set the header value
+        headerValue.setBytes(buf, start, realPos - start);
+    
+        return true;
+    }
 }
