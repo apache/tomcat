@@ -377,7 +377,7 @@ elif [ "$1" = "start" ] ; then
 
   fi
 
-  if [ ! -z "$CATALINA_PID" -a ! -e "$CATALINA_PID" ]; then
+  if [ ! -z "$CATALINA_PID" -a ! -f "$CATALINA_PID" ]; then
     echo $! > "$CATALINA_PID"
   fi
 
