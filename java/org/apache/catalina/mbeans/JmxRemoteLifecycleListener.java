@@ -260,8 +260,8 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
                     serviceUrl, theEnv, theMBeanServer);
             cs.start();
             log.info(sm.getString("jmxRemoteLifecycleListener.start",
-                    Integer.valueOf(theRmiRegistryPort),
-                    Integer.valueOf(theRmiServerPort), serverName));
+                    Integer.toString(theRmiRegistryPort),
+                    Integer.toString(theRmiServerPort), serverName));
         } catch (IOException e) {
             log.error(sm.getString(
                     "jmxRemoteLifecycleListener.createServerFailed",
