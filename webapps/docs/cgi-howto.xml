@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="cgi-howto.html">
+
+    &project;
+
+    <properties>
+        <author email="glenn@apache.org">Glenn L. Nielsen</author>
+        <title>CGI How To</title>
+    </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+<section name="Introduction">
+
+<p>The CGI (Common Gateway Interface) defines a way for a web server to
+interact with external content-generating programs, which are often
+referred to as CGI programs or CGI scripts.
+</p>
+
+<p>Within Tomcat, CGI support can be added when you are using Tomcat as your
+HTTP server and require CGI support.  Typically this is done
+during development when you don't want to run a web server like 
+Apache httpd.
+Tomcat's CGI support is largely compatible with Apache httpd's, 
+but there are some limitations (e.g., only one cgi-bin directory).
+</p>
+
+<p>CGI support is implemented using the servlet class
+<code>org.apache.catalina.servlets.CGIServlet</code>.  Traditionally,
+this servlet is mapped to the URL pattern "/cgi-bin/*".</p>
+
+<p>By default CGI support is disabled in Tomcat.</p>
+</section>
+
+<section name="Installation">
+
+<p><strong>CAUTION</strong> - CGI scripts are used to execute programs
+external to the Tomcat JVM. If you are using the Java SecurityManager this
+will bypass your security policy configuration in <code>catalina.policy.</code></p>
+
+<p>Remove the XML comments from around the CGI servlet and servlet-mapping
+configuration in <code>$CATALINA_BASE/conf/web.xml</code>.</p>
+
+<p>Only Contexts which are marked as privileged may use the CGI servlet (see the
+privileged property of the Context element).</p>
+
+</section>
+
+<section name="Configuration">
+
+<p>There are several servlet init parameters which can be used to
+configure the behaviour of the CGI servlet.
+<ul>
+<li><strong>cgiPathPrefix</strong> - The CGI search path will start at
+the web application root directory + File.separator + this prefix.
+The default cgiPathPrefix is <code>WEB-INF/cgi</code></li>
+<li><strong>debug</strong> - Debugging detail level for messages logged
+by this servlet. Default 0.</li>
+<li><strong>executable</strong> - The of the executable to be used to
+run the script. Default is <code>perl</code>.</li>
+<li><strong>parameterEncoding</strong> - Name of the parameter encoding
+to be used with the GCI servlet. Default is
+<code>System.getProperty("file.encoding","UTF-8")</code>.</li>
+<li><strong>passShellEnvironment</strong> - Should the shell environment
+variables (if any) be passed to the CGI script? Default is
+<code>false</code>.</li>
+<li><strong>stderrTimeout</strong> - The time (in milliseconds) to wait for
+the reading of stderr to complete before terminating the CGI process. Default
+is 2000.</li>
+</ul>
+</p>
+
+</section>
+
+</body>
+
+</document>
