@@ -269,6 +269,9 @@
         Catalina code as well as making it easier for Geronimo and others to
         integrate Jasper. Patch provided by David Jencks. (markt)
       </fix>
+      <fix>
+        <bug>49985</bug>: Fix thread safety issue in EL parser. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

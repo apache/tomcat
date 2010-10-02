@@ -34,7 +34,7 @@ public final class AstFloatingPoint extends SimpleNode {
         super(id);
     }
 
-    private Number number;
+    private volatile Number number;
 
     public Number getFloatingPoint() {
         if (this.number == null) {
