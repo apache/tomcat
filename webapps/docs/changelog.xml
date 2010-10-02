@@ -59,7 +59,7 @@
       <fix>
         <bug>49209</bug>: Prevent possible AccessControlException during
         undeployment when running with a security manager. Patch provided by
-        Sylvain Laurent. (markt)
+        Sylvain Laurent.
       </fix>
       <fix>
         <bug>49657</bug>: Handle CGI executables with spaces in the path.
@@ -244,12 +244,6 @@
         <bug>49860</bug>: Add support for trailing headers in chunked HTTP
         requests. (markt)
       </fix>
-      <add>
-        <bug>49890</bug>: Detect when NIO connector encounters a known JVM bug
-        on Linux and log an error to help determine if the bug is still present
-        ort not. The JVM bug should be fixed for 2.6 kernels and the 1.6.0u18
-        JVMs and later. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
