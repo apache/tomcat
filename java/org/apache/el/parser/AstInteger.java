@@ -34,7 +34,7 @@ public final class AstInteger extends SimpleNode {
         super(id);
     }
 
-    private Number number;
+    private volatile Number number;
 
     protected Number getInteger() {
         if (this.number == null) {
