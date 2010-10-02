@@ -1868,9 +1868,14 @@ class Generator {
                 if (attrs[i].isNamedAttribute()) {
                     NamedAttribute attr = attrs[i].getNamedAttributeNode();
                     Node.JspAttribute omitAttr = attr.getOmit();
-                    String omit = attributeValue(omitAttr, false, boolean.class);
-                    if ("true".equals(omit)) {
-                        continue;
+                    String omit;
+                    if (omitAttr == null) {
+                        omit = "false";
+                    } else {
+                        omit = attributeValue(omitAttr, false, boolean.class);
+                        if ("true".equals(omit)) {
+                            continue;
+                        }
                     }
                     value = generateNamedAttributeValue(
                             attrs[i].getNamedAttributeNode());
@@ -1878,8 +1883,9 @@ class Generator {
                         nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
                                 value + " + \"\\\"\"";
                     } else {
-                        nvp = " + (Boolean.valueOf(" + omit + ")?\"\":\" " + attrs[i].getName() +
-                                "=\\\"\" + " + value + " + \"\\\"\")";
+                        nvp = " + (Boolean.valueOf(" + omit + ")?\"\":\" " +
+                                attrs[i].getName() + "=\\\"\" + " + value +
+                                " + \"\\\"\")";
                     }
                 } else {
                     value = attributeValue(attrs[i], false, Object.class);
