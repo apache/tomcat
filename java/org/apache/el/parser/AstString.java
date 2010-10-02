@@ -32,7 +32,7 @@ public final class AstString extends SimpleNode {
         super(id);
     }
 
-    private String string;
+    private volatile String string;
 
     public String getString() {
         if (this.string == null) {
