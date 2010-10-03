@@ -326,4 +326,13 @@ public class TestMethodExpressionImpl extends TestCase {
                 "#{beanA.name}", java.lang.String.class);
         assertEquals("New value", ve.getValue(context));
     }
+    
+    public void testBugPrimitives() throws Exception {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanA.setValLong(5)}", null, null);
+        me.invoke(context, null);
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanA.valLong}", java.lang.String.class);
+        assertEquals("5", ve.getValue(context));
+    }
 }
