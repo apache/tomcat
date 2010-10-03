@@ -20,6 +20,7 @@ package org.apache.el;
 public class TesterBeanA {
     private TesterBeanB bean;
     private String name;
+    private long valLong;
 
     public TesterBeanB getBean() {
         return bean;
@@ -35,5 +36,13 @@ public class TesterBeanA {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public long getValLong() {
+        return valLong;
+    }
+    
+    public void setValLong(long valLong) {
+        this.valLong = valLong;
     }
 }
