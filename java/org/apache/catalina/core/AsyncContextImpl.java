@@ -17,12 +17,16 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.naming.NamingException;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
@@ -42,6 +46,7 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 /**
  * 
  * @author fhanik
@@ -59,8 +64,8 @@ public class AsyncContextImpl implements AsyncContext {
     private Context context = null;
     private long timeout = -1;
     private AsyncEvent event = null;
-    
     private Request request;
+    private volatile InstanceManager instanceManager;
     
     public AsyncContextImpl(Request request) {
         if (log.isDebugEnabled()) {
@@ -203,16 +208,27 @@ public class AsyncContextImpl implements AsyncContext {
         listeners.add(wrapper);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz)
             throws ServletException {
         T listener = null;
         try {
-             listener = clazz.newInstance();
+             listener = (T) getInstanceManager().newInstance(clazz.getName(),
+                     clazz.getClassLoader());
         } catch (InstantiationException e) {
             ServletException se = new ServletException(e);
             throw se;
         } catch (IllegalAccessException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        } catch (InvocationTargetException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        } catch (NamingException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        } catch (ClassNotFoundException e) {
             ServletException se = new ServletException(e);
             throw se;
         }
@@ -372,6 +388,20 @@ public class AsyncContextImpl implements AsyncContext {
         } else {
             log.debug(msg);
         }
+    }
+
+    private InstanceManager getInstanceManager() {
+        if (instanceManager == null) {
+            if (context instanceof StandardContext) {
+                instanceManager = ((StandardContext)context).getInstanceManager();
+            } else {
+                instanceManager = new DefaultInstanceManager(null,
+                        new HashMap<String, Map<String, String>>(),
+                        context,
+                        getClass().getClassLoader()); 
+            }
+        }
+        return instanceManager;
     }
 
     private static class DebugException extends Exception {
