@@ -80,7 +80,11 @@ public class FilterMap implements Serializable {
     private String[] servletNames = new String[0];
 
     public String[] getServletNames() {
-        return (this.servletNames);
+        if (matchAllServletNames) {
+            return new String[] {};
+        } else {
+            return (this.servletNames);
+        }
     }
 
     public void addServletName(String servletName) {
@@ -121,7 +125,11 @@ public class FilterMap implements Serializable {
     private String[] urlPatterns = new String[0];
 
     public String[] getURLPatterns() {
-        return (this.urlPatterns);
+        if (matchAllUrlPatterns) {
+            return new String[] {};
+        } else {
+            return (this.urlPatterns);
+        }
     }
 
     public void addURLPattern(String urlPattern) {
