@@ -151,10 +151,9 @@ public class ClassLoaderLogManager extends LogManager {
         // Always instantiate parent loggers so that 
         // we can control log categories even during runtime
         int dotIndex = loggerName.lastIndexOf('.');
-        while (dotIndex >= 0) {
+        if (dotIndex >= 0) {
             final String parentName = loggerName.substring(0, dotIndex);
             Logger.getLogger(parentName);
-            dotIndex = loggerName.lastIndexOf('.', dotIndex - 1);
         }
 
         // Find associated node
