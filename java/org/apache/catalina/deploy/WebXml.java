@@ -278,13 +278,37 @@ public class WebXml {
     public Map<String,FilterDef> getFilters() { return filters; }
     
     // filter-mapping
-    private Set<FilterMap> filterMaps = new LinkedHashSet<FilterMap>();
-    private Set<String> filterMappingNames = new HashSet<String>();
+    private Map<String,FilterMap> filterMaps =
+        new LinkedHashMap<String,FilterMap>();
     public void addFilterMapping(FilterMap filterMap) {
-        filterMaps.add(filterMap);
-        filterMappingNames.add(filterMap.getFilterName());
+        FilterMap fm = filterMaps.get(filterMap.getFilterName());
+        if (fm == null) {
+            filterMaps.put(filterMap.getFilterName(), filterMap);
+        } else {
+            for (String dispatcher : filterMap.getDispatcherNames()) {
+                fm.setDispatcher(dispatcher);
+            }
+            if (!fm.getMatchAllServletNames()) {
+                if (filterMap.getMatchAllServletNames()) {
+                    fm.addServletName("*");
+                } else {
+                    for (String servletName : filterMap.getServletNames()) {
+                        fm.addServletName(servletName);
+                    }
+                }
+            }
+            if (!fm.getMatchAllUrlPatterns()) {
+                if (filterMap.getMatchAllUrlPatterns()) {
+                    fm.addURLPattern("*");
+                } else {
+                    for (String urlPattern : filterMap.getURLPatterns()) {
+                        fm.addURLPattern(urlPattern);
+                    }
+                }
+            }
+        }
     }
-    public Set<FilterMap> getFilterMappings() { return filterMaps; }
+    public Map<String,FilterMap> getFilterMappings() { return filterMaps; }
     
     // listener
     // TODO: description (multiple with language) is ignored
@@ -627,7 +651,7 @@ public class WebXml {
         }
         sb.append('\n');
 
-        for (FilterMap filterMap : filterMaps) {
+        for (FilterMap filterMap : filterMaps.values()) {
             sb.append("  <filter-mapping>\n");
             appendElement(sb, INDENT4, "filter-name",
                     filterMap.getFilterName());
@@ -1176,7 +1200,7 @@ public class WebXml {
             }
             context.addFilterDef(filter);
         }
-        for (FilterMap filterMap : filterMaps) {
+        for (FilterMap filterMap : filterMaps.values()) {
             context.addFilterMap(filterMap);
         }
         for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
@@ -1418,17 +1442,16 @@ public class WebXml {
         // main web.xml override those in fragments and those in fragments
         // override mappings in annotations
         for (WebXml fragment : fragments) {
-            Iterator<FilterMap> iterFilterMaps =
-                fragment.getFilterMappings().iterator();
+            Iterator<String> iterFilterMaps =
+                fragment.getFilterMappings().keySet().iterator();
             while (iterFilterMaps.hasNext()) {
-                FilterMap filterMap = iterFilterMaps.next();
-                if (filterMappingNames.contains(filterMap.getFilterName())) {
+                if (filterMaps.containsKey(iterFilterMaps.next())) {
                     iterFilterMaps.remove();
                 }
             }
         }
         for (WebXml fragment : fragments) {
-            for (FilterMap filterMap : fragment.getFilterMappings()) {
+            for (FilterMap filterMap : fragment.getFilterMappings().values()) {
                 // Additive
                 addFilterMapping(filterMap);
             }
