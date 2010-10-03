@@ -26,6 +26,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
@@ -33,6 +36,7 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardContext extends TomcatBaseTest {
 
@@ -106,6 +110,71 @@ public class TestStandardContext extends TomcatBaseTest {
         @Override
         public void init(FilterConfig filterConfig) throws ServletException {
             throw new ServletException("Init fail", new ClassNotFoundException());
+        }
+        
+    }
+
+
+    public void testBug49922() throws Exception {
+        
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        // Use the normal Tomcat ROOT context
+        File root = new File("test/webapp-3.0");
+        tomcat.addWebapp("", root.getAbsolutePath());
+        
+        tomcat.start();
+
+        // Check path mapping works
+        ByteChunk result = getUrl("http://localhost:" + getPort() +
+        "/bug49922/foo");
+        // Filter should only have been called once
+        assertEquals("Filter", result.toString());
+
+        // Check extension mapping works
+        result = getUrl("http://localhost:" + getPort() +
+        "/foo.do");
+        // Filter should only have been called once
+        assertEquals("Filter", result.toString());
+
+        result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/index.do");
+        // Filter should only have been called once
+        assertEquals("Filter", result.toString());
+    }
+
+    
+    public static final class Bug49922Filter implements Filter {
+        
+        @Override
+        public void destroy() {
+            // NOOP
+        }
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response,
+                FilterChain chain) throws IOException, ServletException {
+            response.setContentType("text/plain");
+            response.getWriter().print("Filter");
+            chain.doFilter(request, response);
+        }
+
+        @Override
+        public void init(FilterConfig filterConfig) throws ServletException {
+            // NOOP
+        }
+    }
+    
+    public static final class Bug49922Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // NOOP
         }
         
     }
