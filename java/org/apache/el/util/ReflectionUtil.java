@@ -171,14 +171,14 @@ public class ReflectionUtil {
                 } else if (i == (mParamCount - 1) && m.isVarArgs()) {
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
-                        if (!varType.isAssignableFrom(paramTypes[j])) {
+                        if (!isAssignableFrom(paramTypes[j], varType)) {
                             break;
                         }
                         // Don't treat a varArgs match as an exact match, it can
                         // lead to a varArgs method matching when the result
                         // should be ambiguous
                     }
-                } else if (!mParamTypes[i].isAssignableFrom(paramTypes[i])) {
+                } else if (!isAssignableFrom(paramTypes[i], mParamTypes[i])) {
                     noMatch = true;
                     break;
                 }
@@ -279,6 +279,33 @@ public class ReflectionUtil {
         }
         
         return null;
+    }
+
+    // src will always be an object
+    private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
+        Class<?> targetClass;
+        if (target.isPrimitive()) {
+            if (target == Boolean.TYPE) {
+                targetClass = Boolean.class;
+            } else if (target == Character.TYPE) {
+                targetClass = Character.class;
+            } else if (target == Byte.TYPE) {
+                targetClass = Byte.class;
+            } else if (target == Short.TYPE) {
+                targetClass = Short.class;
+            } else if (target == Integer.TYPE) {
+                targetClass = Integer.class;
+            } else if (target == Long.TYPE) {
+                targetClass = Long.class;
+            } else if (target == Float.TYPE) {
+                targetClass = Float.class;
+            } else {
+                targetClass = Double.class;
+            }
+        } else {
+            targetClass = target;
+        }
+        return targetClass.isAssignableFrom(src);
     }
 
     protected static final String paramString(Class<?>[] types) {

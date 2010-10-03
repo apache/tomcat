@@ -282,6 +282,10 @@
       <fix>
         <bug>49985</bug>: Fix thread safety issue in EL parser. (markt)
       </fix>
+      <fix>
+        Correctly handle the setting of primitve bean values via expression
+        language. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
