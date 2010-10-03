@@ -41,7 +41,12 @@
     <changelog>
       <fix>
         <bug>49922</bug>: Don&apos;t add filter twice to filter chain if the
-        filter matches more than one URL pattern and/or Servlet name.
+        filter matches more than one URL pattern and/or Servlet name. (markt)
+      </fix>
+      <fix>
+        <bug>49937</bug>: Use an InstanceManager when creating an AsyncListener
+        through the AsyncContext to ensure annotations are processed. Based on a
+        patch by David Jencks. (markt)
       </fix>
     </changelog>
   </subsection>
