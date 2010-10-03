@@ -37,6 +37,14 @@
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.4 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>49922</bug>: Don&apos;t add filter twice to filter chain if the
+        filter matches more than one URL pattern and/or Servlet name.
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
