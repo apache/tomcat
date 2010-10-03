@@ -136,8 +136,9 @@ public class ClassLoaderLogManager extends LogManager {
         final String levelString = getProperty(loggerName + ".level");
         if (levelString != null) {
             try {
-                AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                    public Object run() {
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    @Override
+                    public Void run() {
                         logger.setLevel(Level.parse(levelString.trim()));
                         return null;
                     }
@@ -370,8 +371,9 @@ public class ClassLoaderLogManager extends LogManager {
         ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
         if (info == null) {
             final ClassLoader classLoaderParam = classLoader;
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                @Override
+                public Void run() {
                     try {
                         readConfiguration(classLoaderParam);
                     } catch (IOException e) {
@@ -547,8 +549,9 @@ public class ClassLoaderLogManager extends LogManager {
      */
     protected static void doSetParentLogger(final Logger logger,
             final Logger parent) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            @Override
+            public Void run() {
                 logger.setParent(parent);
                 return null;
             }
