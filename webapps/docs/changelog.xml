@@ -36,6 +36,16 @@
 
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
+<section name="Tomcat 7.0.4 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>49998</bug>: Make jsp:root detection work with single quoted
+        attributes as well. (timw)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.3 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -243,10 +253,6 @@
       <fix>
         <bug>49860</bug>: Add support for trailing headers in chunked HTTP
         requests. (markt)
-      </fix>
-      <fix>
-        <bug>49987</bug>: Make jsp:root detection work with single quoted
-        attributes as well. (timw)
       </fix>
     </changelog>
   </subsection>
