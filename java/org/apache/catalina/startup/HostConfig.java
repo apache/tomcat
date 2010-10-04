@@ -451,7 +451,8 @@ public class HostConfig
     }
 
     /**
-     * Given a context path, get the base name for WARs, directories etc.
+     * Given a context path, get the base name for WARs, directories and
+     * context.xml files.
      */
     protected String getBaseName(String path) {
         String basename = null;
@@ -464,6 +465,32 @@ public class HostConfig
     }
 
     
+    /**
+     * Given the name of a WAR file, directory of context.xml file, determine
+     * the context path.
+     */
+    protected String getContextPath(String filename, boolean stripExtension) {
+        String contextPath;
+
+        // Remove any file extension
+        if (stripExtension) {
+            contextPath = filename.substring(0, filename.length() -4);
+        } else {
+            contextPath = filename;
+        }
+        
+        if ("ROOT".equals(contextPath)) {
+            // Handle special case of ROOT
+            contextPath = "";
+        } else {
+            // Prepend / and otherwise # -> / replacement
+            contextPath = '/' + contextPath.replace('#', '/');
+        }
+
+        return contextPath;
+    }
+
+
     /**
      * Deploy applications for any directories or WAR files that are found
      * in our "application root" directory.
@@ -517,16 +544,10 @@ public class HostConfig
             return;
         
         for (int i = 0; i < files.length; i++) {
-
             File contextXml = new File(configBase, files[i]);
-            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
 
-                // Calculate the context path and make sure it is unique
-                String nameTmp = files[i].substring(0, files[i].length() - 4);
-                String contextPath = "/" + nameTmp.replace('#', '/');
-                if (nameTmp.equals("ROOT")) {
-                    contextPath = "";
-                }
+            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+                String contextPath = getContextPath(files[i], true);
 
                 if (isServiced(contextPath))
                     continue;
@@ -534,11 +555,8 @@ public class HostConfig
                 String file = files[i];
 
                 deployDescriptor(contextPath, contextXml, file);
-                
             }
-
         }
-
     }
 
 
@@ -692,10 +710,7 @@ public class HostConfig
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && dir.isFile()
                     && !invalidWars.contains(files[i]) ) {
                 
-                // Calculate the context path and make sure it is unique
-                String contextPath = "/" + files[i].replace('#','/');
-                int period = contextPath.lastIndexOf(".");
-                contextPath = contextPath.substring(0, period);
+                String contextPath = getContextPath(files[i], true);
                 
                 // Check for WARs with /../ /./ or similar sequences in the name
                 if (!validateContextPath(appBase, contextPath)) {
@@ -705,20 +720,14 @@ public class HostConfig
                     continue;
                 }
 
-                if (contextPath.equals("/ROOT"))
-                    contextPath = "";
-                
                 if (isServiced(contextPath))
                     continue;
                 
                 String file = files[i];
                 
                 deployWAR(contextPath, dir, file);
-                
             }
-            
         }
-        
     }
 
 
@@ -926,22 +935,8 @@ public class HostConfig
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
             if (unpackWARs && (context.getDocBase() != null)) {
-                String name = null;
-                String path = context.getPath();
-                if (path.equals("")) {
-                    name = "ROOT";
-                } else {
-                    if (path.startsWith("/")) {
-                        name = path.substring(1);
-                    } else {
-                        name = path;
-                    }
-                }
-                name = name.replace('/', '#');
-                File docBase = new File(name);
-                if (!docBase.isAbsolute()) {
-                    docBase = new File(appBase(), name);
-                }
+                String name = getBaseName(context.getPath());
+                File docBase = new File(appBase(), name);
                 deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         new Long(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
@@ -974,21 +969,14 @@ public class HostConfig
                 continue;
             File dir = new File(appBase, files[i]);
             if (dir.isDirectory()) {
-
-                // Calculate the context path and make sure it is unique
-                String contextPath = "/" + files[i].replace('#','/');
-                if (files[i].equals("ROOT"))
-                    contextPath = "";
+                String contextPath = getContextPath(files[i], false);
 
                 if (isServiced(contextPath))
                     continue;
 
                 deployDirectory(contextPath, dir, files[i]);
-            
             }
-
         }
-
     }
 
     
