@@ -428,6 +428,20 @@ public class WebdavServlet
 
 
     /**
+     * Determines the prefix for standard directory GET listings.
+     */
+    @Override
+    protected String getPathPrefix(final HttpServletRequest request) {
+        // Repeat the servlet path (e.g. /webdav/) in the listing path
+        String contextPath = request.getContextPath();
+        if (request.getServletPath() !=  null) {
+            contextPath = contextPath + request.getServletPath();
+        }
+        return contextPath;
+    }
+
+
+    /**
      * OPTIONS Method.
      *
      * @param req The request
