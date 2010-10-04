@@ -55,6 +55,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>49923</bug>: Avoid using negative timeouts during acceptor unlock
+        to ensure APR connector shuts down properly. (mturk) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
