@@ -610,7 +610,7 @@ public class AprEndpoint extends AbstractEndpoint {
             running = false;
             unlockAccept();
             for (int i = 0; i < acceptors.length; i++) {
-                int c = 0;
+                long s = System.currentTimeMillis() + 30000;
                 while (acceptors[i].isAlive()) {
                     try {
                         acceptors[i].interrupt();
@@ -618,7 +618,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     } catch (InterruptedException e) {
                         // Ignore
                     }
-                    if (c++ > 60) {
+                    if (System.currentTimeMillis() >= s) {
                         log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed",
                                  acceptors[i].getName()));
                         // If the Acceptor is still running force
