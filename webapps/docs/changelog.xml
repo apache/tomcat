@@ -48,6 +48,11 @@
         through the AsyncContext to ensure annotations are processed. Based on a
         patch by David Jencks. (markt)
       </fix>
+      <fix>
+        To avoid NoSuchMethodException, xmlValidation and xmlNamespaceAware are 
+        removed from the createStandardHost definition 
+        of mbeans-descriptors.xml. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
