@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,13 +36,13 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 /**
- * 
+ *
  * @author fhanik
  * @author Mladen Turk
  * @author Remy Maucherat
  */
 public abstract class AbstractEndpoint {
-    
+
     // -------------------------------------------------------------- Constants
     protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
 
@@ -72,7 +72,7 @@ public abstract class AbstractEndpoint {
      * This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SESSION_MGR = "javax.servlet.request.ssl_session_mgr";
-   
+
     /**
      * Different types of socket states to react upon
      */
@@ -81,7 +81,7 @@ public abstract class AbstractEndpoint {
             OPEN, CLOSED, LONG, ASYNC_END
         }
     }
-    
+
     // Standard SSL Configuration attributes
     // JSSE
     // Standard configuration attribute names
@@ -131,12 +131,12 @@ public abstract class AbstractEndpoint {
      * Track the initialization state of the endpoint.
      */
     protected boolean initialized = false;
-    
+
     /**
      * Are we using an internal executor
      */
     protected volatile boolean internalExecutor = false;
-    
+
     /**
      * Socket properties
      */
@@ -145,7 +145,7 @@ public abstract class AbstractEndpoint {
         return socketProperties;
     }
 
-    
+
     // ----------------------------------------------------------------- Properties
 
     private int maxConnections = 10000;
@@ -155,13 +155,13 @@ public abstract class AbstractEndpoint {
      * External Executor based thread pool.
      */
     private Executor executor = null;
-    public void setExecutor(Executor executor) { 
+    public void setExecutor(Executor executor) {
         this.executor = executor;
         this.internalExecutor = (executor==null);
     }
     public Executor getExecutor() { return executor; }
 
-    
+
     /**
      * Server socket port.
      */
@@ -176,7 +176,7 @@ public abstract class AbstractEndpoint {
     private InetAddress address;
     public InetAddress getAddress() { return address; }
     public void setAddress(InetAddress address) { this.address = address; }
-    
+
     /**
      * Allows the server developer to specify the backlog that
      * should be used for server sockets. By default, this value
@@ -205,7 +205,7 @@ public abstract class AbstractEndpoint {
      * Socket linger.
      */
     public int getSoLinger() { return socketProperties.getSoLingerTime(); }
-    public void setSoLinger(int soLinger) { 
+    public void setSoLinger(int soLinger) {
         socketProperties.setSoLingerTime(soLinger);
         socketProperties.setSoLingerOn(soLinger>=0);
     }
@@ -239,7 +239,7 @@ public abstract class AbstractEndpoint {
             }
         }
     }
-    
+
     /**
      * Maximum amount of worker threads.
      */
@@ -269,7 +269,7 @@ public abstract class AbstractEndpoint {
     }
 
     /**
-     * Max keep alive requests 
+     * Max keep alive requests
      */
     private int maxKeepAliveRequests=100; // as in Apache HTTPD server
     public int getMaxKeepAliveRequests() {
@@ -278,7 +278,7 @@ public abstract class AbstractEndpoint {
     public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
         this.maxKeepAliveRequests = maxKeepAliveRequests;
     }
-    
+
     /**
      * Name of the thread pool, which will be used for naming child threads.
      */
@@ -304,7 +304,7 @@ public abstract class AbstractEndpoint {
     public int getThreadPriority() { return threadPriority; }
 
     protected abstract boolean getDeferAccept();
-    
+
     /**
      * Generic properties, introspected
      */
@@ -342,7 +342,7 @@ public abstract class AbstractEndpoint {
     }
 
     /**
-     * Return the amount of threads that are in use 
+     * Return the amount of threads that are in use
      *
      * @return the amount of threads that are in use
      */
@@ -363,11 +363,11 @@ public abstract class AbstractEndpoint {
     public boolean isRunning() {
         return running;
     }
-    
+
     public boolean isPaused() {
         return paused;
     }
-    
+
 
     public void createExecutor() {
         internalExecutor = true;
@@ -376,7 +376,7 @@ public abstract class AbstractEndpoint {
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
         taskqueue.setParent( (ThreadPoolExecutor) executor);
     }
-    
+
     public void shutdownExecutor() {
         if ( executor!=null && internalExecutor ) {
             if ( executor instanceof ThreadPoolExecutor ) {
@@ -404,13 +404,19 @@ public abstract class AbstractEndpoint {
                 saddr = new InetSocketAddress(address,getPort());
             }
             s = new java.net.Socket();
-            s.setSoTimeout(getSocketProperties().getSoTimeout());
+            int stmo = 2 * 1000;
+            int utmo = 2 * 1000;
+            if (getSocketProperties().getSoTimeout() > stmo)
+                stmo = getSocketProperties().getSoTimeout();
+            if (getSocketProperties().getUnlockTimeout() > utmo)
+                utmo = getSocketProperties().getUnlockTimeout();
+            s.setSoTimeout(stmo);
             // TODO Consider hard-coding to s.setSoLinger(true,0)
             s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
             if (getLog().isDebugEnabled()) {
                 getLog().debug("About to unlock socket for:"+saddr);
             }
-            s.connect(saddr,getSocketProperties().getUnlockTimeout());
+            s.connect(saddr,utmo);
             if (getDeferAccept()) {
                 /*
                  * In the case of a deferred accept / accept filters we need to
@@ -440,12 +446,12 @@ public abstract class AbstractEndpoint {
                 }
             }
         }
-    }    
-    
-    
+    }
+
+
     public abstract void init() throws Exception;
     public abstract void start() throws Exception;
-    
+
     /**
      * Pause the endpoint, which will stop it accepting new connections.
      */
@@ -461,7 +467,7 @@ public abstract class AbstractEndpoint {
             }
         }
     }
-    
+
     /**
      * Resume the endpoint, which will make it start accepting new connections
      * again.
@@ -471,10 +477,10 @@ public abstract class AbstractEndpoint {
             paused = false;
         }
     }
-    
+
     public abstract void stop() throws Exception;
     public abstract void destroy() throws Exception;
-    
+
     public String adjustRelativePath(String path, String relativeTo) {
         String newPath = path;
         File f = new File(newPath);
@@ -487,7 +493,7 @@ public abstract class AbstractEndpoint {
         }
         return newPath;
     }
-    
+
     protected abstract Log getLog();
     public abstract boolean getUseSendfile();
 
@@ -500,18 +506,18 @@ public abstract class AbstractEndpoint {
     private String clientAuth = "false";
     public String getClientAuth() { return clientAuth;}
     public void setClientAuth(String s ) { this.clientAuth = s;}
-    
+
     private String keystoreFile = System.getProperty("user.home")+"/.keystore";
     public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) { 
+    public void setKeystoreFile(String s ) {
         String file = adjustRelativePath(s, System.getProperty(Globals.CATALINA_BASE_PROP));
-        this.keystoreFile = file; 
+        this.keystoreFile = file;
     }
 
     private String keystorePass = null;
     public String getKeystorePass() { return keystorePass;}
     public void setKeystorePass(String s ) { this.keystorePass = s;}
-    
+
     private String keystoreType = "JKS";
     public String getKeystoreType() { return keystoreType;}
     public void setKeystoreType(String s ) { this.keystoreType = s;}
@@ -520,17 +526,17 @@ public abstract class AbstractEndpoint {
     public String getKeystoreProvider() { return keystoreProvider;}
     public void setKeystoreProvider(String s ) { this.keystoreProvider = s;}
 
-    private String sslProtocol = "TLS"; 
+    private String sslProtocol = "TLS";
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
-    
+
     // Note: Some implementations use the comma separated string, some use
     // the array
     private String ciphers = null;
     private String[] ciphersarr = new String[0];
     public String[] getCiphersArray() { return this.ciphersarr;}
     public String getCiphers() { return ciphers;}
-    public void setCiphers(String s) { 
+    public void setCiphers(String s) {
         ciphers = s;
         if ( s == null ) ciphersarr = new String[0];
         else {
@@ -543,7 +549,7 @@ public abstract class AbstractEndpoint {
     private String keyAlias = null;
     public String getKeyAlias() { return keyAlias;}
     public void setKeyAlias(String s ) { keyAlias = s;}
-    
+
     private String keyPass = JSSESocketFactory.DEFAULT_KEY_PASS;
     public String getKeyPass() { return keyPass;}
     public void setKeyPass(String s ) { this.keyPass = s;}
@@ -561,7 +567,7 @@ public abstract class AbstractEndpoint {
     public void setTruststorePass(String truststorePass) {
         this.truststorePass = truststorePass;
     }
-    
+
     private String truststoreType =
         System.getProperty("javax.net.ssl.trustStoreType");
     public String getTruststoreType() {return truststoreType;}
@@ -617,6 +623,6 @@ public abstract class AbstractEndpoint {
         sslEnabledProtocolsarr = new String[t.countTokens()];
         for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
     }
-        
+
 }
 
