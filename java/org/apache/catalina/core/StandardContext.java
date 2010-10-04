@@ -1780,7 +1780,7 @@ public class StandardContext extends ContainerBase
      * @param path The new context path
      */
     public void setPath(String path) {
-        // XXX Use host in name
+
         setName(path);
 
     }
