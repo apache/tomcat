@@ -374,6 +374,18 @@ public class DefaultServlet
 
 
     /**
+     * Determines the appropriate path to prepend resources with
+     * when generating directory listings. Depending on the behaviour of 
+     * {@link #getRelativePath(HttpServletRequest)} this will change.
+     * @param request the request to determine the path for
+     * @return the prefix to apply to all resources in the listing.
+     */
+    protected String getPathPrefix(final HttpServletRequest request) {
+        return request.getContextPath();
+    }
+
+
+    /**
      * Process a GET request for the specified resource.
      *
      * @param request The servlet request we are processing
@@ -890,8 +902,7 @@ public class DefaultServlet
 
                 if (serveContent) {
                     // Serve the directory browser
-                    renderResult =
-                        render(request.getContextPath(), cacheEntry);
+                    renderResult = render(getPathPrefix(request), cacheEntry);
                 }
 
             }
