@@ -123,9 +123,9 @@
                description="Should Tomcat attempt to terminate TimerThreads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
                
-    <attribute name="configFilePath"
+    <attribute name="configFile"
                description="Location of the context.xml resource or file"
-               type="java.lang.String"/>
+               type="java.net.URL"/>
                
     <attribute name="configured"
                description="The correctly configured flag for this Context."
@@ -364,11 +364,6 @@
                description="Create a JNDI naming context for this application?"
                is="true"
                type="boolean"/>
-               
-    <attribute name="valveObjectNames"
-               description="ObjectNames for the valves associated with this container"
-               type="[Ljavax.management.ObjectName;"
-               writeable="false"/>
 
     <attribute name="welcomeFiles"
                description="The welcome files for this context"
@@ -936,6 +931,7 @@
     
     <attribute name="asyncSupported"
                description="Does this valve support async reporting?"
+               is="true"
                type="boolean"/>
 
     <attribute name="className"
@@ -974,10 +970,6 @@
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
                type="java.lang.Object"/>
-               
-    <attribute name="mbeansFile"
-               description="Optional mbeans config file."
-               type="java.lang.String"/>
       
     <attribute name="name"
                description="Unique name of this Engine"
@@ -994,11 +986,6 @@
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"/>
-               
-    <attribute name="valveObjectNames"
-               description="ObjectNames for the valves associated with this container"
-               type="[Ljavax.management.ObjectName;"
-               writeable="false"/>  
                
     <operation name="addChild"
                description="Add a virtual host"
@@ -1139,6 +1126,7 @@
           
     <attribute name="copyXML"
                description="Should XML files be copied to $CATALINA_BASE/conf/{engine}/{host} by default when a web application is deployed?"
+               is="true"
                type="boolean"/>
                
     <attribute name="createDirs"
@@ -1187,10 +1175,6 @@
     <attribute name="valveNames"
                description="Return the MBean Names of the Valves associated with this Host"
                type="[Ljava.lang.String;"/>
-      
-    <attribute name="valveObjectNames"
-               description="Return the MBean ObjectNames of the Valves associated with this Host"
-               type="[Ljavax.management.ObjectName;"/>
                
     <attribute name="workDir"
                description="Work Directory base for applications"
@@ -1199,14 +1183,6 @@
     <attribute name="xmlBase"
                description="The XML root for this Host."
                type="java.lang.String"/>   
-      
-    <attribute name="xmlNamespaceAware"
-               description="Attribute value used to turn on/off XML namespace awareness"
-               type="boolean"/>
-      
-    <attribute name="xmlValidation"
-               description="Attribute value used to turn on/off XML validation"
-               type="boolean"/> 
                
     <operation name="addAlias"
                description="Add an alias name that should be mapped to this Host"
@@ -1398,11 +1374,6 @@
                description="ObjectNames of the connectors"
                type="[Ljavax.management.ObjectName;"
                writeable="false" />
-      
-    <attribute name="containerName"
-               description="ObjectNames of the engine"
-               type="javax.management.ObjectName"
-               writeable="false" />
 
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
@@ -1561,6 +1532,7 @@
          
     <attribute name="asyncSupported"
                description="Async support"
+               is="true"
                type="boolean"/>  
                
     <attribute name="available"
@@ -1580,11 +1552,6 @@
                description="The count of allocations that are currently active (even if they  are for the same instance, as will be true on a non-STM servlet)."
                type="int"
                writeable="false" />             
-           
-    <attribute name="engineName"
-               description="Fully qualified class name of the managed object"
-               type="java.lang.String"
-               writeable="false"/>
                
     <attribute name="errorCount"
                description="Error count"
@@ -1651,11 +1618,8 @@
     <attribute name="singleThreadModel"
                description="Does this servlet implement the SingleThreadModel interface?"
                type="boolean"
+               is="true"
                writeable="false" />
-          
-    <attribute name="startChildern"
-               description="Will children be started automatically when they are added?"
-               type="boolean" />
 
     <attribute name="stateManageable"
                description="State management support for this managed object"
