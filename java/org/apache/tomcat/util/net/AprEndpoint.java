@@ -619,7 +619,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         // Ignore
                     }
                     if (c++ > 60) {
-                        log.warn(sm.getString("endpoint.warn.unlockAcceptFailed",
+                        log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed",
                                  acceptors[i].getName()));
                         // If the Acceptor is still running force
                         // the hard socket close.
