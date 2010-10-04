@@ -71,42 +71,46 @@ import org.xml.sax.SAXException;
  * Servlet which adds support for WebDAV level 2. All the basic HTTP requests
  * are handled by the DefaultServlet. The WebDAVServlet must not be used as the
  * default servlet (ie mapped to '/') as it will not work in this configuration.
- * To enable WebDAV for a context add the following to web.xml:<br/><code>
- * &lt;servlet&gt;<br/>
- *  &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;<br/>
- *  &lt;servlet-class&gt;org.apache.catalina.servlets.WebdavServlet&lt;/servlet-class&gt;<br/>
- *    &lt;init-param&gt;<br/>
- *      &lt;param-name&gt;debug&lt;/param-name&gt;<br/>
- *      &lt;param-value&gt;0&lt;/param-value&gt;<br/>
- *    &lt;/init-param&gt;<br/>
- *    &lt;init-param&gt;<br/>
- *      &lt;param-name&gt;listings&lt;/param-name&gt;<br/>
- *      &lt;param-value&gt;true&lt;/param-value&gt;<br/>
- *    &lt;/init-param&gt;<br/>
- *  &lt;/servlet&gt;<br/>
- *  &lt;servlet-mapping&gt;<br/>
- *    &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;<br/>
- *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;<br/>
+ * <p/>
+ * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect
+ * of re-mounting the entire web application under that sub-path, with WebDAV
+ * access to all the resources. This <code>WEB-INF</code> and <code>META-INF</code>
+ * directories are protected in this re-mounted resource tree.
+ * <p/>
+ * To enable WebDAV for a context add the following to web.xml:
+ * <pre>
+ * &lt;servlet&gt;
+ *  &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;
+ *  &lt;servlet-class&gt;org.apache.catalina.servlets.WebdavServlet&lt;/servlet-class&gt;
+ *    &lt;init-param&gt;
+ *      &lt;param-name&gt;debug&lt;/param-name&gt;
+ *      &lt;param-value&gt;0&lt;/param-value&gt;
+ *    &lt;/init-param&gt;
+ *    &lt;init-param&gt;
+ *      &lt;param-name&gt;listings&lt;/param-name&gt;
+ *      &lt;param-value&gt;false&lt;/param-value&gt;
+ *    &lt;/init-param&gt;
+ *  &lt;/servlet&gt;
+ *  &lt;servlet-mapping&gt;
+ *    &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;
+ *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *  &lt;/servlet-mapping&gt;
- * </code>
- * <p/>
- * This will enable read only access. To enable read-write access add:<br/>
- * <code>
- *    &lt;init-param&gt;<br/>
- *      &lt;param-name&gt;readonly&lt;/param-name&gt;<br/>
- *      &lt;param-value&gt;false&lt;/param-value&gt;<br/>
- *    &lt;/init-param&gt;<br/>
- * </code>
- * <p/>
- * To make the content editable via a different URL, using the following
- * mapping:<br/>
- * <code>
- *  &lt;servlet-mapping&gt;<br/>
- *    &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;<br/>
- *    &lt;url-pattern&gt;/webdavedit/*&lt;/url-pattern&gt;<br/>
+ * </pre>
+ * This will enable read only access. To enable read-write access add:
+ * <pre>
+ *  &lt;init-param&gt;
+ *    &lt;param-name&gt;readonly&lt;/param-name&gt;
+ *    &lt;param-value&gt;false&lt;/param-value&gt;
+ *  &lt;/init-param&gt;
+ * </pre>
+ * To make the content editable via a different URL, use the following
+ * mapping:
+ * <pre>
+ *  &lt;servlet-mapping&gt;
+ *    &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;
+ *    &lt;url-pattern&gt;/webdavedit/*&lt;/url-pattern&gt;
  *  &lt;/servlet-mapping&gt;
- * </code>
- * <p/>
+ * </pre>
  * Don't forget to secure access appropriately to the editing URLs. With this
  * configuration the context will be accessible to normal users as before. Those
  * users with the necessary access will be able to edit content available via
@@ -315,10 +319,21 @@ public class WebdavServlet
     protected void service(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
-        String method = req.getMethod();
+        final String path = getRelativePath(req);
+        
+        // Block access to special subdirectories.
+        // DefaultServlet assumes it services resources from the root of the web app
+        // and doesn't add any special path protection
+        // WebdavServlet remounts the webapp under a new path, so this check is
+        // necessary on all methods (including GET).
+        if (isSpecialPath(path)) {
+            resp.sendError(WebdavStatus.SC_NOT_FOUND);
+            return;
+        }
+
+        final String method = req.getMethod();
 
         if (debug > 0) {
-            String path = getRelativePath(req);
             log("[" + method + "] " + path);
         }
 
@@ -341,6 +356,19 @@ public class WebdavServlet
             super.service(req, resp);
         }
 
+    }
+
+
+    /**
+     * Checks whether a given path refers to a resource under
+     * <code>WEB-INF</code> or <code>META-INF</code>.
+     * @param path the full path of the resource being accessed
+     * @return <code>true</code> if the resource specified is under a special path
+     */
+    private static final boolean isSpecialPath(final String path) {
+        // FIXME: why isn't this just equalsIgnoreCase?
+        return path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")
+            || path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF");
     }
 
 
@@ -441,12 +469,6 @@ public class WebdavServlet
         String path = getRelativePath(req);
         if (path.endsWith("/"))
             path = path.substring(0, path.length() - 1);
-
-        if ((path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
-            (path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
 
         // Properties which are to be displayed.
         Vector<String> properties = null;
@@ -718,12 +740,6 @@ public class WebdavServlet
         }
 
         String path = getRelativePath(req);
-
-        if ((path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
-            (path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
 
         boolean exists = true;
         try {
@@ -1601,19 +1617,13 @@ public class WebdavServlet
         if (debug > 0)
             log("Dest path :" + destinationPath);
 
-        if ((destinationPath.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
-            (destinationPath.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
+        // Check destination path to protect special subdirectories
+        if (isSpecialPath(destinationPath)) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return false;
         }
 
         String path = getRelativePath(req);
-
-        if ((path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
-            (path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return false;
-        }
 
         if (destinationPath.equals(path)) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
@@ -1810,12 +1820,6 @@ public class WebdavServlet
                                    HttpServletResponse resp, boolean setStatus)
             throws IOException {
 
-        if ((path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
-            (path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return false;
-        }
-
         String ifHeader = req.getHeader("If");
         if (ifHeader == null)
             ifHeader = "";
@@ -1895,8 +1899,8 @@ public class WebdavServlet
         if (debug > 1)
             log("Delete:" + path);
 
-        if ((path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
-            (path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
+        // Prevent deletion of special subdirectories
+        if (isSpecialPath(path)) {
             errorList.put(path, new Integer(WebdavStatus.SC_FORBIDDEN));
             return;
         }
@@ -2034,9 +2038,7 @@ public class WebdavServlet
                                  Vector<String> propertiesVector) {
 
         // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        // (the "toUpperCase()" avoids problems on Windows systems)
-        if (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
-            path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))
+        if (isSpecialPath(path))
             return;
 
         CacheEntry cacheEntry = resources.lookupCache(path);
@@ -2327,9 +2329,7 @@ public class WebdavServlet
                                          Vector<String> propertiesVector) {
 
         // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        // (the "toUpperCase()" avoids problems on Windows systems)
-        if (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
-            path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))
+        if (isSpecialPath(path))
             return;
 
         // Retrieving the lock associated with the lock-null resource
