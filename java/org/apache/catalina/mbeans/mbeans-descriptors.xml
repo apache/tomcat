@@ -232,12 +232,6 @@
       <parameter name="unpackWARs"
           description="Unpack WARs property"
                type="boolean"/>
-      <parameter name="xmlNamespaceAware"
-          description="Attribute value used to turn on/off XML namespace awareness"
-               type="boolean"/>
-      <parameter name="xmlValidation"
-               description="Attribute value used to turn on/off XML validation"
-               type="boolean"/>
     </operation>
 
 
