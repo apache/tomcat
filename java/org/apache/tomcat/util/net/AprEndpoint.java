@@ -98,7 +98,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
         new ConcurrentLinkedQueue<SocketWrapper<Long>>();
-    
+
     // ------------------------------------------------------------- Properties
 
 
@@ -619,6 +619,8 @@ public class AprEndpoint extends AbstractEndpoint {
                         // Ignore
                     }
                     if (c++ > 60) {
+                        log.warn(sm.getString("endpoint.warn.unlockAcceptFailed",
+                                 acceptors[i].getName()));
                         // If the Acceptor is still running force
                         // the hard socket close.
                         if (serverSock != 0) {
@@ -992,7 +994,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         processSocketAsync(socket,SocketStatus.TIMEOUT);
                     }
                 }
-                
+
                 // Loop if endpoint is paused
                 while (paused && running) {
                     try {
@@ -1001,12 +1003,12 @@ public class AprEndpoint extends AbstractEndpoint {
                         // Ignore
                     }
                 }
-                
+
             }
         }
     }
-    
-    
+
+
     // ----------------------------------------------------- Poller Inner Class
     /**
      * Poller class.
