@@ -78,22 +78,17 @@
                
      <attribute name="copyXML"
                description="The copy XML config file flag for this component"
+               is="true"
                type="boolean"/>
                
      <attribute name="deployXML"
                description="The deploy XML config file flag for this component"
+               is="true"
                type="boolean"/>
                
      <attribute name="unpackWARs"
                description="The unpack WARs flag"
-               type="boolean"/>
-               
-    <attribute name="xmlNamespaceAware"
-               description="The Java class name of the Context configuration class we should use"
-               type="boolean"/>
-               
-    <attribute name="xmlValidation"
-               description="Set the validation feature of the XML parser used when parsing xml instances."
+               is="true"
                type="boolean"/>
                
     <operation name="addServiced"

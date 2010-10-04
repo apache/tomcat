@@ -53,6 +53,11 @@
         removed from the createStandardHost definition 
         of mbeans-descriptors.xml. (kfujino)
       </fix>
+      <fix>
+        <bug>49945</bug>: Continue improvements to JMX. Fix a handful of
+        attributes that were showing as Unavailable in JConsole. Patch provided
+        by Chamith Buddhika. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
