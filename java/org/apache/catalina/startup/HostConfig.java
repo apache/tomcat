@@ -451,23 +451,9 @@ public class HostConfig
     }
 
     /**
-     * Given a context path, get the config file name.
+     * Given a context path, get the base name for WARs, directories etc.
      */
-    protected String getConfigFile(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename);
-    }
-
-    
-    /**
-     * Given a context path, get the docBase.
-     */
-    protected String getDocBase(String path) {
+    protected String getBaseName(String path) {
         String basename = null;
         if (path.equals("")) {
             basename = "ROOT";
@@ -504,21 +490,20 @@ public class HostConfig
 
         File appBase = appBase();
         File configBase = configBase();
-        String baseName = getConfigFile(name);
-        String docBase = getDocBase(name);
+        String baseName = getBaseName(name);
         
         // Deploy XML descriptors from configBase
         File xml = new File(configBase, baseName + ".xml");
         if (xml.exists())
             deployDescriptor(name, xml, baseName + ".xml");
         // Deploy WARs, and loop if additional descriptors are found
-        File war = new File(appBase, docBase + ".war");
+        File war = new File(appBase, baseName + ".war");
         if (war.exists())
-            deployWAR(name, war, docBase + ".war");
+            deployWAR(name, war, baseName + ".war");
         // Deploy expanded folders
-        File dir = new File(appBase, docBase);
+        File dir = new File(appBase, baseName);
         if (dir.exists())
-            deployDirectory(name, dir, docBase);
+            deployDirectory(name, dir, baseName);
         
     }
 
