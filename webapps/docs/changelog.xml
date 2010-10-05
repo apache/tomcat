@@ -40,6 +40,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>49669</bug>: Fix memoey leak triggered by using the deprecated
+        javax.security.auth.Policy class. (markt)
+      </fix>
+      <fix>
         <bug>49922</bug>: Don&apos;t add filter twice to filter chain if the
         filter matches more than one URL pattern and/or Servlet name. (markt)
       </fix>
