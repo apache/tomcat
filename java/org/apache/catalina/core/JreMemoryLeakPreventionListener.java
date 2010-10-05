@@ -23,9 +23,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.Policy;
 
 import javax.imageio.ImageIO;
+import javax.security.auth.Policy;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -50,6 +50,7 @@ import org.apache.tomcat.util.res.StringManager;
  * first disabling Jar URL connection caching. The workaround is to disable this
  * caching by default. 
  */
+@SuppressWarnings("deprecation")
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     private static final Log log =
