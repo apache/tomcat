@@ -752,7 +752,7 @@
     <copy todir="${tomcat.build}/webapps" encoding="ISO-8859-1">
       <filterset refid="version.filters" />
       <fileset dir="webapps">
-        <include name="ROOT/index.html"/>
+        <include name="ROOT/index.jsp"/>
       </fileset>
     </copy>
 

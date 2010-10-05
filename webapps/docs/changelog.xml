@@ -84,6 +84,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Apply filters to default home page so copyright year is correctly
+        displayed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.3 (markt)">
   <subsection name="Catalina">
