@@ -743,7 +743,7 @@
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="ROOT/**"/>
-        <exclude name="ROOT/index.html"/>
+        <exclude name="ROOT/index.jsp"/>
         <include name="examples/**"/>
         <include name="manager/**"/>
         <include name="host-manager/**"/>
