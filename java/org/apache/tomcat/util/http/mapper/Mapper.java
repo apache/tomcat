@@ -464,7 +464,7 @@ public final class Mapper {
     protected void removeWrapper(Context context, String path) {
         
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapper.removeWrapper", context.path, path));
+            log.debug(sm.getString("mapper.removeWrapper", context.name, path));
         }
 
         synchronized (context) {
@@ -1460,7 +1460,6 @@ public final class Mapper {
     protected static final class Context
         extends MapElement {
 
-        public String path = null;
         public String[] welcomeResources = new String[0];
         public javax.naming.Context resources = null;
         public Wrapper defaultWrapper = null;
