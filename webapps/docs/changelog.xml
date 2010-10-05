@@ -40,7 +40,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>49669</bug>: Fix memoey leak triggered by using the deprecated
+        <bug>49669</bug>: Fix memory leak triggered by using the deprecated
         javax.security.auth.Policy class. (markt)
       </fix>
       <fix>
