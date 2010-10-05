@@ -245,6 +245,15 @@
         that may have caused additional problems during a failure at start up.
         (markt) 
       </fix>
+      <fix>
+        <bug>50026</bug>: Prevent serving of resources from WEB-INF and
+        META-INF directories when DefaultServlet or WebdavServlet is mapped
+        to a sub-path of the context. This changes DefaultServlet to always
+        serve resources with paths relative to the root of the context
+        regardless of where it is mapped, which is a breaking change for
+        current servlet-mappings that map the default servlet to a subpath.
+        (timw)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
