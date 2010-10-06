@@ -62,6 +62,10 @@
         attributes that were showing as Unavailable in JConsole. Patch provided
         by Chamith Buddhika. (markt)
       </fix>
+      <fix>
+        <bug>49952</bug>: Allow ServletContainerInitializers to add listeners to
+        a web application. Patch provided by David Jencks. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
