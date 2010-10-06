@@ -509,15 +509,15 @@ public class DefaultInstanceManager implements InstanceManager {
         method.setAccessible(accessibility);
     }
 
-        public static String getName(Method setter) {
-            StringBuilder name = new StringBuilder(setter.getName());
+    public static String getName(Method setter) {
+        StringBuilder name = new StringBuilder(setter.getName());
 
-            // remove 'set'
-            name.delete(0, 3);
+        // remove 'set'
+        name.delete(0, 3);
 
-            // lowercase first char
-            name.setCharAt(0, Character.toLowerCase(name.charAt(0)));
+        // lowercase first char
+        name.setCharAt(0, Character.toLowerCase(name.charAt(0)));
 
-            return name.toString();
-        }
+        return name.toString();
+    }
 }
