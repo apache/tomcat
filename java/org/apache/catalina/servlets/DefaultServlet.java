@@ -490,7 +490,7 @@ public class DefaultServlet
 
 
     /**
-     * Process a POST request for the specified resource.
+     * Process a PUT request for the specified resource.
      *
      * @param req The servlet request we are processing
      * @param resp The servlet response we are creating
@@ -630,7 +630,7 @@ public class DefaultServlet
 
 
     /**
-     * Process a POST request for the specified resource.
+     * Process a DELETE request for the specified resource.
      *
      * @param req The servlet request we are processing
      * @param resp The servlet response we are creating
