@@ -642,7 +642,7 @@ public class WebdavServlet
 
             // Stack of the objects one level below
             Stack<String> stackBelow = new Stack<String>();
-
+ 
             while ((!stack.isEmpty()) && (depth >= 0)) {
 
                 String currentPath = stack.pop();
@@ -834,7 +834,7 @@ public class WebdavServlet
 
 
     /**
-     * Process a POST request for the specified resource.
+     * Process a PUT request for the specified resource.
      *
      * @param req The servlet request we are processing
      * @param resp The servlet response we are creating
