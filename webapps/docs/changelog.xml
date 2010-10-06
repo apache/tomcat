@@ -70,6 +70,11 @@
         <bug>49956</bug>: Handle case when @Resource annotation uses the full
         JNDI name for a resource. Based on a patch by Gurkan Erdogdu. (markt) 
       </fix>
+      <fix>
+        <bug>49557</bug>: Correct regression due to Lifecycle refactoring that
+        cleared all work directories (with compiled JSPs and persisted sessions)
+        when Tomcat was stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
