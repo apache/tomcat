@@ -49,7 +49,6 @@ import org.apache.tomcat.util.res.StringManager;
  * first disabling Jar URL connection caching. The workaround is to disable this
  * caching by default. 
  */
-@SuppressWarnings("deprecation")
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     private static final Log log =
