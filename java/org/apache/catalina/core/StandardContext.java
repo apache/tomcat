@@ -4289,7 +4289,14 @@ public class StandardContext extends ContainerBase
             }
         }
 
+        //Listeners may have been added by ServletContextInitializers.  Put them after the ones we know about.
+        for (Object eventListener: getApplicationEventListeners()) {
+            eventListeners.add(eventListener);
+        }
         setApplicationEventListeners(eventListeners.toArray());
+        for (Object lifecycleListener: getApplicationLifecycleListeners()) {
+            lifecycleListeners.add(lifecycleListener);
+        }
         setApplicationLifecycleListeners(lifecycleListeners.toArray());
 
         // Send application start events
