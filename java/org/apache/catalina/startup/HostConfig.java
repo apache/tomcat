@@ -1332,8 +1332,6 @@ public class HostConfig
         if (log.isDebugEnabled())
             log.debug(sm.getString("hostConfig.stop"));
 
-        undeployApps();
-
         if (oname != null) {
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
@@ -1344,32 +1342,6 @@ public class HostConfig
         oname = null;
         appBase = null;
         configBase = null;
-
-    }
-
-
-    /**
-     * Undeploy all deployed applications.
-     */
-    protected void undeployApps() {
-
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("hostConfig.undeploying"));
-
-        // Soft undeploy all contexts we have deployed
-        DeployedApplication[] apps =
-            deployed.values().toArray(new DeployedApplication[0]);
-        for (int i = 0; i < apps.length; i++) {
-            try {
-                host.removeChild(host.findChild(apps[i].name));
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.warn(sm.getString
-                        ("hostConfig.context.remove", apps[i].name), t);
-            }
-        }
-        
-        deployed.clear();
 
     }
 
