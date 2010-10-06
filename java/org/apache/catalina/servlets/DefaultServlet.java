@@ -348,21 +348,24 @@ public class DefaultServlet
         if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
             String result = (String) request.getAttribute(
                                             Globals.INCLUDE_PATH_INFO_ATTR);
-            if (result == null)
+            if (result == null) {
                 result = (String) request.getAttribute(
                                             Globals.INCLUDE_SERVLET_PATH_ATTR);
-            if ((result == null) || (result.equals("")))
+            } else {
+                result = (String) request.getAttribute(
+                                  Globals.INCLUDE_SERVLET_PATH_ATTR) + result;
+            }
+            if ((result == null) || (result.equals(""))) {
                 result = "/";
+            }
             return (result);
         }
 
         // No, extract the desired path directly from the request
         String result = request.getPathInfo();
         if (result == null) {
-            // Mapped to '/'
             result = request.getServletPath();
         } else {
-            // Mapped to '/path/*' so get entire path under context
             result = request.getServletPath() + result;
         }
         if ((result == null) || (result.equals(""))) {
