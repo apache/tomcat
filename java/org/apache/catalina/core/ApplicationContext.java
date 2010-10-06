@@ -206,7 +206,7 @@ public class ApplicationContext
     /**
      * Flag that indicates if a new {@link ServletContextListener} may be added
      * to the application. Once the first {@link ServletContextListener} is
-     * called, not more may be added.
+     * called, no more may be added.
      */
     private boolean newServletContextListenerAllowed = true;
 
@@ -1312,10 +1312,15 @@ public class ApplicationContext
         
         if (match) return;
         
-        throw new IllegalArgumentException(sm.getString(
-                "applicationContext.addListener.iae.wrongType",
-                t.getClass().getName()));
-
+        if (t instanceof ServletContextListener) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.sclNotAllowed",
+                    t.getClass().getName()));
+        } else {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addListener.iae.wrongType",
+                    t.getClass().getName()));
+        }
     }
 
 
