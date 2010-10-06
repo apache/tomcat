@@ -271,8 +271,8 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
       </attribute>
 
       <attribute name="securityPolicyProtection" required="false">
-        <p>Enables protection so that usage of
-        <code>javax.security.auth.Policy</code> by a web application does not
+        <p>Enables protection so that usage of the deprecated
+        <code>javax.security.auth.Policy</code> class by a web application does not
         result in a memory leak. The first access of this class will trigger the
         static initializer that will retain a static reference to the context
         class loader. The protection calls the <code>getPolicy()</code> method
