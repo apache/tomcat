@@ -66,6 +66,10 @@
         <bug>49952</bug>: Allow ServletContainerInitializers to add listeners to
         a web application. Patch provided by David Jencks. (markt)
       </fix>
+      <fix>
+        <bug>49956</bug>: Handle case when @Resource annotation uses the full
+        JNDI name for a resource. Based on a patch by Gurkan Erdogdu. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

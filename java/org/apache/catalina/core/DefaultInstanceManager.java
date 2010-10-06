@@ -454,9 +454,10 @@ public class DefaultInstanceManager implements InstanceManager {
         Object lookedupResource;
         boolean accessibility;
 
-        if ((name != null) &&
-                (name.length() > 0)) {
-            lookedupResource = context.lookup(name);
+        String normalizedName = normalize(name);
+
+        if ((normalizedName != null) && (normalizedName.length() > 0)) {
+            lookedupResource = context.lookup(normalizedName);
         } else {
             lookedupResource =
                 context.lookup(clazz.getName() + "/" + field.getName());
@@ -495,9 +496,10 @@ public class DefaultInstanceManager implements InstanceManager {
         Object lookedupResource;
         boolean accessibility;
 
-        if ((name != null) &&
-                (name.length() > 0)) {
-            lookedupResource = context.lookup(name);
+        String normalizedName = normalize(name);
+
+        if ((normalizedName != null) && (normalizedName.length() > 0)) {
+            lookedupResource = context.lookup(normalizedName);
         } else {
             lookedupResource = context.lookup(
                     clazz.getName() + "/" + getName(method));
@@ -519,5 +521,12 @@ public class DefaultInstanceManager implements InstanceManager {
         name.setCharAt(0, Character.toLowerCase(name.charAt(0)));
 
         return name.toString();
+    }
+    
+    private static String normalize(String jndiName){
+        if(jndiName != null && jndiName.startsWith("java:comp/env/")){
+            return jndiName.substring(14);
+        }
+        return jndiName;
     }
 }
