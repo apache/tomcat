@@ -81,6 +81,10 @@
         than throwing an exception and failing to start, allow thw web
         application to start normally. (mark)
       </fix>
+      <fix>
+        <bug>49987</bug>: Fix thread safety issue with population of servlet
+        context initialization parameters. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
