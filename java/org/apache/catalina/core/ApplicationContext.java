@@ -66,7 +66,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
@@ -173,7 +172,8 @@ public class ApplicationContext
     /**
      * The merged context initialization parameters for this Context.
      */
-    private Map<String,String> parameters = null;
+    private Map<String,String> parameters =
+        new ConcurrentHashMap<String,String>();
 
 
     /**
@@ -317,10 +317,7 @@ public class ApplicationContext
      * @param name Name of the initialization parameter to retrieve
      */
     public String getInitParameter(final String name) {
-
-        mergeParameters();
         return parameters.get(name);
-
     }
 
 
@@ -329,10 +326,7 @@ public class ApplicationContext
      * empty enumeration if the context has no initialization parameters.
      */
     public Enumeration<String> getInitParameterNames() {
-
-        mergeParameters();
         return (new Enumerator<String>(parameters.keySet()));
-
     }
 
 
@@ -1215,9 +1209,6 @@ public class ApplicationContext
 
     @Override
     public boolean setInitParameter(String name, String value) {
-        
-        mergeParameters();
-        
         if (parameters.containsKey(name)) {
             return false;
         }
@@ -1509,38 +1500,6 @@ public class ApplicationContext
         this.newServletContextListenerAllowed = allowed;
     }
     
-    // -------------------------------------------------------- Private Methods
-
-
-    /**
-     * Merge the context initialization parameters specified in the application
-     * deployment descriptor with the application parameters described in the
-     * server configuration, respecting the <code>override</code> property of
-     * the application parameters appropriately.
-     */
-    private void mergeParameters() {
-
-        if (parameters != null)
-            return;
-        Map<String,String> results = new ConcurrentHashMap<String,String>();
-        String names[] = context.findParameters();
-        for (int i = 0; i < names.length; i++)
-            results.put(names[i], context.findParameter(names[i]));
-        ApplicationParameter params[] =
-            context.findApplicationParameters();
-        for (int i = 0; i < params.length; i++) {
-            if (params[i].getOverride()) {
-                if (results.get(params[i].getName()) == null)
-                    results.put(params[i].getName(), params[i].getValue());
-            } else {
-                results.put(params[i].getName(), params[i].getValue());
-            }
-        }
-        parameters = results;
-
-    }
-
-
     /**
      * List resource paths (recursively), and store all of them in the given
      * Set.
