@@ -87,6 +87,10 @@
         <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
         AJP connector. (kfujino) 
       </fix>
+      <fix>
+        Set not maxThreads  but minSpareThreads to corePoolSize, if 
+        AbstractEndpoint.setMinSpareThreads is called. (kfujino) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
