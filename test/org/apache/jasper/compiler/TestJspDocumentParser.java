@@ -20,8 +20,11 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestJspDocumentParser extends TomcatBaseTest {
     
@@ -35,15 +38,10 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         
         tomcat.start();
 
-        Exception e = null;
-        try {
-            getUrl("http://localhost:" + getPort() + "/test/bug47977.jspx");
-        } catch (IOException ioe) {
-            e = ioe;
-        }
-
-        // Failure is expected
-        assertNotNull(e);
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug47977.jspx", new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
     
     public void testBug48827() throws Exception {
