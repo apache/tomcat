@@ -233,7 +233,7 @@ public abstract class AbstractEndpoint {
         this.minSpareThreads = minSpareThreads;
         if (running && executor!=null) {
             if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                ((java.util.concurrent.ThreadPoolExecutor)executor).setCorePoolSize(maxThreads);
+                ((java.util.concurrent.ThreadPoolExecutor)executor).setCorePoolSize(minSpareThreads);
             } else if (executor instanceof ResizableExecutor) {
                 ((ResizableExecutor)executor).resizePool(minSpareThreads, maxThreads);
             }
