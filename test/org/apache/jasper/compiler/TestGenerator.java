@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
@@ -75,15 +77,10 @@ public class TestGenerator extends TomcatBaseTest {
         
         tomcat.start();
 
-        Exception e = null;
-        try {
-            getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015b.jsp");
-        } catch (IOException ioe) {
-            e = ioe;
-        }
-
-        // Failure is expected
-        assertNotNull(e);
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug45nnn/bug45015b.jsp", new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     public void testBug45015c() throws Exception {
@@ -96,15 +93,10 @@ public class TestGenerator extends TomcatBaseTest {
         
         tomcat.start();
 
-        Exception e = null;
-        try {
-            getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015c.jsp");
-        } catch (IOException ioe) {
-            e = ioe;
-        }
-
-        // Failure is expected
-        assertNotNull(e);
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug45nnn/bug45015c.jsp", new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     public void testBug48701Fail() throws Exception {
@@ -122,15 +114,10 @@ public class TestGenerator extends TomcatBaseTest {
         
         tomcat.start();
 
-        Exception e = null;
-        try {
-            getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48701-fail.jsp");
-        } catch (IOException ioe) {
-            e = ioe;
-        }
-
-        // Failure is expected
-        assertNotNull(e);
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug48nnn/bug48701-fail.jsp", new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     public void testBug48701UseBean() throws Exception {
