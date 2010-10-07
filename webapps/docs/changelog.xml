@@ -94,12 +94,13 @@
         for us in HTTP headers. (markt)
       </fix>
       <fix>
-        <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
-        AJP connector. (kfujino) 
+        <bug>50003</bug>: Set not maxThreads but minSpareThreads to
+        corePoolSize, if AbstractEndpoint.setMinSpareThreads is called.
+        (kfujino) 
       </fix>
       <fix>
-        Set not maxThreads but minSpareThreads to corePoolSize, if 
-        AbstractEndpoint.setMinSpareThreads is called. (kfujino) 
+        <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
+        AJP connector. (kfujino) 
       </fix>
     </changelog>
   </subsection>
