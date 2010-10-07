@@ -75,6 +75,12 @@
         cleared all work directories (with compiled JSPs and persisted sessions)
         when Tomcat was stopped. (markt)
       </fix>
+      <fix>
+        <bug>49978</bug>: Correctly handle the case when a directory expected
+        to be created during web application start is already present. Rather
+        than throwing an exception and failing to start, allow thw web
+        application to start normally. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -84,11 +90,15 @@
         to ensure APR connector shuts down properly. (mturk) 
       </fix>
       <fix>
+        <bug>49972</bug>: Fix potential thread safe issue when formatting dates
+        for us in HTTP headers. (markt)
+      </fix>
+      <fix>
         <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
         AJP connector. (kfujino) 
       </fix>
       <fix>
-        Set not maxThreads  but minSpareThreads to corePoolSize, if 
+        Set not maxThreads but minSpareThreads to corePoolSize, if 
         AbstractEndpoint.setMinSpareThreads is called. (kfujino) 
       </fix>
     </changelog>
