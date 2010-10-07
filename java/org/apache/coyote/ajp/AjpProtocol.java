@@ -17,35 +17,25 @@
 
 package org.apache.coyote.ajp;
 
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.URLEncoder;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.coyote.Adapter;
-import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
-import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
-import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 
 
 /**
@@ -56,23 +46,19 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class AjpProtocol 
-    implements ProtocolHandler, MBeanRegistration {
+public class AjpProtocol extends AbstractAjpProtocol {
     
     
     private static final Log log = LogFactory.getLog(AjpProtocol.class);
 
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
+    @Override
+    protected Log getLog() { return log; }
 
     // ------------------------------------------------------------ Constructor
 
 
     public AjpProtocol() {
+        endpoint = new JIoEndpoint();
         cHandler = new AjpConnectionHandler(this);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
@@ -83,31 +69,6 @@ public class AjpProtocol
     
     // ----------------------------------------------------- Instance Variables
 
-
-    protected ObjectName tpOname;
-    
-    
-    protected ObjectName rgOname;
-
-
-    /**
-     * Associated java.io endpoint.
-     */
-    protected JIoEndpoint endpoint = new JIoEndpoint();
-
-
-    /**
-     * Configuration attributes.
-     */
-    protected Hashtable<String,Object> attributes =
-        new Hashtable<String,Object>();
-
-
-    /**
-     * Adapter which will process the requests received by this endpoint.
-     */
-    private Adapter adapter;
-    
     
     /**
      * Connection handler for AJP.
@@ -118,53 +79,12 @@ public class AjpProtocol
     // --------------------------------------------------------- Public Methods
 
 
-    /** 
-     * Pass config info
-     */
-    @Override
-    public void setAttribute(String name, Object value) {
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("ajpprotocol.setattribute", name, value));
-        }
-        attributes.put(name, value);
-    }
-
-    @Override
-    public Object getAttribute(String key) {
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("ajpprotocol.getattribute", key));
-        }
-        return attributes.get(key);
-    }
-
-
-    @Override
-    public Iterator<String> getAttributeNames() {
-        return attributes.keySet().iterator();
-    }
-
-
-    /**
-     * The adapter, used to call the connector
-     */
-    @Override
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
-    }
-
-
-    @Override
-    public Adapter getAdapter() {
-        return adapter;
-    }
-
-
     /** Start the protocol
      */
     @Override
     public void init() throws Exception {
         endpoint.setName(getName());
-        endpoint.setHandler(cHandler);
+        ((JIoEndpoint)endpoint).setHandler(cHandler);
 
         try {
             endpoint.init();
@@ -204,136 +124,6 @@ public class AjpProtocol
         if (log.isInfoEnabled())
             log.info(sm.getString("ajpprotocol.start", getName()));
     }
-
-    @Override
-    public void pause() throws Exception {
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            log.error(sm.getString("ajpprotocol.endpoint.pauseerror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("ajpprotocol.pause", getName()));
-    }
-
-    @Override
-    public void resume() throws Exception {
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            log.error(sm.getString("ajpprotocol.endpoint.resumeerror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("ajpprotocol.resume", getName()));
-    }
-
-    @Override
-    public void stop() throws Exception {
-        try {
-            endpoint.stop();
-        } catch (Exception ex) {
-            log.error(sm.getString("ajpprotocol.endpoint.stoperror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("ajpprotocol.stop", getName()));
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        if (log.isInfoEnabled())
-            log.info(sm.getString("ajpprotocol.destroy", getName()));
-        endpoint.destroy();
-        if (tpOname!=null)
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if (rgOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-    }
-
-    // *
-    public String getName() {
-        String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
-            if (encodedAddr.startsWith("/"))
-                encodedAddr = encodedAddr.substring(1);
-            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
-        }
-        return ("ajp-" + encodedAddr + endpoint.getPort());
-    }
-
-    /**
-     * Processor cache.
-     */
-    protected int processorCache = -1;
-    public int getProcessorCache() { return this.processorCache; }
-    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
-
-    @Override
-    public Executor getExecutor() { return endpoint.getExecutor(); }
-    public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
-    
-    public int getMaxThreads() { return endpoint.getMaxThreads(); }
-    public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
-
-    public int getThreadPriority() { return endpoint.getThreadPriority(); }
-    public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
-
-    public int getBacklog() { return endpoint.getBacklog(); }
-    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
-
-    public int getPort() { return endpoint.getPort(); }
-    public void setPort(int port) { endpoint.setPort(port); }
-
-    public InetAddress getAddress() { return endpoint.getAddress(); }
-    public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
-
-    public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
-    public void setTcpNoDelay(boolean tcpNoDelay) { endpoint.setTcpNoDelay(tcpNoDelay); }
-
-    public int getSoLinger() { return endpoint.getSoLinger(); }
-    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
-
-    public int getSoTimeout() { return endpoint.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
-
-    /**
-     * Should authentication be done in the native webserver layer, 
-     * or in the Servlet container ?
-     */
-    protected boolean tomcatAuthentication = true;
-    public boolean getTomcatAuthentication() { return tomcatAuthentication; }
-    public void setTomcatAuthentication(boolean tomcatAuthentication) { this.tomcatAuthentication = tomcatAuthentication; }
-
-    /**
-     * Required secret.
-     */
-    protected String requiredSecret = null;
-    public void setRequiredSecret(String requiredSecret) { this.requiredSecret = requiredSecret; }
-    
-    /**
-     * AJP packet size.
-     */
-    protected int packetSize = Constants.MAX_PACKET_SIZE;
-    public int getPacketSize() { return packetSize; }
-    public void setPacketSize(int packetSize) {
-        if(packetSize < Constants.MAX_PACKET_SIZE) {
-            this.packetSize = Constants.MAX_PACKET_SIZE;
-        } else {
-            this.packetSize = packetSize;
-        }
-    }
-
-    
-    /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection.
-     */
-    protected int keepAliveTimeout = -1;
-    public int getKeepAliveTimeout() { return keepAliveTimeout; }
-    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
 
 
     // --------------------------------------  AjpConnectionHandler Inner Class
@@ -444,7 +234,7 @@ public class AjpProtocol
         }
 
         protected AjpProcessor createProcessor() {
-            AjpProcessor processor = new AjpProcessor(proto.packetSize, proto.endpoint);
+            AjpProcessor processor = new AjpProcessor(proto.packetSize, (JIoEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
             processor.setTomcatAuthentication(proto.tomcatAuthentication);
             processor.setRequiredSecret(proto.requiredSecret);
@@ -496,43 +286,4 @@ public class AjpProtocol
 
     }
 
-
-    // -------------------- Various implementation classes --------------------
-
-
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
-
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
-    }
-
-    @Override
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
-    }
-
-    @Override
-    public void preDeregister() throws Exception {
-        // NOOP
-    }
-
-    @Override
-    public void postDeregister() {
-        // NOOP
-    }
 }
