@@ -20,6 +20,7 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -39,15 +40,10 @@ public class TestValidator extends TomcatBaseTest {
         
         tomcat.start();
 
-        Exception e = null;
-        try {
-            getUrl("http://localhost:" + getPort() + "/test/bug47331.jsp");
-        } catch (IOException ioe) {
-            e = ioe;
-        }
-
-        // Failure is expected
-        assertNotNull(e);
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug47331.jsp", new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
     
 
