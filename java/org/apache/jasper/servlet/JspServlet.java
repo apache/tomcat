@@ -61,6 +61,8 @@ import org.apache.tomcat.PeriodicEventListener;
  */
 public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
+    private static final long serialVersionUID = 1L;
+
     // Logger
     private final Log log = LogFactory.getLog(JspServlet.class);
 
@@ -125,6 +127,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 serviceJspFile(null, null, jspFile, null, true);
                 if (SecurityUtil.isPackageProtectionEnabled()){
                    AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
+                        @Override
                         public Object run() throws IOException, ServletException {
                             serviceJspFile(null, null, jspFile, null, true);
                             return null;
@@ -324,6 +327,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     }
 
 
+    @Override
     public void periodicEvent() {
         rctxt.checkUnload();
         rctxt.checkCompile();

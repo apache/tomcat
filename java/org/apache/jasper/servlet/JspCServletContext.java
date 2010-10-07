@@ -104,6 +104,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param name Name of the requested attribute
      */
+    @Override
     public Object getAttribute(String name) {
 
         return (myAttributes.get(name));
@@ -114,6 +115,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Return an enumeration of context attribute names.
      */
+    @Override
     public Enumeration<String> getAttributeNames() {
 
         return (myAttributes.keys());
@@ -126,6 +128,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param uripath Server-relative path starting with '/'
      */
+    @Override
     public ServletContext getContext(String uripath) {
 
         return (null);
@@ -136,6 +139,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Return the context path.
      */
+    @Override
     public String getContextPath() {
 
         return (null);
@@ -148,6 +152,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param name Name of the requested parameter
      */
+    @Override
     public String getInitParameter(String name) {
 
         return (null);
@@ -159,6 +164,7 @@ public class JspCServletContext implements ServletContext {
      * Return an enumeration of the names of context initialization
      * parameters.
      */
+    @Override
     public Enumeration<String> getInitParameterNames() {
 
         return (new Vector<String>().elements());
@@ -169,6 +175,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Return the Servlet API major version number.
      */
+    @Override
     public int getMajorVersion() {
 
         return (3);
@@ -181,6 +188,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param file Filename whose MIME type is requested
      */
+    @Override
     public String getMimeType(String file) {
 
         return (null);
@@ -191,6 +199,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Return the Servlet API minor version number.
      */
+    @Override
     public int getMinorVersion() {
 
         return (0);
@@ -203,6 +212,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param name Name of the requested servlet
      */
+    @Override
     public RequestDispatcher getNamedDispatcher(String name) {
 
         return (null);
@@ -216,6 +226,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param path The context-relative virtual path to resolve
      */
+    @Override
     public String getRealPath(String path) {
 
         if (!myResourceBaseURL.getProtocol().equals("file"))
@@ -238,6 +249,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param path Context-relative path for which to acquire a dispatcher
      */
+    @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
         return (null);
@@ -254,6 +266,7 @@ public class JspCServletContext implements ServletContext {
      * @exception MalformedURLException if the resource path is
      *  not properly formed
      */
+    @Override
     public URL getResource(String path) throws MalformedURLException {
 
         if (!path.startsWith("/"))
@@ -286,6 +299,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param path Context-relative path of the desired resource
      */
+    @Override
     public InputStream getResourceAsStream(String path) {
 
         try {
@@ -304,6 +318,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param path Context-relative base path
      */
+    @Override
     public Set<String> getResourcePaths(String path) {
 
         Set<String> thePaths = new HashSet<String>();
@@ -331,6 +346,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Return descriptive information about this server.
      */
+    @Override
     public String getServerInfo() {
 
         return ("JspCServletContext/1.0");
@@ -345,6 +361,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
+    @Override
     @Deprecated
     public Servlet getServlet(String name) throws ServletException {
 
@@ -356,6 +373,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Return the name of this servlet context.
      */
+    @Override
     public String getServletContextName() {
 
         return (getServerInfo());
@@ -368,6 +386,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
+    @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
 
@@ -381,6 +400,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
+    @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
 
@@ -394,6 +414,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param message The message to be logged
      */
+    @Override
     public void log(String message) {
 
         myLogWriter.println(message);
@@ -409,6 +430,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated Use log(String,Throwable) instead
      */
+    @Override
     @Deprecated
     public void log(Exception exception, String message) {
 
@@ -423,6 +445,7 @@ public class JspCServletContext implements ServletContext {
      * @param message The message to be logged
      * @param exception The exception to be logged
      */
+    @Override
     public void log(String message, Throwable exception) {
 
         myLogWriter.println(message);
@@ -436,6 +459,7 @@ public class JspCServletContext implements ServletContext {
      *
      * @param name Name of the attribute to remove
      */
+    @Override
     public void removeAttribute(String name) {
 
         myAttributes.remove(name);
@@ -449,6 +473,7 @@ public class JspCServletContext implements ServletContext {
      * @param name Name of the context attribute to set
      * @param value Corresponding attribute value
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         myAttributes.put(name, value);
@@ -456,84 +481,99 @@ public class JspCServletContext implements ServletContext {
     }
 
 
+    @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             String className) {
         return null;
     }
 
 
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             String className) {
         return null;
     }
 
 
+    @Override
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return EnumSet.noneOf(SessionTrackingMode.class);
     }
 
 
+    @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         return EnumSet.noneOf(SessionTrackingMode.class);
     }
 
 
+    @Override
     public SessionCookieConfig getSessionCookieConfig() {
         return null;
     }
 
 
+    @Override
     public void setSessionTrackingModes(
             Set<SessionTrackingMode> sessionTrackingModes) {
         // Do nothing
     }
 
 
+    @Override
     public Dynamic addFilter(String filterName, Filter filter) {
         return null;
     }
 
 
+    @Override
     public Dynamic addFilter(String filterName,
             Class<? extends Filter> filterClass) {
         return null;
     }
 
 
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) {
         return null;
     }
 
 
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class<? extends Servlet> servletClass) {
         return null;
     }
 
 
+    @Override
     public <T extends Filter> T createFilter(Class<T> c)
             throws ServletException {
         return null;
     }
 
 
+    @Override
     public <T extends Servlet> T createServlet(Class<T> c)
             throws ServletException {
         return null;
     }
 
 
+    @Override
     public FilterRegistration getFilterRegistration(String filterName) {
         return null;
     }
 
 
+    @Override
     public ServletRegistration getServletRegistration(String servletName) {
         return null;
     }
 
 
+    @Override
     public boolean setInitParameter(String name, String value) {
         return false;
     }
