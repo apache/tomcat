@@ -83,6 +83,10 @@
         <bug>49923</bug>: Avoid using negative timeouts during acceptor unlock
         to ensure APR connector shuts down properly. (mturk) 
       </fix>
+      <fix>
+        <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
+        AJP connector. (kfujino) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
