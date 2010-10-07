@@ -884,9 +884,11 @@ public class WebappLoader extends LifecycleMBeanBase
             } else {
 
                 classRepository = new File(workDir, classesPath);
-                if (!classRepository.mkdirs())
-                    throw new IOException(
-                            sm.getString("webappLoader.mkdirFailure"));
+                if (!classRepository.isDirectory()) {
+                    if (!classRepository.mkdirs())
+                        throw new IOException(
+                                sm.getString("webappLoader.mkdirFailure"));
+                }
                 if (!copyDir(classes, classRepository)) {
                     throw new IOException(
                             sm.getString("webappLoader.copyFailure"));
@@ -934,9 +936,11 @@ public class WebappLoader extends LifecycleMBeanBase
             } else {
                 copyJars = true;
                 destDir = new File(workDir, libPath);
-                if (!destDir.mkdirs())
-                    throw new IOException(
-                            sm.getString("webappLoader.mkdirFailure"));
+                if (!destDir.isDirectory()) {
+                    if (!destDir.mkdirs())
+                        throw new IOException(
+                                sm.getString("webappLoader.mkdirFailure"));
+                }
             }
 
             // Looking up directory /WEB-INF/lib in the context
