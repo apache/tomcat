@@ -44,9 +44,9 @@ package javax.servlet;
  */
 public class UnavailableException extends ServletException {
 
-    private Servlet servlet; // what's unavailable
-    private boolean permanent; // needs admin action?
-    private int seconds; // unavailability estimate
+    private final Servlet servlet; // what's unavailable
+    private final boolean permanent; // needs admin action?
+    private final int seconds; // unavailability estimate
 
     /**
      * @param servlet
@@ -62,6 +62,7 @@ public class UnavailableException extends ServletException {
         super(msg);
         this.servlet = servlet;
         permanent = true;
+        this.seconds = 0;
     }
 
     /**
@@ -98,7 +99,8 @@ public class UnavailableException extends ServletException {
      */
     public UnavailableException(String msg) {
         super(msg);
-
+        seconds = 0;
+        servlet = null;
         permanent = true;
     }
 
@@ -128,7 +130,7 @@ public class UnavailableException extends ServletException {
             this.seconds = -1;
         else
             this.seconds = seconds;
-
+        servlet = null;
         permanent = false;
     }
 

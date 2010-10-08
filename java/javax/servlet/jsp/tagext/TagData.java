@@ -149,5 +149,5 @@ public class TagData implements Cloneable {
 
     // private data
 
-    private Hashtable<String, Object> attributes;        // the tagname/value map
+    private final Hashtable<String, Object> attributes;        // the tagname/value map
 }
