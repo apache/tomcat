@@ -1760,9 +1760,13 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("namingResources",
                                    oldNamingResources, this.namingResources);
         
-        unregister(onameNamingResources);
-        onameNamingResources = register(namingResources,
-                "type=NamingResources," + getObjectKeyPropertiesNameOnly());
+        // If set from server.xml, getObjectKeyPropertiesNameOnly() will
+        // trigger an NPE. Initial registration takes place on INIT. 
+        if (getState() != LifecycleState.NEW) {
+            unregister(onameNamingResources);
+            onameNamingResources = register(namingResources,
+                    "type=NamingResources," + getObjectKeyPropertiesNameOnly());
+        }
     }
 
 
