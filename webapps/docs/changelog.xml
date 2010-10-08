@@ -89,6 +89,11 @@
         <bug>49994</bug>: As per the Java EE 6 specification, return a new
         object instance for each JNDI look up of a resource reference. (markt) 
       </fix>
+      <fix>
+        <bug>50015</bug>: Re-factor dynamic servlet security implementation to
+        make extensions, such as JACC implementations, simpler. Patch provided
+        by David Jencks. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -117,10 +117,12 @@ public class ApplicationServletRegistration
 
         // Have to add in a separate loop since spec requires no updates at all
         // if there is an issue
-        for (Map.Entry<String, String> entry : initParameters.entrySet()) {
-            setInitParameter(entry.getKey(), entry.getValue());
+        if (conflicts.isEmpty()) {
+            for (Map.Entry<String, String> entry : initParameters.entrySet()) {
+                setInitParameter(entry.getKey(), entry.getValue());
+            }
         }
-        
+
         return conflicts;
     }
 
@@ -158,53 +160,7 @@ public class ApplicationServletRegistration
                     getName(), context.getPath()));
         }
 
-        Set<String> conflicts = new HashSet<String>();
-
-        Collection<String> urlPatterns = getMappings();
-        for (String urlPattern : urlPatterns) {
-            boolean foundConflict = false;
-            
-            SecurityConstraint[] securityConstraints =
-                context.findConstraints();
-            for (SecurityConstraint securityConstraint : securityConstraints) {
-                
-                SecurityCollection[] collections =
-                    securityConstraint.findCollections();
-                for (SecurityCollection collection : collections) {
-                    if (collection.findPattern(urlPattern)) {
-                        // First pattern found will indicate if there is a
-                        // conflict since for any given pattern all matching
-                        // constraints will be from either the descriptor or
-                        // not. It is not permitted to have a mixture
-                        if (collection.isFromDescriptor()) {
-                            // Skip this pattern
-                            foundConflict = true;
-                        } else {
-                            // Need to overwrite constraint for this pattern
-                            // so remove every pattern found
-                            context.removeConstraint(securityConstraint);
-                        }
-                    }
-                    if (foundConflict) {
-                        break;
-                    }
-                }
-                if (foundConflict) {
-                    break;
-                }
-            }
-            if (!foundConflict) {
-                SecurityConstraint[] newSecurityConstraints =
-                        SecurityConstraint.createConstraints(constraint,
-                                urlPattern);
-                for (SecurityConstraint securityConstraint :
-                        newSecurityConstraints) {
-                    context.addConstraint(securityConstraint);
-                }
-            }
-        }
-        
-        return conflicts;
+        return context.addServletSecurity(this, constraint);
     }
 
 
