@@ -24,8 +24,8 @@ package javax.servlet;
  * @since Servlet 2.4
  */
 public class ServletRequestAttributeEvent extends ServletRequestEvent {
-    private String name;
-    private Object value;
+    private final String name;
+    private final Object value;
 
     /**
      * Construct a ServletRequestAttributeEvent giving the servlet context of

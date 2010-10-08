@@ -250,8 +250,8 @@ public class VariableInfo {
     }
 
     // == private data
-    private String varName;
-    private String className;
-    private boolean declare;
-    private int scope;
+    private final String varName;
+    private final String className;
+    private final boolean declare;
+    private final int scope;
 }

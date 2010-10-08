@@ -24,7 +24,7 @@ package javax.servlet;
  * @since Servlet 2.4
  */
 public class ServletRequestEvent extends java.util.EventObject {
-    private ServletRequest request;
+    private final ServletRequest request;
 
     /**
      * Construct a ServletRequestEvent for the given ServletContext and
