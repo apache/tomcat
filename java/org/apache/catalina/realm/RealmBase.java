@@ -40,6 +40,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
@@ -763,7 +764,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     log.debug("  No user authenticated, cannot grant access");
             } else {
                 for (int j = 0; j < roles.length; j++) {
-                    if (hasRole(principal, roles[j])) {
+                    if (hasRole(null, principal, roles[j])) {
                         status = true;
                         if( log.isDebugEnabled() )
                             log.debug( "Role found:  " + roles[j]);
@@ -828,7 +829,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param principal Principal for whom the role is to be checked
      * @param role Security role to be checked
      */
-    public boolean hasRole(Principal principal, String role) {
+    @Override
+    public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
+        // Check for a role alias defined in a <security-role-ref> element
+        if (wrapper != null) {
+            String realRole = wrapper.findSecurityReference(role);
+            if (realRole != null)
+                role = realRole;
+        }
 
         // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if ((principal == null) || (role == null) ||

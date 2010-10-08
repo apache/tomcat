@@ -198,6 +198,12 @@ public class DigestAuthenticator
     }
 
 
+    @Override
+    protected String getAuthMethod() {
+        return Constants.DIGEST_METHOD;
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
 

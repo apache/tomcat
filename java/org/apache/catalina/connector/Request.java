@@ -2325,15 +2325,8 @@ public class Request
         if (realm == null)
             return false;
 
-        // Check for a role alias defined in a <security-role-ref> element
-        if (wrapper != null) {
-            String realRole = wrapper.findSecurityReference(role);
-            if ((realRole != null) && realm.hasRole(userPrincipal, realRole))
-                return true;
-        }
-
         // Check for a role defined directly as a <security-role>
-        return (realm.hasRole(userPrincipal, role));
+        return (realm.hasRole(wrapper, userPrincipal, role));
     }
 
 
@@ -2499,31 +2492,11 @@ public class Request
                     sm.getString("coyoteRequest.alreadyAuthenticated"));
         }
         
-        LoginConfig config = context.getLoginConfig();
-        if (config == null) {
-            throw new ServletException(
-                    sm.getString("coyoteRequest.noLoginConfig"));
+        if (context.getAuthenticator() == null) {
+            throw new ServletException("no authenticator");
         }
         
-        String authMethod = config.getAuthMethod();
-        if (BASIC_AUTH.equals(authMethod) || FORM_AUTH.equals(authMethod) ||
-                DIGEST_AUTH.equals(authMethod)) {
-            // Methods support user name and password authentication
-            Realm realm = context.getRealm();
-            
-            Principal principal = realm.authenticate(username, password);
-
-            if (principal == null) {
-                throw new ServletException(
-                        sm.getString("coyoteRequest.authFail", username));
-            }
-            // Assume if we have a non-null LoginConfig then we must have an
-            // authenticator
-            context.getAuthenticator().register(this, getResponse(), principal,
-                    authMethod, username, password);
-        } else {
-            throw new ServletException("coyoteRequest.noPasswordLogin");
-        }
+        context.getAuthenticator().login(username, password, this);
     }
 
     /**
@@ -2531,8 +2504,7 @@ public class Request
      */
     @Override
     public void logout() throws ServletException {
-        context.getAuthenticator().register(this, getResponse(), null,
-                null, null, null);
+        context.getAuthenticator().logout(this);
     }
     
     /**
