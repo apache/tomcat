@@ -21,13 +21,16 @@ package javax.servlet;
  * @since Servlet 3.0
  */
 public class AsyncEvent {
-    private AsyncContext context;
-    private ServletRequest request;
-    private ServletResponse response;
-    private Throwable throwable;
+    private final AsyncContext context;
+    private final ServletRequest request;
+    private final ServletResponse response;
+    private final Throwable throwable;
     
     public AsyncEvent(AsyncContext context) {
         this.context = context;
+        this.request = null;
+        this.response = null;
+        this.throwable = null;
     }
 
     public AsyncEvent(AsyncContext context, ServletRequest request,
@@ -35,11 +38,14 @@ public class AsyncEvent {
         this.context = context;
         this.request = request;
         this.response = response;
+        this.throwable = null;
     }
     
     public AsyncEvent(AsyncContext context, Throwable throwable) {
         this.context = context;
         this.throwable = throwable;
+        this.request = null;
+        this.response = null;
     }
 
     public AsyncEvent(AsyncContext context, ServletRequest request,

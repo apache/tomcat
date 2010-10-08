@@ -32,7 +32,7 @@ import javax.servlet.annotation.ServletSecurity;
  */
 public class ServletSecurityElement extends HttpConstraintElement {
     
-    private Map<String,HttpMethodConstraintElement> methodConstraints =
+    private final Map<String,HttpMethodConstraintElement> methodConstraints =
         new HashMap<String,HttpMethodConstraintElement>();
 
     /**

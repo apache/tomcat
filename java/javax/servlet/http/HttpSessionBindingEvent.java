@@ -38,11 +38,11 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
 
     /* The name to which the object is being bound or unbound */
 
-    private String name;
+    private final String name;
 
     /* The object is being bound or unbound */
 
-    private Object value;
+    private final Object value;
 
     /**
      * Constructs an event that notifies an object that it has been bound to or
@@ -59,6 +59,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
     public HttpSessionBindingEvent(HttpSession session, String name) {
         super(session);
         this.name = name;
+        this.value = null;
     }
 
     /**

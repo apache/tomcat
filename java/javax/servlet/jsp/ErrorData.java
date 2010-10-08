@@ -27,10 +27,10 @@ package javax.servlet.jsp;
  */
 public final class ErrorData {
 
-    private Throwable throwable;
-    private int statusCode;
-    private String uri;
-    private String servletName;
+    private final Throwable throwable;
+    private final int statusCode;
+    private final String uri;
+    private final String servletName;
 
     /**
      * Creates a new ErrorData object.

@@ -99,6 +99,10 @@
         <code>login()/logout()</code> methods to support JACC implementations
         and to improve encapsulation. Patch provided by David Jencks. (markt)
       </fix>
+      <update>
+        <bug>50017</bug>: Code clean-up. No functional change. Patch provided by
+        sebb. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

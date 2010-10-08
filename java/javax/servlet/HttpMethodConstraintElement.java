@@ -29,7 +29,7 @@ public class HttpMethodConstraintElement extends HttpConstraintElement {
     private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
-    private String methodName;
+    private final String methodName;
 
     public HttpMethodConstraintElement(String methodName) {
         if (methodName == null || methodName.length() == 0) {

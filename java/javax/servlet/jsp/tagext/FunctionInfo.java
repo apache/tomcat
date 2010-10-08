@@ -73,7 +73,7 @@ public class FunctionInfo {
     /*
      * fields
      */
-    private String name;
-    private String functionClass;
-    private String functionSignature;
+    private final String name;
+    private final String functionClass;
+    private final String functionSignature;
 }
