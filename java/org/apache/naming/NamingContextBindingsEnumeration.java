@@ -105,13 +105,13 @@ public class NamingContextBindingsEnumeration
     
     private Binding nextElementInternal() throws NamingException {
         NamingEntry entry = iterator.next();
+        Object value;
         
         // If the entry is a reference, resolve it
         if (entry.type == NamingEntry.REFERENCE
                 || entry.type == NamingEntry.LINK_REF) {
             try {
-                // A lookup will resolve the entry
-                ctx.lookup(new CompositeName(entry.name));
+                value = ctx.lookup(new CompositeName(entry.name));
             } catch (NamingException e) {
                 throw e;
             } catch (Exception e) {
@@ -119,12 +119,11 @@ public class NamingContextBindingsEnumeration
                 ne.initCause(e);
                 throw ne;
             }
+        } else {
+            value = entry.value;
         }
         
-        return new Binding(entry.name, entry.value.getClass().getName(), 
-                           entry.value, true);
+        return new Binding(entry.name, value.getClass().getName(), value, true);
     }
-
-
 }
 
