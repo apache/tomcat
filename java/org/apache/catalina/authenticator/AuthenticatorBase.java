@@ -829,6 +829,29 @@ public abstract class AuthenticatorBase extends ValveBase
 
     }
 
+    public void login(String username, String password, Request request)
+            throws ServletException {
+        Principal principal = doLogin(request, username, password);
+        register(request, request.getResponse(), principal,
+                    getAuthMethod(), username, password);
+    }
+
+    protected abstract String getAuthMethod();
+
+    protected Principal doLogin(Request request, String username,
+            String password) throws ServletException {
+        Principal p = context.getRealm().authenticate(username, password);
+        if (p == null) {
+            throw new ServletException(sm.getString("authenticator.loginFail"));
+        }
+        return p;
+    }
+
+    public void logout(Request request) throws ServletException {
+        register(request, request.getResponse(), null,
+                null, null, null);
+
+    }
 
     /**
      * Start this component and implement the requirements

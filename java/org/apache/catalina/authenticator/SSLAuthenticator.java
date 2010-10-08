@@ -161,4 +161,10 @@ public class SSLAuthenticator
         return (true);
 
     }
+
+
+    @Override
+    protected String getAuthMethod() {
+        return Constants.CERT_METHOD;
+    }
 }

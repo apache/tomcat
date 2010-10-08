@@ -31,6 +31,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -136,7 +137,13 @@ public class UserDatabaseRealm
      * @param role Security role to be checked
      */
     @Override
-    public boolean hasRole(Principal principal, String role) {
+    public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
+        // Check for a role alias defined in a <security-role-ref> element
+        if (wrapper != null) {
+            String realRole = wrapper.findSecurityReference(role);
+            if (realRole != null)
+                role = realRole;
+        }
         if( principal instanceof GenericPrincipal) {
             GenericPrincipal gp = (GenericPrincipal)principal;
             if(gp.getUserPrincipal() instanceof User) {
@@ -145,7 +152,7 @@ public class UserDatabaseRealm
         }
         if(! (principal instanceof User) ) {
             //Play nice with SSO and mixed Realms
-            return super.hasRole(principal, role);
+            return super.hasRole(null, principal, role);
         }
         if("*".equals(role)) {
             return true;
