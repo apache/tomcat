@@ -101,9 +101,9 @@ public class TagVariableInfo {
     /*
      * private fields
      */
-    private String nameGiven; // <name-given>
-    private String nameFromAttribute; // <name-from-attribute>
-    private String className; // <class>
-    private boolean declare; // <declare>
-    private int scope; // <scope>
+    private final String nameGiven; // <name-given>
+    private final String nameFromAttribute; // <name-from-attribute>
+    private final String className; // <class>
+    private final boolean declare; // <declare>
+    private final int scope; // <scope>
 }

@@ -24,8 +24,8 @@ package javax.servlet;
  * @since v 2.3
  */
 public class ServletContextAttributeEvent extends ServletContextEvent {
-    private String name;
-    private Object value;
+    private final String name;
+    private final Object value;
 
     /**
      * Construct a ServletContextAttributeEvent from the given context for the

@@ -26,8 +26,8 @@ public class ValueReference implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private Object base;
-    private Object property;
+    private final Object base;
+    private final Object property;
     
     public ValueReference(Object base, Object property) {
         this.base = base;

@@ -137,7 +137,7 @@ public abstract class TagExtraInfo {
     }
     
     // private data
-    private TagInfo tagInfo;
+    private  TagInfo tagInfo;
 
     // zero length VariableInfo array
     private static final VariableInfo[] ZERO_VARIABLE_INFO = { };
