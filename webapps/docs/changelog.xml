@@ -135,6 +135,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>50013</bug>: Correctly package classes from
+        <code>org.apache.tomcat.util.file</code> and add the tomcat-util.jar to
+        the class path for the Ant tasks. Based on a patch provided by
+        Sylvain Laurent. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.3 (markt)" rtext="not released">
   <subsection name="Catalina">
