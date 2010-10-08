@@ -24,8 +24,10 @@ import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.catalina.core.ApplicationServletRegistration;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -1222,5 +1224,16 @@ public interface Context extends Container {
      * Is this context using version 2.2 of the Servlet spec?
      */
     boolean isServlet22();
+
+    /**
+     * Notification that servlet security has been dynamically set in a
+     * {@Link ServletRegistration.Dynamic}
+     * @param registration servlet security was modified for
+     * @param servletSecurityElement new security constraints for this servlet
+     * @return urls currently mapped to this registration that are already
+     *         present in web.xml
+     */
+    Set<String> addServletSecurity(ApplicationServletRegistration registration,
+            ServletSecurityElement servletSecurityElement);
 }
 

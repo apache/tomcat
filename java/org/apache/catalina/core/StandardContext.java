@@ -26,7 +26,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -47,14 +49,17 @@ import javax.management.ObjectName;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.servlet.FilterConfig;
+import javax.servlet.Servlet;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
@@ -4050,6 +4055,22 @@ public class StandardContext extends ContainerBase
         return null;
     }
 
+    /**
+     * hook to register that we need to scan for security annotations.
+     * @param registration
+     */
+    public ServletRegistration.Dynamic dynamicServletAdded(Wrapper wrapper) {
+        return new ApplicationServletRegistration(wrapper, this);
+    }
+
+    /**
+     * hook to track which registrations need annotation scanning
+     * @param servlet
+     */
+    public void dynamicServletCreated(Servlet servlet) {
+        // NOOP - Hook for JACC implementations
+    }
+
 
     /**
      * A helper class to manage the filter mappings in a Context.
@@ -5170,6 +5191,71 @@ public class StandardContext extends ContainerBase
             return (true);
         else
             return (false);
+
+    }
+
+    public Set<String> addServletSecurity(
+            ApplicationServletRegistration registration,
+            ServletSecurityElement servletSecurityElement) {
+
+        Set<String> conflicts = new HashSet<String>();
+
+        Collection<String> urlPatterns = registration.getMappings();
+        for (String urlPattern : urlPatterns) {
+            boolean foundConflict = false;
+
+            SecurityConstraint[] securityConstraints =
+                findConstraints();
+            for (SecurityConstraint securityConstraint : securityConstraints) {
+
+                SecurityCollection[] collections =
+                    securityConstraint.findCollections();
+                for (SecurityCollection collection : collections) {
+                    if (collection.findPattern(urlPattern)) {
+                        // First pattern found will indicate if there is a
+                        // conflict since for any given pattern all matching
+                        // constraints will be from either the descriptor or
+                        // not. It is not permitted to have a mixture
+                        if (collection.isFromDescriptor()) {
+                            // Skip this pattern
+                            foundConflict = true;
+                            conflicts.add(urlPattern);
+                        } else {
+                            // Need to overwrite constraint for this pattern
+                            // so remove every pattern found
+
+                            // TODO spec 13.4.2 appears to say only the
+                            // conflicting pattern is overwritten, not the
+                            // entire security constraint.
+                            removeConstraint(securityConstraint);
+                        }
+                    }
+                    if (foundConflict) {
+                        break;
+                    }
+                }
+                if (foundConflict) {
+                    break;
+                }
+            }
+            // TODO spec 13.4.2 appears to say that non-conflicting patterns are
+            // still used.
+            // TODO you can't calculate the eventual security constraint now,
+            // you have to wait until the context is started, since application
+            // code can add url patterns after calling setSecurity.
+            if (!foundConflict) {
+                SecurityConstraint[] newSecurityConstraints =
+                        SecurityConstraint.createConstraints(
+                                servletSecurityElement,
+                                urlPattern);
+                for (SecurityConstraint securityConstraint :
+                        newSecurityConstraints) {
+                    addConstraint(securityConstraint);
+                }
+            }
+        }
+
+        return conflicts;
 
     }
 
