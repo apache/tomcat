@@ -104,6 +104,10 @@
         sebb. (markt)
       </update>
       <fix>
+        <bug>50027</bug>: Avoid NPE on start when a Context is defined in
+        server.xml with one or more JNDI resources. (markt)
+      </fix>
+      <fix>
         <bug>50059</bug>: JARs should always be searched for static resources
         even if the web application is marked as meta-data complete. (markt)
       </fix>
