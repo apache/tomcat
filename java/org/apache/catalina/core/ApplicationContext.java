@@ -1082,10 +1082,10 @@ public class ApplicationContext
         } else {
             wrapper.setServletClass(servlet.getClass().getName());
             wrapper.setServlet(servlet);
-       }
-        
-        return new ApplicationServletRegistration(wrapper, context);
-    } 
+        }
+
+        return context.dynamicServletAdded(wrapper);
+    }
 
 
     public <T extends Servlet> T createServlet(Class<T> c)
@@ -1093,6 +1093,7 @@ public class ApplicationContext
         try {
             @SuppressWarnings("unchecked")
             T servlet = (T) context.getInstanceManager().newInstance(c.getName());
+            context.dynamicServletCreated(servlet);
             return servlet;
         } catch (IllegalAccessException e) {
             throw new ServletException(e);
