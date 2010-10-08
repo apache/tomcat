@@ -797,10 +797,6 @@ public class NamingContext implements Context {
                 try {
                     Object obj = NamingManager.getObjectInstance
                         (entry.value, name, this, env);
-                    if (obj != null) {
-                        entry.value = obj;
-                        entry.type = NamingEntry.ENTRY;
-                    }
                     return obj; 
                 } catch (NamingException e) {
                     throw e;
