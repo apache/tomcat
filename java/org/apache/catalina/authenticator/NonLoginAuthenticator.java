@@ -103,4 +103,8 @@ public final class NonLoginAuthenticator
     }
 
 
+    @Override
+    protected String getAuthMethod() {
+        return "NONE";
+    }
 }

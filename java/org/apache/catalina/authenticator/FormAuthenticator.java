@@ -300,6 +300,12 @@ public class FormAuthenticator
     }
 
 
+    @Override
+    protected String getAuthMethod() {
+        return Constants.FORM_METHOD;
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
 

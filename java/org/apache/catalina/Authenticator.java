@@ -19,8 +19,8 @@
 package org.apache.catalina;
 
 import java.io.IOException;
-import java.security.Principal;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
@@ -53,21 +53,8 @@ public interface Authenticator {
     public boolean authenticate(Request request, HttpServletResponse response,
             LoginConfig config) throws IOException;
     
-    /**
-     * Register an authenticated Principal and authentication type in our
-     * request, in the current session (if there is one), and with our
-     * SingleSignOn valve, if there is one.  Set the appropriate cookie
-     * to be returned. Passing in a null principal will de-register any
-     * SSO sessions.
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are populating
-     * @param principal The authenticated Principal to be registered
-     * @param authType The authentication type to be registered
-     * @param username Username used to authenticate (if any)
-     * @param password Password used to authenticate (if any)
-     */
-    public void register(Request request, HttpServletResponse response,
-            Principal principal, String authType,
-            String username, String password);
+    public void login(String userName, String password, Request request)
+            throws ServletException;
+
+    public void logout(Request request) throws ServletException;
 }
