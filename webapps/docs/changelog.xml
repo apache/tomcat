@@ -103,6 +103,10 @@
         <bug>50017</bug>: Code clean-up. No functional change. Patch provided by
         sebb. (markt)
       </update>
+      <fix>
+        <bug>50059</bug>: JARs should always be searched for static resources
+        even if the web application is marked as meta-data complete. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
