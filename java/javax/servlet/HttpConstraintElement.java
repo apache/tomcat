@@ -31,15 +31,18 @@ public class HttpConstraintElement {
     private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
-    private EmptyRoleSemantic emptyRoleSemantic = EmptyRoleSemantic.PERMIT;
-    private TransportGuarantee transportGuarantee = TransportGuarantee.NONE;
-    private String[] rolesAllowed = new String[0];
+    private final EmptyRoleSemantic emptyRoleSemantic;// = EmptyRoleSemantic.PERMIT;
+    private final TransportGuarantee transportGuarantee;// = TransportGuarantee.NONE;
+    private final String[] rolesAllowed;// = new String[0];
     
     /**
      * Default constraint is permit with no transport guarantee.
      */
     public HttpConstraintElement() {
         // Default constructor
+        this.emptyRoleSemantic = EmptyRoleSemantic.PERMIT;
+        this.transportGuarantee = TransportGuarantee.NONE;
+        this.rolesAllowed = new String[0];
     }
     
     /**
@@ -48,6 +51,8 @@ public class HttpConstraintElement {
      */
     public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic) {
         this.emptyRoleSemantic = emptyRoleSemantic;
+        this.transportGuarantee = TransportGuarantee.NONE;
+        this.rolesAllowed = new String[0];
     }
     
     /**
@@ -55,6 +60,7 @@ public class HttpConstraintElement {
      */
     public HttpConstraintElement(TransportGuarantee transportGuarantee,
             String... rolesAllowed) {
+        this.emptyRoleSemantic = EmptyRoleSemantic.PERMIT;
         this.transportGuarantee = transportGuarantee;
         this.rolesAllowed = rolesAllowed;
     }

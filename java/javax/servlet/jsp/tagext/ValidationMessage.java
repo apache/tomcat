@@ -72,6 +72,6 @@ public class ValidationMessage {
     }
 
     // Private data
-    private String id;
-    private String message;
+    private final String id;
+    private final String message;
 }

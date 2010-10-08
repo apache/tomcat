@@ -51,10 +51,7 @@ public class TagAttributeInfo {
 
     public TagAttributeInfo(String name, boolean required, String type,
             boolean reqTime) {
-        this.name = name;
-        this.required = required;
-        this.type = type;
-        this.reqTime = reqTime;
+        this(name, required, type, reqTime, false);
     }
 
     /**
@@ -78,8 +75,7 @@ public class TagAttributeInfo {
 
     public TagAttributeInfo(String name, boolean required, String type,
             boolean reqTime, boolean fragment) {
-        this(name, required, type, reqTime);
-        this.fragment = fragment;
+        this(name, required, type, reqTime, fragment, null, false, false, null, null);
     }
 
     /**
@@ -89,7 +85,11 @@ public class TagAttributeInfo {
             boolean reqTime, boolean fragment, String description,
             boolean deferredValue, boolean deferredMethod,
             String expectedTypeName, String methodSignature) {
-        this(name, required, type, reqTime, fragment);
+        this.name = name;
+        this.required = required;
+        this.type = type;
+        this.reqTime = reqTime;
+        this.fragment = fragment;
         this.description = description;
         this.deferredValue = deferredValue;
         this.deferredMethod = deferredMethod;
@@ -188,31 +188,31 @@ public class TagAttributeInfo {
     /*
      * private fields
      */
-    private String name;
+    private final String name;
 
-    private String type;
+    private final String type;
 
-    private boolean reqTime;
+    private final boolean reqTime;
 
-    private boolean required;
+    private final boolean required;
 
     /*
      * private fields for JSP 2.0
      */
-    private boolean fragment;
+    private final boolean fragment;
 
     /*
      * private fields for JSP 2.1
      */
-    private String description;
+    private final String description;
 
-    private boolean deferredValue;
+    private final boolean deferredValue;
 
-    private boolean deferredMethod;
+    private final boolean deferredMethod;
 
-    private String expectedTypeName;
+    private final String expectedTypeName;
 
-    private String methodSignature;
+    private final String methodSignature;
 
     public boolean isDeferredMethod() {
         return deferredMethod;

@@ -80,7 +80,7 @@ public class TagFileInfo {
     }
 
     // private fields for 2.0 info
-    private String name;
-    private String path;
-    private TagInfo tagInfo;
+    private final String name;
+    private final String path;
+    private final TagInfo tagInfo;
 }
