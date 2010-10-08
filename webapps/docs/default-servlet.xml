@@ -54,7 +54,7 @@ By default here is it's declaration:
         &lt;/init-param&gt;
         &lt;init-param&gt;
             &lt;param-name&gt;listings&lt;/param-name&gt;
-            &lt;param-value&gt;true&lt;/param-value&gt;
+            &lt;param-value&gt;false&lt;/param-value&gt;
         &lt;/init-param&gt;
         &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
     &lt;/servlet&gt;
@@ -69,7 +69,7 @@ By default here is it's declaration:
 </source>
 
 So by default, the default servlet is loaded at webapp startup and
-directory listings are enabled and debugging is turned off.
+directory listings are disabled and debugging is turned off.
 </section>
 
 <section anchor="change" name="What can I change?">
@@ -81,7 +81,7 @@ The DefaultServlet allows the following initParamters:
     <td valign='top'>
         Debugging level. It is not very useful unless you are a tomcat
         developer. As
-        of this writing, useful values are 0, 1, 11, 1000.
+        of this writing, useful values are 0, 1, 11, 1000. [0]
     </td>
   </tr>
   <tr>
@@ -89,7 +89,7 @@ The DefaultServlet allows the following initParamters:
     <td valign='top'>
         If no welcome file is present, can a directory listing be
         shown?
-        value may be <b>true</b> or <b>false</b>
+        value may be <b>true</b> or <b>false</b> [false]
         <br />
         Welcome files are part of the servlet api.
         <br />
@@ -103,7 +103,7 @@ The DefaultServlet allows the following initParamters:
     <td valign='top'>
         If a directory listing is presented, a readme file may also
         be presented with the listing. This file is inserted as is
-        so it may contain HTML. default value is null
+        so it may contain HTML.
     </td>
   </tr>
   <tr>
