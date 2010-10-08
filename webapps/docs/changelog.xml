@@ -85,6 +85,10 @@
         <bug>49987</bug>: Fix thread safety issue with population of servlet
         context initialization parameters. (markt)
       </fix>
+      <fix>
+        <bug>49994</bug>: As per the Java EE 6 specification, return a new
+        object instance for each JNDI look up of a resource reference. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
