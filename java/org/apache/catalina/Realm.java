@@ -158,10 +158,11 @@ public interface Realm {
      * security role, within the context of this Realm; otherwise return
      * <code>false</code>.
      *
+     * @param wrapper wrapper context for evaluating role
      * @param principal Principal for whom the role is to be checked
      * @param role Security role to be checked
      */
-    public boolean hasRole(Principal principal, String role);
+    public boolean hasRole(Wrapper wrapper, Principal principal, String role);
 
         /**
      * Enforce any user data constraint required by the security constraint

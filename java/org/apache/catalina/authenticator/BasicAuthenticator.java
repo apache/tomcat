@@ -177,4 +177,8 @@ public class BasicAuthenticator
     }
 
 
+    @Override
+    protected String getAuthMethod() {
+        return Constants.BASIC_METHOD;
+    }
 }

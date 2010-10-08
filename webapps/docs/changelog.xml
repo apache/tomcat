@@ -94,6 +94,11 @@
         make extensions, such as JACC implementations, simpler. Patch provided
         by David Jencks. (markt) 
       </fix>
+      <fix>
+        <bug>50016</bug>: Re-factor <code>isUserInRole()</code> and
+        <code>login()/logout()</code> methods to support JACC implementations
+        and to improve encapsulation. Patch provided by David Jencks. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
