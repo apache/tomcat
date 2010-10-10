@@ -565,6 +565,10 @@ class TagFileProcessor {
                             .getServletContext(), ctxt.getOptions(),
                             tagFilePath, tagInfo, ctxt.getRuntimeContext(),
                             ctxt.getTagFileJarResource(tagFilePath));
+                    // Use same classloader and classpath for compiling tag files
+                    tempWrapper.getJspEngineContext().setClassLoader(
+                            ctxt.getClassLoader());
+                    tempWrapper.getJspEngineContext().setClassPath(ctxt.getClassPath());
                     tagClazz = tempWrapper.loadTagFilePrototype();
                     tempVector.add(tempWrapper.getJspEngineContext()
                             .getCompiler());
