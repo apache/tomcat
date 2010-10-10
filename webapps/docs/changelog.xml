@@ -111,6 +111,11 @@
         <bug>50059</bug>: JARs should always be searched for static resources
         even if the web application is marked as meta-data complete. (markt)
       </fix>
+      <fix>
+        <bug>500063</bug>: Correct regression in fix for <bug>50059</bug> that
+        causes applications marked as meta-data complete to return 404s for all
+        requests. Patch provided by heyoulin. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
