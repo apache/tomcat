@@ -201,7 +201,7 @@ public class TldLocationsCache {
             initialized = true;
         } catch (Exception ex) {
             throw new JasperException(Localizer.getMessage(
-                    "jsp.error.internal.tldinit", ex.getMessage()));
+                    "jsp.error.internal.tldinit", ex.getMessage()), ex);
         }
     }
 
@@ -233,7 +233,10 @@ public class TldLocationsCache {
         WebXml webXml = null;
         try {
             webXml = new WebXml(ctxt);
-            
+            if (webXml.getInputSource() == null) {
+                return;
+            }
+
             // Parse the web application deployment descriptor
             TreeNode webtld = null;
             webtld = new ParserUtils().parseXMLDocument(webXml.getSystemId(),

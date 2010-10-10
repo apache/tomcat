@@ -152,6 +152,10 @@
         Correctly handle the setting of primitve bean values via expression
         language. (markt)
       </fix>
+      <fix>
+        Don&apos;t swallow exceptions when processing TLD files and handle the
+        case when there is no web.xml file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
