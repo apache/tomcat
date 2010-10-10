@@ -156,6 +156,10 @@
         Don&apos;t swallow exceptions when processing TLD files and handle the
         case when there is no web.xml file. (markt)
       </fix>
+      <fix>
+        <bug>50066</bug>: Fix building of recursive tag files when the file
+        depends on a JAR file. Patch provided by Sylvain Laurent. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
