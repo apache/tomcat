@@ -1281,6 +1281,7 @@ public class ContextConfig
                     }
                 }
             } else {
+                webXml.configureContext(context);
                 ok = true;
             }
             
