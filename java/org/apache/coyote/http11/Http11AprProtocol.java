@@ -355,8 +355,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
                 SocketState state = processor.process(socket);
                 if (state == SocketState.LONG) {
-                    // Check if the post processing is going to change the state
-                    state = processor.asyncPostProcess();
+                    if (processor.isAsync()) {
+                        // Check if the post processing is going to change the state
+                        state = processor.asyncPostProcess();
+                    }
                 }
                 if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
                     // Need to make socket available for next processing cycle
