@@ -647,7 +647,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
             //notify poller if not on a tomcat thread
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
-                socket.getPoller().cometInterest(socket);
+                socket.getPoller().add(socket);
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             if (param==null) return;
             if (socket==null || socket.getAttachment(false)==null) return;

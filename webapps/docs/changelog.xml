@@ -134,9 +134,8 @@
         (kfujino) 
       </fix>
       <fix>
-        <bug>50044</bug>: Fix issue in APR/native connector when using comet
-        where socket remained in long poll after the comet request has ended.
-        (markt) 
+        <bug>50044</bug>: Fix issue when using comet where socket remained in
+        long poll after the comet request has ended. (markt) 
       </fix>
       <fix>
         <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
