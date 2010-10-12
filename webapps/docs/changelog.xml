@@ -208,7 +208,7 @@
       <fix>
         <bug>49209</bug>: Prevent possible AccessControlException during
         undeployment when running with a security manager. Patch provided by
-        Sylvain Laurent.
+        Sylvain Laurent. (markt)
       </fix>
       <fix>
         <bug>49657</bug>: Handle CGI executables with spaces in the path.
