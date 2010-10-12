@@ -330,6 +330,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     } finally {
                         if (state != SocketState.LONG) {
                             connections.remove(socket);
+                            socket.setAsync(false);
                             recycledProcessors.offer(processor);
                             if (state == SocketState.OPEN) {
                                 ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
@@ -364,6 +365,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     // Need to make socket available for next processing cycle
                     // but no need for the poller
                     connections.put(socket, processor);
+                    socket.setAsync(true);
                 } else {
                     recycledProcessors.offer(processor);
                 }
@@ -418,6 +420,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     }
                     if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
                         connections.remove(socket);
+                        socket.setAsync(false);
                         recycledProcessors.offer(result);
                         if (state == SocketState.OPEN) {
                             ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
