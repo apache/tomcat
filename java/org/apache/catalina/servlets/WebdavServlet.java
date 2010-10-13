@@ -2787,6 +2787,7 @@ public class WebdavServlet
             context = theContext;
         }
      
+        @Override
         public InputSource resolveEntity (String publicId, String systemId) {
             context.log(sm.getString("webdavservlet.enternalEntityIgnored",
                     publicId, systemId));
