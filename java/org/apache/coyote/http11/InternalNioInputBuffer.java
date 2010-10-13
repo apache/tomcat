@@ -262,7 +262,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
                 }
                 pos++;
             }
-            parsingRequestLineStart = pos;
             parsingRequestLinePhase = 3;
         }
         if ( parsingRequestLinePhase == 3 ) {
@@ -280,13 +279,17 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
                     space = false;
                 }
             }
-
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 4;
+        }
+        if (parsingRequestLinePhase == 4) {
             // Mark the current buffer position
             
             int end = 0;
             //
             // Reading the URI
             //
+            boolean space = false;
             while (!space) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
@@ -316,10 +319,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
             } else {
                 request.requestURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
             }
-            parsingRequestLineStart = pos;
-            parsingRequestLinePhase = 4;
+            parsingRequestLinePhase = 5;
         }
-        if ( parsingRequestLinePhase == 4 ) {
+        if ( parsingRequestLinePhase == 5 ) {
             // Spec says single SP but also be tolerant of multiple and/or HT
             boolean space = true;
             while (space) {
@@ -334,7 +336,10 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
                     space = false;
                 }
             }
-
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 6;
+        }
+        if (parsingRequestLinePhase == 6) { 
             // Mark the current buffer position
             
             end = 0;
