@@ -395,8 +395,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    socket.getPoller().add(socket);
                     release(socket);
+                    socket.getPoller().add(socket);
                 } else {
                     // Connection closed. OK to recycle the processor.
                     release(socket);
