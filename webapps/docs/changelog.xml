@@ -146,6 +146,11 @@
         <bug>50054</bug>: Correctly handle the setting of minSpareThreads in 
         AJP connector. (kfujino) 
       </fix>
+      <fix>
+        Fix issues when using a non-blocking read for the request line with the
+        NIO connector that could result in the request line being mis-read.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
