@@ -33,7 +33,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2210,7 +2209,7 @@ public class ContextConfig
             fragment.addFilterMapping(filterMap);
         }
         if (urlPatternsSet || dispatchTypesSet) {
-            Collection<FilterMap> fmap = fragment.getFilterMappings().values();
+            Set<FilterMap> fmap = fragment.getFilterMappings();
             FilterMap descMap = null;
             for (FilterMap map : fmap) {
                 if (filterName.equals(map.getFilterName())) {

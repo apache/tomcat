@@ -126,23 +126,43 @@ public class TestStandardContext extends TomcatBaseTest {
         tomcat.addWebapp("", root.getAbsolutePath());
         
         tomcat.start();
+        ByteChunk result;
 
-        // Check path mapping works
-        ByteChunk result = getUrl("http://localhost:" + getPort() +
-        "/bug49922/foo");
-        // Filter should only have been called once
-        assertEquals("Filter", result.toString());
+        // Check filter and servlet aren't called
+        result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/foo");
+        assertNull(result.toString());
 
         // Check extension mapping works
-        result = getUrl("http://localhost:" + getPort() +
-        "/foo.do");
-        // Filter should only have been called once
-        assertEquals("Filter", result.toString());
+        result = getUrl("http://localhost:" + getPort() + "/foo.do");
+        assertEquals("FilterServlet", result.toString());
 
+        // Check path mapping works
+        result = getUrl("http://localhost:" + getPort() + "/bug49922/servlet");
+        assertEquals("FilterServlet", result.toString());
+
+        // Check servlet name mapping works
+        result = getUrl("http://localhost:" + getPort() + "/foo.od");
+        assertEquals("FilterServlet", result.toString());
+
+        // Check filter is only called once
         result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/index.do");
-        // Filter should only have been called once
-        assertEquals("Filter", result.toString());
+                "/bug49922/servlet/foo.do");
+        assertEquals("FilterServlet", result.toString());
+        result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/servlet/foo.od");
+        assertEquals("FilterServlet", result.toString());
+
+        // Check dispatcher mapping
+        result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/target");
+        assertEquals("Target", result.toString());
+        result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/forward");
+        assertEquals("FilterTarget", result.toString());
+        result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/include");
+        assertEquals("IncludeFilterTarget", result.toString());
     }
 
     
@@ -167,6 +187,45 @@ public class TestStandardContext extends TomcatBaseTest {
         }
     }
     
+    public static final class Bug49922ForwardServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            req.getRequestDispatcher("/bug49922/target").forward(req, resp);
+        }
+        
+    }
+
+    public static final class Bug49922IncludeServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().print("Include");
+            req.getRequestDispatcher("/bug49922/target").include(req, resp);
+        }
+        
+    }
+
+    public static final class Bug49922TargetServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().print("Target");
+        }
+        
+    }
+
     public static final class Bug49922Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -174,7 +233,8 @@ public class TestStandardContext extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            // NOOP
+            resp.setContentType("text/plain");
+            resp.getWriter().print("Servlet");
         }
         
     }

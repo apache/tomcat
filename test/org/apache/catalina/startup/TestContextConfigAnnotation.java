@@ -18,7 +18,7 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collection;
+import java.util.Set;
 
 import javax.servlet.DispatcherType;
 
@@ -201,8 +201,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertNotNull(fdef);
         assertEquals(filterDef,fdef);
         assertEquals("tomcat",fdef.getParameterMap().get("message"));
-        Collection<FilterMap> filterMappings =
-            webxml.getFilterMappings().values();
+        Set<FilterMap> filterMappings = webxml.getFilterMappings();
         assertTrue(filterMappings.contains(filterMap));
         // annotation mapping not added s. Servlet Spec 3.0 (Nov 2009)
         // 8.2.3.3.vi page 81
