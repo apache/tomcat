@@ -525,6 +525,11 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      */
     void addFilter(ApplicationFilterConfig filterConfig) {
 
+        // Prevent the same filter being added multiple times
+        for(ApplicationFilterConfig filter:filters)
+            if(filter==filterConfig)
+                return;
+
         if (n == filters.length) {
             ApplicationFilterConfig[] newFilters =
                 new ApplicationFilterConfig[n + INCREMENT];
