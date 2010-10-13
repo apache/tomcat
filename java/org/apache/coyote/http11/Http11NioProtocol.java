@@ -396,10 +396,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
                     socket.getPoller().add(socket);
-                    recycledProcessors.offer(processor);
+                    release(socket);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    recycledProcessors.offer(processor);
+                    release(socket);
                 }
                 return state;
 
