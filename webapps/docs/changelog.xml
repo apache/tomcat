@@ -127,7 +127,7 @@
       </fix>
       <fix>
         <bug>49972</bug>: Fix potential thread safe issue when formatting dates
-        for us in HTTP headers. (markt)
+        for use in HTTP headers. (markt)
       </fix>
       <fix>
         <bug>50003</bug>: Set not maxThreads but minSpareThreads to
