@@ -80,6 +80,18 @@
       <code>false</code> will be used.</p>
     </property>
 
+    <property name="org.apache.el.BeanELResolver.CACHE_SIZE">
+      <p>The number of javax.el.BeanELResolver.BeanProperties objects that will
+      be cached by the EL Parser. If not specified, the default of
+      <code>1000</code> will be used.</p>
+    </property>
+
+    <property name="org.apache.el.ExpressionBuilder.CACHE_SIZE">
+      <p>The number of parsed EL expressions that will be cached by the EL
+      Parser. If not specified, the default of <code>5000</code> will be used.
+      </p>
+    </property>
+
   </properties>
 </section>
 

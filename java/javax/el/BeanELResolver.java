@@ -26,6 +26,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,10 +37,31 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BeanELResolver extends ELResolver {
 
+    private static final int CACHE_SIZE;
+    private static final String CACHE_SIZE_PROP =
+        "org.apache.el.BeanELResolver.CACHE_SIZE";
+
+    static {
+        if (System.getSecurityManager() == null) {
+            CACHE_SIZE = Integer.parseInt(
+                    System.getProperty(CACHE_SIZE_PROP, "1000"));
+        } else {
+            CACHE_SIZE = AccessController.doPrivileged(
+                    new PrivilegedAction<Integer>() {
+
+                    @Override
+                    public Integer run() {
+                        return Integer.valueOf(
+                                System.getProperty(CACHE_SIZE_PROP, "1000"));
+                    }
+                }).intValue();
+        }
+    }
+
     private final boolean readOnly;
 
     private final ConcurrentCache<String, BeanProperties> cache =
-        new ConcurrentCache<String, BeanProperties>(1000);
+        new ConcurrentCache<String, BeanProperties>(CACHE_SIZE);
 
     public BeanELResolver() {
         this.readOnly = false;
