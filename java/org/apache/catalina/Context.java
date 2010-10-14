@@ -1227,7 +1227,7 @@ public interface Context extends Container {
 
     /**
      * Notification that servlet security has been dynamically set in a
-     * {@Link ServletRegistration.Dynamic}
+     * {@link ServletRegistration.Dynamic}
      * @param registration servlet security was modified for
      * @param servletSecurityElement new security constraints for this servlet
      * @return urls currently mapped to this registration that are already
