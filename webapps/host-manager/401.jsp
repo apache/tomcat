@@ -54,9 +54,20 @@
     the functionality you wish to access.
    </p>
     <ul>
-      <li><tt>admin</tt> - allows access to the HTML GUI</li>
+      <li><tt>admin-gui</tt> - allows access to the HTML GUI</li>
       <li><tt>admin-script</tt> - allows access to the text interface</li>
     </ul>
+   <p>
+    The HTML interface is protected against CSRF but the text interface is not.
+    To maintain the CSRF protection:
+   </p>
+   <ul>
+    <li>users with the <tt>admin-gui</tt> role should not be granted the
+       <tt>manager-script</tt> role.</li>
+    <li>if the text interface is accessed through a browser (e.g. for testing
+        since this interfaces is intended for tools not humans) then the browser
+        must be closed afterwards to terminate the session.</li>
+   </ul>
  </body>
 
 </html>
