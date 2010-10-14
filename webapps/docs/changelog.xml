@@ -178,6 +178,13 @@
         <bug>50066</bug>: Fix building of recursive tag files when the file
         depends on a JAR file. Patch provided by Sylvain Laurent. (markt)
       </fix>
+      <fix>
+        <bug>50078</bug>: Fix threading problem in EL caches. Patch provided by
+        Takayoshi Kimura. (markt)
+      </fix>
+      <add>
+        Make EL cache sizes configurable. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
