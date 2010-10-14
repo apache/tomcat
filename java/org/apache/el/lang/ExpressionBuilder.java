@@ -19,6 +19,8 @@ package org.apache.el.lang;
 
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -49,8 +51,29 @@ import org.apache.el.util.MessageFactory;
  */
 public final class ExpressionBuilder implements NodeVisitor {
 
+    private static final int CACHE_SIZE;
+    private static final String CACHE_SIZE_PROP =
+        "org.apache.el.ExpressionBuilder.CACHE_SIZE";
+
+    static {
+        if (System.getSecurityManager() == null) {
+            CACHE_SIZE = Integer.parseInt(
+                    System.getProperty(CACHE_SIZE_PROP, "5000"));
+        } else {
+            CACHE_SIZE = AccessController.doPrivileged(
+                    new PrivilegedAction<Integer>() {
+
+                    @Override
+                    public Integer run() {
+                        return Integer.valueOf(
+                                System.getProperty(CACHE_SIZE_PROP, "5000"));
+                    }
+                }).intValue();
+        }
+    }
+
     private static final ConcurrentCache<String, Node> cache =
-        new ConcurrentCache<String, Node>(5000);
+        new ConcurrentCache<String, Node>(CACHE_SIZE);
 
     private FunctionMapper fnMapper;
 
