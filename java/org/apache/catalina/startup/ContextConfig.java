@@ -1958,6 +1958,10 @@ public class ContextConfig
             log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
             return;
+        } catch (ClassFormatError e) {
+            log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
+                    className), e);
+            return;
         }
 
         if (clazz.isAnnotation()) {
