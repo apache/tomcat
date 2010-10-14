@@ -334,7 +334,9 @@ public class BeanELResolver extends ELResolver {
         public V get(K key) {
             V value = this.eden.get(key);
             if (value == null) {
-                value = this.longterm.get(key);
+                synchronized (longterm) {
+                    value = this.longterm.get(key);
+                }
                 if (value != null) {
                     this.eden.put(key, value);
                 }
@@ -344,7 +346,9 @@ public class BeanELResolver extends ELResolver {
         
         public void put(K key, V value) {
             if (this.eden.size() >= this.size) {
-                this.longterm.putAll(this.eden);
+                synchronized (longterm) {
+                    this.longterm.putAll(this.eden);
+                }
                 this.eden.clear();
             }
             this.eden.put(key, value);
