@@ -4061,7 +4061,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * hook to register that we need to scan for security annotations.
-     * @param registration
+     * @param wrapper   The wrapper for the Servlet that was added
      */
     public ServletRegistration.Dynamic dynamicServletAdded(Wrapper wrapper) {
         return new ApplicationServletRegistration(wrapper, this);
