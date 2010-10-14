@@ -687,7 +687,7 @@ public class CoyoteAdapter implements Adapter {
             log.debug(sm.getString("coyoteAdapter.debug", "uriBC",
                     uriBC.toString()));
             log.debug(sm.getString("coyoteAdapter.debug", "semicolon",
-                    Integer.valueOf(semicolon)));
+                    String.valueOf(semicolon)));
             log.debug(sm.getString("coyoteAdapter.debug", "enc", enc));
         }
 
@@ -739,9 +739,9 @@ public class CoyoteAdapter implements Adapter {
             
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("coyoteAdapter.debug", "pathParamStart",
-                        Integer.valueOf(pathParamStart)));
+                        String.valueOf(pathParamStart)));
                 log.debug(sm.getString("coyoteAdapter.debug", "pathParamEnd",
-                        Integer.valueOf(pathParamEnd)));
+                        String.valueOf(pathParamEnd)));
                 log.debug(sm.getString("coyoteAdapter.debug", "pv", pv));
             }
 
@@ -753,7 +753,7 @@ public class CoyoteAdapter implements Adapter {
                     request.addPathParameter(name, value);
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("coyoteAdapter.debug", "equals",
-                                Integer.valueOf(equals)));
+                                String.valueOf(equals)));
                         log.debug(sm.getString("coyoteAdapter.debug", "name",
                                 name));
                         log.debug(sm.getString("coyoteAdapter.debug", "value",
