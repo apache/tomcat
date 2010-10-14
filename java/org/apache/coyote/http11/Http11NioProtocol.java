@@ -330,8 +330,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         state = processor.asyncPostProcess();
                     }
                     if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
-                        connections.remove(socket);
-                        recycledProcessors.offer(processor);
+                        release(socket);
                         if (state == SocketState.OPEN) {
                             socket.getPoller().add(socket);
                         }
@@ -422,6 +421,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("http11protocol.proto.error"), e);
             }
+            connections.remove(socket);
+            processor.recycle();
             recycledProcessors.offer(processor);
             return SocketState.CLOSED;
         }
