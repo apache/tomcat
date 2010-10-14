@@ -121,6 +121,10 @@
         causes applications marked as meta-data complete to return 404s for all
         requests. Patch provided by heyoulin. (markt)
       </fix>
+      <fix>
+        <bug>50087</bug>: Catch ClassFormatErrors when scanning for annotations.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
