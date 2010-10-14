@@ -37,7 +37,9 @@ public final class ConcurrentCache<K,V> {
     public V get(K k) {
         V v = this.eden.get(k);
         if (v == null) {
-            v = this.longterm.get(k);
+            synchronized (longterm) {
+                v = this.longterm.get(k);
+            }
             if (v != null) {
                 this.eden.put(k, v);
             }
@@ -47,7 +49,9 @@ public final class ConcurrentCache<K,V> {
 
     public void put(K k, V v) {
         if (this.eden.size() >= size) {
-            this.longterm.putAll(this.eden);
+            synchronized (longterm) {
+                this.longterm.putAll(this.eden);
+            }
             this.eden.clear();
         }
         this.eden.put(k, v);
