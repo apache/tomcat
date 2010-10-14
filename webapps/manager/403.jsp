@@ -78,6 +78,17 @@
       <li><tt>manager-status</tt> - allows access to the status pages only</li>
     </ul>
    <p>
+    The HTML interface is protected against CSRF but the text and JMX interfaces
+    are not. To maintain the CSRF protection:
+   </p>
+   <ul>
+    <li>users with the <tt>manager-gui</tt> role should not be granted either
+        the <tt>manager-script</tt> or <tt>manager-jmx</tt> roles.</li>
+    <li>if the text or jmx interfaces are accessed through a browser (e.g. for
+         testing since these interfaces are intended for tools not humans) then
+         the browser must be closed afterwards to terminate the session.</li>
+   </ul>
+   <p>
     For more information - please see the
     <a href="/docs/manager-howto.html">Manager App HOW-TO</a>.
    </p>
