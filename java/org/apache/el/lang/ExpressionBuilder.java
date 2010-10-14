@@ -49,7 +49,8 @@ import org.apache.el.util.MessageFactory;
  */
 public final class ExpressionBuilder implements NodeVisitor {
 
-    private static final ConcurrentCache<String, Node> cache = new ConcurrentCache<String, Node>(5000);
+    private static final ConcurrentCache<String, Node> cache =
+        new ConcurrentCache<String, Node>(5000);
 
     private FunctionMapper fnMapper;
 
