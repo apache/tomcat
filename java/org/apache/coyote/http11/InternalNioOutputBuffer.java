@@ -144,8 +144,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     @Override
     public void recycle() {
         super.recycle();
-        socket.getBufHandler().getWriteBuffer().clear();
-        socket = null;
+        if (socket != null) {
+            socket.getBufHandler().getWriteBuffer().clear();
+            socket = null;
+        }
         lastWrite.set(1);
     }
 
