@@ -38,7 +38,7 @@
   <!-- The default servlet for all web applications, that serves static     -->
   <!-- resources.  It processes all requests that are not mapped to other   -->
   <!-- servlets with servlet mappings (defined either here or in your own   -->
-  <!-- web.xml file.  This servlet supports the following initialization    -->
+  <!-- web.xml file).  This servlet supports the following initialization   -->
   <!-- parameters (default values are in square brackets):                  -->
   <!--                                                                      -->
   <!--   debug               Debugging detail level for messages logged     -->
@@ -63,7 +63,7 @@
   <!--                       commands like PUT and DELETE are               -->
   <!--                       rejected?  [true]                              -->
   <!--                                                                      -->
-  <!--   readmeFile          File name to display with the directory        -->
+  <!--   readmeFile          File to display together with the directory    -->
   <!--                       contents. [null]                               -->
   <!--                                                                      -->
   <!--   sendfileSize        If the connector used supports sendfile, this  -->
@@ -221,7 +221,7 @@
   <!--                       actions or directives be trimmed?  [false]     -->
   <!--                                                                      -->
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
-  <!--                       header is added by generated servlet  [false]  -->
+  <!--                       header is added by generated servlet.  [false] -->
 
     <servlet>
         <servlet-name>jsp</servlet-name>
@@ -357,7 +357,7 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-    <!-- The mapping for the JSP servlet -->
+    <!-- The mappings for the JSP servlet -->
     <servlet-mapping>
         <servlet-name>jsp</servlet-name>
         <url-pattern>*.jsp</url-pattern>
@@ -1190,15 +1190,17 @@
 
   <!-- ==================== Default Welcome File List ===================== -->
   <!-- When a request URI refers to a directory, the default servlet looks  -->
-  <!-- for a "welcome file" within that directory and, if present,          -->
-  <!-- to the corresponding resource URI for display.  If no welcome file   -->
-  <!-- is present, the default servlet either serves a directory listing,   -->
-  <!-- or returns a 404 status, depending on how it is configured.          -->
+  <!-- for a "welcome file" within that directory and, if present, to the   -->
+  <!-- corresponding resource URI for display.                              -->
+  <!-- If none welcome file are present, the default servlet either serves  -->
+  <!-- a directory listing (see default servlet configuration on how to     -->
+  <!-- customize) or returns a 404 status, depending on the value of the    -->
+  <!-- listings setting.                                                    -->
   <!--                                                                      -->
   <!-- If you define welcome files in your own application's web.xml        -->
   <!-- deployment descriptor, that list *replaces* the list configured      -->
-  <!-- here, so be sure that you include any of the default values that     -->
-  <!-- you wish to include.                                                 -->
+  <!-- here, so be sure to include any of the default values that you wish  -->
+  <!-- use within your application.                                         -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
