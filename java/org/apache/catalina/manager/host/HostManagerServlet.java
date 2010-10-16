@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.management.MBeanServer;
@@ -210,6 +212,8 @@ public class HostManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
+        StringManager smClient = getStringManager(request);
+
         // Identify the request parameters that we need
         String command = request.getPathInfo();
         if (command == null)
@@ -224,15 +228,15 @@ public class HostManagerServlet
         if (command == null) {
             writer.println(sm.getString("hostManagerServlet.noCommand"));
         } else if (command.equals("/add")) {
-            add(request, writer, name, false);
+            add(request, writer, name, false, smClient);
         } else if (command.equals("/remove")) {
-            remove(writer, name);
+            remove(writer, name, smClient);
         } else if (command.equals("/list")) {
-            list(writer);
+            list(writer, smClient);
         } else if (command.equals("/start")) {
-            start(writer, name);
+            start(writer, name, smClient);
         } else if (command.equals("/stop")) {
-            stop(writer, name);
+            stop(writer, name, smClient);
         } else {
             writer.println(sm.getString("hostManagerServlet.unknownCommand",
                                         command));
@@ -253,7 +257,8 @@ public class HostManagerServlet
      * @param name The host name
      * @param htmlMode Flag value
      */
-    protected void add(HttpServletRequest request, PrintWriter writer, String name, boolean htmlMode ) {
+    protected void add(HttpServletRequest request, PrintWriter writer,
+            String name, boolean htmlMode, StringManager smClient) {
         String aliases = request.getParameter("aliases");
         String appBase = request.getParameter("appBase");
         boolean manager = booleanParameter(request, "manager", false, htmlMode);
@@ -265,7 +270,8 @@ public class HostManagerServlet
             autoDeploy,
             deployOnStartup,
             deployXML,                                       
-            unpackWARs);
+            unpackWARs,
+            smClient);
     }
 
 
@@ -340,21 +346,23 @@ public class HostManagerServlet
          boolean autoDeploy,
          boolean deployOnStartup,
          boolean deployXML,                                       
-         boolean unpackWARs) {
+         boolean unpackWARs,
+         StringManager smClient) {
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.add", name));
         }
 
         // Validate the requested host name
         if ((name == null) || name.length() == 0) {
-            writer.println(sm.getString("hostManagerServlet.invalidHostName", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.invalidHostName", name));
             return;
         }
 
         // Check if host already exists
         if (engine.findChild(name) != null) {
-            writer.println
-                (sm.getString("hostManagerServlet.alreadyHost", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.alreadyHost", name));
             return;
         }
 
@@ -375,7 +383,7 @@ public class HostManagerServlet
         }
         if (!appBaseFile.exists()) {
             if (!appBaseFile.mkdirs()) {
-                writer.println(sm.getString(
+                writer.println(smClient.getString(
                         "hostManagerServlet.appBaseCreateFail",
                         appBaseFile.toString(), name));
                 return;
@@ -388,7 +396,7 @@ public class HostManagerServlet
         // Copy manager.xml if requested
         if (manager) {
             if (configBaseFile == null) {
-                writer.println(sm.getString(
+                writer.println(smClient.getString(
                         "hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
@@ -406,8 +414,8 @@ public class HostManagerServlet
                     os.write(buffer, 0, len);
                 }
             } catch (IOException e) {
-                writer.println
-                    (sm.getString("hostManagerServlet.managerXml"));
+                writer.println(smClient.getString(
+                        "hostManagerServlet.managerXml"));
                 return;
             } finally {
                 if (is != null) {
@@ -449,17 +457,18 @@ public class HostManagerServlet
         try {
             engine.addChild(host);
         } catch (Exception e) {
-            writer.println(sm.getString("hostManagerServlet.exception",
-                                        e.toString()));
+            writer.println(smClient.getString("hostManagerServlet.exception",
+                    e.toString()));
             return;
         }
         
         host = (StandardHost) engine.findChild(name);
         if (host != null) {
-            writer.println(sm.getString("hostManagerServlet.add", name));
+            writer.println(smClient.getString("hostManagerServlet.add", name));
         } else {
             // Something failed
-            writer.println(sm.getString("hostManagerServlet.addFailed", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.addFailed", name));
         }
         
     }
@@ -471,7 +480,8 @@ public class HostManagerServlet
      * @param writer Writer to render results to
      * @param name host name
      */
-    protected synchronized void remove(PrintWriter writer, String name) {
+    protected synchronized void remove(PrintWriter writer, String name,
+            StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.remove", name));
@@ -479,21 +489,22 @@ public class HostManagerServlet
 
         // Validate the requested host name
         if ((name == null) || name.length() == 0) {
-            writer.println(sm.getString("hostManagerServlet.invalidHostName", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.invalidHostName", name));
             return;
         }
 
         // Check if host exists
         if (engine.findChild(name) == null) {
-            writer.println
-                (sm.getString("hostManagerServlet.noHost", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent removing our own host
         if (engine.findChild(name) == installedHost) {
-            writer.println
-                (sm.getString("hostManagerServlet.cannotRemoveOwnHost", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.cannotRemoveOwnHost", name));
             return;
         }
 
@@ -504,17 +515,19 @@ public class HostManagerServlet
             engine.removeChild(child);
             if ( child instanceof ContainerBase ) ((ContainerBase)child).destroy();
         } catch (Exception e) {
-            writer.println(sm.getString("hostManagerServlet.exception",
-                                        e.toString()));
+            writer.println(smClient.getString("hostManagerServlet.exception",
+                    e.toString()));
             return;
         }
         
         Host host = (StandardHost) engine.findChild(name);
         if (host == null) {
-            writer.println(sm.getString("hostManagerServlet.remove", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.remove", name));
         } else {
             // Something failed
-            writer.println(sm.getString("hostManagerServlet.removeFailed", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.removeFailed", name));
         }
         
     }
@@ -525,14 +538,14 @@ public class HostManagerServlet
      *
      * @param writer Writer to render to
      */
-    protected void list(PrintWriter writer) {
+    protected void list(PrintWriter writer, StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.list", engine.getName()));
         }
 
-        writer.println(sm.getString("hostManagerServlet.listed",
-                                    engine.getName()));
+        writer.println(smClient.getString("hostManagerServlet.listed",
+                engine.getName()));
         Container[] hosts = engine.findChildren();
         for (int i = 0; i < hosts.length; i++) {
             Host host = (Host) hosts[i];
@@ -545,7 +558,7 @@ public class HostManagerServlet
                     buf.append(',').append(aliases[j]);
                 }
             }
-            writer.println(sm.getString("hostManagerServlet.listitem",
+            writer.println(smClient.getString("hostManagerServlet.listitem",
                                         name, buf.toString()));
         }
     }
@@ -557,7 +570,8 @@ public class HostManagerServlet
      * @param writer Writer to render to
      * @param name Host name
      */
-    protected void start(PrintWriter writer, String name) {
+    protected void start(PrintWriter writer, String name,
+            StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.start", name));
@@ -565,7 +579,8 @@ public class HostManagerServlet
 
         // Validate the requested host name
         if ((name == null) || name.length() == 0) {
-            writer.println(sm.getString("hostManagerServlet.invalidHostName", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.invalidHostName", name));
             return;
         }
 
@@ -573,37 +588,37 @@ public class HostManagerServlet
         
         // Check if host exists
         if (host == null) {
-            writer.println
-                (sm.getString("hostManagerServlet.noHost", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent starting our own host
         if (host == installedHost) {
-            writer.println
-                (sm.getString("hostManagerServlet.cannotStartOwnHost", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.cannotStartOwnHost", name));
             return;
         }
 
         // Don't start host of already started
         if (host.getState().isAvailable()) {
-            writer.println
-                (sm.getString("hostManagerServlet.alreadyStarted", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.alreadyStarted", name));
             return;
         }
 
         // Start host
         try {
             host.start();
-            writer.println
-                (sm.getString("hostManagerServlet.started", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.started", name));
         } catch (Exception e) {
             getServletContext().log
                 (sm.getString("hostManagerServlet.startFailed", name), e);
-            writer.println
-                (sm.getString("hostManagerServlet.startFailed", name));
-            writer.println(sm.getString("hostManagerServlet.exception",
-                                        e.toString()));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.startFailed", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.exception", e.toString()));
             return;
         }
         
@@ -616,7 +631,8 @@ public class HostManagerServlet
      * @param writer Writer to render to
      * @param name Host name
      */
-    protected void stop(PrintWriter writer, String name) {
+    protected void stop(PrintWriter writer, String name,
+            StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.stop", name));
@@ -624,7 +640,8 @@ public class HostManagerServlet
 
         // Validate the requested host name
         if ((name == null) || name.length() == 0) {
-            writer.println(sm.getString("hostManagerServlet.invalidHostName", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.invalidHostName", name));
             return;
         }
 
@@ -632,37 +649,37 @@ public class HostManagerServlet
 
         // Check if host exists
         if (host == null) {
-            writer.println
-                (sm.getString("hostManagerServlet.noHost", name));
+            writer.println(smClient.getString("hostManagerServlet.noHost",
+                    name));
             return;
         }
 
         // Prevent starting our own host
         if (host == installedHost) {
-            writer.println
-                (sm.getString("hostManagerServlet.cannotStopOwnHost", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.cannotStopOwnHost", name));
             return;
         }
 
         // Don't stop host of already stopped
         if (!host.getState().isAvailable()) {
-            writer.println
-                (sm.getString("hostManagerServlet.alreadyStopped", name));
+            writer.println(smClient.getString(
+                    "hostManagerServlet.alreadyStopped", name));
             return;
         }
 
         // Stop host
         try {
             host.stop();
-            writer.println
-                (sm.getString("hostManagerServlet.stopped", name));
+            writer.println(smClient.getString("hostManagerServlet.stopped",
+                    name));
         } catch (Exception e) {
-            getServletContext().log
-                (sm.getString("hostManagerServlet.stopFailed", name), e);
-            writer.println
-                (sm.getString("hostManagerServlet.stopFailed", name));
-            writer.println(sm.getString("hostManagerServlet.exception",
-                                        e.toString()));
+            getServletContext().log(sm.getString(
+                    "hostManagerServlet.stopFailed", name), e);
+            writer.println(smClient.getString("hostManagerServlet.stopFailed",
+                    name));
+            writer.println(smClient.getString("hostManagerServlet.exception",
+                    e.toString()));
             return;
         }
         
@@ -696,4 +713,17 @@ public class HostManagerServlet
     }
 
 
+    protected StringManager getStringManager(HttpServletRequest req) {
+        Enumeration<Locale> requestedLocales = req.getLocales();
+        while (requestedLocales.hasMoreElements()) {
+            Locale locale = requestedLocales.nextElement();
+            StringManager result = StringManager.getManager(Constants.Package,
+                    locale);
+            if (result.getLocale().equals(locale)) {
+                return result;
+            }
+        }
+        // Return the default
+        return sm;
+    }
 }
