@@ -35,6 +35,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Host;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
 * Servlet that enables remote management of the virtual hosts deployed
@@ -79,6 +80,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                       HttpServletResponse response)
         throws IOException, ServletException {
 
+        StringManager smClient = getStringManager(request);
+
         // Identify the request parameters that we need
         String command = request.getPathInfo();
 
@@ -93,14 +96,14 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
             // Nothing to do - always generate list
         } else if (command.equals("/add") || command.equals("/remove") ||
                 command.equals("/start") || command.equals("/stop")) {
-            message =
-                sm.getString("hostManagerServlet.postCommand", command);
+            message = smClient.getString(
+                    "hostManagerServlet.postCommand", command);
         } else {
-            message =
-                sm.getString("hostManagerServlet.unknownCommand", command);
+            message = smClient.getString(
+                    "hostManagerServlet.unknownCommand", command);
         }
 
-        list(request, response, message);
+        list(request, response, message, smClient);
     }
 
     
@@ -116,7 +119,9 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
+        StringManager smClient = getStringManager(request);
+
         // Identify the request parameters that we need
         String command = request.getPathInfo();
 
@@ -131,19 +136,19 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         if (command == null) {
             // No command == list
         } else if (command.equals("/add")) {
-            message = add(request, name);
+            message = add(request, name, smClient);
         } else if (command.equals("/remove")) {
-            message = remove(name);
+            message = remove(name, smClient);
         } else if (command.equals("/start")) {
-            message = start(name);
+            message = start(name, smClient);
         } else if (command.equals("/stop")) {
-            message = stop(name);
+            message = stop(name, smClient);
         } else {
             //Try GET
             doGet(request, response);
         }
 
-        list(request, response, message);
+        list(request, response, message, smClient);
     }
 
 
@@ -152,12 +157,13 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      *
      * @param name host name
      */
-    protected String add(HttpServletRequest request,String name) {
+    protected String add(HttpServletRequest request,String name,
+            StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.add(request,printWriter,name,true);
+        super.add(request,printWriter,name,true, smClient);
 
         return stringWriter.toString();
     }
@@ -168,12 +174,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      *
      * @param name host name
      */
-    protected String remove(String name) {
+    protected String remove(String name, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.remove(printWriter, name);
+        super.remove(printWriter, name, smClient);
 
         return stringWriter.toString();
     }
@@ -184,12 +190,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      *
      * @param name Host name
      */
-    protected String start(String name) {
+    protected String start(String name, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.start(printWriter, name);
+        super.start(printWriter, name, smClient);
 
         return stringWriter.toString();
     }
@@ -200,12 +206,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      *
      * @param name Host name
      */
-    protected String stop(String name) {
+    protected String stop(String name, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.stop(printWriter, name);
+        super.stop(printWriter, name, smClient);
 
         return stringWriter.toString();
     }
@@ -221,7 +227,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      */
     public void list(HttpServletRequest request,
                      HttpServletResponse response,
-                     String message) throws IOException {
+                     String message,
+                     StringManager smClient) throws IOException {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.list", engine.getName()));
@@ -235,13 +242,13 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Body Header Section
         Object[] args = new Object[2];
         args[0] = request.getContextPath();
-        args[1] = sm.getString("htmlHostManagerServlet.title");
+        args[1] = smClient.getString("htmlHostManagerServlet.title");
         writer.print(MessageFormat.format
                      (Constants.BODY_HEADER_SECTION, args));
 
         // Message Section
         args = new Object[3];
-        args[0] = sm.getString("htmlHostManagerServlet.messageLabel");
+        args[0] = smClient.getString("htmlHostManagerServlet.messageLabel");
         if (message == null || message.length() == 0) {
             args[1] = "OK";
         } else {
@@ -251,26 +258,26 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
         // Manager Section
         args = new Object[9];
-        args[0] = sm.getString("htmlHostManagerServlet.manager");
+        args[0] = smClient.getString("htmlHostManagerServlet.manager");
         args[1] = response.encodeURL(request.getContextPath() + "/html/list");
-        args[2] = sm.getString("htmlHostManagerServlet.list");
+        args[2] = smClient.getString("htmlHostManagerServlet.list");
         args[3] = response.encodeURL
             (request.getContextPath() + "/" +
-             sm.getString("htmlHostManagerServlet.helpHtmlManagerFile"));
-        args[4] = sm.getString("htmlHostManagerServlet.helpHtmlManager");
+             smClient.getString("htmlHostManagerServlet.helpHtmlManagerFile"));
+        args[4] = smClient.getString("htmlHostManagerServlet.helpHtmlManager");
         args[5] = response.encodeURL
             (request.getContextPath() + "/" +
-             sm.getString("htmlHostManagerServlet.helpManagerFile"));
-        args[6] = sm.getString("htmlHostManagerServlet.helpManager");
+             smClient.getString("htmlHostManagerServlet.helpManagerFile"));
+        args[6] = smClient.getString("htmlHostManagerServlet.helpManager");
         args[7] = response.encodeURL("/manager/status");
-        args[8] = sm.getString("statusServlet.title");
+        args[8] = smClient.getString("statusServlet.title");
         writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
 
          // Hosts Header Section
         args = new Object[3];
-        args[0] = sm.getString("htmlHostManagerServlet.hostName");
-        args[1] = sm.getString("htmlHostManagerServlet.hostAliases");
-        args[2] = sm.getString("htmlHostManagerServlet.hostTasks");
+        args[0] = smClient.getString("htmlHostManagerServlet.hostName");
+        args[1] = smClient.getString("htmlHostManagerServlet.hostAliases");
+        args[2] = smClient.getString("htmlHostManagerServlet.hostTasks");
         writer.print(MessageFormat.format(HOSTS_HEADER_SECTION, args));
 
         // Hosts Row Section
@@ -288,9 +295,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
             sortedHostNamesMap.put(displayPath, hostNames[i]);
         }
 
-        String hostsStart = sm.getString("htmlHostManagerServlet.hostsStart");
-        String hostsStop = sm.getString("htmlHostManagerServlet.hostsStop");
-        String hostsRemove = sm.getString("htmlHostManagerServlet.hostsRemove");
+        String hostsStart =
+            smClient.getString("htmlHostManagerServlet.hostsStart");
+        String hostsStop =
+            smClient.getString("htmlHostManagerServlet.hostsStop");
+        String hostsRemove =
+            smClient.getString("htmlHostManagerServlet.hostsRemove");
 
         Iterator<Map.Entry<String,String>> iterator =
             sortedHostNamesMap.entrySet().iterator();
@@ -352,50 +362,51 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
         // Add Section
         args = new Object[6];
-        args[0] = sm.getString("htmlHostManagerServlet.addTitle");
-        args[1] = sm.getString("htmlHostManagerServlet.addHost");
+        args[0] = smClient.getString("htmlHostManagerServlet.addTitle");
+        args[1] = smClient.getString("htmlHostManagerServlet.addHost");
         args[2] = response.encodeURL(request.getContextPath() + "/html/add");
-        args[3] = sm.getString("htmlHostManagerServlet.addName");
-        args[4] = sm.getString("htmlHostManagerServlet.addAliases");
-        args[5] = sm.getString("htmlHostManagerServlet.addAppBase");
+        args[3] = smClient.getString("htmlHostManagerServlet.addName");
+        args[4] = smClient.getString("htmlHostManagerServlet.addAliases");
+        args[5] = smClient.getString("htmlHostManagerServlet.addAppBase");
         writer.print(MessageFormat.format(ADD_SECTION_START, args));
  
         args = new Object[3];
-        args[0] = sm.getString("htmlHostManagerServlet.addAutoDeploy");
+        args[0] = smClient.getString("htmlHostManagerServlet.addAutoDeploy");
         args[1] = "autoDeploy";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        args[0] = sm.getString("htmlHostManagerServlet.addDeployOnStartup");
+        args[0] = smClient.getString(
+                "htmlHostManagerServlet.addDeployOnStartup");
         args[1] = "deployOnStartup";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        args[0] = sm.getString("htmlHostManagerServlet.addDeployXML");
+        args[0] = smClient.getString("htmlHostManagerServlet.addDeployXML");
         args[1] = "deployXML";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        args[0] = sm.getString("htmlHostManagerServlet.addUnpackWARs");
+        args[0] = smClient.getString("htmlHostManagerServlet.addUnpackWARs");
         args[1] = "unpackWARs";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
 
-        args[0] = sm.getString("htmlHostManagerServlet.addManager");
+        args[0] = smClient.getString("htmlHostManagerServlet.addManager");
         args[1] = "manager";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
         
         args = new Object[1];
-        args[0] = sm.getString("htmlHostManagerServlet.addButton");
+        args[0] = smClient.getString("htmlHostManagerServlet.addButton");
         writer.print(MessageFormat.format(ADD_SECTION_END, args));
 
         // Server Header Section
         args = new Object[7];
-        args[0] = sm.getString("htmlHostManagerServlet.serverTitle");
-        args[1] = sm.getString("htmlHostManagerServlet.serverVersion");
-        args[2] = sm.getString("htmlHostManagerServlet.serverJVMVersion");
-        args[3] = sm.getString("htmlHostManagerServlet.serverJVMVendor");
-        args[4] = sm.getString("htmlHostManagerServlet.serverOSName");
-        args[5] = sm.getString("htmlHostManagerServlet.serverOSVersion");
-        args[6] = sm.getString("htmlHostManagerServlet.serverOSArch");
+        args[0] = smClient.getString("htmlHostManagerServlet.serverTitle");
+        args[1] = smClient.getString("htmlHostManagerServlet.serverVersion");
+        args[2] = smClient.getString("htmlHostManagerServlet.serverJVMVersion");
+        args[3] = smClient.getString("htmlHostManagerServlet.serverJVMVendor");
+        args[4] = smClient.getString("htmlHostManagerServlet.serverOSName");
+        args[5] = smClient.getString("htmlHostManagerServlet.serverOSVersion");
+        args[6] = smClient.getString("htmlHostManagerServlet.serverOSArch");
         writer.print(MessageFormat.format
                      (Constants.SERVER_HEADER_SECTION, args));
 
