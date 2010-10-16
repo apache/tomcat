@@ -25,7 +25,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -316,6 +318,8 @@ public class ManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
+        StringManager smClient = getStringManager(request);
+
         // Identify the request parameters that we need
         String command = request.getPathInfo();
         if (command == null)
@@ -337,40 +341,40 @@ public class ManagerServlet
 
         // Process the requested command (note - "/deploy" is not listed here)
         if (command == null) {
-            writer.println(sm.getString("managerServlet.noCommand"));
+            writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
             if (war != null || config != null) {
-                deploy(writer, config, path, war, update);
+                deploy(writer, config, path, war, update, smClient);
             } else {
-                deploy(writer, path, tag);
+                deploy(writer, path, tag, smClient);
             }
         } else if (command.equals("/list")) {
-            list(writer);
+            list(writer, smClient);
         } else if (command.equals("/reload")) {
-            reload(writer, path);
+            reload(writer, path, smClient);
         } else if (command.equals("/resources")) {
-            resources(writer, type);
+            resources(writer, type, smClient);
         } else if (command.equals("/roles")) {
-            roles(writer);
+            roles(writer, smClient);
         } else if (command.equals("/save")) {
-            save(writer, path);
+            save(writer, path, smClient);
         } else if (command.equals("/serverinfo")) {
-            serverinfo(writer);
+            serverinfo(writer, smClient);
         } else if (command.equals("/sessions")) {
-            expireSessions(writer, path, request);
+            expireSessions(writer, path, request, smClient);
         } else if (command.equals("/expire")) {
-            expireSessions(writer, path, request);
+            expireSessions(writer, path, request, smClient);
         } else if (command.equals("/start")) {
-            start(writer, path);
+            start(writer, path, smClient);
         } else if (command.equals("/stop")) {
-            stop(writer, path);
+            stop(writer, path, smClient);
         } else if (command.equals("/undeploy")) {
-            undeploy(writer, path);
+            undeploy(writer, path, smClient);
         } else if (command.equals("/findleaks")) {
-            findleaks(writer);
+            findleaks(writer, smClient);
         } else {
-            writer.println(sm.getString("managerServlet.unknownCommand",
-                                        command));
+            writer.println(smClient.getString("managerServlet.unknownCommand",
+                    command));
         }
 
         // Finish up the response
@@ -394,6 +398,8 @@ public class ManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
+        StringManager smClient = getStringManager(request);
+
         // Identify the request parameters that we need
         String command = request.getPathInfo();
         if (command == null)
@@ -412,12 +418,12 @@ public class ManagerServlet
 
         // Process the requested command
         if (command == null) {
-            writer.println(sm.getString("managerServlet.noCommand"));
+            writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
-            deploy(writer, path, tag, update, request);
+            deploy(writer, path, tag, update, request, smClient);
         } else {
-            writer.println(sm.getString("managerServlet.unknownCommand",
-                                        command));
+            writer.println(smClient.getString("managerServlet.unknownCommand",
+                    command));
         }
 
         // Finish up the response
@@ -435,8 +441,8 @@ public class ManagerServlet
 
         // Ensure that our ContainerServlet properties have been set
         if ((wrapper == null) || (context == null))
-            throw new UnavailableException
-                (sm.getString("managerServlet.noWrapper"));
+            throw new UnavailableException(
+                    sm.getString("managerServlet.noWrapper"));
 
         // Set our properties from the initialization parameters
         String value = null;
@@ -503,10 +509,10 @@ public class ManagerServlet
     /**
      * Find potential memory leaks caused by web application reload.
      */
-    protected void findleaks(PrintWriter writer) {
+    protected void findleaks(PrintWriter writer, StringManager smClient) {
         
         if (!(host instanceof StandardHost)) {
-            writer.println(sm.getString("managerServlet.findleaksFail"));
+            writer.println(smClient.getString("managerServlet.findleaksFail"));
             return;
         }
         
@@ -527,23 +533,25 @@ public class ManagerServlet
      * 
      * @param path Optional context path to save
      */
-    protected synchronized void save(PrintWriter writer, String path) {
+    protected synchronized void save(PrintWriter writer, String path,
+            StringManager smClient) {
 
         Server server = ((Engine)host.getParent()).getService().getServer();
 
         if (!(server instanceof StandardServer)) {
-            writer.println(sm.getString("managerServlet.saveFail", server));
+            writer.println(smClient.getString("managerServlet.saveFail",
+                    server));
             return;
         }
 
         if ((path == null) || path.length() == 0 || !path.startsWith("/")) {
             try {
                 ((StandardServer) server).storeConfig();
-                writer.println(sm.getString("managerServlet.saved"));
+                writer.println(smClient.getString("managerServlet.saved"));
             } catch (Exception e) {
                 log("managerServlet.storeConfig", e);
-                writer.println(sm.getString("managerServlet.exception",
-                                            e.toString()));
+                writer.println(smClient.getString("managerServlet.exception",
+                        e.toString()));
                 return;
             }
         } else {
@@ -553,17 +561,18 @@ public class ManagerServlet
             }
             Context context = (Context) host.findChild(contextPath);
             if (context == null) {
-                writer.println(sm.getString("managerServlet.noContext", path));
+                writer.println(smClient.getString("managerServlet.noContext",
+                        path));
                 return;
             }
             try {
                 ((StandardServer) server).storeContext(context);
-                writer.println(sm.getString("managerServlet.savedContext", 
-                               path));
+                writer.println(smClient.getString("managerServlet.savedContext",
+                        path));
             } catch (Exception e) {
                 log("managerServlet.save[" + path + "]", e);
-                writer.println(sm.getString("managerServlet.exception",
-                                            e.toString()));
+                writer.println(smClient.getString("managerServlet.exception",
+                        e.toString()));
                 return;
             }
         }
@@ -582,7 +591,8 @@ public class ManagerServlet
      */
     protected synchronized void deploy
         (PrintWriter writer, String path,
-         String tag, boolean update, HttpServletRequest request) {
+         String tag, boolean update, HttpServletRequest request,
+         StringManager smClient) {
 
         if (debug >= 1) {
             log("deploy: Deploying web application at '" + path + "'");
@@ -590,7 +600,8 @@ public class ManagerServlet
 
         // Validate the requested context path
         if ((path == null) || path.length() == 0 || !path.startsWith("/")) {
-            writer.println(sm.getString("managerServlet.invalidPath", path));
+            writer.println(smClient.getString(
+                    "managerServlet.invalidPath", path));
             return;
         }
         String displayPath = path;
@@ -602,14 +613,13 @@ public class ManagerServlet
         Context context = (Context) host.findChild(path);
         if (update) {
             if (context != null) {
-                undeploy(writer, displayPath);
+                undeploy(writer, displayPath, smClient);
             }
             context = (Context) host.findChild(path);
         }
         if (context != null) {
-            writer.println
-                (sm.getString("managerServlet.alreadyContext",
-                              displayPath));
+            writer.println(smClient.getString("managerServlet.alreadyContext",
+                    displayPath));
             return;
         }
 
@@ -649,17 +659,19 @@ public class ManagerServlet
             }
         } catch (Exception e) {
             log("managerServlet.check[" + displayPath + "]", e);
-            writer.println(sm.getString("managerServlet.exception",
-                                        e.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    e.toString()));
             return;
         }
         
         context = (Context) host.findChild(path);
         if (context != null && context.getConfigured()) {
-            writer.println(sm.getString("managerServlet.deployed", displayPath));
+            writer.println(smClient.getString(
+                    "managerServlet.deployed", displayPath));
         } else {
             // Something failed
-            writer.println(sm.getString("managerServlet.deployFailed", displayPath));
+            writer.println(smClient.getString(
+                    "managerServlet.deployFailed", displayPath));
         }
         
     }
@@ -673,11 +685,13 @@ public class ManagerServlet
      * @param tag Revision tag to deploy from
      * @param path Context path of the application to be installed
      */
-    protected void deploy(PrintWriter writer, String path, String tag) {
+    protected void deploy(PrintWriter writer, String path, String tag,
+            StringManager smClient) {
 
         // Validate the requested context path
         if ((path == null) || path.length() == 0 || !path.startsWith("/")) {
-            writer.println(sm.getString("managerServlet.invalidPath", path));
+            writer.println(smClient.getString(
+                    "managerServlet.invalidPath", path));
             return;
         }
         String displayPath = path;
@@ -696,7 +710,7 @@ public class ManagerServlet
         // Check if app already exists, or undeploy it if updating
         Context context = (Context) host.findChild(path);
         if (context != null) {
-            undeploy(writer, displayPath);
+            undeploy(writer, displayPath, smClient);
         }
 
         // Copy WAR to appBase
@@ -713,17 +727,19 @@ public class ManagerServlet
             }
         } catch (Exception e) {
             log("managerServlet.check[" + displayPath + "]", e);
-            writer.println(sm.getString("managerServlet.exception",
-                                        e.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    e.toString()));
             return;
         }
         
         context = (Context) host.findChild(path);
         if (context != null && context.getConfigured()) {
-            writer.println(sm.getString("managerServlet.deployed", displayPath));
+            writer.println(smClient.getString("managerServlet.deployed",
+                    displayPath));
         } else {
             // Something failed
-            writer.println(sm.getString("managerServlet.deployFailed", displayPath));
+            writer.println(smClient.getString("managerServlet.deployFailed",
+                    displayPath));
         }
         
     }
@@ -740,7 +756,7 @@ public class ManagerServlet
      * @param update true to override any existing webapp on the path
      */
     protected void deploy(PrintWriter writer, String config,
-            String path, String war, boolean update) {
+            String path, String war, boolean update,  StringManager smClient) {
         
         if (config != null && config.length() == 0) {
             config = null;
@@ -769,8 +785,8 @@ public class ManagerServlet
         }
         
         if (path == null || path.length() == 0 || !path.startsWith("/")) {
-            writer.println(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            writer.println(smClient.getString("managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
             return;
         }
         String displayPath = path;
@@ -782,13 +798,12 @@ public class ManagerServlet
         Context context = (Context) host.findChild(path);
         if (update) {
             if (context != null) {
-                undeploy(writer, displayPath);
+                undeploy(writer, displayPath, smClient);
             }
             context = (Context) host.findChild(path);
         }
         if (context != null) {
-            writer.println
-            (sm.getString("managerServlet.alreadyContext",
+            writer.println(smClient.getString("managerServlet.alreadyContext",
                     displayPath));
             return;
         }
@@ -826,17 +841,20 @@ public class ManagerServlet
             }
             context = (Context) host.findChild(path);
             if (context != null && context.getConfigured() && context.getAvailable()) {
-                writer.println(sm.getString("managerServlet.deployed", displayPath));
+                writer.println(smClient.getString(
+                        "managerServlet.deployed", displayPath));
             } else if (context!=null && !context.getAvailable()) {
-                writer.println(sm.getString("managerServlet.deployedButNotStarted", displayPath));
+                writer.println(smClient.getString(
+                        "managerServlet.deployedButNotStarted", displayPath));
             } else {
                 // Something failed
-                writer.println(sm.getString("managerServlet.deployFailed", displayPath));
+                writer.println(smClient.getString(
+                        "managerServlet.deployFailed", displayPath));
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.install[" + displayPath + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
+            writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
         
@@ -848,13 +866,13 @@ public class ManagerServlet
      *
      * @param writer Writer to render to
      */
-    protected void list(PrintWriter writer) {
+    protected void list(PrintWriter writer, StringManager smClient) {
 
         if (debug >= 1)
             log("list: Listing contexts for virtual host '" +
                 host.getName() + "'");
 
-        writer.println(sm.getString("managerServlet.listed",
+        writer.println(smClient.getString("managerServlet.listed",
                                     host.getName()));
         Container[] contexts = host.findChildren();
         for (int i = 0; i < contexts.length; i++) {
@@ -864,17 +882,17 @@ public class ManagerServlet
                 if( displayPath.equals("") )
                     displayPath = "/";
                 if (context.getAvailable()) {
-                    writer.println(sm.getString("managerServlet.listitem",
-                                                displayPath,
-                                                "running",
-                                      "" + context.getManager().findSessions().length,
-                                                context.getDocBase()));
+                    writer.println(smClient.getString("managerServlet.listitem",
+                            displayPath,
+                            "running",
+                            "" + context.getManager().findSessions().length,
+                            context.getDocBase()));
                 } else {
-                    writer.println(sm.getString("managerServlet.listitem",
-                                                displayPath,
-                                                "stopped",
-                                                "0",
-                                                context.getDocBase()));
+                    writer.println(smClient.getString("managerServlet.listitem",
+                            displayPath,
+                            "stopped",
+                            "0",
+                            context.getDocBase()));
                 }
             }
         }
@@ -887,14 +905,15 @@ public class ManagerServlet
      * @param writer Writer to render to
      * @param path Context path of the application to be restarted
      */
-    protected void reload(PrintWriter writer, String path) {
+    protected void reload(PrintWriter writer, String path,
+            StringManager smClient) {
 
         if (debug >= 1)
             log("restart: Reloading web application at '" + path + "'");
 
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            writer.println(smClient.getString("managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
             return;
         }
         String displayPath = path;
@@ -904,24 +923,23 @@ public class ManagerServlet
         try {
             Context context = (Context) host.findChild(path);
             if (context == null) {
-                writer.println(sm.getString
-                               ("managerServlet.noContext",
-                                   RequestUtil.filter(displayPath)));
+                writer.println(smClient.getString("managerServlet.noContext",
+                        RequestUtil.filter(displayPath)));
                 return;
             }
             // It isn't possible for the manager to reload itself
             if (context.getPath().equals(this.context.getPath())) {
-                writer.println(sm.getString("managerServlet.noSelf"));
+                writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
             context.reload();
             writer.println
-                (sm.getString("managerServlet.reloaded", displayPath));
+                (smClient.getString("managerServlet.reloaded", displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.reload[" + displayPath + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
 
     }
@@ -933,7 +951,8 @@ public class ManagerServlet
      * @param type Fully qualified class name of the resource type of interest,
      *  or <code>null</code> to list resources of all types
      */
-    protected void resources(PrintWriter writer, String type) {
+    protected void resources(PrintWriter writer, String type,
+            StringManager smClient) {
 
         if (debug >= 1) {
             if (type != null) {
@@ -945,16 +964,16 @@ public class ManagerServlet
 
         // Is the global JNDI resources context available?
         if (global == null) {
-            writer.println(sm.getString("managerServlet.noGlobal"));
+            writer.println(smClient.getString("managerServlet.noGlobal"));
             return;
         }
 
         // Enumerate the global JNDI resources of the requested type
         if (type != null) {
-            writer.println(sm.getString("managerServlet.resourcesType",
-                                        type));
+            writer.println(smClient.getString("managerServlet.resourcesType",
+                    type));
         } else {
-            writer.println(sm.getString("managerServlet.resourcesAll"));
+            writer.println(smClient.getString("managerServlet.resourcesAll"));
         }
 
         Class<?> clazz = null;
@@ -965,12 +984,12 @@ public class ManagerServlet
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.resources[" + type + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
             return;
         }
 
-        printResources(writer, "", global, type, clazz);
+        printResources(writer, "", global, type, clazz, smClient);
 
     }
 
@@ -980,7 +999,8 @@ public class ManagerServlet
      */
     protected void printResources(PrintWriter writer, String prefix,
                                   javax.naming.Context namingContext,
-                                  String type, Class<?> clazz) {
+                                  String type, Class<?> clazz,
+                                  StringManager smClient) {
 
         try {
             NamingEnumeration<Binding> items = namingContext.listBindings("");
@@ -989,7 +1009,8 @@ public class ManagerServlet
                 if (item.getObject() instanceof javax.naming.Context) {
                     printResources
                         (writer, prefix + item.getName() + "/",
-                         (javax.naming.Context) item.getObject(), type, clazz);
+                         (javax.naming.Context) item.getObject(), type, clazz,
+                         smClient);
                 } else {
                     if ((clazz != null) &&
                         (!(clazz.isInstance(item.getObject())))) {
@@ -1005,8 +1026,8 @@ public class ManagerServlet
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.resources[" + type + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
 
     }
@@ -1021,7 +1042,7 @@ public class ManagerServlet
      *
      * @param writer Writer to render to
      */
-    protected void roles(PrintWriter writer) {
+    protected void roles(PrintWriter writer,  StringManager smClient) {
 
         if (debug >= 1) {
             log("roles:  List security roles from user database");
@@ -1033,17 +1054,19 @@ public class ManagerServlet
             InitialContext ic = new InitialContext();
             database = (UserDatabase) ic.lookup("java:comp/env/users");
         } catch (NamingException e) {
-            writer.println(sm.getString("managerServlet.userDatabaseError"));
+            writer.println(smClient.getString(
+                    "managerServlet.userDatabaseError"));
             log("java:comp/env/users", e);
             return;
         }
         if (database == null) {
-            writer.println(sm.getString("managerServlet.userDatabaseMissing"));
+            writer.println(smClient.getString(
+                    "managerServlet.userDatabaseMissing"));
             return;
         }
 
         // Enumerate the available roles
-        writer.println(sm.getString("managerServlet.rolesList"));
+        writer.println(smClient.getString("managerServlet.rolesList"));
         Iterator<Role> roles = database.getRoles();
         if (roles != null) {
             while (roles.hasNext()) {
@@ -1065,7 +1088,7 @@ public class ManagerServlet
      * Writes System OS and JVM properties.
      * @param writer Writer to render to
      */
-    protected void serverinfo(PrintWriter writer) {
+    protected void serverinfo(PrintWriter writer,  StringManager smClient) {
         if (debug >= 1)
             log("serverinfo");
         try {
@@ -1087,8 +1110,8 @@ public class ManagerServlet
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             getServletContext().log("ManagerServlet.serverinfo",t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
     }
 
@@ -1101,7 +1124,8 @@ public class ManagerServlet
      * @param path Context path of the application to list session information for
      * @param idle Expire all sessions with idle time &gt; idle for this context
      */
-    protected void sessions(PrintWriter writer, String path, int idle) {
+    protected void sessions(PrintWriter writer, String path, int idle,
+            StringManager smClient) {
 
         if (debug >= 1) {
             log("sessions: Session information for web application at '" + path + "'");
@@ -1110,8 +1134,8 @@ public class ManagerServlet
         }
 
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            writer.println(smClient.getString("managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
             return;
         }
         String displayPath = path;
@@ -1120,13 +1144,13 @@ public class ManagerServlet
         try {
             Context context = (Context) host.findChild(path);
             if (context == null) {
-                writer.println(sm.getString("managerServlet.noContext",
-                                            RequestUtil.filter(displayPath)));
+                writer.println(smClient.getString("managerServlet.noContext",
+                        RequestUtil.filter(displayPath)));
                 return;
             }
             Manager manager = context.getManager() ;
             if(manager == null) {
-                writer.println(sm.getString("managerServlet.noManager",
+                writer.println(smClient.getString("managerServlet.noManager",
                         RequestUtil.filter(displayPath)));
                 return;               
             }
@@ -1141,9 +1165,11 @@ public class ManagerServlet
             if ( histoInterval * maxCount < maxInactiveInterval ) 
                 maxCount++;
 
-            writer.println(sm.getString("managerServlet.sessions", displayPath));
-            writer.println(sm.getString("managerServlet.sessiondefaultmax",
-                                "" + maxInactiveInterval));
+            writer.println(smClient.getString("managerServlet.sessions",
+                    displayPath));
+            writer.println(smClient.getString(
+                    "managerServlet.sessiondefaultmax",
+                    "" + maxInactiveInterval));
             Session [] sessions = manager.findSessions();
             int [] timeout = new int[maxCount];
             int notimeout = 0;
@@ -1164,29 +1190,34 @@ public class ManagerServlet
                     timeout[time]++;
             }
             if (timeout[0] > 0)
-                writer.println(sm.getString("managerServlet.sessiontimeout",
-                                            "<" + histoInterval, "" + timeout[0]));
+                writer.println(smClient.getString(
+                        "managerServlet.sessiontimeout",
+                        "<" + histoInterval, "" + timeout[0]));
             for (int i = 1; i < maxCount-1; i++) {
                 if (timeout[i] > 0)
-                    writer.println(sm.getString("managerServlet.sessiontimeout",
-                                     "" + (i)*histoInterval + " - <" + (i+1)*histoInterval,
-                                                "" + timeout[i]));
+                    writer.println(smClient.getString(
+                            "managerServlet.sessiontimeout",
+                            "" + (i)*histoInterval + " - <" + (i+1)*histoInterval,
+                            "" + timeout[i]));
             }
             if (timeout[maxCount-1] > 0)
-                writer.println(sm.getString("managerServlet.sessiontimeout",
-                                            ">=" + maxCount*histoInterval,
-                                            "" + timeout[maxCount-1]));
+                writer.println(smClient.getString(
+                        "managerServlet.sessiontimeout",
+                        ">=" + maxCount*histoInterval,
+                        "" + timeout[maxCount-1]));
             if (notimeout > 0)
-                writer.println(sm.getString("managerServlet.sessiontimeout.unlimited",
-                                            "" + notimeout));
+                writer.println(smClient.getString(
+                        "managerServlet.sessiontimeout.unlimited",
+                        "" + notimeout));
             if (idle >= 0)
-                writer.println(sm.getString("managerServlet.sessiontimeout.expired",
-                                            "" + idle,"" + expired));
+                writer.println(smClient.getString(
+                        "managerServlet.sessiontimeout.expired",
+                        "" + idle,"" + expired));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.sessions[" + displayPath + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
 
     }
@@ -1200,8 +1231,9 @@ public class ManagerServlet
      * @param writer Writer to render to
      * @param path Context path of the application to list session information for
      */
-    protected void sessions(PrintWriter writer, String path) {
-        sessions(writer, path, -1);
+    protected void sessions(PrintWriter writer, String path,
+            StringManager smClient) {
+        sessions(writer, path, -1, smClient);
     }
 
 
@@ -1212,7 +1244,8 @@ public class ManagerServlet
      * @param path
      * @param req
      */
-    protected void expireSessions(PrintWriter writer, String path, HttpServletRequest req) {
+    protected void expireSessions(PrintWriter writer, String path,
+            HttpServletRequest req, StringManager smClient) {
         int idle = -1;
         String idleParam = req.getParameter("idle");
         if (idleParam != null) {
@@ -1222,7 +1255,7 @@ public class ManagerServlet
                 log("Could not parse idle parameter to an int: " + idleParam);
             }
         }
-        sessions(writer, path, idle);
+        sessions(writer, path, idle, smClient);
     }
 
     /**
@@ -1231,14 +1264,15 @@ public class ManagerServlet
      * @param writer Writer to render to
      * @param path Context path of the application to be started
      */
-    protected void start(PrintWriter writer, String path) {
+    protected void start(PrintWriter writer, String path,
+            StringManager smClient) {
 
         if (debug >= 1)
             log("start: Starting web application at '" + path + "'");
 
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            writer.println(smClient.getString("managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
             return;
         }
         String displayPath = path;
@@ -1248,25 +1282,25 @@ public class ManagerServlet
         try {
             Context context = (Context) host.findChild(path);
             if (context == null) {
-                writer.println(sm.getString("managerServlet.noContext", 
-                                            RequestUtil.filter(displayPath)));
+                writer.println(smClient.getString("managerServlet.noContext", 
+                        RequestUtil.filter(displayPath)));
                 return;
             }
             context.start();
             if (context.getAvailable())
-                writer.println
-                    (sm.getString("managerServlet.started", displayPath));
+                writer.println(smClient.getString("managerServlet.started",
+                        displayPath));
             else
-                writer.println
-                    (sm.getString("managerServlet.startFailed", displayPath));
+                writer.println(smClient.getString("managerServlet.startFailed",
+                        displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            getServletContext().log
-                (sm.getString("managerServlet.startFailed", displayPath), t);
-            writer.println
-                (sm.getString("managerServlet.startFailed", displayPath));
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            getServletContext().log(sm.getString("managerServlet.startFailed",
+                    displayPath), t);
+            writer.println(smClient.getString("managerServlet.startFailed",
+                    displayPath));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
 
     }
@@ -1278,14 +1312,15 @@ public class ManagerServlet
      * @param writer Writer to render to
      * @param path Context path of the application to be stopped
      */
-    protected void stop(PrintWriter writer, String path) {
+    protected void stop(PrintWriter writer, String path,
+            StringManager smClient) {
 
         if (debug >= 1)
             log("stop: Stopping web application at '" + path + "'");
 
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            writer.println(smClient.getString("managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
             return;
         }
         String displayPath = path;
@@ -1295,22 +1330,23 @@ public class ManagerServlet
         try {
             Context context = (Context) host.findChild(path);
             if (context == null) {
-                writer.println(sm.getString("managerServlet.noContext", 
-                                            RequestUtil.filter(displayPath)));
+                writer.println(smClient.getString("managerServlet.noContext",
+                        RequestUtil.filter(displayPath)));
                 return;
             }
             // It isn't possible for the manager to stop itself
             if (context.getPath().equals(this.context.getPath())) {
-                writer.println(sm.getString("managerServlet.noSelf"));
+                writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
             context.stop();
-            writer.println(sm.getString("managerServlet.stopped", displayPath));
+            writer.println(smClient.getString(
+                    "managerServlet.stopped", displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.stop[" + displayPath + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
 
     }
@@ -1322,14 +1358,15 @@ public class ManagerServlet
      * @param writer Writer to render to
      * @param path Context path of the application to be removed
      */
-    protected void undeploy(PrintWriter writer, String path) {
+    protected void undeploy(PrintWriter writer, String path,
+            StringManager smClient) {
 
         if (debug >= 1)
             log("undeploy: Undeploying web application at '" + path + "'");
 
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            writer.println(smClient.getString("managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
             return;
         }
         String displayPath = path;
@@ -1341,13 +1378,13 @@ public class ManagerServlet
             // Validate the Context of the specified application
             Context context = (Context) host.findChild(path);
             if (context == null) {
-                writer.println(sm.getString("managerServlet.noContext",
-                                            RequestUtil.filter(displayPath)));
+                writer.println(smClient.getString("managerServlet.noContext",
+                        RequestUtil.filter(displayPath)));
                 return;
             }
 
             if (!isDeployed(path)) {
-                writer.println(sm.getString("managerServlet.notDeployed",
+                writer.println(smClient.getString("managerServlet.notDeployed",
                         RequestUtil.filter(displayPath)));
                 return;
             }
@@ -1380,13 +1417,13 @@ public class ManagerServlet
                     removeServiced(path.replace('#','/'));
                 }
             }
-            writer.println(sm.getString("managerServlet.undeployed",
-                                        displayPath));
+            writer.println(smClient.getString("managerServlet.undeployed",
+                    displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.undeploy[" + displayPath + "]", t);
-            writer.println(sm.getString("managerServlet.exception",
-                                        t.toString()));
+            writer.println(smClient.getString("managerServlet.exception",
+                    t.toString()));
         }
 
     }
@@ -1585,6 +1622,21 @@ public class ManagerServlet
             }
         }
 
+    }
+
+
+    protected StringManager getStringManager(HttpServletRequest req) {
+        Enumeration<Locale> requestedLocales = req.getLocales();
+        while (requestedLocales.hasMoreElements()) {
+            Locale locale = requestedLocales.nextElement();
+            StringManager result = StringManager.getManager(Constants.Package,
+                    locale);
+            if (result.getLocale().equals(locale)) {
+                return result;
+            }
+        }
+        // Return the default
+        return sm;
     }
 
 
