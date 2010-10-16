@@ -37,6 +37,14 @@
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.5 (markt)">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>49426</bug>: Localize messages in Manager application based on the
+        Locale of the user rather than the default Locale of the server. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
