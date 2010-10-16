@@ -55,6 +55,10 @@
       <fix>
         Correct a handful of Javadoc warnings. (markt)
       </fix>
+      <fix>
+        <bug>22965</bug>: Fix some typos and formatting issues in the global
+        web.xml file. Based on a patch by Yann Cébron. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
