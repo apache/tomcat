@@ -20,6 +20,7 @@ package org.apache.tomcat.util.res;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -66,11 +67,11 @@ public class StringManager {
      *
      * @param packageName Name of package to create StringManager for.
      */
-    private StringManager(String packageName) {
+    private StringManager(String packageName, Locale locale) {
         String bundleName = packageName + ".LocalStrings";
         ResourceBundle bnd = null;
         try {
-            bnd = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+            bnd = ResourceBundle.getBundle(bundleName, locale);
         } catch( MissingResourceException ex ) {
             // Try from the current loader (that's the case for trusted apps)
             // Should only be required if using a TC5 style classloader structure
@@ -78,8 +79,7 @@ public class StringManager {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if( cl != null ) {
                 try {
-                    bnd = ResourceBundle.getBundle(
-                            bundleName, Locale.getDefault(), cl);
+                    bnd = ResourceBundle.getBundle(bundleName, locale, cl);
                 } catch(MissingResourceException ex2) {
                     // Ignore
                 }
@@ -88,9 +88,9 @@ public class StringManager {
         bundle = bnd;
         // Get the actual locale, which may be different from the requested one
         if (bundle != null) {
-            locale = bundle.getLocale();
+            this.locale = bundle.getLocale();
         } else {
-            locale = null;
+            this.locale = null;
         }
     }
 
@@ -119,7 +119,8 @@ public class StringManager {
             }
         } catch(MissingResourceException mre) {
             //bad: shouldn't mask an exception the following way:
-            //   str = "[cannot find message associated with key '" + key + "' due to " + mre + "]";
+            //   str = "[cannot find message associated with key '" + key +
+            //         "' due to " + mre + "]";
             //     because it hides the fact that the String was missing
             //     from the calling code.
             //good: could just throw the exception (or wrap it in another)
@@ -152,12 +153,19 @@ public class StringManager {
         return mf.format(args, new StringBuffer(), null).toString();
     }
 
+    /**
+     * Identify the Locale this StringManager is associated with
+     */
+    public Locale getLocale() {
+        return locale;
+    }
+
     // --------------------------------------------------------------
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static final Hashtable<String, StringManager> managers =
-        new Hashtable<String, StringManager>();
+    private static final Map<String, Map<Locale,StringManager>> managers =
+        new Hashtable<String, Map<Locale,StringManager>>();
 
     /**
      * Get the StringManager for a particular package. If a manager for
@@ -166,13 +174,33 @@ public class StringManager {
      *
      * @param packageName The package name
      */
-    public synchronized static final StringManager getManager(String packageName) {
-        StringManager mgr = managers.get(packageName);
+    public synchronized static final StringManager getManager(
+            String packageName) {
+        return getManager(packageName, Locale.getDefault());
+    }
+
+    /**
+     * Get the StringManager for a particular package and Locale. If a manager
+     * for a package/Locale combination already exists, it will be reused, else
+     * a new StringManager will be created and returned.
+     *
+     * @param packageName The package name
+     * @param locale      The Locale
+     */
+    public synchronized static final StringManager getManager(
+            String packageName, Locale locale) {
+
+        Map<Locale,StringManager> map = managers.get(packageName);
+        if (map == null) {
+            map = new Hashtable<Locale, StringManager>();
+            managers.put(packageName, map);
+        }
+        
+        StringManager mgr = map.get(locale);
         if (mgr == null) {
-            mgr = new StringManager(packageName);
-            managers.put(packageName, mgr);
+            mgr = new StringManager(packageName, locale);
+            map.put(locale, mgr);
         }
         return mgr;
     }
-
 }
