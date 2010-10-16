@@ -40,8 +40,13 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        <bug>49426</bug>: Localize messages in Manager application based on the
-        Locale of the user rather than the default Locale of the server. (markt)
+        <bug>49426</bug>: Localize messages in the Manager application based on
+        the Locale of the user rather than the default Locale of the server.
+        (markt)
+      </fix>
+      <fix>
+        Localize messages in the Host Manager application based on the Locale of
+        the user rather than the default Locale of the server. (markt)
       </fix>
     </changelog>
   </subsection>
