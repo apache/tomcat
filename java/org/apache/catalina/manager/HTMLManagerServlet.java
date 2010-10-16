@@ -55,6 +55,7 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
 * Servlet that enables remote management of the web applications deployed
@@ -116,6 +117,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                       HttpServletResponse response)
         throws IOException, ServletException {
 
+        StringManager smClient = getStringManager(request);
+        
         // Identify the request parameters that we need
         // By obtaining the command from the pathInfo, per-command security can
         // be configured in web.xml
@@ -134,11 +137,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
             // List always displayed - nothing to do here
         } else if (command.equals("/sessions")) {
             try {
-                doSessions(path, request, response);
+                doSessions(path, request, response, smClient);
                 return;
             } catch (Exception e) {
                 log("HTMLManagerServlet.sessions[" + path + "]", e);
-                message = sm.getString("managerServlet.exception",
+                message = smClient.getString("managerServlet.exception",
                         e.toString());
             }
         } else if (command.equals("/upload") || command.equals("/deploy") ||
@@ -146,13 +149,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 command.equals("/expire") || command.equals("/start") ||
                 command.equals("/stop")) {
             message =
-                sm.getString("managerServlet.postCommand", command);
+                smClient.getString("managerServlet.postCommand", command);
         } else {
             message =
-                sm.getString("managerServlet.unknownCommand", command);
+                smClient.getString("managerServlet.unknownCommand", command);
         }
 
-        list(request, response, message);
+        list(request, response, message, smClient);
     }
 
     /**
@@ -168,6 +171,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
     public void doPost(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException {
+
+        StringManager smClient = getStringManager(request);
 
         // Identify the request parameters that we need
         // By obtaining the command from the pathInfo, per-command security can
@@ -188,28 +193,29 @@ public final class HTMLManagerServlet extends ManagerServlet {
             // No command == list
             // List always displayed -> do nothing
         } else if (command.equals("/upload")) {
-            message = upload(request);
+            message = upload(request, smClient);
         } else if (command.equals("/deploy")) {
-            message = deployInternal(deployConfig, deployPath, deployWar);
+            message = deployInternal(deployConfig, deployPath, deployWar,
+                    smClient);
         } else if (command.equals("/reload")) {
-            message = reload(path);
+            message = reload(path, smClient);
         } else if (command.equals("/undeploy")) {
-            message = undeploy(path);
+            message = undeploy(path, smClient);
         } else if (command.equals("/expire")) {
-            message = expireSessions(path, request);
+            message = expireSessions(path, request, smClient);
         } else if (command.equals("/start")) {
-            message = start(path);
+            message = start(path, smClient);
         } else if (command.equals("/stop")) {
-            message = stop(path);
+            message = stop(path, smClient);
         } else if (command.equals("/findleaks")) {
-            message = findleaks();
+            message = findleaks(smClient);
         } else {
             // Try GET
             doGet(request,response);
             return;
         }
 
-        list(request, response, message);
+        list(request, response, message, smClient);
     }
 
     /**
@@ -242,7 +248,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         return buffer.toString();
     }
 
-    protected String upload(HttpServletRequest request)
+    protected String upload(HttpServletRequest request, StringManager smClient)
             throws IOException, ServletException {
         String message = "";
 
@@ -265,14 +271,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
             while (true) {
                 if (warPart == null) {
-                    message =
-                        sm.getString("htmlManagerServlet.deployUploadNoFile");
+                    message = smClient.getString(
+                            "htmlManagerServlet.deployUploadNoFile");
                     break;
                 }
                 filename =
                     extractFilename(warPart.getHeader("Content-Disposition"));
                 if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                    message = sm.getString(
+                    message = smClient.getString(
                             "htmlManagerServlet.deployUploadNotWar", filename);
                     break;
                 }
@@ -291,7 +297,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                         filename.toLowerCase(Locale.ENGLISH).indexOf(".war"));
                 File file = new File(getAppBase(), filename);
                 if (file.exists()) {
-                    message = sm.getString(
+                    message = smClient.getString(
                             "htmlManagerServlet.deployUploadWarExists",
                             filename);
                     break;
@@ -304,7 +310,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
 
                 if ((host.findChild(path) != null) && !isDeployed(path)) {
-                    message = sm.getString(
+                    message = smClient.getString(
                             "htmlManagerServlet.deployUploadInServerXml",
                             filename);
                     break;
@@ -323,7 +329,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 break;
             }
         } catch(Exception e) {
-            message = sm.getString
+            message = smClient.getString
                 ("htmlManagerServlet.deployUploadFail", e.getMessage());
             log(message, e);
         } finally {
@@ -373,12 +379,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param war URL of the web application archive to be deployed
      * @return message String
      */
-    protected String deployInternal(String config, String path, String war) {
+    protected String deployInternal(String config, String path, String war,
+            StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.deploy(printWriter, config, path, war, false);
+        super.deploy(printWriter, config, path, war, false, smClient);
 
         return stringWriter.toString();
     }
@@ -393,7 +400,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
      */
     public void list(HttpServletRequest request,
                      HttpServletResponse response,
-                     String message) throws IOException {
+                     String message,
+                     StringManager smClient) throws IOException {
 
         if (debug >= 1)
             log("list: Listing contexts for virtual host '" +
@@ -407,13 +415,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // Body Header Section
         Object[] args = new Object[2];
         args[0] = request.getContextPath();
-        args[1] = sm.getString("htmlManagerServlet.title");
+        args[1] = smClient.getString("htmlManagerServlet.title");
         writer.print(MessageFormat.format
                      (Constants.BODY_HEADER_SECTION, args));
 
         // Message Section
         args = new Object[3];
-        args[0] = sm.getString("htmlManagerServlet.messageLabel");
+        args[0] = smClient.getString("htmlManagerServlet.messageLabel");
         if (message == null || message.length() == 0) {
             args[1] = "OK";
         } else {
@@ -423,30 +431,30 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         // Manager Section
         args = new Object[9];
-        args[0] = sm.getString("htmlManagerServlet.manager");
+        args[0] = smClient.getString("htmlManagerServlet.manager");
         args[1] = response.encodeURL(request.getContextPath() + "/html/list");
-        args[2] = sm.getString("htmlManagerServlet.list");
+        args[2] = smClient.getString("htmlManagerServlet.list");
         args[3] = response.encodeURL
             (request.getContextPath() + "/" +
-             sm.getString("htmlManagerServlet.helpHtmlManagerFile"));
-        args[4] = sm.getString("htmlManagerServlet.helpHtmlManager");
+             smClient.getString("htmlManagerServlet.helpHtmlManagerFile"));
+        args[4] = smClient.getString("htmlManagerServlet.helpHtmlManager");
         args[5] = response.encodeURL
             (request.getContextPath() + "/" +
-             sm.getString("htmlManagerServlet.helpManagerFile"));
-        args[6] = sm.getString("htmlManagerServlet.helpManager");
+             smClient.getString("htmlManagerServlet.helpManagerFile"));
+        args[6] = smClient.getString("htmlManagerServlet.helpManager");
         args[7] = response.encodeURL
             (request.getContextPath() + "/status");
-        args[8] = sm.getString("statusServlet.title");
+        args[8] = smClient.getString("statusServlet.title");
         writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
 
         // Apps Header Section
         args = new Object[6];
-        args[0] = sm.getString("htmlManagerServlet.appsTitle");
-        args[1] = sm.getString("htmlManagerServlet.appsPath");
-        args[2] = sm.getString("htmlManagerServlet.appsName");
-        args[3] = sm.getString("htmlManagerServlet.appsAvailable");
-        args[4] = sm.getString("htmlManagerServlet.appsSessions");
-        args[5] = sm.getString("htmlManagerServlet.appsTasks");
+        args[0] = smClient.getString("htmlManagerServlet.appsTitle");
+        args[1] = smClient.getString("htmlManagerServlet.appsPath");
+        args[2] = smClient.getString("htmlManagerServlet.appsName");
+        args[3] = smClient.getString("htmlManagerServlet.appsAvailable");
+        args[4] = smClient.getString("htmlManagerServlet.appsSessions");
+        args[5] = smClient.getString("htmlManagerServlet.appsTasks");
         writer.print(MessageFormat.format(APPS_HEADER_SECTION, args));
 
         // Apps Row Section
@@ -464,11 +472,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
             sortedContextPathsMap.put(displayPath, contextPaths[i]);
         }
  
-        String appsStart = sm.getString("htmlManagerServlet.appsStart");
-        String appsStop = sm.getString("htmlManagerServlet.appsStop");
-        String appsReload = sm.getString("htmlManagerServlet.appsReload");
-        String appsUndeploy = sm.getString("htmlManagerServlet.appsUndeploy");
-        String appsExpire = sm.getString("htmlManagerServlet.appsExpire");
+        String appsStart = smClient.getString("htmlManagerServlet.appsStart");
+        String appsStop = smClient.getString("htmlManagerServlet.appsStop");
+        String appsReload = smClient.getString("htmlManagerServlet.appsReload");
+        String appsUndeploy = smClient.getString("htmlManagerServlet.appsUndeploy");
+        String appsExpire = smClient.getString("htmlManagerServlet.appsExpire");
 
         Iterator<Map.Entry<String,String>> iterator =
             sortedContextPathsMap.entrySet().iterator();
@@ -549,14 +557,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     (request.getContextPath() +
                      "/html/expire?path=" + URL_ENCODER.encode(displayPath));
                 args[9] = appsExpire;
-                args[10] = sm.getString("htmlManagerServlet.expire.explain");
+                args[10] = smClient.getString(
+                        "htmlManagerServlet.expire.explain");
                 if (manager == null) {
-                    args[11] = sm.getString("htmlManagerServlet.noManager");
+                    args[11] = smClient.getString(
+                            "htmlManagerServlet.noManager");
                 } else {
                     args[11] = new Integer(
                             ctxt.getManager().getMaxInactiveInterval()/60);
                 }
-                args[12] = sm.getString("htmlManagerServlet.expire.unit");
+                args[12] = smClient.getString("htmlManagerServlet.expire.unit");
                 args[13] = highlightColor;
                 
                 if (ctxt.getPath().equals(this.context.getPath())) {
@@ -581,41 +591,41 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         // Deploy Section
         args = new Object[7];
-        args[0] = sm.getString("htmlManagerServlet.deployTitle");
-        args[1] = sm.getString("htmlManagerServlet.deployServer");
+        args[0] = smClient.getString("htmlManagerServlet.deployTitle");
+        args[1] = smClient.getString("htmlManagerServlet.deployServer");
         args[2] = response.encodeURL(request.getContextPath() + "/html/deploy");
-        args[3] = sm.getString("htmlManagerServlet.deployPath");
-        args[4] = sm.getString("htmlManagerServlet.deployConfig");
-        args[5] = sm.getString("htmlManagerServlet.deployWar");
-        args[6] = sm.getString("htmlManagerServlet.deployButton");
+        args[3] = smClient.getString("htmlManagerServlet.deployPath");
+        args[4] = smClient.getString("htmlManagerServlet.deployConfig");
+        args[5] = smClient.getString("htmlManagerServlet.deployWar");
+        args[6] = smClient.getString("htmlManagerServlet.deployButton");
         writer.print(MessageFormat.format(DEPLOY_SECTION, args));
 
         args = new Object[4];
-        args[0] = sm.getString("htmlManagerServlet.deployUpload");
+        args[0] = smClient.getString("htmlManagerServlet.deployUpload");
         args[1] = response.encodeURL(request.getContextPath() + "/html/upload");
-        args[2] = sm.getString("htmlManagerServlet.deployUploadFile");
-        args[3] = sm.getString("htmlManagerServlet.deployButton");
+        args[2] = smClient.getString("htmlManagerServlet.deployUploadFile");
+        args[3] = smClient.getString("htmlManagerServlet.deployButton");
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
         // Diagnostics section
         args = new Object[5];
-        args[0] = sm.getString("htmlManagerServlet.diagnosticsTitle");
-        args[1] = sm.getString("htmlManagerServlet.diagnosticsLeak");
+        args[0] = smClient.getString("htmlManagerServlet.diagnosticsTitle");
+        args[1] = smClient.getString("htmlManagerServlet.diagnosticsLeak");
         args[2] = response.encodeURL(
                 request.getContextPath() + "/html/findleaks");
-        args[3] = sm.getString("htmlManagerServlet.diagnosticsLeakWarning");
-        args[4] = sm.getString("htmlManagerServlet.diagnosticsLeakButton");
+        args[3] = smClient.getString("htmlManagerServlet.diagnosticsLeakWarning");
+        args[4] = smClient.getString("htmlManagerServlet.diagnosticsLeakButton");
         writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
 
         // Server Header Section
         args = new Object[7];
-        args[0] = sm.getString("htmlManagerServlet.serverTitle");
-        args[1] = sm.getString("htmlManagerServlet.serverVersion");
-        args[2] = sm.getString("htmlManagerServlet.serverJVMVersion");
-        args[3] = sm.getString("htmlManagerServlet.serverJVMVendor");
-        args[4] = sm.getString("htmlManagerServlet.serverOSName");
-        args[5] = sm.getString("htmlManagerServlet.serverOSVersion");
-        args[6] = sm.getString("htmlManagerServlet.serverOSArch");
+        args[0] = smClient.getString("htmlManagerServlet.serverTitle");
+        args[1] = smClient.getString("htmlManagerServlet.serverVersion");
+        args[2] = smClient.getString("htmlManagerServlet.serverJVMVersion");
+        args[3] = smClient.getString("htmlManagerServlet.serverJVMVendor");
+        args[4] = smClient.getString("htmlManagerServlet.serverOSName");
+        args[5] = smClient.getString("htmlManagerServlet.serverOSVersion");
+        args[6] = smClient.getString("htmlManagerServlet.serverOSArch");
         writer.print(MessageFormat.format
                      (Constants.SERVER_HEADER_SECTION, args));
 
@@ -645,12 +655,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path Context path of the application to be restarted
      * @return message String
      */
-    protected String reload(String path) {
+    protected String reload(String path, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.reload(printWriter, path);
+        super.reload(printWriter, path, smClient);
 
         return stringWriter.toString();
     }
@@ -663,12 +673,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path Context path of the application to be undeployed
      * @return message String
      */
-    protected String undeploy(String path) {
+    protected String undeploy(String path, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.undeploy(printWriter, path);
+        super.undeploy(printWriter, path, smClient);
 
         return stringWriter.toString();
     }
@@ -682,12 +692,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param idle Expire all sessions with idle time &ge; idle for this context
      * @return message String
      */
-    public String sessions(String path, int idle) {
+    public String sessions(String path, int idle, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.sessions(printWriter, path, idle);
+        super.sessions(printWriter, path, idle, smClient);
 
         return stringWriter.toString();
     }
@@ -700,9 +710,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path Context path of the application to list session information
      * @return message String
      */
-    public String sessions(String path) {
+    public String sessions(String path, StringManager smClient) {
 
-        return sessions(path, -1);
+        return sessions(path, -1, smClient);
     }
 
     /**
@@ -713,12 +723,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path Context path of the application to be started
      * @return message String
      */
-    public String start(String path) {
+    public String start(String path, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.start(printWriter, path);
+        super.start(printWriter, path, smClient);
 
         return stringWriter.toString();
     }
@@ -731,12 +741,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path Context path of the application to be stopped
      * @return message String
      */
-    protected String stop(String path) {
+    protected String stop(String path, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.stop(printWriter, path);
+        super.stop(printWriter, path, smClient);
 
         return stringWriter.toString();
     }
@@ -748,20 +758,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @return message String
      */
-    protected String findleaks() {
+    protected String findleaks(StringManager smClient) {
 
         StringBuilder msg = new StringBuilder();
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.findleaks(printWriter);
+        super.findleaks(printWriter, smClient);
 
         if (stringWriter.getBuffer().length() > 0) {
-            msg.append(sm.getString("htmlManagerServlet.findleaksList"));
+            msg.append(smClient.getString("htmlManagerServlet.findleaksList"));
             msg.append(stringWriter.toString());
         } else {
-            msg.append(sm.getString("htmlManagerServlet.findleaksNone"));
+            msg.append(smClient.getString("htmlManagerServlet.findleaksNone"));
         }
         
         return msg.toString();
@@ -798,7 +808,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path
      * @param req
      */
-    protected String expireSessions(String path, HttpServletRequest req) {
+    protected String expireSessions(String path, HttpServletRequest req,
+            StringManager smClient) {
         int idle = -1;
         String idleParam = req.getParameter("idle");
         if (idleParam != null) {
@@ -808,7 +819,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 log("Could not parse idle parameter to an int: " + idleParam);
             }
         }
-        return sessions(path, idle);
+        return sessions(path, idle, smClient);
     }
 
     /**
@@ -818,7 +829,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @throws ServletException
      * @throws IOException 
      */
-    protected void doSessions(String path, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doSessions(String path, HttpServletRequest req,
+            HttpServletResponse resp, StringManager smClient)
+            throws ServletException, IOException {
         req.setAttribute("path", path);
         String action = req.getParameter("action");
         if (debug >= 1) {
@@ -826,36 +839,38 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
         if ("sessionDetail".equals(action)) {
             String sessionId = req.getParameter("sessionId");
-            displaySessionDetailPage(req, resp, path, sessionId);
+            displaySessionDetailPage(req, resp, path, sessionId, smClient);
             return;
         } else if ("invalidateSessions".equals(action)) {
             String[] sessionIds = req.getParameterValues("sessionIds");
-            int i = invalidateSessions(path, sessionIds);
+            int i = invalidateSessions(path, sessionIds, smClient);
             req.setAttribute(APPLICATION_MESSAGE, "" + i + " sessions invalidated.");
         } else if ("removeSessionAttribute".equals(action)) {
             String sessionId = req.getParameter("sessionId");
             String name = req.getParameter("attributeName");
-            boolean removed = removeSessionAttribute(path, sessionId, name);
+            boolean removed =
+                removeSessionAttribute(path, sessionId, name, smClient);
             String outMessage = removed ? "Session attribute '" + name + "' removed." : "Session did not contain any attribute named '" + name + "'";
             req.setAttribute(APPLICATION_MESSAGE, outMessage);
             resp.sendRedirect(resp.encodeRedirectURL(req.getRequestURL().append("?path=").append(path).append("&action=sessionDetail&sessionId=").append(sessionId).toString()));
             return;
         } // else
-        displaySessionsListPage(path, req, resp);
+        displaySessionsListPage(path, req, resp, smClient);
     }
 
-    protected List<Session> getSessionsForPath(String path) {
+    protected List<Session> getSessionsForPath(String path,
+            StringManager smClient) {
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            throw new IllegalArgumentException(smClient.getString(
+                    "managerServlet.invalidPath", RequestUtil.filter(path)));
         }
         String searchPath = path;
         if( path.equals("/") )
             searchPath = "";
         Context ctxt = (Context) host.findChild(searchPath);
         if (null == ctxt) {
-            throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
-                                        RequestUtil.filter(path)));
+            throw new IllegalArgumentException(smClient.getString(
+                    "managerServlet.noContext", RequestUtil.filter(path)));
         }
         Manager manager = ctxt.getManager();
         List<Session> sessions = new ArrayList<Session>();
@@ -875,18 +890,19 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
         return sessions;
     }
-    protected Session getSessionForPathAndId(String path, String id) throws IOException {
+    protected Session getSessionForPathAndId(String path, String id,
+            StringManager smClient) throws IOException {
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
-                                        RequestUtil.filter(path)));
+            throw new IllegalArgumentException(smClient.getString(
+                    "managerServlet.invalidPath", RequestUtil.filter(path)));
         }
         String searchPath = path;
         if( path.equals("/") )
             searchPath = "";
         Context ctxt = (Context) host.findChild(searchPath);
         if (null == ctxt) {
-            throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
-                                        RequestUtil.filter(path)));
+            throw new IllegalArgumentException(smClient.getString(
+                    "managerServlet.noContext", RequestUtil.filter(path)));
         }
         Session session = ctxt.getManager().findSession(id);
         return session;
@@ -899,8 +915,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void displaySessionsListPage(String path, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Session> sessions = getSessionsForPath(path);
+    protected void displaySessionsListPage(String path, HttpServletRequest req,
+            HttpServletResponse resp, StringManager smClient)
+            throws ServletException, IOException {
+        List<Session> sessions = getSessionsForPath(path, smClient);
         String sortBy = req.getParameter("sort");
         String orderBy = null;
         if (null != sortBy && !"".equals(sortBy.trim())) {
@@ -943,8 +961,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void displaySessionDetailPage(HttpServletRequest req, HttpServletResponse resp, String path, String sessionId) throws ServletException, IOException {
-        Session session = getSessionForPathAndId(path, sessionId);
+    protected void displaySessionDetailPage(HttpServletRequest req,
+            HttpServletResponse resp, String path, String sessionId,
+            StringManager smClient) throws ServletException, IOException {
+        Session session = getSessionForPathAndId(path, sessionId, smClient);
         //strong>NOTE</strong> - This header will be overridden
         // automatically if a <code>RequestDispatcher.forward()</code> call is
         // ultimately invoked.
@@ -961,14 +981,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @return number of invalidated sessions
      * @throws IOException 
      */
-    public int invalidateSessions(String path, String[] sessionIds) throws IOException {
+    public int invalidateSessions(String path, String[] sessionIds,
+            StringManager smClient) throws IOException {
         if (null == sessionIds) {
             return 0;
         }
         int nbAffectedSessions = 0;
         for (int i = 0; i < sessionIds.length; ++i) {
             String sessionId = sessionIds[i];
-            HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
+            HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {
@@ -998,8 +1019,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @return true if there was an attribute removed, false otherwise
      * @throws IOException 
      */
-    public boolean removeSessionAttribute(String path, String sessionId, String attributeName) throws IOException {
-        HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
+    public boolean removeSessionAttribute(String path, String sessionId,
+            String attributeName, StringManager smClient) throws IOException {
+        HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
         if (null == session) {
             // Shouldn't happen, but let's play nice...
             if (debug >= 1) {
@@ -1025,8 +1047,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @return old value for maxInactiveInterval
      * @throws IOException 
      */
-    public int setSessionMaxInactiveInterval(String path, String sessionId, int maxInactiveInterval) throws IOException {
-        HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
+    public int setSessionMaxInactiveInterval(String path, String sessionId,
+            int maxInactiveInterval, StringManager smClient) throws IOException {
+        HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
         if (null == session) {
             // Shouldn't happen, but let's play nice...
             if (debug >= 1) {
