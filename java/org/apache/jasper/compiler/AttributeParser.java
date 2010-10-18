@@ -148,7 +148,7 @@ public class AttributeParser {
      * - literals that need to be converted for EL processing
      *   \ -> type{'\\'}
      *   $ -> type{'$'}
-     *   # -> type{'$'}
+     *   # -> type{'#'}
      * - start of EL
      *   ${
      *   #{
