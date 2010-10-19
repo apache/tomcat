@@ -319,8 +319,8 @@ elif [ "$1" = "start" ] ; then
 
   if [ ! -z "$CATALINA_PID" ]; then
     if [ -f "$CATALINA_PID" ]; then
-      echo "Existing PID file found during start."
       if [ -s "$CATALINA_PID" ]; then
+        echo "Existing PID file found during start."
         if [ -r "$CATALINA_PID" ]; then
           PID=`cat "$CATALINA_PID"`
           ps -p $PID >/dev/null 2>&1
@@ -328,11 +328,15 @@ elif [ "$1" = "start" ] ; then
             echo "Tomcat appears to still be running with PID $PID. Start aborted."
             exit 1
           else
-            echo "Removing stale PID file."
+            echo "Removing/clearing stale PID file."
             rm -f "$CATALINA_PID" >/dev/null 2>&1
             if [ $? != 0 ]; then
-              echo "Unable to remove stale PID file. Start aborted."
-              exit 1
+              if [ -w "$CATALINA_PID" ]; then
+                cat /dev/null > "$CATALINA_PID"
+              else
+                echo "Unable to remove or clear stale PID file. Start aborted."
+                exit 1
+              fi
             fi
           fi
         else
@@ -340,10 +344,12 @@ elif [ "$1" = "start" ] ; then
           exit 1
         fi
       else
-        echo "Removing empty PID file."
         rm -f "$CATALINA_PID" >/dev/null 2>&1
         if [ $? != 0 ]; then
-          echo "Unable to remove empty PID file. Start will continue."
+          if [ ! -w "$CATALINA_PID" ]; then
+            echo "Unable to remove or write to empty PID file. Start aborted."
+            exit 1
+          fi
         fi
       fi
     fi
@@ -377,7 +383,7 @@ elif [ "$1" = "start" ] ; then
 
   fi
 
-  if [ ! -z "$CATALINA_PID" -a ! -f "$CATALINA_PID" ]; then
+  if [ ! -z "$CATALINA_PID" ]; then
     echo $! > "$CATALINA_PID"
   fi
 
@@ -431,7 +437,11 @@ elif [ "$1" = "stop" ] ; then
         if [ $? -gt 0 ]; then
           rm -f "$CATALINA_PID" >/dev/null 2>&1
           if [ $? != 0 ]; then
-            echo "Tomcat stopped but the PID file could not be removed."
+            if [ -w "$CATALINA_PID" ]; then
+              cat /dev/null > "$CATALINA_PID"
+            else
+              echo "Tomcat stopped but the PID file could not be removed or cleared."
+            fi
           fi
           break
         fi
