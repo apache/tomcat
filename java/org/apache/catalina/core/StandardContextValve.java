@@ -28,6 +28,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
@@ -170,10 +171,9 @@ final class StandardContextValve
 
         ServletRequestEvent event = null;
 
-        if ((instances != null) 
-                && (instances.length > 0)) {
+        if ((instances != null) && (instances.length > 0)) {
             event = new ServletRequestEvent
-                (((StandardContext) container).getServletContext(), 
+                (((Context) container).getServletContext(), 
                  request.getRequest());
             // create pre-service event
             for (int i = 0; i < instances.length; i++) {
@@ -189,8 +189,9 @@ final class StandardContextValve
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
-                                     instances[i].getClass().getName()), t);
+                    container.getLogger().error(sm.getString(
+                            "standardContext.requestListener.requestInit",
+                            instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
                     return;
@@ -202,8 +203,7 @@ final class StandardContextValve
         }
         wrapper.getPipeline().getFirst().invoke(request, response);
 
-        if ((instances !=null ) &&
-                (instances.length > 0)) {
+        if ((instances !=null ) && (instances.length > 0)) {
             // create post-service event
             for (int i = 0; i < instances.length; i++) {
                 int j = (instances.length -1) -i;
@@ -219,14 +219,14 @@ final class StandardContextValve
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
-                                     instances[j].getClass().getName()), t);
+                    container.getLogger().error(sm.getString(
+                            "standardContext.requestListener.requestDestroy",
+                            instances[j].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
                 }
             }
         }
-                
     }
 
 
