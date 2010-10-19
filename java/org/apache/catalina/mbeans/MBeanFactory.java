@@ -907,12 +907,8 @@ public class MBeanFactory {
 
         // Remove this component from its parent component
         if(host!=null) {
-            if(host instanceof StandardHost)
-                ((StandardHost)host).destroy();
-            else
-                engine.removeChild(host);
+            engine.removeChild(host);
         }
-
     }
 
 
