@@ -166,66 +166,15 @@ final class StandardContextValve
             }
         }
 
-        // Normal request processing
-        Object instances[] = context.getApplicationEventListeners();
-
-        ServletRequestEvent event = null;
-
-        if ((instances != null) && (instances.length > 0)) {
-            event = new ServletRequestEvent
-                (((Context) container).getServletContext(), 
-                 request.getRequest());
-            // create pre-service event
-            for (int i = 0; i < instances.length; i++) {
-                if (instances[i] == null)
-                    continue;
-                if (!(instances[i] instanceof ServletRequestListener))
-                    continue;
-                ServletRequestListener listener =
-                    (ServletRequestListener) instances[i];
-                try {
-                    if (!request.isAsyncDispatching()) {
-                        listener.requestInitialized(event);
-                    }
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    container.getLogger().error(sm.getString(
-                            "standardContext.requestListener.requestInit",
-                            instances[i].getClass().getName()), t);
-                    ServletRequest sreq = request.getRequest();
-                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
-                    return;
-                }
+        // If a request init listener throws an exception, the request is
+        // aborted
+        if (context.fireRequestInitEvent(request)) {
+            if (request.isAsyncSupported()) {
+                request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
             }
-        }
-        if (request.isAsyncSupported()) {
-            request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
-        }
-        wrapper.getPipeline().getFirst().invoke(request, response);
+            wrapper.getPipeline().getFirst().invoke(request, response);
 
-        if ((instances !=null ) && (instances.length > 0)) {
-            // create post-service event
-            for (int i = 0; i < instances.length; i++) {
-                int j = (instances.length -1) -i;
-                if (instances[j] == null)
-                    continue;
-                if (!(instances[j] instanceof ServletRequestListener))
-                    continue;
-                ServletRequestListener listener =
-                    (ServletRequestListener) instances[j];
-                try {
-                    if (!request.isAsyncDispatching()) {
-                        listener.requestDestroyed(event);
-                    }
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    container.getLogger().error(sm.getString(
-                            "standardContext.requestListener.requestDestroy",
-                            instances[j].getClass().getName()), t);
-                    ServletRequest sreq = request.getRequest();
-                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
-                }
-            }
+            context.fireRequestDestroyEvent(request);
         }
     }
 

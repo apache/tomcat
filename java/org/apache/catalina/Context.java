@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
@@ -1003,6 +1004,20 @@ public interface Context extends Container {
      */
     public String[] findWrapperListeners();
 
+
+    /**
+     * Notify all {@link ServletRequestListener}s that a request has started.
+     * @return <code>true</code> if the listeners fire successfully, else
+     *         <code>false</code>
+     */
+    public boolean fireRequestInitEvent(ServletRequest request);
+
+    /**
+     * Notify all {@link ServletRequestListener}s that a request has ended.
+     * @return <code>true</code> if the listeners fire successfully, else
+     *         <code>false</code>
+     */
+    public boolean fireRequestDestroyEvent(ServletRequest request);
 
     /**
      * Reload this web application, if reloading is supported.

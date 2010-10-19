@@ -48,6 +48,7 @@ import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterConfig;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContainerInitializer;
@@ -57,7 +58,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -5502,6 +5505,83 @@ public class StandardContext extends ContainerBase
             hostName = "_";
         return hostName;
     }
+
+
+    @Override
+    public boolean fireRequestInitEvent(ServletRequest request) {
+
+        Object instances[] = getApplicationEventListeners();
+
+        if ((instances != null) && (instances.length > 0)) {
+
+            ServletRequestEvent event = 
+                    new ServletRequestEvent(getServletContext(), request);
+
+            for (int i = 0; i < instances.length; i++) {
+                if (instances[i] == null)
+                    continue;
+                if (!(instances[i] instanceof ServletRequestListener))
+                    continue;
+                ServletRequestListener listener =
+                    (ServletRequestListener) instances[i];
+                
+                try {
+                    // Don't fire the listener for async requests
+                    if (!DispatcherType.ASYNC.equals(
+                            request.getDispatcherType())) {
+                        listener.requestInitialized(event);
+                    }
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    getLogger().error(sm.getString(
+                            "standardContext.requestListener.requestInit",
+                            instances[i].getClass().getName()), t);
+                    request.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    @Override
+    public boolean fireRequestDestroyEvent(ServletRequest request) {
+        Object instances[] = getApplicationEventListeners();
+
+        if ((instances != null) && (instances.length > 0)) {
+
+            ServletRequestEvent event = 
+                    new ServletRequestEvent(getServletContext(), request);
+
+            for (int i = 0; i < instances.length; i++) {
+                int j = (instances.length -1) -i;
+                if (instances[j] == null)
+                    continue;
+                if (!(instances[j] instanceof ServletRequestListener))
+                    continue;
+                ServletRequestListener listener =
+                    (ServletRequestListener) instances[j];
+                
+                try {
+                    // Don't fire the listener for async requests
+                    if (!DispatcherType.ASYNC.equals(
+                            request.getDispatcherType())) {
+                        listener.requestDestroyed(event);
+                    }
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    getLogger().error(sm.getString(
+                            "standardContext.requestListener.requestInit",
+                            instances[j].getClass().getName()), t);
+                    request.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Set the appropriate context attribute for our work directory.
