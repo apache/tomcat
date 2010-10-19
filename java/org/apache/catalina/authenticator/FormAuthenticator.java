@@ -327,7 +327,10 @@ public class FormAuthenticator
             context.getServletContext().getRequestDispatcher
             (config.getLoginPage());
         try {
-            disp.forward(request.getRequest(), response);
+            if (context.fireRequestInitEvent(request)) {
+                disp.forward(request.getRequest(), response);
+                context.fireRequestDestroyEvent(request);
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             String msg = sm.getString("formAuthenticator.forwardLoginFail");
@@ -357,7 +360,10 @@ public class FormAuthenticator
             context.getServletContext().getRequestDispatcher
             (config.getErrorPage());
         try {
-            disp.forward(request.getRequest(), response);
+            if (context.fireRequestInitEvent(request)) {
+                disp.forward(request.getRequest(), response);
+                context.fireRequestDestroyEvent(request);
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             String msg = sm.getString("formAuthenticator.forwardErrorFail");
