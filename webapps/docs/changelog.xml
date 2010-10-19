@@ -37,11 +37,22 @@
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.5 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>50107</bug>: When removing a Host via JMX, do not attempt to
+        destroy the host&apos;s pipeline twice. Patch provided by Eiji
+        Takahashi. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
-      <bug>50105</bug>: When processing composite EL expressions use
-      <code>Enum.name()</code> rather than <code>Enum.toString()</code> as
-      required by the EL specification. (markt)
+      <fix>
+        <bug>50105</bug>: When processing composite EL expressions use
+        <code>Enum.name()</code> rather than <code>Enum.toString()</code> as
+        required by the EL specification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
