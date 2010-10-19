@@ -81,4 +81,27 @@ public class TestValueExpressionImpl extends TestCase {
         assertEquals(beanB, vr.getBase());
         assertEquals("name", vr.getProperty());
     }
+
+
+    public void testBug50105() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+        
+        TesterEnum testEnum = TesterEnum.APPLE;
+        
+        ValueExpression var =
+            factory.createValueExpression(testEnum, TesterEnum.class);
+        context.getVariableMapper().setVariable("testEnum", var);
+
+        // When coercing an Enum to a String, name() should always be used.
+        ValueExpression ve1 = factory.createValueExpression(
+                context, "${testEnum}", String.class);
+        String result1 = (String) ve1.getValue(context);
+        assertEquals("APPLE", result1);
+        
+        ValueExpression ve2 = factory.createValueExpression(
+                context, "foo${testEnum}bar", String.class);
+        String result2 = (String) ve2.getValue(context);
+        assertEquals("fooAPPLEbar", result2);
+    }
 }
