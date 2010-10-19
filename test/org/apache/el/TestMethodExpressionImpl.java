@@ -29,7 +29,7 @@ import org.apache.jasper.el.ELContextImpl;
 public class TestMethodExpressionImpl extends TestCase {
 
     private ExpressionFactory factory;
-    ELContext context;
+    private ELContext context;
     
     @Override
     public void setUp() {
