@@ -40,6 +40,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>49991</bug>: Ensure servlet request listeners are fired for
+        the login and error pages during FORM authentication. (markt)
+      </fix>
+      <fix>
         <bug>50107</bug>: When removing a Host via JMX, do not attempt to
         destroy the host&apos;s pipeline twice. Patch provided by Eiji
         Takahashi. (markt)
