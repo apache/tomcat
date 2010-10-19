@@ -37,6 +37,13 @@
 <body>
 <!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.5 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <bug>50105</bug>: When processing composite EL expressions use
+      <code>Enum.name()</code> rather than <code>Enum.toString()</code> as
+      required by the EL specification. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

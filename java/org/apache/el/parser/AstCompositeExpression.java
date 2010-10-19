@@ -20,6 +20,7 @@ package org.apache.el.parser;
 
 import javax.el.ELException;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
 
@@ -48,7 +49,7 @@ public final class AstCompositeExpression extends SimpleNode {
             for (int i = 0; i < this.children.length; i++) {
                 obj = this.children[i].getValue(ctx);
                 if (obj != null) {
-                    sb.append(obj);
+                    sb.append(ELSupport.coerceToString(obj));
                 }
             }
         }
