@@ -49,6 +49,15 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>49297</bug>: Enforce the rules in the JSP specification for parsing
+        the attributes of custom and standard actions that require that
+        the attribute names are unique within an element and that there is
+        whitespace before the attribute name. The whitespace test can be
+        disabled by setting the system property
+        <code>org.apache.jasper.compiler.Parser.STRICT_WHITESPACE</code> to
+        <code>false</code>. (markt)
+      </fix>
+      <fix>
         <bug>50105</bug>: When processing composite EL expressions use
         <code>Enum.name()</code> rather than <code>Enum.toString()</code> as
         required by the EL specification. (markt)

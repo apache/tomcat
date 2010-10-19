@@ -26,11 +26,19 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Tests are duplicated in {@link TestParserNoStrictWhitespace} with the strict
- * whitespace parsing disabled.
+ * Tests are duplicated in {@link TestParser} with the strict whitespace parsing
+ * enabled by default.
  */
-public class TestParser extends TomcatBaseTest {
+public class TestParserNoStrictWhitespace extends TomcatBaseTest {
     
+    @Override
+    public void setUp() throws Exception {
+        System.setProperty(
+                "org.apache.jasper.compiler.Parser.STRICT_WHITESPACE",
+                "false");
+        super.setUp();
+    }
+
     public void testBug48627() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -112,7 +120,8 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(result, "01-Hello world</p>#{foo2");
     }
 
-    public void testBug49297NoSpaceStrict() throws Exception {
+    public void testBug49297NoSpaceNotStrict() throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp-3.0");
@@ -121,13 +130,16 @@ public class TestParser extends TomcatBaseTest {
         
         tomcat.start();
 
+        ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49297NoSpace.jsp", new ByteChunk(),
+                "/test/bug49297NoSpace.jsp", res,
                 new HashMap<String,List<String>>());
 
-        assertEquals(500, sc);
+
+        assertEquals(200, sc);
+        assertEcho(res.toString(), "Hello World");
     }
-    
+
     public void testBug49297DuplicateAttr() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -143,7 +155,7 @@ public class TestParser extends TomcatBaseTest {
 
         assertEquals(500, sc);
     }
-    
+
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);

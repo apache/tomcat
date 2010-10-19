@@ -28,6 +28,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.util.UniqueAttributesImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -74,6 +75,13 @@ class Parser implements TagConstants {
     private static final String JAVAX_BODY_CONTENT_TEMPLATE_TEXT =
         "JAVAX_BODY_CONTENT_TEMPLATE_TEXT";
 
+    /* System property that controls if the strict white space rules are
+     * applied.
+     */ 
+    private static final boolean STRICT_WHITESPACE = Boolean.valueOf(
+            System.getProperty(
+                    "org.apache.jasper.compiler.Parser.STRICT_WHITESPACE",
+                    "true")).booleanValue();
     /**
      * The constructor
      */
@@ -142,11 +150,23 @@ class Parser implements TagConstants {
      * Attributes ::= (S Attribute)* S?
      */
     Attributes parseAttributes() throws JasperException {
-        AttributesImpl attrs = new AttributesImpl();
+        UniqueAttributesImpl attrs = new UniqueAttributesImpl();
 
         reader.skipSpaces();
-        while (parseAttribute(attrs))
-            reader.skipSpaces();
+        int ws = 1;
+
+        try {
+            while (parseAttribute(attrs)) {
+                if (ws == 0 && STRICT_WHITESPACE) {
+                    err.jspError(reader.mark(),
+                            "jsp.error.attribute.nowhitespace");
+                }
+                ws = reader.skipSpaces();
+            }
+        } catch (IllegalArgumentException iae) {
+            // Duplicate attribute
+            err.jspError(reader.mark(), "jsp.error.attribute.duplicate");
+        }
 
         return attrs;
     }
