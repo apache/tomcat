@@ -13,7 +13,11 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---%><%@ tag %><%@
-attribute name="echo" type="java.lang.String"%><%@
-attribute name="dummy" type="java.lang.String" required="false"%><%@
-tag body-content="empty" %><p>${echo}</p>
+--%>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<html>
+  <head><title>Bug 49297 duplicate attribute test case</title></head>
+  <body>
+    <tags:echo echo="Hello World" echo="error"/>
+  </body>
+</html>
