@@ -125,6 +125,13 @@
       <code>true</code> will be used.</p>
     </property>
 
+    <property name="org.apache.jasper.compiler. Parser.STRICT_WHITESPACE">
+      <p>If <code>false</code> the requirements for whitespace before an
+      attribute name will be relaxed so that the lack of whitespace will not
+      cause an error. If not specified, the specification compliant default of
+      <code>true</code> will be used.</p>
+    </property>
+
     <property name="org.apache.jasper.runtime. BodyContentImpl.LIMIT_BUFFER">
       <p>If <code>true</code>, any tag buffer that expands beyond
       <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> will be
