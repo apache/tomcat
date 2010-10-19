@@ -127,7 +127,7 @@ class PageDataImpl extends PageData implements TagConstants {
         }
 
         @Override
-    public void visit(Node.Root n) throws JasperException {
+        public void visit(Node.Root n) throws JasperException {
             visitBody(n);
             if (n == root) {
                 /*
@@ -164,7 +164,7 @@ class PageDataImpl extends PageData implements TagConstants {
         }
 
         @Override
-    public void visit(Node.JspRoot n) throws JasperException {
+        public void visit(Node.JspRoot n) throws JasperException {
             addAttributes(n.getTaglibAttributes());
             addAttributes(n.getNonTaglibXmlnsAttributes());
             addAttributes(n.getAttributes());
@@ -177,7 +177,7 @@ class PageDataImpl extends PageData implements TagConstants {
          * element.
          */
         @Override
-    public void visit(Node.TaglibDirective n) throws JasperException {
+        public void visit(Node.TaglibDirective n) throws JasperException {
             Attributes attrs = n.getAttributes();
             if (attrs != null) {
                 String qName = "xmlns:" + attrs.getValue("prefix");
