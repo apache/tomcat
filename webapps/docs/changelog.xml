@@ -40,6 +40,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>3839</bug>: Provide a mechanism to gracefully handle the case where
+        users book-mark the form login page or otherwise misuse the FORM
+        authentication process. Based on a suggestion by Mark Morris. (markt)
+      </fix>
+      <fix>
         <bug>49991</bug>: Ensure servlet request listeners are fired for
         the login and error pages during FORM authentication. (markt)
       </fix>
