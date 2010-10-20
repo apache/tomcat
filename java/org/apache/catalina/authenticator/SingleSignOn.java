@@ -210,6 +210,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      *
      * @param event SessionEvent that has occurred
      */
+    @Override
     public void sessionEvent(SessionEvent event) {
 
         // We only care about session destroyed events
