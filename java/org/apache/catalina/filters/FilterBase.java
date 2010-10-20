@@ -41,6 +41,7 @@ public abstract class FilterBase implements Filter {
 
     protected abstract Log getLogger();
     
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         Enumeration<String> paramNames = filterConfig.getInitParameterNames();
         while (paramNames.hasMoreElements()) {
