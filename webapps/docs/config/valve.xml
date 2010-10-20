@@ -552,6 +552,19 @@
         workaround for browser caching issues. If not set, the default value of
         <code>true</code> will be used.</p>
       </attribute>
+      
+      <attribute name="landingPage" required="false">
+        <p>Controls the behavior of the FORM authentication process if the
+        process is misused, for example by directly requesting the login page
+        or delaying logging in for so long that the session expires. If this
+        attribute is set, rather than returning an error response code, Tomcat
+        will redirect the user to the specified landing page if the login form
+        is submitted with valid credentials. For the login to be processed, the
+        landing page must be a protected resource (i.e. one that requires
+        authentication). If the landing page does not require authentication
+        then the user will not be logged in and will be prompted for their
+        credentials again when they access a protected page.</p>
+      </attribute>
 
       <attribute name="securePagesWithPragma" required="false">
         <p>Controls the caching of pages that are protected by security
