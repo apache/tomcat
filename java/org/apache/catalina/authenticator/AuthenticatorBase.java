@@ -596,6 +596,7 @@ public abstract class AuthenticatorBase extends ValveBase
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public abstract boolean authenticate(Request request,
                                             HttpServletResponse response,
                                             LoginConfig config)
@@ -829,6 +830,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
     }
 
+    @Override
     public void login(String username, String password, Request request)
             throws ServletException {
         Principal principal = doLogin(request, username, password);
@@ -847,6 +849,7 @@ public abstract class AuthenticatorBase extends ValveBase
         return p;
     }
 
+    @Override
     public void logout(Request request) throws ServletException {
         register(request, request.getResponse(), null,
                 null, null, null);

@@ -62,11 +62,8 @@ public class SingleSignOnEntry
      */
     public SingleSignOnEntry(Principal principal, String authType,
                              String username, String password) {
-        super();
-        updateCredentials(principal, authType, username, password);
-    }
 
-    public SingleSignOnEntry() {
+        updateCredentials(principal, authType, username, password);
     }
 
     // ------------------------------------------------------- Package Methods
