@@ -226,8 +226,6 @@ import org.apache.catalina.util.IOTools;
  * <li> Better documentation
  * <li> Confirm use of ServletInputStream.available() in CGIRunner.run() is
  *      not needed
- * <li> Make checking for "." and ".." in servlet & cgi PATH_INFO less
- *      draconian
  * <li> [add more to this TODO list]
  * </ul>
  * </p>
@@ -1522,7 +1520,10 @@ public final class CGIServlet extends HttpServlet {
          *             segments</u>:
          *             This implementation does not allow "<code>.</code>" and
          *             "<code>..</code>" in the the path, and such characters
-         *             will result in an IOException being thrown;
+         *             will result in an IOException being thrown (this should
+         *             never happen since Tomcat normalises the requestURI
+         *             before determining the contextPath, servletPath and
+         *             pathInfo);
          *     <LI> <u>Implementation limitations</u>: This implementation
          *             does not impose any limitations except as documented
          *             above.  This implementation may be limited by the
