@@ -75,6 +75,12 @@ public class FormAuthenticator
      */
     protected String characterEncoding = null;
 
+    /**
+     * Landing page to use if a user tries to access the login page directly or
+     * if the session times out during login. If not set, error responses will
+     * be sent instead.
+     */
+    protected String landingPage = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -103,6 +109,22 @@ public class FormAuthenticator
      */
     public void setCharacterEncoding(String encoding) {
         characterEncoding = encoding;
+    }
+
+
+    /**
+     * Return the landing page to use when FORM auth is mis-used.
+     */
+    public String getLandingPage() {
+        return landingPage;
+    }
+
+
+    /**
+     * Set the landing page to use when the FORM auth is mis-used.
+     */
+    public void setLandingPage(String landingPage) {
+        this.landingPage = landingPage;
     }
 
 
@@ -273,8 +295,19 @@ public class FormAuthenticator
             if (containerLog.isDebugEnabled())
                 containerLog.debug
                     ("User took so long to log on the session expired");
-            response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
-                               sm.getString("authenticator.sessionExpired"));
+            if (landingPage == null) {
+                response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
+                        sm.getString("authenticator.sessionExpired"));
+            } else {
+                // Make the authenticator think the user originally requested
+                // the landing page
+                String uri = request.getContextPath() + landingPage;
+                SavedRequest saved = new SavedRequest();
+                saved.setRequestURI(uri);
+                request.getSessionInternal(true).setNote(
+                        Constants.FORM_REQUEST_NOTE, saved);
+                response.sendRedirect(response.encodeRedirectURL(uri));
+            }
             return (false);
         }
 
@@ -291,8 +324,18 @@ public class FormAuthenticator
         if (log.isDebugEnabled())
             log.debug("Redirecting to original '" + requestURI + "'");
         if (requestURI == null)
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               sm.getString("authenticator.formlogin"));
+            if (landingPage == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        sm.getString("authenticator.formlogin"));
+            } else {
+                // Make the authenticator think the user originally requested
+                // the landing page
+                String uri = request.getContextPath() + landingPage;
+                SavedRequest saved = new SavedRequest();
+                saved.setRequestURI(uri);
+                session.setNote(Constants.FORM_REQUEST_NOTE, saved);
+                response.sendRedirect(response.encodeRedirectURL(uri));
+            }
         else
             response.sendRedirect(response.encodeRedirectURL(requestURI));
         return (false);
