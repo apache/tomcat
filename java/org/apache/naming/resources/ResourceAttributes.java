@@ -41,6 +41,7 @@ public class ResourceAttributes implements Attributes {
     
     // -------------------------------------------------------------- Constants
     
+    private static final long serialVersionUID = 1L;
     
     // Default attribute names
     
@@ -175,6 +176,7 @@ public class ResourceAttributes implements Attributes {
      * Default constructor.
      */
     public ResourceAttributes() {
+        // NO-OP
     }
     
     
@@ -772,6 +774,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get attribute.
      */
+    @Override
     public Attribute get(String attrID) {
         if (attributes == null) {
             if (attrID.equals(CREATION_DATE)) {
@@ -829,6 +832,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Put attribute.
      */
+    @Override
     public Attribute put(Attribute attribute) {
         if (attributes == null) {
             try {
@@ -845,6 +849,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Put attribute.
      */
+    @Override
     public Attribute put(String attrID, Object val) {
         if (attributes == null) {
             return null; // No reason to implement this
@@ -857,6 +862,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Remove attribute.
      */
+    @Override
     public Attribute remove(String attrID) {
         if (attributes == null) {
             return null; // No reason to implement this
@@ -869,6 +875,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get all attributes.
      */
+    @Override
     public NamingEnumeration<? extends Attribute> getAll() {
         if (attributes == null) {
             Vector<BasicAttribute> attributes = new Vector<BasicAttribute>();
@@ -916,6 +923,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get all attribute IDs.
      */
+    @Override
     public NamingEnumeration<String> getIDs() {
         if (attributes == null) {
             Vector<String> attributeIDs = new Vector<String>();
@@ -957,6 +965,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Retrieves the number of attributes in the attribute set.
      */
+    @Override
     public int size() {
         if (attributes == null) {
             int size = 0;
@@ -985,6 +994,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * Case sensitivity.
      */
+    @Override
     public boolean isCaseIgnored() {
         return false;
     }
