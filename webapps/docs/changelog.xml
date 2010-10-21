@@ -78,6 +78,12 @@
       <fix>
         Add support for maxActiveSessions attributes to BackupManager. (kfujino)
       </fix>
+      <fix>
+        Improve sending an access message in DeltaManager.
+        maxInactiveInterval of not Manager but the session is used. 
+        If maxInactiveInterval is negative, an access message is not sending. 
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
