@@ -18,7 +18,6 @@ package javax.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -250,7 +249,7 @@ public interface ServletRequest {
      * or {@link #getInputStream} may be called to read the body, not both.
      * 
      * @return a <code>BufferedReader</code> containing the body of the request
-     * @exception UnsupportedEncodingException
+     * @exception java.io.UnsupportedEncodingException
      *                if the character set encoding used is not supported and
      *                the text cannot be decoded
      * @exception IllegalStateException
