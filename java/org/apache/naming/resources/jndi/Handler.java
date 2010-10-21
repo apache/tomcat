@@ -25,15 +25,9 @@ import org.apache.naming.resources.DirContextURLStreamHandler;
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$
  */
-public class Handler 
-    extends DirContextURLStreamHandler {
-    
-    
-    // ----------------------------------------------------------- Constructors
-    
+public class Handler extends DirContextURLStreamHandler {
     
     public Handler() {
+        // NOOP
     }
-    
-    
 }
