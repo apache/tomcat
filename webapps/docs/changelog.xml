@@ -53,6 +53,10 @@
         destroy the host&apos;s pipeline twice. Patch provided by Eiji
         Takahashi. (markt)
       </fix>
+      <fix>
+        <bug>50138</bug>: Fix threading issues in
+        <code>org.apache.catalina.security.SecurityUtil</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
