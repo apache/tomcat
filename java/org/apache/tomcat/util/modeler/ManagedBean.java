@@ -35,7 +35,6 @@ import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
 import javax.management.ServiceNotFoundException;
-import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 
 /**
@@ -304,8 +303,8 @@ public class ManagedBean implements java.io.Serializable
      *
      * @exception InstanceNotFoundException if the managed resource
      *  object cannot be found
-     * @exception InvalidTargetObjectTypeException if our MBean cannot
-     *  handle object references (should never happen)
+     * @exception javax.management.modelmbean.InvalidTargetObjectTypeException
+     *  if our MBean cannot handle object references (should never happen)
      * @exception MBeanException if a problem occurs instantiating the
      *  <code>ModelMBean</code> instance
      * @exception RuntimeOperationsException if a JMX runtime error occurs
@@ -332,8 +331,8 @@ public class ManagedBean implements java.io.Serializable
      *
      * @exception InstanceNotFoundException if the managed resource
      *  object cannot be found
-     * @exception InvalidTargetObjectTypeException if our MBean cannot
-     *  handle object references (should never happen)
+     * @exception javax.management.modelmbean.InvalidTargetObjectTypeException
+     *  if our MBean cannot handle object references (should never happen)
      * @exception MBeanException if a problem occurs instantiating the
      *  <code>ModelMBean</code> instance
      * @exception RuntimeOperationsException if a JMX runtime error occurs
