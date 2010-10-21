@@ -39,6 +39,7 @@ public class DirContextURLStreamHandler
     
     
     public DirContextURLStreamHandler() {
+        // NOOP
     }
     
     
