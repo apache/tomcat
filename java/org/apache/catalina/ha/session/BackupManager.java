@@ -242,6 +242,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         result.cluster = cluster;
         result.notifyListenersOnReplication = notifyListenersOnReplication;
         result.mapSendOptions = mapSendOptions;
+        result.maxActiveSessions = maxActiveSessions;
         return result;
     }
 
