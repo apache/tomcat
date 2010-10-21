@@ -26,20 +26,13 @@ import java.util.Hashtable;
 import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.Name;
-import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.NotContextException;
-import javax.naming.OperationNotSupportedException;
-import javax.naming.directory.AttributeModificationException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
-import javax.naming.directory.InvalidAttributesException;
-import javax.naming.directory.InvalidSearchControlsException;
-import javax.naming.directory.InvalidSearchFilterException;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
@@ -105,29 +98,6 @@ public class ProxyDirContext implements DirContext {
         hostName = env.get(HOST);
         contextName = env.get(CONTEXT);
     }
-
-
-    /**
-     * Builds a clone of this proxy dir context, wrapping the given directory
-     * context, and sharing the same cache.
-     */
-    // TODO: Refactor using the proxy field
-    /*
-    protected ProxyDirContext(ProxyDirContext proxyDirContext, 
-                              DirContext dirContext, String vPath) {
-        this.env = proxyDirContext.env;
-        this.dirContext = dirContext;
-        this.vPath = vPath;
-        this.cache = proxyDirContext.cache;
-        this.cacheMaxSize = proxyDirContext.cacheMaxSize;
-        this.cacheSize = proxyDirContext.cacheSize;
-        this.cacheTTL = proxyDirContext.cacheTTL;
-        this.cacheObjectMaxSize = proxyDirContext.cacheObjectMaxSize;
-        this.notFoundCache = proxyDirContext.notFoundCache;
-        this.hostName = proxyDirContext.hostName;
-        this.contextName = proxyDirContext.contextName;
-    }
-    */
 
 
     // ----------------------------------------------------- Instance Variables
@@ -266,6 +236,7 @@ public class ProxyDirContext implements DirContext {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookup(Name name)
         throws NamingException {
         CacheEntry entry = cacheLookup(name.toString());
@@ -295,6 +266,7 @@ public class ProxyDirContext implements DirContext {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookup(String name)
         throws NamingException {
         CacheEntry entry = cacheLookup(name);
@@ -329,11 +301,13 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void bind(Name name, Object obj)
         throws NamingException {
         dirContext.bind(parseName(name), obj);
@@ -346,11 +320,13 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void bind(String name, Object obj)
         throws NamingException {
         dirContext.bind(parseName(name), obj);
@@ -369,10 +345,11 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rebind(Name name, Object obj)
         throws NamingException {
         dirContext.rebind(parseName(name), obj);
@@ -385,10 +362,11 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rebind(String name, Object obj)
         throws NamingException {
         dirContext.rebind(parseName(name), obj);
@@ -410,6 +388,7 @@ public class ProxyDirContext implements DirContext {
      * exist
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void unbind(Name name)
         throws NamingException {
         dirContext.unbind(parseName(name));
@@ -425,6 +404,7 @@ public class ProxyDirContext implements DirContext {
      * exist
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void unbind(String name)
         throws NamingException {
         dirContext.unbind(parseName(name));
@@ -440,9 +420,11 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param oldName the name of the existing binding; may not be empty
      * @param newName the name of the new binding; may not be empty
-     * @exception NameAlreadyBoundException if newName is already bound
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rename(Name oldName, Name newName)
         throws NamingException {
         dirContext.rename(parseName(oldName), parseName(newName));
@@ -456,9 +438,11 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param oldName the name of the existing binding; may not be empty
      * @param newName the name of the new binding; may not be empty
-     * @exception NameAlreadyBoundException if newName is already bound
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rename(String oldName, String newName)
         throws NamingException {
         dirContext.rename(parseName(oldName), parseName(newName));
@@ -479,6 +463,7 @@ public class ProxyDirContext implements DirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         return dirContext.list(parseName(name));
@@ -494,6 +479,7 @@ public class ProxyDirContext implements DirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
         return dirContext.list(parseName(name));
@@ -513,6 +499,7 @@ public class ProxyDirContext implements DirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         return dirContext.listBindings(parseName(name));
@@ -528,6 +515,7 @@ public class ProxyDirContext implements DirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<Binding> listBindings(String name)
         throws NamingException {
         return dirContext.listBindings(parseName(name));
@@ -556,9 +544,10 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the context to be destroyed; may not be empty
      * @exception NameNotFoundException if an intermediate context does not 
      * exist
-     * @exception NotContextException if the name is bound but does not name 
-     * a context, or does not name a context of the appropriate type
+     * @exception javax.naming.NotContextException if the name is bound but does
+     * not name a context, or does not name a context of the appropriate type
      */
+    @Override
     public void destroySubcontext(Name name)
         throws NamingException {
         dirContext.destroySubcontext(parseName(name));
@@ -572,9 +561,10 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the context to be destroyed; may not be empty
      * @exception NameNotFoundException if an intermediate context does not 
      * exist
-     * @exception NotContextException if the name is bound but does not name 
-     * a context, or does not name a context of the appropriate type
+     * @exception javax.naming.NotContextException if the name is bound but does
+     * not name a context, or does not name a context of the appropriate type
      */
+    @Override
     public void destroySubcontext(String name)
         throws NamingException {
         dirContext.destroySubcontext(parseName(name));
@@ -590,11 +580,13 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name of the context to create; may not be empty
      * @return the newly created context
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if creation of the subcontext 
-     * requires specification of mandatory attributes
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if creation
+     * of the sub-context requires specification of mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Context createSubcontext(Name name)
         throws NamingException {
         Context context = dirContext.createSubcontext(parseName(name));
@@ -608,11 +600,13 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name of the context to create; may not be empty
      * @return the newly created context
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if creation of the subcontext 
-     * requires specification of mandatory attributes
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if creation
+     * of the sub-context requires specification of mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Context createSubcontext(String name)
         throws NamingException {
         Context context = dirContext.createSubcontext(parseName(name));
@@ -631,6 +625,7 @@ public class ProxyDirContext implements DirContext {
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookupLink(Name name)
         throws NamingException {
         return dirContext.lookupLink(parseName(name));
@@ -646,6 +641,7 @@ public class ProxyDirContext implements DirContext {
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookupLink(String name)
         throws NamingException {
         return dirContext.lookupLink(parseName(name));
@@ -666,6 +662,7 @@ public class ProxyDirContext implements DirContext {
      * components
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NameParser getNameParser(Name name)
         throws NamingException {
         return dirContext.getNameParser(parseName(name));
@@ -680,6 +677,7 @@ public class ProxyDirContext implements DirContext {
      * components
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NameParser getNameParser(String name)
         throws NamingException {
         return dirContext.getNameParser(parseName(name));
@@ -701,10 +699,11 @@ public class ProxyDirContext implements DirContext {
      * @return the composition of prefix and name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Name composeName(Name name, Name prefix)
         throws NamingException {
-        prefix = (Name) prefix.clone();
-        return prefix.addAll(name);
+        Name prefixClone = (Name) prefix.clone();
+        return prefixClone.addAll(name);
     }
 
 
@@ -716,6 +715,7 @@ public class ProxyDirContext implements DirContext {
      * @return the composition of prefix and name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public String composeName(String name, String prefix)
         throws NamingException {
         return prefix + "/" + name;
@@ -731,6 +731,7 @@ public class ProxyDirContext implements DirContext {
      * @param propVal the value of the property to add; may not be null
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object addToEnvironment(String propName, Object propVal)
         throws NamingException {
         return dirContext.addToEnvironment(propName, propVal);
@@ -744,6 +745,7 @@ public class ProxyDirContext implements DirContext {
      * may not be null
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object removeFromEnvironment(String propName)
         throws NamingException {
         return dirContext.removeFromEnvironment(propName);
@@ -760,6 +762,7 @@ public class ProxyDirContext implements DirContext {
      * @return the environment of this context; never null
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Hashtable<?,?> getEnvironment()
         throws NamingException {
         return dirContext.getEnvironment();
@@ -776,6 +779,7 @@ public class ProxyDirContext implements DirContext {
      * 
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void close()
         throws NamingException {
         dirContext.close();
@@ -795,10 +799,11 @@ public class ProxyDirContext implements DirContext {
      * OperationNotSupportedException is thrown.
      * 
      * @return this context's name in its own namespace; never null
-     * @exception OperationNotSupportedException if the naming system does 
-     * not have the notion of a full name
+     * @exception javax.naming.OperationNotSupportedException if the naming
+     * system does not have the notion of a full name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public String getNameInNamespace()
         throws NamingException {
         return dirContext.getNameInNamespace();
@@ -816,6 +821,7 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the object from which to retrieve attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Attributes getAttributes(Name name)
         throws NamingException {
         CacheEntry entry = cacheLookup(name.toString());
@@ -840,6 +846,7 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the object from which to retrieve attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Attributes getAttributes(String name)
         throws NamingException {
         CacheEntry entry = cacheLookup(name);
@@ -869,6 +876,7 @@ public class ProxyDirContext implements DirContext {
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Attributes getAttributes(Name name, String[] attrIds)
         throws NamingException {
         Attributes attributes = 
@@ -890,7 +898,8 @@ public class ProxyDirContext implements DirContext {
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
-     public Attributes getAttributes(String name, String[] attrIds)
+     @Override
+    public Attributes getAttributes(String name, String[] attrIds)
          throws NamingException {
         Attributes attributes = 
             dirContext.getAttributes(parseName(name), attrIds);
@@ -911,10 +920,11 @@ public class ProxyDirContext implements DirContext {
      * REPLACE_ATTRIBUTE, REMOVE_ATTRIBUTE
      * @param attrs the attributes to be used for the modification; may not 
      * be null
-     * @exception AttributeModificationException if the modification cannot be
-     * completed successfully
+     * @exception javax.naming.directory.AttributeModificationException if the
+     * modification cannot be completed successfully
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void modifyAttributes(Name name, int mod_op, Attributes attrs)
         throws NamingException {
         dirContext.modifyAttributes(parseName(name), mod_op, attrs);
@@ -930,10 +940,11 @@ public class ProxyDirContext implements DirContext {
      * REPLACE_ATTRIBUTE, REMOVE_ATTRIBUTE
      * @param attrs the attributes to be used for the modification; may not 
      * be null
-     * @exception AttributeModificationException if the modification cannot be
-     * completed successfully
+     * @exception javax.naming.directory.AttributeModificationException if the
+     * modification cannot be completed successfully
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void modifyAttributes(String name, int mod_op, Attributes attrs)
         throws NamingException {
         dirContext.modifyAttributes(parseName(name), mod_op, attrs);
@@ -951,10 +962,11 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the object whose attributes will be updated
      * @param mods an ordered sequence of modifications to be performed; may 
      * not be null
-     * @exception AttributeModificationException if the modification cannot be
-     * completed successfully
+     * @exception javax.naming.directory.AttributeModificationException if the
+     * modification cannot be completed successfully
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void modifyAttributes(Name name, ModificationItem[] mods)
         throws NamingException {
         dirContext.modifyAttributes(parseName(name), mods);
@@ -969,10 +981,11 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the object whose attributes will be updated
      * @param mods an ordered sequence of modifications to be performed; may 
      * not be null
-     * @exception AttributeModificationException if the modification cannot be
-     * completed successfully
+     * @exception javax.naming.directory.AttributeModificationException if the
+     * modification cannot be completed successfully
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void modifyAttributes(String name, ModificationItem[] mods)
         throws NamingException {
         dirContext.modifyAttributes(parseName(name), mods);
@@ -990,11 +1003,13 @@ public class ProxyDirContext implements DirContext {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if some "mandatory" attributes 
-     * of the binding are not supplied
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if some
+     * "mandatory" attributes of the binding are not supplied
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void bind(Name name, Object obj, Attributes attrs)
         throws NamingException {
         dirContext.bind(parseName(name), obj, attrs);
@@ -1008,11 +1023,13 @@ public class ProxyDirContext implements DirContext {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if some "mandatory" attributes 
-     * of the binding are not supplied
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if some
+     * "mandatory" attributes of the binding are not supplied
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void bind(String name, Object obj, Attributes attrs)
         throws NamingException {
         dirContext.bind(parseName(name), obj, attrs);
@@ -1034,10 +1051,11 @@ public class ProxyDirContext implements DirContext {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
-     * @exception InvalidAttributesException if some "mandatory" attributes 
-     * of the binding are not supplied
+     * @exception javax.naming.directory.InvalidAttributesException if some
+     * "mandatory" attributes of the binding are not supplied
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rebind(Name name, Object obj, Attributes attrs)
         throws NamingException {
         dirContext.rebind(parseName(name), obj, attrs);
@@ -1052,10 +1070,11 @@ public class ProxyDirContext implements DirContext {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
-     * @exception InvalidAttributesException if some "mandatory" attributes 
-     * of the binding are not supplied
+     * @exception javax.naming.directory.InvalidAttributesException if some
+     * "mandatory" attributes of the binding are not supplied
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rebind(String name, Object obj, Attributes attrs)
         throws NamingException {
         dirContext.rebind(parseName(name), obj, attrs);
@@ -1075,11 +1094,13 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the context to create; may not be empty
      * @param attrs the attributes to associate with the newly created context
      * @return the newly created context
-     * @exception NameAlreadyBoundException if the name is already bound
-     * @exception InvalidAttributesException if attrs does not contain all 
-     * the mandatory attributes required for creation
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if attrs
+     * does not contain all the mandatory attributes required for creation
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public DirContext createSubcontext(Name name, Attributes attrs)
         throws NamingException {
         DirContext context = 
@@ -1095,11 +1116,13 @@ public class ProxyDirContext implements DirContext {
      * @param name the name of the context to create; may not be empty
      * @param attrs the attributes to associate with the newly created context
      * @return the newly created context
-     * @exception NameAlreadyBoundException if the name is already bound
-     * @exception InvalidAttributesException if attrs does not contain all 
-     * the mandatory attributes required for creation
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if attrs
+     * does not contain all the mandatory attributes required for creation
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public DirContext createSubcontext(String name, Attributes attrs)
         throws NamingException {
         DirContext context = 
@@ -1119,9 +1142,11 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name of the object whose schema is to be retrieved
      * @return the schema associated with the context; never null
-     * @exception OperationNotSupportedException if schema not supported
+     * @exception javax.naming.OperationNotSupportedException if schema not
+     * supported
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public DirContext getSchema(Name name)
         throws NamingException {
         return dirContext.getSchema(parseName(name));
@@ -1133,9 +1158,11 @@ public class ProxyDirContext implements DirContext {
      * 
      * @param name the name of the object whose schema is to be retrieved
      * @return the schema associated with the context; never null
-     * @exception OperationNotSupportedException if schema not supported
+     * @exception javax.naming.OperationNotSupportedException if schema not
+     * supported
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public DirContext getSchema(String name)
         throws NamingException {
         return dirContext.getSchema(parseName(name));
@@ -1150,9 +1177,11 @@ public class ProxyDirContext implements DirContext {
      * be retrieved
      * @return the DirContext containing the named object's class 
      * definitions; never null
-     * @exception OperationNotSupportedException if schema not supported
+     * @exception javax.naming.OperationNotSupportedException if schema not
+     * supported
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public DirContext getSchemaClassDefinition(Name name)
         throws NamingException {
         return dirContext.getSchemaClassDefinition(parseName(name));
@@ -1167,9 +1196,11 @@ public class ProxyDirContext implements DirContext {
      * be retrieved
      * @return the DirContext containing the named object's class 
      * definitions; never null
-     * @exception OperationNotSupportedException if schema not supported
+     * @exception javax.naming.OperationNotSupportedException if schema not
+     * supported
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public DirContext getSchemaClassDefinition(String name)
         throws NamingException {
         return dirContext.getSchemaClassDefinition(parseName(name));
@@ -1193,6 +1224,7 @@ public class ProxyDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(Name name,
             Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
@@ -1217,6 +1249,7 @@ public class ProxyDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(String name,
             Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
@@ -1240,6 +1273,7 @@ public class ProxyDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(Name name,
             Attributes matchingAttributes) throws NamingException {
         return dirContext.search(parseName(name), matchingAttributes);
@@ -1259,6 +1293,7 @@ public class ProxyDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(String name,
             Attributes matchingAttributes) throws NamingException {
         return dirContext.search(parseName(name), matchingAttributes);
@@ -1278,12 +1313,14 @@ public class ProxyDirContext implements DirContext {
      * (new SearchControls())).
      * @return an enumeration of SearchResults of the objects that satisfy 
      * the filter; never null
-     * @exception InvalidSearchFilterException if the search filter specified 
-     * is not supported or understood by the underlying directory
-     * @exception InvalidSearchControlsException if the search controls 
-     * contain invalid settings
+     * @exception javax.naming.directory.InvalidSearchFilterException if the
+     * search filter specified is not supported or understood by the underlying
+     * directory
+     * @exception javax.naming.directory.InvalidSearchControlsException if the
+     * search controls contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(Name name, String filter, 
                                     SearchControls cons)
         throws NamingException {
@@ -1304,12 +1341,14 @@ public class ProxyDirContext implements DirContext {
      * (new SearchControls())).
      * @return an enumeration of SearchResults of the objects that satisfy 
      * the filter; never null
-     * @exception InvalidSearchFilterException if the search filter 
-     * specified is not supported or understood by the underlying directory
-     * @exception InvalidSearchControlsException if the search controls 
-     * contain invalid settings
+     * @exception javax.naming.directory.InvalidSearchFilterException if the
+     * search filter specified is not supported or understood by the underlying
+     * directory
+     * @exception javax.naming.directory.InvalidSearchControlsException if the
+     * search controls contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(String name, String filter, 
                                     SearchControls cons)
         throws NamingException {
@@ -1335,12 +1374,13 @@ public class ProxyDirContext implements DirContext {
      * filter; never null
      * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
      * expressions where i is outside the bounds of the array filterArgs
-     * @exception InvalidSearchControlsException if cons contains invalid 
-     * settings
-     * @exception InvalidSearchFilterException if filterExpr with filterArgs 
-     * represents an invalid search filter
+     * @exception javax.naming.directory.InvalidSearchControlsException if cons
+     * contains invalid settings
+     * @exception javax.naming.directory.InvalidSearchFilterException if
+     * filterExpr with filterArgs represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(Name name, String filterExpr,
                                     Object[] filterArgs, SearchControls cons)
         throws NamingException {
@@ -1367,12 +1407,13 @@ public class ProxyDirContext implements DirContext {
      * filter; never null
      * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
      * expressions where i is outside the bounds of the array filterArgs
-     * @exception InvalidSearchControlsException if cons contains invalid 
-     * settings
-     * @exception InvalidSearchFilterException if filterExpr with filterArgs 
-     * represents an invalid search filter
+     * @exception javax.naming.directory.InvalidSearchControlsException if cons
+     * contains invalid settings
+     * @exception javax.naming.directory.InvalidSearchFilterException if
+     * filterExpr with filterArgs represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<SearchResult> search(String name,
             String filterExpr, Object[] filterArgs, SearchControls cons)
         throws NamingException {
@@ -1428,8 +1469,7 @@ public class ProxyDirContext implements DirContext {
      * 
      * @return the parsed name
      */
-    protected String parseName(String name) 
-        throws NamingException {
+    protected String parseName(String name) {
         return name;
     }
 
@@ -1439,8 +1479,7 @@ public class ProxyDirContext implements DirContext {
      * 
      * @return the parsed name
      */
-    protected Name parseName(Name name) 
-        throws NamingException {
+    protected Name parseName(Name name) {
         return name;
     }
 
@@ -1448,11 +1487,15 @@ public class ProxyDirContext implements DirContext {
     /**
      * Lookup in cache.
      */
-    protected CacheEntry cacheLookup(String name) {
+    protected CacheEntry cacheLookup(String lookupName) {
         if (cache == null)
             return (null);
-        if (name == null)
+        String name;
+        if (lookupName == null) {
             name = "";
+        } else {
+            name = lookupName;
+        }
         for (int i = 0; i < nonCacheable.length; i++) {
             if (name.startsWith(nonCacheable[i])) {
                 return (null);
