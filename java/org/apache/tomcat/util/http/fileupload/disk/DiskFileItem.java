@@ -36,9 +36,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
 import org.apache.tomcat.util.http.fileupload.FileItemHeadersSupport;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
-import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 
 
@@ -49,8 +47,8 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * <p> After retrieving an instance of this class from a {@link
  * org.apache.tomcat.util.http.fileupload.FileUpload FileUpload} instance (see
  * {@link org.apache.tomcat.util.http.fileupload.FileUpload
- * #parseRequest(RequestContext)}), you may
- * either request all contents of file at once using {@link #get()} or
+ * #parseRequest(org.apache.tomcat.util.http.fileupload.RequestContext)}), you
+ * may either request all contents of file at once using {@link #get()} or
  * request an {@link java.io.InputStream InputStream} with
  * {@link #getInputStream()} and process the file without attempting to load
  * it into memory, which may come handy with large files.
@@ -276,10 +274,10 @@ public class DiskFileItem
      * Returns the original filename in the client's filesystem.
      *
      * @return The original filename in the client's filesystem.
-     * @throws InvalidFileNameException The file name contains a NUL character,
-     *   which might be an indicator of a security attack. If you intend to
-     *   use the file name anyways, catch the exception and use
-     *   InvalidFileNameException#getName().
+     * @throws org.apache.tomcat.util.http.fileupload.InvalidFileNameException
+     *   The file name contains a NUL character, which might be an indicator of
+     *   a security attack. If you intend to use the file name anyways, catch
+     *   the exception and use InvalidFileNameException#getName().
      */
     public String getName() {
         return Streams.checkFileName(fileName);
