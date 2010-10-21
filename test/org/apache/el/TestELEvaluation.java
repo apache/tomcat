@@ -28,12 +28,12 @@ import javax.el.ValueExpression;
 import junit.framework.TestCase;
 
 import org.apache.el.lang.ELSupport;
-import org.apache.jasper.compiler.TestAttributeParser;
 import org.apache.jasper.el.ELContextImpl;
 
 /**
  * Tests the EL engine directly. Similar tests may be found in
- * {@link TestAttributeParser} and {@link TestELInJsp}.
+ * {@link org.apache.jasper.compiler.TestAttributeParser} and
+ * {@link TestELInJsp}.
  */
 public class TestELEvaluation extends TestCase {
 
