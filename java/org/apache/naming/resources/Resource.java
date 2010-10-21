@@ -34,6 +34,7 @@ public class Resource {
     
     
     public Resource() {
+        // NO-OP
     }
     
     
@@ -69,9 +70,9 @@ public class Resource {
      * Content accessor.
      * 
      * @return InputStream
+     * @throws IOException
      */
-    public InputStream streamContent()
-        throws IOException {
+    public InputStream streamContent() throws IOException {
         if (binaryContent != null) {
             return new ByteArrayInputStream(binaryContent);
         }
