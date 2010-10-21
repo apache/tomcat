@@ -34,6 +34,7 @@ public class DirContextURLStreamHandlerFactory
     
     
     public DirContextURLStreamHandlerFactory() {
+        // NOOP
     }
     
     
@@ -54,6 +55,7 @@ public class DirContextURLStreamHandlerFactory
      * @return a URLStreamHandler for the jndi protocol, or null if the 
      * protocol is not JNDI
      */
+    @Override
     public URLStreamHandler createURLStreamHandler(String protocol) {
         if (protocol.equals("jndi")) {
             return new DirContextURLStreamHandler();
