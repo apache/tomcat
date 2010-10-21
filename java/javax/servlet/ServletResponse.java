@@ -18,7 +18,6 @@ package javax.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /**
@@ -121,7 +120,7 @@ public interface ServletResponse {
      * 
      * @return a <code>PrintWriter</code> object that can return character data
      *         to the client
-     * @exception UnsupportedEncodingException
+     * @exception java.io.UnsupportedEncodingException
      *                if the character encoding returned by
      *                <code>getCharacterEncoding</code> cannot be used
      * @exception IllegalStateException
