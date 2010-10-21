@@ -21,12 +21,12 @@ import java.io.File;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.jasper.compiler.TestAttributeParser;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Tests EL with an without JSP attributes using a test web application. Similar
- * tests may be found in {@link TestELEvaluation} and {@link TestAttributeParser}.
+ * tests may be found in {@link TestELEvaluation} and
+ * {@link org.apache.jasper.compiler.TestAttributeParser}.
  */
 public class TestELInJsp extends TomcatBaseTest {
     
