@@ -1078,7 +1078,8 @@ public class DeltaManager extends ClusterManagerBase{
             //check to see if we need to send out an access message
             if (!expires && (msg == null)) {
                 long replDelta = System.currentTimeMillis() - session.getLastTimeReplicated();
-                if (replDelta > (getMaxInactiveInterval() * 1000)) {
+                if (session.getMaxInactiveInterval() >=0 && 
+                        replDelta > (session.getMaxInactiveInterval() * 1000)) {
                     counterSend_EVT_SESSION_ACCESSED++;
                     msg = new SessionMessageImpl(getName(),
                                                  SessionMessage.EVT_SESSION_ACCESSED, 
