@@ -25,14 +25,12 @@ import javax.el.ValueExpression;
 import junit.framework.TestCase;
 
 import org.apache.el.ExpressionFactoryImpl;
-import org.apache.el.TestELEvaluation;
-import org.apache.el.TestELInJsp;
 import org.apache.el.TesterFunctions;
 import org.apache.jasper.el.ELContextImpl;
 
 /**
  * Test the EL processing from JSP attributes. Similar tests may be found in
- * {@link TestELEvaluation} and {@link TestELInJsp}.
+ * {@link org.apache.el.TestELEvaluation} and {@link org.apache.el.TestELInJsp}.
  */
 public class TestAttributeParser extends TestCase {
 
@@ -62,8 +60,8 @@ public class TestAttributeParser extends TestCase {
 
     /**
      * Test use nested ternary expressions. Full tests in
-     * {@link TestELEvaluation}. This is just a smoke test to ensure JSP
-     * attribute processing doesn't cause any additional issues.
+     * {@link org.apache.el.TestELEvaluation}. This is just a smoke test to
+     * ensure JSP attribute processing doesn't cause any additional issues.
      */
     public void testBug44994() {
         assertEquals("none",
