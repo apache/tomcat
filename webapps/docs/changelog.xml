@@ -115,7 +115,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.4 (markt)">
+<section name="Tomcat 7.0.4 (markt)" rtext="beta, 2010-10-21">
   <subsection name="Catalina">
     <changelog>
       <fix>
