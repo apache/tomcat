@@ -38,7 +38,6 @@ import javax.naming.NotContextException;
 import javax.naming.OperationNotSupportedException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
-import javax.naming.directory.InvalidAttributesException;
 import javax.naming.spi.NamingManager;
 
 /**
@@ -140,6 +139,7 @@ public class NamingContext implements Context {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookup(Name name)
         throws NamingException {
         return lookup(name, true);
@@ -153,6 +153,7 @@ public class NamingContext implements Context {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookup(String name)
         throws NamingException {
         return lookup(new CompositeName(name), true);
@@ -167,10 +168,11 @@ public class NamingContext implements Context {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void bind(Name name, Object obj)
         throws NamingException {
         bind(name, obj, false);
@@ -183,10 +185,11 @@ public class NamingContext implements Context {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void bind(String name, Object obj)
         throws NamingException {
         bind(new CompositeName(name), obj);
@@ -204,10 +207,11 @@ public class NamingContext implements Context {
      * 
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rebind(Name name, Object obj)
         throws NamingException {
         bind(name, obj, true);
@@ -219,10 +223,11 @@ public class NamingContext implements Context {
      * 
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rebind(String name, Object obj)
         throws NamingException {
         rebind(new CompositeName(name), obj);
@@ -243,6 +248,7 @@ public class NamingContext implements Context {
      * exist
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void unbind(Name name)
         throws NamingException {
         checkWritable();
@@ -282,6 +288,7 @@ public class NamingContext implements Context {
      * exist
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void unbind(String name)
         throws NamingException {
         unbind(new CompositeName(name));
@@ -299,6 +306,7 @@ public class NamingContext implements Context {
      * @exception NameAlreadyBoundException if newName is already bound
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rename(Name oldName, Name newName)
         throws NamingException {
         Object value = lookup(oldName);
@@ -316,6 +324,7 @@ public class NamingContext implements Context {
      * @exception NameAlreadyBoundException if newName is already bound
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void rename(String oldName, String newName)
         throws NamingException {
         rename(new CompositeName(oldName), new CompositeName(newName));
@@ -335,6 +344,7 @@ public class NamingContext implements Context {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         // Removing empty parts
@@ -368,6 +378,7 @@ public class NamingContext implements Context {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
         return list(new CompositeName(name));
@@ -387,6 +398,7 @@ public class NamingContext implements Context {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         // Removing empty parts
@@ -420,6 +432,7 @@ public class NamingContext implements Context {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NamingEnumeration<Binding> listBindings(String name)
         throws NamingException {
         return listBindings(new CompositeName(name));
@@ -451,6 +464,7 @@ public class NamingContext implements Context {
      * @exception NotContextException if the name is bound but does not name 
      * a context, or does not name a context of the appropriate type
      */
+    @Override
     public void destroySubcontext(Name name)
         throws NamingException {
         
@@ -498,6 +512,7 @@ public class NamingContext implements Context {
      * @exception NotContextException if the name is bound but does not name 
      * a context, or does not name a context of the appropriate type
      */
+    @Override
     public void destroySubcontext(String name)
         throws NamingException {
         destroySubcontext(new CompositeName(name));
@@ -513,10 +528,11 @@ public class NamingContext implements Context {
      * @param name the name of the context to create; may not be empty
      * @return the newly created context
      * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if creation of the subcontext 
-     * requires specification of mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if creation
+     * of the sub-context requires specification of mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Context createSubcontext(Name name)
         throws NamingException {
         checkWritable();
@@ -534,10 +550,11 @@ public class NamingContext implements Context {
      * @param name the name of the context to create; may not be empty
      * @return the newly created context
      * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if creation of the subcontext 
-     * requires specification of mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if creation 
+     * of the sub-context requires specification of mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Context createSubcontext(String name)
         throws NamingException {
         return createSubcontext(new CompositeName(name));
@@ -554,6 +571,7 @@ public class NamingContext implements Context {
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookupLink(Name name)
         throws NamingException {
         return lookup(name, false);
@@ -569,6 +587,7 @@ public class NamingContext implements Context {
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object lookupLink(String name)
         throws NamingException {
         return lookup(new CompositeName(name), false);
@@ -589,6 +608,7 @@ public class NamingContext implements Context {
      * components
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NameParser getNameParser(Name name)
         throws NamingException {
 
@@ -620,6 +640,7 @@ public class NamingContext implements Context {
      * components
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public NameParser getNameParser(String name)
         throws NamingException {
         return getNameParser(new CompositeName(name));
@@ -641,6 +662,7 @@ public class NamingContext implements Context {
      * @return the composition of prefix and name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Name composeName(Name name, Name prefix)
         throws NamingException {
         prefix = (Name) prefix.clone();
@@ -656,6 +678,7 @@ public class NamingContext implements Context {
      * @return the composition of prefix and name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public String composeName(String name, String prefix)
         throws NamingException {
         return prefix + "/" + name;
@@ -671,6 +694,7 @@ public class NamingContext implements Context {
      * @param propVal the value of the property to add; may not be null
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object addToEnvironment(String propName, Object propVal)
         throws NamingException {
         return env.put(propName, propVal);
@@ -684,6 +708,7 @@ public class NamingContext implements Context {
      * may not be null
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Object removeFromEnvironment(String propName)
         throws NamingException {
         return env.remove(propName);
@@ -700,6 +725,7 @@ public class NamingContext implements Context {
      * @return the environment of this context; never null
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public Hashtable<?,?> getEnvironment()
         throws NamingException {
         return env;
@@ -716,6 +742,7 @@ public class NamingContext implements Context {
      * 
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public void close()
         throws NamingException {
         env.clear();
@@ -739,6 +766,7 @@ public class NamingContext implements Context {
      * not have the notion of a full name
      * @exception NamingException if a naming exception is encountered
      */
+    @Override
     public String getNameInNamespace()
         throws NamingException {
         throw  new OperationNotSupportedException
@@ -822,8 +850,8 @@ public class NamingContext implements Context {
      * @param obj the object to bind; possibly null
      * @param rebind if true, then perform a rebind (ie, overwrite)
      * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if object did not supply all 
-     * mandatory attributes
+     * @exception javax.naming.directory.InvalidAttributesException if object
+     * did not supply all mandatory attributes
      * @exception NamingException if a naming exception is encountered
      */
     protected void bind(Name name, Object obj, boolean rebind)
