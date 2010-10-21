@@ -34,19 +34,13 @@ import javax.naming.Binding;
 import javax.naming.CompositeName;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
-import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.NotContextException;
 import javax.naming.OperationNotSupportedException;
-import javax.naming.directory.AttributeModificationException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
-import javax.naming.directory.InvalidAttributesException;
-import javax.naming.directory.InvalidSearchControlsException;
-import javax.naming.directory.InvalidSearchFilterException;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
@@ -266,7 +260,8 @@ public class WARDirContext extends BaseDirContext {
      * 
      * @param oldName the name of the existing binding; may not be empty
      * @param newName the name of the new binding; may not be empty
-     * @exception NameAlreadyBoundException if newName is already bound
+     * @exception javax.naming.NameAlreadyBoundException if newName is already
+     * bound
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -375,8 +370,8 @@ public class WARDirContext extends BaseDirContext {
      * @param name the name of the context to be destroyed; may not be empty
      * @exception NameNotFoundException if an intermediate context does not 
      * exist
-     * @exception NotContextException if the name is bound but does not name 
-     * a context, or does not name a context of the appropriate type
+     * @exception javax.naming.NotContextException if the name is bound but does
+     * not name a context, or does not name a context of the appropriate type
      */
     @Override
     public void destroySubcontext(String name)
@@ -494,8 +489,8 @@ public class WARDirContext extends BaseDirContext {
      * REPLACE_ATTRIBUTE, REMOVE_ATTRIBUTE
      * @param attrs the attributes to be used for the modification; may not 
      * be null
-     * @exception AttributeModificationException if the modification cannot be
-     * completed successfully
+     * @exception javax.naming.directory.AttributeModificationException if the
+     * modification cannot be completed successfully
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -515,8 +510,8 @@ public class WARDirContext extends BaseDirContext {
      * @param name the name of the object whose attributes will be updated
      * @param mods an ordered sequence of modifications to be performed; may 
      * not be null
-     * @exception AttributeModificationException if the modification cannot be
-     * completed successfully
+     * @exception javax.naming.directory.AttributeModificationException if the
+     * modification cannot be completed successfully
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -536,9 +531,10 @@ public class WARDirContext extends BaseDirContext {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception InvalidAttributesException if some "mandatory" attributes 
-     * of the binding are not supplied
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if some
+     * "mandatory" attributes of the binding are not supplied
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -562,8 +558,8 @@ public class WARDirContext extends BaseDirContext {
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
-     * @exception InvalidAttributesException if some "mandatory" attributes 
-     * of the binding are not supplied
+     * @exception javax.naming.directory.InvalidAttributesException if some
+     * "mandatory" attributes of the binding are not supplied
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -585,9 +581,10 @@ public class WARDirContext extends BaseDirContext {
      * @param name the name of the context to create; may not be empty
      * @param attrs the attributes to associate with the newly created context
      * @return the newly created context
-     * @exception NameAlreadyBoundException if the name is already bound
-     * @exception InvalidAttributesException if attrs does not contain all 
-     * the mandatory attributes required for creation
+     * @exception javax.naming.NameAlreadyBoundException if name is already
+     * bound
+     * @exception javax.naming.directory.InvalidAttributesException if attrs
+     * does not contain all the mandatory attributes required for creation
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -695,10 +692,11 @@ public class WARDirContext extends BaseDirContext {
      * (new SearchControls())).
      * @return an enumeration of SearchResults of the objects that satisfy 
      * the filter; never null
-     * @exception InvalidSearchFilterException if the search filter specified 
-     * is not supported or understood by the underlying directory
-     * @exception InvalidSearchControlsException if the search controls 
-     * contain invalid settings
+     * @exception javax.naming.directory.InvalidSearchFilterException if the
+     * search filter specified is not supported or understood by the underlying
+     * directory
+     * @exception javax.naming.directory.InvalidSearchControlsException if the
+     * search controls contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -727,10 +725,10 @@ public class WARDirContext extends BaseDirContext {
      * filter; never null
      * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
      * expressions where i is outside the bounds of the array filterArgs
-     * @exception InvalidSearchControlsException if cons contains invalid 
-     * settings
-     * @exception InvalidSearchFilterException if filterExpr with filterArgs 
-     * represents an invalid search filter
+     * @exception javax.naming.directory.InvalidSearchControlsException if cons
+     * contains invalid settings
+     * @exception javax.naming.directory.InvalidSearchFilterException if
+     * filterExpr with filterArgs represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -809,6 +807,7 @@ public class WARDirContext extends BaseDirContext {
             }
 
         } catch (Exception e) {
+            // Ignore
         }
 
     }
@@ -893,6 +892,7 @@ public class WARDirContext extends BaseDirContext {
         // ----------------------------------------------------- Public Methods
         
         
+        @Override
         public int compareTo(Object o) {
             if (!(o instanceof Entry))
                 return (+1);
