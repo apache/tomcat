@@ -80,7 +80,7 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
-        Add support for maxActiveSessions attributes to BackupManager. (kfujino)
+        Add support for maxActiveSessions attribute to BackupManager. (kfujino)
       </fix>
       <fix>
         Improve sending an access message in DeltaManager.
@@ -163,7 +163,7 @@
         <bug>49978</bug>: Correctly handle the case when a directory expected
         to be created during web application start is already present. Rather
         than throwing an exception and failing to start, allow the web
-        application to start normally. (mark)
+        application to start normally. (markt)
       </fix>
       <fix>
         <bug>49987</bug>: Fix thread safety issue with population of servlet
