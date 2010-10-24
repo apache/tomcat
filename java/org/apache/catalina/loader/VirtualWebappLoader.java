@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.util.LifecycleBase;
 
 /**
  * A WebappLoader that allows a customized classpath to be added
@@ -103,7 +102,7 @@ public class VirtualWebappLoader extends WebappLoader {
 
     /**
      * Implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
