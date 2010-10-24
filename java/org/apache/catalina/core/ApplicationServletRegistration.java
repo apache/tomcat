@@ -30,8 +30,6 @@ import javax.servlet.ServletSecurityElement;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.deploy.SecurityCollection;
-import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.tomcat.util.res.StringManager;
 

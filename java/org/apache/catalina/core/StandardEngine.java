@@ -26,13 +26,10 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
-import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.JAASRealm;
-import org.apache.catalina.startup.Catalina;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -134,6 +131,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     /**
      * Return the default host.
      */
+    @Override
     public String getDefaultHost() {
 
         return (defaultHost);
@@ -146,6 +144,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      *
      * @param host The new default host
      */
+    @Override
     public void setDefaultHost(String host) {
 
         String oldDefaultHost = this.defaultHost;
@@ -166,6 +165,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * <p>
      * This property should not be changed once it is set.
      */
+    @Override
     public void setJvmRoute(String routeId) {
         jvmRouteId = routeId;
     }
@@ -175,6 +175,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * Retrieve the cluster-wide unique identifier for this Engine.
      * This value is only useful in a load-balancing scenario.
      */
+    @Override
     public String getJvmRoute() {
         return jvmRouteId;
     }
@@ -183,6 +184,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     /**
      * Return the <code>Service</code> with which we are associated (if any).
      */
+    @Override
     public Service getService() {
 
         return (this.service);
@@ -195,6 +197,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      *
      * @param service The service that owns this Engine
      */
+    @Override
     public void setService(Service service) {
         this.service = service;
     }
@@ -262,7 +265,7 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used

@@ -120,6 +120,7 @@ public class StandardPipeline extends LifecycleBase
 
     }
     
+    @Override
     public boolean isAsyncSupported() {
         Valve valve = (first!=null)?first:basic;
         boolean supported = true;
@@ -137,6 +138,7 @@ public class StandardPipeline extends LifecycleBase
     /**
      * Return the Container with which this Pipeline is associated.
      */
+    @Override
     public Container getContainer() {
 
         return (this.container);
@@ -149,6 +151,7 @@ public class StandardPipeline extends LifecycleBase
      *
      * @param container The new associated container
      */
+    @Override
     public void setContainer(Container container) {
 
         this.container = container;
@@ -240,6 +243,7 @@ public class StandardPipeline extends LifecycleBase
      * <p>Return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
      */
+    @Override
     public Valve getBasic() {
 
         return (this.basic);
@@ -259,6 +263,7 @@ public class StandardPipeline extends LifecycleBase
      *
      * @param valve Valve to be distinguished as the basic Valve
      */
+    @Override
     public void setBasic(Valve valve) {
 
         // Change components if necessary
@@ -333,6 +338,7 @@ public class StandardPipeline extends LifecycleBase
      * @exception IllegalStateException if the specified Valve is already
      *  associated with a different Container
      */
+    @Override
     public void addValve(Valve valve) {
     
         // Validate that we can add this Valve
@@ -375,6 +381,7 @@ public class StandardPipeline extends LifecycleBase
      * Container, including the basic Valve (if any).  If there are no
      * such Valves, a zero-length array is returned.
      */
+    @Override
     public Valve[] getValves() {
 
         ArrayList<Valve> valveList = new ArrayList<Valve>();
@@ -417,6 +424,7 @@ public class StandardPipeline extends LifecycleBase
      *
      * @param valve Valve to be removed
      */
+    @Override
     public void removeValve(Valve valve) {
 
         Valve current;
@@ -459,6 +467,7 @@ public class StandardPipeline extends LifecycleBase
     }
 
 
+    @Override
     public Valve getFirst() {
         if (first != null) {
             return first;
