@@ -24,9 +24,6 @@ import java.io.ObjectOutput;
 
 import javax.el.ELContext;
 import javax.el.ELException;
-import javax.el.ELResolver;
-import javax.el.Expression;
-import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
 import javax.el.MethodExpression;
 import javax.el.MethodInfo;
@@ -44,7 +41,7 @@ import org.apache.el.util.ReflectionUtil;
  * An <code>Expression</code> that refers to a method on an object.
  * 
  * <p>
- * <code>The {@link ExpressionFactory#createMethodExpression} method
+ * <code>The {@link javax.el.ExpressionFactory#createMethodExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>MethodExpression</code> that encapsulates the parsed expression.
  * The {@link FunctionMapper} is used at parse time, not evaluation time, 
@@ -52,13 +49,13 @@ import org.apache.el.util.ReflectionUtil;
  * However, the {@link ELContext} is needed at evaluation time.</p>
  *
  * <p>The {@link #getMethodInfo} and {@link #invoke} methods will evaluate the 
- * expression each time they are called. The {@link ELResolver} in the 
+ * expression each time they are called. The {@link javax.el.ELResolver} in the 
  * <code>ELContext</code> is used to resolve the top-level variables and to 
  * determine the behavior of the <code>.</code> and <code>[]</code> 
- * operators. For any of the two methods, the {@link ELResolver#getValue} 
- * method is used to resolve all properties up to but excluding the last 
- * one. This provides the <code>base</code> object on which the method
- * appears. If the <code>base</code> object is null, a 
+ * operators. For any of the two methods, the
+ * {@link javax.el.ELResolver#getValue} method is used to resolve all properties
+ * up to but excluding the last one. This provides the <code>base</code> object
+ * on which the method appears. If the <code>base</code> object is null, a 
  * <code>NullPointerException</code> must be thrown. At the last resolution, 
  * the final <code>property</code> is then coerced to a <code>String</code>,
  * which provides the name of the method to be found. A method matching the 
@@ -67,7 +64,7 @@ import org.apache.el.util.ReflectionUtil;
  * <code>MethodExpression</code>).</p>
  *
  * <p>See the notes about comparison, serialization and immutability in 
- * the {@link Expression} javadocs.
+ * the {@link javax.el.Expression} javadocs.
  *
  * @see javax.el.ELResolver
  * @see javax.el.Expression
@@ -286,6 +283,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
      * 
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
+    @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
         this.expr = in.readUTF();
@@ -304,6 +302,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
      * 
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.expr);
         out.writeUTF((this.expectedType != null) ? this.expectedType.getName()

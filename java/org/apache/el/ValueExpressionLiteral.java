@@ -104,12 +104,14 @@ public final class ValueExpressionLiteral extends ValueExpression implements
         return true;
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(this.value);
         out.writeUTF((this.expectedType != null) ? this.expectedType.getName()
                 : "");
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
         this.value = in.readObject();
