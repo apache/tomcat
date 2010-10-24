@@ -650,7 +650,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Reload the web application at the specified context path.
      *
-     * @see ManagerServlet#reload(PrintWriter, String)
+     * @see ManagerServlet#reload(PrintWriter, String, StringManager)
      *
      * @param path Context path of the application to be restarted
      * @return message String
@@ -668,7 +668,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Undeploy the web application at the specified context path.
      *
-     * @see ManagerServlet#undeploy(PrintWriter, String)
+     * @see ManagerServlet#undeploy(PrintWriter, String, StringManager)
      *
      * @param path Context path of the application to be undeployed
      * @return message String
@@ -686,7 +686,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Display session information and invoke list.
      *
-     * @see ManagerServlet#sessions(PrintWriter, String, int)
+     * @see ManagerServlet#sessions(PrintWriter, String, int, StringManager)
      *
      * @param path Context path of the application to list session information
      * @param idle Expire all sessions with idle time &ge; idle for this context
@@ -705,7 +705,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Display session information and invoke list.
      *
-     * @see ManagerServlet#sessions(PrintWriter, String)
+     * @see ManagerServlet#sessions(PrintWriter, String, StringManager)
      *
      * @param path Context path of the application to list session information
      * @return message String
@@ -718,7 +718,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Start the web application at the specified context path.
      *
-     * @see ManagerServlet#start(PrintWriter, String)
+     * @see ManagerServlet#start(PrintWriter, String, StringManager)
      *
      * @param path Context path of the application to be started
      * @return message String
@@ -736,7 +736,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Stop the web application at the specified context path.
      *
-     * @see ManagerServlet#stop(PrintWriter, String)
+     * @see ManagerServlet#stop(PrintWriter, String, StringManager)
      *
      * @param path Context path of the application to be stopped
      * @return message String
@@ -754,7 +754,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Find potential memory leaks caused by web application reload.
      *
-     * @see ManagerServlet#findleaks(PrintWriter) 
+     * @see ManagerServlet#findleaks(PrintWriter, StringManager) 
      *
      * @return message String
      */
