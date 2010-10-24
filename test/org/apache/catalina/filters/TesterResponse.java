@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.catalina.core;
+package org.apache.catalina.filters;
 
 
 import java.io.IOException;
@@ -42,10 +42,10 @@ import org.apache.catalina.connector.Request;
  * @version $Id$
  */
 
-public class DummyResponse
+public class TesterResponse
     implements HttpServletResponse {
 
-    public DummyResponse() {
+    public TesterResponse() {
     }
 
 

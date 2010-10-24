@@ -19,7 +19,6 @@ package org.apache.catalina.filters;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.core.DummyResponse;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestCsrfPreventionFilter extends TomcatBaseTest {
@@ -51,7 +50,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
                 wrapper.encodeRedirectURL("/test?a=b#c"));
     }
     
-    private static class NonEncodingResponse extends DummyResponse {
+    private static class NonEncodingResponse extends TesterResponse {
 
         @Override
         public String encodeRedirectURL(String url) {
