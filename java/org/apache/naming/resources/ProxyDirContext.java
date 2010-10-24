@@ -1468,6 +1468,7 @@ public class ProxyDirContext implements DirContext {
      * Parses a name.
      * 
      * @return the parsed name
+     * @throws NamingException if the name cannot be parsed
      */
     protected String parseName(String name) throws NamingException {
         return name;
@@ -1478,6 +1479,7 @@ public class ProxyDirContext implements DirContext {
      * Parses a name.
      * 
      * @return the parsed name
+     * @throws NamingException if the name cannot be parsed
      */
     protected Name parseName(Name name) throws NamingException {
         return name;
