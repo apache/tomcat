@@ -31,7 +31,6 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Valve that implements the default basic behavior for the
@@ -60,13 +59,6 @@ final class StandardContextValve
      */
     private static final String info =
         "org.apache.catalina.core.StandardContextValve/1.0";
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     private StandardContext context = null;
