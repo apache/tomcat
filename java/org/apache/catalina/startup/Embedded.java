@@ -44,7 +44,6 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.security.SecurityConfig;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -798,7 +797,8 @@ public class Embedded  extends StandardService {
 
     /**
      * Start nested components ({@link Connector}s and {@link Engine}s) and
-     * implement the requirements of {@link LifecycleBase#startInternal()}.
+     * implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -832,7 +832,8 @@ public class Embedded  extends StandardService {
 
     /**
      * Stop nested components ({@link Connector}s and {@link Engine}s) and
-     * implement the requirements of {@link LifecycleBase#stopInternal()}.
+     * implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
