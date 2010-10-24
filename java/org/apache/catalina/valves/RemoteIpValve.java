@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -125,14 +124,14 @@ import org.apache.tomcat.util.res.StringManager;
  * </tr>
  * <tr>
  * <td>httpServerPort</td>
- * <td>Value returned by {@link ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>http</code> protocol</td>
+ * <td>Value returned by {@link javax.servlet.ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>http</code> protocol</td>
  * <td>N/A</td>
  * <td>integer</td>
  * <td>80</td>
  * </tr>
  * <tr>
  * <td>httpsServerPort</td>
- * <td>Value returned by {@link ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>https</code> protocol</td>
+ * <td>Value returned by {@link javax.servlet.ServletRequest#getServerPort()} when the <code>protocolHeader</code> indicates <code>https</code> protocol</td>
  * <td>N/A</td>
  * <td>integer</td>
  * <td>443</td>
