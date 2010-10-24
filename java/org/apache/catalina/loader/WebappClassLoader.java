@@ -69,7 +69,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
-import org.apache.jasper.servlet.JasperLoader;
 import org.apache.naming.JndiPermission;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
@@ -2591,7 +2590,8 @@ public class WebappClassLoader
      * Clear the {@link ResourceBundle} cache of any bundles loaded by this
      * class loader or any class loader where this loader is a parent class
      * loader. Whilst {@link ResourceBundle#clearCache()} could be used there
-     * are complications around the {@link JasperLoader} that mean a reflection
+     * are complications around the
+     * {@link org.apache.jasper.servlet.JasperLoader} that mean a reflection
      * based approach is more likely to be complete.
      * 
      * The ResourceBundle is using WeakReferences so it shouldn't be pinning the
