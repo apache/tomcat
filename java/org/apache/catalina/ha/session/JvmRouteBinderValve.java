@@ -31,11 +31,9 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
-import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.PersistentManager;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -278,6 +276,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     /**
      * @return Returns the cluster.
      */
+    @Override
     public CatalinaCluster getCluster() {
         return cluster;
     }
@@ -285,6 +284,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     /**
      * @param cluster The cluster to set.
      */
+    @Override
     public void setCluster(CatalinaCluster cluster) {
         this.cluster = cluster;
     }
@@ -404,7 +404,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     /**
      * Send the changed Sessionid to all clusternodes.
      * 
-     * @see JvmRouteSessionIDBinderListener#messageReceived(ClusterMessage)
+     * @see JvmRouteSessionIDBinderListener#messageReceived(
+     *            org.apache.catalina.ha.ClusterMessage)
      * @param manager
      *            ClusterManager
      * @param sessionId
@@ -412,8 +413,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      * @param newSessionID
      *            new session id, bind to the new cluster node
      */
-    protected void sendSessionIDClusterBackup(ClusterManager manager,Request request,String sessionId,
-            String newSessionID) {
+    protected void sendSessionIDClusterBackup(ClusterManager manager,
+            Request request, String sessionId, String newSessionID) {
         SessionIDMessage msg = new SessionIDMessage();
         msg.setOrignalSessionID(sessionId);
         msg.setBackupSessionID(newSessionID);
@@ -425,7 +426,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -466,7 +467,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used

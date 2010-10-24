@@ -227,6 +227,7 @@ public class DeltaRequest implements Externalizable {
         actionPool.clear();
     }
     
+    @Override
     public void readExternal(java.io.ObjectInput in) throws IOException,ClassNotFoundException {
         //sessionId - String
         //recordAll - boolean
@@ -259,6 +260,7 @@ public class DeltaRequest implements Externalizable {
     }
 
 
+    @Override
     public void writeExternal(java.io.ObjectOutput out ) throws java.io.IOException {
         //sessionId - String
         //recordAll - boolean
@@ -294,8 +296,6 @@ public class DeltaRequest implements Externalizable {
         private Object value = null;
         private int action;
         private int type;
-
-        public AttributeInfo() {}
 
         public AttributeInfo(int type,
                              int action,
@@ -349,6 +349,7 @@ public class DeltaRequest implements Externalizable {
             return other.getName().equals(this.getName());
         }
         
+        @Override
         public void readExternal(java.io.ObjectInput in ) throws IOException,ClassNotFoundException {
             //type - int
             //action - int
@@ -362,6 +363,7 @@ public class DeltaRequest implements Externalizable {
             if ( hasValue ) value = in.readObject();
         }
 
+        @Override
         public void writeExternal(java.io.ObjectOutput out) throws IOException {
             //type - int
             //action - int
