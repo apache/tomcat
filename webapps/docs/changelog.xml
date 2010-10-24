@@ -112,6 +112,9 @@
         <bug>22965</bug>: Fix some typos and formatting issues in the global
         web.xml file. Based on a patch by Yann Cébron. (markt) 
       </fix>
+      <add>
+        Extend Checkstyle validation checks to check for unused imports. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
