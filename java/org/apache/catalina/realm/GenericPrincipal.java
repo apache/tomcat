@@ -120,6 +120,7 @@ public class GenericPrincipal implements Principal {
      */
     protected String name = null;
 
+    @Override
     public String getName() {
         return (this.name);
     }
