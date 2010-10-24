@@ -936,11 +936,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             }
         }
 
+        @Override
         public boolean hasMoreElements() {
             return ((pos != last) || (next != null) 
                     || ((next = findNext()) != null));
         }
 
+        @Override
         public String nextElement() {
             if (pos != last) {
                 for (int i = pos + 1; i <= last; i++) {

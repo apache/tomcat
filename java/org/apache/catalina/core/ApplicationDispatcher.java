@@ -47,8 +47,6 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.InstanceSupport;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -68,8 +66,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 final class ApplicationDispatcher
     implements RequestDispatcher {
-
-    private static final Log log = LogFactory.getLog(ApplicationDispatcher.class);
 
     protected static final boolean STRICT_SERVLET_COMPLIANCE;
 
@@ -101,6 +97,7 @@ final class ApplicationDispatcher
             this.response = response;
         }
 
+        @Override
         public Void run() throws java.lang.Exception {
             doForward(request,response);
             return null;
@@ -118,6 +115,7 @@ final class ApplicationDispatcher
             this.response = response;
         }
 
+        @Override
         public Void run() throws ServletException, IOException {
             DispatcherType type = DispatcherType.INCLUDE;
             if (request.getDispatcherType()==DispatcherType.ASYNC) type = DispatcherType.ASYNC; 
@@ -313,6 +311,7 @@ final class ApplicationDispatcher
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet exception occurs
      */
+    @Override
     public void forward(ServletRequest request, ServletResponse response)
         throws ServletException, IOException
     {
@@ -497,6 +496,7 @@ final class ApplicationDispatcher
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet exception occurs
      */
+    @Override
     public void include(ServletRequest request, ServletResponse response)
         throws ServletException, IOException
     {
