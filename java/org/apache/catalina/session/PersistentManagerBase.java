@@ -551,7 +551,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
                     Exception exception = ex.getException();
                     log.error("Exception in the Store during load: "
                               + exception);
-                    exception.printStackTrace();                        
+                    return;
                 }
             } else {
                 ids = store.keys();
