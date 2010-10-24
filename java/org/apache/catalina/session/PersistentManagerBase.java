@@ -550,7 +550,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
                     log.error("Exception in the Store during load: "
-                              + exception);
+                              + exception, exception);
                     return;
                 }
             } else {
