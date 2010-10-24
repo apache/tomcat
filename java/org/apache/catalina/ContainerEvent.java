@@ -29,9 +29,9 @@ import java.util.EventObject;
  * @version $Id$
  */
 
-public final class ContainerEvent
-    extends EventObject {
+public final class ContainerEvent extends EventObject {
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * The Container on which this event occurred.
