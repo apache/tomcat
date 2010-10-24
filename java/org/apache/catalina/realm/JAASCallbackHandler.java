@@ -182,6 +182,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @exception UnsupportedCallbackException if the login method requests
      *  an unsupported callback type
      */
+    @Override
     public void handle(Callback callbacks[])
         throws IOException, UnsupportedCallbackException {
 

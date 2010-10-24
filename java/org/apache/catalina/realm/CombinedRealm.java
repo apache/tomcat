@@ -29,7 +29,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -182,7 +181,7 @@ public class CombinedRealm extends RealmBase {
     /**
      * Prepare for the beginning of active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#startInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -212,7 +211,7 @@ public class CombinedRealm extends RealmBase {
     /**
      * Gracefully terminate the active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#stopInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported

@@ -49,7 +49,6 @@ import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.HexUtils;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
@@ -154,6 +153,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Return the Container with which this Realm has been associated.
      */
+    @Override
     public Container getContainer() {
 
         return (container);
@@ -166,6 +166,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param container The associated Container
      */
+    @Override
     public void setContainer(Container container) {
 
         Container oldContainer = this.container;
@@ -237,6 +238,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return info;
@@ -274,6 +276,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param listener The listener to add
      */
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
 
         support.addPropertyChangeListener(listener);
@@ -289,6 +292,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, String credentials) {
 
         String serverCredentials = getPassword(username);
@@ -330,6 +334,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
      */
+    @Override
     public Principal authenticate(String username, String clientDigest,
                                   String nOnce, String nc, String cnonce,
                                   String qop, String realm,
@@ -382,6 +387,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param certs Array of client certificates, with the first one in
      *  the array being the certificate of the client itself.
      */
+    @Override
     public Principal authenticate(X509Certificate certs[]) {
 
         if ((certs == null) || (certs.length < 1))
@@ -416,6 +422,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         // NOOP in base class
     }
@@ -428,6 +435,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param request Request we are processing
      * @param context Context the Request is mapped to
      */
+    @Override
     public SecurityConstraint [] findSecurityConstraints(Request request,
                                                          Context context) {
 
@@ -692,6 +700,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public boolean hasResourcePermission(Request request,
                                          Response response,
                                          SecurityConstraint []constraints,
@@ -869,6 +878,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public boolean hasUserDataPermission(Request request,
                                          Response response,
                                          SecurityConstraint []constraints)
@@ -953,6 +963,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
 
         support.removePropertyChangeListener(listener);
@@ -974,7 +985,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Prepare for the beginning of active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#startInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -999,7 +1010,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Gracefully terminate the active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#stopInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
