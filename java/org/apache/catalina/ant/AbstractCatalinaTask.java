@@ -28,7 +28,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.catalina.util.Base64;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -285,11 +284,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 } catch (IOException ioe) {
                     // Ignore
                 }
-                istream = null;
             }
         }
-
     }
-
-
 }
