@@ -42,7 +42,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -361,12 +360,13 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     public void setPattern(String pattern) {
         if (pattern == null)
-            pattern = "";
-        if (pattern.equals(Constants.AccessLog.COMMON_ALIAS))
-            pattern = Constants.AccessLog.COMMON_PATTERN;
-        if (pattern.equals(Constants.AccessLog.COMBINED_ALIAS))
-            pattern = Constants.AccessLog.COMBINED_PATTERN;
-        this.pattern = pattern;
+            this.pattern = "";
+        else if (pattern.equals(Constants.AccessLog.COMMON_ALIAS))
+            this.pattern = Constants.AccessLog.COMMON_PATTERN;
+        else if (pattern.equals(Constants.AccessLog.COMBINED_ALIAS))
+            this.pattern = Constants.AccessLog.COMBINED_PATTERN;
+        else
+            this.pattern = pattern;
         logElements = createLogElements();
     }
 
@@ -573,6 +573,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
     
+    @Override
     public void log(Request request, Response response, long time) {
         if (logElements == null || condition != null
                 && null != request.getRequest().getAttribute(condition)) {
@@ -809,7 +810,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -836,7 +837,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -861,6 +862,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write thread name - %I
      */
     protected class ThreadNameElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             RequestInfo info = request.getCoyoteRequest().getRequestProcessor();
@@ -890,6 +892,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             LOCAL_ADDR_VALUE = init;
         }
         
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(LOCAL_ADDR_VALUE);
@@ -900,6 +903,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write remote IP address - %a
      */
     protected class RemoteAddrElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getRemoteAddr());
@@ -910,6 +914,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write remote host name - %h
      */
     protected class HostElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getRemoteHost());
@@ -920,6 +925,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write remote logical username from identd (always returns '-') - %l
      */
     protected class LogicalUserNameElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append('-');
@@ -930,6 +936,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write request protocol - %H
      */
     protected class ProtocolElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getProtocol());
@@ -940,6 +947,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write remote user that was authenticated (if any), else '-' - %u
      */
     protected class UserElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -961,6 +969,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     protected class DateAndTimeElement implements AccessLogElement {
 
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             AccessDateStruct struct = currentDateStruct.get();
@@ -987,6 +996,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write first line of the request (method and request URI) - %r
      */
     protected class RequestElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -1009,6 +1019,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write HTTP status code of the response - %s
      */
     protected class HttpStatusCodeElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (response != null) {
@@ -1023,6 +1034,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write local port on which this request was received - %p
      */
     protected class LocalPortElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerPort());
@@ -1042,6 +1054,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.conversion = conversion;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             long length = response.getContentCountLong() ;
@@ -1057,6 +1070,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write request method (GET, POST, etc.) - %m
      */
     protected class MethodElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -1079,6 +1093,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.millis = millis;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (millis) {
@@ -1100,6 +1115,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write Query string (prepended with a '?' if it exists) - %q
      */
     protected class QueryElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             String query = null;
@@ -1116,6 +1132,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write user session ID - %S
      */
     protected class SessionIdElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -1135,6 +1152,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write requested URL path - %U
      */
     protected class RequestURIElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -1149,6 +1167,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * write local server name - %v
      */
     protected class LocalServerNameElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerName());
@@ -1165,6 +1184,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.str = str;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(str);
@@ -1181,6 +1201,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.header = header;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             String value = request.getHeader(header);
@@ -1202,6 +1223,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.header = header;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             String value = "-";
@@ -1228,6 +1250,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.header = header;
         }
         
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
            if (null != response) {
@@ -1255,6 +1278,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.header = header;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             Object value = null;
@@ -1285,6 +1309,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             this.header = header;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             Object value = null;

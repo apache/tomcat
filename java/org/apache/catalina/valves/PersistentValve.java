@@ -182,10 +182,12 @@ public class PersistentValve extends ValveBase {
                     session.recycle();
                 } else {
                     if (container.getLogger().isDebugEnabled())
-                        container.getLogger().debug("newsessionId store: " + store + " session: " +
-                                session + " valid: " + session.isValid() +
-                                " Staled: " +
-                                isSessionStale(session, System.currentTimeMillis()));
+                        container.getLogger().debug("newsessionId store: " +
+                                store + " session: " + session + " valid: " +
+                                (session == null ? "N/A" : Boolean.toString(
+                                        session.isValid())) +
+                                " Staled: " + isSessionStale(session,
+                                        System.currentTimeMillis()));
 
                 }
             } else {
@@ -203,12 +205,14 @@ public class PersistentValve extends ValveBase {
      */
     protected boolean isSessionStale(Session session, long timeNow) {
  
-        int maxInactiveInterval = session.getMaxInactiveInterval();
-        if (maxInactiveInterval >= 0) {
-            int timeIdle = // Truncate, do not round up
-                (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-            if (timeIdle >= maxInactiveInterval)
-                return true;
+        if (session != null) {
+            int maxInactiveInterval = session.getMaxInactiveInterval();
+            if (maxInactiveInterval >= 0) {
+                int timeIdle = // Truncate, do not round up
+                    (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+                if (timeIdle >= maxInactiveInterval)
+                    return true;
+            }
         }
  
         return false;
