@@ -17,8 +17,6 @@
 
 package org.apache.catalina.ha.authenticator;
 
-import java.io.Serializable;
-
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
 
@@ -27,7 +25,9 @@ import org.apache.catalina.tribes.Member;
  * @author Fabien Carrion
  */
 
-public class SingleSignOnMessage implements ClusterMessage, Serializable {
+public class SingleSignOnMessage implements ClusterMessage {
+
+    private static final long serialVersionUID = 1L;
 
     public static final int ADD_SESSION = 1;
     public static final int DEREGISTER_SESSION = 2;
@@ -61,6 +61,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      * if the message was being relayed from a host other than the one
      * that originally sent it.
      */
+    @Override
     public Member getAddress() {
         return address;
     }
@@ -71,6 +72,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      *
      * @param member Member
      */
+    @Override
     public void setAddress(Member member) {
         this.address = member;
     }
@@ -80,6 +82,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      *
      * @return long
      */
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -90,6 +93,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      *
      * @param timestamp The timestamp
      */
+    @Override
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
@@ -100,6 +104,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      *
      * @return String
      */
+    @Override
     public String getUniqueId() {
         if (this.uniqueId != null)
             return this.uniqueId;
@@ -109,6 +114,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
         return result.toString();
     }
 
+    @Override
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
