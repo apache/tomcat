@@ -32,8 +32,9 @@ import java.util.EventObject;
  * @version $Id$
  */
 
-public final class LifecycleEvent
-    extends EventObject {
+public final class LifecycleEvent extends EventObject {
+
+    private static final long serialVersionUID = 1L;
 
 
     // ----------------------------------------------------------- Constructors

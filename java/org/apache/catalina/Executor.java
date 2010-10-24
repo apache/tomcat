@@ -16,9 +16,7 @@
  */
 package org.apache.catalina;
 
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-
 
 
 public interface Executor extends java.util.concurrent.Executor, Lifecycle {
@@ -33,8 +31,8 @@ public interface Executor extends java.util.concurrent.Executor, Lifecycle {
      * time until it throws a RejectedExecutionException
      *
      * @param command the runnable task
-     * @throws RejectedExecutionException if this task cannot be
-     * accepted for execution - the queue is full
+     * @throws org.apache.catalina.util.RejectedExecutionException if this task
+     * cannot be accepted for execution - the queue is full
      * @throws NullPointerException if command or unit is null
      */
     void execute(Runnable command, long timeout, TimeUnit unit);
