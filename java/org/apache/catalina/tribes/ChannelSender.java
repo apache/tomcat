@@ -48,7 +48,8 @@ public interface ChannelSender extends Heartbeat
      * Start the channel sender
      * @throws IOException if preprocessing takes place and an error happens
      */
-    public void start() throws java.io.IOException;
+    public void start() throws IOException;
+
     /**
      * Stop the channel sender
      */
@@ -57,6 +58,7 @@ public interface ChannelSender extends Heartbeat
     /**
      * A channel heartbeat, use this method to clean up resources
      */
+    @Override
     public void heartbeat() ;
     
     /**
