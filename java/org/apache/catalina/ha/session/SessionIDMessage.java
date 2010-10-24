@@ -27,6 +27,8 @@ import org.apache.catalina.ha.ClusterMessageBase;
  */
 public class SessionIDMessage extends ClusterMessageBase {
 
+    private static final long serialVersionUID = 1L;
+
     private int messageNumber;
 
     private String orignalSessionID;

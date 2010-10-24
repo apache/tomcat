@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Manager;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -62,10 +61,12 @@ public abstract class ClusterManagerBase extends ManagerBase
      * @return The object input stream
      * @throws IOException
      */
+    @Override
     public ReplicationStream getReplicationStream(byte[] data) throws IOException {
         return getReplicationStream(data,0,data.length);
     }
 
+    @Override
     public ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException {
         ByteArrayInputStream fis = new ByteArrayInputStream(data, offset, length);
         return new ReplicationStream(fis, getClassLoaders());
@@ -75,13 +76,15 @@ public abstract class ClusterManagerBase extends ManagerBase
     //  ---------------------------------------------------- persistence handler
 
     /**
-     * {@link Manager} implementations that also implement
+     * {@link org.apache.catalina.Manager} implementations that also implement
      * {@link ClusterManager} do not support local session persistence.
      */
+    @Override
     public void load() {
         // NOOP 
     }
 
+    @Override
     public void unload() {
         // NOOP
     }
