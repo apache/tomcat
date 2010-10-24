@@ -19,10 +19,8 @@ package org.apache.catalina.mbeans;
 
 import java.io.File;
 
-import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -78,10 +76,10 @@ public class MBeanFactory {
      * Construct a <code>ModelMBean</code> with default
      * <code>ModelMBeanInfo</code> information.
      *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
+     * @exception javax.management.MBeanException if the initializer of an
+     *  object throws an exception
+     * @exception javax.management.RuntimeOperationsException if an
+     *  IllegalArgumentException occurs
      */
     public MBeanFactory() {
 
