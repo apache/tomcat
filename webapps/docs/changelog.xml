@@ -115,6 +115,10 @@
       <add>
         Extend Checkstyle validation checks to check for unused imports. (markt)
       </add>
+      <fix>
+        General code clean-up to reduce (not eliminate) the number of warnings
+        reported by IDEs. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
