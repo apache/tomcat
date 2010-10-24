@@ -46,89 +46,172 @@ public class TesterResponse
     implements HttpServletResponse {
 
     public TesterResponse() {
+        // NOOP
     }
 
 
     public void setAppCommitted(
-            @SuppressWarnings("unused") boolean appCommitted) {}
+            @SuppressWarnings("unused") boolean appCommitted) {/* NOOP */}
     public boolean isAppCommitted() { return false; }
     public Connector getConnector() { return null; }
-    public void setConnector(@SuppressWarnings("unused") Connector connector) {}
+    public void setConnector(@SuppressWarnings("unused") Connector connector) {
+        // NOOP
+    }
     public int getContentCount() { return -1; }
     public Context getContext() { return null; }
-    public void setContext(@SuppressWarnings("unused") Context context) {}
+    public void setContext(@SuppressWarnings("unused") Context context) {
+        // NOOP
+    }
     public boolean getIncluded() { return false; }
-    public void setIncluded(@SuppressWarnings("unused") boolean included) {}
+    public void setIncluded(@SuppressWarnings("unused") boolean included) {
+        // NOOP
+    }
     public String getInfo() { return null; }
     public Request getRequest() { return null; }
-    public void setRequest(@SuppressWarnings("unused") Request request) {}
+    public void setRequest(@SuppressWarnings("unused") Request request) {
+        // NOOP
+    }
     public ServletResponse getResponse() { return null; }
     public OutputStream getStream() { return null; }
-    public void setStream(@SuppressWarnings("unused") OutputStream stream) {}
-    public void setSuspended(@SuppressWarnings("unused") boolean suspended) {}
+    public void setStream(@SuppressWarnings("unused") OutputStream stream) {
+        // NOOP
+    }
+    public void setSuspended(@SuppressWarnings("unused") boolean suspended) {
+        // NOOP
+    }
     public boolean isSuspended() { return false; }
-    public void setError() {}
+    public void setError() {/* NOOP */}
     public boolean isError() { return false; }
+    /**
+     * 
+     * @return
+     * @throws IOException
+     */
     public ServletOutputStream createOutputStream() throws IOException {
         return null;
     }
-    public void finishResponse() throws IOException {}
+    /**
+     * 
+     * @throws IOException
+     */
+    public void finishResponse() throws IOException {/* NOOP */}
     public int getContentLength() { return -1; }
+    @Override
     public String getContentType() { return null; }
     public PrintWriter getReporter() { return null; }
-    public void recycle() {}
-    public void write(@SuppressWarnings("unused") int b) throws IOException {}
-    public void write(@SuppressWarnings("unused") byte b[]) throws IOException {
+    public void recycle() {/* NOOP */}
+    /**
+     * 
+     * @param b
+     * @throws IOException
+     */
+    public void write(@SuppressWarnings("unused") int b) throws IOException {
+        // NOOP
     }
+    /**
+     * 
+     * @param b
+     * @throws IOException
+     */
+    public void write(@SuppressWarnings("unused") byte b[]) throws IOException {
+     // NOOP
+    }
+    /**
+     * 
+     * @param b
+     * @param off
+     * @param len
+     * @throws IOException
+     */
     public void write(@SuppressWarnings("unused") byte b[],
             @SuppressWarnings("unused") int off,
-            @SuppressWarnings("unused") int len) throws IOException {}
-    public void flushBuffer() throws IOException {}
+            @SuppressWarnings("unused") int len) throws IOException {/* NOOP */}
+    @Override
+    public void flushBuffer() throws IOException {/* NOOP */}
+    @Override
     public int getBufferSize() { return -1; }
+    @Override
     public String getCharacterEncoding() { return null; }
-    public void setCharacterEncoding(String charEncoding) {}
+    @Override
+    public void setCharacterEncoding(String charEncoding) {/* NOOP */}
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return null;
     }
+    @Override
     public Locale getLocale() { return null; }
+    @Override
     public PrintWriter getWriter() throws IOException { return null; }
+    @Override
     public boolean isCommitted() { return false; }
-    public void reset() {}
-    public void resetBuffer() {}
-    public void setBufferSize(int size) {}
-    public void setContentLength(int length) {}
-    public void setContentType(String type) {}
-    public void setLocale(Locale locale) {}
-
+    @Override
+    public void reset() {/* NOOP */}
+    @Override
+    public void resetBuffer() {/* NOOP */}
+    @Override
+    public void setBufferSize(int size) {/* NOOP */}
+    @Override
+    public void setContentLength(int length) {/* NOOP */}
+    @Override
+    public void setContentType(String type) {/* NOOP */}
+    @Override
+    public void setLocale(Locale locale) {/* NOOP */}
+    @Override
     public String getHeader(String name) { return null; }
+    @Override
     public Collection<String> getHeaderNames() { return null; }
+    @Override
     public Collection<String> getHeaders(String name) { return null; }
     public String getMessage() { return null; }
+    @Override
     public int getStatus() { return -1; }
     public void reset(@SuppressWarnings("unused") int status,
-            @SuppressWarnings("unused") String message) {}
-    public void addCookie(Cookie cookie) {}
-    public void addDateHeader(String name, long value) {}
-    public void addHeader(String name, String value) {}
-    public void addIntHeader(String name, int value) {}
+            @SuppressWarnings("unused") String message) {/* NOOP */}
+    @Override
+    public void addCookie(Cookie cookie) {/* NOOP */}
+    @Override
+    public void addDateHeader(String name, long value) {/* NOOP */}
+    @Override
+    public void addHeader(String name, String value) {/* NOOP */}
+    @Override
+    public void addIntHeader(String name, int value) {/* NOOP */}
+    @Override
     public boolean containsHeader(String name) { return false; }
+    @Override
     public String encodeRedirectURL(String url) { return null; }
     /** @deprecated */
+    @Override
     @Deprecated
     public String encodeRedirectUrl(String url) { return null; }
+    @Override
     public String encodeURL(String url) { return null; }
     /** @deprecated */
+    @Override
     @Deprecated
     public String encodeUrl(String url) { return null; }
-    public void sendAcknowledgement() throws IOException {}
-    public void sendError(int status) throws IOException {}
-    public void sendError(int status, String message) throws IOException {}
-    public void sendRedirect(String location) throws IOException {}
-    public void setDateHeader(String name, long value) {}
-    public void setHeader(String name, String value) {}
-    public void setIntHeader(String name, int value) {}
-    public void setStatus(int status) {}
+    /**
+     * 
+     * @throws IOException
+     */
+    public void sendAcknowledgement() throws IOException {/* NOOP */}
+    @Override
+    public void sendError(int status) throws IOException {/* NOOP */}
+    @Override
+    public void sendError(int status, String message) throws IOException {
+        // NOOP
+    }
+    @Override
+    public void sendRedirect(String location) throws IOException {/* NOOP */}
+    @Override
+    public void setDateHeader(String name, long value) {/* NOOP */}
+    @Override
+    public void setHeader(String name, String value) {/* NOOP */}
+    @Override
+    public void setIntHeader(String name, int value) {/* NOOP */}
+    @Override
+    public void setStatus(int status) {/* NOOP */}
     /** @deprecated */
+    @Override
     @Deprecated
-    public void setStatus(int status, String message) {}
+    public void setStatus(int status, String message) {/* NOOP */}
 }
