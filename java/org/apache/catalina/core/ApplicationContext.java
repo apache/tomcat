@@ -52,7 +52,6 @@ import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
-import javax.servlet.annotation.WebListener;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
@@ -234,6 +233,7 @@ public class ApplicationContext
      *
      * @param name Name of the context attribute to return
      */
+    @Override
     public Object getAttribute(String name) {
 
         return (attributes.get(name));
@@ -245,6 +245,7 @@ public class ApplicationContext
      * Return an enumeration of the names of the context attributes
      * associated with this context.
      */
+    @Override
     public Enumeration<String> getAttributeNames() {
 
         return new Enumerator<String>(attributes.keySet(), true);
@@ -262,6 +263,7 @@ public class ApplicationContext
      *
      * @param uri Absolute URI of a resource on the server
      */
+    @Override
     public ServletContext getContext(String uri) {
 
         // Validate the format of the specified argument
@@ -305,6 +307,7 @@ public class ApplicationContext
     /**
      * Return the main path associated with this context.
      */
+    @Override
     public String getContextPath() {
         return context.getPath();
     }
@@ -316,6 +319,7 @@ public class ApplicationContext
      *
      * @param name Name of the initialization parameter to retrieve
      */
+    @Override
     public String getInitParameter(final String name) {
         return parameters.get(name);
     }
@@ -325,6 +329,7 @@ public class ApplicationContext
      * Return the names of the context's initialization parameters, or an
      * empty enumeration if the context has no initialization parameters.
      */
+    @Override
     public Enumeration<String> getInitParameterNames() {
         return (new Enumerator<String>(parameters.keySet()));
     }
@@ -333,6 +338,7 @@ public class ApplicationContext
     /**
      * Return the major version of the Java Servlet API that we implement.
      */
+    @Override
     public int getMajorVersion() {
 
         return (Constants.MAJOR_VERSION);
@@ -343,6 +349,7 @@ public class ApplicationContext
     /**
      * Return the minor version of the Java Servlet API that we implement.
      */
+    @Override
     public int getMinorVersion() {
 
         return (Constants.MINOR_VERSION);
@@ -356,6 +363,7 @@ public class ApplicationContext
      *
      * @param file Filename for which to identify a MIME type
      */
+    @Override
     public String getMimeType(String file) {
 
         if (file == null)
@@ -377,6 +385,7 @@ public class ApplicationContext
      *
      * @param name Name of the servlet for which a dispatcher is requested
      */
+    @Override
     public RequestDispatcher getNamedDispatcher(String name) {
 
         // Validate the name argument
@@ -399,6 +408,7 @@ public class ApplicationContext
      *
      * @param path The path to the desired resource
      */
+    @Override
     public String getRealPath(String path) {
         return context.getRealPath(path);
     }
@@ -411,6 +421,7 @@ public class ApplicationContext
      *
      * @param path The path to the desired resource.
      */
+    @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
         // Validate the path argument
@@ -505,6 +516,7 @@ public class ApplicationContext
      * @exception MalformedURLException if the path is not given
      *  in the correct form
      */
+    @Override
     public URL getResource(String path)
         throws MalformedURLException {
 
@@ -550,6 +562,7 @@ public class ApplicationContext
      *
      * @param path The path to the desired resource.
      */
+    @Override
     public InputStream getResourceAsStream(String path) {
 
         if (path == null)
@@ -588,6 +601,7 @@ public class ApplicationContext
      *
      * @param path Collection path
      */
+    @Override
     public Set<String> getResourcePaths(String path) {
 
         // Validate the path argument
@@ -636,6 +650,7 @@ public class ApplicationContext
     /**
      * Return the name and version of the servlet container.
      */
+    @Override
     public String getServerInfo() {
 
         return (ServerInfo.getServerInfo());
@@ -646,6 +661,7 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Override
     @Deprecated
     public Servlet getServlet(String name) {
 
@@ -657,6 +673,7 @@ public class ApplicationContext
     /**
      * Return the display name of this web application.
      */
+    @Override
     public String getServletContextName() {
 
         return (context.getDisplayName());
@@ -667,6 +684,7 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
         return (new Enumerator<String>(emptyString));
@@ -676,6 +694,7 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
         return (new Enumerator<Servlet>(emptyServlet));
@@ -687,6 +706,7 @@ public class ApplicationContext
      *
      * @param message Message to be written
      */
+    @Override
     public void log(String message) {
 
         context.getLogger().info(message);
@@ -703,6 +723,7 @@ public class ApplicationContext
      * @deprecated As of Java Servlet API 2.1, use
      *  <code>log(String, Throwable)</code> instead
      */
+    @Override
     @Deprecated
     public void log(Exception exception, String message) {
         
@@ -717,6 +738,7 @@ public class ApplicationContext
      * @param message Message to be written
      * @param throwable Exception to be reported
      */
+    @Override
     public void log(String message, Throwable throwable) {
         
         context.getLogger().error(message, throwable);
@@ -729,6 +751,7 @@ public class ApplicationContext
      *
      * @param name Name of the context attribute to be removed
      */
+    @Override
     public void removeAttribute(String name) {
 
         Object value = null;
@@ -783,6 +806,7 @@ public class ApplicationContext
      * @param name Attribute name to be bound
      * @param value New attribute value to be bound
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         // Name cannot be null
@@ -868,8 +892,10 @@ public class ApplicationContext
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
      *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     *         in web.xml, a web-fragment or annotated with
+     *         {@link javax.servlet.annotation.WebListener}.
      */
+    @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass) throws IllegalStateException {
         
@@ -888,8 +914,10 @@ public class ApplicationContext
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
      *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     *         in web.xml, a web-fragment or annotated with
+     *         {@link javax.servlet.annotation.WebListener}.
      */
+    @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             Filter filter) throws IllegalStateException {
         
@@ -908,8 +936,10 @@ public class ApplicationContext
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
      *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     *         in web.xml, a web-fragment or annotated with
+     *         {@link javax.servlet.annotation.WebListener}.
      */
+    @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             Class<? extends Filter> filterClass) throws IllegalStateException {
         
@@ -930,7 +960,8 @@ public class ApplicationContext
         // throw UnsupportedOperationException - if this context was passed to the
         // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
         // method of a {@link ServletContextListener} that was not declared
-        // in web.xml, a web-fragment or annotated with {@link WebListener}.
+        // in web.xml, a web-fragment or annotated with
+        // {@link javax.servlet.annotation.WebListener}.
 
         FilterDef filterDef = context.findFilterDef(filterName);
         
@@ -957,6 +988,7 @@ public class ApplicationContext
         return new ApplicationFilterRegistration(filterDef, context);
     } 
     
+    @Override
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
         try {
@@ -977,6 +1009,7 @@ public class ApplicationContext
     }
 
 
+    @Override
     public FilterRegistration getFilterRegistration(String filterName) {
         FilterDef filterDef = context.findFilterDef(filterName);
         if (filterDef == null) {
@@ -997,8 +1030,10 @@ public class ApplicationContext
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
      *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     *         in web.xml, a web-fragment or annotated with
+     *         {@link javax.servlet.annotation.WebListener}.
      */
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass) throws IllegalStateException {
         
@@ -1017,8 +1052,10 @@ public class ApplicationContext
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
      *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     *         in web.xml, a web-fragment or annotated with
+     *         {@link javax.servlet.annotation.WebListener}.
      */
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) throws IllegalStateException {
 
@@ -1037,8 +1074,10 @@ public class ApplicationContext
      * @throws UnsupportedOperationException - if this context was passed to the
      *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
      *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with {@link WebListener}.
+     *         in web.xml, a web-fragment or annotated with
+     *         {@link javax.servlet.annotation.WebListener}.
      */
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class<? extends Servlet> servletClass)
     throws IllegalStateException {
@@ -1060,7 +1099,8 @@ public class ApplicationContext
         // throw UnsupportedOperationException - if this context was passed to the
         // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
         // method of a {@link ServletContextListener} that was not declared
-        // in web.xml, a web-fragment or annotated with {@link WebListener}.
+        // in web.xml, a web-fragment or annotated with
+        // {@link javax.servlet.annotation.WebListener}.
 
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
         
@@ -1088,6 +1128,7 @@ public class ApplicationContext
     }
 
 
+    @Override
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException {
         try {
@@ -1109,6 +1150,7 @@ public class ApplicationContext
     }
 
 
+    @Override
     public ServletRegistration getServletRegistration(String servletName) {
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
         if (wrapper == null) {
@@ -1127,6 +1169,7 @@ public class ApplicationContext
      * used by this context has the attribute <code>secure</code> set to
      * <code>true</code>.
      */
+    @Override
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return defaultSessionTrackingModes;
     }
@@ -1158,6 +1201,7 @@ public class ApplicationContext
      * Return the supplied value if one was previously set, else return the
      * defaults.
      */
+    @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         if (sessionTrackingModes != null) {
             return sessionTrackingModes;
@@ -1166,6 +1210,7 @@ public class ApplicationContext
     }
 
 
+    @Override
     public SessionCookieConfig getSessionCookieConfig() {
         return sessionCookieConfig;
     }
@@ -1177,6 +1222,7 @@ public class ApplicationContext
      *                                  anything else or if an unsupported
      *                                  tracking mode is requested
      */
+    @Override
     public void setSessionTrackingModes(
             Set<SessionTrackingMode> sessionTrackingModes) {
 
@@ -1284,7 +1330,8 @@ public class ApplicationContext
         // throw UnsupportedOperationException - if this context was passed to the
         // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
         // method of a {@link ServletContextListener} that was not declared
-        // in web.xml, a web-fragment or annotated with {@link WebListener}.
+        // in web.xml, a web-fragment or annotated with
+        // {@link javax.servlet.annotation.WebListener}.
         
         boolean match = false;
         if (t instanceof ServletContextAttributeListener ||
