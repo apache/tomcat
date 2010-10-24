@@ -2020,12 +2020,17 @@ public class ContextConfig
             servletName = className;
         }
         ServletDef servletDef = fragment.getServlets().get(servletName);
-        boolean isWebXMLservletDef = servletDef != null;
-        if (!isWebXMLservletDef) {
+        
+        boolean isWebXMLservletDef;
+        if (servletDef == null) {
             servletDef = new ServletDef();
             servletDef.setServletName(servletName);
             servletDef.setServletClass(className);
+            isWebXMLservletDef = false;
+        } else {
+            isWebXMLservletDef = true;
         }
+
         boolean urlPatternsSet = false;
         String[] urlPatterns = null;
 
@@ -2090,7 +2095,7 @@ public class ContextConfig
         if (!isWebXMLservletDef && urlPatterns != null) {
             fragment.addServlet(servletDef);
         }
-        if (urlPatternsSet) {
+        if (urlPatterns != null) {
             if (!fragment.getServletMappings().containsValue(servletName)) {
                 for (String urlPattern : urlPatterns) {
                     fragment.addServletMapping(urlPattern, servletName);
@@ -2126,11 +2131,14 @@ public class ContextConfig
         FilterDef filterDef = fragment.getFilters().get(filterName);
         FilterMap filterMap = new FilterMap();
 
-        boolean isWebXMLfilterDef = filterDef != null;
-        if (!isWebXMLfilterDef) {
+        boolean isWebXMLfilterDef;
+        if (filterDef == null) {
             filterDef = new FilterDef();
             filterDef.setFilterName(filterName);
             filterDef.setFilterClass(className);
+            isWebXMLfilterDef = false;
+        } else {
+            isWebXMLfilterDef = true;
         }
 
         boolean urlPatternsSet = false;
@@ -2145,7 +2153,7 @@ public class ContextConfig
                             "contextConfig.urlPatternValue", className));
                 }
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
-                urlPatternsSet = urlPatterns != null && urlPatterns.length > 0;
+                urlPatternsSet = urlPatterns.length > 0;
                 for (String urlPattern : urlPatterns) {
                     filterMap.addURLPattern(urlPattern);
                 }
@@ -2158,8 +2166,7 @@ public class ContextConfig
             } else if ("dispatcherTypes".equals(name)) {
                 String[] dispatcherTypes = processAnnotationsStringArray(evp
                         .getValue());
-                dispatchTypesSet = dispatcherTypes != null
-                        && dispatcherTypes.length > 0;
+                dispatchTypesSet = dispatcherTypes.length > 0;
                 for (String dispatcherType : dispatcherTypes) {
                     filterMap.setDispatcher(dispatcherType);
                 }
