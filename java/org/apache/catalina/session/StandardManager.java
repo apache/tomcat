@@ -42,7 +42,6 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.CustomObjectInputStream;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -73,6 +72,7 @@ public class StandardManager extends ManagerBase {
             // NOOP
         }
 
+        @Override
         public Void run() throws Exception{
            doLoad();
            return null;
@@ -86,6 +86,7 @@ public class StandardManager extends ManagerBase {
             // NOOP
         }
 
+        @Override
         public Void run() throws Exception{
             doUnload();
             return null;
@@ -183,6 +184,7 @@ public class StandardManager extends ManagerBase {
      *  found during the reload
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void load() throws ClassNotFoundException, IOException {
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
@@ -333,6 +335,7 @@ public class StandardManager extends ManagerBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void unload() throws IOException {
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
@@ -447,7 +450,7 @@ public class StandardManager extends ManagerBase {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -476,7 +479,7 @@ public class StandardManager extends ManagerBase {
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
