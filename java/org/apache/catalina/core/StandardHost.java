@@ -33,7 +33,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.ExceptionUtils;
 
@@ -175,6 +174,7 @@ public class StandardHost extends ContainerBase implements Host {
      * Return the application root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      */
+    @Override
     public String getAppBase() {
 
         return (this.appBase);
@@ -186,6 +186,7 @@ public class StandardHost extends ContainerBase implements Host {
      * pathname, a relative pathname, or a URL.
      * If null, defaults to ${catalina.base}/conf/ directory
      */
+    @Override
     public String getXmlBase() {
 
         return (this.xmlBase);
@@ -198,6 +199,7 @@ public class StandardHost extends ContainerBase implements Host {
      *
      * @param appBase The new application root
      */
+    @Override
     public void setAppBase(String appBase) {
 
         String oldAppBase = this.appBase;
@@ -213,6 +215,7 @@ public class StandardHost extends ContainerBase implements Host {
      *
      * @param xmlBase The new XML root
      */
+    @Override
     public void setXmlBase(String xmlBase) {
 
         String oldXmlBase = this.xmlBase;
@@ -225,6 +228,7 @@ public class StandardHost extends ContainerBase implements Host {
      * Returns true if the Host will attempt to create directories for appBase and xmlBase
      * unless they already exist.
      */
+    @Override
     public boolean getCreateDirs() {
         return createDirs;
     }
@@ -233,6 +237,7 @@ public class StandardHost extends ContainerBase implements Host {
      * Set to true if the Host should attempt to create directories for xmlBase and appBase upon startup
      * @param createDirs
      */
+    @Override
     public void setCreateDirs(boolean createDirs) {
         this.createDirs = createDirs;
     }
@@ -241,6 +246,7 @@ public class StandardHost extends ContainerBase implements Host {
      * Return the value of the auto deploy flag.  If true, it indicates that 
      * this host's child webapps will be dynamically deployed.
      */
+    @Override
     public boolean getAutoDeploy() {
 
         return (this.autoDeploy);
@@ -253,6 +259,7 @@ public class StandardHost extends ContainerBase implements Host {
      * 
      * @param autoDeploy The new auto deploy flag
      */
+    @Override
     public void setAutoDeploy(boolean autoDeploy) {
 
         boolean oldAutoDeploy = this.autoDeploy;
@@ -267,6 +274,7 @@ public class StandardHost extends ContainerBase implements Host {
      * Return the Java class name of the context configuration class
      * for new web applications.
      */
+    @Override
     public String getConfigClass() {
 
         return (this.configClass);
@@ -280,6 +288,7 @@ public class StandardHost extends ContainerBase implements Host {
      *
      * @param configClass The new context configuration class
      */
+    @Override
     public void setConfigClass(String configClass) {
 
         String oldConfigClass = this.configClass;
@@ -322,6 +331,7 @@ public class StandardHost extends ContainerBase implements Host {
      * that this host's child webapps should be discovered and automatically 
      * deployed at startup time.
      */
+    @Override
     public boolean getDeployOnStartup() {
 
         return (this.deployOnStartup);
@@ -334,6 +344,7 @@ public class StandardHost extends ContainerBase implements Host {
      * 
      * @param deployOnStartup The new deploy on startup flag
      */
+    @Override
     public void setDeployOnStartup(boolean deployOnStartup) {
 
         boolean oldDeployOnStartup = this.deployOnStartup;
@@ -518,6 +529,7 @@ public class StandardHost extends ContainerBase implements Host {
      *
      * @param alias The alias to be added
      */
+    @Override
     public void addAlias(String alias) {
 
         alias = alias.toLowerCase(Locale.ENGLISH);
@@ -607,6 +619,7 @@ public class StandardHost extends ContainerBase implements Host {
      * Return the set of alias names for this Host.  If none are defined,
      * a zero length array is returned.
      */
+    @Override
     public String[] findAliases() {
 
         synchronized (aliasesLock) {
@@ -635,6 +648,7 @@ public class StandardHost extends ContainerBase implements Host {
      *
      * @param uri Request URI to be mapped
      */
+    @Override
     public Context map(String uri) {
 
         if (log.isDebugEnabled())
@@ -683,6 +697,7 @@ public class StandardHost extends ContainerBase implements Host {
      *
      * @param alias Alias name to be removed
      */
+    @Override
     public void removeAlias(String alias) {
 
         alias = alias.toLowerCase(Locale.ENGLISH);
@@ -737,7 +752,7 @@ public class StandardHost extends ContainerBase implements Host {
     
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
