@@ -70,32 +70,38 @@ public class StandardSessionFacade
     // ---------------------------------------------------- HttpSession Methods
 
 
+    @Override
     public long getCreationTime() {
         return session.getCreationTime();
     }
 
 
+    @Override
     public String getId() {
         return session.getId();
     }
 
 
+    @Override
     public long getLastAccessedTime() {
         return session.getLastAccessedTime();
     }
 
 
+    @Override
     public ServletContext getServletContext() {
         // FIXME : Facade this object ?
         return session.getServletContext();
     }
 
 
+    @Override
     public void setMaxInactiveInterval(int interval) {
         session.setMaxInactiveInterval(interval);
     }
 
 
+    @Override
     public int getMaxInactiveInterval() {
         return session.getMaxInactiveInterval();
     }
@@ -104,12 +110,14 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public HttpSessionContext getSessionContext() {
         return session.getSessionContext();
     }
 
 
+    @Override
     public Object getAttribute(String name) {
         return session.getAttribute(name);
     }
@@ -118,12 +126,14 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public Object getValue(String name) {
         return session.getAttribute(name);
     }
 
 
+    @Override
     public Enumeration<String> getAttributeNames() {
         return session.getAttributeNames();
     }
@@ -132,12 +142,14 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public String[] getValueNames() {
         return session.getValueNames();
     }
 
 
+    @Override
     public void setAttribute(String name, Object value) {
         session.setAttribute(name, value);
     }
@@ -146,12 +158,14 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public void putValue(String name, Object value) {
         session.setAttribute(name, value);
     }
 
 
+    @Override
     public void removeAttribute(String name) {
         session.removeAttribute(name);
     }
@@ -160,17 +174,20 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public void removeValue(String name) {
         session.removeAttribute(name);
     }
 
 
+    @Override
     public void invalidate() {
         session.invalidate();
     }
 
 
+    @Override
     public boolean isNew() {
         return session.isNew();
     }

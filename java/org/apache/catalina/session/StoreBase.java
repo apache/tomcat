@@ -70,6 +70,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Return the info for this Store.
      */
+    @Override
     public String getInfo() {
         return(info);
     }
@@ -88,6 +89,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      *
      * @param manager The newly associated Manager
      */
+    @Override
     public void setManager(Manager manager) {
         Manager oldManager = this.manager;
         this.manager = manager;
@@ -97,6 +99,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Return the Manager with which the Store is associated.
      */
+    @Override
     public Manager getManager() {
         return(this.manager);
     }
@@ -109,6 +112,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      *
      * @param listener a value of type 'PropertyChangeListener'
      */
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
@@ -118,6 +122,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      *
      * @param listener The listener to remove
      */
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
     }
