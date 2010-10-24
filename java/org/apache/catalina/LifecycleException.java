@@ -30,6 +30,7 @@ package org.apache.catalina;
 
 public final class LifecycleException extends Exception {
 
+    private static final long serialVersionUID = 1L;
 
     //------------------------------------------------------------ Constructors
 

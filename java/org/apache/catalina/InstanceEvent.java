@@ -36,11 +36,9 @@ import javax.servlet.ServletResponse;
  * @version $Id$
  */
 
-public final class InstanceEvent
-    extends EventObject {
+public final class InstanceEvent extends EventObject {
 
-
-    // ----------------------------------------------------- Manifest Constants
+    private static final long serialVersionUID = 1L;
 
 
     /**
