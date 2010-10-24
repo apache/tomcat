@@ -177,6 +177,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet exception occurs
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response)
         throws IOException, ServletException {
 
@@ -186,6 +187,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             try {
                 java.security.AccessController.doPrivileged(
                     new java.security.PrivilegedExceptionAction<Void>() {
+                        @Override
                         public Void run() 
                             throws ServletException, IOException {
                             internalDoFilter(req,res);
@@ -344,6 +346,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet exception occurs
      */
+    @Override
     public void doFilterEvent(CometEvent event)
         throws IOException, ServletException {
 
@@ -352,6 +355,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             try {
                 java.security.AccessController.doPrivileged(
                     new java.security.PrivilegedExceptionAction<Void>() {
+                        @Override
                         public Void run() 
                             throws ServletException, IOException {
                             internalDoFilterEvent(ev);
