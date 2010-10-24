@@ -42,6 +42,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SerializablePrincipal  implements java.io.Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(SerializablePrincipal.class);
     

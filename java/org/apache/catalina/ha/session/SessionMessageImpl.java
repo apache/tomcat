@@ -29,6 +29,9 @@ import org.apache.catalina.ha.ClusterMessageBase;
  */
 public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage {
     
+    private static final long serialVersionUID = 1L;
+
+
     public SessionMessageImpl() {
     }
     
@@ -100,16 +103,19 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      * returns the event type
      * @return one of the event types EVT_XXXX
      */
+    @Override
     public int getEventType() { return mEvtType; }
 
     /**
      * @return the serialized data for the session
      */
+    @Override
     public byte[] getSession() { return mSession;}
 
     /**
      * @return the session ID for the session
      */
+    @Override
     public String getSessionID(){ return mSessionID; }
     
     /**
@@ -132,6 +138,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      * clear text event type name (for logging purpose only) 
      * @return the event type in a string representation, useful for debugging
      */
+    @Override
     public String getEventTypeString()
     {
         switch (mEvtType)
@@ -148,6 +155,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
         }
     }
 
+    @Override
     public String getContextName() {
        return mContextName;
     }

@@ -32,7 +32,6 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.tribes.tipis.ReplicatedMap;
 import org.apache.catalina.util.Enumerator;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -47,7 +46,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -74,7 +73,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -185,12 +184,14 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         public MultiEnumeration(Enumeration<T>[] lists) {
             e = lists;
         }
+        @Override
         public boolean hasMoreElements() {
             for ( int i=0; i<e.length; i++ ) {
                 if ( e[i].hasMoreElements() ) return true;
             }
             return false;
         }
+        @Override
         public T nextElement() {
             for ( int i=0; i<e.length; i++ ) {
                 if ( e[i].hasMoreElements() ) return e[i].nextElement();
@@ -200,6 +201,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         }
     }
     
+    @Override
     public void objectMadePrimay(Object key, Object value) {
         //noop
     }
