@@ -29,8 +29,9 @@ import java.util.EventObject;
  * @version $Id$
  */
 
-public final class SessionEvent
-    extends EventObject {
+public final class SessionEvent extends EventObject {
+
+    private static final long serialVersionUID = 1L;
 
 
     /**
