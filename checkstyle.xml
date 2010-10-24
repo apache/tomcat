@@ -41,10 +41,7 @@
         <property name="option" value="above"/>
     </module>
     <module name="RedundantImport"/>
-    <!--
-    Do not use - does not take account of imports required for Javadocs
     <module name="UnusedImports"/>
-    -->
     
     <!--  Modifiers -->
     <!-- ~250 errors
