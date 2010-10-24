@@ -121,6 +121,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
          * and is not in a locked state
          * @return boolean
          */
+        @Override
         public boolean isDirty() {
             return getDeltaRequest().getSize()>0;
         }
@@ -130,6 +131,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
          * Otherwise it will serialize the entire object.
          * @return boolean
          */
+        @Override
         public boolean isDiffable() {
             return true;
         }
@@ -139,6 +141,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
          * @return byte[]
          * @throws IOException
          */
+        @Override
         public byte[] getDiff() throws IOException {
             try{
                 lock();
@@ -168,6 +171,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
          * @param length int
          * @throws IOException
          */
+        @Override
         public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
             try {
                 lock();
@@ -190,6 +194,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         /**
          * Resets the current diff state and resets the dirty flag
          */
+        @Override
         public void resetDiff() {
             resetDeltaRequest();
         }
@@ -197,6 +202,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         /**
          * Lock during serialization
          */
+        @Override
         public void lock() {
             diffLock.lock();
         }
@@ -204,10 +210,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         /**
          * Unlock after serialization
          */
+        @Override
         public void unlock() {
             diffLock.unlock();
         }
 
+        @Override
         public void setOwner(Object owner) {
             if ( owner instanceof ClusterManager && getManager()==null) {
                 ClusterManager cm = (ClusterManager)owner;
@@ -225,6 +233,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * returns true if this session is the primary session, if that is the case,
      * the manager can expire it upon timeout.
      */
+    @Override
     public boolean isPrimarySession() {
         return isPrimarySession;
     }
@@ -235,6 +244,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @param primarySession
      *            Flag value
      */
+    @Override
     public void setPrimarySession(boolean primarySession) {
         this.isPrimarySession = primarySession;
     }
@@ -456,6 +466,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     // ------------------------------------------------ Session Package Methods
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException,ClassNotFoundException {
         try {
             lock();
@@ -672,6 +683,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         activate();
     }
 
+    @Override
     public void writeExternal(ObjectOutput out ) throws java.io.IOException {
         try {
             lock();
@@ -786,6 +798,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return lastTimeReplicated;
     }
 
+    @Override
     public long getVersion() {
         return version;
     }
@@ -794,6 +807,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         this.lastTimeReplicated = lastTimeReplicated;
     }
 
+    @Override
     public void setVersion(long version) {
         this.version = version;
     }
@@ -831,6 +845,7 @@ final class StandardSessionContext
      *             must return an empty <code>Enumeration</code> and will be
      *             removed in a future version of the API.
      */
+    @Override
     @Deprecated
     public Enumeration<String> getIds() {
         return (new Enumerator<String>(dummy));
@@ -847,6 +862,7 @@ final class StandardSessionContext
      *             must return null and will be removed in a future version of
      *             the API.
      */
+    @Override
     @Deprecated
     public HttpSession getSession(String id) {
         return (null);

@@ -29,7 +29,6 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -78,6 +77,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
 //      ClusterManager Interface     
 //******************************************************************************/
 
+    @Override
     public void messageDataReceived(ClusterMessage msg) {
     }
 
@@ -86,6 +86,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         mExpireSessionsOnShutdown = expireSessionsOnShutdown;
     }
 
+    @Override
     public void setCluster(CatalinaCluster cluster) {
         if(log.isDebugEnabled())
             log.debug("Cluster associated with BackupManager");
@@ -98,6 +99,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
     }
 
 
+    @Override
     public ClusterMessage requestCompleted(String sessionId) {
         if (!getState().isAvailable()) return null;
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
@@ -109,6 +111,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
 //=========================================================================
 // OVERRIDE THESE METHODS TO IMPLEMENT THE REPLICATION
 //=========================================================================
+    @Override
     public void objectMadePrimay(Object key, Object value) {
         if (value!=null && value instanceof DeltaSession) {
             DeltaSession session = (DeltaSession)value;
@@ -134,7 +137,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * Starts the cluster communication channel, this will connect with the
      * other nodes in the cluster, and request the current session state to be
@@ -176,7 +179,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      * 
      * This will disconnect the cluster communication channel and stop the
      * listener thread.
@@ -206,9 +209,11 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         this.distributable = dist;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
+    @Override
     public boolean isNotifyListenersOnReplication() {
         return notifyListenersOnReplication;
     }
@@ -223,6 +228,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
     /* 
      * @see org.apache.catalina.ha.ClusterManager#getCluster()
      */
+    @Override
     public CatalinaCluster getCluster() {
         return cluster;
     }
@@ -231,10 +237,12 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         return mapSendOptions;
     }
 
+    @Override
     public String[] getInvalidatedSessions() {
         return new String[0];
     }
     
+    @Override
     public ClusterManager cloneFromTemplate() {
         BackupManager result = new BackupManager();
         result.mExpireSessionsOnShutdown = mExpireSessionsOnShutdown;
