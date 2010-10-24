@@ -155,6 +155,7 @@ public final class FileStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public int getSize() throws IOException {
 
         // Acquire the list of files in our storage directory
@@ -184,6 +185,7 @@ public final class FileStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void clear()
         throws IOException {
 
@@ -202,6 +204,7 @@ public final class FileStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurred
      */
+    @Override
     public String[] keys() throws IOException {
 
         // Acquire the list of files in our storage directory
@@ -240,6 +243,7 @@ public final class FileStore extends StoreBase {
      * @exception ClassNotFoundException if a deserialization error occurs
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public Session load(String id)
         throws ClassNotFoundException, IOException {
 
@@ -322,6 +326,7 @@ public final class FileStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void remove(String id) throws IOException {
 
         File file = file(id);
@@ -345,6 +350,7 @@ public final class FileStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void save(Session session) throws IOException {
 
         // Open an output stream to the specified pathname, if any

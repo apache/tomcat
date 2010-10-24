@@ -38,7 +38,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.CustomObjectInputStream;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -443,6 +442,7 @@ public class JDBCStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurred
      */
+    @Override
     public String[] keys() throws IOException {
         ResultSet rst = null;
         String keys[] = null;
@@ -504,6 +504,7 @@ public class JDBCStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurred
      */
+    @Override
     public int getSize() throws IOException {
         int size = 0;
         ResultSet rst = null;
@@ -561,6 +562,7 @@ public class JDBCStore extends StoreBase {
      * @exception ClassNotFoundException if an error occurs
      * @exception IOException if an input/output error occurred
      */
+    @Override
     public Session load(String id)
             throws ClassNotFoundException, IOException {
         ResultSet rst = null;
@@ -657,6 +659,7 @@ public class JDBCStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void remove(String id) throws IOException {
 
         synchronized (this) {
@@ -702,6 +705,7 @@ public class JDBCStore extends StoreBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void clear() throws IOException {
 
         synchronized (this) {
@@ -741,6 +745,7 @@ public class JDBCStore extends StoreBase {
      * @param session the session to be stored
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void save(Session session) throws IOException {
         ObjectOutputStream oos = null;
         ByteArrayOutputStream bos = null;
@@ -963,7 +968,7 @@ public class JDBCStore extends StoreBase {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -979,7 +984,7 @@ public class JDBCStore extends StoreBase {
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
