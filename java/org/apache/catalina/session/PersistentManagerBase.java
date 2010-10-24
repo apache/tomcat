@@ -31,7 +31,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 /**
@@ -61,6 +60,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
             // NOOP
         }
 
+        @Override
         public Void run() throws Exception{
            store.clear();
            return null;
@@ -76,6 +76,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
             this.id = id;
         }
 
+        @Override
         public Void run() throws Exception{
            store.remove(id);
            return null;
@@ -91,6 +92,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
             this.id = id;
         }
 
+        @Override
         public Session run() throws Exception{
            return store.load(id);
         }                       
@@ -105,6 +107,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
             this.session = session;
         }
 
+        @Override
         public Void run() throws Exception{
            store.save(session);
            return null;
@@ -118,6 +121,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
             // NOOP
         }
 
+        @Override
         public String[] run() throws Exception{
            return store.keys();
         }                       
@@ -528,6 +532,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
      * class. In order to use it, a subclass must specifically call it,
      * for example in the start() and/or processPersistenceChecks() methods.
      */
+    @Override
     public void load() {
 
         // Initialize our internal data structures
@@ -625,6 +630,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
      * class. In order to use it, a subclass must specifically call it,
      * for example in the stop() and/or processPersistenceChecks() methods.
      */
+    @Override
     public void unload() {
 
         if (store == null)
@@ -809,7 +815,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -835,7 +841,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
