@@ -32,7 +32,6 @@ import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
@@ -107,6 +106,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
     /**
      * Return the Container with which this Valve is associated, if any.
      */
+    @Override
     public Container getContainer() {
 
         return (container);
@@ -114,6 +114,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
     }
 
 
+    @Override
     public boolean isAsyncSupported() {
         return asyncSupported;
     }
@@ -129,6 +130,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      *
      * @param container The new associated container
      */
+    @Override
     public void setContainer(Container container) {
 
         this.container = container;
@@ -139,6 +141,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -150,6 +153,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * Return the next Valve in this pipeline, or <code>null</code> if this
      * is the last Valve in the pipeline.
      */
+    @Override
     public Valve getNext() {
 
         return (next);
@@ -162,6 +166,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      *
      * @param valve The new next valve
      */
+    @Override
     public void setNext(Valve valve) {
 
         this.next = valve;
@@ -177,6 +182,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         // NOOP by default
     }
@@ -194,6 +200,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public abstract void invoke(Request request, Response response)
         throws IOException, ServletException;
 
@@ -211,6 +218,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * @exception ServletException if a servlet error occurs, or is thrown
      *  by a subsequently invoked Valve, Filter, or Servlet
      */
+    @Override
     public void event(Request request, Response response, CometEvent event)
         throws IOException, ServletException {
         // Perform the request
@@ -228,7 +236,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
     
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -242,7 +250,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
