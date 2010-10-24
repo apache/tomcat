@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.naming.ContextBindings;
 
 /**
@@ -612,7 +611,7 @@ public class DataSourceRealm
     /**
      * Prepare for the beginning of active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#startInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used

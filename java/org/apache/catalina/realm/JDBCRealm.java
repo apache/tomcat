@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.ExceptionUtils;
 
 
@@ -769,7 +768,7 @@ public class JDBCRealm
     /**
      * Prepare for the beginning of active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#startInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -792,7 +791,7 @@ public class JDBCRealm
     /**
      * Gracefully terminate the active use of the public methods of this
      * component and implement the requirements of
-     * {@link LifecycleBase#stopInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
