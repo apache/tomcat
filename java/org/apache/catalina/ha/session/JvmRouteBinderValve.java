@@ -367,11 +367,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             ((DeltaSession) catalinaSession).resetDeltaRequest();
         changeRequestSessionID(request, sessionId, newSessionID);
 
-        if (getCluster() != null) {
-            // now sending the change to all other clusternodes!
-            ClusterManager manager = (ClusterManager)catalinaSession.getManager();
-            sendSessionIDClusterBackup(manager,request,sessionId, newSessionID);
-        }
+        // now sending the change to all other clusternodes!
+        sendSessionIDClusterBackup(request,sessionId, newSessionID);
 
         fireLifecycleEvent("After session migration", catalinaSession);
         if (log.isDebugEnabled()) {
@@ -406,22 +403,23 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      * 
      * @see JvmRouteSessionIDBinderListener#messageReceived(
      *            org.apache.catalina.ha.ClusterMessage)
-     * @param manager
-     *            ClusterManager
      * @param sessionId
      *            current failed sessionid
      * @param newSessionID
      *            new session id, bind to the new cluster node
      */
-    protected void sendSessionIDClusterBackup(ClusterManager manager,
-            Request request, String sessionId, String newSessionID) {
-        SessionIDMessage msg = new SessionIDMessage();
-        msg.setOrignalSessionID(sessionId);
-        msg.setBackupSessionID(newSessionID);
-        Context context = request.getContext();
-        msg.setContextPath(context.getPath());
-        msg.setHost(context.getParent().getName());
-        cluster.send(msg);
+    protected void sendSessionIDClusterBackup(Request request, String sessionId,
+            String newSessionID) {
+        CatalinaCluster c = getCluster();
+        if (c != null) {
+            SessionIDMessage msg = new SessionIDMessage();
+            msg.setOrignalSessionID(sessionId);
+            msg.setBackupSessionID(newSessionID);
+            Context context = request.getContext();
+            msg.setContextPath(context.getPath());
+            msg.setHost(context.getParent().getName());
+            c.send(msg);
+        }
     }
 
     /**
