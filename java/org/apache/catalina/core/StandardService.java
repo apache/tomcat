@@ -34,7 +34,6 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -112,6 +111,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * Return the <code>Container</code> that handles requests for all
      * <code>Connectors</code> associated with this Service.
      */
+    @Override
     public Container getContainer() {
 
         return (this.container);
@@ -125,6 +125,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      *
      * @param container The new Container
      */
+    @Override
     public void setContainer(Container container) {
 
         Container oldContainer = this.container;
@@ -159,6 +160,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -169,6 +171,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Return the name of this Service.
      */
+    @Override
     public String getName() {
 
         return (this.name);
@@ -181,6 +184,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      *
      * @param name The new service name
      */
+    @Override
     public void setName(String name) {
 
         this.name = name;
@@ -191,6 +195,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Return the <code>Server</code> with which we are associated (if any).
      */
+    @Override
     public Server getServer() {
 
         return (this.server);
@@ -203,6 +208,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      *
      * @param server The server that owns this Service
      */
+    @Override
     public void setServer(Server server) {
 
         this.server = server;
@@ -219,6 +225,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      *
      * @param connector The Connector to be added
      */
+    @Override
     public void addConnector(Connector connector) {
 
         synchronized (connectors) {
@@ -268,6 +275,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Find and return the set of Connectors associated with this Service.
      */
+    @Override
     public Connector[] findConnectors() {
 
         return (connectors);
@@ -282,6 +290,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      *
      * @param connector The Connector to be removed
      */
+    @Override
     public void removeConnector(Connector connector) {
 
         synchronized (connectors) {
@@ -349,6 +358,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * Adds a named executor to the service
      * @param ex Executor
      */
+    @Override
     public void addExecutor(Executor ex) {
         synchronized (executors) {
             if (!executors.contains(ex)) {
@@ -367,6 +377,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * Retrieves all executors
      * @return Executor[]
      */
+    @Override
     public Executor[] findExecutors() {
         synchronized (executors) {
             Executor[] arr = new Executor[executors.size()];
@@ -380,6 +391,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * @param executorName String
      * @return Executor
      */
+    @Override
     public Executor getExecutor(String executorName) {
         synchronized (executors) {
             for (Executor executor: executors) {
@@ -394,6 +406,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * Removes an executor from the service
      * @param ex Executor
      */
+    @Override
     public void removeExecutor(Executor ex) {
         synchronized (executors) {
             if ( executors.remove(ex) && getState().isAvailable() ) {
@@ -411,7 +424,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Start nested components ({@link Executor}s, {@link Connector}s and
      * {@link Container}s) and implement the requirements of
-     * {@link LifecycleBase#startInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -454,7 +467,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Stop nested components ({@link Executor}s, {@link Connector}s and
      * {@link Container}s) and implement the requirements of
-     * {@link LifecycleBase#stopInternal()}.
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
