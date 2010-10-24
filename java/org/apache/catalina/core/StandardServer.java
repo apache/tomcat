@@ -32,7 +32,6 @@ import java.util.Random;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -41,7 +40,6 @@ import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.startup.Catalina;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
@@ -190,6 +188,7 @@ public final class StandardServer extends LifecycleMBeanBase
     /**
      * Return the global naming resources.
      */
+    @Override
     public NamingResources getGlobalNamingResources() {
 
         return (this.globalNamingResources);
@@ -202,6 +201,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param globalNamingResources The new global naming resources
      */
+    @Override
     public void setGlobalNamingResources
         (NamingResources globalNamingResources) {
 
@@ -221,6 +221,7 @@ public final class StandardServer extends LifecycleMBeanBase
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -239,6 +240,7 @@ public final class StandardServer extends LifecycleMBeanBase
     /**
      * Return the port number we listen to for shutdown commands.
      */
+    @Override
     public int getPort() {
 
         return (this.port);
@@ -251,6 +253,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param port The new port number
      */
+    @Override
     public void setPort(int port) {
 
         this.port = port;
@@ -261,6 +264,7 @@ public final class StandardServer extends LifecycleMBeanBase
     /**
      * Return the address on which we listen to for shutdown commands.
      */
+    @Override
     public String getAddress() {
 
         return (this.address);
@@ -273,6 +277,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param address The new address
      */
+    @Override
     public void setAddress(String address) {
 
         this.address = address;
@@ -282,6 +287,7 @@ public final class StandardServer extends LifecycleMBeanBase
     /**
      * Return the shutdown command string we are waiting for.
      */
+    @Override
     public String getShutdown() {
 
         return (this.shutdown);
@@ -294,6 +300,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param shutdown The new shutdown command
      */
+    @Override
     public void setShutdown(String shutdown) {
 
         this.shutdown = shutdown;
@@ -326,6 +333,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param service The Service to be added
      */
+    @Override
     public void addService(Service service) {
 
         service.setServer(this);
@@ -359,6 +367,7 @@ public final class StandardServer extends LifecycleMBeanBase
      * This keeps the main thread alive - the thread pool listening for http 
      * connections is daemon threads.
      */
+    @Override
     public void await() {
         // Negative values - don't wait on port - tomcat is embedded or we just don't like ports
         if( port == -2 ) {
@@ -463,6 +472,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param name Name of the Service to be returned
      */
+    @Override
     public Service findService(String name) {
 
         if (name == null) {
@@ -483,6 +493,7 @@ public final class StandardServer extends LifecycleMBeanBase
     /**
      * Return the set of Services defined within this Server.
      */
+    @Override
     public Service[] findServices() {
 
         return (services);
@@ -507,6 +518,7 @@ public final class StandardServer extends LifecycleMBeanBase
      *
      * @param service The Service to be removed
      */
+    @Override
     public void removeService(Service service) {
 
         synchronized (services) {
@@ -645,7 +657,7 @@ public final class StandardServer extends LifecycleMBeanBase
 
     /**
      * Start nested components ({@link Service}s) and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -667,7 +679,7 @@ public final class StandardServer extends LifecycleMBeanBase
 
     /**
      * Stop nested components ({@link Service}s) and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
@@ -753,7 +765,7 @@ public final class StandardServer extends LifecycleMBeanBase
      * Obtain the MBean domain for this server. The domain is obtained using
      * the following search order:
      * <ol>
-     * <li>Name of first {@link Engine}.</li>
+     * <li>Name of first {@link org.apache.catalina.Engine}.</li>
      * <li>Name of first {@link Service}.</li>
      * </ol>
      */
