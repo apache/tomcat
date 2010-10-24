@@ -42,7 +42,6 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -150,6 +149,7 @@ public class DeltaManager extends ClusterManagerBase{
         return info;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -410,6 +410,7 @@ public class DeltaManager extends ClusterManagerBase{
         this.expireSessionsOnShutdown = expireSessionsOnShutdown;
     }
     
+    @Override
     public boolean isNotifyListenersOnReplication() {
         return notifyListenersOnReplication;
     }
@@ -419,10 +420,12 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     
-   public CatalinaCluster getCluster() {
+   @Override
+public CatalinaCluster getCluster() {
         return cluster;
     }
 
+    @Override
     public void setCluster(CatalinaCluster cluster) {
         this.cluster = cluster;
     }
@@ -726,7 +729,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -929,7 +932,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -972,6 +975,7 @@ public class DeltaManager extends ClusterManagerBase{
      * @param cmsg -
      *            the message received.
      */
+    @Override
     public void messageDataReceived(ClusterMessage cmsg) {
         if (cmsg != null && cmsg instanceof SessionMessage) {
             SessionMessage msg = (SessionMessage) cmsg;
@@ -1011,6 +1015,7 @@ public class DeltaManager extends ClusterManagerBase{
      *            the sessionId that just completed.
      * @return a SessionMessage to be sent,
      */
+    @Override
     public ClusterMessage requestCompleted(String sessionId) {
          return requestCompleted(sessionId, false);
      }
@@ -1188,6 +1193,7 @@ public class DeltaManager extends ClusterManagerBase{
      * 
      * @return The invalidated sessions array
      */
+    @Override
     public String[] getInvalidatedSessions() {
         return new String[0];
     }
@@ -1471,6 +1477,7 @@ public class DeltaManager extends ClusterManagerBase{
         cluster.send(newmsg, sender);
     }
 
+    @Override
     public ClusterManager cloneFromTemplate() {
         DeltaManager result = new DeltaManager();
         result.name = "Clone-from-"+name;

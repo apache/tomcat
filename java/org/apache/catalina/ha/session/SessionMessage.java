@@ -37,8 +37,7 @@ import org.apache.catalina.ha.ClusterMessage;
  *
  */
 
-public interface SessionMessage extends ClusterMessage, java.io.Serializable
-{
+public interface SessionMessage extends ClusterMessage {
 
     /**
      * Event type used when a session has been created on a node
