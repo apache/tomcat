@@ -56,6 +56,7 @@ public class JasperListener
      *
      * @param event The event that has occurred
      */
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
