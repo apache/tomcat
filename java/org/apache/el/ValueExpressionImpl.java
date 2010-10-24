@@ -24,9 +24,6 @@ import java.io.ObjectOutput;
 
 import javax.el.ELContext;
 import javax.el.ELException;
-import javax.el.ELResolver;
-import javax.el.Expression;
-import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
@@ -58,7 +55,7 @@ import org.apache.el.util.ReflectionUtil;
  * </p>
  * 
  * <p>
- * <code>The {@link ExpressionFactory#createValueExpression} method
+ * <code>The {@link javax.el.ExpressionFactory#createValueExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>ValueExpression</code> that encapsulates the parsed expression.
  * The {@link FunctionMapper} is used at parse time, not evaluation time, 
@@ -67,20 +64,20 @@ import org.apache.el.util.ReflectionUtil;
  *
  * <p>The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and
  * {@link #getType} methods will evaluate the expression each time they are
- * called. The {@link ELResolver} in the <code>ELContext</code> is used to 
- * resolve the top-level variables and to determine the behavior of the
+ * called. The {@link javax.el.ELResolver} in the <code>ELContext</code> is used
+ * to resolve the top-level variables and to determine the behavior of the
  * <code>.</code> and <code>[]</code> operators. For any of the four methods,
- * the {@link ELResolver#getValue} method is used to resolve all properties 
- * up to but excluding the last one. This provides the <code>base</code> 
- * object. At the last resolution, the <code>ValueExpression</code> will 
- * call the corresponding {@link ELResolver#getValue}, 
- * {@link ELResolver#setValue}, {@link ELResolver#isReadOnly} or 
- * {@link ELResolver#getType} method, depending on which was called on 
- * the <code>ValueExpression</code>.
+ * the {@link javax.el.ELResolver#getValue} method is used to resolve all
+ * properties up to but excluding the last one. This provides the
+ * <code>base</code> object. At the last resolution, the
+ * <code>ValueExpression</code> will call the corresponding
+ * {@link javax.el.ELResolver#getValue}, {@link javax.el.ELResolver#setValue},
+ * {@link javax.el.ELResolver#isReadOnly} or {@link javax.el.ELResolver#getType}
+ * method, depending on which was called on the <code>ValueExpression</code>.
  * </p>
  *
  * <p>See the notes about comparison, serialization and immutability in 
- * the {@link Expression} javadocs.
+ * the {@link javax.el.Expression} javadocs.
  *
  * @see javax.el.ELResolver
  * @see javax.el.Expression
@@ -233,6 +230,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return this.getNode().isReadOnly(ctx);
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
         this.expr = in.readUTF();
@@ -259,6 +257,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
         this.getNode().setValue(ctx, value);
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.expr);
         out.writeUTF((this.expectedType != null) ? this.expectedType.getName()

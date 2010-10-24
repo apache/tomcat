@@ -84,6 +84,7 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
         return true;
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.expr = in.readUTF();
         String type = in.readUTF();
@@ -94,6 +95,7 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
                 .readObject()));
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.expr);
         out.writeUTF((this.expectedType != null) ? this.expectedType.getName()
