@@ -1006,14 +1006,16 @@ public interface Context extends Container {
 
 
     /**
-     * Notify all {@link ServletRequestListener}s that a request has started.
+     * Notify all {@link javax.servlet.ServletRequestListener}s that a request
+     * has started.
      * @return <code>true</code> if the listeners fire successfully, else
      *         <code>false</code>
      */
     public boolean fireRequestInitEvent(ServletRequest request);
 
     /**
-     * Notify all {@link ServletRequestListener}s that a request has ended.
+     * Notify all {@link javax.servlet.ServletRequestListener}s that a request
+     * has ended.
      * @return <code>true</code> if the listeners fire successfully, else
      *         <code>false</code>
      */
@@ -1242,7 +1244,7 @@ public interface Context extends Container {
 
     /**
      * Notification that servlet security has been dynamically set in a
-     * {@link ServletRegistration.Dynamic}
+     * {@link javax.servlet.ServletRegistration.Dynamic}
      * @param registration servlet security was modified for
      * @param servletSecurityElement new security constraints for this servlet
      * @return urls currently mapped to this registration that are already
