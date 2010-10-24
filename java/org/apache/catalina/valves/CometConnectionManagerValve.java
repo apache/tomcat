@@ -41,7 +41,6 @@ import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.connector.CometEventImpl;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -97,7 +96,7 @@ public class CometConnectionManagerValve extends ValveBase
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -115,7 +114,7 @@ public class CometConnectionManagerValve extends ValveBase
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -131,6 +130,7 @@ public class CometConnectionManagerValve extends ValveBase
     }
 
     
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
             // The container is getting stopped, close all current connections 
@@ -305,11 +305,13 @@ public class CometConnectionManagerValve extends ValveBase
     }
 
 
+    @Override
     public void sessionCreated(HttpSessionEvent se) {
         // NOOP
     }
 
 
+    @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         // Close all Comet connections associated with this session
         Request[] reqs = (Request[])

@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
-
 
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
@@ -28,7 +25,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleBase;
 
 
 /**
@@ -101,7 +97,7 @@ public class SemaphoreValve extends ValveBase {
 
     /**
      * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -117,7 +113,7 @@ public class SemaphoreValve extends ValveBase {
 
     /**
      * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -200,10 +196,14 @@ public class SemaphoreValve extends ValveBase {
     
 
     /**
-     * Subclass friendly method to add error handling when a permit isn't granted.
+     * Subclass friendly method to add error handling when a permit isn't
+     * granted.
+     * @throws IOException
+     * @throws ServletException
      */
     public void permitDenied(Request request, Response response)
         throws IOException, ServletException {
+        // NO-OP by default
     }
     
 
