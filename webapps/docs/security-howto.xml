@@ -33,7 +33,7 @@
 </section>
 
   <section name="Introduction">
-    <p>Tomcat is configured to be reasonably secure for must use cases by
+    <p>Tomcat is configured to be reasonably secure for most use cases by
     default. Some environments may require more, or less, secure configurations.
     This page is to provide a single point of reference for configuration
     options that may impact security and to offer some commentary on the
@@ -264,7 +264,8 @@ server.info=Apache Tomcat/7.0.x
       <p>The default entropy value has been shown to generate predictable values
       under certain conditions. For more secure session generation, this should
       be set to a long string. This is done automatically if the APR/native
-      library is installed; a random value will be obtained from the APR.</p>
+      library is installed; a random value will be obtained from the APR/native
+      library.</p>
       
       <p>The class used to generate random session IDs may be changed with
       the <strong>randomClass</strong> attribute.</p>
