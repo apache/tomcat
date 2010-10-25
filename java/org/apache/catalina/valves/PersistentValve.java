@@ -186,7 +186,7 @@ public class PersistentValve extends ValveBase {
                                 store + " session: " + session + " valid: " +
                                 (session == null ? "N/A" : Boolean.toString(
                                         session.isValid())) +
-                                " Staled: " + isSessionStale(session,
+                                " stale: " + isSessionStale(session,
                                         System.currentTimeMillis()));
 
                 }
