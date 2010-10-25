@@ -412,15 +412,14 @@ public abstract class PersistentManagerBase extends ManagerBase {
                     AccessController.doPrivileged(new PrivilegedStoreClear());
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
-                    log.error("Exception clearing the Store: " + exception);
-                    exception.printStackTrace();                        
+                    log.error("Exception clearing the Store: " + exception,
+                            exception);
                 }
             } else {
                 store.clear();
             }
         } catch (IOException e) {
-            log.error("Exception clearing the Store: " + e);
-            e.printStackTrace();
+            log.error("Exception clearing the Store: " + e, e);
         }
 
     }
@@ -609,15 +608,13 @@ public abstract class PersistentManagerBase extends ManagerBase {
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
                     log.error("Exception in the Store during removeSession: "
-                              + exception);
-                    exception.printStackTrace();                        
+                              + exception, exception);
                 }
             } else {
                  store.remove(id);
             }               
         } catch (IOException e) {
-            log.error("Exception removing session  " + e.getMessage());
-            e.printStackTrace();
+            log.error("Exception removing session  " + e.getMessage(), e);
         }        
     }
 
@@ -797,9 +794,11 @@ public abstract class PersistentManagerBase extends ManagerBase {
                     AccessController.doPrivileged(new PrivilegedStoreSave(session));
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
+                    if (exception instanceof IOException) {
+                        throw (IOException) exception;
+                    }
                     log.error("Exception in the Store during writeSession: "
-                              + exception);
-                    exception.printStackTrace();                        
+                              + exception, exception);
                 }
             } else {
                  store.save(session);
