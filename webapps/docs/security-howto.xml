@@ -33,7 +33,7 @@
 </section>
 
   <section name="Introduction">
-    <p>Tomcat is configured to be reasonable secure for must use cases by
+    <p>Tomcat is configured to be reasonably secure for must use cases by
     default. Some environments may require more, or less, secure configurations.
     This page is to provide a single point of reference for configuration
     options that may impact security and to offer some commentary on the
@@ -48,7 +48,7 @@
   </section>
 
   <section name="Non-Tomcat settings">
-    <p>Tomcat configuration should not be the only line of defence. The other
+    <p>Tomcat configuration should not be the only line of defense. The other
     components in the system (operating system, network, database, etc.) should
     also be secured. For the operating system, consider limiting the privileges
     of the user under which Tomcat is running and limiting access to Tomcat's
@@ -66,15 +66,15 @@
   
   <section name="Security manager">
     <p>Enabling the security manager causes web applications to be run in a
-    sandbox, significantly limiting a web applications ability to perform
+    sandbox, significantly limiting a web application's ability to perform
     malicious actions such as calling System.exit(), establishing network
     connections or accessing the file system outside of the web application's
     root and temporary directories.</p>
     
-    <p>Tomcat is tested with the security manager enabled but the majority of
-    Tomcat users do not run with a security manager so Tomcat is not as well
-    tested in this configuration. There have been, and continue to be, bugs
-    reported that are triggered by running under a security manager.</p>
+    <p>Tomcat is tested with the security manager enabled; but the majority of
+    Tomcat users do not run with a security manager, so Tomcat is not as well
+    user-tested in this configuration. There have been, and continue to be,
+    bugs reported that are triggered by running under a security manager.</p>
     
     <p>The restrictions imposed by a security manager are likely to break most
     applications if the security manager is enabled. The security manager should
@@ -103,7 +103,7 @@
     
     <subsection name="Listeners">
       <p>The APR Lifecycle Listener is not stable if compiled on Solaris using
-      gcc. It using the APR/native connector on Solaris, compile it with the
+      gcc. If using the APR/native connector on Solaris, compile it with the
       Sun Studio compiler.</p>
     </subsection>
     
@@ -127,7 +127,7 @@
       
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       POST requests during FORM and CLIENT-CERT authentication. The parameters
-      are cached for the duration of the authentication (that may be many
+      are cached for the duration of the authentication (which may be many
       minutes) so this is limited to 4KB by default to reduce exposure to a DOS
       attack.</p>
       
@@ -147,10 +147,10 @@
       <p>The <strong>SSLEnabled</strong>, <strong>scheme</strong> and
       <strong>secure</strong> attributes may all be independently set. These are
       normally used when Tomcat is located behind a reverse proxy and the proxy
-      is connecting to Tomcat via http or https. They allow Tomcat to see the
+      is connecting to Tomcat via HTTP or HTTPS. They allow Tomcat to see the
       SSL attributes of the connections between the client and the proxy rather
       than the proxy and Tomcat. For example, the client may connect to the
-      proxy over https but the proxy connects to Tomcat using http. If it is
+      proxy over HTTPS but the proxy connects to Tomcat using HTTP. If it is
       necessary for Tomcat to be able to distinguish between secure and
       non-secure connections received by a proxy, the proxy must use separate
       connectors to pass secure and non-secure requests to Tomcat. If the
@@ -205,8 +205,8 @@
       behaviour, use the <strong>aliases</strong> attribute. Changing this
       setting from the default of <code>false</code> on case insensitive
       operating systems (this includes Windows) will disable a number of
-      security and allow, amongst other things, direct access to the WEB-INF
-      directory.</p>
+      security measures and allow, among other things, direct access to the
+      WEB-INF directory.</p>
     </subsection>
     
     <subsection name="Valves">
@@ -215,15 +215,15 @@
       per context as required.</p>
       
       <p>Any administrative application should be protected by a
-      RemoteAddressValve. (Note that this Valve is also available as a Filter).
+      RemoteAddressValve. (Note that this Valve is also available as a Filter.)
       The allow attribute should be used to limit access to a set of known
       trusted hosts.</p>
       
       <p>The default ErrorReportValve includes the Tomcat version number in the
       response sent to clients. To avoid this, custom error handling can be
       configured within each web application. Alternatively, the version number
-      can be changed by creating the following file in
-      CATALINA_HOME/lib/org/apache/catalina/util/ServerInfo.properties with the
+      can be changed by creating the file 
+      CATALINA_HOME/lib/org/apache/catalina/util/ServerInfo.properties with 
       content as follows:</p>
       <source>
 server.info=Apache Tomcat/7.0.x
@@ -242,7 +242,7 @@ server.info=Apache Tomcat/7.0.x
       <p>The MemoryRealm is not intended for production use as any changes to
       tomcat-users.xml require a restart of Tomcat to take effect.</p>
       
-      <p>The JDBCRealm is not recommended for production use as it single
+      <p>The JDBCRealm is not recommended for production use as it is single
       threaded for all authentication and authorization options. Use the
       DataSourceRealm instead.</p>
       
@@ -253,7 +253,7 @@ server.info=Apache Tomcat/7.0.x
       mature as the other realms. Additional testing is recommended before using
       this realm.</p>
       
-      <p>By default, the realms not not implement any form of account lock-out.
+      <p>By default, the realms do not implement any form of account lock-out.
       This means that brute force attacks can be successful. To prevent a brute
       force attack, the chosen realm should be wrapped in a LockOutRealm.</p>
     </subsection>
@@ -264,12 +264,12 @@ server.info=Apache Tomcat/7.0.x
       <p>The default entropy value has been shown to generate predictable values
       under certain conditions. For more secure session generation, this should
       be set to a long string. This is done automatically if the APR/native
-      library is installed, a random value will be obtained from APR.</p>
+      library is installed; a random value will be obtained from the APR.</p>
       
-      <p>The class used to generate random session IDs may be changed by using
+      <p>The class used to generate random session IDs may be changed with
       the <strong>randomClass</strong> attribute.</p>
       
-      <p>The length of the session ID may be changed by using the
+      <p>The length of the session ID may be changed with the
       <strong>sessionIdLength</strong> attribute.</p>
     </subsection>
   </section>
@@ -289,12 +289,12 @@ server.info=Apache Tomcat/7.0.x
       
     <p>The <strong>
     org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER
-    </strong> has security implications if disabled. Many user agents, in
-    breach of RFC2616, try and guess the character encoding of text media
-    types when the specification mandated default of ISO-8859-1 should be
-    used. If the response contains characters that are safe for ISO-8859-1
-    but trigger an XSS if interpreted as UTF-7, some browsers will use UTF-7
-    and trigger an XSS vulnerability.</p>
+    </strong> system property has security implications if disabled. Many user
+    agents, in breach of RFC2616, try to guess the character encoding of text
+    media types when the specification-mandated default of ISO-8859-1 should be
+    used. Some browsers will interpret as UTF-7 a response containing characters
+    that are safe for ISO-8859-1 but trigger an XSS vulnerability if interpreted
+    as UTF-7.</p>
   </section>
     
   <section name="CATALINA_BASE/conf/web.xml">
