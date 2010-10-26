@@ -127,7 +127,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * The default maximum inactive interval for Sessions created by
      * this Manager.
      */
-    protected int maxInactiveInterval = 60;
+    protected int maxInactiveInterval = 30 * 60;
 
 
     /**
