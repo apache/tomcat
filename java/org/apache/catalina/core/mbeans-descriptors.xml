@@ -583,6 +583,12 @@
                returnType="java.lang.String">    
     </operation>
     
+    <operation name="findContainerListenerNames"
+               description="Return the set of container listener class names configured for this application."
+               impact="INFO"
+               returnType="[Ljava.lang.String;">    
+    </operation>
+    
     <operation name="findErrorPage"
                description="Return the error page entry for the specified HTTP error code, if any; otherwise return null"
                impact="ACTION"
@@ -630,6 +636,12 @@
     
     <operation name="findInstanceListeners"
                description="Return the set of InstanceListener classes that will be added to newly created Wrappers automatically."
+               impact="INFO"
+               returnType="[Ljava.lang.String;">    
+    </operation>
+    
+    <operation name="findLifecycleListenerNames"
+               description="Return the set of lifecycle listener class names configured for this application."
                impact="INFO"
                returnType="[Ljava.lang.String;">    
     </operation>
