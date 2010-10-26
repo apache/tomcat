@@ -119,6 +119,18 @@
         General code clean-up to reduce (not eliminate) the number of warnings
         reported by IDEs. (markt)
       </fix>
+      <fix>
+        <bug>50140</bug>: Don&apos;t ignore a user specified installation
+        directory when performing a silent install with the Windows installer on
+        64-bit platforms. (markt)
+      </fix>
+      <add>
+        When installing with the Windows installer on 64-bit platforms, allow
+        the user to select either a 32-bit JDK or a 64-bit JDK. If a 32-bit JDK
+        is selected, the 32-bit service wrapper and the 32-bit native DLL will
+        be installed. If a 64-bit JDK is selected, the 64-bit service wrapper
+        and the 64-bit native DLL will be installed. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

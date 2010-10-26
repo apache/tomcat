@@ -37,7 +37,10 @@
 !include "StrFunc.nsh"
 ${StrRep}
   Var "JavaHome"
-
+  Var "JavaExe"
+  Var "JvmDll"
+  Var "Arch"
+  Var "ResetInstDir"
 
 
 ;--------------------------------
@@ -76,9 +79,9 @@ ${StrRep}
   !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE INSTALLLICENSE
   !insertmacro MUI_PAGE_COMPONENTS
-  !insertmacro MUI_PAGE_DIRECTORY
   Page custom SetConfiguration Void "$(TEXT_CONF_PAGETITLE)"
-  Page custom SetChooseJVM Void "$(TEXT_JVM_PAGETITLE)"
+  Page custom SetChooseJVM checkJava "$(TEXT_JVM_PAGETITLE)"
+  !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   Page custom CheckUserType
   !insertmacro MUI_PAGE_FINISH
@@ -105,9 +108,6 @@ ${StrRep}
   ;Language
   !insertmacro MUI_LANGUAGE English
 
-  ;Folder-select dialog
-  InstallDir "$PROGRAMFILES\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
-
   ;Install types
   InstType Normal
   InstType Minimum
@@ -129,9 +129,9 @@ Section "Core" SecTomcatCore
 
   SectionIn 1 2 3 RO
 
-  IfSilent +2 0
-  Call checkJvm
-
+  IfSilent 0 +2
+  Call checkJava
+  
   SetOutPath $INSTDIR
   File tomcat.ico
   File LICENSE
@@ -153,38 +153,27 @@ Section "Core" SecTomcatCore
   File /r webapps\ROOT\*.*
 
   Call configure
-  Call findJavaPath
-  Pop $2
 
-  IfSilent +2 0
-  !insertmacro MUI_INSTALLOPTIONS_READ $2 "jvm.ini" "Field 2" "State"
-
-  StrCpy "$JavaHome" $2
-  Call findJVMPath
-  Pop $2
-
-  DetailPrint "Using Jvm: $2"
+  DetailPrint "Using Jvm: $JavaHome"
 
   SetOutPath $INSTDIR\bin
   File bin\tomcat@VERSION_MAJOR@w.exe
 
   ; Get the current platform x86 / AMD64 / IA64
-  Call FindCpuType
-  Pop $0
-  StrCmp $0 "x86" 0 +2
+  StrCmp $Arch "x86" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
-  StrCmp $0 "x64" 0 +2
+  StrCmp $Arch "x64" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\x64\tomcat@VERSION_MAJOR@.exe
-  StrCmp $0 "i64" 0 +2
+  StrCmp $Arch "i64" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\i64\tomcat@VERSION_MAJOR@.exe
 
   InstallRetry:
   FileOpen $R7 "$INSTDIR\logs\service-install.log" w
-  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$2" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
+  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   FileWrite $R7 "$\r$\n"
   
   ClearErrors
-  nsExec::ExecToStack '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$2" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
+  nsExec::ExecToStack '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   Pop $0
   Pop $1
   StrCmp $0 "0" InstallOk
@@ -202,17 +191,6 @@ Section "Service" SecTomcatService
 
   SectionIn 3
 
-  IfSilent 0 +3
-  Call findJavaPath
-  Pop $2
-
-  IfSilent +2 0
-  !insertmacro MUI_INSTALLOPTIONS_READ $2 "jvm.ini" "Field 2" "State"
-
-  StrCpy "$JavaHome" $2
-  Call findJVMPath
-  Pop $2
-
   FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
   FileWrite $R7 "$\r$\n"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
@@ -228,14 +206,12 @@ Section "Native" SecTomcatNative
   SectionIn 3
 
   SetOutPath $INSTDIR\bin
-  Call FindCpuType
-  Pop $0
 
-  StrCmp $0 "x86" 0 +2
+  StrCmp $Arch "x86" 0 +2
   File bin\tcnative-1.dll
-  StrCmp $0 "x64" 0 +2
+  StrCmp $Arch "x64" 0 +2
   File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
-  StrCmp $0 "i64" 0 +2
+  StrCmp $Arch "i64" 0 +2
   File /oname=tcnative-1.dll bin\i64\tcnative-1.dll
 
   ClearErrors
@@ -247,8 +223,6 @@ SubSectionEnd
 Section "Start Menu Items" SecMenu
 
   SectionIn 1 2 3
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $2 "jvm.ini" "Field 2" "State"
 
   SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
 
@@ -353,20 +327,16 @@ Section -post
 SectionEnd
 
 Function .onInit
-  ;Reset install dir for 64-bit
-  ExpandEnvStrings $0 "%PROGRAMW6432%"
-  StrCmp $0 "%PROGRAMW6432%" +2 0
-  StrCpy $INSTDIR "$0\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
+  StrCpy $ResetInstDir $INSTDIR
 
   ;Extract Install Options INI Files
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "config.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "jvm.ini"
-
 FunctionEnd
 
 Function SetChooseJVM
   !insertmacro MUI_HEADER_TEXT "$(TEXT_JVM_TITLE)" "$(TEXT_JVM_SUBTITLE)"
-  Call findJavaPath
+  Call findJavaHome
   Pop $3
   !insertmacro MUI_INSTALLOPTIONS_WRITE "jvm.ini" "Field 2" "State" $3
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "jvm.ini"
@@ -430,13 +400,13 @@ FunctionEnd
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ; =====================
-; FindCpuType Function
+; findCpuType Function
 ; =====================
 ;
 ; Find the CPU used on the system, and put the result on the top of the
 ; stack
 ;
-Function FindCpuType
+Function findCpuType
 
   ClearErrors
   ; Default CPU is always x86
@@ -485,16 +455,89 @@ Function CheckUserType
   done:
 FunctionEnd
 
+; ==================
+; checkJava Function
+; ==================
+;
+; Checks that a valid JVM has been specified or a suitable default is available
+; Sets $JavaHome, $JavaExe and $JvmDll accordingly
+; Determines if the JVM is 32-bit or 64-bit and sets $Arch accordingly. For
+; 64-bit JVMs, also determines if it is x64 or ia64
+Function checkJava
+
+  IfSilent +3
+  !insertmacro MUI_INSTALLOPTIONS_READ $5 "jvm.ini" "Field 2" "State"
+  Goto TestJavaHome
+  
+  ; Silent install so try and find JavaHome from registry
+  Call findJavaHome
+  Pop $5
+  
+TestJavaHome:
+  IfFileExists "$5\bin\java.exe" FoundJavaExe
+  IfSilent +2
+  MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$5"
+  DetailPrint "No Java Virtual Machine found in folder:$\r$\n$5"
+  Quit
+  
+FoundJavaExe:
+  StrCpy "$JavaHome" $5
+  StrCpy "$JavaExe" "$5\bin\java.exe"
+
+  ; Need path to jvm.dll to configure the service - uses $JavaHome
+  Call findJVMPath
+  Pop $5
+  StrCmp $5 "" 0 FoundJvmDll
+  IfSilent +2
+  MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$5"
+  DetailPrint "No Java Virtual Machine found in folder:$\r$\n$5"
+  Quit
+
+FoundJvmDll:
+  StrCpy "$JvmDll" $5
+
+  ; 32-bit JVM -> use 32-bit service wrapper regardless of cpu type
+  ; 64-bit JVM -> use x64 or ia64 service wrapper depending on OS architecture
+  ; Yes, this is ugly and fragile. Suggestions for a better approach welcome
+  GetTempFileName $R0
+  FileOpen $R1 $R0.bat w
+  FileWrite $R1 "@echo off$\r$\n"
+  FileWrite $R1 "$\"$JavaExe$\" -version 2>&1 | find /i $\"64-Bit$\"$\r$\n"
+  FileClose $R1
+
+  ClearErrors
+  ExecWait '"$R0.bat"'
+  IfErrors +6
+  Delete $R0.bat
+  Call findCpuType
+  Pop $5
+  StrCpy "$Arch" $5
+  Goto SetInstallDir
+  Delete $R0.bat
+  StrCpy "$Arch" "x86"
+  
+SetInstallDir:
+  StrCpy $INSTDIR $ResetInstDir
+
+  ; The default varies depending on 32-bit or 64-bit
+  StrCmp $INSTDIR "" 0 +5
+  StrCmp $Arch "x86" 0 +2
+  StrCpy $INSTDIR "$PROGRAMFILES32\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
+  StrCmp $Arch "x86" +2 0
+  StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
+
+FunctionEnd
+
 
 ; =====================
-; FindJavaPath Function
+; findJavaHome Function
 ; =====================
 ;
 ; Find the JAVA_HOME used on the system, and put the result on the top of the
 ; stack
 ; Will return an empty string if the path cannot be determined
 ;
-Function findJavaPath
+Function findJavaHome
 
   ClearErrors
 
@@ -525,7 +568,7 @@ FunctionEnd
 ; ====================
 ;
 ; Find the full JVM path, and put the result on top of the stack
-; Argument: JVM base path (result of findJavaPath)
+; Argument: JVM base path (result of findJavaHome)
 ; Will return an empty string if the path cannot be determined
 ;
 Function findJVMPath
@@ -573,27 +616,6 @@ Function findJVMPath
 
 FunctionEnd
 
-
-; ====================
-; CheckJvm Function
-; ====================
-;
-Function checkJvm
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $3 "jvm.ini" "Field 2" "State"
-  IfFileExists "$3\bin\java.exe" NoErrors1
-  MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$3"
-  Quit
-NoErrors1:
-  StrCpy "$JavaHome" $3
-  Call findJVMPath
-  Pop $4
-  StrCmp $4 "" 0 NoErrors2
-  MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$3"
-  Quit
-NoErrors2:
-
-FunctionEnd
 
 ; ==================
 ; Configure Function
