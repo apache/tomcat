@@ -17,6 +17,9 @@
 
 package org.apache.catalina.mbeans;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
@@ -25,6 +28,7 @@ import javax.management.RuntimeOperationsException;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.ContainerListener;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
@@ -265,4 +269,57 @@ public class ContainerMBean extends BaseModelMBean {
         }
     }
 
+    
+    /**
+     * List the class name of each of the lifecycle listeners added to this
+     * container.
+     */
+    public String[] findLifecycleListenerNames() throws MBeanException {
+        ContainerBase container = null;
+        List<String> result = new ArrayList<String>();
+
+        try {
+            container = (ContainerBase) getManagedResource();
+        } catch (InstanceNotFoundException e) {
+            throw new MBeanException(e);
+        } catch (RuntimeOperationsException e) {
+            throw new MBeanException(e);
+        } catch (InvalidTargetObjectTypeException e) {
+            throw new MBeanException(e);
+        }
+
+        LifecycleListener[] listeners = container.findLifecycleListeners();
+        for(LifecycleListener listener: listeners){
+            result.add(listener.getClass().getName());
+        }
+
+        return result.toArray(new String[result.size()]);
+    }
+
+    
+    /**
+     * List the class name of each of the container listeners added to this
+     * container.
+     */
+    public String[] findContainerListenerNames() throws MBeanException {
+        ContainerBase container = null;
+        List<String> result = new ArrayList<String>();
+
+        try {
+            container = (ContainerBase) getManagedResource();
+        } catch (InstanceNotFoundException e) {
+            throw new MBeanException(e);
+        } catch (RuntimeOperationsException e) {
+            throw new MBeanException(e);
+        } catch (InvalidTargetObjectTypeException e) {
+            throw new MBeanException(e);
+        }
+
+        ContainerListener[] listeners = container.findContainerListeners();
+        for(ContainerListener listener: listeners){
+            result.add(listener.getClass().getName());
+        }
+
+        return result.toArray(new String[result.size()]);
+    }
 }
