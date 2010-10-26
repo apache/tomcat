@@ -40,7 +40,7 @@ public class ResourceBase implements Serializable, Injectable {
 
 
     /**
-     * The description of this Context Element.
+     * The description of this resource.
      */
     private String description = null;
 
@@ -55,10 +55,11 @@ public class ResourceBase implements Serializable, Injectable {
 
 
     /**
-     * The name of this context Element.
+     * The name of this resource.
      */
     private String name = null;
 
+    @Override
     public String getName() {
         return (this.name);
     }
@@ -69,7 +70,7 @@ public class ResourceBase implements Serializable, Injectable {
 
 
     /**
-     * The name of the EJB bean implementation class.
+     * The name of the resource implementation class.
      */
     private String type = null;
 
@@ -102,7 +103,7 @@ public class ResourceBase implements Serializable, Injectable {
     }
 
     /** 
-     * remove a configured property.
+     * Remove a configured property.
      */
     public void removeProperty(String name) {
         properties.remove(name);
@@ -117,11 +118,13 @@ public class ResourceBase implements Serializable, Injectable {
 
     private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
 
+    @Override
     public void addInjectionTarget(String injectionTargetName, String jndiName) {
         InjectionTarget target = new InjectionTarget(injectionTargetName, jndiName);
         injectionTargets.add(target);
     }
 
+    @Override
     public List<InjectionTarget> getInjectionTargets() {
         return injectionTargets;
     }
