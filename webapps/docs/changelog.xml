@@ -57,6 +57,17 @@
         <bug>50138</bug>: Fix threading issues in
         <code>org.apache.catalina.security.SecurityUtil</code>. (markt)
       </fix>
+      <fix>
+        <bug>50157</bug>: Ensure MapperListener is only added to a container
+        object once. (markt)
+      </fix>
+      <add>
+        Improve debug logging for MapperListener registration. (markt)
+      </add>
+      <add>
+        Expose names of LifecycleListeners and ContainerListers for
+        StandardContext via JMX. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
