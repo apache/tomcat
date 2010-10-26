@@ -101,13 +101,12 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         findDefaultHost();
         
         Engine engine = (Engine) connector.getService().getContainer();
-        engine.addContainerListener(this);
+        addListeners(engine);
         
         Container[] conHosts = engine.findChildren();
         for (Container conHost : conHosts) {
             Host host = (Host) conHost;
             if (!LifecycleState.NEW.equals(host.getState())) {
-                host.addLifecycleListener(this);
                 // Registering the host will register the context and wrappers
                 registerHost(host);
             }
@@ -125,29 +124,28 @@ public class MapperListener implements ContainerListener, LifecycleListener {
 
     // --------------------------------------------- Container Listener methods
 
+    @Override
     public void containerEvent(ContainerEvent event) {
 
         if (event.getType() == Container.ADD_CHILD_EVENT) {
             Container child = (Container) event.getData();
-            child.addLifecycleListener(this);
-            child.addContainerListener(this);
-            if (child instanceof Host) {
-                registerHost((Host) child);
-            } else if (child instanceof Context) {
-                registerContext((Context) child);
-            } else if (child instanceof Wrapper) {
-                registerWrapper((Wrapper) child);
+            addListeners(child);
+            // If child is started then it is too late for life-cycle listener
+            // to register the child so register it here
+            if (child.getState().isAvailable()) {
+                if (child instanceof Host) {
+                    registerHost((Host) child);
+                } else if (child instanceof Context) {
+                    registerContext((Context) child);
+                } else if (child instanceof Wrapper) {
+                    registerWrapper((Wrapper) child);
+                }
             }
         } else if (event.getType() == Container.REMOVE_CHILD_EVENT) {
             Container child = (Container) event.getData();
             removeListeners(child);
-            if (child instanceof Host) {
-                unregisterHost((Host) child);
-            } else if (child instanceof Context) {
-                unregisterContext((Context) child);
-            } else if (child instanceof Wrapper) {
-                unregisterWrapper((Wrapper) child);
-            }
+            // No need to unregister - life-cycle listener will handle this when
+            // the child stops
         } else if (event.getType() == Host.ADD_ALIAS_EVENT) {
             // Handle dynamically adding host aliases
             mapper.addHostAlias(((Host) event.getSource()).getName(),
@@ -260,7 +258,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             mapper.setDefaultHostName(defaultHost);
         } else {
             log.warn(sm.getString("mapperListener.unknownDefaultHost",
-                    defaultHost));
+                    defaultHost, connector));
         }
     }
 
@@ -273,14 +271,12 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         String[] aliases = host.findAliases();
         mapper.addHost(host.getName(), aliases, host);
         
-        host.addContainerListener(this);
-        
         for (Container container : host.findChildren()) {
             registerContext((Context) container);
         }
         if(log.isDebugEnabled()) {
-            log.debug(sm.getString
-                 ("mapperListener.registerHost", host.getName(), domain));
+            log.debug(sm.getString("mapperListener.registerHost",
+                    host.getName(), domain, connector));
         }
     }
 
@@ -296,7 +292,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
 
         if(log.isDebugEnabled())
             log.debug(sm.getString("mapperListener.unregisterHost", hostname,
-                    domain));
+                    domain, connector));
     }
 
     
@@ -306,6 +302,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
     private void unregisterWrapper(Wrapper wrapper) {
 
         String contextName = wrapper.getParent().getName();
+        String wrapperName = wrapper.getName();
+
         if ("/".equals(contextName)) {
             contextName = "";
         }
@@ -315,6 +313,11 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         
         for (String mapping : mappings) {
             mapper.removeWrapper(hostName, contextName, mapping);
+        }
+        
+        if(log.isDebugEnabled()) {
+            log.debug(sm.getString("mapperListener.unregisterWrapper",
+                    wrapperName, contextName, connector));
         }
     }
 
@@ -336,15 +339,13 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         mapper.addContext(host.getName(), host, contextName, context,
                 welcomeFiles, resources);
 
-        context.addContainerListener(this);
-       
         for (Container container : context.findChildren()) {
             registerWrapper((Wrapper) container);
         }
 
         if(log.isDebugEnabled()) {
-            log.debug(sm.getString
-                 ("mapperListener.registerContext", contextName));
+            log.debug(sm.getString("mapperListener.registerContext",
+                    contextName, connector));
         }
     }
 
@@ -366,8 +367,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         String hostName = context.getParent().getName();
 
         if(log.isDebugEnabled())
-            log.debug(sm.getString
-                  ("mapperListener.unregisterContext", contextName));
+            log.debug(sm.getString("mapperListener.unregisterContext",
+                    contextName, connector));
 
         mapper.removeContext(hostName, contextName);
     }
@@ -394,11 +395,9 @@ public class MapperListener implements ContainerListener, LifecycleListener {
                               jspWildCard);
         }
 
-        wrapper.addContainerListener(this);
-
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerWrapper",
-                    wrapperName, contextName));
+                    wrapperName, contextName, connector));
         }
     }
 
@@ -424,6 +423,21 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             }
         }
     }
+
+
+    /**
+     * Add this mapper to the container and all child containers
+     * 
+     * @param container
+     */
+    private void addListeners(Container container) {
+        container.addContainerListener(this);
+        container.addLifecycleListener(this);
+        for (Container child : container.findChildren()) {
+            addListeners(child);
+        }
+    }
+
 
     /**
      * Remove this mapper from the container and all child containers
