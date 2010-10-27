@@ -16,7 +16,7 @@
 # -----------------------------------------------------------------------------
 # build.properties.sample
 #
-# This is an example "build.properties" file, used to customize building 
+# This is an example "build.properties" file, used to customize building
 # Tomcat for your local environment.  It defines the location of all external
 # modules that Tomcat depends on.  Copy this file to "build.properties"
 # in the top-level source directory, and customize it as needed.
@@ -94,7 +94,7 @@ servletapi.version=2.3
 servletapi.home=${base.path}/servletapi-${servletapi.version}
 servletapi.loc=${base-maven1.loc}/servletapi/jars/servletapi-${servletapi.version}.jar
 servletapi.jar=${servletapi.home}/servletapi-${servletapi.version}.jar
-    
+
 # ----- Webservices - JAX RPC -----
 jaxrpc-lib.version=1.1-rc4
 jaxrpc-lib.home=${base.path}/jaxrpc-${jaxrpc-lib.version}
@@ -144,7 +144,7 @@ nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-2.46.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
-commons-daemon.version=1.0.3
+commons-daemon.version=1.0.4
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
 commons-daemon.native.win.home=${commons-daemon.home}/windows
