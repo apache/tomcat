@@ -144,7 +144,12 @@ public class StandardContext extends ContainerBase
         super();
         pipeline.setBasic(new StandardContextValve());
         broadcaster = new NotificationBroadcasterSupport();
-
+        // Set defaults
+        if (!Globals.STRICT_SERVLET_COMPLIANCE) {
+            // Strict servlet compliance requires all extension mapped servlets
+            // to be checked against welcome files
+            resourceOnlyServlets.add("jsp");
+        }
     }
 
 
@@ -799,7 +804,44 @@ public class StandardContext extends ContainerBase
     private JspConfigDescriptor jspConfigDescriptor =
         new ApplicationJspConfigDescriptor();
 
+    private Set<String> resourceOnlyServlets = new HashSet<String>();
+
+
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public String getResourceOnlyServlets() {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (String servletName : resourceOnlyServlets) {
+            if (!first) {
+                result.append(',');
+            }
+            result.append(servletName);
+        }
+        return result.toString();
+    }
+
+
+    @Override
+    public void setResourceOnlyServlets(String resourceOnlyServlets) {
+        this.resourceOnlyServlets.clear();
+        if (resourceOnlyServlets == null ||
+                resourceOnlyServlets.length() == 0) {
+            return;
+        }
+        String[] servletNames = resourceOnlyServlets.split(",");
+        for (String servletName : servletNames) {
+            this.resourceOnlyServlets.add(servletName);
+        }
+    }
+
+
+    @Override
+    public boolean isResourceOnlyServlet(String servletName) {
+        return resourceOnlyServlets.contains(servletName);
+    }
+
 
     @Override
     public int getEffectiveMajorVersion() {
@@ -2921,7 +2963,8 @@ public class StandardContext extends ContainerBase
         wrapper.addMapping(pattern);
 
         // Update context mapper
-        mapper.addWrapper(pattern, wrapper, jspWildCard);
+        mapper.addWrapper(pattern, wrapper, jspWildCard,
+                resourceOnlyServlets.contains(name));
 
         fireContainerEvent("addServletMapping", pattern);
 

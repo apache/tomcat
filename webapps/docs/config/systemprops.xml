@@ -258,6 +258,8 @@
       <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
       <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
       <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
+      <li>The <code>resourceOnlyServlets</code> attribute of any
+          <a href="context.html">Context</a> element.</li>
       <li>The <code>tldNamespaceAware</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       <li>The <code>tldValidation</code> attribute of any

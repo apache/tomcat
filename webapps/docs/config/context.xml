@@ -237,6 +237,20 @@
         on demand.</p>
       </attribute>
 
+      <attribute name="resourceOnlyServlets" required="false">
+        <p>Comma separated list of Servlet names (as used in
+        <code>/WEB-INF/web.xml</code>) that expect a resource to be present.
+        Ensures that welcome files associated with Servlets that expect a
+        resource to be present (such as the JSP Servlet) are not used when there
+        is no resource present. This prevents issues caused by the clarification
+        of welcome file mapping in section 10.10 of the Servlet 3.0
+        specification. If the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <a href="systemprops.html">system property</a> is set to
+        <code>true</code>, the default value of this attribute will be the empty
+        string, else the default value will be <code>jsp</code>.
+      </attribute>
+
       <attribute name="sessionCookieDomain" required="false">
         <p>The domain to be used for all session cookies created for this
         context. If set, this overrides any domain set by the web application.
