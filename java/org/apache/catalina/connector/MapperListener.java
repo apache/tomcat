@@ -156,18 +156,18 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         } else if (event.getType() == Wrapper.ADD_MAPPING_EVENT) {
             // Handle dynamically adding wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
-
-            String contextName = wrapper.getParent().getName();
+            Context context = (Context) wrapper.getParent();
+            String contextName = context.getName();
             if ("/".equals(contextName)) {
                 contextName = "";
             }
-            String hostName = wrapper.getParent().getParent().getName();
-
+            String hostName = context.getParent().getName();
+            String wrapperName = wrapper.getName();
             String mapping = (String) event.getData();
-            boolean jspWildCard = ("jsp".equals(wrapper.getName())
+            boolean jspWildCard = ("jsp".equals(wrapperName)
                     && mapping.endsWith("/*"));
             mapper.addWrapper(hostName, contextName, mapping, wrapper,
-                    jspWildCard);
+                    jspWildCard, context.isResourceOnlyServlet(wrapperName));
         } else if (event.getType() == Wrapper.REMOVE_MAPPING_EVENT) {
             // Handle dynamically removing wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
@@ -380,11 +380,12 @@ public class MapperListener implements ContainerListener, LifecycleListener {
     private void registerWrapper(Wrapper wrapper) {
 
         String wrapperName = wrapper.getName();
-        String contextName = wrapper.getParent().getName();
+        Context context = (Context) wrapper.getParent();
+        String contextName = context.getName();
         if ("/".equals(contextName)) {
             contextName = "";
         }
-        String hostName = wrapper.getParent().getParent().getName();
+        String hostName = context.getParent().getName();
         
         String[] mappings = wrapper.findMappings();
 
@@ -392,7 +393,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             boolean jspWildCard = (wrapperName.equals("jsp")
                                    && mapping.endsWith("/*"));
             mapper.addWrapper(hostName, contextName, mapping, wrapper,
-                              jspWildCard);
+                              jspWildCard,
+                              context.isResourceOnlyServlet(wrapperName));
         }
 
         if(log.isDebugEnabled()) {

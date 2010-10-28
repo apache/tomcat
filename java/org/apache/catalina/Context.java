@@ -1252,5 +1252,28 @@ public interface Context extends Container {
      */
     Set<String> addServletSecurity(ApplicationServletRegistration registration,
             ServletSecurityElement servletSecurityElement);
+    
+    /**
+     * Sets the (comma separated) list of Servlets that expect a resource to be
+     * present. Used to ensure that welcome files associated with Servlets that
+     * expect a resource to be present are not mapped when there is no resource. 
+     */
+    public void setResourceOnlyServlets(String resourceOnlyServlets);
+    
+    /**
+     * Obtains the list of Servlets that expect a resource to be present.
+     * 
+     * @return  A comma separated list of Servlet names as used in web.xml
+     */
+    public String getResourceOnlyServlets();
+
+    /**
+     * Checks the named Servlet to see if it expects a resource to be present.
+     * 
+     * @param servletName   Name of the Servlet (as per web.xml) to check
+     * @return              <code>true</code> if the Servlet expects a resource,
+     *                      otherwise <code>false</code>
+     */
+    public boolean isResourceOnlyServlet(String servletName);
 }
 
