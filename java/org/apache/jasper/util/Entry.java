@@ -41,15 +41,15 @@ public class Entry<T> {
         this.previous = previous;
     }
 
-    public T getContent() {
+    protected T getContent() {
         return content;
     }
 
-    public Entry<T> getPrevious() {
+    protected Entry<T> getPrevious() {
         return previous;
     }
 
-    public Entry<T> getNext() {
+    protected Entry<T> getNext() {
         return next;
     }
 
