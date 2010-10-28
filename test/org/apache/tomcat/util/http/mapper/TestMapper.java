@@ -60,14 +60,22 @@ public class TestMapper extends TestCase {
         mapper.addContext("iowejoiejfoiew", "blah7", "/foo/bar/bla",
                 "context3", new String[0], null);
 
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/fo/*", "wrapper0");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/", "wrapper1");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blh", "wrapper2");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "*.jsp", "wrapper3");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blah/bou/*", "wrapper4");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blah/bobou/*", "wrapper5");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "*.htm", "wrapper6");
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "/bobou/*", "wrapper7");
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/fo/*",
+                "wrapper0", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/",
+                "wrapper1", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blh",
+                "wrapper2", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "*.jsp",
+                "wrapper3", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blah/bou/*",
+                "wrapper4", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blah/bobou/*",
+                "wrapper5", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "*.htm",
+                "wrapper6", false, false);
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "/bobou/*",
+                "wrapper7", false, false);
     }
     
 
