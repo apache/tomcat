@@ -218,7 +218,7 @@ public final class JspRuntimeContext {
      * @param jsw Servlet wrapper for jsp.
      * @return a ticket that can be pushed to front of queue at later execution times.
      * */
-    public org.apache.jasper.util.Entry<JspServletWrapper> push(JspServletWrapper jsw) {
+    public FastRemovalDequeue<JspServletWrapper>.Entry push(JspServletWrapper jsw) {
         synchronized (jspQueue) {
             return jspQueue.push(jsw);
         }
@@ -229,7 +229,7 @@ public final class JspRuntimeContext {
      *
      * @param ticket the ticket for the jsp.
      * */
-    public void makeYoungest(org.apache.jasper.util.Entry<JspServletWrapper> ticket) {
+    public void makeYoungest(FastRemovalDequeue<JspServletWrapper>.Entry ticket) {
         synchronized(jspQueue) {
             jspQueue.moveFirst(ticket);
         }
