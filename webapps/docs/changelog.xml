@@ -31,12 +31,20 @@
     <author email="pero@apache.org">Peter Rossbach</author>
     <author email="kfujino@apache.org">Keiichi Fujino</author>
     <author email="timw@apache.org">Tim Whittington</author>    
+    <author email="mturk@apache.org">Mladen Turk</author>
     <title>Changelog</title>
   </properties>
 
 <body>
-<!--  Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
+<!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.5 (markt)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.0.4. (mturk)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
