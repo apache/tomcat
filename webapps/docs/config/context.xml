@@ -248,7 +248,7 @@
         <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         <a href="systemprops.html">system property</a> is set to
         <code>true</code>, the default value of this attribute will be the empty
-        string, else the default value will be <code>jsp</code>.
+        string, else the default value will be <code>jsp</code>.</p>
       </attribute>
 
       <attribute name="sessionCookieDomain" required="false">
