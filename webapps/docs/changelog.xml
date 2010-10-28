@@ -76,6 +76,13 @@
         Expose names of LifecycleListeners and ContainerListers for
         StandardContext via JMX. (markt)
       </add>
+      <add>
+        Add a new option, <code>resourceOnlyServlets</code>, to Context elements
+        that provides a mechanism for working around the issues caused by new
+        requirements for welcome file mapping introduced in Servlet 3.0. By
+        default, the existing Tomcat 6.0.x welcome file handling is used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
