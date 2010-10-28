@@ -41,7 +41,7 @@ import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.jasper.util.ExceptionUtils;
-import org.apache.jasper.util.JspQueue;
+import org.apache.jasper.util.FastRemovalDequeue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -178,7 +178,7 @@ public final class JspRuntimeContext {
     /**
      * Keeps JSP pages ordered by last access. 
      */
-    private JspQueue<JspServletWrapper> jspQueue = new JspQueue<JspServletWrapper>();
+    private FastRemovalDequeue<JspServletWrapper> jspQueue = new FastRemovalDequeue<JspServletWrapper>();
 
     // ------------------------------------------------------ Public Methods
 
@@ -229,9 +229,9 @@ public final class JspRuntimeContext {
      *
      * @param ticket the ticket for the jsp.
      * */
-    public void makeFirst(org.apache.jasper.util.Entry<JspServletWrapper> ticket) {
-        synchronized( jspQueue ) {
-            jspQueue.makeYoungest(ticket);
+    public void makeYoungest(org.apache.jasper.util.Entry<JspServletWrapper> ticket) {
+        synchronized(jspQueue) {
+            jspQueue.moveFirst(ticket);
         }
     }
     
@@ -505,7 +505,7 @@ public final class JspRuntimeContext {
         if( jsps.size() > maxLoadedJsps ) {
             synchronized( jsps ) {
                 JspServletWrapper oldest;
-                synchronized( jspQueue) {
+                synchronized(jspQueue) {
                     oldest = jspQueue.pop();
                 }
                 if (oldest != null) {

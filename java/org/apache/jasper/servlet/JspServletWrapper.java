@@ -391,7 +391,7 @@ public class JspServletWrapper {
                     if (ticket == null)
                         ticket = ctxt.getRuntimeContext().push(this);
                     else
-                        ctxt.getRuntimeContext().makeFirst(ticket);
+                        ctxt.getRuntimeContext().makeYoungest(ticket);
                 }
             }
         } catch (UnavailableException ex) {
