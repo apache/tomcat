@@ -23,8 +23,7 @@ package org.apache.jasper.util;
  * added to the collection with an Entry type, that is returned to the consumer.
  * When removing an object from the list, the consumer provides this Entry object.
  *
- * The Entry type is mostly opaque to the consumer itself. The consumer can only
- * retrieve the original object - named content - from the Entry.
+ * The Entry type is completely opaque to the consumer itself.
  *
  * The Entry object contains the links pointing to the neighbours in the doubly
  * linked list, so that removal of an Entry does not need to search for it but
@@ -41,9 +40,9 @@ package org.apache.jasper.util;
 public class FastRemovalDequeue<T> {
 
     /** First element of the queue. */
-    private Entry<T> first;
+    private Entry first;
     /** Last element of the queue. */
-    private Entry<T> last;
+    private Entry last;
 
     /** Initialize empty queue. */
     public FastRemovalDequeue() {
@@ -58,8 +57,8 @@ public class FastRemovalDequeue<T> {
      * @param object the object to prepend to the start of the list.
      * @return an entry for use when the object should be moved.
      * */
-    public Entry<T> push(final T object) {
-        Entry<T> entry = new Entry<T>(object);
+    public Entry push(final T object) {
+        Entry entry = new Entry(object);
         if (first == null) {
             first = last = entry;
         } else {
@@ -78,8 +77,8 @@ public class FastRemovalDequeue<T> {
      * @param object the object to append to the end of the list.
      * @return an entry for use when the object should be moved.
      * */
-    public Entry<T> unpop(final T object) {
-        Entry<T> entry = new Entry<T>(object);
+    public Entry unpop(final T object) {
+        Entry entry = new Entry(object);
         if (first == null) {
             first = last = entry;
         } else {
@@ -128,9 +127,9 @@ public class FastRemovalDequeue<T> {
     /**
      * Removes any element of the list and returns its content.
      **/
-    public void remove(final Entry<T> element) {
-        Entry<T> next = element.getNext();
-        Entry<T> prev = element.getPrevious();
+    public void remove(final Entry element) {
+        Entry next = element.getNext();
+        Entry prev = element.getPrevious();
         if (next != null) {
             next.setPrevious(prev);
         } else {
@@ -151,10 +150,10 @@ public class FastRemovalDequeue<T> {
      * 
      * @param element the entry to move in front.
      * */
-    public void moveFirst(final Entry<T> element) {
+    public void moveFirst(final Entry element) {
         if (element.getPrevious() != null) {
-            Entry<T> prev = element.getPrevious();
-            Entry<T> next = element.getNext();
+            Entry prev = element.getPrevious();
+            Entry next = element.getNext();
             prev.setNext(next);
             if (next != null) {
                 next.setPrevious(prev);
@@ -176,10 +175,10 @@ public class FastRemovalDequeue<T> {
      * 
      * @param element the entry to move to the back.
      * */
-    public void moveLast(final Entry<T> element) {
+    public void moveLast(final Entry element) {
         if (element.getNext() != null) {
-            Entry<T> next = element.getNext();
-            Entry<T> prev = element.getPrevious();
+            Entry next = element.getNext();
+            Entry prev = element.getPrevious();
             next.setPrevious(prev);
             if (prev != null) {
                 prev.setNext(next);
@@ -192,4 +191,50 @@ public class FastRemovalDequeue<T> {
             last = element;
         }
     }
+
+    /**
+     * Implementation of a doubly linked list entry.
+     * All implementation details are private.
+     * For the consumer of the above collection, this
+     * is simply garbage in, garbage out.
+     */
+    public class Entry {
+
+        /** The content this entry is valid for. */
+        private final T content;
+        /** Pointer to next element in queue. */
+        private Entry next;
+        /** Pointer to previous element in queue. */
+        private Entry previous;
+
+        private Entry(T object) {
+            content = object;
+        }
+
+        private final void setNext(final Entry next) {
+            this.next = next;
+        }
+
+        private final void setPrevious(final Entry previous) {
+            this.previous = previous;
+        }
+
+        private final T getContent() {
+            return content;
+        }
+
+        private final Entry getPrevious() {
+            return previous;
+        }
+
+        private final Entry getNext() {
+            return next;
+        }
+
+        @Override
+        public String toString() {
+            return "Entry-" + content.toString();
+        }
+    }
+
 }
