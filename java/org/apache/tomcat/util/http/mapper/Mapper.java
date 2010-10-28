@@ -279,22 +279,9 @@ public final class Mapper {
     }
 
 
-    /**
-     * Add a new Wrapper to an existing Context.
-     *
-     * @param hostName Virtual host name this wrapper belongs to
-     * @param contextPath Context path this wrapper belongs to
-     * @param path Wrapper mapping
-     * @param wrapper Wrapper object
-     */
     public void addWrapper(String hostName, String contextPath, String path,
-                           Object wrapper) {
-        addWrapper(hostName, contextPath, path, wrapper, false);
-    }
-
-
-    public void addWrapper(String hostName, String contextPath, String path,
-                           Object wrapper, boolean jspWildCard) {
+                           Object wrapper, boolean jspWildCard,
+                           boolean resourceOnly) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -310,30 +297,15 @@ public final class Mapper {
             }
             Context context = contexts[pos2];
             if (context.name.equals(contextPath)) {
-                addWrapper(context, path, wrapper, jspWildCard);
+                addWrapper(context, path, wrapper, jspWildCard, resourceOnly);
             }
         }
     }
 
 
-    /**
-     * Add a wrapper to the context associated with this wrapper.
-     *
-     * @param path Wrapper mapping
-     * @param wrapper The Wrapper object
-     */
-    public void addWrapper(String path, Object wrapper) {
-        addWrapper(context, path, wrapper);
-    }
-
-
-    public void addWrapper(String path, Object wrapper, boolean jspWildCard) {
-        addWrapper(context, path, wrapper, jspWildCard);
-    }
-
-
-    protected void addWrapper(Context context, String path, Object wrapper) {
-        addWrapper(context, path, wrapper, false);
+    public void addWrapper(String path, Object wrapper, boolean jspWildCard,
+            boolean resourceOnly) {
+        addWrapper(context, path, wrapper, jspWildCard, resourceOnly);
     }
 
 
@@ -344,15 +316,18 @@ public final class Mapper {
      * @param path Wrapper mapping
      * @param wrapper The Wrapper object
      * @param jspWildCard true if the wrapper corresponds to the JspServlet
+     * @param resourceOnly true if this wrapper always expects a physical
+     *                     resource to be present (such as a JSP)
      * and the mapping path contains a wildcard; false otherwise
      */
     protected void addWrapper(Context context, String path, Object wrapper,
-                              boolean jspWildCard) {
+                              boolean jspWildCard, boolean resourceOnly) {
 
         synchronized (context) {
             Wrapper newWrapper = new Wrapper();
             newWrapper.object = wrapper;
             newWrapper.jspWildCard = jspWildCard;
+            newWrapper.resourceOnly = resourceOnly;
             if (path.endsWith("/*")) {
                 // Wildcard wrapper
                 newWrapper.name = path.substring(0, path.length() - 2);
@@ -801,7 +776,8 @@ public final class Mapper {
         // Rule 3 -- Extension Match
         Wrapper[] extensionWrappers = context.extensionWrappers;
         if (mappingData.wrapper == null && !checkJspWelcomeFiles) {
-            internalMapExtensionWrapper(extensionWrappers, path, mappingData);
+            internalMapExtensionWrapper(extensionWrappers, path, mappingData,
+                    true);
         }
 
         // Rule 4 -- Welcome resources processing for servlets
@@ -842,8 +818,8 @@ public final class Mapper {
                             // Swallow not found, since this is normal
                         }
                         if (file != null && !(file instanceof DirContext) ) {
-                            internalMapExtensionWrapper(extensionWrappers,
-                                                        path, mappingData);
+                            internalMapExtensionWrapper(extensionWrappers, path,
+                                                        mappingData, true);
                             if (mappingData.wrapper == null
                                 && context.defaultWrapper != null) {
                                 mappingData.wrapper =
@@ -888,8 +864,8 @@ public final class Mapper {
                     path.append(context.welcomeResources[i], 0,
                                 context.welcomeResources[i].length());
                     path.setOffset(servletPath);
-                    internalMapExtensionWrapper(extensionWrappers,
-                                                path, mappingData);
+                    internalMapExtensionWrapper(extensionWrappers, path,
+                                                mappingData, false);
                 }
 
                 path.setOffset(servletPath);
@@ -1005,9 +981,14 @@ public final class Mapper {
 
     /**
      * Extension mappings.
+     * 
+     * @param wrappers          Set of wrappers to check for matches
+     * @param path              Path to map
+     * @param mappingData       Mapping data for result
+     * @param resourceExpected  Is this mapping expecting to find a resource
      */
-    private final void internalMapExtensionWrapper
-        (Wrapper[] wrappers, CharChunk path, MappingData mappingData) {
+    private final void internalMapExtensionWrapper(Wrapper[] wrappers,
+            CharChunk path, MappingData mappingData, boolean resourceExpected) {
         char[] buf = path.getBuffer();
         int pathEnd = path.getEnd();
         int servletPath = path.getOffset();
@@ -1030,8 +1011,8 @@ public final class Mapper {
                 path.setOffset(period + 1);
                 path.setEnd(pathEnd);
                 int pos = find(wrappers, path);
-                if ((pos != -1)
-                    && (path.equals(wrappers[pos].name))) {
+                if ((pos != -1) && (path.equals(wrappers[pos].name)) &&
+                        (resourceExpected || !wrappers[pos].resourceOnly)) {
                     mappingData.wrapperPath.setChars
                         (buf, servletPath, pathEnd - servletPath);
                     mappingData.requestPath.setChars
@@ -1412,5 +1393,6 @@ public final class Mapper {
 
         public String path = null;
         public boolean jspWildCard = false;
+        public boolean resourceOnly = false;
     }
 }
