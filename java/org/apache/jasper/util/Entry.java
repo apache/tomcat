@@ -17,8 +17,8 @@
 package org.apache.jasper.util;
 
 /**
- * Implementation of a list entry. It exposes links to previous and next
- * elements on package level only.
+ * Implementation of a doubly linked list entry.
+ * It exposes links to previous and next elements on package level only.
  */
 public class Entry<T> {
 
@@ -55,6 +55,6 @@ public class Entry<T> {
 
     @Override
     public String toString() {
-        return content.toString();
+        return "Entry-" + content.toString();
     }
 }
