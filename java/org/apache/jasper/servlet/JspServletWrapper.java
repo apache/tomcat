@@ -41,8 +41,8 @@ import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.runtime.InstanceManagerFactory;
 import org.apache.jasper.runtime.JspSourceDependent;
-import org.apache.jasper.util.Entry;
 import org.apache.jasper.util.ExceptionUtils;
+import org.apache.jasper.util.FastRemovalDequeue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -87,7 +87,7 @@ public class JspServletWrapper {
     /** Timestamp of last time servlet resource was modified */
     private volatile long servletClassLastModifiedTime;
     private long lastModificationTest = 0L;
-    private Entry<JspServletWrapper> ticket;
+    private FastRemovalDequeue<JspServletWrapper>.Entry ticket;
 
     /*
      * JspServletWrapper for JSP pages.
