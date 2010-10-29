@@ -153,7 +153,7 @@ public final class JspRuntimeContext {
         if (!options.getDevelopment()
                 && appBase != null
                 && options.getCheckInterval() > 0) {
-            lastCheck = System.currentTimeMillis();
+            lastCompileCheck = System.currentTimeMillis();
         }                                            
 
         if (options.getMaxLoadedJsps() > 0) {
@@ -173,7 +173,8 @@ public final class JspRuntimeContext {
     private final PermissionCollection permissionCollection;
     private final CodeSource codeSource;                    
     private final String classpath;
-    private volatile long lastCheck = -1L;
+    private volatile long lastCompileCheck = -1L;
+    private volatile long lastJspQueueUpdate = System.currentTimeMillis();
 
     /**
      * Maps JSP pages to their JspServletWrapper's
@@ -221,7 +222,7 @@ public final class JspRuntimeContext {
      * execution of jsp. Destroy any JSP the has been replaced in the queue.
      *
      * @param jsw Servlet wrapper for jsp.
-     * @return a ticket that can be pushed to front of queue at later execution times.
+     * @return an unloadHandle that can be pushed to front of queue at later execution times.
      * */
     public FastRemovalDequeue<JspServletWrapper>.Entry push(JspServletWrapper jsw) {
         FastRemovalDequeue<JspServletWrapper>.Entry entry = jspQueue.push(jsw);
@@ -233,12 +234,12 @@ public final class JspRuntimeContext {
     }
     
     /**
-     * Push ticket for JspServletWrapper to front of the queue.
+     * Push unloadHandle for JspServletWrapper to front of the queue.
      *
-     * @param ticket the ticket for the jsp.
+     * @param unloadHandle the unloadHandle for the jsp.
      * */
-    public void makeYoungest(FastRemovalDequeue<JspServletWrapper>.Entry ticket) {
-        jspQueue.moveFirst(ticket);
+    public void makeYoungest(FastRemovalDequeue<JspServletWrapper>.Entry unloadHandle) {
+        jspQueue.moveFirst(unloadHandle);
     }
     
     /**
@@ -322,13 +323,13 @@ public final class JspRuntimeContext {
      */
     public void checkCompile() {
 
-        if (lastCheck < 0) {
+        if (lastCompileCheck < 0) {
             // Checking was disabled
             return;
         }
         long now = System.currentTimeMillis();
-        if (now > (lastCheck + (options.getCheckInterval() * 1000L))) {
-            lastCheck = now;
+        if (now > (lastCompileCheck + (options.getCheckInterval() * 1000L))) {
+            lastCompileCheck = now;
         } else {
             return;
         }
@@ -359,6 +360,13 @@ public final class JspRuntimeContext {
      */
     public String getClassPath() {
         return classpath;
+    }
+
+    /**
+     * Last time the update background task has run
+     */
+    public long getLastJspQueueUpdate() {
+        return lastJspQueueUpdate;
     }
 
 
@@ -513,31 +521,12 @@ public final class JspRuntimeContext {
         }
     }
 
+
     /**
-     * Method used by background thread to check if any JSP's should be destroyed.
-     * If JSP's to be unloaded are found, they will be destroyed.
-     * Uses the lastCheck time from background compiler to determine if it is time to unload JSP's.
+     * Method used by background thread to check if any JSP's should be unloaded.
      */
     public void checkUnload() {
-        if (options.getMaxLoadedJsps() > 0) {
-            while (unloadJsp()) {}
-        }
-    }
-    
-    /**
-     * Checks whether there is a jsp to unload, if one is found, it is destroyed. 
-     * */
-    public boolean unloadJsp() {
-        JspServletWrapper jsw = null;
-        synchronized(jspQueue) {
-            if(jspQueue.getSize() > options.getMaxLoadedJsps()) {
-                jsw = jspQueue.pop();
-            }
-        }
-        if (jsw != null) {
-            unloadJspServletWrapper(jsw);
-            return true;
-        }
-        return false;
+
+        lastJspQueueUpdate = System.currentTimeMillis();
     }
 }
