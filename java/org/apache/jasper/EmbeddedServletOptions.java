@@ -195,7 +195,7 @@ public final class EmbeddedServletOptions implements Options {
     private int maxLoadedJsps = -1;
 
     /**
-     * The idle time after which a JSP is unloaded.
+     * The idle time in seconds after which a JSP is unloaded.
      * If unset or less or equal than 0, no jsps are unloaded.
      */
     private int jspIdleTimeout = -1;
@@ -405,7 +405,7 @@ public final class EmbeddedServletOptions implements Options {
     }
 
     /**
-     * Should any jsps be unloaded when being idle for to long?
+     * Should any jsps be unloaded when being idle for this time in seconds?
      * If set to a value greater than 0 eviction of jsps is started. Default: -1
      */
     public int getJspIdleTimeout() {
