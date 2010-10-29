@@ -155,6 +155,11 @@ public final class JspRuntimeContext {
                 && options.getCheckInterval() > 0) {
             lastCheck = System.currentTimeMillis();
         }                                            
+
+        if (options.getMaxLoadedJsps() > 0) {
+            jspQueue = new FastRemovalDequeue<JspServletWrapper>(options.getMaxLoadedJsps());
+        }
+
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -178,7 +183,7 @@ public final class JspRuntimeContext {
     /**
      * Keeps JSP pages ordered by last access. 
      */
-    private FastRemovalDequeue<JspServletWrapper> jspQueue = new FastRemovalDequeue<JspServletWrapper>();
+    private FastRemovalDequeue<JspServletWrapper> jspQueue = null;
 
     // ------------------------------------------------------ Public Methods
 
@@ -213,15 +218,18 @@ public final class JspRuntimeContext {
 
     /**
      * Push a newly compiled JspServletWrapper into the queue at first
-     * execution of jsp.
+     * execution of jsp. Destroy any JSP the has been replaced in the queue.
      *
      * @param jsw Servlet wrapper for jsp.
      * @return a ticket that can be pushed to front of queue at later execution times.
      * */
     public FastRemovalDequeue<JspServletWrapper>.Entry push(JspServletWrapper jsw) {
-        synchronized (jspQueue) {
-            return jspQueue.push(jsw);
+        FastRemovalDequeue<JspServletWrapper>.Entry entry = jspQueue.push(jsw);
+        JspServletWrapper replaced = entry.getReplaced();
+        if (replaced != null) {
+            unloadJspServletWrapper(replaced);
         }
+        return entry;
     }
     
     /**
@@ -230,9 +238,7 @@ public final class JspRuntimeContext {
      * @param ticket the ticket for the jsp.
      * */
     public void makeYoungest(FastRemovalDequeue<JspServletWrapper>.Entry ticket) {
-        synchronized(jspQueue) {
-            jspQueue.moveFirst(ticket);
-        }
+        jspQueue.moveFirst(ticket);
     }
     
     /**
@@ -500,6 +506,13 @@ public final class JspRuntimeContext {
         return new SecurityHolder(source, permissions);
     }
 
+    private void unloadJspServletWrapper(JspServletWrapper jsw) {
+        removeWrapper(jsw.getJspUri());
+        synchronized(jsw) {
+            jsw.destroy();
+        }
+    }
+
     /**
      * Method used by background thread to check if any JSP's should be destroyed.
      * If JSP's to be unloaded are found, they will be destroyed.
@@ -522,11 +535,8 @@ public final class JspRuntimeContext {
             }
         }
         if (jsw != null) {
-            removeWrapper(jsw.getJspUri());
-            synchronized(jsw) {
-                jsw.destroy();
-                return true;
-            }
+            unloadJspServletWrapper(jsw);
+            return true;
         }
         return false;
     }
