@@ -179,7 +179,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                     parseTLD(jarResource.getUrl(), in, jarResource);
                 } catch (Exception ex) {
                     err.jspError(mark, "jsp.error.tld.unable_to_read", jarResource.getUrl(),
-                            jarResource.getUrl(), ex.toString());
+                            tldName, ex.toString());
                 }
             }
         } finally {
