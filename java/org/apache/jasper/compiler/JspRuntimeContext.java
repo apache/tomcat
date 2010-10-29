@@ -160,6 +160,7 @@ public final class JspRuntimeContext {
             jspQueue = new FastRemovalDequeue<JspServletWrapper>(options.getMaxLoadedJsps());
         }
 
+        /* Init parameter is in seconds, locally we use milliseconds */
         jspIdleTimeout = options.getJspIdleTimeout() * 1000;
     }
 
@@ -176,6 +177,7 @@ public final class JspRuntimeContext {
     private final String classpath;
     private volatile long lastCompileCheck = -1L;
     private volatile long lastJspQueueUpdate = System.currentTimeMillis();
+    /* JSP idle timeout in milliseconds */
     private long jspIdleTimeout;
 
     /**
