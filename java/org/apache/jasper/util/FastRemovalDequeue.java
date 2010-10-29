@@ -23,15 +23,18 @@ package org.apache.jasper.util;
  * added to the collection with an Entry type, that is returned to the consumer.
  * When removing an object from the list, the consumer provides this Entry object.
  *
- * The Entry type is completely opaque to the consumer itself.
+ * The Entry type is nearly opaque to the consumer of the queue. The only public
+ * member is the getter for any object displaced when adding a new object to the
+ * queue. This can be used to destroy that object.
  *
  * The Entry object contains the links pointing to the neighbours in the doubly
  * linked list, so that removal of an Entry does not need to search for it but
  * instead can be done in constant time.
  *
- * The implementation is not thread-safe. Full synchronisation has to be provided
- * externally. Invalidation of Entry objects during removal from the list is done
- * by setting their valid field to false. All public methods which take Entry
+ * The implementation is fully thread-safe.
+ *
+ * Invalidation of Entry objects during removal from the list is done
+ * by setting their "valid" field to false. All public methods which take Entry
  * objects as arguments are NOP if the entry is no longer valid.
  *
  * A typical use of the FastRemovalDequeue is a list of entries in sorted order,
@@ -44,6 +47,8 @@ package org.apache.jasper.util;
  */
 public class FastRemovalDequeue<T> {
 
+    /** Maximum size of the queue */
+    private final int maxSize;
     /** First element of the queue. */
     private Entry first;
     /** Last element of the queue. */
@@ -52,7 +57,11 @@ public class FastRemovalDequeue<T> {
     private int size;
 
     /** Initialize empty queue. */
-    public FastRemovalDequeue() {
+    public FastRemovalDequeue(int maxSize) {
+        if (maxSize <=1 ) {
+            maxSize = 2;
+        }
+        this.maxSize = maxSize;
         first = null;
         last = null;
         size = 0;
@@ -65,7 +74,7 @@ public class FastRemovalDequeue<T> {
      * 
      * @return the size of the list.
      * */
-    public int getSize() {
+    public synchronized int getSize() {
         return size;
     }
 
@@ -76,8 +85,11 @@ public class FastRemovalDequeue<T> {
      * @param object the object to prepend to the start of the list.
      * @return an entry for use when the object should be moved.
      * */
-    public Entry push(final T object) {
+    public synchronized Entry push(final T object) {
         Entry entry = new Entry(object);
+        if (size >= maxSize) {
+            entry.setReplaced(pop());
+        }
         if (first == null) {
             first = last = entry;
         } else {
@@ -97,8 +109,11 @@ public class FastRemovalDequeue<T> {
      * @param object the object to append to the end of the list.
      * @return an entry for use when the object should be moved.
      * */
-    public Entry unpop(final T object) {
+    public synchronized Entry unpop(final T object) {
         Entry entry = new Entry(object);
+        if (size >= maxSize) {
+            entry.setReplaced(unpush());
+        }
         if (first == null) {
             first = last = entry;
         } else {
@@ -116,16 +131,17 @@ public class FastRemovalDequeue<T> {
      * 
      * @return the content of the first element of the list.
      **/
-    public T unpush() {
+    public synchronized T unpush() {
         T content = null;
         if (first != null) {
-            content = first.getContent();
-            first.setValid(false);
+            Entry element = first;
             first = first.getNext();
+            content = element.getContent();
             if (first != null) {
                 first.setPrevious(null);
             }
             size--;
+            element.setValid(false);
         }
         return content;
     }
@@ -135,16 +151,17 @@ public class FastRemovalDequeue<T> {
      * 
      * @return the content of the last element of the list.
      **/
-    public T pop() {
+    public synchronized T pop() {
         T content = null;
         if (last != null) {
-            content = last.getContent();
-            last.setValid(false);
+            Entry element = last;
             last = last.getPrevious();
+            content = element.getContent();
             if (last != null) {
                 last.setNext(null);
             }
             size--;
+            element.setValid(false);
         }
         return content;
     }
@@ -152,7 +169,7 @@ public class FastRemovalDequeue<T> {
     /**
      * Removes any element of the list and returns its content.
      **/
-    public void remove(final Entry element) {
+    public synchronized void remove(final Entry element) {
         if (!element.getValid()) {
             return;
         }
@@ -169,6 +186,7 @@ public class FastRemovalDequeue<T> {
             first = next;
         }
         size--;
+        element.setValid(false);
     }
 
     /**
@@ -179,7 +197,7 @@ public class FastRemovalDequeue<T> {
      * 
      * @param element the entry to move in front.
      * */
-    public void moveFirst(final Entry element) {
+    public synchronized void moveFirst(final Entry element) {
         if (element.getValid() &&
             element.getPrevious() != null) {
             Entry prev = element.getPrevious();
@@ -205,7 +223,7 @@ public class FastRemovalDequeue<T> {
      * 
      * @param element the entry to move to the back.
      * */
-    public void moveLast(final Entry element) {
+    public synchronized void moveLast(final Entry element) {
         if (element.getValid() &&
             element.getNext() != null) {
             Entry next = element.getNext();
@@ -235,6 +253,8 @@ public class FastRemovalDequeue<T> {
         private boolean valid = true;
         /** The content this entry is valid for. */
         private final T content;
+        /** Optional content that was displaced by this entry */
+        private T replaced = null;
         /** Pointer to next element in queue. */
         private Entry next = null;
         /** Pointer to previous element in queue. */
@@ -254,6 +274,14 @@ public class FastRemovalDequeue<T> {
 
         private final T getContent() {
             return content;
+        }
+
+        public final T getReplaced() {
+            return replaced;
+        }
+
+        private final void setReplaced(final T replaced) {
+            this.replaced = replaced;
         }
 
         private final Entry getNext() {
