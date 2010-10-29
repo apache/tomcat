@@ -500,23 +500,6 @@ public final class JspRuntimeContext {
         return new SecurityHolder(source, permissions);
     }
 
-    /** Returns a JspServletWrapper that should be destroyed. Default strategy: Least recently used. */
-    public JspServletWrapper getJspForUnload(final int maxLoadedJsps) {
-        if( jsps.size() > maxLoadedJsps ) {
-            synchronized( jsps ) {
-                JspServletWrapper oldest;
-                synchronized(jspQueue) {
-                    oldest = jspQueue.pop();
-                }
-                if (oldest != null) {
-                    removeWrapper(oldest.getJspUri());
-                    return oldest;
-                }
-            }
-        }
-        return null;
-    }
-
     /**
      * Method used by background thread to check if any JSP's should be destroyed.
      * If JSP's to be unloaded are found, they will be destroyed.
@@ -524,10 +507,7 @@ public final class JspRuntimeContext {
      */
     public void checkUnload() {
         if (options.getMaxLoadedJsps() > 0) {
-            long now = System.currentTimeMillis();
-            if (now > (lastCheck + (options.getCheckInterval() * 1000L))) {
-                while (unloadJsp());
-            }
+            while (unloadJsp()) {}
         }
     }
     
@@ -535,8 +515,14 @@ public final class JspRuntimeContext {
      * Checks whether there is a jsp to unload, if one is found, it is destroyed. 
      * */
     public boolean unloadJsp() {
-        JspServletWrapper jsw = getJspForUnload(options.getMaxLoadedJsps());
-        if( null != jsw ) {
+        JspServletWrapper jsw = null;
+        synchronized(jspQueue) {
+            if(jspQueue.getSize() > options.getMaxLoadedJsps()) {
+                jsw = jspQueue.pop();
+            }
+        }
+        if (jsw != null) {
+            removeWrapper(jsw.getJspUri());
             synchronized(jsw) {
                 jsw.destroy();
                 return true;
