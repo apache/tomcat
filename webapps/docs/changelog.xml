@@ -241,7 +241,7 @@
         even if the web application is marked as meta-data complete. (markt)
       </fix>
       <fix>
-        <bug>500063</bug>: Correct regression in fix for <bug>50059</bug> that
+        <bug>50063</bug>: Correct regression in fix for <bug>50059</bug> that
         causes applications marked as meta-data complete to return 404s for all
         requests. Patch provided by heyoulin. (markt)
       </fix>
@@ -321,6 +321,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        <bug>48716</bug>: Do not call reset if the default LogManager is in use.
+        (markt)
+      </update>
       <fix>
         <bug>50013</bug>: Correctly package classes from
         <code>org.apache.tomcat.util.file</code> and add the tomcat-util.jar to
