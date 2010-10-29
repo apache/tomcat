@@ -229,7 +229,7 @@ public interface Options {
     public int getMaxLoadedJsps();
     
     /**
-     * The idle time after which a JSP is unloaded.
+     * The idle time in seconds after which a JSP is unloaded.
      * If unset or less or equal than 0, no jsps are unloaded.
      */
     public int getJspIdleTimeout();
