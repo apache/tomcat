@@ -87,7 +87,9 @@ public class JspServletWrapper {
     /** Timestamp of last time servlet resource was modified */
     private volatile long servletClassLastModifiedTime;
     private long lastModificationTest = 0L;
-    private FastRemovalDequeue<JspServletWrapper>.Entry ticket;
+    private long lastUsageTime = System.currentTimeMillis();
+    private FastRemovalDequeue<JspServletWrapper>.Entry unloadHandle;
+    private final boolean unloadByCount;
 
     /*
      * JspServletWrapper for JSP pages.
@@ -99,6 +101,7 @@ public class JspServletWrapper {
         this.config = config;
         this.options = options;
         this.jspUri = jspUri;
+        unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
         ctxt = new JspCompilationContext(jspUri, isErrorPage, options,
                                          config.getServletContext(),
                                          this, rctxt);
@@ -119,6 +122,7 @@ public class JspServletWrapper {
         this.options = options;
         this.jspUri = tagFilePath;
         this.tripCount = 0;
+        unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
         ctxt = new JspCompilationContext(jspUri, tagInfo, options,
                                          servletContext, this, rctxt,
                                          tagJarResource);
@@ -373,12 +377,13 @@ public class JspServletWrapper {
             /*
              * (3) Handle limitation of number of loaded Jsps
              */
-            if (options.getMaxLoadedJsps() > 0) {
+            if (unloadByCount) {
                 synchronized(this) {
-                    if (ticket == null) {
-                        ticket = ctxt.getRuntimeContext().push(this);
-                    } else {
-                        ctxt.getRuntimeContext().makeYoungest(ticket);
+                    if (unloadHandle == null) {
+                        unloadHandle = ctxt.getRuntimeContext().push(this);
+                    } else if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
+                        ctxt.getRuntimeContext().makeYoungest(unloadHandle);
+                        lastUsageTime = System.currentTimeMillis();
                     }
                 }
             }
