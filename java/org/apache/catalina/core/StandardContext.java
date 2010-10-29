@@ -826,13 +826,14 @@ public class StandardContext extends ContainerBase
     @Override
     public void setResourceOnlyServlets(String resourceOnlyServlets) {
         this.resourceOnlyServlets.clear();
-        if (resourceOnlyServlets == null ||
-                resourceOnlyServlets.length() == 0) {
+        if (resourceOnlyServlets == null) {
             return;
         }
-        String[] servletNames = resourceOnlyServlets.split(",");
-        for (String servletName : servletNames) {
-            this.resourceOnlyServlets.add(servletName);
+        for (String servletName : resourceOnlyServlets.split(",")) {
+            servletName = servletName.trim();
+            if (servletName.length()>0) {
+                this.resourceOnlyServlets.add(servletName);
+            }
         }
     }
 
