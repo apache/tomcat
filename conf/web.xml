@@ -193,6 +193,10 @@
   <!--                       this limit. A value of zero or less indicates  -->
   <!--                       no limit. [-1]                                 -->
   <!--                                                                      -->
+  <!--   jspIdleTimeout      The amount of time in seconds a JSP can be     -->
+  <!--                       idle before it is unloaded. A value of zero    -->
+  <!--                       or less indicates never unload. [-1]           -->
+  <!--                                                                      -->
   <!--   modificationTestInterval                                           -->
   <!--                       Causes a JSP (and its dependent files) to not  -->
   <!--                       be checked for modification during the         -->
