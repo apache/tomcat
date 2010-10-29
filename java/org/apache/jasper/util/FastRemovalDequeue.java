@@ -29,6 +29,11 @@ package org.apache.jasper.util;
  * linked list, so that removal of an Entry does not need to search for it but
  * instead can be done in constant time.
  *
+ * The implementation is not thread-safe. Full synchronisation has to be provided
+ * externally. Invalidation of Entry objects during removal from the list is done
+ * by setting their valid field to false. All public methods which take Entry
+ * objects as arguments are NOP if the entry is no longer valid.
+ *
  * A typical use of the FastRemovalDequeue is a list of entries in sorted order,
  * where the sort position of an object will only switch to first or last.
  *
@@ -43,11 +48,25 @@ public class FastRemovalDequeue<T> {
     private Entry first;
     /** Last element of the queue. */
     private Entry last;
+    /** Size of the queue */
+    private int size;
 
     /** Initialize empty queue. */
     public FastRemovalDequeue() {
         first = null;
         last = null;
+        size = 0;
+    }
+
+    /**
+     * Retrieve the size of the list.
+     * This method also needs to be externaly synchronized to
+     * ensure correct publication of changes.
+     * 
+     * @return the size of the list.
+     * */
+    public int getSize() {
+        return size;
     }
 
     /**
@@ -66,6 +85,7 @@ public class FastRemovalDequeue<T> {
             entry.setNext(first);
             first = entry;
         }
+        size++;
 
         return entry;
     }
@@ -86,6 +106,7 @@ public class FastRemovalDequeue<T> {
             entry.setPrevious(last);
             last = entry;
         }
+        size++;
 
         return entry;
     }
@@ -99,10 +120,12 @@ public class FastRemovalDequeue<T> {
         T content = null;
         if (first != null) {
             content = first.getContent();
+            first.setValid(false);
             first = first.getNext();
             if (first != null) {
                 first.setPrevious(null);
             }
+            size--;
         }
         return content;
     }
@@ -116,10 +139,12 @@ public class FastRemovalDequeue<T> {
         T content = null;
         if (last != null) {
             content = last.getContent();
+            last.setValid(false);
             last = last.getPrevious();
             if (last != null) {
                 last.setNext(null);
             }
+            size--;
         }
         return content;
     }
@@ -128,6 +153,9 @@ public class FastRemovalDequeue<T> {
      * Removes any element of the list and returns its content.
      **/
     public void remove(final Entry element) {
+        if (!element.getValid()) {
+            return;
+        }
         Entry next = element.getNext();
         Entry prev = element.getPrevious();
         if (next != null) {
@@ -140,6 +168,7 @@ public class FastRemovalDequeue<T> {
         } else {
             first = next;
         }
+        size--;
     }
 
     /**
@@ -151,7 +180,8 @@ public class FastRemovalDequeue<T> {
      * @param element the entry to move in front.
      * */
     public void moveFirst(final Entry element) {
-        if (element.getPrevious() != null) {
+        if (element.getValid() &&
+            element.getPrevious() != null) {
             Entry prev = element.getPrevious();
             Entry next = element.getNext();
             prev.setNext(next);
@@ -176,7 +206,8 @@ public class FastRemovalDequeue<T> {
      * @param element the entry to move to the back.
      * */
     public void moveLast(final Entry element) {
-        if (element.getNext() != null) {
+        if (element.getValid() &&
+            element.getNext() != null) {
             Entry next = element.getNext();
             Entry prev = element.getPrevious();
             next.setPrevious(prev);
@@ -200,35 +231,45 @@ public class FastRemovalDequeue<T> {
      */
     public class Entry {
 
+        /** Is this entry still valid? */
+        private boolean valid = true;
         /** The content this entry is valid for. */
         private final T content;
         /** Pointer to next element in queue. */
-        private Entry next;
+        private Entry next = null;
         /** Pointer to previous element in queue. */
-        private Entry previous;
+        private Entry previous = null;
 
         private Entry(T object) {
             content = object;
         }
 
-        private final void setNext(final Entry next) {
-            this.next = next;
+        private final boolean getValid() {
+            return valid;
         }
 
-        private final void setPrevious(final Entry previous) {
-            this.previous = previous;
+        private final void setValid(final boolean valid) {
+            this.valid = valid;
         }
 
         private final T getContent() {
             return content;
         }
 
+        private final Entry getNext() {
+            return next;
+        }
+
+        private final void setNext(final Entry next) {
+            this.next = next;
+        }
+
         private final Entry getPrevious() {
             return previous;
         }
 
-        private final Entry getNext() {
-            return next;
+        private final void setPrevious(final Entry previous) {
+            this.previous = previous;
         }
 
         @Override
