@@ -101,6 +101,14 @@
         <code>Enum.name()</code> rather than <code>Enum.toString()</code> as
         required by the EL specification. (markt)
       </fix>
+      <fix>
+        Fix minor thread-safety and performance issues in the implementation
+        of <code>maxLoadedJsps</code>. (rjung)
+      </fix>
+      <add>
+        Add support for unloading JSPs that have not been requested for a
+        long time using the new parameter <code>jspIdleTimeout</code>. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
