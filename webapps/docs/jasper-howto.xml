@@ -163,6 +163,10 @@ least recently used JSPs will be unloaded so that the number of JSPs loaded at
 any one time does not exceed this limit. A value of zero or less indicates no
 limit. Default <code>-1</code></li>
 
+<li><strong>jspIdleTimeout</strong> - The amount of time in seconds a JSP can be
+idle before it is unloaded. A value of zero or less indicates never unload.
+Default <code>-1</code></li>
+
 <li><strong>modificationTestInterval</strong> - Causes a JSP (and its dependent
 files) to not be checked for modification during the specified time interval
 (in seconds) from the last time the JSP was checked for modification. A value of
