@@ -89,7 +89,9 @@ public class JspServletWrapper {
     private long lastModificationTest = 0L;
     private long lastUsageTime = System.currentTimeMillis();
     private FastRemovalDequeue<JspServletWrapper>.Entry unloadHandle;
+    private final boolean unloadAllowed;
     private final boolean unloadByCount;
+    private final boolean unloadByIdle;
 
     /*
      * JspServletWrapper for JSP pages.
@@ -102,6 +104,8 @@ public class JspServletWrapper {
         this.options = options;
         this.jspUri = jspUri;
         unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
+        unloadByIdle = options.getJspIdleTimeout() > 0 ? true : false;
+        unloadAllowed = unloadByCount || unloadByIdle ? true : false;
         ctxt = new JspCompilationContext(jspUri, isErrorPage, options,
                                          config.getServletContext(),
                                          this, rctxt);
@@ -123,6 +127,8 @@ public class JspServletWrapper {
         this.jspUri = tagFilePath;
         this.tripCount = 0;
         unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
+        unloadByIdle = options.getJspIdleTimeout() > 0 ? true : false;
+        unloadAllowed = unloadByCount || unloadByIdle ? true : false;
         ctxt = new JspCompilationContext(jspUri, tagInfo, options,
                                          servletContext, this, rctxt,
                                          tagJarResource);
@@ -296,6 +302,10 @@ public class JspServletWrapper {
         return jspUri;
     }
 
+    public FastRemovalDequeue<JspServletWrapper>.Entry getUnloadHandle() {
+        return unloadHandle;
+    }
+
     public void service(HttpServletRequest request, 
                         HttpServletResponse response,
                         boolean precompile)
@@ -377,13 +387,19 @@ public class JspServletWrapper {
             /*
              * (3) Handle limitation of number of loaded Jsps
              */
-            if (unloadByCount) {
+            if (unloadAllowed) {
                 synchronized(this) {
-                    if (unloadHandle == null) {
-                        unloadHandle = ctxt.getRuntimeContext().push(this);
-                    } else if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
-                        ctxt.getRuntimeContext().makeYoungest(unloadHandle);
-                        lastUsageTime = System.currentTimeMillis();
+                    if (unloadByCount) {
+                        if (unloadHandle == null) {
+                            unloadHandle = ctxt.getRuntimeContext().push(this);
+                        } else if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
+                            ctxt.getRuntimeContext().makeYoungest(unloadHandle);
+                            lastUsageTime = System.currentTimeMillis();
+                        }
+                    } else {
+                        if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
+                            lastUsageTime = System.currentTimeMillis();
+                        }
                     }
                 }
             }
@@ -466,6 +482,13 @@ public class JspServletWrapper {
      */
     public void setLastModificationTest(long lastModificationTest) {
         this.lastModificationTest = lastModificationTest;
+    }
+
+    /**
+     * @return the lastUsageTime.
+     */
+    public long getLastUsageTime() {
+        return lastUsageTime;
     }
 
     /**

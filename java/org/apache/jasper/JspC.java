@@ -447,6 +447,10 @@ public class JspC implements Options {
         return -1;
     }
 
+    public int getJspIdleTimeout() {
+        return -1;
+    }
+
     /**
      * {@inheritDoc}
      */
