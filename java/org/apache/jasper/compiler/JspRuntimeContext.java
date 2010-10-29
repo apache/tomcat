@@ -160,6 +160,7 @@ public final class JspRuntimeContext {
             jspQueue = new FastRemovalDequeue<JspServletWrapper>(options.getMaxLoadedJsps());
         }
 
+        jspIdleTimeout = options.getJspIdleTimeout() * 1000;
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -175,6 +176,7 @@ public final class JspRuntimeContext {
     private final String classpath;
     private volatile long lastCompileCheck = -1L;
     private volatile long lastJspQueueUpdate = System.currentTimeMillis();
+    private long jspIdleTimeout;
 
     /**
      * Maps JSP pages to their JspServletWrapper's
@@ -527,6 +529,22 @@ public final class JspRuntimeContext {
      */
     public void checkUnload() {
 
-        lastJspQueueUpdate = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        if (jspIdleTimeout > 0) {
+            long unloadBefore = now - jspIdleTimeout;
+            Object [] wrappers = jsps.values().toArray();
+            for (int i = 0; i < wrappers.length; i++ ) {
+                JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
+                synchronized(jsw) {
+                    if (jsw.getLastUsageTime() < unloadBefore) {
+                        if (jspQueue != null) {
+                            jspQueue.remove(jsw.getUnloadHandle());
+                        }
+                        unloadJspServletWrapper(jsw);
+                    }
+                }
+            }
+        }
+        lastJspQueueUpdate = now;
     }
 }

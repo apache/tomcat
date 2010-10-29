@@ -222,9 +222,15 @@ public interface Options {
     public Map<String, TagLibraryInfo> getCache();
     
     /**
-     * The maxim number of loaded jsps per web-application. If there are more
+     * The maximum number of loaded jsps per web-application. If there are more
      * jsps loaded, they will be unloaded. If unset or less than 0, no jsps
      * are unloaded.
      */
     public int getMaxLoadedJsps();
+    
+    /**
+     * The idle time after which a JSP is unloaded.
+     * If unset or less or equal than 0, no jsps are unloaded.
+     */
+    public int getJspIdleTimeout();
 }

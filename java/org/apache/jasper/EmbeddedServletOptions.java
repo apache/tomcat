@@ -189,10 +189,16 @@ public final class EmbeddedServletOptions implements Options {
 
     
     /**
-     * The maxim number of loaded jsps per web-application. If there are more
+     * The maximum number of loaded jsps per web-application. If there are more
      * jsps loaded, they will be unloaded.
      */
     private int maxLoadedJsps = -1;
+
+    /**
+     * The idle time after which a JSP is unloaded.
+     * If unset or less or equal than 0, no jsps are unloaded.
+     */
+    private int jspIdleTimeout = -1;
 
     public String getProperty(String name ) {
         return settings.getProperty( name );
@@ -391,11 +397,19 @@ public final class EmbeddedServletOptions implements Options {
     }
 
     /**
-     * Should any jsps be unloaded? If set to a value greater than 0 eviction of jsps
-     * is started. Default: -1
-     * */
+     * Should jsps be unloaded if to many are loaded?
+     * If set to a value greater than 0 eviction of jsps is started. Default: -1
+     */
     public int getMaxLoadedJsps() {
         return maxLoadedJsps;
+    }
+
+    /**
+     * Should any jsps be unloaded when being idle for to long?
+     * If set to a value greater than 0 eviction of jsps is started. Default: -1
+     */
+    public int getJspIdleTimeout() {
+        return jspIdleTimeout;
     }
 
     /**
@@ -686,6 +700,17 @@ public final class EmbeddedServletOptions implements Options {
             } catch(NumberFormatException ex) {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.maxLoadedJsps", ""+this.maxLoadedJsps));
+                }
+            }
+        }
+        
+        String jspIdleTimeout = config.getInitParameter("jspIdleTimeout");
+        if (jspIdleTimeout != null) {
+            try {
+                this.jspIdleTimeout = Integer.parseInt(jspIdleTimeout);
+            } catch(NumberFormatException ex) {
+                if (log.isWarnEnabled()) {
+                    log.warn(Localizer.getMessage("jsp.warning.jspIdleTimeout", ""+this.jspIdleTimeout));
                 }
             }
         }
