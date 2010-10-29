@@ -377,7 +377,6 @@ public class JspServletWrapper {
                 synchronized(this) {
                     if (ticket == null) {
                         ticket = ctxt.getRuntimeContext().push(this);
-                        ctxt.getRuntimeContext().unloadJsp();
                     } else {
                         ctxt.getRuntimeContext().makeYoungest(ticket);
                     }
