@@ -325,10 +325,6 @@ public class JspServletWrapper {
 
                     // The following sets reload to true, if necessary
                     ctxt.compile();
-                    
-                    if (options.getMaxLoadedJsps() > 0) {
-                        ctxt.getRuntimeContext().unloadJsp();
-                    }
                 }
             } else {
                 if (compileException != null) {
@@ -375,7 +371,20 @@ public class JspServletWrapper {
         try {
             
             /*
-             * (3) Service request
+             * (3) Handle limitation of number of loaded Jsps
+             */
+            if (options.getMaxLoadedJsps() > 0) {
+                synchronized(this) {
+                    if (ticket == null) {
+                        ticket = ctxt.getRuntimeContext().push(this);
+                        ctxt.getRuntimeContext().unloadJsp();
+                    } else {
+                        ctxt.getRuntimeContext().makeYoungest(ticket);
+                    }
+                }
+            }
+            /*
+             * (4) Service request
              */
             if (theServlet instanceof SingleThreadModel) {
                // sync on the wrapper so that the freshness
@@ -385,14 +394,6 @@ public class JspServletWrapper {
                 }
             } else {
                 theServlet.service(request, response);
-            }
-            if (options.getMaxLoadedJsps() > 0) {
-                synchronized(this) {
-                    if (ticket == null)
-                        ticket = ctxt.getRuntimeContext().push(this);
-                    else
-                        ctxt.getRuntimeContext().makeYoungest(ticket);
-                }
             }
         } catch (UnavailableException ex) {
             String includeRequestUri = (String)
