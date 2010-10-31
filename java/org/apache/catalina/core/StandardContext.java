@@ -325,6 +325,12 @@ public class StandardContext extends ContainerBase
     
 
     /**
+     * Unencoded path for this web application.
+     */
+    private String path = null;
+
+
+    /**
      * The "follow standard delegation model" flag that will be used to
      * configure our ClassLoader.
      */
@@ -921,13 +927,6 @@ public class StandardContext extends ContainerBase
     @Override
     public String getEncodedPath() {
         return encodedPath;
-    }
-
-
-    @Override
-    public void setName( String name ) {
-        super.setName( name );
-        encodedPath = urlEncoder.encode(name);
     }
 
 
@@ -1870,25 +1869,22 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getPath() {
-
-        return (getName());
-
+        return (path);
     }
 
     
     /**
      * Set the context path for this Context.
-     * <p>
-     * <b>IMPLEMENTATION NOTE</b>:  The context path is used as the "name" of
-     * a Context, because it must be unique.
-     *
+     * 
      * @param path The new context path
      */
     @Override
     public void setPath(String path) {
-
-        setName(path);
-
+        this.path = path;
+        encodedPath = urlEncoder.encode(path);
+        if (getName() == null) {
+            setName(path);
+        }
     }
 
 
