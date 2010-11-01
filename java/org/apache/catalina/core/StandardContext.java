@@ -100,6 +100,7 @@ import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
+import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -812,8 +813,28 @@ public class StandardContext extends ContainerBase
 
     private Set<String> resourceOnlyServlets = new HashSet<String>();
 
+    private String webappVersion;
 
     // ----------------------------------------------------- Context Properties
+
+
+    @Override
+    public void setWebappVersion(String webappVersion) {
+        this.webappVersion = webappVersion;
+    }
+
+
+    @Override
+    public String getWebappVersion() {
+        return webappVersion;
+    }
+
+
+    @Override
+    public String getBaseName() {
+        return new ContextName(path, webappVersion).getBaseName();
+    }
+
 
     @Override
     public String getResourceOnlyServlets() {
@@ -1029,7 +1050,7 @@ public class StandardContext extends ContainerBase
             ((BaseDirContext) webappResources).addResourcesJar(url);
         } else {
             log.error(sm.getString("standardContext.noResourceJar", url,
-                    getPath()));
+                    getName()));
         }
     }
     
@@ -1872,7 +1893,7 @@ public class StandardContext extends ContainerBase
         return (path);
     }
 
-    
+
     /**
      * Set the context path for this Context.
      * 
@@ -2335,7 +2356,8 @@ public class StandardContext extends ContainerBase
                 workDir = new File(catalinaHomePath,
                         getWorkDir());
             } catch (IOException e) {
-                log.warn("Exception obtaining work path for " + getPath());
+                log.warn(sm.getString("standardContext.workPath", getName()),
+                        e);
             }
         }
         return workDir.getAbsolutePath();
@@ -3627,17 +3649,9 @@ public class StandardContext extends ContainerBase
             throw new IllegalStateException
                 (sm.getString("containerBase.notStarted", logName()));
 
-        String path = getPath();
-        if (path.length() == 0) {
-            path = "/";
-        }
-
-        // Make sure reloading is enabled
-        //      if (!reloadable)
-        //          throw new IllegalStateException
-        //              (sm.getString("standardContext.notReloadable"));
         if(log.isInfoEnabled())
-            log.info(sm.getString("standardContext.reloadingStarted", path));
+            log.info(sm.getString("standardContext.reloadingStarted",
+                    getName()));
 
         // Stop accepting requests temporarily
         setPaused(true);
@@ -3657,7 +3671,8 @@ public class StandardContext extends ContainerBase
         setPaused(false);
 
         if(log.isInfoEnabled())
-            log.info(sm.getString("standardContext.reloadingCompleted", path));
+            log.info(sm.getString("standardContext.reloadingCompleted",
+                    getName()));
 
     }
 
@@ -4644,10 +4659,13 @@ public class StandardContext extends ContainerBase
             }
             // Register the cache in JMX
             if (isCachingAllowed()) {
+                String contextName = getName();
+                if (!contextName.startsWith("/")) {
+                    contextName = "/" + contextName;
+                }
                 ObjectName resourcesName = 
                     new ObjectName(this.getDomain() + ":type=Cache,host=" 
-                                   + getHostname() + ",path=" 
-                                   + (("".equals(getPath()))?"/":getPath()));
+                                   + getHostname() + ",context=" + contextName);
                 Registry.getRegistry(null, null).registerComponent
                     (proxyDirContext.getCache(), resourcesName, null);
             }
@@ -4680,12 +4698,15 @@ public class StandardContext extends ContainerBase
                 }
                 // Unregister the cache in JMX
                 if (isCachingAllowed()) {
+                    String contextName = getName();
+                    if (!contextName.startsWith("/")) {
+                        contextName = "/" + contextName;
+                    }
                     ObjectName resourcesName = 
                         new ObjectName(this.getDomain()
                                        + ":type=Cache,host=" 
-                                       + getHostname() + ",path=" 
-                                       + (("".equals(getPath()))?"/"
-                                          :getPath()));
+                                       + getHostname() + ",context=" 
+                                       + contextName);
                     Registry.getRegistry(null, null)
                         .unregisterComponent(resourcesName);
                 }
@@ -4758,7 +4779,7 @@ public class StandardContext extends ContainerBase
     protected synchronized void startInternal() throws LifecycleException {
 
         if(log.isDebugEnabled())
-            log.debug("Starting " + ("".equals(getName()) ? "ROOT" : getName()));
+            log.debug("Starting " + getBaseName());
 
         // Send j2ee.state.starting notification 
         if (this.getObjectName() != null) {
@@ -5592,21 +5613,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Given a context path, get the config file name.
-     */
-    protected String getDefaultConfigFile() {
-        String basename = null;
-        String path = getPath();
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename + ".xml");
-    }
-
-
-    /**
      * Get naming context full name.
      */
     private String getNamingContextName() {
@@ -5786,7 +5792,7 @@ public class StandardContext extends ContainerBase
             if ((engineName == null) || (engineName.length() < 1))
                 engineName = "_";
 
-            String temp = getPath();
+            String temp = getName();
             if (temp.startsWith("/"))
                 temp = temp.substring(1);
             temp = temp.replace('/', '_');
@@ -5963,12 +5969,11 @@ public class StandardContext extends ContainerBase
             result.append(hostname);
         }
         
-        String pathName = getName();
-        if ("".equals(pathName)) {
+        String contextName = getName();
+        if (!contextName.startsWith("/")) {
             result.append('/');
-        } else {
-            result.append(pathName);
         }
+        result.append(contextName);
 
         return result.toString();
     }

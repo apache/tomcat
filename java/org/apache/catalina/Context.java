@@ -1275,5 +1275,25 @@ public interface Context extends Container {
      *                      otherwise <code>false</code>
      */
     public boolean isResourceOnlyServlet(String servletName);
+    
+    /**
+     * Return the base name to use for WARs, directories or context.xml files
+     * for this context.
+     */
+    public String getBaseName();
+     
+    /**
+     * Set the version of this web application - used to differentiate
+     * different versions of the same web application when using parallel
+     * deployment.
+     */
+    public void setWebappVersion(String webappVersion);
+
+    /**
+     * Set the version of this web application - used to differentiate
+     * different versions of the same web application when using parallel
+     * deployment. If not specified, defaults to the empty string.
+     */
+    public String getWebappVersion();
 }
 

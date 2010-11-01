@@ -595,7 +595,7 @@ public class Embedded  extends StandardService {
     public synchronized void removeContext(Context context) {
 
         if( log.isDebugEnabled() )
-            log.debug("Removing context[" + context.getPath() + "]");
+            log.debug("Removing context[" + context.getName() + "]");
 
         // Is this Context actually among those that are defined?
         boolean found = false;

@@ -57,6 +57,7 @@ import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -605,17 +606,18 @@ public class ManagerServlet
             return;
         }
         String displayPath = path;
-        if( path.equals("/") )
-            path = "";
-        String basename = getDocBase(path);
+        
+        ContextName cn = new ContextName(path, null);
+        String name = cn.getName();
+        String baseName = cn.getBaseName();
 
         // Check if app already exists, or undeploy it if updating
-        Context context = (Context) host.findChild(path);
+        Context context = (Context) host.findChild(name);
         if (update) {
             if (context != null) {
                 undeploy(writer, displayPath, smClient);
             }
-            context = (Context) host.findChild(path);
+            context = (Context) host.findChild(name);
         }
         if (context != null) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
@@ -631,30 +633,30 @@ public class ManagerServlet
         }
 
         // Upload the web application archive to a local WAR file
-        File localWar = new File(deployedPath, basename + ".war");
+        File localWar = new File(deployedPath, baseName + ".war");
         if (debug >= 2) {
             log("Uploading WAR file to " + localWar);
         }
 
         // Copy WAR to appBase
         try {
-            if (!isServiced(path)) {
-                addServiced(path);
+            if (!isServiced(name)) {
+                addServiced(name);
                 try {
                     // Upload WAR
                     uploadWar(request, localWar);
                     // Copy WAR and XML to the host app base if needed
                     if (tag != null) {
                         deployedPath = deployed;
-                        File localWarCopy = new File(deployedPath, basename + ".war");
+                        File localWarCopy = new File(deployedPath, baseName + ".war");
                         copy(localWar, localWarCopy);
                         localWar = localWarCopy;
-                        copy(localWar, new File(getAppBase(), basename + ".war"));
+                        copy(localWar, new File(getAppBase(), baseName + ".war"));
                     }
                     // Perform new deployment
-                    check(path);
+                    check(name);
                 } finally {
-                    removeServiced(path);
+                    removeServiced(name);
                 }
             }
         } catch (Exception e) {
@@ -664,7 +666,7 @@ public class ManagerServlet
             return;
         }
         
-        context = (Context) host.findChild(path);
+        context = (Context) host.findChild(name);
         if (context != null && context.getConfigured()) {
             writer.println(smClient.getString(
                     "managerServlet.deployed", displayPath));
@@ -695,9 +697,10 @@ public class ManagerServlet
             return;
         }
         String displayPath = path;
-        if( path.equals("/") )
-            path = "";
-
+        ContextName cn = new ContextName(path, null);
+        String baseName = cn.getBaseName();
+        String name = cn.getName();
+        
         // Calculate the base path
         File deployedPath = versioned;
         if (tag != null) {
@@ -705,24 +708,24 @@ public class ManagerServlet
         }
 
         // Find the local WAR file
-        File localWar = new File(deployedPath, getDocBase(path) + ".war");
+        File localWar = new File(deployedPath, baseName + ".war");
 
         // Check if app already exists, or undeploy it if updating
-        Context context = (Context) host.findChild(path);
+        Context context = (Context) host.findChild(name);
         if (context != null) {
             undeploy(writer, displayPath, smClient);
         }
 
         // Copy WAR to appBase
         try {
-            if (!isServiced(path)) {
-                addServiced(path);
+            if (!isServiced(name)) {
+                addServiced(name);
                 try {
-                    copy(localWar, new File(getAppBase(), getDocBase(path) + ".war"));
+                    copy(localWar, new File(getAppBase(), baseName + ".war"));
                     // Perform new deployment
-                    check(path);
+                    check(name);
                 } finally {
-                    removeServiced(path);
+                    removeServiced(name);
                 }
             }
         } catch (Exception e) {
@@ -732,7 +735,7 @@ public class ManagerServlet
             return;
         }
         
-        context = (Context) host.findChild(path);
+        context = (Context) host.findChild(name);
         if (context != null && context.getConfigured()) {
             writer.println(smClient.getString("managerServlet.deployed",
                     displayPath));
@@ -790,17 +793,17 @@ public class ManagerServlet
             return;
         }
         String displayPath = path;
-        if("/".equals(path)) {
-            path = "";
-        }
+        ContextName cn = new ContextName(path, null);
+        String name = cn.getName();
+        String baseName = cn.getBaseName();
         
         // Check if app already exists, or undeploy it if updating
-        Context context = (Context) host.findChild(path);
+        Context context = (Context) host.findChild(name);
         if (update) {
             if (context != null) {
                 undeploy(writer, displayPath, smClient);
             }
-            context = (Context) host.findChild(path);
+            context = (Context) host.findChild(name);
         }
         if (context != null) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
@@ -816,30 +819,30 @@ public class ManagerServlet
         }
         
         try {
-            if (!isServiced(path)) {
-                addServiced(path);
+            if (!isServiced(name)) {
+                addServiced(name);
                 try {
                     if (config != null) {
                         configBase.mkdirs();
                         copy(new File(config), 
-                                new File(configBase, getConfigFile(path) + ".xml"));
+                                new File(configBase, baseName + ".xml"));
                     }
                     if (war != null) {
                         if (war.endsWith(".war")) {
                             copy(new File(war), 
-                                    new File(getAppBase(), getDocBase(path) + ".war"));
+                                    new File(getAppBase(), baseName + ".war"));
                         } else {
                             copy(new File(war), 
-                                    new File(getAppBase(), getDocBase(path)));
+                                    new File(getAppBase(), baseName));
                         }
                     }
                     // Perform new deployment
-                    check(path);
+                    check(name);
                 } finally {
-                    removeServiced(path);
+                    removeServiced(name);
                 }
             }
-            context = (Context) host.findChild(path);
+            context = (Context) host.findChild(name);
             if (context != null && context.getConfigured() && context.getAvailable()) {
                 writer.println(smClient.getString(
                         "managerServlet.deployed", displayPath));
@@ -928,7 +931,7 @@ public class ManagerServlet
                 return;
             }
             // It isn't possible for the manager to reload itself
-            if (context.getPath().equals(this.context.getPath())) {
+            if (context.getName().equals(this.context.getName())) {
                 writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
@@ -1335,7 +1338,7 @@ public class ManagerServlet
                 return;
             }
             // It isn't possible for the manager to stop itself
-            if (context.getPath().equals(this.context.getPath())) {
+            if (context.getName().equals(this.context.getName())) {
                 writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
@@ -1370,27 +1373,28 @@ public class ManagerServlet
             return;
         }
         String displayPath = path;
-        if( path.equals("/") )
-            path = "";
+        ContextName cn = new ContextName(path, null);
+        String name = cn.getName();
+        String baseName = cn.getBaseName();
 
         try {
 
             // Validate the Context of the specified application
-            Context context = (Context) host.findChild(path);
+            Context context = (Context) host.findChild(name);
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
                         RequestUtil.filter(displayPath)));
                 return;
             }
 
-            if (!isDeployed(path)) {
+            if (!isDeployed(name)) {
                 writer.println(smClient.getString("managerServlet.notDeployed",
                         RequestUtil.filter(displayPath)));
                 return;
             }
 
-            if (!isServiced(path)) {
-                addServiced(path);
+            if (!isServiced(name)) {
+                addServiced(name);
                 try {
                     // Try to stop the context first to be nicer
                     context.stop();
@@ -1398,12 +1402,9 @@ public class ManagerServlet
                     ExceptionUtils.handleThrowable(t);
                 }
                 try {
-                    if (path.lastIndexOf('/') > 0) {
-                        path = "/" + path.substring(1).replace('/','#');
-                    }
-                    File war = new File(getAppBase(), getDocBase(path) + ".war");
-                    File dir = new File(getAppBase(), getDocBase(path));
-                    File xml = new File(configBase, getConfigFile(path) + ".xml");
+                    File war = new File(getAppBase(), baseName + ".war");
+                    File dir = new File(getAppBase(), baseName);
+                    File xml = new File(configBase, baseName + ".xml");
                     if (war.exists()) {
                         war.delete();
                     } else if (dir.exists()) {
@@ -1412,9 +1413,9 @@ public class ManagerServlet
                         xml.delete();
                     }
                     // Perform new deployment
-                    check(path.replace('#', '/'));
+                    check(name);
                 } finally {
-                    removeServiced(path.replace('#','/'));
+                    removeServiced(name);
                 }
             }
             writer.println(smClient.getString("managerServlet.undeployed",
@@ -1432,34 +1433,6 @@ public class ManagerServlet
     // -------------------------------------------------------- Support Methods
 
 
-    /**
-     * Given a context path, get the config file name.
-     */
-    protected String getConfigFile(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename);
-    }
-
-
-    /**
-     * Given a context path, get the doc base.
-     */
-    protected String getDocBase(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename);
-    }
-
-    
     /**
      * Return a File object representing the "application root" directory
      * for our associated Host.

@@ -48,6 +48,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -450,46 +451,6 @@ public class HostConfig
         return configBase().getAbsolutePath();
     }
 
-    /**
-     * Given a context path, get the base name for WARs, directories and
-     * context.xml files.
-     */
-    protected String getBaseName(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename);
-    }
-
-    
-    /**
-     * Given the name of a WAR file, directory of context.xml file, determine
-     * the context path.
-     */
-    protected String getContextPath(String filename, boolean stripExtension) {
-        String contextPath;
-
-        // Remove any file extension
-        if (stripExtension) {
-            contextPath = filename.substring(0, filename.length() -4);
-        } else {
-            contextPath = filename;
-        }
-        
-        if ("ROOT".equals(contextPath)) {
-            // Handle special case of ROOT
-            contextPath = "";
-        } else {
-            // Prepend / and otherwise # -> / replacement
-            contextPath = '/' + contextPath.replace('#', '/');
-        }
-
-        return contextPath;
-    }
-
 
     /**
      * Deploy applications for any directories or WAR files that are found
@@ -517,20 +478,21 @@ public class HostConfig
 
         File appBase = appBase();
         File configBase = configBase();
-        String baseName = getBaseName(name);
+        ContextName cn = new ContextName(name);
+        String baseName = cn.getBaseName();
         
         // Deploy XML descriptors from configBase
         File xml = new File(configBase, baseName + ".xml");
         if (xml.exists())
-            deployDescriptor(name, xml, baseName + ".xml");
+            deployDescriptor(cn, xml, baseName + ".xml");
         // Deploy WARs, and loop if additional descriptors are found
         File war = new File(appBase, baseName + ".war");
         if (war.exists())
-            deployWAR(name, war, baseName + ".war");
+            deployWAR(cn, war, baseName + ".war");
         // Deploy expanded folders
         File dir = new File(appBase, baseName);
         if (dir.exists())
-            deployDirectory(name, dir, baseName);
+            deployDirectory(cn, dir, baseName);
         
     }
 
@@ -547,14 +509,15 @@ public class HostConfig
             File contextXml = new File(configBase, files[i]);
 
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
-                String contextPath = getContextPath(files[i], true);
+                ContextName cn = new ContextName(files[i]);
+                String name = cn.getName();
 
-                if (isServiced(contextPath))
+                if (isServiced(name))
                     continue;
                 
                 String file = files[i];
 
-                deployDescriptor(contextPath, contextXml, file);
+                deployDescriptor(cn, contextXml, file);
             }
         }
     }
@@ -565,12 +528,12 @@ public class HostConfig
      * @param contextXml
      * @param file
      */
-    protected void deployDescriptor(String contextPath, File contextXml, String file) {
-        if (deploymentExists(contextPath)) {
+    protected void deployDescriptor(ContextName cn, File contextXml, String file) {
+        if (deploymentExists(cn.getName())) {
             return;
         }
         
-        DeployedApplication deployedApp = new DeployedApplication(contextPath);
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
         // Assume this is a configuration descriptor and deploy it
         if(log.isInfoEnabled()) {
@@ -599,7 +562,9 @@ public class HostConfig
             context.addLifecycleListener(listener);
 
             context.setConfigFile(contextXml.toURI().toURL());
-            context.setPath(contextPath);
+            context.setName(cn.getName());
+            context.setPath(cn.getPath());
+            context.setWebappVersion(cn.getVersion());
             // Add the associated docBase to the redeployed list if it's a WAR
             boolean isExternalWar = false;
             boolean isExternal = false;
@@ -628,19 +593,9 @@ public class HostConfig
             }
             host.addChild(context);
             // Get paths for WAR and expanded WAR in appBase
-            String name = null;
-            String path = context.getPath();
-            if (path.equals("")) {
-                name = "ROOT";
-            } else {
-                if (path.startsWith("/")) {
-                    name = path.substring(1);
-                } else {
-                    name = path;
-                }
-            }
+
             // default to appBase dir + name
-            File expandedDocBase = new File(appBase(), name);
+            File expandedDocBase = new File(appBase(), cn.getBaseName());
             if (context.getDocBase() != null) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
@@ -687,7 +642,7 @@ public class HostConfig
         }
 
         if (context != null && host.findChild(context.getName()) != null) {
-            deployed.put(contextPath, deployedApp);
+            deployed.put(context.getName(), deployedApp);
         }
     }
 
@@ -710,22 +665,22 @@ public class HostConfig
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && dir.isFile()
                     && !invalidWars.contains(files[i]) ) {
                 
-                String contextPath = getContextPath(files[i], true);
+                ContextName cn = new ContextName(files[i]);
                 
                 // Check for WARs with /../ /./ or similar sequences in the name
-                if (!validateContextPath(appBase, contextPath)) {
+                if (!validateContextPath(appBase, cn.getBaseName())) {
                     log.error(sm.getString(
                             "hostConfig.illegalWarName", files[i]));
                     invalidWars.add(files[i]);
                     continue;
                 }
 
-                if (isServiced(contextPath))
+                if (isServiced(cn.getName()))
                     continue;
                 
                 String file = files[i];
                 
-                deployWAR(contextPath, dir, file);
+                deployWAR(cn, dir, file);
             }
         }
     }
@@ -772,9 +727,9 @@ public class HostConfig
      * @param war
      * @param file
      */
-    protected void deployWAR(String contextPath, File war, String file) {
+    protected void deployWAR(ContextName cn, File war, String file) {
         
-        if (deploymentExists(contextPath))
+        if (deploymentExists(cn.getName()))
             return;
         
         // Checking for a nested /META-INF/context.xml
@@ -844,7 +799,7 @@ public class HostConfig
             }
         }
         
-        DeployedApplication deployedApp = new DeployedApplication(contextPath);
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName());
         
         // Deploy the application in this WAR file
         if(log.isInfoEnabled()) 
@@ -929,14 +884,15 @@ public class HostConfig
                 (LifecycleListener) clazz.newInstance();
             context.addLifecycleListener(listener);
 
-            context.setPath(contextPath);
+            context.setName(cn.getName());
+            context.setPath(cn.getPath());
+            context.setWebappVersion(cn.getVersion());
             context.setDocBase(file);
             host.addChild(context);
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
             if (unpackWARs && (context.getDocBase() != null)) {
-                String name = getBaseName(context.getPath());
-                File docBase = new File(appBase(), name);
+                File docBase = new File(appBase(), cn.getBaseName());
                 deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         new Long(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
@@ -949,7 +905,7 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployWar.error", file), t);
         }
         
-        deployed.put(contextPath, deployedApp);
+        deployed.put(cn.getName(), deployedApp);
     }
 
 
@@ -969,12 +925,12 @@ public class HostConfig
                 continue;
             File dir = new File(appBase, files[i]);
             if (dir.isDirectory()) {
-                String contextPath = getContextPath(files[i], false);
+                ContextName cn = new ContextName(files[i]);
 
-                if (isServiced(contextPath))
+                if (isServiced(cn.getName()))
                     continue;
 
-                deployDirectory(contextPath, dir, files[i]);
+                deployDirectory(cn, dir, files[i]);
             }
         }
     }
@@ -985,11 +941,12 @@ public class HostConfig
      * @param dir
      * @param file
      */
-    protected void deployDirectory(String contextPath, File dir, String file) {
-        DeployedApplication deployedApp = new DeployedApplication(contextPath);
+    protected void deployDirectory(ContextName cn, File dir, String file) {
         
-        if (deploymentExists(contextPath))
+        if (deploymentExists(cn.getName()))
             return;
+
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
         // Deploy the application in this directory
         if( log.isInfoEnabled() ) 
@@ -1046,7 +1003,9 @@ public class HostConfig
                 (LifecycleListener) clazz.newInstance();
             context.addLifecycleListener(listener);
 
-            context.setPath(contextPath);
+            context.setName(cn.getName());
+            context.setPath(cn.getPath());
+            context.setWebappVersion(cn.getVersion());
             context.setDocBase(file);
             host.addChild(context);
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
@@ -1061,18 +1020,18 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployDir.error", file), t);
         }
 
-        deployed.put(contextPath, deployedApp);
+        deployed.put(cn.getName(), deployedApp);
     }
 
     
     /**
      * Check if a webapp is already deployed in this host.
      * 
-     * @param contextPath of the context which will be checked
+     * @param contextName of the context which will be checked
      */
-    protected boolean deploymentExists(String contextPath) {
-        return (deployed.containsKey(contextPath) ||
-                (host.findChild(contextPath) != null));
+    protected boolean deploymentExists(String contextName) {
+        return (deployed.containsKey(contextName) ||
+                (host.findChild(contextName) != null));
     }
     
 
@@ -1384,12 +1343,12 @@ public class HostConfig
      */
     public void manageApp(Context context)  {    
 
-        String contextPath = context.getPath();
+        String contextName = context.getName();
         
-        if (deployed.containsKey(contextPath))
+        if (deployed.containsKey(contextName))
             return;
 
-        DeployedApplication deployedApp = new DeployedApplication(contextPath);
+        DeployedApplication deployedApp = new DeployedApplication(contextName);
         
         // Add the associated docBase to the redeployed list if it's a WAR
         boolean isWar = false;
@@ -1408,38 +1367,24 @@ public class HostConfig
         // Add the eventual unpacked WAR and all the resources which will be
         // watched inside it
         if (isWar && unpackWARs) {
-            String name = null;
-            String path = context.getPath();
-            if (path.equals("")) {
-                name = "ROOT";
-            } else {
-                if (path.startsWith("/")) {
-                    name = path.substring(1);
-                } else {
-                    name = path;
-                }
-            }
-            File docBase = new File(name);
-            if (!docBase.isAbsolute()) {
-                docBase = new File(appBase(), name);
-            }
+            File docBase = new File(appBase(), context.getBaseName());
             deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         new Long(docBase.lastModified()));
             addWatchedResources(deployedApp, docBase.getAbsolutePath(), context);
         } else {
             addWatchedResources(deployedApp, null, context);
         }
-        deployed.put(contextPath, deployedApp);
+        deployed.put(contextName, deployedApp);
     }
 
     /**
      * Remove a webapp from our control.
      * Entry point for the admin webapp, and other JMX Context controllers.
      */
-    public void unmanageApp(String contextPath) {
-        if(isServiced(contextPath)) {
-            deployed.remove(contextPath);
-            host.removeChild(host.findChild(contextPath));
+    public void unmanageApp(String contextName) {
+        if(isServiced(contextName)) {
+            deployed.remove(contextName);
+            host.removeChild(host.findChild(contextName));
         }
     }
 
