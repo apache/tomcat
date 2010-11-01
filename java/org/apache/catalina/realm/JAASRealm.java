@@ -218,7 +218,10 @@ public class JAASRealm
         super.setContainer(container);
 
         if( appName==null  ) {
-            String name=container.getName();
+            String name = container.getName();
+            if (!name.startsWith("/")) {
+                name = "/" + name;
+            }
             name = makeLegalForJAAS(name);
 
             appName=name;

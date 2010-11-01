@@ -73,6 +73,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.ServletDef;
 import org.apache.catalina.deploy.WebXml;
+import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.DirContextURLConnection;
@@ -683,15 +684,8 @@ public class ContextConfig
             if (path == null) {
                 return;
             }
-            if (path.equals("")) {
-                docBase = "ROOT";
-            } else {
-                if (path.startsWith("/")) {
-                    docBase = path.substring(1).replace('/', '#');
-                } else {
-                    docBase = path.replace('/', '#');
-                }
-            }
+            ContextName cn = new ContextName(path, context.getWebappVersion());
+            docBase = cn.getBaseName();
         }
 
         File file = new File(docBase);
@@ -703,13 +697,10 @@ public class ContextConfig
         file = new File(docBase);
         String origDocBase = docBase;
         
-        String pathName = context.getPath();
-        if (pathName.equals("")) {
-            pathName = "ROOT";
-        } else {
-            // Context path must start with '/'
-            pathName = pathName.substring(1).replace('/', '#');
-        }
+        ContextName cn = new ContextName(context.getPath(),
+                context.getWebappVersion());
+        String pathName = cn.getBaseName();
+
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
             URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
             docBase = ExpandWar.expand(host, war, pathName);
@@ -788,18 +779,12 @@ public class ContextConfig
             if (path == null) {
                 return;
             }
-            if (path.equals("")) {
-                docBase = "ROOT";
-            } else {
-                if (path.startsWith("/")) {
-                    docBase = path.substring(1);
-                } else {
-                    docBase = path;
-                }
-            }
+            ContextName cn = new ContextName(path, context.getWebappVersion());
+            docBase = cn.getBaseName();
 
             File file = null;
             if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                // TODO - This is never executed. Bug or code to delete?
                 file = new File(System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase + ".war");
             } else {
@@ -808,7 +793,7 @@ public class ContextConfig
             }
             
             if (log.isDebugEnabled())
-                log.debug("Anti locking context[" + context.getPath() 
+                log.debug("Anti locking context[" + context.getName() 
                         + "] setting docBase to " + file);
             
             // Cleanup just in case an old deployment is lying around
@@ -844,7 +829,7 @@ public class ContextConfig
             fixDocBase();
         } catch (IOException e) {
             log.error(sm.getString(
-                    "contextConfig.fixDocBase", context.getPath()), e);
+                    "contextConfig.fixDocBase", context.getName()), e);
         }
         
     }
@@ -1397,7 +1382,7 @@ public class ContextConfig
             } catch (IOException ioe) {
                 log.error(sm.getString(
                         "contextConfig.servletContainerInitializerFail", url,
-                        context.getPath()));
+                        context.getName()));
                 return false;
             } finally {
                 if (is != null) {
@@ -1514,7 +1499,7 @@ public class ContextConfig
                 }
             } catch (IOException ioe) {
                 log.error(sm.getString("contextConfig.resourceJarFail", url,
-                        context.getPath()));
+                        context.getName()));
             } finally {
                 if (jarFile != null) {
                     try {

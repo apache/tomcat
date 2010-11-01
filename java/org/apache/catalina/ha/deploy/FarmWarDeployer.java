@@ -501,32 +501,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
     
     /**
-     * Given a context path, get the config file name.
-     */
-    protected String getConfigFile(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename);
-    }
-
-    /**
-     * Given a context path, get the config file name.
-     */
-    protected String getDocBase(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1);
-        }
-        return (basename);
-    }
-
-    /**
      * Return a File object representing the "application root" directory for
      * our associated Host.
      */
@@ -560,9 +534,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             if(log.isDebugEnabled())
                 log.debug("Undeploy local context " +path );
             context.stop();
-            File war = new File(getAppBase(), getDocBase(path) + ".war");
-            File dir = new File(getAppBase(), getDocBase(path));
-            File xml = new File(configBase, getConfigFile(path) + ".xml");
+            String baseName = context.getBaseName();
+            File war = new File(getAppBase(), baseName + ".war");
+            File dir = new File(getAppBase(), baseName);
+            File xml = new File(configBase, baseName + ".xml");
             if (war.exists()) {
                 war.delete();
             } else if (dir.exists()) {

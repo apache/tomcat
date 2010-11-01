@@ -51,6 +51,7 @@ import org.apache.catalina.ha.session.BackupManager;
 import org.apache.catalina.manager.util.BaseSessionComparator;
 import org.apache.catalina.manager.util.ReverseComparator;
 import org.apache.catalina.manager.util.SessionUtils;
+import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
@@ -254,7 +255,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         Part warPart = null;
         String filename = null;
-        String basename = null;
 
         Collection<Part> parts = request.getParts();
         Iterator<Part> iter = parts.iterator();
@@ -291,10 +291,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     filename =
                         filename.substring(filename.lastIndexOf('/') + 1);
                 }
+
                 // Identify the appBase of the owning Host of this Context
                 // (if any)
-                basename = filename.substring(0,
-                        filename.toLowerCase(Locale.ENGLISH).indexOf(".war"));
                 File file = new File(getAppBase(), filename);
                 if (file.exists()) {
                     message = smClient.getString(
@@ -302,28 +301,25 @@ public final class HTMLManagerServlet extends ManagerServlet {
                             filename);
                     break;
                 }
-                String path = null;
-                if (basename.equals("ROOT")) {
-                    path = "";
-                } else {
-                    path = "/" + basename.replace('#', '/');
-                }
+                
+                ContextName cn = new ContextName(filename);
+                String name = cn.getName();
 
-                if ((host.findChild(path) != null) && !isDeployed(path)) {
+                if ((host.findChild(name) != null) && !isDeployed(name)) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadInServerXml",
                             filename);
                     break;
                 }
 
-                if (!isServiced(path)) {
-                    addServiced(path);
+                if (!isServiced(name)) {
+                    addServiced(name);
                     try {
                         warPart.write(file.getAbsolutePath());
                         // Perform new deployment
-                        check(path);
+                        check(name);
                     } finally {
-                        removeServiced(path);
+                        removeServiced(name);
                     }
                 }
                 break;
@@ -569,7 +565,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args[12] = smClient.getString("htmlManagerServlet.expire.unit");
                 args[13] = highlightColor;
                 
-                if (ctxt.getPath().equals(this.context.getPath())) {
+                if (ctxt.getName().equals(this.context.getName())) {
                     writer.print(MessageFormat.format(
                         MANAGER_APP_ROW_BUTTON_SECTION, args));
                 } else if (ctxt.getAvailable() && isDeployed) {
