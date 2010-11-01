@@ -188,6 +188,9 @@ public class JDBCStore extends StoreBase {
         if (name == null) {
             Container container = manager.getContainer();
             String contextName = container.getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
+            }
             String hostName = "";
             String engineName = "";
 

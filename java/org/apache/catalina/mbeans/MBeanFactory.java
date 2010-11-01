@@ -548,18 +548,6 @@ public class MBeanFactory {
                 false, false);                                  
     }
 
-    /**
-     * Given a context path, get the config file name.
-     */
-    private String getConfigFile(String path) {
-        String basename = null;
-        if (path.equals("")) {
-            basename = "ROOT";
-        } else {
-            basename = path.substring(1).replace('/', '#');
-        }
-        return (basename);
-    }
 
    /**
      * Create a new StandardContext.
@@ -598,20 +586,20 @@ public class MBeanFactory {
                                              ":type=Deployer,host="+
                                              pname.getKeyProperty("host"));
         if(mserver.isRegistered(deployer)) {
-            String contextPath = context.getPath();
+            String contextName = context.getName();
             mserver.invoke(deployer, "addServiced",
-                           new Object [] {contextPath},
+                           new Object [] {contextName},
                            new String [] {"java.lang.String"});
             String configPath = (String)mserver.getAttribute(deployer,
                                                              "configBaseName");
-            String baseName = getConfigFile(contextPath);
+            String baseName = context.getBaseName();
             File configFile = new File(new File(configPath), baseName+".xml");
             context.setConfigFile(configFile.toURI().toURL());
             mserver.invoke(deployer, "manageApp",
                            new Object[] {context},
                            new String[] {"org.apache.catalina.Context"});
             mserver.invoke(deployer, "removeServiced",
-                           new Object [] {contextPath},
+                           new Object [] {contextName},
                            new String [] {"java.lang.String"});
         } else {
             log.warn("Deployer not found for "+pname.getKeyProperty("host"));

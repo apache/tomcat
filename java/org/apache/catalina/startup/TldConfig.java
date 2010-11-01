@@ -568,6 +568,7 @@ public final class TldConfig  implements LifecycleListener {
         }
     }
 
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Identify the context we are associated with
         try {
@@ -584,7 +585,7 @@ public final class TldConfig  implements LifecycleListener {
                 execute();
             } catch (Exception e) {
                 log.error(sm.getString(
-                        "tldConfig.execute", context.getPath()), e);
+                        "tldConfig.execute", context.getName()), e);
             }
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             taglibUris.clear();

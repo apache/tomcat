@@ -394,7 +394,9 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     private void registerJMX() {
         String parentName = context.getName();
-        parentName = ("".equals(parentName)) ? "/" : parentName;
+        if (!parentName.startsWith("/")) {
+            parentName = "/" + parentName;
+        }
 
         String hostName = context.getParent().getName();
         hostName = (hostName == null) ? "DEFAULT" : hostName;
