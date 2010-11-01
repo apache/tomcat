@@ -87,6 +87,10 @@
         <bug>49180</bug>: Add option to disable log rotation in 
         juli FileHandler. credit: Pid (pidster at apache )
       </fix>
+      <fix>
+        Make Tomcat more tolerant of <code>null</code> when generating JMX names
+        for Valves. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

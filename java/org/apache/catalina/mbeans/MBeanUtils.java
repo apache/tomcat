@@ -1690,7 +1690,7 @@ public class MBeanUtils {
         
         Container c = container;
         StringBuilder keyProperties = new StringBuilder();
-        int unknown = 0;
+        int containerCount = 0;
         
         // Work up container hierarchy, add a component to the name for
         // each container
@@ -1708,10 +1708,16 @@ public class MBeanUtils {
             } else if (c instanceof Host) {
                 keyProperties.append(",host=");
                 keyProperties.append(c.getName());
+            } else if (c == null) {
+                // May happen in unit testing and/or some embedding scenarios
+                keyProperties.append(",container");
+                keyProperties.append(containerCount++);
+                keyProperties.append("=null");
+                break;
             } else {
                 // Should never happen...
-                keyProperties.append(",unknown");
-                keyProperties.append(unknown++);
+                keyProperties.append(",container");
+                keyProperties.append(containerCount++);
                 keyProperties.append('=');
                 keyProperties.append(c.getName());
             }
