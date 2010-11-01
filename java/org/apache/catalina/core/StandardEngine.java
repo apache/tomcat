@@ -307,7 +307,7 @@ public class StandardEngine extends ContainerBase implements Engine {
 
         boolean logged = false;
         
-        if (accessLog != null) {
+        if (getAccessLog() != null) {
             accessLog.log(request, response, time);
             logged = true;
         }
