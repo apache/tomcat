@@ -478,7 +478,7 @@ public class HostConfig
 
         File appBase = appBase();
         File configBase = configBase();
-        ContextName cn = new ContextName(name);
+        ContextName cn = new ContextName(name, null);
         String baseName = cn.getBaseName();
         
         // Deploy XML descriptors from configBase
