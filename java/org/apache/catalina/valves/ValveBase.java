@@ -27,6 +27,7 @@ import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
@@ -289,19 +290,24 @@ public abstract class ValveBase extends LifecycleMBeanBase
         name.append(MBeanUtils.getContainerKeyProperties(container));
         
         int seq = 0;
-        for (Valve valve : container.getPipeline().getValves()) {
-            // Skip null valves
-            if (valve == null) {
-                continue;
-            }
-            // Only compare valves in pipeline until we find this valve
-            if (valve == this) {
-                break;
-            }
-            if (valve.getClass() == this.getClass()) {
-                // Duplicate valve earlier in pipeline
-                // increment sequence number
-                seq ++;
+        
+        // Pipeline may not be present in unit testing
+        Pipeline p = container.getPipeline();
+        if (p != null) {
+            for (Valve valve : p.getValves()) {
+                // Skip null valves
+                if (valve == null) {
+                    continue;
+                }
+                // Only compare valves in pipeline until we find this valve
+                if (valve == this) {
+                    break;
+                }
+                if (valve.getClass() == this.getClass()) {
+                    // Duplicate valve earlier in pipeline
+                    // increment sequence number
+                    seq ++;
+                }
             }
         }
         
