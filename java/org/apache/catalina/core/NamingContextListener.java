@@ -720,12 +720,12 @@ public class NamingContextListener
                         ",class=" + resource.getType() + 
                         ",name=" + quotedResourceName);
         } else if (container instanceof Context) {                    
-            String path = ((Context)container).getPath();
-            if (path.length() < 1)
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/"))
+                contextName = "/" + contextName;
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=DataSource" +
-                        ",path=" + path + 
+                        ",context=" + contextName + 
                         ",host=" + host.getName() +
                         ",class=" + resource.getType() +
                         ",name=" + quotedResourceName);

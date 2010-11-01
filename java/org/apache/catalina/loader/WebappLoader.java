@@ -612,13 +612,13 @@ public class WebappLoader extends LifecycleMBeanBase
                     this.container.getResources());
 
             StandardContext ctx=(StandardContext)container;
-            String path = ctx.getPath();
-            if (path.equals("")) {
-                path = "/";
+            String contextName = ctx.getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
             }   
             ObjectName cloname = new ObjectName
-                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,path="
-                 + path + ",host=" + ctx.getParent().getName());
+                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,context="
+                 + contextName + ",host=" + ctx.getParent().getName());
             Registry.getRegistry(null, null)
                 .registerComponent(classLoader, cloname, null);
 
@@ -660,13 +660,13 @@ public class WebappLoader extends LifecycleMBeanBase
 
         try {
             StandardContext ctx=(StandardContext)container;
-            String path = ctx.getPath();
-            if (path.equals("")) {
-                path = "/";
-            }
+            String contextName = ctx.getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
+            }   
             ObjectName cloname = new ObjectName
-                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,path="
-                 + path + ",host=" + ctx.getParent().getName());
+                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,context="
+                 + contextName + ",host=" + ctx.getParent().getName());
             Registry.getRegistry(null, null).unregisterComponent(cloname);
         } catch (Exception e) {
             log.error("LifecycleException ", e);
@@ -1187,14 +1187,14 @@ public class WebappLoader extends LifecycleMBeanBase
         StringBuilder name = new StringBuilder("type=Loader");
         
         if (container instanceof Context) {
-            name.append(",path=");
+            name.append(",context=");
             Context context = (Context) container;
             
-            String path = context.getPath();
-            if (path.equals("")) {
-                path = "/";
+            String contextName = context.getName();
+            if (!contextName.startsWith("/")) {
+                name.append("/");
             }   
-            name.append(path);
+            name.append(contextName);
             
             name.append(",host=");
             name.append(context.getParent().getName());

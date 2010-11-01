@@ -137,7 +137,7 @@ public final class ExtensionValidator {
                                            Context context)
                     throws IOException {
 
-        String appName = context.getPath();
+        String appName = context.getName();
         ArrayList<ManifestResource> appManifestResources =
             new ArrayList<ManifestResource>();
         // If the application context is null it does not exist and 
