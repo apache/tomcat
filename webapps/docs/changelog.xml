@@ -83,6 +83,10 @@
         default, the existing Tomcat 6.0.x welcome file handling is used.
         (markt)
       </add>
+      <fix>
+        <bug>49180</bug>: Add option to disable log rotation in 
+        juli FileHandler. credit: Pid (pidster at apache )
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -165,6 +169,9 @@
         be installed. If a 64-bit JDK is selected, the 64-bit service wrapper
         and the 64-bit native DLL will be installed. (markt)
       </add>
+      <fix>
+        <bug>49819</bug>: redesign of home page by Pid (pidster at apache )
+      </fix>
     </changelog>
   </subsection>
 </section>
