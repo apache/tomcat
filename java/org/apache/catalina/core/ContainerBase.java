@@ -1269,6 +1269,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             String name = current.getName();
             if ((name == null) || (name.equals(""))) {
                 name = "/";
+            } else if (name.startsWith("##")) {
+                name = "/" + name;
             }
             loggerName = "[" + name + "]" 
                 + ((loggerName != null) ? ("." + loggerName) : "");

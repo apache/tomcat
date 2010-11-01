@@ -495,12 +495,12 @@ public class MBeanUtils {
 
         ObjectName name = null;
         Host host = (Host)context.getParent();
-        String path = context.getPath();
-        if (path.length() < 1)
-            path = "/";
-        // FIXME 
+        String contextName = context.getName();
+        if (!contextName.startsWith("/")) {
+            contextName = "/" + contextName;
+        }
         name = new ObjectName(domain + ":j2eeType=WebModule,name=//" +
-                              host.getName()+ path +
+                              host.getName()+ contextName +
                               ",J2EEApplication=none,J2EEServer=none");
     
         return (name);
@@ -528,12 +528,14 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=Environment" + 
                         ",resourcetype=Global,name=" + environment.getName());
         } else if (container instanceof Context) {        
-            String path = ((Context)container).getPath();
-            if (path.length() < 1)
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
+            }
+
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=Environment" + 
-                        ",resourcetype=Context,path=" + path + 
+                        ",resourcetype=Context,context=" + contextName + 
                         ",host=" + host.getName() +
                         ",name=" + environment.getName());
         }        
@@ -603,12 +605,14 @@ public class MBeanUtils {
                         ",resourcetype=Global" + 
                         ",name=" + quotedResourceLinkName);
         } else if (container instanceof Context) {                    
-            String path = ((Context)container).getPath();
-            if (path.length() < 1)
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
+            }
+
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=ResourceLink" +
-                        ",resourcetype=Context,path=" + path + 
+                        ",resourcetype=Context,context=" + contextName + 
                         ",host=" + host.getName() +
                         ",name=" + quotedResourceLinkName);
         }
@@ -703,13 +707,13 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=Loader,host=" +
                               container.getName());
         } else if (container instanceof Context) {
-            String path = ((Context)container).getPath();
-            if (path.length() < 1) {
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
             }
             Host host = (Host) container.getParent();
-            name = new ObjectName(domain + ":type=Loader,path=" + path +
-                              ",host=" + host.getName());
+            name = new ObjectName(domain + ":type=Loader,context=" +
+                    contextName + ",host=" + host.getName());
         }
 
         return (name);
@@ -739,13 +743,13 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=Manager,host=" +
                               container.getName());
         } else if (container instanceof Context) {
-            String path = ((Context)container).getPath();
-            if (path.length() < 1) {
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
             }
             Host host = (Host) container.getParent();
-            name = new ObjectName(domain + ":type=Manager,path=" + path +
-                              ",host=" + host.getName());
+            name = new ObjectName(domain + ":type=Manager,context=" +
+                    contextName + ",host=" + host.getName());
         }
 
         return (name);
@@ -772,12 +776,13 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=NamingResources" + 
                         ",resourcetype=Global");
         } else if (container instanceof Context) {        
-            String path = ((Context)container).getPath();
-            if (path.length() < 1)
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
+            }
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=NamingResources" + 
-                        ",resourcetype=Context,path=" + path + 
+                        ",resourcetype=Context,context=" + contextName + 
                         ",host=" + host.getName());
         }
         
@@ -828,13 +833,13 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=Realm,host=" +
                               container.getName());
         } else if (container instanceof Context) {
-            String path = ((Context)container).getPath();
-            if (path.length() < 1) {
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
             }
             Host host = (Host) container.getParent();
-            name = new ObjectName(domain + ":type=Realm,path=" + path +
-                              ",host=" + host.getName());
+            name = new ObjectName(domain + ":type=Realm,context=" +
+                    contextName + ",host=" + host.getName());
         }
 
         return (name);
@@ -999,12 +1004,12 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=Valve,name=" + className + 
                                     ext + local );
         } else if (container instanceof Context) {
-            String path = ((Context)container).getPath();
-            if (path.length() < 1) {
-                path = "/";
+            String contextName = ((Context)container).getName();
+            if (!contextName.startsWith("/")) {
+                contextName = "/" + contextName;
             }
             Host host = (Host) container.getParent();
-            String local=",path=" + path + ",host=" +
+            String local=",context=" + contextName + ",host=" +
                     host.getName();
             int seq = getSeq(local);
             String ext="";
@@ -1694,12 +1699,12 @@ public class MBeanUtils {
                 keyProperties.append(",servlet=");
                 keyProperties.append(c.getName());
             } else if (c instanceof Context) {
-                String path = ((Context)c).getPath();
-                if (path.length() < 1) {
-                    path = "/";
+                String contextName = ((Context)container).getName();
+                if (!contextName.startsWith("/")) {
+                    contextName = "/" + contextName;
                 }
-                keyProperties.append(",path=");
-                keyProperties.append(path);
+                keyProperties.append(",context=");
+                keyProperties.append(contextName);
             } else if (c instanceof Host) {
                 keyProperties.append(",host=");
                 keyProperties.append(c.getName());

@@ -157,70 +157,70 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             // Handle dynamically adding wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
             Context context = (Context) wrapper.getParent();
-            String contextName = context.getName();
-            if ("/".equals(contextName)) {
-                contextName = "";
+            String contextPath = context.getPath();
+            if ("/".equals(contextPath)) {
+                contextPath = "";
             }
             String hostName = context.getParent().getName();
             String wrapperName = wrapper.getName();
             String mapping = (String) event.getData();
             boolean jspWildCard = ("jsp".equals(wrapperName)
                     && mapping.endsWith("/*"));
-            mapper.addWrapper(hostName, contextName, mapping, wrapper,
+            mapper.addWrapper(hostName, contextPath, mapping, wrapper,
                     jspWildCard, context.isResourceOnlyServlet(wrapperName));
         } else if (event.getType() == Wrapper.REMOVE_MAPPING_EVENT) {
             // Handle dynamically removing wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
 
-            String contextName = wrapper.getParent().getName();
-            if ("/".equals(contextName)) {
-                contextName = "";
+            String contextPath = ((Context) wrapper.getParent()).getPath();
+            if ("/".equals(contextPath)) {
+                contextPath = "";
             }
             String hostName = wrapper.getParent().getParent().getName();
 
             String mapping = (String) event.getData();
             
-            mapper.removeWrapper(hostName, contextName, mapping);
+            mapper.removeWrapper(hostName, contextPath, mapping);
         } else if (event.getType() == Context.ADD_WELCOME_FILE_EVENT) {
             // Handle dynamically adding welcome files
             Context context = (Context) event.getSource();
             
             String hostName = context.getParent().getName();
 
-            String contextName = context.getName();
-            if ("/".equals(contextName)) {
-                contextName = "";
+            String contextPath = context.getPath();
+            if ("/".equals(contextPath)) {
+                contextPath = "";
             }
             
             String welcomeFile = (String) event.getData();
             
-            mapper.addWelcomeFile(hostName, contextName, welcomeFile);
+            mapper.addWelcomeFile(hostName, contextPath, welcomeFile);
         } else if (event.getType() == Context.REMOVE_WELCOME_FILE_EVENT) {
             // Handle dynamically removing welcome files
             Context context = (Context) event.getSource();
             
             String hostName = context.getParent().getName();
 
-            String contextName = context.getName();
-            if ("/".equals(contextName)) {
-                contextName = "";
+            String contextPath = context.getPath();
+            if ("/".equals(contextPath)) {
+                contextPath = "";
             }
             
             String welcomeFile = (String) event.getData();
             
-            mapper.removeWelcomeFile(hostName, contextName, welcomeFile);
+            mapper.removeWelcomeFile(hostName, contextPath, welcomeFile);
         } else if (event.getType() == Context.CLEAR_WELCOME_FILES_EVENT) {
             // Handle dynamically clearing welcome files
             Context context = (Context) event.getSource();
             
             String hostName = context.getParent().getName();
 
-            String contextName = context.getName();
-            if ("/".equals(contextName)) {
-                contextName = "";
+            String contextPath = context.getPath();
+            if ("/".equals(contextPath)) {
+                contextPath = "";
             }
             
-            mapper.clearWelcomeFiles(hostName, contextName);
+            mapper.clearWelcomeFiles(hostName, contextPath);
         }
     }
 
@@ -301,23 +301,23 @@ public class MapperListener implements ContainerListener, LifecycleListener {
      */
     private void unregisterWrapper(Wrapper wrapper) {
 
-        String contextName = wrapper.getParent().getName();
+        String contextPath = ((Context) wrapper.getParent()).getPath();
         String wrapperName = wrapper.getName();
 
-        if ("/".equals(contextName)) {
-            contextName = "";
+        if ("/".equals(contextPath)) {
+            contextPath = "";
         }
         String hostName = wrapper.getParent().getParent().getName();
 
         String[] mappings = wrapper.findMappings();
         
         for (String mapping : mappings) {
-            mapper.removeWrapper(hostName, contextName, mapping);
+            mapper.removeWrapper(hostName, contextPath, mapping);
         }
         
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterWrapper",
-                    wrapperName, contextName, connector));
+                    wrapperName, contextPath, connector));
         }
     }
 
@@ -327,16 +327,16 @@ public class MapperListener implements ContainerListener, LifecycleListener {
      */
     private void registerContext(Context context) {
 
-        String contextName = context.getName();
-        if ("/".equals(contextName)) {
-            contextName = "";
+        String contextPath = context.getPath();
+        if ("/".equals(contextPath)) {
+            contextPath = "";
         }
         Container host = context.getParent();
         
         javax.naming.Context resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
 
-        mapper.addContext(host.getName(), host, contextName, context,
+        mapper.addContext(host.getName(), host, contextPath, context,
                 welcomeFiles, resources);
 
         for (Container container : context.findChildren()) {
@@ -345,7 +345,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerContext",
-                    contextName, connector));
+                    contextPath, connector));
         }
     }
 
@@ -360,17 +360,17 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             return;
         }
 
-        String contextName = context.getName();
-        if ("/".equals(contextName)) {
-            contextName = "";
+        String contextPath = context.getPath();
+        if ("/".equals(contextPath)) {
+            contextPath = "";
         }
         String hostName = context.getParent().getName();
 
         if(log.isDebugEnabled())
             log.debug(sm.getString("mapperListener.unregisterContext",
-                    contextName, connector));
+                    contextPath, connector));
 
-        mapper.removeContext(hostName, contextName);
+        mapper.removeContext(hostName, contextPath);
     }
 
 
@@ -381,10 +381,11 @@ public class MapperListener implements ContainerListener, LifecycleListener {
 
         String wrapperName = wrapper.getName();
         Context context = (Context) wrapper.getParent();
-        String contextName = context.getName();
-        if ("/".equals(contextName)) {
-            contextName = "";
+        String contextPath = context.getPath();
+        if ("/".equals(contextPath)) {
+            contextPath = "";
         }
+
         String hostName = context.getParent().getName();
         
         String[] mappings = wrapper.findMappings();
@@ -392,14 +393,14 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         for (String mapping : mappings) {
             boolean jspWildCard = (wrapperName.equals("jsp")
                                    && mapping.endsWith("/*"));
-            mapper.addWrapper(hostName, contextName, mapping, wrapper,
+            mapper.addWrapper(hostName, contextPath, mapping, wrapper,
                               jspWildCard,
                               context.isResourceOnlyServlet(wrapperName));
         }
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerWrapper",
-                    wrapperName, contextName, connector));
+                    wrapperName, contextPath, connector));
         }
     }
 

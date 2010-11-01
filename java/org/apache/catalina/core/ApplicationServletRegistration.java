@@ -149,13 +149,13 @@ public class ApplicationServletRegistration
         if (constraint == null) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationServletRegistration.setServletSecurity.iae",
-                    getName(), context.getPath()));
+                    getName(), context.getName()));
         }
         
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(sm.getString(
                     "applicationServletRegistration.setServletSecurity.ise",
-                    getName(), context.getPath()));
+                    getName(), context.getName()));
         }
 
         return context.addServletSecurity(this, constraint);

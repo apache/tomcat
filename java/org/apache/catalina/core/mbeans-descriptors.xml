@@ -86,6 +86,11 @@
                description="Take care to not lock resources"
                type="boolean" />
 
+    <attribute name="baseName"
+               description="The base name used for directories, WAR files (with .war appended) and context.xml files (with .xml appended)."
+               type="java.lang.String"
+               writeable="false"/>             
+
     <attribute name="cacheMaxSize"
                description="Maximum cache size in KB"
                type="int"/>
@@ -237,6 +242,10 @@
                description="The default context.xml override flag for this web application"
                type="boolean"/>
       
+    <attribute name="name"
+               description="The name of this Context"
+               type="java.lang.String"/>
+               
     <attribute name="parentClassLoader"
                description="Parent class loader."
                type="java.lang.ClassLoader" />
@@ -365,6 +374,11 @@
                is="true"
                type="boolean"/>
 
+    <attribute name="webappVersion"
+               description="The version of this web application - used in parallel deployment to differentiate different versions of the same web application"
+               type="java.lang.String"
+               writeable="false"/>
+               
     <attribute name="welcomeFiles"
                description="The welcome files for this context"
                type="[Ljava.lang.String;"
