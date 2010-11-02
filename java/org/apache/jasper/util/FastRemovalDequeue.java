@@ -272,7 +272,7 @@ public class FastRemovalDequeue<T> {
             this.valid = valid;
         }
 
-        private final T getContent() {
+        public final T getContent() {
             return content;
         }
 
