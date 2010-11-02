@@ -31,6 +31,14 @@
           description="The number of JSPs that have been reloaded"
                  type="int"/>
 
+    <attribute   name="jspUnloadCount"
+          description="The number of JSPs that have been unloaded"
+                 type="int"/>
+
+    <attribute   name="jspQueueLength"
+          description="The length of the JSP queue (if enabled via maxLoadedJsps)"
+                 type="int"/>
+
   </mbean>
 
 </mbeans-descriptors>
