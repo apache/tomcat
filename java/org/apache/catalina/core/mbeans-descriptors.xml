@@ -1590,11 +1590,6 @@
                type="boolean"
                writeable="false"/>
           
-    <attribute name="jspFile"
-               description="The context-relative URI of the JSP file for this servlet."
-               type="java.lang.String"
-               writeable="false"/>
-               
     <attribute name="loadOnStartup"
                description="The load-on-startup order value (negative value means load on first call) for this servlet."
                type="int"/>
