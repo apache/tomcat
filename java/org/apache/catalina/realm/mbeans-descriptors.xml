@@ -168,7 +168,7 @@
                  type="java.lang.String"/>
 
     <attribute   name="connectionPassword"
-          description="The connection URL to use when trying to connect to the database"
+          description="The connection password to use when trying to connect to the database"
                  type="java.lang.String"/>
 
     <attribute   name="connectionURL"
