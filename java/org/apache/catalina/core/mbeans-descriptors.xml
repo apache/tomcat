@@ -1102,6 +1102,7 @@
     
     <attribute name="asyncSupported"
                description="Does this valve support async reporting?"
+               is="true"
                type="boolean"/>
     
     <attribute name="className"
@@ -1326,6 +1327,7 @@
          
     <attribute name="asyncSupported"
                description="Does this valve support async reporting?"
+               is="true"
                type="boolean"/>
     
     <attribute name="className"

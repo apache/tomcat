@@ -25,6 +25,7 @@
          
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
 
     <attribute name="buffered"
@@ -46,17 +47,12 @@
                description="The value to look for conditional logging."
                type="java.lang.String"/>
                
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
-               
     <attribute name="directory"
                description="The directory in which log files are created"
                type="java.lang.String"/>
                
-     <attribute name="enabled"
+    <attribute name="enabled"
                description="Enable Access Logging"
-               is="true"
                type="boolean"/>
 
     <attribute name="fileDateFormat"
@@ -113,16 +109,13 @@
 
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
 
     <attribute name="info"
                description="Information about this implementation"
@@ -143,6 +136,7 @@
 
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
 
     <attribute name="buffered"
@@ -163,10 +157,6 @@
     <attribute name="condition"
                description="The value to look for conditional logging."
                type="java.lang.String"/>
-               
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
                
     <attribute name="directory"
                description="The directory in which log files are created"
@@ -227,6 +217,7 @@
          
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
                
     <attribute name="block"
@@ -237,10 +228,6 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
 
     <attribute name="concurrency"
                description="Desired concurrency level"
@@ -277,11 +264,8 @@
                
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
-
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
 
     <attribute   name="className"
                description="Fully qualified class name of the managed object"
@@ -315,11 +299,8 @@
                
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
-
-    <attribute name="containerName"
-               description="Object name of the container"
-               type="javax.management.ObjectName"/>
 
     <attribute   name="className"
                description="Fully qualified class name of the managed object"
@@ -349,6 +330,7 @@
          
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
+               is="true"
                type="boolean"/>
 
     <attribute name="httpServerPort"
