@@ -192,6 +192,32 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
 
     /**
+     * Gets the number of JSPs that are in the JSP limiter queue
+     *
+     * <p>This info may be used for monitoring purposes.
+     *
+     * @return The number of JSPs (in the webapp with which this JspServlet is
+     * associated) that are in the JSP limiter queue
+     */
+    public int getJspQueueLength() {
+        return this.rctxt.getJspQueueLength();
+    }
+
+
+    /**
+     * Gets the number of JSPs that have been unloaded.
+     *
+     * <p>This info may be used for monitoring purposes.
+     *
+     * @return The number of JSPs (in the webapp with which this JspServlet is
+     * associated) that have been unloaded
+     */
+    public int getJspUnloadCount() {
+        return this.rctxt.getJspUnloadCount();
+    }
+
+
+    /**
      * <p>Look for a <em>precompilation request</em> as described in
      * Section 8.4.2 of the JSP 1.2 Specification.  <strong>WARNING</strong> -
      * we cannot use <code>request.getParameter()</code> for this, because

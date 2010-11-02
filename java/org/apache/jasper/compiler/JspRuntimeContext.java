@@ -69,6 +69,11 @@ public final class JspRuntimeContext {
      */
     private AtomicInteger jspReloadCount = new AtomicInteger(0);
 
+    /*
+     * Counts how many times JSPs have been unloaded in this webapp.
+     */
+    private AtomicInteger jspUnloadCount = new AtomicInteger(0);
+
     /**
      * Preload classes required at runtime by a JSP servlet so that
      * we don't get a defineClassInPackage security exception.
@@ -158,6 +163,10 @@ public final class JspRuntimeContext {
 
         if (options.getMaxLoadedJsps() > 0) {
             jspQueue = new FastRemovalDequeue<JspServletWrapper>(options.getMaxLoadedJsps());
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage("jsp.message.jsp_queue_created",
+                                               "" + options.getMaxLoadedJsps(), context.getContextPath()));
+            }
         }
 
         /* Init parameter is in seconds, locally we use milliseconds */
@@ -229,9 +238,17 @@ public final class JspRuntimeContext {
      * @return an unloadHandle that can be pushed to front of queue at later execution times.
      * */
     public FastRemovalDequeue<JspServletWrapper>.Entry push(JspServletWrapper jsw) {
+        if (log.isTraceEnabled()) {
+            log.trace(Localizer.getMessage("jsp.message.jsp_added",
+                                           jsw.getJspUri(), context.getContextPath()));
+        }
         FastRemovalDequeue<JspServletWrapper>.Entry entry = jspQueue.push(jsw);
         JspServletWrapper replaced = entry.getReplaced();
         if (replaced != null) {
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage("jsp.message.jsp_removed_excess",
+                                               jsw.getJspUri(), context.getContextPath()));
+            }
             unloadJspServletWrapper(replaced);
         }
         return entry;
@@ -243,6 +260,11 @@ public final class JspRuntimeContext {
      * @param unloadHandle the unloadHandle for the jsp.
      * */
     public void makeYoungest(FastRemovalDequeue<JspServletWrapper>.Entry unloadHandle) {
+        if (log.isTraceEnabled()) {
+            JspServletWrapper jsw = unloadHandle.getContent();
+            log.trace(Localizer.getMessage("jsp.message.jsp_queue_update",
+                                           jsw.getJspUri(), context.getContextPath()));
+        }
         jspQueue.moveFirst(unloadHandle);
     }
     
@@ -318,6 +340,36 @@ public final class JspRuntimeContext {
      */
     public int getJspReloadCount() {
         return jspReloadCount.intValue();
+    }
+
+    /**
+     * Gets the number of JSPs that are in the JSP limiter queue
+     *
+     * @return The number of JSPs (in the webapp with which this JspServlet is
+     * associated) that are in the JSP limiter queue
+     */
+    public int getJspQueueLength() {
+        if (jspQueue != null) {
+            return jspQueue.getSize();
+        }
+        return -1;
+    }
+
+    /**
+     * Increments the JSP unload counter.
+     */
+    public void incrementJspUnloadCount() {
+        jspUnloadCount.incrementAndGet();
+    }
+
+    /**
+     * Gets the number of JSPs that have been unloaded.
+     *
+     * @return The number of JSPs (in the webapp with which this JspServlet is
+     * associated) that have been unloaded
+     */
+    public int getJspUnloadCount() {
+        return jspUnloadCount.intValue();
     }
 
 
@@ -523,6 +575,7 @@ public final class JspRuntimeContext {
         synchronized(jsw) {
             jsw.destroy();
         }
+        jspUnloadCount.incrementAndGet();
     }
 
 
@@ -531,6 +584,14 @@ public final class JspRuntimeContext {
      */
     public void checkUnload() {
 
+        if (log.isTraceEnabled()) {
+            int queueLength = -1;
+            if (jspQueue != null) {
+                queueLength = jspQueue.getSize();
+            }
+            log.trace(Localizer.getMessage("jsp.message.jsp_unload_check",
+                                           context.getContextPath(), "" + jsps.size(), "" + queueLength));
+        }
         long now = System.currentTimeMillis();
         if (jspIdleTimeout > 0) {
             long unloadBefore = now - jspIdleTimeout;
@@ -539,6 +600,11 @@ public final class JspRuntimeContext {
                 JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
                 synchronized(jsw) {
                     if (jsw.getLastUsageTime() < unloadBefore) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(Localizer.getMessage("jsp.message.jsp_removed_idle",
+                                                           jsw.getJspUri(), context.getContextPath(),
+                                                           "" + (now-jsw.getLastUsageTime())));
+                        }
                         if (jspQueue != null) {
                             jspQueue.remove(jsw.getUnloadHandle());
                         }
