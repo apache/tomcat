@@ -247,7 +247,7 @@ public final class JspRuntimeContext {
         if (replaced != null) {
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.message.jsp_removed_excess",
-                                               jsw.getJspUri(), context.getContextPath()));
+                                               replaced.getJspUri(), context.getContextPath()));
             }
             unloadJspServletWrapper(replaced);
         }
