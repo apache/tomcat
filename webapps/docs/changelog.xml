@@ -117,6 +117,9 @@
         Add support for unloading JSPs that have not been requested for a
         long time using the new parameter <code>jspIdleTimeout</code>. (rjung)
       </add>
+      <add>
+        Add logging and JMX support to JSP unloading. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
