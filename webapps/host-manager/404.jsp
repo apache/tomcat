@@ -37,9 +37,9 @@
     does not exist.
    </p>
    <p>
-    The Host Manager application has been re-structured for Tomcat 7 onwards and some
-    of URLs have changed. All URLs used to access the Manager application should
-    now start with one of the following options:
+    The Host Manager application has been re-structured for Tomcat 7 onwards and
+    some URLs have changed. All URLs used to access the Manager application
+    should now start with one of the following options:
    </p>
     <ul>
       <li><%=request.getContextPath()%>/html for the HTML GUI</li>
