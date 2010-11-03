@@ -62,10 +62,10 @@
     To maintain the CSRF protection:
    </p>
    <ul>
-    <li>users with the <tt>admin-gui</tt> role should not be granted the
+    <li>Users with the <tt>admin-gui</tt> role should not be granted the
        <tt>manager-script</tt> role.</li>
-    <li>if the text interface is accessed through a browser (e.g. for testing
-        since this interfaces is intended for tools not humans) then the browser
+    <li>If the text interface is accessed through a browser (e.g. for testing
+        since this interface is intended for tools not humans) then the browser
         must be closed afterwards to terminate the session.</li>
    </ul>
  </body>
