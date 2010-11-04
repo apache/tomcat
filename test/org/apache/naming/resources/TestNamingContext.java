@@ -37,7 +37,15 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestNamingContext extends TomcatBaseTest {
 
-    public void testLookup() throws Exception {
+    public void testLookupSingletonResource() throws Exception {
+        doTestLookup(true);
+    }
+    
+    public void testLookupNonSingletonResource() throws Exception {
+        doTestLookup(false);
+    }
+    
+    public void doTestLookup(boolean useSingletonResource) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
         
@@ -50,6 +58,7 @@ public class TestNamingContext extends TomcatBaseTest {
         cr.setName("list/foo");
         cr.setType("org.apache.naming.resources.TesterObject");
         cr.setProperty("factory", "org.apache.naming.resources.TesterFactory");
+        cr.setSingleton(useSingletonResource);
         ctx.getNamingResources().addResource(cr);
         
         // Map the test Servlet
@@ -60,7 +69,14 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("OK", bc.toString());
+        
+        String expected;
+        if (useSingletonResource) {
+            expected = "EQUAL";
+        } else {
+            expected = "NOTEQUAL";
+        }
+        assertEquals(expected, bc.toString());
 
     }
 
@@ -80,9 +96,9 @@ public class TestNamingContext extends TomcatBaseTest {
                 Object obj1 = ctx.lookup("java:comp/env/list/foo");
                 Object obj2 = ctx.lookup("java:comp/env/list/foo");
                 if (obj1 == obj2) {
-                    out.print("FAIL");
+                    out.print("EQUAL");
                 } else {
-                    out.print("OK");
+                    out.print("NOTEQUAL");
                 }
             } catch (NamingException ne) {
                 ne.printStackTrace(out);

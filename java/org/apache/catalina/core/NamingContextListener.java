@@ -849,7 +849,8 @@ public class NamingContextListener
     /**
      * Set the specified local EJBs in the naming context.
      */
-    public void addLocalEjb(ContextLocalEjb localEjb) {
+    public void addLocalEjb(
+            @SuppressWarnings("unused") ContextLocalEjb localEjb) {
         // NO-OP
     }
 
@@ -992,7 +993,8 @@ public class NamingContextListener
         // Create a reference to the resource.
         Reference ref = new ResourceRef
             (resource.getType(), resource.getDescription(),
-             resource.getScope(), resource.getAuth());
+             resource.getScope(), resource.getAuth(),
+             resource.getSingleton());
         // Adding the additional parameters, if any
         Iterator<String> params = resource.listProperties();
         while (params.hasNext()) {
