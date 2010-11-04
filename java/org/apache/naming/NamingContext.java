@@ -825,6 +825,13 @@ public class NamingContext implements Context {
                 try {
                     Object obj = NamingManager.getObjectInstance
                         (entry.value, name, this, env);
+                    boolean singleton = Boolean.parseBoolean(
+                            (String) ((ResourceRef) entry.value).get(
+                                    "singleton").getContent());
+                    if (singleton) {
+                        entry.type = NamingEntry.ENTRY;
+                        entry.value = obj;
+                    }
                     return obj; 
                 } catch (NamingException e) {
                     throw e;

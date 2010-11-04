@@ -73,6 +73,13 @@
         <bug>50157</bug>: Ensure MapperListener is only added to a container
         object once. (markt)
       </fix>
+      <fix>
+        <bug>50159</bug>: Add a new attribute for <code>&lt;Resource&gt;</code>
+        elements, <code>singleton</code>, that controls whether or not a new
+        object is created every time a JNDI lookup is performed to obtain the
+        resource. The default value is <code>true</code>, which will return the
+        same instance of the resource in every JNDI lookup. (markt)
+      </fix>
       <add>
         Improve debug logging for MapperListener registration. (markt)
       </add>
