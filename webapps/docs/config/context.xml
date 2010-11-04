@@ -878,6 +878,16 @@
         connections are assumed to be shareable.</p>
       </attribute>
 
+      <attribute name="singleton" required="false">
+        <p>Specify whether this resource definition is for a singleton resource,
+        i.e. one where there is only a single instance of the resource. If this
+        attribute is <code>true</code>, multiple JNDI lookups for this resource
+        will return the same object. If this attribute is <code>false</code>,
+        multiple JNDI lookups for this resource will return different objects.
+        The value of this attribute must be <code>true</code> or
+        <code>false</code>. By default, this attribute is <code>true</code>.</p>
+      </attribute>
+
       <attribute name="type" required="true">
         <p>The fully qualified Java class name expected by the web
         application when it performs a lookup for this resource.</p>
