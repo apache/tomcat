@@ -176,6 +176,7 @@ public class SimpleTcpCluster extends LifecycleBase
     // ------------------------------------------------------------- Properties
 
     public SimpleTcpCluster() {
+        // NO-OP
     }
 
     /**
@@ -183,6 +184,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
         return (info);
     }
@@ -210,6 +212,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param clusterName
      *            The clustername to join
      */
+    @Override
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
     }
@@ -220,6 +223,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @return The name of the cluster associated with this server
      */
+    @Override
     public String getClusterName() {
         if(clusterName == null && container != null)
             return container.getName() ;
@@ -232,6 +236,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param container
      *            The Container to use
      */
+    @Override
     public void setContainer(Container container) {
         Container oldContainer = this.container;
         this.container = container;
@@ -243,6 +248,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @return The Container associated with our Cluster
      */
+    @Override
     public Container getContainer() {
         return (this.container);
     }
@@ -281,8 +287,11 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param managerClassName String
      */
     @Deprecated
-    public void setManagerClassName(String managerClassName) {
-        log.warn("setManagerClassName is deprecated, use nested <Manager> element inside the <Cluster> element instead, this request will be ignored.");
+    public void setManagerClassName(
+            @SuppressWarnings("unused") String managerClassName) {
+        log.warn("setManagerClassName is deprecated, use nested <Manager> " +
+                 "element inside the <Cluster> element instead, this request " +
+                 "will be ignored.");
     }
 
     /**
@@ -290,6 +299,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * Cluster Valves are only add to container when cluster is started!
      * @param valve The new cluster Valve.
      */
+    @Override
     public void addValve(Valve valve) {
         if (valve instanceof ClusterValve && (!valves.contains(valve)))
             valves.add(valve);
@@ -299,6 +309,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * get all cluster valves
      * @return current cluster valves
      */
+    @Override
     public Valve[] getValves() {
         return valves.toArray(new Valve[valves.size()]);
     }
@@ -322,6 +333,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.ha.CatalinaCluster#addClusterListener(org.apache.catalina.ha.ClusterListener)
      */
+    @Override
     public void addClusterListener(ClusterListener listener) {
         if (listener != null && !clusterListeners.contains(listener)) {
             clusterListeners.add(listener);
@@ -334,6 +346,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.ha.CatalinaCluster#removeClusterListener(org.apache.catalina.ha.ClusterListener)
      */
+    @Override
     public void removeClusterListener(ClusterListener listener) {
         if (listener != null) {
             clusterListeners.remove(listener);
@@ -344,6 +357,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * get current Deployer
      */
+    @Override
     public org.apache.catalina.ha.ClusterDeployer getClusterDeployer() {
         return clusterDeployer;
     }
@@ -351,11 +365,13 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * set a new Deployer, must be set before cluster started!
      */
+    @Override
     public void setClusterDeployer(
             org.apache.catalina.ha.ClusterDeployer clusterDeployer) {
         this.clusterDeployer = clusterDeployer;
     }
 
+    @Override
     public void setChannel(Channel channel) {
         this.channel = channel;
     }
@@ -372,6 +388,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * has members
      */
     protected boolean hasMembers = false;
+    @Override
     public boolean hasMembers() {
         return hasMembers;
     }
@@ -380,6 +397,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * Get all current cluster members
      * @return all members or empty array 
      */
+    @Override
     public Member[] getMembers() {
         return channel.getMembers();
     }
@@ -389,6 +407,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @return Member
      */
+    @Override
     public Member getLocalMember() {
         return channel.getLocalMember(true);
     }
@@ -412,6 +431,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param name
      * @param value
      */
+    @Override
     public boolean setProperty(String name, Object value) {
         if (log.isTraceEnabled())
             log.trace(sm.getString("SimpleTcpCluster.setProperty", name, value,properties.get(name)));
@@ -429,6 +449,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param key
      * @return The property
      */
+    @Override
     public Object getProperty(String key) {
         if (log.isTraceEnabled())
             log.trace(sm.getString("SimpleTcpCluster.getProperty", key));
@@ -440,6 +461,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @return An iterator over the property names.
      */
+    @Override
     public Iterator<String> getPropertyNames() {
         return properties.keySet().iterator();
     }
@@ -449,6 +471,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @param key
      */
+    @Override
     public void removeProperty(String key) {
         properties.remove(key);
     }
@@ -476,10 +499,12 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * @return Returns the managers.
      */
+    @Override
     public Map<String, ClusterManager> getManagers() {
         return managers;
     }
 
+    @Override
     public Channel getChannel() {
         return channel;
     }
@@ -500,6 +525,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @see org.apache.catalina.Cluster#createManager(java.lang.String)
      * @see DeltaManager#start()
      */
+    @Override
     public synchronized Manager createManager(String name) {
         if (log.isDebugEnabled()) log.debug("Creating ClusterManager for context " + name + " using class " + getManagerClassName());
         Manager manager = null;
@@ -515,6 +541,7 @@ public class SimpleTcpCluster extends LifecycleBase
         return manager;
     }
     
+    @Override
     public void registerManager(Manager manager) {
     
         if (! (manager instanceof ClusterManager)) {
@@ -557,6 +584,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param manager
      * @return TODO
      */
+    @Override
     public String getManagerName(String name, Manager manager) {
         String clusterName = name ;
         if ( clusterName == null ) clusterName = manager.getContainer().getName();
@@ -576,6 +604,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.ha.CatalinaCluster#getManager(java.lang.String)
      */
+    @Override
     public Manager getManager(String name) {
         return managers.get(name);
     }
@@ -591,6 +620,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @see org.apache.catalina.tribes.group.GroupChannel.HeartbeatThread#run()
      * 
      */
+    @Override
     public void backgroundProcess() {
         if (clusterDeployer != null) clusterDeployer.backgroundProcess();
        
@@ -605,6 +635,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
      */
+    @Override
     public void lifecycleEvent(LifecycleEvent lifecycleEvent) {
         if (log.isTraceEnabled())
             log.trace(sm.getString("SimpleTcpCluster.event.log", lifecycleEvent.getType(), lifecycleEvent.getData()));
@@ -682,8 +713,8 @@ public class SimpleTcpCluster extends LifecycleBase
                             new Object[] { valve },
                             new Class[] { org.apache.catalina.Valve.class });
 
+                    valve.setCluster(this);
                 }
-                valve.setCluster(this);
             }
         }
     }
@@ -700,10 +731,11 @@ public class SimpleTcpCluster extends LifecycleBase
                 log.debug("Invoking removeValve on " + getContainer()
                         + " with class=" + valve.getClass().getName());
             if (valve != null) {
-                    IntrospectionUtils.callMethodN(getContainer(), "removeValve",
-                        new Object[] { valve }, new Class[] { org.apache.catalina.Valve.class });
+                IntrospectionUtils.callMethodN(getContainer(), "removeValve",
+                    new Object[] { valve },
+                    new Class[] { org.apache.catalina.Valve.class });
+                valve.setCluster(this);
             }
-            valve.setCluster(this);
         }
     }
 
@@ -766,6 +798,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.ha.CatalinaCluster#send(org.apache.catalina.ha.ClusterMessage)
      */
+    @Override
     public void send(ClusterMessage msg) {
         send(msg, null);
     }
@@ -778,6 +811,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @see org.apache.catalina.ha.CatalinaCluster#send(org.apache.catalina.ha.ClusterMessage,
      *      org.apache.catalina.tribes.Member)
      */
+    @Override
     public void send(ClusterMessage msg, Member dest) {
         try {
             msg.setAddress(getLocalMember());
@@ -803,6 +837,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.tribes.MembershipListener#memberAdded(org.apache.catalina.tribes.Member)
      */
+    @Override
     public void memberAdded(Member member) {
         try {
             hasMembers = channel.hasMembers();
@@ -822,6 +857,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.tribes.MembershipListener#memberDisappeared(org.apache.catalina.tribes.Member)
      */
+    @Override
     public void memberDisappeared(Member member) {
         try {
             hasMembers = channel.hasMembers();            
@@ -845,11 +881,13 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param msg
      *            received Message
      */
+    @Override
     public boolean accept(Serializable msg, Member sender) {
         return (msg instanceof ClusterMessage);
     }
     
     
+    @Override
     public void messageReceived(Serializable message, Member sender) {
         ClusterMessage fwd = (ClusterMessage)message;
         fwd.setAddress(sender);
@@ -867,30 +905,32 @@ public class SimpleTcpCluster extends LifecycleBase
         //invoke all the listeners
         boolean accepted = false;
         if (message != null) {
-            for (Iterator<ClusterListener> iter = clusterListeners.iterator(); iter.hasNext();) {
+            for (Iterator<ClusterListener> iter = clusterListeners.iterator();
+                    iter.hasNext();) {
                 ClusterListener listener = iter.next();
                 if (listener.accept(message)) {
                     accepted = true;
                     listener.messageReceived(message);
                 }
             }
-        }
-        if (!accepted && log.isDebugEnabled()) {
-            if (notifyLifecycleListenerOnFailure) {
+            if (!accepted && notifyLifecycleListenerOnFailure) {
                 Member dest = message.getAddress();
                 // Notify our interested LifecycleListeners
                 fireLifecycleEvent(RECEIVE_MESSAGE_FAILURE_EVENT,
                         new SendMessageData(message, dest, null));
+                if (log.isDebugEnabled()) {
+                    log.debug("Message " + message.toString() + " from type "
+                            + message.getClass().getName()
+                            + " transfered but no listener registered");
+                }
             }
-            log.debug("Message " + message.toString() + " from type "
-                    + message.getClass().getName()
-                    + " transfered but no listener registered");
         }
         return;
     }
 
     // --------------------------------------------------------- Logger
 
+    @Override
     public Log getLogger() {
         return log;
     }
@@ -902,12 +942,15 @@ public class SimpleTcpCluster extends LifecycleBase
      * 
      * @see org.apache.catalina.Cluster#setProtocol(java.lang.String)
      */
+    @Override
     public void setProtocol(String protocol) {
+        // NO-OP
     }
 
     /**
      * @see org.apache.catalina.Cluster#getProtocol()
      */
+    @Override
     public String getProtocol() {
         return null;
     }
