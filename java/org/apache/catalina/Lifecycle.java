@@ -50,10 +50,11 @@ package org.apache.catalina;
  * |  |          |                    |                         |  |
  * |  |          |                    |auto                     |  |
  * |  |          |    destroy()      \|/              destroy() |  |
- * |  |       FAILED ---->------ DESTROYED ----<-----------------  |
- * |  |                             ^                              |
- * |  |        destroy()            |                              |
- * |  -------------------------------                              |
+ * |  |       FAILED ---->------ DESTROYING ---<-----------------  |
+ * |  |                           ^     |                          |
+ * |  |        destroy()          |     |auto                      |
+ * |  -----------------------------    \|/                         |
+ * |                                 DESTROYED                     |
  * |                                                               |
  * |                            stop()                             |
  * --->------------------------------>------------------------------
@@ -149,9 +150,15 @@ public interface Lifecycle {
 
 
     /**
-     * The LifecycleEvent type for the "component destroy" event.
+     * The LifecycleEvent type for the "component after destroy" event.
      */
-    public static final String DESTROY_EVENT = "destroy";
+    public static final String AFTER_DESTROY_EVENT = "after_destroy";
+
+
+    /**
+     * The LifecycleEvent type for the "component before destroy" event.
+     */
+    public static final String BEFORE_DESTROY_EVENT = "before_destroy";
 
 
     /**
