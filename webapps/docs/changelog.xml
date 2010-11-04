@@ -80,6 +80,13 @@
         resource. The default value is <code>true</code>, which will return the
         same instance of the resource in every JNDI lookup. (markt)
       </fix>
+      <fix>
+        <bug>50168</bug>: Separate the <code>Lifecycle.DESTROY_EVENT</code> into
+        <code>Lifecycle.BEFORE_DESTROY_EVENT</code> and
+        <code>Lifecycle.AFTER_DESTROY_EVENT</code>. Use the additional state to
+        ensure that <code>Context</code> objects are only destroyed once.
+        (markt)
+      </fix>
       <add>
         Improve debug logging for MapperListener registration. (markt)
       </add>
