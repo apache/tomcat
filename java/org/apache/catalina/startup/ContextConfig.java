@@ -332,7 +332,7 @@ public class ContextConfig
             configureStop();
         } else if (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) {
             init();
-        } else if (event.getType().equals(Lifecycle.DESTROY_EVENT)) {
+        } else if (event.getType().equals(Lifecycle.AFTER_DESTROY_EVENT)) {
             destroy();
         }
 

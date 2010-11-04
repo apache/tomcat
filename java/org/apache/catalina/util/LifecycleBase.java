@@ -248,7 +248,8 @@ public abstract class LifecycleBase implements Lifecycle {
 
     @Override
     public synchronized final void destroy() throws LifecycleException {
-        if (LifecycleState.DESTROYED.equals(state)) {
+        if (LifecycleState.DESTROYING.equals(state) ||
+                LifecycleState.DESTROYED.equals(state)) {
 
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
@@ -265,9 +266,11 @@ public abstract class LifecycleBase implements Lifecycle {
         if (!state.equals(LifecycleState.STOPPED) &&
                 !state.equals(LifecycleState.FAILED) &&
                 !state.equals(LifecycleState.NEW)) {
-            invalidTransition(Lifecycle.DESTROY_EVENT);
+            invalidTransition(Lifecycle.BEFORE_DESTROY_EVENT);
         }
 
+        setState(LifecycleState.DESTROYING);
+        
         destroyInternal();
         
         setState(LifecycleState.DESTROYED);
