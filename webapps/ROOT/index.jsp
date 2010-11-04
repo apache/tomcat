@@ -19,7 +19,7 @@ limitations under the License.
 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy");
 request.setAttribute("year", sdf.format(new java.util.Date()));
 request.setAttribute("tomcat7Url", "http://tomcat.apache.org/");
-request.setAttribute("tomcat7DocUrl", "http://tomcat.apache.org/tomcat-7.0-doc/");
+request.setAttribute("tomcat7DocUrl", "/docs/");
 %>
 <!-- License must be after DOCTYPE to ensure IE Standards Mode fires -->
 <html lang="en">
