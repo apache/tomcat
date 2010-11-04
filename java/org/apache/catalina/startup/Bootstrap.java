@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,7 +54,7 @@ import org.apache.juli.logging.LogFactory;
 public final class Bootstrap {
 
     private static final Log log = LogFactory.getLog(Bootstrap.class);
-    
+
     // -------------------------------------------------------------- Constants
 
 
@@ -115,7 +115,7 @@ public final class Bootstrap {
         ArrayList<String> repositoryLocations = new ArrayList<String>();
         ArrayList<Integer> repositoryTypes = new ArrayList<Integer>();
         int i;
- 
+
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
         while (tokenizer.hasMoreElements()) {
             String repository = tokenizer.nextToken();
@@ -126,20 +126,20 @@ public final class Bootstrap {
             while ((i=repository.indexOf(CATALINA_HOME_TOKEN))>=0) {
                 replace=true;
                 if (i>0) {
-                repository = repository.substring(0,i) + getCatalinaHome() 
+                repository = repository.substring(0,i) + getCatalinaHome()
                     + repository.substring(i+CATALINA_HOME_TOKEN.length());
                 } else {
-                    repository = getCatalinaHome() 
+                    repository = getCatalinaHome()
                         + repository.substring(CATALINA_HOME_TOKEN.length());
                 }
             }
             while ((i=repository.indexOf(CATALINA_BASE_TOKEN))>=0) {
                 replace=true;
                 if (i>0) {
-                repository = repository.substring(0,i) + getCatalinaBase() 
+                repository = repository.substring(0,i) + getCatalinaBase()
                     + repository.substring(i+CATALINA_BASE_TOKEN.length());
                 } else {
-                    repository = getCatalinaBase() 
+                    repository = getCatalinaBase()
                         + repository.substring(CATALINA_BASE_TOKEN.length());
                 }
             }
@@ -172,7 +172,7 @@ public final class Bootstrap {
 
         String[] locations = repositoryLocations.toArray(new String[0]);
         Integer[] types = repositoryTypes.toArray(new Integer[0]);
- 
+
         ClassLoader classLoader = ClassLoaderFactory.createClassLoader
             (locations, types, parent);
 
@@ -255,11 +255,24 @@ public final class Bootstrap {
             param = new Object[1];
             param[0] = arguments;
         }
-        Method method = 
+        Method method =
             catalinaDaemon.getClass().getMethod(methodName, paramTypes);
         if (log.isDebugEnabled())
             log.debug("Calling startup class " + method);
         method.invoke(catalinaDaemon, param);
+
+    }
+
+
+    /**
+     * getServer() for configtest
+     */
+    private Object getServer() throws Exception {
+
+        String methodName = "getServer";
+        Method method =
+            catalinaDaemon.getClass().getMethod(methodName);
+        return method.invoke(catalinaDaemon);
 
     }
 
@@ -310,7 +323,7 @@ public final class Bootstrap {
     public void stopServer()
         throws Exception {
 
-        Method method = 
+        Method method =
             catalinaDaemon.getClass().getMethod("stopServer", (Class []) null);
         method.invoke(catalinaDaemon, (Object []) null);
 
@@ -334,7 +347,7 @@ public final class Bootstrap {
             param = new Object[1];
             param[0] = arguments;
         }
-        Method method = 
+        Method method =
             catalinaDaemon.getClass().getMethod("stopServer", paramTypes);
         method.invoke(catalinaDaemon, param);
 
@@ -351,7 +364,7 @@ public final class Bootstrap {
         paramTypes[0] = Boolean.TYPE;
         Object paramValues[] = new Object[1];
         paramValues[0] = Boolean.valueOf(await);
-        Method method = 
+        Method method =
             catalinaDaemon.getClass().getMethod("setAwait", paramTypes);
         method.invoke(catalinaDaemon, paramValues);
 
@@ -418,12 +431,19 @@ public final class Bootstrap {
                 daemon.start();
             } else if (command.equals("stop")) {
                 daemon.stopServer(args);
+            } else if (command.equals("configtest")) {
+                daemon.load(args);
+                if (null==daemon.getServer()) {
+                    System.exit(1);
+                }
+                System.exit(0);
             } else {
                 log.warn("Bootstrap: command \"" + command + "\" does not exist.");
             }
         } catch (Throwable t) {
             handleThrowable(t);
             t.printStackTrace();
+            System.exit(1);
         }
 
     }
@@ -463,12 +483,12 @@ public final class Bootstrap {
 
         if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
             return;
-        File bootstrapJar = 
+        File bootstrapJar =
             new File(System.getProperty("user.dir"), "bootstrap.jar");
         if (bootstrapJar.exists()) {
             try {
                 System.setProperty
-                    (Globals.CATALINA_HOME_PROP, 
+                    (Globals.CATALINA_HOME_PROP,
                      (new File(System.getProperty("user.dir"), ".."))
                      .getCanonicalPath());
             } catch (Exception e) {
