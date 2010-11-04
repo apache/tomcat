@@ -959,7 +959,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Set child's parent to null to prevent a loop
         child.setParent(null);
         try {
-            child.destroy();
+            // child.destroy() may have already been called which would have
+            // triggered this call. If that is the case, no need to destroy the
+            // child again.
+            if (!LifecycleState.DESTROYING.equals(child.getState())) {
+                child.destroy();
+            }
         } catch (LifecycleException e) {
             log.error("ContainerBase.removeChild: destroy: ", e);
         }
