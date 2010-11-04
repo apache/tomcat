@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,6 +57,7 @@ import org.xml.sax.InputSource;
  *     "catalina.base" system property.   [conf/server.xml]
  * <li><b>-help</b>      - Display usage information.
  * <li><b>-nonaming</b>  - Disable naming support.
+ * <li><b>configtest</b> - Try to test the config
  * <li><b>start</b>      - Start an instance of Catalina.
  * <li><b>stop</b>       - Stop the currently running instance of Catalina.
  * </u>
@@ -103,7 +104,7 @@ public class Catalina {
      */
     protected Server server = null;
 
-    
+
     /**
      * Are we starting a new server?
      */
@@ -135,12 +136,12 @@ public class Catalina {
 
 
     // ----------------------------------------------------------- Constructors
-    
+
     public Catalina() {
         setSecurityProtection();
     }
-    
-    
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -250,6 +251,9 @@ public class Catalina {
             } else if (args[i].equals("start")) {
                 starting = true;
                 stopping = false;
+            } else if (args[i].equals("configtest")) {
+                starting = true;
+                stopping = false;
             } else if (args[i].equals("stop")) {
                 starting = false;
                 stopping = true;
@@ -344,10 +348,10 @@ public class Catalina {
                             "addExecutor",
                             "org.apache.catalina.Executor");
 
-        
+
         digester.addRule("Server/Service/Connector",
                          new ConnectorCreateRule());
-        digester.addRule("Server/Service/Connector", 
+        digester.addRule("Server/Service/Connector",
                          new SetAllPropertiesRule(new String[]{"executor"}));
         digester.addSetNext("Server/Service/Connector",
                             "addConnector",
@@ -440,7 +444,7 @@ public class Catalina {
 
         // Stop the existing server
         try {
-            if (getServer().getPort()>0) { 
+            if (getServer().getPort()>0) {
                 Socket socket = new Socket(getServer().getAddress(),
                         getServer().getPort());
                 OutputStream stream = socket.getOutputStream();
@@ -513,7 +517,7 @@ public class Catalina {
                 // Ignore
             }
         }
-        
+
 
         if ((inputStream == null) && (file != null)) {
             log.warn("Can't load server.xml from " + file.getAbsolutePath());
@@ -545,9 +549,9 @@ public class Catalina {
         } catch (LifecycleException e) {
             if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
                 throw new java.lang.Error(e);
-            else   
+            else
                 log.error("Catalina.start", e);
-            
+
         }
 
         long t2 = System.nanoTime();
@@ -557,7 +561,7 @@ public class Catalina {
     }
 
 
-    /* 
+    /*
      * Load using arguments
      */
     public void load(String args[]) {
@@ -605,7 +609,7 @@ public class Catalina {
                     shutdownHook = new CatalinaShutdownHook();
                 }
                 Runtime.getRuntime().addShutdownHook(shutdownHook);
-                
+
                 // If JULI is being used, disable JULI's shutdown hook since
                 // shutdown hooks run in parallel and log messages may be lost
                 // if JULI's hook completes before the CatalinaShutdownHook()
@@ -635,7 +639,7 @@ public class Catalina {
     public void stop() {
 
         try {
-            // Remove the ShutdownHook first so that server.stop() 
+            // Remove the ShutdownHook first so that server.stop()
             // doesn't get invoked twice
             if (useShutdownHook) {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
@@ -708,7 +712,7 @@ public class Catalina {
                 }
             }
         }
-        // last resort - for minimal/embedded cases. 
+        // last resort - for minimal/embedded cases.
         if(catalinaHome==null) {
             catalinaHome=System.getProperty("user.dir");
         }
@@ -739,7 +743,7 @@ public class Catalina {
             }
             System.setProperty(Globals.CATALINA_BASE_PROP, catalinaBase);
         }
-        
+
         String temp = System.getProperty("java.io.tmpdir");
         if (temp == null || (!(new File(temp)).exists())
                 || (!(new File(temp)).isDirectory())) {
@@ -748,7 +752,7 @@ public class Catalina {
 
     }
 
-    
+
     protected void initStreams() {
         // Replace System.out and System.err with a custom PrintStream
         SystemLogHandler systemlog = new SystemLogHandler(System.out);
@@ -756,7 +760,7 @@ public class Catalina {
         System.setErr(systemlog);
     }
 
-    
+
     protected void initNaming() {
         // Setting additional variables
         if (!useNaming) {
@@ -785,7 +789,7 @@ public class Catalina {
         }
     }
 
-    
+
     /**
      * Set the security package access/protection.
      */
@@ -794,8 +798,8 @@ public class Catalina {
         securityConfig.setPackageDefinition();
         securityConfig.setPackageAccess();
     }
-    
-    
+
+
     // --------------------------------------- CatalinaShutdownHook Inner Class
 
     // XXX Should be moved to embedded !
@@ -823,8 +827,8 @@ public class Catalina {
             }
         }
     }
-    
-    
+
+
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( Catalina.class );
 

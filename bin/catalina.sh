@@ -474,6 +474,16 @@ elif [ "$1" = "stop" ] ; then
     fi
   fi
 
+elif [ "$1" = "configtest" ] ; then
+
+    eval \"$_RUNJAVA\" $JAVA_OPTS $CATALINA_OPTS \
+      -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
+      -Dcatalina.base=\"$CATALINA_BASE\" \
+      -Dcatalina.home=\"$CATALINA_HOME\" \
+      -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+      org.apache.catalina.startup.Bootstrap configtest 
+    exit $?
+
 elif [ "$1" = "version" ] ; then
 
     "$_RUNJAVA"   \
