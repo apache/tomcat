@@ -334,18 +334,26 @@
   <!-- Every standard pattern set above should be included in an embedded JAR -->
   <patternset id="files.tomcat-embed-core" >
     <patternset refid="files.annotations-api" />
-    <patternset refid="files.servlet-api" />
-    <patternset refid="files.el-api" />
     <patternset refid="files.bootstrap" />
-    <patternset refid="files.tomcat-api" />
     <patternset refid="files.catalina" />
-    <patternset refid="files.tomcat-coyote" />
+    <patternset refid="files.el-api" />
+    <patternset refid="files.servlet-api" />
+    <patternset refid="files.tomcat-api" />
+    <!-- These pattern sets conflict so include files directly
+      <patternset refid="files.tomcat-coyote" />
+      <patternset refid="files.tomcat-util" />
+    -->
+    <include name="org/apache/coyote/**" />
+    <include name="org/apache/tomcat/jni/**" />
+    <include name="org/apache/jk/**" />
+    <include name="org/apache/tomcat/util/**" />
+
   </patternset>
 
   <patternset id="files.tomcat-embed-jasper" >
-    <patternset refid="files.jsp-api" />
     <patternset refid="files.jasper" />
     <patternset refid="files.jasper-el" />
+    <patternset refid="files.jsp-api" />
   </patternset>
 
   <!-- Pattern sets used directly -->
