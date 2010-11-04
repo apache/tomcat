@@ -32,12 +32,12 @@ import javax.naming.StringRefAddr;
  * @version $Id$
  */
 
-public class ResourceRef
-    extends Reference {
+public class ResourceRef extends Reference {
 
+    private static final long serialVersionUID = 1L;
 
+    
     // -------------------------------------------------------------- Constants
-
 
     /**
      * Default factory for this reference.
@@ -64,6 +64,11 @@ public class ResourceRef
     public static final String AUTH = "auth";
 
 
+    /**
+     * Is this resource a singleton
+     */
+    public static final String SINGLETON = "singleton";
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -75,8 +80,8 @@ public class ResourceRef
      * @param auth Resource authentication
      */
     public ResourceRef(String resourceClass, String description, 
-                       String scope, String auth) {
-        this(resourceClass, description, scope, auth, null, null);
+                       String scope, String auth, boolean singleton) {
+        this(resourceClass, description, scope, auth, singleton, null, null);
     }
 
 
@@ -88,8 +93,8 @@ public class ResourceRef
      * @param auth Resource authentication
      */
     public ResourceRef(String resourceClass, String description, 
-                       String scope, String auth, String factory,
-                       String factoryLocation) {
+                       String scope, String auth, boolean singleton,
+                       String factory, String factoryLocation) {
         super(resourceClass, factory, factoryLocation);
         StringRefAddr refAddr = null;
         if (description != null) {
@@ -104,6 +109,9 @@ public class ResourceRef
             refAddr = new StringRefAddr(AUTH, auth);
             add(refAddr);
         }
+        // singleton is a boolean so slightly different handling
+        refAddr = new StringRefAddr(SINGLETON, Boolean.toString(singleton));
+        add(refAddr);
     }
 
 
