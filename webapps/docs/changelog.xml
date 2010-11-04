@@ -184,7 +184,8 @@
         and the 64-bit native DLL will be installed. (markt)
       </add>
       <fix>
-        <bug>49819</bug>: redesign of home page by Pid (pidster at apache )
+        <bug>49819</bug>: Redesign of home page by Pid (pidster at apache).
+        (timw)
       </fix>
     </changelog>
   </subsection>
