@@ -146,7 +146,7 @@ attribute to "true").</p>
 <p>Tomcat maintains a separate namespace of global resources for the 
 entire server.  These are configured in the 
 <a href="config/globalresources.html">
-<code><strong>&lt;GlobalNameingResources&gt;</strong></code></a> element of 
+<code><strong>&lt;GlobalNamingResources&gt;</strong></code></a> element of 
 <code>$CATALINA_BASE/conf/server.xml</code>. You may expose these resources to 
 web applications by using a 
 <a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a> to
