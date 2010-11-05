@@ -167,15 +167,6 @@ public interface Host extends Container {
 
 
     /**
-     * Return the Context that would be used to process the specified
-     * host-relative request URI, if any; otherwise return <code>null</code>.
-     *
-     * @param uri Request URI to be mapped
-     */
-    public Context map(String uri);
-
-
-    /**
      * Remove the specified alias name from the aliases for this Host.
      *
      * @param alias Alias name to be removed
