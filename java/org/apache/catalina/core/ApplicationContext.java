@@ -533,7 +533,7 @@ public class ApplicationContext
 
         DirContext resources = context.getResources();
         if (resources != null) {
-            String fullPath = context.getName() + normPath;
+            String fullPath = context.getPath() + normPath;
             String hostName = context.getParent().getName();
             try {
                 resources.lookup(path);
