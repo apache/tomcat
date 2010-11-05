@@ -140,17 +140,17 @@ public class DirContextURLConnection
                     ProxyDirContext proxyDirContext = 
                         (ProxyDirContext) context;
                     String hostName = proxyDirContext.getHostName();
-                    String contextName = proxyDirContext.getContextName();
+                    String contextPath = proxyDirContext.getContextPath();
                     if (hostName != null) {
                         if (!path.startsWith("/" + hostName + "/"))
                             return;
                         path = path.substring(hostName.length()+ 1);
                     }
-                    if (contextName != null) {
-                        if (!path.startsWith(contextName + "/")) {
+                    if (contextPath != null) {
+                        if (!path.startsWith(contextPath + "/")) {
                             return;
                         }
-                        path = path.substring(contextName.length());
+                        path = path.substring(contextPath.length());
                     }
                 }
                 object = context.lookup(path);
@@ -432,7 +432,7 @@ public class DirContextURLConnection
                 // Strip off the hostname and the contextpath
                 int start;
                 if(context instanceof ProxyDirContext &&
-                        "".equals(((ProxyDirContext)context).getContextName())){
+                        "".equals(((ProxyDirContext)context).getContextPath())){
                     start = file.indexOf('/',1);
                 }
                 else

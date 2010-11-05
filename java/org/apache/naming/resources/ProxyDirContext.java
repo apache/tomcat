@@ -97,6 +97,12 @@ public class ProxyDirContext implements DirContext {
         }
         hostName = env.get(HOST);
         contextName = env.get(CONTEXT);
+        int i = contextName.indexOf('#');
+        if (i == -1) {
+            contextPath = contextName;
+        } else {
+            contextPath = contextName.substring(0, i);
+        }
     }
 
 
@@ -144,6 +150,12 @@ public class ProxyDirContext implements DirContext {
      * Context name.
      */
     protected String contextName;
+
+
+    /**
+     * Context path.
+     */
+    protected String contextPath;
 
 
     /**
@@ -220,6 +232,14 @@ public class ProxyDirContext implements DirContext {
      */
     public String getContextName() {
         return this.contextName;
+    }
+
+
+    /**
+     * Return the context path.
+     */
+    public String getContextPath() {
+        return this.contextPath;
     }
 
 
