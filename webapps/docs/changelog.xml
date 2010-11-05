@@ -91,7 +91,7 @@
         Improve debug logging for MapperListener registration. (markt)
       </add>
       <add>
-        Expose names of LifecycleListeners and ContainerListers for
+        Expose names of LifecycleListeners and ContainerListeners for
         StandardContext via JMX. (markt)
       </add>
       <add>
@@ -104,6 +104,9 @@
       <fix>
         Make Tomcat more tolerant of <code>null</code> when generating JMX names
         for Valves. (markt)
+      </fix>
+      <fix>
+        Make AccessLogValve attribute <code>enabled</code> changeable to JMX. (pero)
       </fix>
     </changelog>
   </subsection>
