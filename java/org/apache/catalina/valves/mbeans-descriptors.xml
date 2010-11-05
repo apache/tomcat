@@ -53,6 +53,7 @@
                
     <attribute name="enabled"
                description="Enable Access Logging"
+               is="false"
                type="boolean"/>
 
     <attribute name="fileDateFormat"
@@ -164,7 +165,7 @@
                
      <attribute name="enabled"
                description="Enable Access Logging"
-               is="true"
+               is="false"
                type="boolean"/>
 
     <attribute name="fileDateFormat"
