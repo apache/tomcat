@@ -1356,14 +1356,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         
         if (container instanceof Context) {
             name.append(",context=");
-            Context context = (Context) container;
-            
-            String contextName = ((Context)container).getName();
+            String contextName = container.getName();
             if (!contextName.startsWith("/")) {
-                contextName = "/" + contextName;
+                name.append('/');
             }
             name.append(contextName);
             
+            Context context = (Context) container;
             name.append(",host=");
             name.append(context.getParent().getName());
         } else {
