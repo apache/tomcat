@@ -643,56 +643,6 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the Context that would be used to process the specified
-     * host-relative request URI, if any; otherwise return <code>null</code>.
-     *
-     * @param uri Request URI to be mapped
-     */
-    @Override
-    public Context map(String uri) {
-
-        if (log.isDebugEnabled())
-            log.debug("Mapping request URI '" + uri + "'");
-        if (uri == null)
-            return (null);
-
-        // Match on the longest possible context path prefix
-        if (log.isTraceEnabled())
-            log.trace("  Trying the longest context path prefix");
-        Context context = null;
-        String mapuri = uri;
-        while (true) {
-            context = (Context) findChild(mapuri);
-            if (context != null)
-                break;
-            int slash = mapuri.lastIndexOf('/');
-            if (slash < 0)
-                break;
-            mapuri = mapuri.substring(0, slash);
-        }
-
-        // If no Context matches, select the default Context
-        if (context == null) {
-            if (log.isTraceEnabled())
-                log.trace("  Trying the default context");
-            context = (Context) findChild("");
-        }
-
-        // Complain if no Context has been selected
-        if (context == null) {
-            log.error(sm.getString("standardHost.mappingError", uri));
-            return (null);
-        }
-
-        // Return the mapped Context (if any)
-        if (log.isDebugEnabled())
-            log.debug(" Mapped to context '" + context.getPath() + "'");
-        return (context);
-
-    }
-
-
-    /**
      * Remove the specified alias name from the aliases for this Host.
      *
      * @param alias Alias name to be removed
