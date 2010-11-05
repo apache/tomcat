@@ -1699,11 +1699,11 @@ public class MBeanUtils {
                 keyProperties.append(",servlet=");
                 keyProperties.append(c.getName());
             } else if (c instanceof Context) {
-                String contextName = ((Context)container).getName();
-                if (!contextName.startsWith("/")) {
-                    contextName = "/" + contextName;
-                }
                 keyProperties.append(",context=");
+                String contextName = c.getName();
+                if (!contextName.startsWith("/")) {
+                    keyProperties.append('/');
+                }
                 keyProperties.append(contextName);
             } else if (c instanceof Host) {
                 keyProperties.append(",host=");
