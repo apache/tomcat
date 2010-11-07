@@ -87,6 +87,9 @@
         ensure that <code>Context</code> objects are only destroyed once.
         (markt)
       </fix>
+      <fix>
+        <bug>50228</bug>: Improve recycling of BodyContentImpl. (kkolinko)
+      </fix>
       <add>
         Improve debug logging for MapperListener registration. (markt)
       </add>
