@@ -60,8 +60,7 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
     Apache Tomcat on a variety of platforms.</li>
 <li><a href="appdev/index.html"><strong>First web application</strong></a>
     - An introduction to the concepts of a <em>web application</em> as defined
-    in the <a href="http://java.sun.com/products/servlet/download.html">Servlet
-    2.4 Specification</a>.  Covers basic organization of your web application
+    in the Servlet Specification.  Covers basic organization of your web application
     source tree, the structure of a web application archive, and an
     introduction to the web application deployment descriptor
     (<code>/WEB-INF/web.xml</code>).</li>
