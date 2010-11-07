@@ -767,6 +767,7 @@ public class PageContextImpl extends PageContext {
 
     @Override
     public JspWriter popBody() {
+        outs[depth].setWriter(null);
         depth--;
         if (depth >= 0) {
             out = outs[depth];
