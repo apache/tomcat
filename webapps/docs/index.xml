@@ -126,6 +126,10 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
     Extensions available over regular, blocking IO.</li>
 <li><a href="extras.html"><strong>Additional Components</strong></a> -
     Obtaining additional, optional components.</li>
+<li><a href="maven-jars.html"><strong>Using Tomcat libraries with Maven</strong></a> -
+    Obtaining Tomcat jars through Maven.</li>
+<li><a href="security-howto.html"><strong>Security Considerations</strong></a> -
+    Options to consider when securing an Apache Tomcat installation.</li>
 
 </ol>
 
