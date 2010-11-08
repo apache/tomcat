@@ -131,7 +131,7 @@ request.setAttribute("tomcat7DocUrl", "/docs/");
                 <div id="low-docs" class="">
                     <div class="curved container">
                         <h3>Documentation</h3>
-                        <h4><a href="${tomcat7Url}tomcat-7.0-doc">Tomcat 7.0 Documentation</a></h4>
+                        <h4><a href="${tomcat7DocUrl}">Tomcat 7.0 Documentation</a></h4>
                         <h4><a href="${tomcat7DocUrl}config/">Tomcat 7.0 Configuration</a></h4>
                         <h4><a href="http://wiki.apache.org/tomcat/FrontPage">Tomcat Wiki</a></h4>
                         <p>Find additional important configuration information in:</p>
