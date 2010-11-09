@@ -195,6 +195,7 @@ public class JspHelper {
      *
      * See also OutSupport.writeEscapedXml().
      */
+    @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(String buffer) {
         if (buffer == null) {
             return "";
