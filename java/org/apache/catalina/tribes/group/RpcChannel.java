@@ -44,7 +44,8 @@ public class RpcChannel implements ChannelListener{
     private Channel channel;
     private RpcCallback callback;
     private byte[] rpcId;
-    
+    private int replyMessageOptions = 0;
+
     private HashMap<RpcCollectorKey, RpcCollector> responseMap = new HashMap<RpcCollectorKey, RpcCollector>();
 
     /**
@@ -130,7 +131,8 @@ public class RpcChannel implements ChannelListener{
             rmsg.reply = true;
             rmsg.message = reply;
             try {
-                channel.send(new Member[] {sender}, rmsg,0);
+                channel.send(new Member[] {sender}, rmsg,
+                        replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
             }catch ( Exception x )  {
                 log.error("Unable to send back reply in RpcChannel.",x);
             }
@@ -178,7 +180,14 @@ public class RpcChannel implements ChannelListener{
         this.rpcId = rpcId;
     }
 
+    public int getReplyMessageOptions() {
+        return replyMessageOptions;
+    }
 
+    public void setReplyMessageOptions(int replyMessageOptions) {
+        this.replyMessageOptions = replyMessageOptions;
+    }
+        
     /**
      * 
      * Class that holds all response.
