@@ -163,6 +163,11 @@
         If maxInactiveInterval is negative, an access message is not sending. 
         (kfujino)
       </fix>
+      <fix>
+        <bug>50184</bug>: Add an option to the RpcChannel to enable the Channel
+        send options to be set for the reply message. Based on a patch by Ariel.
+        (markt))
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
