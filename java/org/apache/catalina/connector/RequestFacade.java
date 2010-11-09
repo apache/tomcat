@@ -1028,7 +1028,7 @@ public class RequestFacade implements HttpServletRequest {
     @Override
     public AsyncContext startAsync(ServletRequest request, ServletResponse response)
     throws IllegalStateException {
-        return request.startAsync(request, response);
+        return this.request.startAsync(request, response);
     }
 
 
