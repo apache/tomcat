@@ -109,7 +109,12 @@
         for Valves. (markt)
       </fix>
       <fix>
-        Make AccessLogValve attribute <code>enabled</code> changeable to JMX. (pero)
+        Make AccessLogValve attribute <code>enabled</code> changeable via JMX.
+        (pero)
+      </fix>
+      <fix>
+        Correct infinite loop if <code>ServletRequest.startAsync(ServletRequest,
+        ServletResponse)</code> was called. (markt)
       </fix>
     </changelog>
   </subsection>
