@@ -116,6 +116,11 @@
         Correct infinite loop if <code>ServletRequest.startAsync(ServletRequest,
         ServletResponse)</code> was called. (markt)
       </fix>
+      <fix>
+        <bug>50232</bug>: Remove dependency between StoreBase and
+        PersistentManager and associated code clean-up. Patch provided by
+        Tiago Batista. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
