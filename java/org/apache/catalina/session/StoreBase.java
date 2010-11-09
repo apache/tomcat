@@ -167,7 +167,15 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 if (manager.getContainer().getLogger().isDebugEnabled()) {
                     manager.getContainer().getLogger().debug(getStoreName()+ ": processExpires expire store session " + keys[i] );
                 }
-                if ( ( (PersistentManagerBase) manager).isLoaded( keys[i] )) {
+                boolean isLoaded = false;
+                try {
+                    if (manager.findSession(keys[i]) != null) {
+                        isLoaded = true;
+                    }
+                } catch (IOException ioe) {
+                    // Ignore - session will be expired
+                }
+                if (isLoaded) {
                     // recycle old backup session
                     session.recycle();
                 } else {
