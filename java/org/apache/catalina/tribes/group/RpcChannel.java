@@ -81,7 +81,8 @@ public class RpcChannel implements ChannelListener{
         if ( destination==null || destination.length == 0 ) return new Response[0];
         
         //avoid dead lock
-        channelOptions = channelOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
+        int sendOptions =
+            channelOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
         
         RpcCollectorKey key = new RpcCollectorKey(UUIDGenerator.randomUUID(false));
         RpcCollector collector = new RpcCollector(key,rpcOptions,destination.length,timeout);
@@ -89,7 +90,7 @@ public class RpcChannel implements ChannelListener{
             synchronized (collector) {
                 if ( rpcOptions != NO_REPLY ) responseMap.put(key, collector);
                 RpcMessage rmsg = new RpcMessage(rpcId, key.id, message);
-                channel.send(destination, rmsg, channelOptions);
+                channel.send(destination, rmsg, sendOptions);
                 if ( rpcOptions != NO_REPLY ) collector.wait(timeout);
             }
         } catch ( InterruptedException ix ) {
@@ -101,6 +102,7 @@ public class RpcChannel implements ChannelListener{
         return collector.getResponses();
     }
     
+    @Override
     public void messageReceived(Serializable msg, Member sender) {
         RpcMessage rmsg = (RpcMessage)msg;
         RpcCollectorKey key = new RpcCollectorKey(rmsg.uuid);
@@ -144,6 +146,7 @@ public class RpcChannel implements ChannelListener{
         breakdown();
     }
     
+    @Override
     public boolean accept(Serializable msg, Member sender) {
         if ( msg instanceof RpcMessage ) {
             RpcMessage rmsg = (RpcMessage)msg;
