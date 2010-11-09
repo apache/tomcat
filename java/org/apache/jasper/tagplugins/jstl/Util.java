@@ -178,6 +178,7 @@ public class Util {
      * 
      * taken from org.apache.taglibs.standard.tag.common.core.Util
      */
+    @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(String buffer) {
         int start = 0;
         int length = buffer.length();
