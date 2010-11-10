@@ -151,162 +151,188 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
-            /*
-             * Several components end up calling:
-             * sun.awt.AppContext.getAppContext()
-             * 
-             * Those libraries / components known to trigger memory leaks due to
-             * eventual calls to getAppContext() are:
-             * - Google Web Toolkit via its use of javax.imageio
-             * - Tomcat via its use of java.beans.Introspector.flushCaches() in
-             *   1.6.0_15 onwards
-             * - others TBD
-             */
-            
-            // Trigger a call to sun.awt.AppContext.getAppContext(). This will
-            // pin the common class loader in memory but that shouldn't be an
-            // issue.
-            if (appContextProtection) {
-                ImageIO.getCacheDirectory();
-            }
-            
-            /*
-             * Several components end up calling:
-             * sun.misc.GC.requestLatency(long)
-             * 
-             * Those libraries / components known to trigger memory leaks due to
-             * eventual calls to requestLatency(long) are:
-             * - javax.management.remote.rmi.RMIConnectorServer.start()
-             */
-            if (gcDaemonProtection) {
-                try {
-                    Class<?> clazz = Class.forName("sun.misc.GC");
-                    Method method = clazz.getDeclaredMethod("requestLatency",
-                            new Class[] {long.class});
-                    method.invoke(null, Long.valueOf(3600000));
-                } catch (ClassNotFoundException e) {
-                    if (System.getProperty("java.vendor").startsWith("Sun")) {
-                        log.error(sm.getString(
-                                "jreLeakListener.gcDaemonFail"), e);
-                    } else {
-                        log.debug(sm.getString(
-                                "jreLeakListener.gcDaemonFail"), e);
-                    }
-                } catch (SecurityException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (NoSuchMethodException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (IllegalArgumentException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (IllegalAccessException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                } catch (InvocationTargetException e) {
-                    log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
-                }
-            }
 
-            /*
-             * When a servlet opens a connection using a URL it will use
-             * sun.net.www.http.HttpClient which keeps a static reference to a
-             * keep-alive cache which is loaded using the web application class
-             * loader.
-             */
-            if (keepAliveProtection) {
-                try {
-                    Class.forName("sun.net.www.http.HttpClient");
-                } catch (ClassNotFoundException e) {
-                    if (System.getProperty("java.vendor").startsWith("Sun")) {
-                        log.error(sm.getString(
-                                "jreLeakListener.keepAliveFail"), e);
-                    } else {
-                        log.debug(sm.getString(
-                                "jreLeakListener.keepAliveFail"), e);
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+
+            try
+            {
+                // Use the system classloader as the victim for all this
+                // ClassLoader pinning we're about to do.
+                Thread.currentThread().setContextClassLoader(
+                        ClassLoader.getSystemClassLoader());
+
+                /*
+                 * Several components end up calling:
+                 * sun.awt.AppContext.getAppContext()
+                 * 
+                 * Those libraries / components known to trigger memory leaks
+                 * due to eventual calls to getAppContext() are:
+                 * - Google Web Toolkit via its use of javax.imageio
+                 * - Tomcat via its use of java.beans.Introspector.flushCaches()
+                 *   in 1.6.0_15 onwards
+                 * - others TBD
+                 */
+                
+                // Trigger a call to sun.awt.AppContext.getAppContext(). This
+                // will pin the system class loader in memory but that shouldn't
+                // be an issue.
+                if (appContextProtection) {
+                    ImageIO.getCacheDirectory();
+                }
+                
+                /*
+                 * Several components end up calling:
+                 * sun.misc.GC.requestLatency(long)
+                 * 
+                 * Those libraries / components known to trigger memory leaks
+                 * due to eventual calls to requestLatency(long) are:
+                 * - javax.management.remote.rmi.RMIConnectorServer.start()
+                 */
+                if (gcDaemonProtection) {
+                    try {
+                        Class<?> clazz = Class.forName("sun.misc.GC");
+                        Method method = clazz.getDeclaredMethod(
+                                "requestLatency",
+                                new Class[] {long.class});
+                        method.invoke(null, Long.valueOf(3600000));
+                    } catch (ClassNotFoundException e) {
+                        if (System.getProperty("java.vendor").startsWith(
+                                "Sun")) {
+                            log.error(sm.getString(
+                                    "jreLeakListener.gcDaemonFail"), e);
+                        } else {
+                            log.debug(sm.getString(
+                                    "jreLeakListener.gcDaemonFail"), e);
+                        }
+                    } catch (SecurityException e) {
+                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
+                                e);
+                    } catch (NoSuchMethodException e) {
+                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
+                                e);
+                    } catch (IllegalArgumentException e) {
+                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
+                                e);
+                    } catch (IllegalAccessException e) {
+                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
+                                e);
+                    } catch (InvocationTargetException e) {
+                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
+                                e);
                     }
                 }
-            }
-            
-            /*
-             * Calling getPolicy retains a static reference to the context class
-             * loader.
-             */
-            if (securityPolicyProtection) {
-                try {
-                    // Policy.getPolicy();
-                    Class<?> policyClass = Class
-                            .forName("javax.security.auth.Policy");
-                    Method method = policyClass.getMethod("getPolicy");
-                    method.invoke(null);
-                } catch(ClassNotFoundException e) {
-                    // Ignore. The class is deprecated.
-                } catch(SecurityException e) {
-                    // Ignore. Don't need call to getPolicy() to be successful,
-                    // just need to trigger static initializer.
-                } catch (NoSuchMethodException e) {
-                    log.warn(sm.getString("jreLeakListener.authPolicyFail"), e);
-                } catch (IllegalArgumentException e) {
-                    log.warn(sm.getString("jreLeakListener.authPolicyFail"), e);
-                } catch (IllegalAccessException e) {
-                    log.warn(sm.getString("jreLeakListener.authPolicyFail"), e);
-                } catch (InvocationTargetException e) {
-                    log.warn(sm.getString("jreLeakListener.authPolicyFail"), e);
+    
+                /*
+                 * When a servlet opens a connection using a URL it will use
+                 * sun.net.www.http.HttpClient which keeps a static reference to
+                 * a keep-alive cache which is loaded using the web application
+                 * class loader.
+                 */
+                if (keepAliveProtection) {
+                    try {
+                        Class.forName("sun.net.www.http.HttpClient");
+                    } catch (ClassNotFoundException e) {
+                        if (System.getProperty("java.vendor").startsWith(
+                                "Sun")) {
+                            log.error(sm.getString(
+                                    "jreLeakListener.keepAliveFail"), e);
+                        } else {
+                            log.debug(sm.getString(
+                                    "jreLeakListener.keepAliveFail"), e);
+                        }
+                    }
                 }
-            }
-
-            /*
-             * Creating a MessageDigest during web application startup
-             * initializes the Java Cryptography Architecture. Under certain
-             * conditions this starts a Token poller thread with TCCL equal
-             * to the web application class loader.
-             * 
-             * Instead we initialize JCA right now.
-             */
-            if (tokenPollerProtection) {
-                java.security.Security.getProviders();
-            }
-            
-            /*
-             * Several components end up opening JarURLConnections without first
-             * disabling caching. This effectively locks the file. Whilst more
-             * noticeable and harder to ignore on Windows, it affects all
-             * operating systems.
-             * 
-             * Those libraries/components known to trigger this issue include:
-             * - log4j versions 1.2.15 and earlier
-             * - javax.xml.bind.JAXBContext.newInstance()
-             */
-            
-            // Set the default URL caching policy to not to cache
-            if (urlCacheProtection) {
-                try {
-                    // Doesn't matter that this JAR doesn't exist - just as long as
-                    // the URL is well-formed
-                    URL url = new URL("jar:file://dummy.jar!/");
-                    URLConnection uConn = url.openConnection();
-                    uConn.setDefaultUseCaches(false);
-                } catch (MalformedURLException e) {
-                    log.error(sm.getString(
-                            "jreLeakListener.jarUrlConnCacheFail"), e);
-                } catch (IOException e) {
-                    log.error(sm.getString(
-                            "jreLeakListener.jarUrlConnCacheFail"), e);
+                
+                /*
+                 * Calling getPolicy retains a static reference to the context 
+                 * class loader.
+                 */
+                if (securityPolicyProtection) {
+                    try {
+                        // Policy.getPolicy();
+                        Class<?> policyClass = Class
+                                .forName("javax.security.auth.Policy");
+                        Method method = policyClass.getMethod("getPolicy");
+                        method.invoke(null);
+                    } catch(ClassNotFoundException e) {
+                        // Ignore. The class is deprecated.
+                    } catch(SecurityException e) {
+                        // Ignore. Don't need call to getPolicy() to be
+                        // successful, just need to trigger static initializer.
+                    } catch (NoSuchMethodException e) {
+                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
+                                e);
+                    } catch (IllegalArgumentException e) {
+                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
+                                e);
+                    } catch (IllegalAccessException e) {
+                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
+                                e);
+                    } catch (InvocationTargetException e) {
+                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
+                                e);
+                    }
                 }
-            }
-            
-            /*
-             * Haven't got to the root of what is going on with this leak but if
-             * a web app is the first to make the calls below the web
-             * application class loader will be pinned in memory.
-             */
-            if (xmlParsingProtection) {
-                DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-                try {
-                    factory.newDocumentBuilder();
-                } catch (ParserConfigurationException e) {
-                    log.error(sm.getString("jreLeakListener.xmlParseFail"), e);
+    
+                /*
+                 * Creating a MessageDigest during web application startup
+                 * initializes the Java Cryptography Architecture. Under certain
+                 * conditions this starts a Token poller thread with TCCL equal
+                 * to the web application class loader.
+                 * 
+                 * Instead we initialize JCA right now.
+                 */
+                if (tokenPollerProtection) {
+                    java.security.Security.getProviders();
                 }
+                
+                /*
+                 * Several components end up opening JarURLConnections without
+                 * first disabling caching. This effectively locks the file.
+                 * Whilst more noticeable and harder to ignore on Windows, it
+                 * affects all operating systems.
+                 * 
+                 * Those libraries/components known to trigger this issue
+                 * include:
+                 * - log4j versions 1.2.15 and earlier
+                 * - javax.xml.bind.JAXBContext.newInstance()
+                 */
+                
+                // Set the default URL caching policy to not to cache
+                if (urlCacheProtection) {
+                    try {
+                        // Doesn't matter that this JAR doesn't exist - just as
+                        // long as the URL is well-formed
+                        URL url = new URL("jar:file://dummy.jar!/");
+                        URLConnection uConn = url.openConnection();
+                        uConn.setDefaultUseCaches(false);
+                    } catch (MalformedURLException e) {
+                        log.error(sm.getString(
+                                "jreLeakListener.jarUrlConnCacheFail"), e);
+                    } catch (IOException e) {
+                        log.error(sm.getString(
+                                "jreLeakListener.jarUrlConnCacheFail"), e);
+                    }
+                }
+                
+                /*
+                 * Haven't got to the root of what is going on with this leak
+                 * but if a web app is the first to make the calls below the web
+                 * application class loader will be pinned in memory.
+                 */
+                if (xmlParsingProtection) {
+                    DocumentBuilderFactory factory =
+                        DocumentBuilderFactory.newInstance();
+                    try {
+                        factory.newDocumentBuilder();
+                    } catch (ParserConfigurationException e) {
+                        log.error(sm.getString("jreLeakListener.xmlParseFail"),
+                                e);
+                    }
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(loader);
             }
         }
     }
-
 }
