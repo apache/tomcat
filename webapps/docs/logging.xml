@@ -235,13 +235,46 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
         <li>Create a file called log4j.properties with the following content 
             and save it into $CATALINA_HOME/lib.
           <source>
-log4j.rootLogger=INFO, R <br />
-log4j.appender.R=org.apache.log4j.RollingFileAppender <br />
-log4j.appender.R.File=${catalina.base}/logs/tomcat.log <br />
-log4j.appender.R.MaxFileSize=10MB <br />
-log4j.appender.R.MaxBackupIndex=10 <br />
-log4j.appender.R.layout=org.apache.log4j.PatternLayout <br />
-log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
+log4j.rootLogger=INFO, CATALINA
+
+# Define all the appenders
+log4j.appender.CATALINA=org.apache.log4j.DailyRollingFileAppender<br />
+log4j.appender.CATALINA.file=${catalina.base}/logs/catalina.<br />
+log4j.appender.CATALINA.encoding=UTF-8<br />
+# Roll-over the log once per day<br />
+log4j.appender.CATALINA.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.CATALINA.conversionPattern = %d [%t] %-5p %c- %m%n<br />
+log4j.appender.CATALINA.append=true<br />
+<br />
+log4j.appender.LOCALHOST=org.apache.log4j.DailyRollingFileAppender<br />
+log4j.appender.LOCALHOST.file=${catalina.base}/logs/localhost.<br />
+log4j.appender.LOCALHOST.encoding=UTF-8<br />
+log4j.appender.LOCALHOST.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.LOCALHOST.conversionPattern = %d [%t] %-5p %c- %m%n<br />
+log4j.appender.LOCALHOST.append=true<br />
+
+log4j.appender.MANAGER=org.apache.log4j.DailyRollingFileAppender<br />
+log4j.appender.MANAGER.file=${catalina.base}/logs/manager.<br />
+log4j.appender.MANAGER.encoding=UTF-8<br />
+log4j.appender.MANAGER.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.MANAGER.conversionPattern = %d [%t] %-5p %c- %m%n<br />
+log4j.appender.MANAGER.append=true<br />
+
+log4j.appender.HOST-MANAGER=org.apache.log4j.DailyRollingFileAppender<br />
+log4j.appender.HOST-MANAGER.file=${catalina.base}/logs/host-manager.<br />
+log4j.appender.HOST-MANAGER.encoding=UTF-8<br />
+log4j.appender.HOST-MANAGER.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.HOST-MANAGER.conversionPattern = %d [%t] %-5p %c- %m%n<br />
+log4j.appender.HOST-MANAGER.append=true<br />
+
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender<br />
+log4j.appender.CONSOLE.encoding=UTF-8<br />
+log4j.appender.CONSOLE.conversionPattern = %d [%t] %-5p %c- %m%n<br />
+<br />
+# Configure which loggers log to which appenders<br />
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO, LOCALHOST<br />
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=INFO, MANAGER<br />
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=INFO, HOST-MANAGER<br />
           </source>
         </li>
 
@@ -251,7 +284,7 @@ log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
         <li>Build or download the additional logging components. See the
             <a href="extras.html">extras components</a> documentation for
             details.</li>
-        
+
         <li>Replace <code>$CATALINA_HOME/bin/tomcat-juli.jar</code> with
             <code>output/extras/tomcat-juli.jar</code>.</li>
 
@@ -265,11 +298,10 @@ log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
     </p>
 
     <p>
-      This log4j configuration sets up a file called tomcat.log in your 
-      Tomcat logs folder with a maximum file size of 10MB and
-      up to 10 backups.  INFO level is specified which will result in a similar
-      level of detail to the standard java.util.logging confgiuration. Use DEBUG
-      level logging for the most verbose output from Tomcat.
+      This log4j configuration mirrors the default java.util.logging setup
+      that ships with Tomcat: both the manager and host-manager apps get an
+      individual log file, and everything else goes to the "catalina.log" log
+      file. Each file is rolled-over once per day.
     </p>
         
     <p>
