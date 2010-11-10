@@ -87,6 +87,12 @@
         ensure that <code>Context</code> objects are only destroyed once.
         (markt)
       </fix>
+      <add>
+        <bug>50222</bug>: Modify memory leak prevention code so it pins the
+        system class loader in memory rather than than the common class loader,
+        which is better for embedded systems. Patch provided by Christopher
+        Schultz. (markt) 
+      </add>
       <fix>
         <bug>50228</bug>: Improve recycling of BodyContentImpl. (kkolinko)
       </fix>
