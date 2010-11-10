@@ -111,6 +111,7 @@ public class MimeHeaders {
      * Creates a new MimeHeaders object using a default buffer size.
      */
     public MimeHeaders() {
+        // NO-OP
     }
 
     /**
@@ -392,10 +393,12 @@ class NamesEnumerator implements Enumeration<String> {
         pos++;
     }
     
+    @Override
     public boolean hasMoreElements() {
         return next!=null;
     }
 
+    @Override
     public String nextElement() {
         String current=next;
         findNext();
@@ -433,10 +436,12 @@ class ValuesEnumerator implements Enumeration<String> {
         pos++;
     }
     
+    @Override
     public boolean hasMoreElements() {
         return next!=null;
     }
 
+    @Override
     public String nextElement() {
         MessageBytes current=next;
         findNext();
@@ -458,6 +463,7 @@ class MimeHeaderField {
      * Creates a new, uninitialized header field.
      */
     public MimeHeaderField() {
+        // NO-OP
     }
 
     public void recycle() {

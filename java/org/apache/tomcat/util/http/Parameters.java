@@ -52,10 +52,8 @@ public final class Parameters {
     String encoding=null;
     String queryStringEncoding=null;
     
-    /**
-     * 
-     */
     public Parameters() {
+        // NO-OP
     }
 
     public void setQuery( MessageBytes queryMB ) {
