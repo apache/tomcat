@@ -123,6 +123,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>49860</bug>: Complete support for handling trailing headers in
+        chunked HTTP requests. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
@@ -606,8 +614,8 @@
         the connectors. (markt)
       </update>
       <fix>
-        <bug>49860</bug>: Add support for trailing headers in chunked HTTP
-        requests. (markt)
+        <bug>49860</bug>: Add partial support for trailing headers in chunked
+        HTTP requests. (markt)
       </fix>
     </changelog>
   </subsection>
