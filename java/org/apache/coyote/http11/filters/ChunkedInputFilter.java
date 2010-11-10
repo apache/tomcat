@@ -100,6 +100,12 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     /**
+     * Byte chunk used to store trailing headers.
+     */
+    protected ByteChunk trailingHeaders = new ByteChunk();
+
+
+    /**
      * Flag set to true if the next call to doRead() must parse a CRLF pair
      * before doing anything else.
      */
@@ -236,6 +242,7 @@ public class ChunkedInputFilter implements InputFilter {
         pos = 0;
         lastValid = 0;
         endChunk = false;
+        trailingHeaders.recycle();
     }
 
 
@@ -377,7 +384,6 @@ public class ChunkedInputFilter implements InputFilter {
     }
 
     
-    @SuppressWarnings("null") // headerValue cannot be null
     private boolean parseHeader() throws IOException {
 
         MimeHeaders headers = request.getMimeHeaders();
@@ -406,7 +412,7 @@ public class ChunkedInputFilter implements InputFilter {
         }
     
         // Mark the current buffer position
-        int start = pos;
+        int start = trailingHeaders.getEnd();
     
         //
         // Reading the header name
@@ -424,29 +430,33 @@ public class ChunkedInputFilter implements InputFilter {
                     throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
             }
     
-            if (buf[pos] == Constants.COLON) {
-                colon = true;
-                headerValue = headers.addValue(buf, start, pos - start);
-            }
             chr = buf[pos];
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
                 buf[pos] = (byte) (chr - Constants.LC_OFFSET);
+            }
+
+            if (buf[pos] == Constants.COLON) {
+                colon = true;
+            } else {
+                trailingHeaders.append(buf[pos]);
             }
     
             pos++;
     
         }
+        headerValue = headers.addValue(trailingHeaders.getBytes(), start,
+                trailingHeaders.getEnd() - start);
     
         // Mark the current buffer position
-        start = pos;
-        int realPos = pos;
-    
+        start = trailingHeaders.getEnd();
+
         //
         // Reading the header value (which can be spanned over multiple lines)
         //
     
         boolean eol = false;
         boolean validLine = true;
+        int lastSignificantChar = 0;
     
         while (validLine) {
     
@@ -469,8 +479,6 @@ public class ChunkedInputFilter implements InputFilter {
     
             }
     
-            int lastSignificantChar = realPos;
-    
             // Reading bytes until the end of the line
             while (!eol) {
     
@@ -485,19 +493,15 @@ public class ChunkedInputFilter implements InputFilter {
                 } else if (buf[pos] == Constants.LF) {
                     eol = true;
                 } else if (buf[pos] == Constants.SP) {
-                    buf[realPos] = buf[pos];
-                    realPos++;
+                    trailingHeaders.append(buf[pos]);
                 } else {
-                    buf[realPos] = buf[pos];
-                    realPos++;
-                    lastSignificantChar = realPos;
+                    trailingHeaders.append(buf[pos]);
+                    lastSignificantChar = trailingHeaders.getEnd();
                 }
     
                 pos++;
     
             }
-    
-            realPos = lastSignificantChar;
     
             // Checking the first character of the new line. If the character
             // is a LWS, then it's a multiline header
@@ -515,14 +519,14 @@ public class ChunkedInputFilter implements InputFilter {
                 eol = false;
                 // Copying one extra space in the buffer (since there must
                 // be at least one space inserted between the lines)
-                buf[realPos] = chr;
-                realPos++;
+                trailingHeaders.append(chr);
             }
     
         }
     
         // Set the header value
-        headerValue.setBytes(buf, start, realPos - start);
+        headerValue.setBytes(trailingHeaders.getBytes(), start,
+                lastSignificantChar - start);
     
         return true;
     }
