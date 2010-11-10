@@ -46,7 +46,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request =
+        String[] request = new String[]{
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
@@ -59,16 +59,16 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "4" + SimpleHttpClient.CRLF +
             "&b=1" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
-            "x-trailer: TestTestTest" + SimpleHttpClient.CRLF +
-            SimpleHttpClient.CRLF;
+            "x-trailer: Test", "TestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF };
 
         TrailerClient client = new TrailerClient();
         client.setPort(getPort());
-        client.setRequest(new String[] {request});
+        client.setRequest(request);
 
         client.connect();
         client.processRequest();
-        assertEquals("null7TestTestTest", client.getResponseBody());
+        assertEquals("null7TestTestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz", client.getResponseBody());
     }
     
     public void testNoTrailingHeaders() throws Exception {
