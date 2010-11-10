@@ -189,6 +189,11 @@
         Localize messages in the Host Manager application based on the Locale of
         the user rather than the default Locale of the server. (markt)
       </fix>
+      <add>
+        <bug>50242</bug>: Provide a sample log4j  configuration that more
+        closely matches the default JULI configuration. Patch provided by
+        Christopher Schultz. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
