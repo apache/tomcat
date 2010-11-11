@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.catalina.DistributedManager;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
@@ -36,7 +37,8 @@ import org.apache.juli.logging.LogFactory;
  *@author Filip Hanik
  *@version 1.0
  */
-public class BackupManager extends ClusterManagerBase implements MapOwner {
+public class BackupManager extends ClusterManagerBase
+        implements MapOwner, DistributedManager {
 
     private static final Log log = LogFactory.getLog(BackupManager.class);
 
@@ -254,22 +256,13 @@ public class BackupManager extends ClusterManagerBase implements MapOwner {
         return result;
     }
 
+    @Override
     public int getActiveSessionsFull() {
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
         return map.sizeFull();
     }
 
-    public String listSessionIdsFull() {
-        StringBuilder sb=new StringBuilder();
-        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
-        @SuppressWarnings("unchecked") // sessions is of type Map<String, Session>
-        Iterator<String> keys = map.keySetFull().iterator();
-        while (keys.hasNext()) {
-            sb.append(keys.next()).append(" ");
-        }
-        return sb.toString();
-    }
-    
+    @Override
     public Set<String> getSessionIdsFull() {
         Set<String> sessionIds = new HashSet<String>();
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;

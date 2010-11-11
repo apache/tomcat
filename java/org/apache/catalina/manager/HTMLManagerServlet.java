@@ -45,9 +45,9 @@ import javax.servlet.http.Part;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.DistributedManager;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.ha.session.BackupManager;
 import org.apache.catalina.manager.util.BaseSessionComparator;
 import org.apache.catalina.manager.util.ReverseComparator;
 import org.apache.catalina.manager.util.SessionUtils;
@@ -517,9 +517,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     (request.getContextPath() +
                      "/html/sessions?path=" + URL_ENCODER.encode(displayPath));
                 Manager manager = ctxt.getManager(); 
-                if (manager instanceof BackupManager && showProxySessions) {
+                if (manager instanceof DistributedManager && showProxySessions) {
                     args[5] = new Integer(
-                            ((BackupManager)manager).getActiveSessionsFull());
+                            ((DistributedManager)manager).getActiveSessionsFull());
                 } else if (ctxt.getManager() != null){
                     args[5] = new Integer(manager.getActiveSessions());
                 } else {
@@ -871,10 +871,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
         Manager manager = ctxt.getManager();
         List<Session> sessions = new ArrayList<Session>();
         sessions.addAll(Arrays.asList(manager.findSessions()));
-        if (manager instanceof BackupManager && showProxySessions) {
+        if (manager instanceof DistributedManager && showProxySessions) {
             // Add dummy proxy sessions
             Set<String> sessionIds =
-                ((BackupManager) manager).getSessionIdsFull();
+                ((DistributedManager) manager).getSessionIdsFull();
             // Remove active (primary and backup) session IDs from full list
             for (Session session : sessions) {
                 sessionIds.remove(session.getId());
