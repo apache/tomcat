@@ -196,31 +196,25 @@ public abstract class RequestFilter
 
         if (list == null)
             return (new Pattern[0]);
-        list = list.trim();
-        if (list.length() < 1)
-            return (new Pattern[0]);
-        list += ",";
-
-        ArrayList<Pattern> reList = new ArrayList<Pattern>();
-        while (list.length() > 0) {
-            int comma = list.indexOf(',');
-            if (comma < 0)
-                break;
-            String pattern = list.substring(0, comma).trim();
-            try {
-                reList.add(Pattern.compile(pattern));
-            } catch (PatternSyntaxException e) {
-                IllegalArgumentException iae = new IllegalArgumentException
-                    (sm.getString("requestFilterFilter.syntax", pattern));
-                iae.initCause(e);
-                throw iae;
+        
+        ArrayList<Pattern> result = new ArrayList<Pattern>();
+        
+        String[] patterns = list.split(",");
+        for (String pattern : patterns) {
+            pattern = pattern.trim();
+            if (pattern.length() > 0) {
+                try {
+                    result.add(Pattern.compile(pattern));
+                } catch (PatternSyntaxException e) {
+                    IllegalArgumentException iae = new IllegalArgumentException
+                        (sm.getString("requestFilterFilter.syntax", pattern));
+                    iae.initCause(e);
+                    throw iae;
+                }
             }
-            list = list.substring(comma + 1);
         }
 
-        Pattern reArray[] = new Pattern[reList.size()];
-        return reList.toArray(reArray);
-
+        return result.toArray(new Pattern[result.size()]);
     }
 
 
