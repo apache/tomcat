@@ -218,6 +218,9 @@
         WebDAV via the provision of a new configuration option,
         allowSpecialPaths. (markt) 
       </add>
+      <fix>
+        Correct broken links for on-line JavaDocs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
