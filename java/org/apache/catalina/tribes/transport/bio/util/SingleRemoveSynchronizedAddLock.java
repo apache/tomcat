@@ -18,8 +18,8 @@
 package org.apache.catalina.tribes.transport.bio.util;
 
 /**
- * The class <b>SingleRemoveSynchronizedAddLock</b> implement locking for accessing the queue
- * by a single remove thread and multiple add threads.
+ * The class <b>SingleRemoveSynchronizedAddLock</b> implement locking for
+ * accessing the queue by a single remove thread and multiple add threads.
  *
  * A thread is only allowed to be either the remove or
  * an add thread.
@@ -37,7 +37,7 @@ package org.apache.catalina.tribes.transport.bio.util;
  * the remove thread will get the lock first.
  *
  * The remove thread removes all entries in the queue
- * at once and proceeses them without further
+ * at once and processes them without further
  * polling the queue.
  *
  * The lock is not reentrant, in the sense, that all
@@ -52,6 +52,7 @@ package org.apache.catalina.tribes.transport.bio.util;
 public class SingleRemoveSynchronizedAddLock {
     
     public SingleRemoveSynchronizedAddLock() {
+        // NO-OP
     }
     
     public SingleRemoveSynchronizedAddLock(boolean dataAvailable) {
