@@ -465,11 +465,12 @@ FunctionEnd
 ; 64-bit JVMs, also determines if it is x64 or ia64
 Function checkJava
 
-  IfSilent +3
+  IfSilent SilentFindJavaHome
   !insertmacro MUI_INSTALLOPTIONS_READ $5 "jvm.ini" "Field 2" "State"
   Goto TestJavaHome
   
   ; Silent install so try and find JavaHome from registry
+SilentFindJavaHome:
   Call findJavaHome
   Pop $5
   
@@ -568,7 +569,7 @@ FunctionEnd
 ; ====================
 ;
 ; Find the full JVM path, and put the result on top of the stack
-; Argument: JVM base path (result of findJavaHome)
+; Implicit argument: $JavaHome
 ; Will return an empty string if the path cannot be determined
 ;
 Function findJVMPath
