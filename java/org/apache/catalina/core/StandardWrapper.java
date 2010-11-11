@@ -53,6 +53,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.InstanceEvent;
 import org.apache.catalina.InstanceListener;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.security.SecurityUtil;
@@ -737,7 +738,8 @@ public class StandardWrapper extends ContainerBase
         synchronized (mappings) {
             mappings.add(mapping);
         }
-        fireContainerEvent(ADD_MAPPING_EVENT, mapping);
+        if(parent.getState().equals(LifecycleState.STARTED))
+            fireContainerEvent(ADD_MAPPING_EVENT, mapping);
 
     }
 
@@ -1198,7 +1200,8 @@ public class StandardWrapper extends ContainerBase
         synchronized (mappings) {
             mappings.remove(mapping);
         }
-        fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
+        if(parent.getState().equals(LifecycleState.STARTED))
+            fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
 
     }
 
