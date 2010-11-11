@@ -615,7 +615,6 @@
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="docs/images/**"/>
-        <include name="docs/**/*.html"/>
         <include name="docs/WEB-INF/**"/>
         <include name="docs/appdev/*.txt"/>
         <include name="docs/appdev/sample/**"/>
@@ -623,6 +622,12 @@
       <fileset dir="webapps">
         <include name="docs/architecture/**"/>
         <exclude name="docs/architecture/*.xml"/>
+      </fileset>
+    </copy>
+    <copy todir="${tomcat.build}/webapps" encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+      <fileset dir="webapps">
+        <include name="docs/**/*.html"/>
       </fileset>
     </copy>
     <copy todir="${tomcat.build}/webapps/docs" encoding="ISO-8859-1">
