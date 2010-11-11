@@ -70,6 +70,7 @@ public class BioSender extends AbstractSender {
     // ------------------------------------------------------------- Constructor
     
     public BioSender()  {
+        // NO-OP
     }
 
 
@@ -203,6 +204,7 @@ public class BioSender extends AbstractSender {
                 try {
                     socket.close();
                 } catch (IOException x) {
+                    // Ignore
                 } finally {
                     socket = null;
                     soOut = null;
