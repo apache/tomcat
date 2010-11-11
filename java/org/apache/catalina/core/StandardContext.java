@@ -3033,8 +3033,8 @@ public class StandardContext extends ContainerBase
             welcomeFiles = results;
         }
         postWelcomeFiles();
-        fireContainerEvent(ADD_WELCOME_FILE_EVENT, name);
-
+        if(this.getState().equals(LifecycleState.STARTED))
+            fireContainerEvent(ADD_WELCOME_FILE_EVENT, name);
     }
 
 
@@ -4127,7 +4127,8 @@ public class StandardContext extends ContainerBase
 
         // Inform interested listeners
         postWelcomeFiles();
-        fireContainerEvent(REMOVE_WELCOME_FILE_EVENT, name);
+        if(this.getState().equals(LifecycleState.STARTED))
+            fireContainerEvent(REMOVE_WELCOME_FILE_EVENT, name);
 
     }
 
