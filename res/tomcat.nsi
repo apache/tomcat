@@ -399,31 +399,6 @@ FunctionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-; =====================
-; findCpuType Function
-; =====================
-;
-; Find the CPU used on the system, and put the result on the top of the
-; stack
-;
-Function findCpuType
-
-  ClearErrors
-  ; Default CPU is always x86
-  StrCpy $1 "x86"
-  ExpandEnvStrings $0 "%PROCESSOR_ARCHITEW6432%"
-  StrCmp $0 "%PROCESSOR_ARCHITEW6432%" +5 0
-  StrCmp $0 "IA64" 0 +3
-  StrCpy $1 "i64"
-  Goto FoundCpu
-  StrCpy $1 "x64"
-
-FoundCpu:
-  ; Put the result in the stack
-  Push $1
-
-FunctionEnd
-
 
 ; =====================
 ; CheckUserType Function
