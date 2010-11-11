@@ -709,6 +709,7 @@ public class RemoteIpFilter implements Filter {
      */
     private Pattern[] trustedProxies = new Pattern[0];
     
+    @Override
     public void destroy() {
         // NOOP
     }
@@ -801,6 +802,7 @@ public class RemoteIpFilter implements Filter {
     /**
      * Wrap the incoming <code>request</code> in a {@link XForwardedRequest} if the http header <code>x-forwareded-for</code> is not empty.
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             doFilter((HttpServletRequest)request, (HttpServletResponse)response, chain);
@@ -837,6 +839,7 @@ public class RemoteIpFilter implements Filter {
         return trustedProxies;
     }
     
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         if (filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
             setInternalProxies(filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER));
