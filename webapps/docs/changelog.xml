@@ -183,9 +183,13 @@
         (kfujino)
       </fix>
       <fix>
+        <bug>50183</bug>: BIO sender was not scheduling tasks to the executor
+        during normal operation. Patch provided by Ariel. (markt)
+      </fix>
+      <fix>
         <bug>50184</bug>: Add an option to the RpcChannel to enable the Channel
         send options to be set for the reply message. Based on a patch by Ariel.
-        (markt))
+        (markt)
       </fix>
     </changelog>
   </subsection>

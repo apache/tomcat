@@ -152,6 +152,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
             socket.setSoTimeout(getTimeout());
             ObjectReader reader = new ObjectReader(socket);
             task.serviceSocket(socket,reader);
+            getExecutor().execute(task);
         }//while
     }
     
