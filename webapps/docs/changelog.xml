@@ -54,7 +54,7 @@
       </fix>
       <fix>
         <bug>49180</bug>: Add option to disable log rotation in 
-        juli FileHandler. credit: Pid (pidster at apache )
+        juli FileHandler. Patch provided by Pid (pidster at apache). (funkman)
       </fix>
       <fix>
         <bug>49991</bug>: Ensure servlet request listeners are fired for
