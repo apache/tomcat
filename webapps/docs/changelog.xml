@@ -200,6 +200,11 @@
         closely matches the default JULI configuration. Patch provided by
         Christopher Schultz. (markt)
       </add>
+      <add>
+        Restore the ability to edit the contents of /WEB-INF and /META-INF via
+        WebDAV via the provision of a new configuration option,
+        allowSpecialPaths. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
