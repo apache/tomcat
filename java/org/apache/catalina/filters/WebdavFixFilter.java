@@ -33,8 +33,9 @@ import javax.servlet.http.HttpServletResponse;
  * a WebDAV client that actually works. Other workarounds that might help
  * include:
  * <ul>
- *   <li>Specifying the port, even if it is port 80, when trying to connect.</li>
- *   <li>Canceling the first authentication dialog box and then trying to
+ *   <li>Specifying the port, even if it is port 80, when trying to
+ *       connect.</li>
+ *   <li>Cancelling the first authentication dialog box and then trying to
  *       reconnect.</li>
  * </ul>
  * 
