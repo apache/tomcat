@@ -221,6 +221,13 @@
       <fix>
         Correct broken links for on-line JavaDocs. (markt)
       </fix>
+      <fix>
+        <bug>50230</bug>: Add new DistributedManager interface that is
+        implemented by the Backup Manager to remove circular dependency between
+        tomcat-catalina-ha and tomcat-catalina modules. Also allows third-party
+        distributed Manager implementations to report full session information
+        through the HTML Manager. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
