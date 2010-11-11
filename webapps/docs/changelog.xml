@@ -87,6 +87,11 @@
         ensure that <code>Context</code> objects are only destroyed once.
         (markt)
       </fix>
+      <fix>
+        <bug>50169</bug>: Ensure that when a Container is started that it
+        doesn&apos;t try and register with the mapper unless its parent has
+        already started. Patch provided by Eiji Takahashi. (markt)
+      </fix>
       <add>
         <bug>50222</bug>: Modify memory leak prevention code so it pins the
         system class loader in memory rather than than the common class loader,
