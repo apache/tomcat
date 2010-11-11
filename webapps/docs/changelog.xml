@@ -228,7 +228,7 @@
         the user to select either a 32-bit JDK or a 64-bit JDK. If a 32-bit JDK
         is selected, the 32-bit service wrapper and the 32-bit native DLL will
         be installed. If a 64-bit JDK is selected, the 64-bit service wrapper
-        and the 64-bit native DLL will be installed. (markt)
+        and the 64-bit native DLL will be installed. (markt/kkolinko)
       </add>
       <fix>
         <bug>49819</bug>: Redesign of home page by Pid (pidster at apache).
