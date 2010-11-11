@@ -132,6 +132,10 @@
         PersistentManager and associated code clean-up. Patch provided by
         Tiago Batista. (markt)
       </fix>
+      <fix>
+        <bug>50252</bug>: Prevent ClassCastException when using a
+        &lt;ResourceLink&gt;. Patch provided by Eiji Takahashi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
