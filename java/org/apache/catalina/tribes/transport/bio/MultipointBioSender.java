@@ -38,6 +38,7 @@ import org.apache.catalina.tribes.transport.MultiPointSender;
  */
 public class MultipointBioSender extends AbstractSender implements MultiPointSender {
     public MultipointBioSender() {
+        // NO-OP
     }
     
     protected long selectTimeout = 1000; 
@@ -110,10 +111,14 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         if ( x != null ) throw x;
     }
 
+    @Override
     public void add(Member member) {
-
+        // NO-OP
+        // Members are defined by the array of members specified in the call to
+        // sendMessage()
     }
 
+    @Override
     public void remove(Member member) {
         //disconnect senders
         BioSender sender = bioSenders.remove(member);
@@ -123,13 +128,13 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
 
     @Override
     public synchronized void disconnect() {
-        try {close(); }catch (Exception x){}
+        try {close(); }catch (Exception x){/* Ignore */}
         setConnected(false);
     }
 
     @Override
     public void finalize() {
-        try {disconnect(); }catch ( Exception ignore){}
+        try {disconnect(); }catch ( Exception e){/* Ignore */}
     }
 
 
