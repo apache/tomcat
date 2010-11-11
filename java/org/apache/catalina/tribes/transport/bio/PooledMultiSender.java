@@ -38,8 +38,10 @@ public class PooledMultiSender extends PooledSender {
     
 
     public PooledMultiSender() {
+        // NO-OP
     }
     
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         MultiPointSender sender = null;
         try {
