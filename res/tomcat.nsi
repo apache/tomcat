@@ -497,26 +497,61 @@ FoundJavaExe:
 FoundJvmDll:
   StrCpy "$JvmDll" $5
 
-  ; 32-bit JVM -> use 32-bit service wrapper regardless of cpu type
-  ; 64-bit JVM -> use x64 or ia64 service wrapper depending on OS architecture
-  ; Yes, this is ugly and fragile. Suggestions for a better approach welcome
-  GetTempFileName $R0
-  FileOpen $R1 $R0.bat w
-  FileWrite $R1 "@echo off$\r$\n"
-  FileWrite $R1 "$\"$JavaExe$\" -version 2>&1 | find /i $\"64-Bit$\"$\r$\n"
+  ; Read PE header of JvmDll to check for architecture
+  ; 1. Jump to 0x3c and read offset of PE header
+  ; 2. Jump to offset. Read PE header signature. It must be 'PE'\0\0 (50 45 00 00).
+  ; 3. The next word gives the machine type.
+  ; 0x014c: x86
+  ; 0x8664: x64
+  ; 0x0200: i64
+  ClearErrors
+  FileOpen $R1 "$JvmDll" r
+  IfErrors WrongPEHeader
+
+  FileSeek $R1 0x3c SET
+  FileReadByte $R1 $R2
+  FileReadByte $R1 $R3
+  IntOp $R3 $R3 << 8
+  IntOp $R2 $R2 + $R3
+
+  FileSeek $R1 $R2 SET
+  FileReadByte $R1 $R2
+  IntCmp $R2 0x50 +1 WrongPEHeader WrongPEHeader
+  FileReadByte $R1 $R2
+  IntCmp $R2 0x45 +1 WrongPEHeader WrongPEHeader
+  FileReadByte $R1 $R2
+  IntCmp $R2 0 +1 WrongPEHeader WrongPEHeader
+  FileReadByte $R1 $R2
+  IntCmp $R2 0 +1 WrongPEHeader WrongPEHeader
+
+  FileReadByte $R1 $R2
+  FileReadByte $R1 $R3
+  IntOp $R3 $R3 << 8
+  IntOp $R2 $R2 + $R3
+
+  IntCmp $R2 0x014c +1 +3 +3
+  StrCpy "$Arch" "x86"
+  Goto DonePEHeader
+
+  IntCmp $R2 0x8664 +1 +3 +3
+  StrCpy "$Arch" "x64"
+  Goto DonePEHeader
+
+  IntCmp $R2 0x0200 +1 +3 +3
+  StrCpy "$Arch" "i64"
+  Goto DonePEHeader
+
+WrongPEHeader:
+  IfSilent +2
+  MessageBox MB_OK|MB_ICONEXCLAMATION 'Cannot read PE header from "$JvmDll"$\r$\nWill assume that the architecture is x86.'
+  DetailPrint 'Cannot read PE header from "$JvmDll". Assuming the architecture is x86.'
+  StrCpy "$Arch" "x86"
+
+DonePEHeader:
   FileClose $R1
 
-  ClearErrors
-  ExecWait '"$R0.bat"'
-  IfErrors +6
-  Delete $R0.bat
-  Call findCpuType
-  Pop $5
-  StrCpy "$Arch" $5
-  Goto SetInstallDir
-  Delete $R0.bat
-  StrCpy "$Arch" "x86"
-  
+  DetailPrint 'Architecture: "$Arch"'
+
 SetInstallDir:
   StrCpy $INSTDIR $ResetInstDir
 
