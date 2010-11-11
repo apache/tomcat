@@ -420,8 +420,6 @@ public class ChunkedInputFilter implements InputFilter {
         //
     
         boolean colon = false;
-        MessageBytes headerValue = null;
-    
         while (!colon) {
     
             // Read new bytes if needed
@@ -432,20 +430,20 @@ public class ChunkedInputFilter implements InputFilter {
     
             chr = buf[pos];
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
-                buf[pos] = (byte) (chr - Constants.LC_OFFSET);
+                chr = (byte) (chr - Constants.LC_OFFSET);
             }
 
-            if (buf[pos] == Constants.COLON) {
+            if (chr == Constants.COLON) {
                 colon = true;
             } else {
-                trailingHeaders.append(buf[pos]);
+                trailingHeaders.append(chr);
             }
     
             pos++;
     
         }
-        headerValue = headers.addValue(trailingHeaders.getBytes(), start,
-                trailingHeaders.getEnd() - start);
+        MessageBytes headerValue = headers.addValue(trailingHeaders.getBytes(),
+                start, trailingHeaders.getEnd() - start);
     
         // Mark the current buffer position
         start = trailingHeaders.getEnd();
@@ -471,7 +469,8 @@ public class ChunkedInputFilter implements InputFilter {
                         throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
                 }
     
-                if ((buf[pos] == Constants.SP) || (buf[pos] == Constants.HT)) {
+                chr = buf[pos];
+                if ((chr == Constants.SP) || (chr == Constants.HT)) {
                     pos++;
                 } else {
                     space = false;
@@ -488,14 +487,15 @@ public class ChunkedInputFilter implements InputFilter {
                         throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
                 }
     
-                if (buf[pos] == Constants.CR) {
+                chr = buf[pos];
+                if (chr == Constants.CR) {
                     // Skip
-                } else if (buf[pos] == Constants.LF) {
+                } else if (chr == Constants.LF) {
                     eol = true;
-                } else if (buf[pos] == Constants.SP) {
-                    trailingHeaders.append(buf[pos]);
+                } else if (chr == Constants.SP) {
+                    trailingHeaders.append(chr);
                 } else {
-                    trailingHeaders.append(buf[pos]);
+                    trailingHeaders.append(chr);
                     lastSignificantChar = trailingHeaders.getEnd();
                 }
     
