@@ -111,9 +111,18 @@ import org.xml.sax.SAXException;
  *    &lt;url-pattern&gt;/webdavedit/*&lt;/url-pattern&gt;
  *  &lt;/servlet-mapping&gt;
  * </pre>
- * Don't forget to secure access appropriately to the editing URLs. With this
- * configuration the context will be accessible to normal users as before. Those
- * users with the necessary access will be able to edit content available via
+ * By default access to /WEB-INF and META-INF are not available via WebDAV. To
+ * enable access to these URLs, use add:
+ * <pre>
+ *  &lt;init-param&gt;
+ *    &lt;param-name&gt;allowSpecialPaths&lt;/param-name&gt;
+ *    &lt;param-value&gt;true&lt;/param-value&gt;
+ *  &lt;/init-param&gt;
+ * </pre>
+ * Don't forget to secure access appropriately to the editing URLs, especially
+ * if allowSpecialPaths is used. With the mapping configuration above, the
+ * context will be accessible to normal users as before. Those users with the
+ * necessary access will be able to edit content available via
  * http://host:port/context/content using
  * http://host:port/context/webdavedit/content
  *
@@ -258,6 +267,13 @@ public class WebdavServlet
     private int maxDepth = 3;
 
 
+    /**
+     * Is access allowed via WebDAV to the special paths (/WEB-INF and
+     * /META-INF)? 
+     */
+    private boolean allowSpecialPaths = false;
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -276,6 +292,10 @@ public class WebdavServlet
         if (getServletConfig().getInitParameter("maxDepth") != null)
             maxDepth = Integer.parseInt(
                     getServletConfig().getInitParameter("maxDepth"));
+
+        if (getServletConfig().getInitParameter("allowSpecialPaths") != null)
+            allowSpecialPaths = Boolean.parseBoolean(
+                    getServletConfig().getInitParameter("allowSpecialPaths"));
 
         // Load the MD5 helper used to calculate signatures.
         try {
@@ -365,10 +385,10 @@ public class WebdavServlet
      * @param path the full path of the resource being accessed
      * @return <code>true</code> if the resource specified is under a special path
      */
-    private static final boolean isSpecialPath(final String path) {
-        // FIXME: why isn't this just equalsIgnoreCase?
-        return path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")
-            || path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF");
+    private final boolean isSpecialPath(final String path) {
+        return !allowSpecialPaths && (
+                path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
+                path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
     }
 
 
