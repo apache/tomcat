@@ -65,7 +65,7 @@ public class BioReplicationTask extends AbstractRxTask {
         try {
             drainSocket();
         } catch ( Exception x ) {
-            log.error("Unable to service bio socket");
+            log.error("Unable to service bio socket", x);
         }finally {
             try {socket.close();}catch ( Exception e){/* Ignore */}
             try {reader.close();}catch ( Exception e){/* Ignore */}
@@ -80,7 +80,6 @@ public class BioReplicationTask extends AbstractRxTask {
     public synchronized void serviceSocket(Socket socket, ObjectReader reader) {
         this.socket = socket;
         this.reader = reader;
-        this.notify();      // awaken the thread
     }
     
     protected void execute(ObjectReader reader) throws Exception{
