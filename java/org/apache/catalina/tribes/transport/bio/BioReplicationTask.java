@@ -58,6 +58,7 @@ public class BioReplicationTask extends AbstractRxTask {
     }
 
     // loop forever waiting for work to do
+    @Override
     public synchronized void run()
     {
         if ( socket == null ) return;
@@ -66,8 +67,8 @@ public class BioReplicationTask extends AbstractRxTask {
         } catch ( Exception x ) {
             log.error("Unable to service bio socket");
         }finally {
-            try {socket.close();}catch ( Exception ignore){}
-            try {reader.close();}catch ( Exception ignore){}
+            try {socket.close();}catch ( Exception e){/* Ignore */}
+            try {reader.close();}catch ( Exception e){/* Ignore */}
             reader = null;
             socket = null;
         }
@@ -158,8 +159,8 @@ public class BioReplicationTask extends AbstractRxTask {
     @Override
     public void close() {
         setDoRun(false);
-        try {socket.close();}catch ( Exception ignore){}
-        try {reader.close();}catch ( Exception ignore){}
+        try {socket.close();}catch ( Exception e){/* Ignore */}
+        try {reader.close();}catch ( Exception e){/* Ignore */}
         reader = null;
         socket = null;
         super.close();

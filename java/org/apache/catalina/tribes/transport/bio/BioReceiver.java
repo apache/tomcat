@@ -39,6 +39,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
     protected ServerSocket serverSocket;
 
     public BioReceiver() {
+        // NO-OP
     }
 
     /**
@@ -69,6 +70,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         }
     }
     
+    @Override
     public AbstractRxTask createRxTask() {
         return getReplicationThread();
     }
@@ -89,7 +91,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         setListen(false);
         try {
             this.serverSocket.close();
-        }catch ( Exception x ) {}
+        } catch (Exception x) {/* Ignore */}
         super.stop();
     }
 
@@ -103,6 +105,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
     }
 
 
+    @Override
     public void run() {
         try {
             listen();
