@@ -38,8 +38,8 @@ public class TestCompiler extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
         
-        getUrl("http://localhost:" + getPort() + "/test/bug49726a.jsp", res,
-                headers);
+        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726a.jsp",
+                res, headers);
 
         // Check request completed
         String result = res.toString();
@@ -59,8 +59,8 @@ public class TestCompiler extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
         
-        getUrl("http://localhost:" + getPort() + "/test/bug49726b.jsp", res,
-                headers);
+        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726b.jsp",
+                res, headers);
 
         // Check request completed
         String result = res.toString();

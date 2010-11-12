@@ -132,7 +132,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49297NoSpace.jsp", res,
+                "/test/bug49nnn/bug49297NoSpace.jsp", res,
                 new HashMap<String,List<String>>());
 
 
@@ -150,7 +150,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
         tomcat.start();
 
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49297DuplicateAttr.jsp", new ByteChunk(),
+                "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(),
                 new HashMap<String,List<String>>());
 
         assertEquals(500, sc);

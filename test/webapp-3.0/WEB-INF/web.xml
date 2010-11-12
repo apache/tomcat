@@ -99,8 +99,8 @@
   <jsp-config>
     <jsp-property-group>
       <default-content-type>text/plain</default-content-type>
-      <url-pattern>/bug49726a.jsp</url-pattern>
-      <url-pattern>/bug49726b.jsp</url-pattern>
+      <url-pattern>/bug49nnn/bug49726a.jsp</url-pattern>
+      <url-pattern>/bug49nnn/bug49726b.jsp</url-pattern>
     </jsp-property-group>
   </jsp-config>
 </web-app>
