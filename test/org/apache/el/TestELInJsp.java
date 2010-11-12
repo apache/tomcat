@@ -319,7 +319,7 @@ public class TestELInJsp extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug49555.jsp");
+                "/test/bug49nnn/bug49555.jsp");
         
         String result = res.toString();
         assertEcho(result, "00-" + TesterFunctions.Inner$Class.RETVAL);
