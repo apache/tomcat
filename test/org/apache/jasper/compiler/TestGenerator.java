@@ -218,8 +218,8 @@ public class TestGenerator extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
         
-        getUrl("http://localhost:" + getPort() + "/test/bug49799.jsp", res,
-                headers);
+        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49799.jsp",
+                res, headers);
 
         // Check request completed
         String result = res.toString();

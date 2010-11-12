@@ -35,7 +35,7 @@ public class TestPageContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug49196.jsp");
+                "/test/bug49nnn/bug49196.jsp");
         
         String result = res.toString();
         assertTrue(result.contains("OK"));
