@@ -175,6 +175,10 @@
       <add>
         Add logging and JMX support to JSP unloading. (rjung)
       </add>
+      <fix>
+        <bug>50192</bug>: Improve performance for EL when running under a
+        security manager. Based on a patch by Robert Goff. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
