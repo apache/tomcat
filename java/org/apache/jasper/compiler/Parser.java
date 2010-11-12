@@ -150,7 +150,10 @@ class Parser implements TagConstants {
      * Attributes ::= (S Attribute)* S?
      */
     Attributes parseAttributes() throws JasperException {
-        UniqueAttributesImpl attrs = new UniqueAttributesImpl();
+        return parseAttributes(false);
+    }
+    Attributes parseAttributes(boolean pageDirective) throws JasperException {
+        UniqueAttributesImpl attrs = new UniqueAttributesImpl(pageDirective);
 
         reader.skipSpaces();
         int ws = 1;
@@ -177,7 +180,7 @@ class Parser implements TagConstants {
     public static Attributes parseAttributes(ParserController pc,
             JspReader reader) throws JasperException {
         Parser tmpParser = new Parser(pc, reader, false, false, null);
-        return tmpParser.parseAttributes();
+        return tmpParser.parseAttributes(true);
     }
 
     /**
@@ -327,7 +330,7 @@ class Parser implements TagConstants {
      * Attribute)*
      */
     private void parsePageDirective(Node parent) throws JasperException {
-        Attributes attrs = parseAttributes();
+        Attributes attrs = parseAttributes(true);
         Node.PageDirective n = new Node.PageDirective(attrs, start, parent);
 
         /*

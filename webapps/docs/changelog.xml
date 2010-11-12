@@ -155,7 +155,9 @@
         whitespace before the attribute name. The whitespace test can be
         disabled by setting the system property
         <code>org.apache.jasper.compiler.Parser.STRICT_WHITESPACE</code> to
-        <code>false</code>. (markt)
+        <code>false</code>. Attributes of the page directive have slightly
+        different rules. The implementation of that part of the fix is based on
+        a patch by genspring. (markt)
       </fix>
       <fix>
         <bug>50105</bug>: When processing composite EL expressions use
