@@ -35,20 +35,27 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.apache.jasper.Constants;
 
 public final class ELResolverImpl extends ELResolver {
-    private final static ELResolver DefaultResolver = new CompositeELResolver();
+    private final static ELResolver DefaultResolver;
 
     static {
-        ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
-        ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
-        ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
-        ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
-        ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
+        if (Constants.IS_SECURITY_ENABLED) {
+            DefaultResolver = null;
+        } else {
+            DefaultResolver = new CompositeELResolver();
+            ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
+        }
     }
 
     private final VariableResolver variableResolver;
+    private final ELResolver elResolver;
 
     public ELResolverImpl(VariableResolver variableResolver) {
         this.variableResolver = variableResolver;
+        this.elResolver = getDefaultResolver();
     }
 
     @Override
@@ -71,7 +78,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (!context.isPropertyResolved()) {
-            return getDefaultResolver().getValue(context, base, property);
+            return elResolver.getValue(context, base, property);
         }
         return null;
     }
@@ -97,7 +104,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (!context.isPropertyResolved()) {
-            return getDefaultResolver().getType(context, base, property);
+            return elResolver.getType(context, base, property);
         }
         return null;
     }
@@ -118,7 +125,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (!context.isPropertyResolved()) {
-            getDefaultResolver().setValue(context, base, property, value);
+            elResolver.setValue(context, base, property, value);
         }
     }
 
@@ -134,12 +141,12 @@ public final class ELResolverImpl extends ELResolver {
             return true;
         }
 
-        return getDefaultResolver().isReadOnly(context, base, property);
+        return elResolver.isReadOnly(context, base, property);
     }
 
     @Override
     public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return getDefaultResolver().getFeatureDescriptors(context, base);
+        return elResolver.getFeatureDescriptors(context, base);
     }
 
     @Override
@@ -147,7 +154,7 @@ public final class ELResolverImpl extends ELResolver {
         if (base == null) {
             return String.class;
         }
-        return getDefaultResolver().getCommonPropertyType(context, base);
+        return elResolver.getCommonPropertyType(context, base);
     }
 
     public static ELResolver getDefaultResolver() {
