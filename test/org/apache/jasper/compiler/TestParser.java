@@ -122,7 +122,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49297NoSpace.jsp", new ByteChunk(),
+                "/test/bug49nnn/bug49297NoSpace.jsp", new ByteChunk(),
                 new HashMap<String,List<String>>());
 
         assertEquals(500, sc);
@@ -138,7 +138,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49297DuplicateAttr.jsp", new ByteChunk(),
+                "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(),
                 new HashMap<String,List<String>>());
 
         assertEquals(500, sc);
