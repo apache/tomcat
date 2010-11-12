@@ -26,8 +26,6 @@ import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
-import org.apache.jasper.Constants;
-
 /**
  * Implementation of ELContext
  * 
@@ -66,22 +64,12 @@ public final class ELContextImpl extends ELContext {
 
     private final ELResolver resolver;
 
-    private FunctionMapper functionMapper;
+    private FunctionMapper functionMapper = NullFunctionMapper;
 
     private VariableMapper variableMapper;
 
     public ELContextImpl() {
         this(ELResolverImpl.getDefaultResolver());
-        if (Constants.IS_SECURITY_ENABLED) {
-            functionMapper = new FunctionMapper() {
-                @Override
-                public Method resolveFunction(String prefix, String localName) {
-                    return null;
-                }
-            };
-        } else {
-            functionMapper = NullFunctionMapper;
-        }
     }
 
     public ELContextImpl(ELResolver resolver) {
