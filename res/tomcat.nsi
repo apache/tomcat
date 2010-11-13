@@ -33,15 +33,30 @@
   VIAddVersionKey InternalName "apache-tomcat-@VERSION@.exe"
   VIProductVersion @VERSION_NUMBER@
 
-!include "MUI.nsh"
+!include "MUI2.nsh"
+!include "nsDialogs.nsh"
 !include "StrFunc.nsh"
+!include "LogicLib.nsh"
+!include "FileFunc.nsh"
 ${StrRep}
-  Var "JavaHome"
-  Var "JavaExe"
-  Var "JvmDll"
-  Var "Arch"
-  Var "ResetInstDir"
 
+Var JavaHome
+Var JavaExe
+Var JvmDll
+Var Arch
+Var ResetInstDir
+Var TomcatPort
+Var TomcatAdminEnable
+Var TomcatAdminUsername
+Var TomcatAdminPassword
+Var TomcatAdminRoles
+
+; Variables that store handles of dialog controls
+Var CtlJavaHome
+Var CtlTomcatPort
+Var CtlTomcatAdminUsername
+Var CtlTomcatAdminPassword
+Var CtlTomcatAdminRoles
 
 ;--------------------------------
 ;Configuration
@@ -56,9 +71,6 @@ ${StrRep}
   !define MUI_FINISHPAGE_NOREBOOTSUPPORT
 
   !define MUI_ABORTWARNING
-
-  !define TEMP1 $R0
-  !define TEMP2 $R1
 
   !define MUI_ICON tomcat.ico
   !define MUI_UNICON tomcat.ico
@@ -75,12 +87,21 @@ ${StrRep}
   LangString TEXT_CONF_SUBTITLE ${LANG_ENGLISH} "Tomcat basic configuration."
   LangString TEXT_CONF_PAGETITLE ${LANG_ENGLISH} ": Configuration Options"
 
+  LangString TEXT_JVM_LABEL1 ${LANG_ENGLISH} "Please select the path of a Java SE 6.0 or later JRE installed on your system."
+  LangString TEXT_CONF_LABEL_PORT ${LANG_ENGLISH} "HTTP/1.1 Connector Port"
+  LangString TEXT_CONF_LABEL_ADMIN ${LANG_ENGLISH} "Tomcat Administrator Login (optional)"
+  LangString TEXT_CONF_LABEL_ADMINUSERNAME ${LANG_ENGLISH} "User Name"
+  LangString TEXT_CONF_LABEL_ADMINPASSWORD ${LANG_ENGLISH} "Password"
+  LangString TEXT_CONF_LABEL_ADMINROLES ${LANG_ENGLISH} "Roles"
+
   ;Install Page order
   !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE INSTALLLICENSE
+  ; Use custom onLeave function with COMPONENTS page
+  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE pageComponentsLeave
   !insertmacro MUI_PAGE_COMPONENTS
-  Page custom SetConfiguration Void "$(TEXT_CONF_PAGETITLE)"
-  Page custom SetChooseJVM checkJava "$(TEXT_JVM_PAGETITLE)"
+  Page custom pageConfiguration pageConfigurationLeave "$(TEXT_CONF_PAGETITLE)"
+  Page custom pageChooseJVM pageChooseJVMLeave "$(TEXT_JVM_PAGETITLE)"
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   Page custom CheckUserType
@@ -116,9 +137,8 @@ ${StrRep}
   ; Main registry key
   InstallDirRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@" ""
 
-  !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
-  ReserveFile "jvm.ini"
-  ReserveFile "config.ini"
+  ReserveFile "${NSISDIR}\Plugins\System.dll"
+  ReserveFile "${NSISDIR}\Plugins\nsDialogs.dll"
 
 ;--------------------------------
 ;Installer Sections
@@ -220,50 +240,6 @@ SectionEnd
 
 SubSectionEnd
 
-Section "Start Menu Items" SecMenu
-
-  SectionIn 1 2 3
-
-  SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Home Page.lnk" \
-                 "http://tomcat.apache.org/"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Welcome.lnk" \
-                 "http://127.0.0.1:$R0/"
-
-  IfFileExists "$INSTDIR\webapps\manager" 0 NoManagerApp
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Manager.lnk" \
-                 "http://127.0.0.1:$R0/manager/html"
-
-NoManagerApp:
-
-  IfFileExists "$INSTDIR\webapps\webapps\tomcat-docs" 0 NoDocumentaion
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Documentation.lnk" \
-                 "$INSTDIR\webapps\tomcat-docs\index.html"
-
-NoDocumentaion:
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
-                 "$INSTDIR\Uninstall.exe"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat @VERSION_MAJOR_MINOR@ Program Directory.lnk" \
-                 "$INSTDIR"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Monitor Tomcat.lnk" \
-                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
-                 '//MS//Tomcat@VERSION_MAJOR@' \
-                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Configure Tomcat.lnk" \
-                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
-                 '//ES//Tomcat@VERSION_MAJOR@' \
-                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
-
-SectionEnd
-
 Section "Documentation" SecDocs
 
   SectionIn 1 3
@@ -302,6 +278,57 @@ Section "Examples" SecExamples
 
 SectionEnd
 
+Section "Start Menu Items" SecMenu
+
+  SectionIn 1 2 3
+
+  SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Home Page.lnk" \
+                 "http://tomcat.apache.org/"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Welcome.lnk" \
+                 "http://127.0.0.1:$TomcatPort/"
+
+  SectionGetFlags ${SecManager} $0
+  IntOp $0 $0 & ${SF_SELECTED}
+  ${If} $0 <> 0
+    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Manager.lnk" \
+                   "http://127.0.0.1:$TomcatPort/manager/html"
+  ${EndIf}
+
+  SectionGetFlags ${SecHostManager} $0
+  IntOp $0 $0 & ${SF_SELECTED}
+  ${If} $0 <> 0
+    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Host Manager.lnk" \
+                   "http://127.0.0.1:$TomcatPort/host-manager/html"
+  ${EndIf}
+
+  SectionGetFlags ${SecDocs} $0
+  IntOp $0 $0 & ${SF_SELECTED}
+  ${If} $0 <> 0
+    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Documentation.lnk" \
+                   "$INSTDIR\webapps\tomcat-docs\index.html"
+  ${EndIf}
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
+                 "$INSTDIR\Uninstall.exe"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat @VERSION_MAJOR_MINOR@ Program Directory.lnk" \
+                 "$INSTDIR"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Monitor Tomcat.lnk" \
+                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
+                 '//MS//Tomcat@VERSION_MAJOR@' \
+                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Configure Tomcat.lnk" \
+                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
+                 '//ES//Tomcat@VERSION_MAJOR@' \
+                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
+
+SectionEnd
+
 Section -post
   FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Classpath "$INSTDIR\bin\bootstrap.jar;$INSTDIR\bin\tomcat-juli.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
   FileWrite $R7 "$\r$\n"
@@ -327,62 +354,146 @@ Section -post
 SectionEnd
 
 Function .onInit
-  StrCpy $ResetInstDir $INSTDIR
+  ${GetParameters} $R0
+  ClearErrors
 
-  ;Extract Install Options INI Files
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "config.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "jvm.ini"
+  ${GetOptions} "$R0" "/?" $R1
+  ${IfNot} ${Errors}
+    MessageBox MB_OK|MB_ICONINFORMATION 'Available options:$\r$\n\
+               /S - Silent install.$\r$\n\
+               /D=INSTDIR - Specify installation directory.'
+    Abort
+  ${EndIf}
+  ClearErrors
+
+  StrCpy $ResetInstDir "$INSTDIR"
+
+  ;Initialize default values
+  StrCpy $JavaHome ""
+  StrCpy $TomcatPort "8080"
+  StrCpy $TomcatAdminEnable "0"
+  StrCpy $TomcatAdminUsername ""
+  StrCpy $TomcatAdminPassword ""
+  StrCpy $TomcatAdminRoles ""
 FunctionEnd
 
-Function SetChooseJVM
+Function pageChooseJVM
   !insertmacro MUI_HEADER_TEXT "$(TEXT_JVM_TITLE)" "$(TEXT_JVM_SUBTITLE)"
-  Call findJavaHome
-  Pop $3
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "jvm.ini" "Field 2" "State" $3
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "jvm.ini"
+  ${If} $JavaHome == ""
+    Call findJavaHome
+    Pop $JavaHome
+  ${EndIf}
+
+  nsDialogs::Create 1018
+  Pop $R0
+
+  ${NSD_CreateLabel} 0 5u 100% 25u "$(TEXT_JVM_LABEL1)"
+  Pop $R0
+  ${NSD_CreateDirRequest} 0 65u 280u 13u "$JavaHome"
+  Pop $CtlJavaHome
+  ${NSD_CreateBrowseButton} 282u 65u 15u 13u "..."
+  Pop $R0
+  ${NSD_OnClick} $R0 pageChooseJVM_onDirBrowse
+
+  ${NSD_SetFocus} $CtlJavaHome
+  nsDialogs::Show
 FunctionEnd
 
-Function SetConfiguration
-  !insertmacro MUI_HEADER_TEXT "$(TEXT_CONF_TITLE)" "$(TEXT_CONF_SUBTITLE)"
+; onClick function for button next to DirRequest control
+Function pageChooseJVM_onDirBrowse
+  ; R0 is HWND of the button, it is on top of the stack
+  Pop $R0
+
+  ${NSD_GetText} $CtlJavaHome $R1
+  nsDialogs::SelectFolderDialog "" "$R1"
+  Pop $R1
+
+  ${If} $R1 != "error"
+    ${NSD_SetText} $CtlJavaHome $R1
+  ${EndIf}
+FunctionEnd
+
+Function pageChooseJVMLeave
+  ${NSD_GetText} $CtlJavaHome $JavaHome
+  ${If} $JavaHome == ""
+    Abort
+  ${EndIf}
+
+  Call checkJava
+FunctionEnd
+
+; onLeave function for the COMPONENTS page
+; It updates options based on what components were selected.
+;
+Function pageComponentsLeave
+  StrCpy $TomcatAdminEnable "0"
+  StrCpy $TomcatAdminRoles ""
 
   SectionGetFlags ${SecManager} $0
   IntOp $0 $0 & ${SF_SELECTED}
-  IntCmp $0 0 0 Enable Enable
+  ${If} $0 <> 0
+    StrCpy $TomcatAdminEnable "1"
+    StrCpy $TomcatAdminRoles "manager-gui"
+  ${EndIf}
+
   SectionGetFlags ${SecHostManager} $0
   IntOp $0 $0 & ${SF_SELECTED}
-  IntCmp $0 0 Disable 0 0
-
-Enable:
-  ; Enable the user and password controls if the manager or host-manager app is
-  ; being installed
-  !insertmacro MUI_INSTALLOPTIONS_READ $0 "config.ini" "Field 5" "HWND"
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 5" "Flags" ""
-  EnableWindow $0 1
-  !insertmacro MUI_INSTALLOPTIONS_READ $0 "config.ini" "Field 7" "HWND"
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 7" "Flags" ""
-  EnableWindow $0 1
-  Goto Display
-
-Disable:
-  ; Disable the user and password controls if neither the manager nor
-  ; host-manager app is being installed
-  !insertmacro MUI_INSTALLOPTIONS_READ $0 "config.ini" "Field 5" "HWND"
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 5" "Flags" "DISABLED"
-  EnableWindow $0 0
-  !insertmacro MUI_INSTALLOPTIONS_READ $0 "config.ini" "Field 7" "HWND"
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 7" "Flags" "DISABLED"
-  EnableWindow $0 0
-  ; Clear the values
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 5" "State" ""
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "config.ini" "Field 7" "State" ""
-
-Display:
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "config.ini"
-
+  ${If} $0 <> 0
+    StrCpy $TomcatAdminEnable "1"
+    ${If} $TomcatAdminRoles != ""
+      StrCpy $TomcatAdminRoles "admin-gui,$TomcatAdminRoles"
+    ${Else}
+      StrCpy $TomcatAdminRoles "admin-gui"
+    ${EndIf}
+  ${EndIf}
 FunctionEnd
 
-Function Void
+Function pageConfiguration
+  !insertmacro MUI_HEADER_TEXT "$(TEXT_CONF_TITLE)" "$(TEXT_CONF_SUBTITLE)"
+
+  nsDialogs::Create 1018
+  Pop $R0
+
+  ${NSD_CreateLabel} 0 5u 100u 15u "$(TEXT_CONF_LABEL_PORT)"
+  Pop $R0
+
+  ${NSD_CreateText} 150u 5u 50u 13u "$TomcatPort"
+  Pop $CtlTomcatPort
+  ${NSD_SetTextLimit} $CtlTomcatPort 5
+
+  ${If} $TomcatAdminEnable == "1"
+    ${NSD_CreateLabel} 0 30u 100% 15u "$(TEXT_CONF_LABEL_ADMIN)"
+    Pop $R0
+    ${NSD_CreateLabel} 10u 50u 140u 15u "$(TEXT_CONF_LABEL_ADMINUSERNAME)"
+    Pop $R0
+    ${NSD_CreateText} 150u 50u 110u 13u "$TomcatAdminUsername"
+    Pop $CtlTomcatAdminUsername
+    ${NSD_CreateLabel} 10u 70u 140u 15u "$(TEXT_CONF_LABEL_ADMINPASSWORD)"
+    Pop $R0
+    ${NSD_CreateText} 150u 70u 110u 13u "$TomcatAdminPassword"
+    Pop $CtlTomcatAdminPassword
+    ${NSD_CreateLabel} 10u 90u 140u 15u "$(TEXT_CONF_LABEL_ADMINROLES)"
+    Pop $R0
+    ${NSD_CreateText} 150u 90u 110u 13u "$TomcatAdminRoles"
+    Pop $CtlTomcatAdminRoles
+  ${EndIf}
+
+  ${NSD_SetFocus} $CtlTomcatPort
+  nsDialogs::Show
 FunctionEnd
+
+Function pageConfigurationLeave
+  ${NSD_GetText} $CtlTomcatPort $TomcatPort
+  ${If} $TomcatAdminEnable == "1"
+    ${NSD_GetText} $CtlTomcatAdminUsername $TomcatAdminUsername
+    ${NSD_GetText} $CtlTomcatAdminPassword $TomcatAdminPassword
+    ${NSD_GetText} $CtlTomcatAdminRoles $TomcatAdminRoles
+  ${EndIf}
+FunctionEnd
+
+; Not used
+;Function Void
+;FunctionEnd
 
 ;--------------------------------
 ;Descriptions
@@ -440,36 +551,32 @@ FunctionEnd
 ; 64-bit JVMs, also determines if it is x64 or ia64
 Function checkJava
 
-  IfSilent SilentFindJavaHome
-  !insertmacro MUI_INSTALLOPTIONS_READ $5 "jvm.ini" "Field 2" "State"
-  Goto TestJavaHome
-  
-  ; Silent install so try and find JavaHome from registry
-SilentFindJavaHome:
-  Call findJavaHome
-  Pop $5
-  
-TestJavaHome:
-  IfFileExists "$5\bin\java.exe" FoundJavaExe
-  IfSilent +2
-  MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$5"
-  DetailPrint "No Java Virtual Machine found in folder:$\r$\n$5"
-  Quit
-  
-FoundJavaExe:
-  StrCpy "$JavaHome" $5
-  StrCpy "$JavaExe" "$5\bin\java.exe"
+  ${If} $JavaHome == ""
+    ; E.g. if a silent install
+    Call findJavaHome
+    Pop $JavaHome
+  ${EndIf}
+
+  ${If} $JavaHome == ""
+  ${OrIfNot} ${FileExists} "$JavaHome\bin\java.exe"
+    IfSilent +2
+    MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$JavaHome"
+    DetailPrint "No Java Virtual Machine found in folder:$\r$\n$JavaHome"
+    Quit
+  ${EndIf}
+
+  StrCpy "$JavaExe" "$JavaHome\bin\java.exe"
 
   ; Need path to jvm.dll to configure the service - uses $JavaHome
   Call findJVMPath
   Pop $5
-  StrCmp $5 "" 0 FoundJvmDll
-  IfSilent +2
-  MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$5"
-  DetailPrint "No Java Virtual Machine found in folder:$\r$\n$5"
-  Quit
+  ${If} $5 == ""
+    IfSilent +2
+    MessageBox MB_OK|MB_ICONSTOP "No Java Virtual Machine found in folder:$\r$\n$5"
+    DetailPrint "No Java Virtual Machine found in folder:$\r$\n$5"
+    Quit
+  ${EndIf}
 
-FoundJvmDll:
   StrCpy "$JvmDll" $5
 
   ; Read PE header of JvmDll to check for architecture
@@ -527,15 +634,16 @@ DonePEHeader:
 
   DetailPrint 'Architecture: "$Arch"'
 
-SetInstallDir:
-  StrCpy $INSTDIR $ResetInstDir
+  StrCpy $INSTDIR "$ResetInstDir"
 
   ; The default varies depending on 32-bit or 64-bit
-  StrCmp $INSTDIR "" 0 +5
-  StrCmp $Arch "x86" 0 +2
-  StrCpy $INSTDIR "$PROGRAMFILES32\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
-  StrCmp $Arch "x86" +2 0
-  StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
+  ${If} "$INSTDIR" == ""
+    ${If} $Arch == "x86"
+      StrCpy $INSTDIR "$PROGRAMFILES32\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
+    ${Else}
+      StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
+    ${EndIf}
+  ${EndIf}
 
 FunctionEnd
 
@@ -632,38 +740,31 @@ FunctionEnd
 ; Configure Function
 ; ==================
 ;
-; Display the configuration dialog boxes, read the values entered by the user,
-; and build the configuration files
+; Writes server.xml and tomcat-users.xml
 ;
 Function configure
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "config.ini" "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "config.ini" "Field 5" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $R2 "config.ini" "Field 7" "State"
-
-  IfSilent 0 +2
-  StrCpy $R0 '8080'
-
-  StrCpy $R4 'port="$R0"'
+  StrCpy $R4 'port="$TomcatPort"'
   StrCpy $R5 ''
 
-  IfSilent Silent 0
+  ${If} $TomcatAdminEnable == "1"
+  ${AndIf} "$TomcatAdminUsername" != ""
+  ${AndIf} "$TomcatAdminPassword" != ""
+  ${AndIf} "$TomcatAdminRoles" != ""
+    ; Escape XML
+    Push $TomcatAdminUsername
+    Call xmlEscape
+    Pop $R1
+    Push $TomcatAdminPassword
+    Call xmlEscape
+    Pop $R2
+    Push $TomcatAdminRoles
+    Call xmlEscape
+    Pop $R3
+    StrCpy $R5 '<user name="$R1" password="$R2" roles="$R3" />$\r$\n'
+    DetailPrint 'Admin user added: "$TomcatAdminUsername"'
+  ${EndIf}
 
-  ; Escape XML
-  Push $R1
-  Call xmlEscape
-  Pop $R1
-  Push $R2
-  Call xmlEscape
-  Pop $R2
-
-  StrCmp $R1 "" +4 0  ; Blank user - do not add anything to tomcat-users.xml
-  StrCmp $R2 "" +3 0  ; Blank password - do not add anything to tomcat-users.xml
-  StrCpy $R5 '<user name="$R1" password="$R2" roles="admin-gui,manager-gui" />'
-  DetailPrint 'Admin user added: "$R1"'
-
-Silent:
-  DetailPrint 'HTTP/1.1 Connector configured on port "$R0"'
+  DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPort"'
 
   SetOutPath $TEMP
   File /r confinstall
@@ -679,11 +780,9 @@ Silent:
   Call copyFile
 
   FileClose $R9
-
   DetailPrint "server.xml written"
 
   ; Build final tomcat-users.xml
-
   Delete "$INSTDIR\conf\tomcat-users.xml"
   FileOpen $R9 "$INSTDIR\conf\tomcat-users.xml" w
   ; File will be written using current windows codepage
@@ -700,7 +799,6 @@ Silent:
   Call copyFile
 
   FileClose $R9
-
   DetailPrint "tomcat-users.xml written"
 
   RMDir /r "$TEMP\confinstall"
