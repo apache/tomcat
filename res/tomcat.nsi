@@ -773,10 +773,10 @@ Function configure
   ; that is automatically deleted when the installer exits.
   InitPluginsDir
   SetOutPath $PLUGINSDIR
-  File confinstall\server_1.xml
-  File confinstall\server_2.xml
-  File confinstall\tomcat-users_1.xml
-  File confinstall\tomcat-users_2.xml
+  ReserveFile confinstall\server_1.xml
+  ReserveFile confinstall\server_2.xml
+  ReserveFile confinstall\tomcat-users_1.xml
+  ReserveFile confinstall\tomcat-users_2.xml
 
   ; Build final server.xml
   Delete "$INSTDIR\conf\server.xml"
