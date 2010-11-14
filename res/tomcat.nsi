@@ -193,6 +193,7 @@ Section "Core" SecTomcatCore
   FileWrite $R7 "$\r$\n"
   
   ClearErrors
+  DetailPrint "Installing Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToStack '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   Pop $0
   Pop $1
@@ -213,6 +214,7 @@ Section "Service" SecTomcatService
 
   FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
   FileWrite $R7 "$\r$\n"
+  DetailPrint "Configuring Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
   ; Behave like Apache Httpd (put the icon in tray on login)
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
@@ -338,6 +340,7 @@ Section -post
   FileWrite $R7 "$\r$\n"
   FileClose $R7
 
+  DetailPrint "Configuring Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Classpath "$INSTDIR\bin\bootstrap.jar;$INSTDIR\bin\tomcat-juli.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --JvmOptions "-Dcatalina.home=$INSTDIR#-Dcatalina.base=$INSTDIR#-Djava.endorsed.dirs=$INSTDIR\endorsed#-Djava.io.tmpdir=$INSTDIR\temp#-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager#-Djava.util.logging.config.file=$INSTDIR\conf\logging.properties"'
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --StdOutput auto --StdError auto --PidFile tomcat@VERSION_MAJOR@.pid'
@@ -766,17 +769,24 @@ Function configure
 
   DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPort"'
 
-  SetOutPath $TEMP
-  File /r confinstall
+  ; Extract these fragments to $PLUGINSDIR. That is a temporary directory,
+  ; that is automatically deleted when the installer exits.
+  InitPluginsDir
+  SetOutPath $PLUGINSDIR
+  File confinstall\server_1.xml
+  File confinstall\server_2.xml
+  File confinstall\tomcat-users_1.xml
+  File confinstall\tomcat-users_2.xml
 
   ; Build final server.xml
   Delete "$INSTDIR\conf\server.xml"
+  DetailPrint "Writing server.xml"
   FileOpen $R9 "$INSTDIR\conf\server.xml" w
 
-  Push "$TEMP\confinstall\server_1.xml"
+  Push "$PLUGINSDIR\server_1.xml"
   Call copyFile
   FileWrite $R9 $R4
-  Push "$TEMP\confinstall\server_2.xml"
+  Push "$PLUGINSDIR\server_2.xml"
   Call copyFile
 
   FileClose $R9
@@ -784,6 +794,7 @@ Function configure
 
   ; Build final tomcat-users.xml
   Delete "$INSTDIR\conf\tomcat-users.xml"
+  DetailPrint "Writing tomcat-users.xml"
   FileOpen $R9 "$INSTDIR\conf\tomcat-users.xml" w
   ; File will be written using current windows codepage
   System::Call 'Kernel32::GetACP() i .r18'
@@ -792,17 +803,19 @@ Function configure
     FileWrite $R9 "<?xml version='1.0' encoding='ms$R8'?>$\r$\n"
     Goto +2
     FileWrite $R9 "<?xml version='1.0' encoding='cp$R8'?>$\r$\n"
-  Push "$TEMP\confinstall\tomcat-users_1.xml"
+  Push "$PLUGINSDIR\tomcat-users_1.xml"
   Call copyFile
   FileWrite $R9 $R5
-  Push "$TEMP\confinstall\tomcat-users_2.xml"
+  Push "$PLUGINSDIR\tomcat-users_2.xml"
   Call copyFile
 
   FileClose $R9
   DetailPrint "tomcat-users.xml written"
 
-  RMDir /r "$TEMP\confinstall"
-
+  Delete "$PLUGINSDIR\server_1.xml"
+  Delete "$PLUGINSDIR\server_2.xml"
+  Delete "$PLUGINSDIR\tomcat-users_1.xml"
+  Delete "$PLUGINSDIR\tomcat-users_2.xml"
 FunctionEnd
 
 
@@ -856,8 +869,10 @@ Section Uninstall
   Delete "$INSTDIR\Uninstall.exe"
 
   ; Stop Tomcat service monitor if running
+  DetailPrint "Stopping Tomcat@VERSION_MAJOR@ service monitor"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MQ//Tomcat@VERSION_MAJOR@'
   ; Delete Tomcat service
+  DetailPrint "Uninstalling Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //DS//Tomcat@VERSION_MAJOR@'
   ClearErrors
 

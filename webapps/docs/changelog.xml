@@ -280,9 +280,14 @@
         Windows installer. (kkolinko)
       </add>
       <fix>
+        In the Windows installer: do not leave stale <code>server.xml</code>
+        and <code>tomcat-users.xml</code> fragments in the $TEMP folder.
+        (kkolinko)
+      </fix>
+      <update>
         <bug>49819</bug>: Redesign of home page by Pid (pidster at apache).
         (timw)
-      </fix>
+      </update>
     </changelog>
   </subsection>
 </section>
