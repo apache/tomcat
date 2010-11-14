@@ -58,6 +58,10 @@ Var CtlTomcatAdminUsername
 Var CtlTomcatAdminPassword
 Var CtlTomcatAdminRoles
 
+; Handle of the service-install.log file
+; It is opened in "Core" section and closed in "-post"
+Var ServiceInstallLog
+
 ;--------------------------------
 ;Configuration
 
@@ -192,17 +196,18 @@ Section "Core" SecTomcatCore
   ${EndIf}
 
   InstallRetry:
-  FileOpen $R7 "$INSTDIR\logs\service-install.log" w
-  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
-  FileWrite $R7 "$\r$\n"
-  
+  FileOpen $ServiceInstallLog "$INSTDIR\logs\service-install.log" a
+  FileSeek $ServiceInstallLog 0 END
+  FileWrite $ServiceInstallLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
+  FileWrite $ServiceInstallLog "$\r$\n"
+
   ClearErrors
   DetailPrint "Installing Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToStack '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   Pop $0
   Pop $1
   StrCmp $0 "0" InstallOk
-    FileWrite $R7 "Install failed: $0 $1$\r$\n"
+    FileWrite $ServiceInstallLog "Install failed: $0 $1$\r$\n"
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP \
       "Failed to install Tomcat@VERSION_MAJOR@ service.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
        /SD IDIGNORE IDIGNORE InstallOk IDRETRY InstallRetry
@@ -210,14 +215,18 @@ Section "Core" SecTomcatCore
   InstallOk:
   ClearErrors
 
+  ; Will be closed in "-post" section
+  ; FileClose $ServiceInstallLog
 SectionEnd
 
 Section "Service Startup" SecTomcatService
 
   SectionIn 3
 
-  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
-  FileWrite $R7 "$\r$\n"
+  ${If} $ServiceInstallLog != ""
+    FileWrite $ServiceInstallLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
+    FileWrite $ServiceInstallLog "$\r$\n"
+  ${EndIf}
   DetailPrint "Configuring Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
   ; Behave like Apache Httpd (put the icon in tray on login)
@@ -293,13 +302,15 @@ Section "Examples" SecExamples
 SectionEnd
 
 Section -post
-  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Classpath "$INSTDIR\bin\bootstrap.jar;$INSTDIR\bin\tomcat-juli.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
-  FileWrite $R7 "$\r$\n"
-  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --JvmOptions "-Dcatalina.home=$INSTDIR#-Dcatalina.base=$INSTDIR#-Djava.endorsed.dirs=$INSTDIR\endorsed#-Djava.io.tmpdir=$INSTDIR\temp#-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager#-Djava.util.logging.config.file=$INSTDIR\conf\logging.properties"'
-  FileWrite $R7 "$\r$\n"
-  FileWrite $R7 '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --StdOutput auto --StdError auto --PidFile tomcat@VERSION_MAJOR@.pid'
-  FileWrite $R7 "$\r$\n"
-  FileClose $R7
+  ${If} $ServiceInstallLog != ""
+    FileWrite $ServiceInstallLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Classpath "$INSTDIR\bin\bootstrap.jar;$INSTDIR\bin\tomcat-juli.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
+    FileWrite $ServiceInstallLog "$\r$\n"
+    FileWrite $ServiceInstallLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --JvmOptions "-Dcatalina.home=$INSTDIR#-Dcatalina.base=$INSTDIR#-Djava.endorsed.dirs=$INSTDIR\endorsed#-Djava.io.tmpdir=$INSTDIR\temp#-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager#-Djava.util.logging.config.file=$INSTDIR\conf\logging.properties"'
+    FileWrite $ServiceInstallLog "$\r$\n"
+    FileWrite $ServiceInstallLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --StdOutput auto --StdError auto --PidFile tomcat@VERSION_MAJOR@.pid'
+    FileWrite $ServiceInstallLog "$\r$\n"
+    FileClose $ServiceInstallLog
+  ${EndIf}
 
   DetailPrint "Configuring Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Classpath "$INSTDIR\bin\bootstrap.jar;$INSTDIR\bin\tomcat-juli.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
