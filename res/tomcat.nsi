@@ -195,12 +195,12 @@ Section "Core" SecTomcatCore
     File /oname=tomcat@VERSION_MAJOR@.exe bin\i64\tomcat@VERSION_MAJOR@.exe
   ${EndIf}
 
-  InstallRetry:
   FileOpen $ServiceInstallLog "$INSTDIR\logs\service-install.log" a
   FileSeek $ServiceInstallLog 0 END
+
+  InstallRetry:
   FileWrite $ServiceInstallLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   FileWrite $ServiceInstallLog "$\r$\n"
-
   ClearErrors
   DetailPrint "Installing Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToStack '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
