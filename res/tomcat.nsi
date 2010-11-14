@@ -139,6 +139,10 @@ Var CtlTomcatAdminRoles
 
   ReserveFile "${NSISDIR}\Plugins\System.dll"
   ReserveFile "${NSISDIR}\Plugins\nsDialogs.dll"
+  ReserveFile confinstall\server_1.xml
+  ReserveFile confinstall\server_2.xml
+  ReserveFile confinstall\tomcat-users_1.xml
+  ReserveFile confinstall\tomcat-users_2.xml
 
 ;--------------------------------
 ;Installer Sections
@@ -180,12 +184,13 @@ Section "Core" SecTomcatCore
   File bin\tomcat@VERSION_MAJOR@w.exe
 
   ; Get the current platform x86 / AMD64 / IA64
-  StrCmp $Arch "x86" 0 +2
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
-  StrCmp $Arch "x64" 0 +2
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\x64\tomcat@VERSION_MAJOR@.exe
-  StrCmp $Arch "i64" 0 +2
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\i64\tomcat@VERSION_MAJOR@.exe
+  ${If} $Arch == "x86"
+    File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
+  ${ElseIf} $Arch == "x64"
+    File /oname=tomcat@VERSION_MAJOR@.exe bin\x64\tomcat@VERSION_MAJOR@.exe
+  ${ElseIf} $Arch == "i64"
+    File /oname=tomcat@VERSION_MAJOR@.exe bin\i64\tomcat@VERSION_MAJOR@.exe
+  ${EndIf}
 
   InstallRetry:
   FileOpen $R7 "$INSTDIR\logs\service-install.log" w
@@ -229,18 +234,26 @@ Section "Native" SecTomcatNative
 
   SetOutPath $INSTDIR\bin
 
-  StrCmp $Arch "x86" 0 +2
-  File bin\tcnative-1.dll
-  StrCmp $Arch "x64" 0 +2
-  File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
-  StrCmp $Arch "i64" 0 +2
-  File /oname=tcnative-1.dll bin\i64\tcnative-1.dll
+  ${If} $Arch == "x86"
+    File bin\tcnative-1.dll
+  ${ElseIf} $Arch == "x64"
+    File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
+  ${ElseIf} $Arch == "i64"
+    File /oname=tcnative-1.dll bin\i64\tcnative-1.dll
+  ${EndIf}
 
   ClearErrors
 
 SectionEnd
 
 SubSectionEnd
+
+Section "Start Menu Items" SecMenu
+
+  SectionIn 1 2 3
+
+  Call createShortcuts
+SectionEnd
 
 Section "Documentation" SecDocs
 
@@ -277,57 +290,6 @@ Section "Examples" SecExamples
   SetOverwrite on
   SetOutPath $INSTDIR\webapps\examples
   File /r webapps\examples\*.*
-
-SectionEnd
-
-Section "Start Menu Items" SecMenu
-
-  SectionIn 1 2 3
-
-  SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Home Page.lnk" \
-                 "http://tomcat.apache.org/"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Welcome.lnk" \
-                 "http://127.0.0.1:$TomcatPort/"
-
-  SectionGetFlags ${SecManager} $0
-  IntOp $0 $0 & ${SF_SELECTED}
-  ${If} $0 <> 0
-    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Manager.lnk" \
-                   "http://127.0.0.1:$TomcatPort/manager/html"
-  ${EndIf}
-
-  SectionGetFlags ${SecHostManager} $0
-  IntOp $0 $0 & ${SF_SELECTED}
-  ${If} $0 <> 0
-    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Host Manager.lnk" \
-                   "http://127.0.0.1:$TomcatPort/host-manager/html"
-  ${EndIf}
-
-  SectionGetFlags ${SecDocs} $0
-  IntOp $0 $0 & ${SF_SELECTED}
-  ${If} $0 <> 0
-    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Documentation.lnk" \
-                   "$INSTDIR\webapps\tomcat-docs\index.html"
-  ${EndIf}
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
-                 "$INSTDIR\Uninstall.exe"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat @VERSION_MAJOR_MINOR@ Program Directory.lnk" \
-                 "$INSTDIR"
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Monitor Tomcat.lnk" \
-                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
-                 '//MS//Tomcat@VERSION_MAJOR@' \
-                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
-
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Configure Tomcat.lnk" \
-                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
-                 '//ES//Tomcat@VERSION_MAJOR@' \
-                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
 
 SectionEnd
 
@@ -473,7 +435,7 @@ Function pageConfiguration
     Pop $CtlTomcatAdminUsername
     ${NSD_CreateLabel} 10u 70u 140u 15u "$(TEXT_CONF_LABEL_ADMINPASSWORD)"
     Pop $R0
-    ${NSD_CreateText} 150u 70u 110u 13u "$TomcatAdminPassword"
+    ${NSD_CreatePassword} 150u 70u 110u 13u "$TomcatAdminPassword"
     Pop $CtlTomcatAdminPassword
     ${NSD_CreateLabel} 10u 90u 140u 15u "$(TEXT_CONF_LABEL_ADMINROLES)"
     Pop $R0
@@ -665,8 +627,9 @@ Function findJavaHome
 
   ; Use the 64-bit registry on 64-bit machines
   ExpandEnvStrings $0 "%PROGRAMW6432%"
-  StrCmp $0 "%PROGRAMW6432%" +2 0
-  SetRegView 64
+  ${If} $0 != "%PROGRAMW6432%"
+    SetRegView 64
+  ${EndIf}
 
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
@@ -773,10 +736,10 @@ Function configure
   ; that is automatically deleted when the installer exits.
   InitPluginsDir
   SetOutPath $PLUGINSDIR
-  ReserveFile confinstall\server_1.xml
-  ReserveFile confinstall\server_2.xml
-  ReserveFile confinstall\tomcat-users_1.xml
-  ReserveFile confinstall\tomcat-users_2.xml
+  File confinstall\server_1.xml
+  File confinstall\server_2.xml
+  File confinstall\tomcat-users_1.xml
+  File confinstall\tomcat-users_2.xml
 
   ; Build final server.xml
   Delete "$INSTDIR\conf\server.xml"
@@ -798,11 +761,12 @@ Function configure
   FileOpen $R9 "$INSTDIR\conf\tomcat-users.xml" w
   ; File will be written using current windows codepage
   System::Call 'Kernel32::GetACP() i .r18'
-  StrCmp $R8 "932" 0 +3
+  ${If} $R8 == "932"
     ; Special case where Java uses non-standard name for character set
     FileWrite $R9 "<?xml version='1.0' encoding='ms$R8'?>$\r$\n"
-    Goto +2
+  ${Else}
     FileWrite $R9 "<?xml version='1.0' encoding='cp$R8'?>$\r$\n"
+  ${EndIf}
   Push "$PLUGINSDIR\tomcat-users_1.xml"
   Call copyFile
   FileWrite $R9 $R5
@@ -859,6 +823,58 @@ Function copyFile
 
 FunctionEnd
 
+
+; =================
+; createShortcuts Function
+; =================
+;
+; This is called by the SecMenu section.
+;
+; The code is moved here, because ${SecManager} etc. are not visible
+; in SecMenu, because they are defined lower than it.
+;
+Function createShortcuts
+
+  SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Home Page.lnk" \
+                 "http://tomcat.apache.org/"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Welcome.lnk" \
+                 "http://127.0.0.1:$TomcatPort/"
+
+  ${If} ${SectionIsSelected} ${SecManager}
+    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Manager.lnk" \
+                   "http://127.0.0.1:$TomcatPort/manager/html"
+  ${EndIf}
+
+  ${If} ${SectionIsSelected} ${SecHostManager}
+    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Host Manager.lnk" \
+                   "http://127.0.0.1:$TomcatPort/host-manager/html"
+  ${EndIf}
+
+  ${If} ${SectionIsSelected} ${SecDocs}
+    CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Documentation.lnk" \
+                   "$INSTDIR\webapps\tomcat-docs\index.html"
+  ${EndIf}
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
+                 "$INSTDIR\Uninstall.exe"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat @VERSION_MAJOR_MINOR@ Program Directory.lnk" \
+                 "$INSTDIR"
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Monitor Tomcat.lnk" \
+                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
+                 '//MS//Tomcat@VERSION_MAJOR@' \
+                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
+
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Configure Tomcat.lnk" \
+                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
+                 '//ES//Tomcat@VERSION_MAJOR@' \
+                 "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
+
+FunctionEnd
 
 ;--------------------------------
 ;Uninstaller Section
