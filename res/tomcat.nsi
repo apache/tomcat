@@ -162,12 +162,10 @@ Section "Core" SecTomcatCore
   File NOTICE
   SetOutPath $INSTDIR\lib
   File /r lib\*.*
+  ; Note: just calling 'SetOutPath' will create the empty folders for us
   SetOutPath $INSTDIR\logs
-  File /nonfatal /r logs\*.*
   SetOutPath $INSTDIR\work
-  File /nonfatal /r work\*.*
   SetOutPath $INSTDIR\temp
-  File /nonfatal /r temp\*.*
   SetOutPath $INSTDIR\bin
   File bin\bootstrap.jar
   File bin\tomcat-juli.jar
@@ -917,8 +915,10 @@ Section Uninstall
     MessageBox MB_YESNO|MB_ICONQUESTION \
       "Remove all files in your Tomcat @VERSION_MAJOR_MINOR@ directory? (If you have anything  \
  you created that you want to keep, click No)" IDNO Removed
-    RMDir /r "$INSTDIR\webapps\ROOT" ; this would be skipped if the user hits no
-    RMDir "$INSTDIR\webapps"
+    ; these would be skipped if the user hits no
+    RMDir /r "$INSTDIR\webapps"
+    RMDir /r "$INSTDIR\logs"
+    RMDir /r "$INSTDIR\conf"
     Delete "$INSTDIR\*.*"
     RMDir /r "$INSTDIR"
     Sleep 500
