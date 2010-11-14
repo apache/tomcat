@@ -891,7 +891,6 @@ FunctionEnd
 
 Section Uninstall
 
-  Delete "$INSTDIR\modern.exe"
   Delete "$INSTDIR\Uninstall.exe"
 
   ; Stop Tomcat service monitor if running
