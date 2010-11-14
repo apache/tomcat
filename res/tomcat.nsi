@@ -153,9 +153,10 @@ Section "Core" SecTomcatCore
 
   SectionIn 1 2 3 RO
 
-  IfSilent 0 +2
-  Call checkJava
-  
+  ${If} ${Silent}
+    Call checkJava
+  ${EndIf}
+
   SetOutPath $INSTDIR
   File tomcat.ico
   File LICENSE
