@@ -35,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -444,70 +443,70 @@ public final class HTMLManagerServlet extends ManagerServlet {
         writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
 
         // Apps Header Section
-        args = new Object[6];
+        args = new Object[7];
         args[0] = smClient.getString("htmlManagerServlet.appsTitle");
         args[1] = smClient.getString("htmlManagerServlet.appsPath");
-        args[2] = smClient.getString("htmlManagerServlet.appsName");
-        args[3] = smClient.getString("htmlManagerServlet.appsAvailable");
-        args[4] = smClient.getString("htmlManagerServlet.appsSessions");
-        args[5] = smClient.getString("htmlManagerServlet.appsTasks");
+        args[2] = smClient.getString("htmlManagerServlet.appsVersion");
+        args[3] = smClient.getString("htmlManagerServlet.appsName");
+        args[4] = smClient.getString("htmlManagerServlet.appsAvailable");
+        args[5] = smClient.getString("htmlManagerServlet.appsSessions");
+        args[6] = smClient.getString("htmlManagerServlet.appsTasks");
         writer.print(MessageFormat.format(APPS_HEADER_SECTION, args));
 
         // Apps Row Section
-        // Create sorted map of deployed applications context paths.
+        // Create sorted map of deployed applications by context name.
         Container children[] = host.findChildren();
-        String contextPaths[] = new String[children.length];
+        String contextNames[] = new String[children.length];
         for (int i = 0; i < children.length; i++)
-            contextPaths[i] = children[i].getName();
+            contextNames[i] = children[i].getName();
 
-        TreeMap<String,String> sortedContextPathsMap =
-            new TreeMap<String,String>();
-
-        for (int i = 0; i < contextPaths.length; i++) {
-            String displayPath = contextPaths[i];
-            sortedContextPathsMap.put(displayPath, contextPaths[i]);
-        }
- 
+        Arrays.sort(contextNames);
+        
         String appsStart = smClient.getString("htmlManagerServlet.appsStart");
         String appsStop = smClient.getString("htmlManagerServlet.appsStop");
         String appsReload = smClient.getString("htmlManagerServlet.appsReload");
-        String appsUndeploy = smClient.getString("htmlManagerServlet.appsUndeploy");
+        String appsUndeploy =
+            smClient.getString("htmlManagerServlet.appsUndeploy");
         String appsExpire = smClient.getString("htmlManagerServlet.appsExpire");
+        String noVersion = "<i>" +
+            smClient.getString("htmlManagerServlet.noVersion") + "</i>";
 
-        Iterator<Map.Entry<String,String>> iterator =
-            sortedContextPathsMap.entrySet().iterator();
         boolean isHighlighted = true;
         boolean isDeployed = true;
         String highlightColor = null;
 
-        while (iterator.hasNext()) {
-            // Bugzilla 34818, alternating row colors
-            isHighlighted = !isHighlighted;
-            if(isHighlighted) {
-                highlightColor = "#C3F3C3";
-            } else {
-                highlightColor = "#FFFFFF";
-            }
+        for (String contextName : contextNames) {
+            Context ctxt = (Context) host.findChild(contextName);
+            
+            if (ctxt != null) {
+                // Bugzilla 34818, alternating row colors
+                isHighlighted = !isHighlighted;
+                if(isHighlighted) {
+                    highlightColor = "#C3F3C3";
+                } else {
+                    highlightColor = "#FFFFFF";
+                }
 
-            Map.Entry<String,String> entry = iterator.next();
-            String displayPath = entry.getKey();
-            String contextPath = entry.getValue();
-            Context ctxt = (Context) host.findChild(contextPath);
-            if (displayPath.equals("")) {
-                displayPath = "/";
-            }
+                String contextPath = ctxt.getPath();
+                String displayPath = contextPath;
+                if (displayPath.equals("")) {
+                    displayPath = "/";
+                }
 
-            if (ctxt != null ) {
                 try {
-                    isDeployed = isDeployed(contextPath);
+                    isDeployed = isDeployed(contextName);
                 } catch (Exception e) {
                     // Assume false on failure for safety
                     isDeployed = false;
                 }
                 
                 args = new Object[7];
-                args[0] = URL_ENCODER.encode(displayPath);
-                args[1] = displayPath;
+                args[0] = "<a href=\"" + displayPath + "\">" +
+                        URL_ENCODER.encode(displayPath) + "</a>";
+                args[1] = ctxt.getWebappVersion();
+                if ("".equals(args[1])) {
+                    args[1]= noVersion;
+                }
                 args[2] = ctxt.getDisplayName();
                 if (args[2] == null) {
                     args[2] = "&nbsp;";
@@ -1151,7 +1150,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String APPS_HEADER_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
-        " <td colspan=\"5\" class=\"title\">{0}</td>\n" +
+        " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
         "<tr>\n" +
         " <td class=\"header-left\"><small>{1}</small></td>\n" +
@@ -1159,12 +1158,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"header-center\"><small>{3}</small></td>\n" +
         " <td class=\"header-center\"><small>{4}</small></td>\n" +
         " <td class=\"header-left\"><small>{5}</small></td>\n" +
+        " <td class=\"header-left\"><small>{6}</small></td>\n" +
         "</tr>\n";
 
     private static final String APPS_ROW_DETAILS_SECTION =
         "<tr>\n" +
-        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small><a href=\"{0}\">{1}</a>" +
-        "</small></td>\n" +
+        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{0}</small></td>\n" +
+        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{1}</small></td>\n" +
         " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\">" +
