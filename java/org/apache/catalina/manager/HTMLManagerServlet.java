@@ -393,7 +393,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param response The response
      * @param message a message to display
      */
-    public void list(HttpServletRequest request,
+    protected void list(HttpServletRequest request,
                      HttpServletResponse response,
                      String message,
                      StringManager smClient) throws IOException {
@@ -687,7 +687,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param idle Expire all sessions with idle time &ge; idle for this context
      * @return message String
      */
-    public String sessions(String path, int idle, StringManager smClient) {
+    protected String sessions(String path, int idle, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -698,19 +698,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     /**
-     * Display session information and invoke list.
-     *
-     * @see ManagerServlet#sessions(PrintWriter, String, StringManager)
-     *
-     * @param path Context path of the application to list session information
-     * @return message String
-     */
-    public String sessions(String path, StringManager smClient) {
-
-        return sessions(path, -1, smClient);
-    }
-
-    /**
      * Start the web application at the specified context path.
      *
      * @see ManagerServlet#start(PrintWriter, String, StringManager)
@@ -718,7 +705,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param path Context path of the application to be started
      * @return message String
      */
-    public String start(String path, StringManager smClient) {
+    protected String start(String path, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -976,7 +963,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @return number of invalidated sessions
      * @throws IOException 
      */
-    public int invalidateSessions(String path, String[] sessionIds,
+    protected int invalidateSessions(String path, String[] sessionIds,
             StringManager smClient) throws IOException {
         if (null == sessionIds) {
             return 0;
@@ -1014,7 +1001,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @return true if there was an attribute removed, false otherwise
      * @throws IOException 
      */
-    public boolean removeSessionAttribute(String path, String sessionId,
+    protected boolean removeSessionAttribute(String path, String sessionId,
             String attributeName, StringManager smClient) throws IOException {
         HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
         if (null == session) {
@@ -1033,35 +1020,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
             }
         }
         return wasPresent;
-    }
-
-    /**
-     * Sets the maximum inactive interval (session timeout) an HttpSession
-     * @param sessionId
-     * @param maxInactiveInterval in seconds
-     * @return old value for maxInactiveInterval
-     * @throws IOException 
-     */
-    public int setSessionMaxInactiveInterval(String path, String sessionId,
-            int maxInactiveInterval, StringManager smClient) throws IOException {
-        HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
-        if (null == session) {
-            // Shouldn't happen, but let's play nice...
-            if (debug >= 1) {
-                log("WARNING: can't set timout for null session " + sessionId);
-            }
-            return 0;
-        }
-        try {
-            int oldMaxInactiveInterval = session.getMaxInactiveInterval();
-            session.setMaxInactiveInterval(maxInactiveInterval);
-            return oldMaxInactiveInterval;
-        } catch (IllegalStateException ise) {
-            if (debug >= 1) {
-                log("Can't set MaxInactiveInterval '" + maxInactiveInterval + "' for invalidated session id " + sessionId);
-            }
-            return 0;
-        }
     }
 
     protected Comparator<Session> getComparator(String sortBy) {
