@@ -813,14 +813,18 @@ public class StandardContext extends ContainerBase
 
     private Set<String> resourceOnlyServlets = new HashSet<String>();
 
-    private String webappVersion;
+    private String webappVersion = "";
 
     // ----------------------------------------------------- Context Properties
 
 
     @Override
     public void setWebappVersion(String webappVersion) {
-        this.webappVersion = webappVersion;
+        if (null == webappVersion) {
+            this.webappVersion = "";
+        } else {
+            this.webappVersion = webappVersion;
+        }
     }
 
 
