@@ -865,7 +865,7 @@ Function createShortcuts
 
   ${If} ${SectionIsSelected} ${SecDocs}
     CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Documentation.lnk" \
-                   "$INSTDIR\webapps\tomcat-docs\index.html"
+                   "$INSTDIR\webapps\docs\index.html"
   ${EndIf}
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
