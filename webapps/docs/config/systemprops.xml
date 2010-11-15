@@ -55,8 +55,8 @@
 
     <property name="org.apache.catalina. tribes.dns_lookups">
       <p>If <code>true</code>, the clustering module will attempt to use DNS to
-      resolve any host names provided in the cluster configuration. If not
-      specified, the default value of <code>false</code> will be used.</p>
+      resolve any host names provided in the cluster configuration.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
   </properties>
@@ -66,30 +66,30 @@
 <section name="Expression Language">
   <properties>
 
-    <property name="org.apache.el.parser.COERCE_TO_ZERO">
+    <property name="org.apache.el.BeanELResolver. CACHE_SIZE">
+      <p>The number of javax.el.BeanELResolver.BeanProperties objects that will
+      be cached by the EL Parser.</p>
+      <p>If not specified, the default of <code>1000</code> will be used.</p>
+    </property>
+
+    <property name="org.apache.el.ExpressionBuilder. CACHE_SIZE">
+      <p>The number of parsed EL expressions that will be cached by the EL
+      Parser.</p>
+      <p>If not specified, the default of <code>5000</code> will be used.</p>
+    </property>
+
+    <property name="org.apache.el.parser. COERCE_TO_ZERO">
       <p>If <code>true</code>, when coercing expressions to numbers
       <code>""</code> and <code>null</code> will be coerced to zero as required
-      by the specification. If not specified, the default value of
-      <code>true</code> will be used.</p>
+      by the specification.</p>
+      <p>If not specified, the default value of <code>true</code> will be used.</p>
     </property>
 
-    <property name="org.apache.el.parser.SKIP_IDENTIFIER_CHECK">
+    <property name="org.apache.el.parser. SKIP_IDENTIFIER_CHECK">
       <p>If <code>true</code>, when parsing expressions, identifiers will not be
       checked to ensure that they conform to the Java Language Specification for
-      Java identifiers. If not specified, the default value of
-      <code>false</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.el.BeanELResolver.CACHE_SIZE">
-      <p>The number of javax.el.BeanELResolver.BeanProperties objects that will
-      be cached by the EL Parser. If not specified, the default of
-      <code>1000</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.el.ExpressionBuilder.CACHE_SIZE">
-      <p>The number of parsed EL expressions that will be cached by the EL
-      Parser. If not specified, the default of <code>5000</code> will be used.
-      </p>
+      Java identifiers.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
   </properties>
@@ -100,70 +100,76 @@
 
     <property name="org.apache.jasper.compiler. Generator.VAR_EXPRESSIONFACTORY">
       <p>The name of the variable to use for the expression language expression
-      factory. If not specified, the default value of
-      <code>_el_expressionfactory</code> will be used.</p>
+      factory.</p>
+      <p>If not specified, the default value of <code>_el_expressionfactory</code>
+      will be used.</p>
     </property>
 
     <property name="org.apache.jasper.compiler. Generator.VAR_INSTANCEMANAGER">
-      <p>The name of the variable to use for the instance manager factory. If
-      not specified, the default value of <code>_jsp_instancemanager</code> will
-      be used.</p>
+      <p>The name of the variable to use for the instance manager factory.</p>
+      <p>If not specified, the default value of <code>_jsp_instancemanager</code>
+      will be used.</p>
     </property>
 
     <property name="org.apache.jasper.compiler. Generator.STRICT_GET_PROPERTY">
       <p>If <code>true</code>, the requirement to have the object referenced in
       <code>jsp:getProperty</code> action to be previously "introduced"
       to the JSP processor, as specified in the chapter JSP.5.3 of JSP 2.0 and
-      later specifications, is enforced. If not specified, the specification
-      compliant default of <code>true</code> will be used.</p>
+      later specifications, is enforced.</p>
+      <p>If not specified, the specification compliant default of
+      <code>true</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.compiler. Parser.STRICT_QUOTE_ESCAPING">
       <p>If <code>false</code> the requirements for escaping quotes in JSP
       attributes will be relaxed so that an unescaped quote will not
-      cause an error. If not specified, the specification compliant default of
+      cause an error.</p>
+      <p>If not specified, the specification compliant default of
       <code>true</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.compiler. Parser.STRICT_WHITESPACE">
       <p>If <code>false</code> the requirements for whitespace before an
       attribute name will be relaxed so that the lack of whitespace will not
-      cause an error. If not specified, the specification compliant default of
+      cause an error.</p>
+      <p>If not specified, the specification compliant default of
       <code>true</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.runtime. BodyContentImpl.LIMIT_BUFFER">
       <p>If <code>true</code>, any tag buffer that expands beyond
       <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> will be
-      destroyed and a new buffer created of the default size. If not specified,
-      the default value of <code>false</code> will be used.</p>
+      destroyed and a new buffer created of the default size.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.runtime. JspFactoryImpl.USE_POOL">
       <p>If <code>true</code>, a ThreadLocal <code>PageContext</code> pool will
-      be used. If not specified, the default value of <code>true</code> will be
-      used.</p>
+      be used.</p>
+      <p>If not specified, the default value of <code>true</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.runtime. JspFactoryImpl.POOL_SIZE">
-      <p>The size of the ThreadLocal <code>PageContext</code>. If not specified,
-      the default value of <code>8</code> will be used.</p>
+      <p>The size of the ThreadLocal <code>PageContext</code>.</p>
+      <p>If not specified, the default value of <code>8</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. JSP_SERVLET_BASE">
-      <p>The base class of the Servlets generated from the JSPs. If not
-      specified, the default value of
+      <p>The base class of the Servlets generated from the JSPs.</p>
+      <p>If not specified, the default value of
       <code>org.apache.jasper.runtime.HttpJspBase</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. SERVICE_METHOD_NAME">
-      <p>The name of the service method called by the base class. If not
-      specified, the default value of <code>_jspService</code> will be used.</p>
+      <p>The name of the service method called by the base class.</p>
+      <p>If not specified, the default value of <code>_jspService</code>
+      will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. SERVLET_CLASSPATH">
       <p>The name of the ServletContext attribute that provides the classpath
-      for the JSP. If not specified, the default value of
+      for the JSP.</p>
+      <p>If not specified, the default value of
       <code>org.apache.catalina.jsp_classpath</code> will be used.</p>
     </property>
 
@@ -171,42 +177,47 @@
       <p>The name of the request attribute for <code>&lt;jsp-file&gt;</code>
       element of a servlet definition. If present on a request, this overrides
       the value returned by <code>request.getServletPath()</code> to select the
-      JSP page to be executed. If not specified, the default value of
+      JSP page to be executed.</p>
+      <p>If not specified, the default value of
       <code>org.apache.catalina.jsp_file</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. PRECOMPILE">
       <p>The name of the query parameter that causes the JSP engine to just
-      pregenerate the servlet but not invoke it. If not specified, the default
-      value of <code>org.apache.catalina.jsp_precompile</code> will be used.</p>
+      pregenerate the servlet but not invoke it.</p>
+      <p>If not specified, the default value of <code>jsp_precompile</code>
+      will be used, as defined by JSP specification (JSP.11.4.2).</p>
     </property>
 
     <property name="org.apache.jasper.Constants. JSP_PACKAGE_NAME">
-      <p>The default package name for compiled jsp pages. If not specified, the
-      default value of <code>org.apache.jsp</code> will be used.</p>
+      <p>The default package name for compiled jsp pages.</p>
+      <p>If not specified, the default value of <code>org.apache.jsp</code>
+      will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. TAG_FILE_PACKAGE_NAME">
-      <p>The default package name for tag handlers generated from tag files. If
-      not specified, the default value of <code>org.apache.jsp.tag</code> will
-      be used.</p>
+      <p>The default package name for tag handlers generated from tag files.</p>
+      <p>If not specified, the default value of <code>org.apache.jsp.tag</code>
+      will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. ALT_DD_ATTR">
       <p>The servlet context attribute under which the alternate deployment
-      descriptor for this web application is stored. If not specified, the
-      default value of <code>org.apache.catalina.deploy.alt_dd</code> will
-      be used.</p>
+      descriptor for this web application is stored.</p>
+      <p>If not specified, the default value of
+      <code>org.apache.catalina.deploy.alt_dd</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. TEMP_VARIABLE_NAME_PREFIX">
-      <p>Prefix to use for generated temporary variable names. If not specified,
-      the default value of <code>_jspx_temp</code> will be used.</p>
+      <p>Prefix to use for generated temporary variable names.</p>
+      <p>If not specified, the default value of <code>_jspx_temp</code>
+      will be used.</p>
     </property>
 
     <property name="org.apache.jasper.Constants. USE_INSTANCE_MANAGER_FOR_TAGS">
       <p>If <code>true</code>, the instance manager is used to obtain tag
-      handler instances. If not specified, <code>false</code> will be used.</p>
+      handler instances.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
   </properties>
@@ -220,22 +231,22 @@
 
     <property name="org.apache.catalina.connector. RECYCLE_FACADES">
       <p>If this is <code>true</code> or if a security manager is in use a new
-      facade object will be created for each request. If not specified, the
-      default value of <code>false</code> will be used.</p>
+      facade object will be created for each request.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
     <property
     name="org.apache.catalina.connector. CoyoteAdapter.ALLOW_BACKSLASH">
       <p>If this is <code>true</code> the '\' character will be permitted as a
-      path delimiter. If not specified, the default value of <code>false</code>
-      will be used.</p>
+      path delimiter.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
     <property
     name="org.apache.tomcat.util.buf. UDecoder.ALLOW_ENCODED_SLASH">
       <p>If this is <code>true</code> '%2F' and '%5C' will be permitted as path
-      delimiters. If not specified, the default value of <code>false</code> will
-      be used.</p>
+      delimiters.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
   </properties>
@@ -248,6 +259,7 @@
   <properties>
 
     <property name="org.apache.catalina. STRICT_SERVLET_COMPLIANCE">
+      <p>The default value of this system property is <code>false</code>.</p>
       <p>If this is <code>true</code> the default values will be changed for:
       <ul>
       <li><code>org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code></li>
@@ -255,9 +267,9 @@
       <li><code>org.apache.catalina.core.StandardHostValve.ACCESS_SESSION</code></li>
       <li><code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code></li>
       <li><code>org.apache.catalina.session.StandardSession.LAST_ACCESS_AT_START</code></li>
-      <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.</li>
-      <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.</li>
-      <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.</li>
+      <li><code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code></li>
+      <li><code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code></li>
+      <li><code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code></li>
       <li>The <code>resourceOnlyServlets</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       <li>The <code>tldNamespaceAware</code> attribute of any
@@ -286,19 +298,18 @@
       has been specified will result in subsequent calls to
       <code>Response.getCharacterEncoding()</code> returning
       <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
-      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)
-      <br />
-      If not specified, the default specification compliant value of
+      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)</p>
+      <p>If not specified, the default specification compliant value of
       <code>true</code> will be used.</p>
     </property>
 
-    <property name="org.apache.catalina.core. ApplicationContext.GET_RESOURCE_REQUIRE_SLASH">
+    <property name="org.apache.catalina.core.ApplicationContext .GET_RESOURCE_REQUIRE_SLASH">
       <p>If this is <code>true</code> then the path passed to
       <code>ServletContext.getResource()</code> or
       <code>ServletContext.getResourceAsStream()</code> must start with
       &quot;/&quot;. If <code>false</code>, code like
-      <code>getResource("myfolder/myresource.txt")</code> will work. If
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>getResource("myfolder/myresource.txt")</code> will work.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
@@ -306,27 +317,29 @@
     <property name="org.apache.catalina.core. ApplicationDispatcher.WRAP_SAME_OBJECT">
       <p>If this is <code>true</code> then any wrapped request or response
       object passed to an application dispatcher will be checked to ensure that
-      it has wrapped the original request or response. If
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      it has wrapped the original request or response.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
     
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
-      <p>If this is <code>true</code> Tomcat will allow <code>=</code>
+      <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
       characters when parsing unquoted cookie values. If <code>false</code>,
-      cookie values containing <code>=</code> will be terminated when the
-      <code>=</code> is encountered and the remainder of the cookie value will
-      be dropped. If not specified, the default value specification compliant
-      value of <code>false</code> will be used.</p>
+      cookie values containing '<code>=</code>' will be terminated when the
+      '<code>=</code>' is encountered and the remainder of the cookie value will
+      be dropped.</p>
+      <p>If not specified, the default value specification compliant value of
+      <code>false</code> will be used.</p>
     </property>
 
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0">
       <p>If this is <code>true</code> Tomcat will allow HTTP separators in
-      cookie names and values. If not specified, the default specification
-      compliant value of <code>false</code> will be used.</p>
+      cookie names and values.</p>
+      <p>If not specified, the default specification compliant value of
+      <code>false</code> will be used.</p>
     </property>
 
     <property
@@ -334,9 +347,8 @@
       <p>If this is <code>true</code> Tomcat will always add an expires
       parameter to a SetCookie header even for cookies with version greater than
       zero. This is to work around a known IE6 and IE7 bug that causes IE to
-      ignore the Max-Age parameter in a SetCookie header. If not specified, the
-      default value will be used. If
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      ignore the Max-Age parameter in a SetCookie header.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>false</code>,
       else the default value will be <code>true</code>.</p>
     </property>
@@ -348,8 +360,8 @@
       cookie path attributes and some browsers will fail to process a cookie if
       the path attribute is quoted as is required by a strict adherence to the
       specifications. This is highly likely to break session tracking using
-      cookies. If not specified, the default value will be used. If
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      cookies.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
@@ -358,8 +370,8 @@
     name="org.apache.tomcat.util.http. ServerCookie.STRICT_NAMING">
       <p> If this is true then the requirements of the Servlet specification
       that Cookie names must adhere to RFC2109 (no use of separators) will be
-      enforced. If not specified, the default value will be used. If
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      enforced.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
@@ -381,8 +393,8 @@
     <property name="org.apache.catalina.core. StandardHostValve.ACCESS_SESSION">
       <p>If this is <code>true</code>, every request that is associated with a
       session will cause the session's last accessed time to be updated
-      regardless of whether or not the request explicitly accesses the session.
-      If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      regardless of whether or not the request explicitly accesses the session.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
@@ -391,8 +403,8 @@
     name="org.apache.catalina.session. StandardSession.ACTIVITY_CHECK">
       <p>If this is <code>true</code>, Tomcat will track the number of active
       requests for each session. When determining if a session is valid, any
-      session with at least one active request will always be considered valid.
-      If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      session with at least one active request will always be considered valid.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
@@ -403,8 +415,8 @@
       be calculated from the beginning of the previous request. If
       <code>false</code>, the last accessed time for sessions will be calculated
       from the end of the previous request. This also affects how the idle time
-      is calculated. If
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      is calculated.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
@@ -420,20 +432,20 @@
     <property name="org.apache.juli.AsyncOverflowDropType">
       <p>When the memory limit of records has been reached the system needs to determine what action to take.
          Currently there are three actions that can be taken:
+      </p>
          <ul>
            <li><code>int OVERFLOW_DROP_LAST = 1</code> - the record that caused the overflow will be dropped and not logged</li>
            <li><code>int OVERFLOW_DROP_FIRST = 2</code> - the record that is next in line to be logged will be dropped to make room for the latest record on the queue</li>
            <li><code>int OVERFLOW_DROP_FLUSH = 3</code> - suspend the thread while the queue empties out and flushes the entries to the write buffer</li>
            <li><code>int OVERFLOW_DROP_CURRENT = 4</code> - drop the current log entry</li>
          </ul>
-         Default value is <code>1</code> (OVERFLOW_DROP_LAST).
-      </p>
+      <p>The default value is <code>1</code> (OVERFLOW_DROP_LAST).</p>
     </property>
 
     <property name="org.apache.juli.AsyncMaxRecordCount">
       <p>The max number of log records that the async logger will keep in memory. When this limit is reached and a new record is being logged by the 
-         JULI framework the system will take an action based on the <code>org.apache.juli.AsyncOverflowDropType</code> setting.
-         The default value is <code>10000</code> records.<br/>
+         JULI framework the system will take an action based on the <code>org.apache.juli.AsyncOverflowDropType</code> setting.</p>
+      <p>The default value is <code>10000</code> records.
          This number represents the global number of records, not on a per handler basis.
       </p>
     </property>
@@ -441,9 +453,8 @@
     <property name="org.apache.juli.AsyncLoggerPollInterval">
       <p>The poll interval in milliseconds for the asynchronous logger thread in milliseconds.
          If the log queue is empty, the async thread will issue a poll(poll interval)
-         in order to not wake up to often.
-         The default value is <code>1000</code> milliseconds.
-      </p>
+         in order to not wake up to often.</p>
+      <p>The default value is <code>1000</code> milliseconds.</p>
     </property>
 
   </properties>
@@ -459,8 +470,8 @@
       <code>true</code>, custom HTTP status messages will be used within HTTP
       headers. If a custom message is specified that is not valid for use in an
       HTTP header (as defined by RFC2616) then the custom message will be
-      ignored and the default message used. If not specified, the default value
-      of <code>false</code> will be used.</p>
+      ignored and the default message used.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
     <property name="catalina.useNaming">
@@ -481,45 +492,46 @@
 
     <property name="tomcat.util.buf.StringCache.byte.enabled">
       <p>If <code>true</code>, the String cache is enabled for
-      <code>ByteChunk</code>. If not specified, the default value of
-      <code>false</code> will be used.</p>
+      <code>ByteChunk</code>.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
     <property name="tomcat.util.buf.StringCache.char.enabled">
       <p>If <code>true</code>, the String cache is enabled for
-      <code>CharChunk</code>. If not specified, the default value of
-      <code>false</code> will be used.</p>
+      <code>CharChunk</code>.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
     <property name="tomcat.util.buf.StringCache.trainThreshold">
       <p>The number of times <code>toString()</code> must be called before the
-      cache is activated. If not specified, the default value of
-      <code>20000</code> will be used.</p>
+      cache is activated.</p>
+      <p>If not specified, the default value of <code>20000</code> will be used.</p>
     </property>
 
     <property name="tomcat.util.buf.StringCache.cacheSize">
-      <p>The size of the String cache. If not specified, the default value of
-      <code>200</code> will be used.</p>
+      <p>The size of the String cache.</p>
+      <p>If not specified, the default value of <code>200</code> will be used.</p>
     </property>
 
     <property name="tomcat.util.buf.StringCache.maxStringSize">
-      <p>The maximum length of String that will be cached. If not specified, the
-      default value of <code>128</code> will be used.</p>
+      <p>The maximum length of String that will be cached.</p>
+      <p>If not specified, the default value of <code>128</code> will be used.</p>
     </property>
 
     <property name="org.apache.tomcat.util. http.FastHttpDateFormat.CACHE_SIZE">
-      <p>The size of the cache to use parsed and formatted date value. If not
-      specified, the default value of <code>1000</code> will be used.</p>
+      <p>The size of the cache to use parsed and formatted date value.</p>
+      <p>If not specified, the default value of <code>1000</code> will be used.</p>
     </property>
 
     <property name="org.apache.tomcat.util. net.NioSelectorShared">
-      <p>If <code>true</code>, use a shared selector for servlet write/read. If
-      not specified, the default value of <code>true</code> will be used.</p>
+      <p>If <code>true</code>, use a shared selector for servlet write/read.</p>
+      <p>If not specified, the default value of <code>true</code> will be used.</p>
     </property>
     
     <property name="org.apache.catalina.startup. EXIT_ON_INIT_FAILURE">
       <p>If <code>true</code>, the server will exit if an exception happens
-         during the server initialization phase. The default is <code>false</code>.</p>
+         during the server initialization phase.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
     
 
