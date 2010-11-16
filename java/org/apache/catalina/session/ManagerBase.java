@@ -905,9 +905,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void remove(Session session) {
-
-        sessions.remove(session.getIdInternal());
-
+        if (session.getIdInternal() != null) {
+            sessions.remove(session.getIdInternal());
+        }
     }
 
 
