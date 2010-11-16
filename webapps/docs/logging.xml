@@ -273,8 +273,10 @@ log4j.appender.CONSOLE.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 <br />
 # Configure which loggers log to which appenders<br />
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO, LOCALHOST<br />
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=INFO, MANAGER<br />
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=INFO, HOST-MANAGER<br />
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=\<br />
+  INFO, MANAGER<br />
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=\<br />
+  INFO, HOST-MANAGER<br />
 </source>
     <ol start="2">
         <li><a href="http://logging.apache.org/log4j">Download Log4J</a> 
