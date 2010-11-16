@@ -234,6 +234,9 @@
         distributed Manager implementations to report full session information
         through the HTML Manager. (markt)
       </fix>
+      <update>
+        Improve Tomcat Logging documentation. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
