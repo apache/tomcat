@@ -36,8 +36,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -99,7 +101,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * Return the MessageDigest implementation to be used when
      * creating session identifiers.
      */
-    protected MessageDigest digest = null;
+    protected Queue<MessageDigest> digests =
+        new ConcurrentLinkedQueue<MessageDigest>();
 
 
     /**
@@ -341,33 +344,32 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * session identifiers.  If none has been created yet, initialize
      * one the first time this method is called.
      */
-    public synchronized MessageDigest getDigest() {
+    protected MessageDigest createDigest() {
 
-        if (this.digest == null) {
-            long t1=System.currentTimeMillis();
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("managerBase.getting", algorithm));
+        MessageDigest result;
+        
+        long t1=System.currentTimeMillis();
+        if (log.isDebugEnabled())
+            log.debug(sm.getString("managerBase.getting", algorithm));
+        try {
+            result = MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            log.error(sm.getString("managerBase.digest", algorithm), e);
             try {
-                this.digest = MessageDigest.getInstance(algorithm);
-            } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("managerBase.digest", algorithm), e);
-                try {
-                    this.digest = MessageDigest.getInstance(DEFAULT_ALGORITHM);
-                } catch (NoSuchAlgorithmException f) {
-                    log.error(sm.getString("managerBase.digest",
-                                     DEFAULT_ALGORITHM), e);
-                    this.digest = null;
-                }
+                result = MessageDigest.getInstance(DEFAULT_ALGORITHM);
+            } catch (NoSuchAlgorithmException f) {
+                log.error(sm.getString("managerBase.digest",
+                                 DEFAULT_ALGORITHM), e);
+                result = null;
             }
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("managerBase.gotten"));
-            long t2=System.currentTimeMillis();
-            if( log.isDebugEnabled() )
-                log.debug("getDigest() " + (t2-t1));
         }
+        if (log.isDebugEnabled())
+            log.debug(sm.getString("managerBase.gotten"));
+        long t2=System.currentTimeMillis();
+        if( log.isDebugEnabled() )
+            log.debug("getDigest() " + (t2-t1));
 
-        return (this.digest);
-
+        return result;
     }
 
 
@@ -998,8 +1000,15 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             while (resultLenBytes < this.sessionIdLength) {
                 synchronized (this) {
                     getRandomBytes(random);
-                    random = getDigest().digest(random);
                 }
+                MessageDigest md = digests.poll();
+                if (md == null) {
+                    // If this fails, NPEs will follow. This should never fail
+                    // since if it falls back to the default digest
+                    md = createDigest();
+                }
+                random = md.digest(random);
+                digests.add(md);
                 for (int j = 0;
                 j < random.length && resultLenBytes < this.sessionIdLength;
                 j++) {
