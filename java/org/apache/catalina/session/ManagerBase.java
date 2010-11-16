@@ -959,7 +959,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    protected void getRandomBytes(byte bytes[]) {
+    protected synchronized void getRandomBytes(byte bytes[]) {
         // Generate a byte array containing a session identifier
         if (devRandomSourceIsValid && randomIS == null) {
             setRandomFile(devRandomSource);
@@ -1008,9 +1008,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             }
 
             while (resultLenBytes < this.sessionIdLength) {
-                synchronized (this) {
-                    getRandomBytes(random);
-                }
+                getRandomBytes(random);
                 MessageDigest md = digests.poll();
                 if (md == null) {
                     // If this fails, NPEs will follow. This should never fail
