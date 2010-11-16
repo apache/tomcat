@@ -230,11 +230,11 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
       named tomcat.log.
     </p>
 
-    <p>
-      <ol>
+    <ol>
         <li>Create a file called log4j.properties with the following content 
-            and save it into $CATALINA_HOME/lib.
-          <source>
+            and save it into $CATALINA_HOME/lib.</li>
+    </ol>
+    <source>
 log4j.rootLogger=INFO, CATALINA
 
 # Define all the appenders
@@ -275,9 +275,8 @@ log4j.appender.CONSOLE.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO, LOCALHOST<br />
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=INFO, MANAGER<br />
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=INFO, HOST-MANAGER<br />
-          </source>
-        </li>
-
+</source>
+    <ol start="2">
         <li><a href="http://logging.apache.org/log4j">Download Log4J</a> 
             (v1.2 or later) and place the log4j jar in $CATALINA_HOME/lib.</li>
 
@@ -294,8 +293,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
         <li>Delete <code>$CATALINA_BASE/conf/logging.properties</code> to
             prevent java.util.logging generating zero length log files.</li>
         <li>Start Tomcat</li>
-      </ol>
-    </p>
+    </ol>
 
     <p>
       This log4j configuration mirrors the default java.util.logging setup
