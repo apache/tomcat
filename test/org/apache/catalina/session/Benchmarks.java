@@ -30,11 +30,11 @@ import org.apache.catalina.core.StandardContext;
 public class Benchmarks extends TestCase {
 
     /*
-     * Results on markt's 4-core dev box
-     *  1 thread  -  ~1,500ms
-     *  2 threads -  ~3,700ms
-     *  4 threads -  ~8,100ms
-     * 16 threads - ~32,500ms
+     * Results on markt's 4-core Windows dev box
+     *  1 thread  -   ~270ms
+     *  2 threads -   ~400ms
+     *  4 threads -   ~970ms
+     * 16 threads - ~4,000ms
      */
     public void testManagerBaseGenerateSessionId() {
         doTestManagerBaseGenerateSessionId(1, 100000);
@@ -107,9 +107,9 @@ public class Benchmarks extends TestCase {
 
     
     /*
-     * Results on markt's 4-core dev box
-     *  1 thread  -  ~860ms
-     *  2 threads -  ~800ms
+     * Results on markt's 4-core Windows dev box
+     *  1 thread  -   ~860ms
+     *  2 threads -   ~800ms
      *  4 threads - ~1,600ms
      * 16 threads - ~6,900ms
      */
