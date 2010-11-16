@@ -73,8 +73,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     // ----------------------------------------------------- Instance Variables
 
-    protected DataInputStream randomIS=null;
-    protected String devRandomSource="/dev/urandom";
+    protected DataInputStream randomIS = null;
+    protected String devRandomSource = "/dev/urandom";
+    protected boolean devRandomSourceIsValid = true;
 
     /**
      * The default message digest algorithm to use if we cannot use
@@ -244,9 +245,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         
         @Override
         public DataInputStream run(){
+            devRandomSourceIsValid = true;
             try {
                 File f=new File( devRandomSource );
-                if( ! f.exists() ) return null;
+                if( ! f.exists() ) {
+                    devRandomSourceIsValid = false;
+                    return null;
+                }
                 randomIS= new DataInputStream( new FileInputStream(f));
                 randomIS.readLong();
                 if( log.isDebugEnabled() )
@@ -261,7 +266,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                         log.warn("Failed to close randomIS.");
                     }
                 }
-                devRandomSource = null;
+                devRandomSourceIsValid = false;
                 randomIS=null;
                 return null;
             }            
@@ -554,6 +559,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      *  - so use it if available.
      */
     public void setRandomFile( String s ) {
+        // Assume the source is valid until proved otherwise
+        devRandomSourceIsValid = true;
         // as a hack, you can use a static file - and generate the same
         // session ids ( good for strange debugging )
         if (Globals.IS_SECURITY_ENABLED){
@@ -562,7 +569,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             try{
                 devRandomSource=s;
                 File f=new File( devRandomSource );
-                if( ! f.exists() ) return;
+                if (!f.exists()) {
+                    devRandomSourceIsValid = false;
+                    return;
+                }
                 randomIS= new DataInputStream( new FileInputStream(f));
                 randomIS.readLong();
                 if( log.isDebugEnabled() )
@@ -576,7 +586,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                         log.warn("Failed to close randomIS.");
                     }
                 }
-                devRandomSource = null;
+                devRandomSourceIsValid = false;
                 randomIS=null;
             }
         }
@@ -951,7 +961,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     protected void getRandomBytes(byte bytes[]) {
         // Generate a byte array containing a session identifier
-        if (devRandomSource != null && randomIS == null) {
+        if (devRandomSourceIsValid && randomIS == null) {
             setRandomFile(devRandomSource);
         }
         if (randomIS != null) {
@@ -965,7 +975,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             } catch (Exception ex) {
                 // Ignore
             }
-            devRandomSource = null;
+            devRandomSourceIsValid = false;
             
             try {
                 randomIS.close();
