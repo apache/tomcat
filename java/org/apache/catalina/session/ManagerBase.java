@@ -980,7 +980,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Generate and return a new session identifier.
      */
-    protected synchronized String generateSessionId() {
+    protected String generateSessionId() {
 
         byte random[] = new byte[16];
         String jvmRoute = getJvmRoute();
@@ -996,8 +996,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             }
 
             while (resultLenBytes < this.sessionIdLength) {
-                getRandomBytes(random);
-                random = getDigest().digest(random);
+                synchronized (this) {
+                    getRandomBytes(random);
+                    random = getDigest().digest(random);
+                }
                 for (int j = 0;
                 j < random.length && resultLenBytes < this.sessionIdLength;
                 j++) {
