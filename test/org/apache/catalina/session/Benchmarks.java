@@ -108,10 +108,10 @@ public class Benchmarks extends TestCase {
     
     /*
      * Results on markt's 4-core dev box
-     *  1 thread  -  ~2,300ms
-     *  2 threads -  ~4,600ms
-     *  4 threads - ~12,300ms
-     * 16 threads - ~51,000ms
+     *  1 thread  -  ~860ms
+     *  2 threads -  ~800ms
+     *  4 threads - ~1,600ms
+     * 16 threads - ~6,900ms
      */
     public void testManagerBaseCreateSession() {
         doTestManagerBaseCreateSession(1, 100000);
