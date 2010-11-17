@@ -37,10 +37,10 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~21,000ms
      * 
      * Results on markt's 2-core OSX dev box
-     *  1 thread  -   ~5,900ms
-     *  2 threads -  ~16,100ms
-     *  4 threads -  ~32,500ms
-     * 16 threads - ~132,000ms
+     *  1 thread  -   ~5,600ms
+     *  2 threads -  ~ 7,300ms
+     *  4 threads -  ~14,400ms
+     * 16 threads -  ~57,559ms
      */
     public void testManagerBaseGenerateSessionId() throws Exception {
         doTestManagerBaseGenerateSessionId(1, 1000000);
@@ -63,7 +63,7 @@ public class Benchmarks extends TestCase {
         StandardManager mgr = new StandardManager();
         // Calling start requires a valid container so do the equivalent
         mgr.randomFileCurrent = mgr.randomFile;
-        mgr.createRandomIS();
+        mgr.createRandomInputStream();
         mgr.generateSessionId();
 
         
@@ -125,10 +125,10 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~43,800ms
      * 
      * Results on markt's 2-core OSX dev box
-     *  1 thread  -   ~8,800ms
-     *  2 threads -  ~23,200ms
-     *  4 threads -  ~51,900ms
-     * 16 threads - ~215,400ms
+     *  1 thread  -  ~9,100ms
+     *  2 threads - ~10,800ms
+     *  4 threads - ~21,400ms
+     * 16 threads - ~87,600ms
      */
     public void testManagerBaseCreateSession() {
         doTestManagerBaseCreateSession(1, 1000000);
@@ -145,7 +145,7 @@ public class Benchmarks extends TestCase {
         mgr.setContainer(new StandardContext());
         // Calling start requires a valid container so do the equivalent
         mgr.randomFileCurrent = mgr.randomFile;
-        mgr.createRandomIS();
+        mgr.createRandomInputStream();
         mgr.generateSessionId();
 
         Thread[] threads = new Thread[threadCount];
