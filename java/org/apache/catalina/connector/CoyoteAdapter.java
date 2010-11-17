@@ -669,10 +669,10 @@ public class CoyoteAdapter implements Adapter {
      */
     protected void parsePathParameters(org.apache.coyote.Request req,
             Request request) {
-        
+
         // Process in bytes (this is default format so this is normally a NO-OP
         req.decodedURI().toBytes();
-        
+
         ByteChunk uriBC = req.decodedURI().getByteChunk();
         int semicolon = uriBC.indexOf(';', 0);
 
@@ -691,6 +691,8 @@ public class CoyoteAdapter implements Adapter {
             log.debug(sm.getString("coyoteAdapter.debug", "enc", enc));
         }
 
+        boolean warnedEncoding = false;
+
         while (semicolon > -1) {
             // Parse path param, and extract it from the decoded request URI
             int start = uriBC.getStart();
@@ -698,12 +700,11 @@ public class CoyoteAdapter implements Adapter {
 
             int pathParamStart = semicolon + 1;
             int pathParamEnd = ByteChunk.findBytes(uriBC.getBuffer(),
-                    uriBC.getStart() + pathParamStart, uriBC.getEnd(),
+                    start + pathParamStart, end,
                     new byte[] {';', '/'});
-            
+
             String pv = null;
-            boolean warnedEncoding = false;
-            
+
             if (pathParamEnd >= 0) {
                 try {
                     pv = (new String(uriBC.getBuffer(), start + pathParamStart,
@@ -736,7 +737,7 @@ public class CoyoteAdapter implements Adapter {
                 }
                 uriBC.setEnd(start + semicolon);
             }
-            
+
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("coyoteAdapter.debug", "pathParamStart",
                         String.valueOf(pathParamStart)));
@@ -761,7 +762,7 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-            
+
             semicolon = uriBC.indexOf(';', semicolon);
         }
     }
