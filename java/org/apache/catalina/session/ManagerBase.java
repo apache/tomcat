@@ -22,10 +22,10 @@ package org.apache.catalina.session;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.MessageDigest;
@@ -73,9 +73,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     // ----------------------------------------------------- Instance Variables
 
-    protected DataInputStream randomIS = null;
-    protected String devRandomSource = "/dev/urandom";
-    protected boolean devRandomSourceIsValid = true;
+    protected volatile InputStream randomIS = null;
+    protected volatile String devRandomSource = "/dev/urandom";
+    protected volatile boolean devRandomSourceIsValid = true;
 
     /**
      * The default message digest algorithm to use if we cannot use
@@ -149,7 +149,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * A random number generator to use when generating session identifiers.
      */
-    protected Random random = null;
+    protected volatile Random random = null;
 
 
     /**
@@ -237,39 +237,33 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ------------------------------------------------------------- Security classes
 
 
-    private class PrivilegedSetRandomFile implements PrivilegedAction<DataInputStream> {
+    private class PrivilegedSetRandomFile implements PrivilegedAction<Void> {
         
         public PrivilegedSetRandomFile(String s) {
             devRandomSource = s;
         }
         
         @Override
-        public DataInputStream run(){
-            devRandomSourceIsValid = true;
+        public Void run(){
             try {
-                File f=new File( devRandomSource );
-                if( ! f.exists() ) {
+                File f = new File(devRandomSource);
+                if (!f.exists()) {
                     devRandomSourceIsValid = false;
+                    closeRandomFile();
                     return null;
                 }
-                randomIS= new DataInputStream( new FileInputStream(f));
-                randomIS.readLong();
+                InputStream is = new FileInputStream(f);
+                is.read();
                 if( log.isDebugEnabled() )
                     log.debug( "Opening " + devRandomSource );
-                return randomIS;
+                randomIS = is;
+                devRandomSourceIsValid = true;
             } catch (IOException ex){
                 log.warn("Error reading " + devRandomSource, ex);
-                if (randomIS != null) {
-                    try {
-                        randomIS.close();
-                    } catch (Exception e) {
-                        log.warn("Failed to close randomIS.");
-                    }
-                }
                 devRandomSourceIsValid = false;
-                randomIS=null;
-                return null;
-            }            
+                closeRandomFile();
+            }
+            return null;
         }
     }
 
@@ -558,36 +552,30 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      *  visible on the first call to getSession ( like in the first JSP )
      *  - so use it if available.
      */
-    public void setRandomFile( String s ) {
-        // Assume the source is valid until proved otherwise
-        devRandomSourceIsValid = true;
+    public synchronized void setRandomFile( String s ) {
         // as a hack, you can use a static file - and generate the same
         // session ids ( good for strange debugging )
         if (Globals.IS_SECURITY_ENABLED){
-            randomIS = AccessController.doPrivileged(new PrivilegedSetRandomFile(s));
+            AccessController.doPrivileged(new PrivilegedSetRandomFile(s));
         } else {
             try{
-                devRandomSource=s;
-                File f=new File( devRandomSource );
+                devRandomSource = s;
+                File f = new File(devRandomSource);
                 if (!f.exists()) {
                     devRandomSourceIsValid = false;
+                    closeRandomFile();
                     return;
                 }
-                randomIS= new DataInputStream( new FileInputStream(f));
-                randomIS.readLong();
+                InputStream is = new FileInputStream(f);
+                is.read();
                 if( log.isDebugEnabled() )
                     log.debug( "Opening " + devRandomSource );
+                randomIS = is;
+                devRandomSourceIsValid = true;
             } catch( IOException ex ) {
                 log.warn("Error reading " + devRandomSource, ex);
-                if (randomIS != null) {
-                    try {
-                        randomIS.close();
-                    } catch (Exception e) {
-                        log.warn("Failed to close randomIS.");
-                    }
-                }
                 devRandomSourceIsValid = false;
-                randomIS=null;
+                closeRandomFile();
             }
         }
     }
@@ -597,6 +585,17 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
+    protected synchronized void closeRandomFile() {
+        if (randomIS != null) {
+            try {
+                randomIS.close();
+            } catch (Exception e) {
+                log.warn("Failed to close randomIS.");
+            }
+            randomIS = null;
+        }
+    }
+    
     /**
      * Return the random number generator instance we should use for
      * generating session identifiers.  If there is no such generator
@@ -604,35 +603,39 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     public Random getRandom() {
         if (this.random == null) {
-            // Calculate the new random number generator seed
-            long seed = System.currentTimeMillis();
-            long t1 = seed;
-            char entropy[] = getEntropy().toCharArray();
-            for (int i = 0; i < entropy.length; i++) {
-                long update = ((byte) entropy[i]) << ((i % 8) * 8);
-                seed ^= update;
-            }
-            try {
-                // Construct and seed a new random number generator
-                Class<?> clazz = Class.forName(randomClass);
-                this.random = (Random) clazz.newInstance();
-                this.random.setSeed(seed);
-            } catch (Exception e) {
-                // Fall back to the simple case
-                log.error(sm.getString("managerBase.random", randomClass),
-                        e);
-                this.random = new java.util.Random();
-                this.random.setSeed(seed);
-            }
-            if(log.isDebugEnabled()) {
-                long t2=System.currentTimeMillis();
-                if( (t2-t1) > 100 )
-                    log.debug(sm.getString("managerBase.seeding", randomClass) + " " + (t2-t1));
+            synchronized (this) {
+                if (this.random == null) {
+                    // Calculate the new random number generator seed
+                    long seed = System.currentTimeMillis();
+                    long t1 = seed;
+                    char entropy[] = getEntropy().toCharArray();
+                    for (int i = 0; i < entropy.length; i++) {
+                        long update = ((byte) entropy[i]) << ((i % 8) * 8);
+                        seed ^= update;
+                    }
+                    try {
+                        // Construct and seed a new random number generator
+                        Class<?> clazz = Class.forName(randomClass);
+                        this.random = (Random) clazz.newInstance();
+                        this.random.setSeed(seed);
+                    } catch (Exception e) {
+                        // Fall back to the simple case
+                        log.error(sm.getString("managerBase.random",
+                                randomClass), e);
+                        this.random = new java.util.Random();
+                        this.random.setSeed(seed);
+                    }
+                    if(log.isDebugEnabled()) {
+                        long t2=System.currentTimeMillis();
+                        if( (t2-t1) > 100 )
+                            log.debug(sm.getString("managerBase.seeding",
+                                    randomClass) + " " + (t2-t1));
+                    }
+                }
             }
         }
         
-        return (this.random);
-
+        return this.random;
     }
 
 
@@ -766,16 +769,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     protected void destroyInternal() throws LifecycleException {
-
-        if (randomIS!=null) {
-            try {
-                randomIS.close();
-            } catch (IOException ioe) {
-                log.warn("Failed to close randomIS.");
-            }
-            randomIS=null;
-        }
-        
+        closeRandomFile();
         super.destroyInternal();
     }
     
@@ -959,14 +953,25 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    protected synchronized void getRandomBytes(byte bytes[]) {
+    protected void getRandomBytes(byte bytes[]) {
         // Generate a byte array containing a session identifier
         if (devRandomSourceIsValid && randomIS == null) {
-            setRandomFile(devRandomSource);
+            synchronized (this) {
+                if (devRandomSourceIsValid && randomIS == null) {
+                    setRandomFile(devRandomSource);
+                }
+            }
         }
         if (randomIS != null) {
             try {
-                int len = randomIS.read(bytes);
+                // If randomIS is set to null by a call to setRandomFile that
+                // fails, the resulting NPE will trigger a fall-back to
+                // getRandom()
+                int len;
+                synchronized (randomIS) {
+                    // FileInputStream is not thread safe on all platforms
+                     len = randomIS.read(bytes);
+                }
                 if (len == bytes.length) {
                     return;
                 }
@@ -976,14 +981,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 // Ignore
             }
             devRandomSourceIsValid = false;
-            
-            try {
-                randomIS.close();
-            } catch (Exception e) {
-                log.warn("Failed to close randomIS.");
-            }
-            
-            randomIS = null;
+            closeRandomFile();
         }
         getRandom().nextBytes(bytes);
     }
