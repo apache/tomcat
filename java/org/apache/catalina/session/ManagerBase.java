@@ -816,22 +816,29 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     @Override
-    protected void destroyInternal() throws LifecycleException {
-        closeRandomFile();
-        super.destroyInternal();
-    }
-    
-    @Override
     protected void initInternal() throws LifecycleException {
         
         super.initInternal();
         
         setDistributable(((Context) getContainer()).getDistributable());
-
-        // Initialize random number generation
-        getRandomBytes(new byte[16]);
     }
 
+    @Override
+    protected void startInternal() throws LifecycleException {
+        // Force initialization of the random number generator
+        if (log.isDebugEnabled())
+            log.debug("Force random number initialization starting");
+        generateSessionId();
+        if (log.isDebugEnabled())
+            log.debug("Force random number initialization completed");
+    }
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        closeRandomFile();
+        super.destroyInternal();
+    }
+    
     /**
      * Add this Session to the set of active Sessions for this Manager.
      *
