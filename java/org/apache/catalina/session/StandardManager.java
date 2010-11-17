@@ -458,8 +458,8 @@ public class StandardManager extends ManagerBase {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-    	super.startInternal();
-    	
+        super.startInternal();
+
         // Load unloaded sessions, if any
         try {
             load();
