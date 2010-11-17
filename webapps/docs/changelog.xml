@@ -136,6 +136,10 @@
         <bug>50252</bug>: Prevent ClassCastException when using a
         &lt;ResourceLink&gt;. Patch provided by Eiji Takahashi. (markt)
       </fix>
+      <add>
+        Reduce synchronization in session managers to improve performance of
+        session creation. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
