@@ -1003,6 +1003,25 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void remove(Session session) {
+        
+        // If the session has expired - as opposed to just being removed from
+        // the manager because it is being persisted - update the expired stats
+        if (!session.isValid()) {
+            long timeNow = System.currentTimeMillis();
+            int timeAlive = (int) ((timeNow - session.getCreationTime())/1000);
+            synchronized (this) {
+                if (timeAlive > getSessionMaxAliveTime()) {
+                    setSessionMaxAliveTime(timeAlive);
+                }
+                long numExpired = getExpiredSessions();
+                numExpired++;
+                setExpiredSessions(numExpired);
+                int average = getSessionAverageAliveTime();
+                average = (int) (((average * (numExpired-1)) + timeAlive)/numExpired);
+                setSessionAverageAliveTime(average);
+            }
+        }
+
         if (session.getIdInternal() != null) {
             sessions.remove(session.getIdInternal());
         }
