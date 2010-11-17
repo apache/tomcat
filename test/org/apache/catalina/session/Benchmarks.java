@@ -42,7 +42,7 @@ public class Benchmarks extends TestCase {
      *  4 threads -  ~32,500ms
      * 16 threads - ~132,000ms
      */
-    public void testManagerBaseGenerateSessionId() {
+    public void testManagerBaseGenerateSessionId() throws Exception {
         doTestManagerBaseGenerateSessionId(1, 1000000);
         doTestManagerBaseGenerateSessionId(1, 1000000);
         doTestManagerBaseGenerateSessionId(1, 1000000);
@@ -57,10 +57,15 @@ public class Benchmarks extends TestCase {
     
     
     public void doTestManagerBaseGenerateSessionId(int threadCount,
-            int iterCount) {
+            int iterCount) throws Exception {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
+        // Calling start requires a valid container so do the equivalent
+        mgr.randomFileCurrent = mgr.randomFile;
+        mgr.createRandomIS();
+        mgr.generateSessionId();
+
         
         Thread[] threads = new Thread[threadCount];
         
@@ -138,7 +143,11 @@ public class Benchmarks extends TestCase {
         // Create a default session manager
         StandardManager mgr = new StandardManager();
         mgr.setContainer(new StandardContext());
-        
+        // Calling start requires a valid container so do the equivalent
+        mgr.randomFileCurrent = mgr.randomFile;
+        mgr.createRandomIS();
+        mgr.generateSessionId();
+
         Thread[] threads = new Thread[threadCount];
         
         for (int i = 0; i < threadCount; i++) {

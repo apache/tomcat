@@ -116,8 +116,13 @@
                  type="java.lang.String"/>
 
     <attribute   name="randomFile"
-          description="File source of random - /dev/urandom or a pipe"
+          description="File source of random - /dev/urandom or a pipe that will be used when the Manager is next started"
                  type="java.lang.String"/>
+                 
+    <attribute   name="randomFileCurrent"
+          description="File source of random - /dev/urandom or a pipe currently being used"
+                 type="java.lang.String"
+            writeable="false"/>
                  
     <attribute   name="randomClass"
           description="The random number generator class name"

@@ -959,8 +959,9 @@ public CatalinaCluster getCluster() {
         }
 
         // Require a new random number generator if we are restarted
-        this.randoms.clear();
         getCluster().removeManager(this);
+        this.randoms.clear();
+        super.stopInternal();
         replicationValve = null;
     }
 
