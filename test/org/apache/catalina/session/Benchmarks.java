@@ -31,10 +31,10 @@ public class Benchmarks extends TestCase {
 
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -   ~300ms
-     *  2 threads -   ~330ms
-     *  4 threads -   ~480ms
-     * 16 threads - ~2,200ms
+     *  1 thread  -  ~1,900ms
+     *  2 threads -  ~3,300ms
+     *  4 threads -  ~4,800ms
+     * 16 threads - ~21,000ms
      * 
      * Results on markt's 2-core OSX dev box (out of date)
      *  1 thread  -    ~720ms
@@ -43,16 +43,16 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~12,700ms
      */
     public void testManagerBaseGenerateSessionId() {
-        doTestManagerBaseGenerateSessionId(1, 100000);
-        doTestManagerBaseGenerateSessionId(1, 100000);
-        doTestManagerBaseGenerateSessionId(1, 100000);
-        doTestManagerBaseGenerateSessionId(2, 100000);
-        doTestManagerBaseGenerateSessionId(2, 100000);
-        doTestManagerBaseGenerateSessionId(2, 100000);
-        doTestManagerBaseGenerateSessionId(4, 100000);
-        doTestManagerBaseGenerateSessionId(4, 100000);
-        doTestManagerBaseGenerateSessionId(4, 100000);
-        doTestManagerBaseGenerateSessionId(16, 100000);
+        doTestManagerBaseGenerateSessionId(1, 1000000);
+        doTestManagerBaseGenerateSessionId(1, 1000000);
+        doTestManagerBaseGenerateSessionId(1, 1000000);
+        doTestManagerBaseGenerateSessionId(2, 1000000);
+        doTestManagerBaseGenerateSessionId(2, 1000000);
+        doTestManagerBaseGenerateSessionId(2, 1000000);
+        doTestManagerBaseGenerateSessionId(4, 1000000);
+        doTestManagerBaseGenerateSessionId(4, 1000000);
+        doTestManagerBaseGenerateSessionId(4, 1000000);
+        doTestManagerBaseGenerateSessionId(16, 1000000);
     }
     
     
@@ -114,10 +114,10 @@ public class Benchmarks extends TestCase {
     
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -   ~625ms
-     *  2 threads -   ~690ms
-     *  4 threads - ~1,100ms
-     * 16 threads - ~4,300ms
+     *  1 thread  -  ~4,600ms
+     *  2 threads -  ~6,700ms
+     *  4 threads - ~10,400ms
+     * 16 threads - ~43,800ms
      * 
      * Results on markt's 2-core OSX dev box (out of date)
      *  1 thread  -  ~1,500ms
@@ -126,10 +126,10 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~18,600ms
      */
     public void testManagerBaseCreateSession() {
-        doTestManagerBaseCreateSession(1, 100000);
-        doTestManagerBaseCreateSession(2, 100000);
-        doTestManagerBaseCreateSession(4, 100000);
-        doTestManagerBaseCreateSession(16, 100000);
+        doTestManagerBaseCreateSession(1, 1000000);
+        doTestManagerBaseCreateSession(2, 1000000);
+        doTestManagerBaseCreateSession(4, 1000000);
+        doTestManagerBaseCreateSession(16, 1000000);
     }
     
     
