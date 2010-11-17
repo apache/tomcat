@@ -870,7 +870,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
             ((Lifecycle)getStore()).stop();
 
         // Require a new random number generator if we are restarted
-        this.random = null;
+        this.randoms.clear();
     }
 
 
