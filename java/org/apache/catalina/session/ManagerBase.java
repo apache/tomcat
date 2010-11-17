@@ -22,6 +22,8 @@ package org.apache.catalina.session;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -99,8 +102,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the MessageDigest implementation to be used when
-     * creating session identifiers.
+     * Queue of MessageDigest objects to be used when creating session
+     * identifiers. If the queue is empty when a MessageDigest is required, a
+     * new MessageDigest object is created. This is designed this way since
+     * MessageDigest objects are not thread-safe and sync'ing on a single object
+     * is slow(er).
      */
     protected Queue<MessageDigest> digests =
         new ConcurrentLinkedQueue<MessageDigest>();
@@ -147,14 +153,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * A random number generator to use when generating session identifiers.
+     * Queue of random number generator objects to be used when creating session
+     * identifiers. If the queue is empty when a random number generator is
+     * required, a new random number generator object is created. This is
+     * designed this way since random number generator use a sync to make them
+     * thread-safe and the sync makes using a a single object slow(er).
      */
-    protected volatile Random random = null;
+    protected Queue<Random> randoms = new ConcurrentLinkedQueue<Random>();
 
+    /**
+     * Random number generator used to see @{link {@link #randoms}.
+     */
+    protected SecureRandom randomSeed = null;
 
     /**
      * The Java class name of the random number generator class to be used
-     * when generating session identifiers.
+     * when generating session identifiers. The random number generator(s) will
+     * always be seeded from a SecureRandom instance.
      */
     protected String randomClass = "java.security.SecureRandom";
 
@@ -597,45 +612,78 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
     
     /**
-     * Return the random number generator instance we should use for
-     * generating session identifiers.  If there is no such generator
-     * currently defined, construct and seed a new one.
+     * Create a new random number generator instance we should use for
+     * generating session identifiers.
      */
-    public Random getRandom() {
-        if (this.random == null) {
-            synchronized (this) {
-                if (this.random == null) {
-                    // Calculate the new random number generator seed
-                    long seed = System.currentTimeMillis();
-                    long t1 = seed;
-                    char entropy[] = getEntropy().toCharArray();
-                    for (int i = 0; i < entropy.length; i++) {
-                        long update = ((byte) entropy[i]) << ((i % 8) * 8);
-                        seed ^= update;
-                    }
-                    try {
-                        // Construct and seed a new random number generator
-                        Class<?> clazz = Class.forName(randomClass);
-                        this.random = (Random) clazz.newInstance();
-                        this.random.setSeed(seed);
-                    } catch (Exception e) {
-                        // Fall back to the simple case
-                        log.error(sm.getString("managerBase.random",
-                                randomClass), e);
-                        this.random = new java.util.Random();
-                        this.random.setSeed(seed);
-                    }
-                    if(log.isDebugEnabled()) {
-                        long t2=System.currentTimeMillis();
-                        if( (t2-t1) > 100 )
-                            log.debug(sm.getString("managerBase.seeding",
-                                    randomClass) + " " + (t2-t1));
-                    }
-                }
+    protected Random createRandom() {
+        if (randomSeed == null) {
+            createRandomSeed();
+        }
+        
+        Random result = null;
+        
+        long t1 = System.currentTimeMillis();
+        try {
+            // Construct and seed a new random number generator
+            Class<?> clazz = Class.forName(randomClass);
+            result = (Random) clazz.newInstance();
+        } catch (Exception e) {
+            // Fall back to the simple case
+            log.error(sm.getString("managerBase.random",
+                    randomClass), e);
+            result = new java.util.Random();
+        }
+        byte[] seedBytes = randomSeed.generateSeed(64);
+        ByteArrayInputStream bais = new ByteArrayInputStream(seedBytes);
+        DataInputStream dis = new DataInputStream(bais);
+        for (int i = 0; i < 8; i++) {
+            try {
+                result.setSeed(dis.readLong());
+            } catch (IOException e) {
+                // Should never happen
+                log.error(sm.getString("managerBase.seedFailed",
+                        result.getClass().getName()), e);
             }
         }
         
-        return this.random;
+        if(log.isDebugEnabled()) {
+            long t2=System.currentTimeMillis();
+            if( (t2-t1) > 100 )
+                log.debug(sm.getString("managerBase.createRandom",
+                        Long.valueOf(t2-t1)));
+        }
+        return result;
+    }
+
+
+    /**
+     * Create the random number generator that will be used to seed the random
+     * number generators that will create session IDs. 
+     */
+    protected synchronized void createRandomSeed() {
+        if (randomSeed != null) {
+            return;
+        }
+
+        long seed = System.currentTimeMillis();
+        long t1 = seed;
+        char entropy[] = getEntropy().toCharArray();
+        for (int i = 0; i < entropy.length; i++) {
+            long update = ((byte) entropy[i]) << ((i % 8) * 8);
+            seed ^= update;
+        }
+
+        // Construct and seed a new random number generator
+        SecureRandom result = new SecureRandom();
+        result.setSeed(seed);
+
+        if(log.isDebugEnabled()) {
+            long t2=System.currentTimeMillis();
+            if( (t2-t1) > 100 )
+                log.debug(sm.getString("managerBase.createRandomSeed",
+                        Long.valueOf(t2-t1)));
+        }
+        randomSeed = result;
     }
 
 
@@ -983,7 +1031,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             devRandomSourceIsValid = false;
             closeRandomFile();
         }
-        getRandom().nextBytes(bytes);
+        Random random = randoms.poll();
+        if (random == null) {
+            random = createRandom();
+        }
+        random.nextBytes(bytes);
+        randoms.add(random);
     }
 
 
