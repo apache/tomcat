@@ -36,11 +36,11 @@ public class Benchmarks extends TestCase {
      *  4 threads -  ~4,800ms
      * 16 threads - ~21,000ms
      * 
-     * Results on markt's 2-core OSX dev box (out of date)
-     *  1 thread  -    ~720ms
-     *  2 threads -  ~1,700ms
-     *  4 threads -  ~3,100ms
-     * 16 threads - ~12,700ms
+     * Results on markt's 2-core OSX dev box
+     *  1 thread  -   ~5,900ms
+     *  2 threads -  ~16,100ms
+     *  4 threads -  ~32,500ms
+     * 16 threads - ~132,000ms
      */
     public void testManagerBaseGenerateSessionId() {
         doTestManagerBaseGenerateSessionId(1, 1000000);
@@ -119,11 +119,11 @@ public class Benchmarks extends TestCase {
      *  4 threads - ~10,400ms
      * 16 threads - ~43,800ms
      * 
-     * Results on markt's 2-core OSX dev box (out of date)
-     *  1 thread  -  ~1,500ms
-     *  2 threads -  ~2,500ms
-     *  4 threads -  ~4,500ms
-     * 16 threads - ~18,600ms
+     * Results on markt's 2-core OSX dev box
+     *  1 thread  -   ~8,800ms
+     *  2 threads -  ~23,200ms
+     *  4 threads -  ~51,900ms
+     * 16 threads - ~215,400ms
      */
     public void testManagerBaseCreateSession() {
         doTestManagerBaseCreateSession(1, 1000000);
