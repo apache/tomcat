@@ -76,7 +76,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     // ----------------------------------------------------- Instance Variables
 
-    protected volatile InputStream randomIS = null;
+    protected volatile Queue<InputStream> randomInputStreams =
+        new ConcurrentLinkedQueue<InputStream>();
     protected String randomFile = "/dev/urandom";
     protected String randomFileCurrent = null;
     protected volatile boolean randomFileCurrentIsValid = true;
@@ -253,27 +254,28 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ------------------------------------------------------------- Security classes
 
 
-    private class PrivilegedCreateRandomIS implements PrivilegedAction<Void> {
+    private class PrivilegedCreateRandomInputStream
+            implements PrivilegedAction<InputStream> {
         
         @Override
-        public Void run(){
+        public InputStream run(){
             try {
                 File f = new File(randomFileCurrent);
                 if (!f.exists()) {
                     randomFileCurrentIsValid = false;
-                    closeRandomFile();
+                    closeRandomInputStreams();
                     return null;
                 }
                 InputStream is = new FileInputStream(f);
                 is.read();
                 if( log.isDebugEnabled() )
                     log.debug( "Opening " + randomFileCurrent );
-                randomIS = is;
                 randomFileCurrentIsValid = true;
+                return is;
             } catch (IOException ex){
                 log.warn("Error reading " + randomFileCurrent, ex);
                 randomFileCurrentIsValid = false;
-                closeRandomFile();
+                closeRandomInputStreams();
             }
             return null;
         }
@@ -570,28 +572,30 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         randomFile = s;
     }
     
-    protected void createRandomIS() {
+    protected InputStream createRandomInputStream() {
         if (Globals.IS_SECURITY_ENABLED){
-            AccessController.doPrivileged(new PrivilegedCreateRandomIS());
+            return AccessController.doPrivileged(
+                    new PrivilegedCreateRandomInputStream());
         } else {
             try{
                 File f = new File(randomFileCurrent);
                 if (!f.exists()) {
                     randomFileCurrentIsValid = false;
-                    closeRandomFile();
-                    return;
+                    closeRandomInputStreams();
+                    return null;
                 }
                 InputStream is = new FileInputStream(f);
                 is.read();
                 if( log.isDebugEnabled() )
                     log.debug( "Opening " + randomFileCurrent );
-                randomIS = is;
                 randomFileCurrentIsValid = true;
+                return is;
             } catch( IOException ex ) {
                 log.warn("Error reading " + randomFileCurrent, ex);
                 randomFileCurrentIsValid = false;
-                closeRandomFile();
+                closeRandomInputStreams();
             }
+            return null;
         }
     }
 
@@ -624,14 +628,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
     
     
-    protected synchronized void closeRandomFile() {
-        if (randomIS != null) {
+    protected synchronized void closeRandomInputStreams() {
+        InputStream is = randomInputStreams.poll();
+        
+        while (is != null) {
             try {
-                randomIS.close();
+                is.close();
             } catch (Exception e) {
-                log.warn("Failed to close randomIS.");
+                log.warn("Failed to close randomInputStream.");
             }
-            randomIS = null;
+            is = randomInputStreams.poll();
         }
     }
     
@@ -851,7 +857,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected void startInternal() throws LifecycleException {
 
         randomFileCurrent = randomFile;
-        createRandomIS();
+        InputStream is = createRandomInputStream();
+        if (is != null) {
+            randomInputStreams.add(is);
+        }
 
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
@@ -863,7 +872,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        closeRandomFile();
+        closeRandomInputStreams();
     }
 
 
@@ -1037,17 +1046,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     protected void getRandomBytes(byte bytes[]) {
-        if (randomIS != null) {
+        if (randomFileCurrentIsValid) {
+            InputStream is = null;
             try {
-                // If randomIS is set to null by a call to setRandomFile that
-                // fails, the resulting NPE will trigger a fall-back to
-                // getRandom()
-                int len;
-                synchronized (randomIS) {
-                    // FileInputStream is not thread safe on all platforms
-                     len = randomIS.read(bytes);
+                // If one of the InputStreams fails, is will be null and the
+                // resulting NPE will trigger a fall-back to getRandom()
+                is = randomInputStreams.poll();
+                if (is == null) {
+                    is = createRandomInputStream();
                 }
+                int len = is.read(bytes);
                 if (len == bytes.length) {
+                    randomInputStreams.add(is);
                     return;
                 }
                 if(log.isDebugEnabled())
@@ -1056,7 +1066,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 // Ignore
             }
             randomFileCurrentIsValid = false;
-            closeRandomFile();
+            if (is != null) {
+                randomInputStreams.add(is);
+            }
+            closeRandomInputStreams();
         }
         Random random = randoms.poll();
         if (random == null) {
