@@ -179,7 +179,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * The longest time (in seconds) that an expired session had been alive.
      */
-    protected int sessionMaxAliveTime;
+    protected volatile int sessionMaxAliveTime;
+    private final Object sessionMaxAliveTimeUpdateLock = new Object();
 
 
     /**
@@ -1009,10 +1010,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         if (!session.isValid()) {
             long timeNow = System.currentTimeMillis();
             int timeAlive = (int) ((timeNow - session.getCreationTime())/1000);
+            updateSessionMaxAliveTime(timeAlive);
             synchronized (this) {
-                if (timeAlive > getSessionMaxAliveTime()) {
-                    setSessionMaxAliveTime(timeAlive);
-                }
                 long numExpired = getExpiredSessions();
                 numExpired++;
                 setExpiredSessions(numExpired);
@@ -1291,16 +1290,35 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Sets the longest time (in seconds) that an expired session had been
-     * alive.
+     * alive. Typically used for resetting the current value.
      *
      * @param sessionMaxAliveTime Longest time (in seconds) that an expired
      * session had been alive.
      */
     @Override
     public void setSessionMaxAliveTime(int sessionMaxAliveTime) {
-        this.sessionMaxAliveTime = sessionMaxAliveTime;
+        synchronized (sessionMaxAliveTimeUpdateLock) {
+            this.sessionMaxAliveTime = sessionMaxAliveTime;
+        }
     }
 
+
+    /**
+     * Updates the sessionMaxAliveTime attribute if the candidate value is
+     * larger than the current value.
+     * 
+     * @param sessionAliveTime  The candidate value (in seconds) for the new 
+     *                          sessionMaxAliveTime value.
+     */
+    public void updateSessionMaxAliveTime(int sessionAliveTime) {
+        if (sessionAliveTime > this.sessionMaxAliveTime) {
+            synchronized (sessionMaxAliveTimeUpdateLock) {
+                if (sessionAliveTime > this.sessionMaxAliveTime) {
+                    this.sessionMaxAliveTime = sessionAliveTime;
+                }
+            }
+        }
+    }
 
     /**
      * Gets the average time (in seconds) that expired sessions had been
