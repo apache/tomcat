@@ -822,12 +822,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // Force initialization of the random number generator
-        if (log.isDebugEnabled())
-            log.debug("Force random number initialization starting");
-        generateSessionId();
-        if (log.isDebugEnabled())
-            log.debug("Force random number initialization completed");
+    	super.startInternal();
 
         if (store == null)
             log.error("No Store configured, persistence disabled");
