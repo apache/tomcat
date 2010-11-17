@@ -203,7 +203,7 @@ public class BackupManager extends ClusterManagerBase
         }
 
         cluster.removeManager(this);
-        this.random = null;
+        this.randoms.clear();
     }
 
     @Override
