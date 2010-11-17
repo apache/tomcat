@@ -737,7 +737,7 @@ public CatalinaCluster getCluster() {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-    	super.startInternal();
+        super.startInternal();
 
         // Load unloaded sessions, if any
         try {
