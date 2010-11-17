@@ -32,9 +32,9 @@ public class Benchmarks extends TestCase {
     /*
      * Results on markt's 4-core Windows dev box
      *  1 thread  -   ~270ms
-     *  2 threads -   ~400ms
-     *  4 threads -   ~970ms
-     * 16 threads - ~4,000ms
+     *  2 threads -   ~350ms
+     *  4 threads -   ~870ms
+     * 16 threads - ~3,500ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -    ~720ms
@@ -114,10 +114,10 @@ public class Benchmarks extends TestCase {
     
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -   ~860ms
-     *  2 threads -   ~800ms
-     *  4 threads - ~1,600ms
-     * 16 threads - ~6,900ms
+     *  1 thread  -   ~670ms
+     *  2 threads -   ~690ms
+     *  4 threads - ~1,100ms
+     * 16 threads - ~5,000ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -  ~1,500ms
