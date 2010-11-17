@@ -737,8 +737,7 @@ public CatalinaCluster getCluster() {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // Force initialization of the random number generator
-        generateSessionId();
+    	super.startInternal();
 
         // Load unloaded sessions, if any
         try {

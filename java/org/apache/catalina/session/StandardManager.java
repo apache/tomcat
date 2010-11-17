@@ -458,13 +458,8 @@ public class StandardManager extends ManagerBase {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // Force initialization of the random number generator
-        if (log.isDebugEnabled())
-            log.debug("Force random number initialization starting");
-        generateSessionId();
-        if (log.isDebugEnabled())
-            log.debug("Force random number initialization completed");
-
+    	super.startInternal();
+    	
         // Load unloaded sessions, if any
         try {
             load();
