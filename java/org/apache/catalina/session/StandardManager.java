@@ -514,6 +514,7 @@ public class StandardManager extends ManagerBase {
 
         // Require a new random number generator if we are restarted
         this.randoms.clear();
+        super.stopInternal();
     }
 
 

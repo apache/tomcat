@@ -77,8 +77,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ----------------------------------------------------- Instance Variables
 
     protected volatile InputStream randomIS = null;
-    protected volatile String randomFile = "/dev/urandom";
-    protected volatile boolean randomFileIsValid = true;
+    protected String randomFile = "/dev/urandom";
+    protected String randomFileCurrent = null;
+    protected volatile boolean randomFileCurrentIsValid = true;
 
     /**
      * The default message digest algorithm to use if we cannot use
@@ -252,30 +253,26 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ------------------------------------------------------------- Security classes
 
 
-    private class PrivilegedSetRandomFile implements PrivilegedAction<Void> {
-        
-        public PrivilegedSetRandomFile(String s) {
-            randomFile = s;
-        }
+    private class PrivilegedCreateRandomIS implements PrivilegedAction<Void> {
         
         @Override
         public Void run(){
             try {
-                File f = new File(randomFile);
+                File f = new File(randomFileCurrent);
                 if (!f.exists()) {
-                    randomFileIsValid = false;
+                    randomFileCurrentIsValid = false;
                     closeRandomFile();
                     return null;
                 }
                 InputStream is = new FileInputStream(f);
                 is.read();
                 if( log.isDebugEnabled() )
-                    log.debug( "Opening " + randomFile );
+                    log.debug( "Opening " + randomFileCurrent );
                 randomIS = is;
-                randomFileIsValid = true;
+                randomFileCurrentIsValid = true;
             } catch (IOException ex){
-                log.warn("Error reading " + randomFile, ex);
-                randomFileIsValid = false;
+                log.warn("Error reading " + randomFileCurrent, ex);
+                randomFileCurrentIsValid = false;
                 closeRandomFile();
             }
             return null;
@@ -567,39 +564,66 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      *  visible on the first call to getSession ( like in the first JSP )
      *  - so use it if available.
      */
-    public synchronized void setRandomFile( String s ) {
+    public void setRandomFile(String s) {
         // as a hack, you can use a static file - and generate the same
         // session ids ( good for strange debugging )
+        randomFile = s;
+    }
+    
+    protected void createRandomIS() {
         if (Globals.IS_SECURITY_ENABLED){
-            AccessController.doPrivileged(new PrivilegedSetRandomFile(s));
+            AccessController.doPrivileged(new PrivilegedCreateRandomIS());
         } else {
             try{
-                randomFile = s;
-                File f = new File(randomFile);
+                File f = new File(randomFileCurrent);
                 if (!f.exists()) {
-                    randomFileIsValid = false;
+                    randomFileCurrentIsValid = false;
                     closeRandomFile();
                     return;
                 }
                 InputStream is = new FileInputStream(f);
                 is.read();
                 if( log.isDebugEnabled() )
-                    log.debug( "Opening " + randomFile );
+                    log.debug( "Opening " + randomFileCurrent );
                 randomIS = is;
-                randomFileIsValid = true;
+                randomFileCurrentIsValid = true;
             } catch( IOException ex ) {
-                log.warn("Error reading " + randomFile, ex);
-                randomFileIsValid = false;
+                log.warn("Error reading " + randomFileCurrent, ex);
+                randomFileCurrentIsValid = false;
                 closeRandomFile();
             }
         }
     }
 
+    
+    /**
+     * Obtain the value of the randomFile attribute currently configured for
+     * this Manager. Note that this will not return the same value as
+     * {@link #getRandomFileCurrent()} if the value for the randomFile attribute
+     * has been changed since this Manager was started.
+     * 
+     * @return  The file currently configured to provide random data for use in
+     *          generating session IDs
+     */
     public String getRandomFile() {
         return randomFile;
     }
 
 
+    /**
+     * Obtain the value of the randomFile attribute currently being used by
+     * this Manager. Note that this will not return the same value as
+     * {@link #getRandomFile()} if the value for the randomFile attribute has
+     * been changed since this Manager was started.
+     * 
+     * @return  The file currently being used to provide random data for use in
+     *          generating session IDs
+     */
+    public String getRandomFileCurrent() {
+        return randomFileCurrent;
+    }
+    
+    
     protected synchronized void closeRandomFile() {
         if (randomIS != null) {
             try {
@@ -825,6 +849,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     protected void startInternal() throws LifecycleException {
+
+        randomFileCurrent = randomFile;
+        createRandomIS();
+
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
             log.debug("Force random number initialization starting");
@@ -834,11 +862,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     @Override
-    protected void destroyInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         closeRandomFile();
-        super.destroyInternal();
     }
-    
+
+
     /**
      * Add this Session to the set of active Sessions for this Manager.
      *
@@ -1009,14 +1037,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     protected void getRandomBytes(byte bytes[]) {
-        // Generate a byte array containing a session identifier
-        if (randomFileIsValid && randomIS == null) {
-            synchronized (this) {
-                if (randomFileIsValid && randomIS == null) {
-                    setRandomFile(randomFile);
-                }
-            }
-        }
         if (randomIS != null) {
             try {
                 // If randomIS is set to null by a call to setRandomFile that
@@ -1035,7 +1055,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             } catch (Exception ex) {
                 // Ignore
             }
-            randomFileIsValid = false;
+            randomFileCurrentIsValid = false;
             closeRandomFile();
         }
         Random random = randoms.poll();
