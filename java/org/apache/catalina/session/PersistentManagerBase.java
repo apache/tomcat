@@ -822,7 +822,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-    	super.startInternal();
+        super.startInternal();
 
         if (store == null)
             log.error("No Store configured, persistence disabled");
