@@ -77,8 +77,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ----------------------------------------------------- Instance Variables
 
     protected volatile InputStream randomIS = null;
-    protected volatile String devRandomSource = "/dev/urandom";
-    protected volatile boolean devRandomSourceIsValid = true;
+    protected volatile String randomFile = "/dev/urandom";
+    protected volatile boolean randomFileIsValid = true;
 
     /**
      * The default message digest algorithm to use if we cannot use
@@ -255,27 +255,27 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     private class PrivilegedSetRandomFile implements PrivilegedAction<Void> {
         
         public PrivilegedSetRandomFile(String s) {
-            devRandomSource = s;
+            randomFile = s;
         }
         
         @Override
         public Void run(){
             try {
-                File f = new File(devRandomSource);
+                File f = new File(randomFile);
                 if (!f.exists()) {
-                    devRandomSourceIsValid = false;
+                    randomFileIsValid = false;
                     closeRandomFile();
                     return null;
                 }
                 InputStream is = new FileInputStream(f);
                 is.read();
                 if( log.isDebugEnabled() )
-                    log.debug( "Opening " + devRandomSource );
+                    log.debug( "Opening " + randomFile );
                 randomIS = is;
-                devRandomSourceIsValid = true;
+                randomFileIsValid = true;
             } catch (IOException ex){
-                log.warn("Error reading " + devRandomSource, ex);
-                devRandomSourceIsValid = false;
+                log.warn("Error reading " + randomFile, ex);
+                randomFileIsValid = false;
                 closeRandomFile();
             }
             return null;
@@ -574,29 +574,29 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             AccessController.doPrivileged(new PrivilegedSetRandomFile(s));
         } else {
             try{
-                devRandomSource = s;
-                File f = new File(devRandomSource);
+                randomFile = s;
+                File f = new File(randomFile);
                 if (!f.exists()) {
-                    devRandomSourceIsValid = false;
+                    randomFileIsValid = false;
                     closeRandomFile();
                     return;
                 }
                 InputStream is = new FileInputStream(f);
                 is.read();
                 if( log.isDebugEnabled() )
-                    log.debug( "Opening " + devRandomSource );
+                    log.debug( "Opening " + randomFile );
                 randomIS = is;
-                devRandomSourceIsValid = true;
+                randomFileIsValid = true;
             } catch( IOException ex ) {
-                log.warn("Error reading " + devRandomSource, ex);
-                devRandomSourceIsValid = false;
+                log.warn("Error reading " + randomFile, ex);
+                randomFileIsValid = false;
                 closeRandomFile();
             }
         }
     }
 
     public String getRandomFile() {
-        return devRandomSource;
+        return randomFile;
     }
 
 
@@ -1010,10 +1010,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     protected void getRandomBytes(byte bytes[]) {
         // Generate a byte array containing a session identifier
-        if (devRandomSourceIsValid && randomIS == null) {
+        if (randomFileIsValid && randomIS == null) {
             synchronized (this) {
-                if (devRandomSourceIsValid && randomIS == null) {
-                    setRandomFile(devRandomSource);
+                if (randomFileIsValid && randomIS == null) {
+                    setRandomFile(randomFile);
                 }
             }
         }
@@ -1035,7 +1035,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             } catch (Exception ex) {
                 // Ignore
             }
-            devRandomSourceIsValid = false;
+            randomFileIsValid = false;
             closeRandomFile();
         }
         Random random = randoms.poll();
