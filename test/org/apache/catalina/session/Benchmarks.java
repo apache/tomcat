@@ -53,6 +53,9 @@ public class Benchmarks extends TestCase {
         doTestManagerBaseGenerateSessionId(4, 1000000);
         doTestManagerBaseGenerateSessionId(4, 1000000);
         doTestManagerBaseGenerateSessionId(16, 1000000);
+        // Reduce iterations as context switching will slow things down
+        doTestManagerBaseGenerateSessionId(100, 100000);
+        doTestManagerBaseGenerateSessionId(400, 10000);
     }
     
     
@@ -92,8 +95,14 @@ public class Benchmarks extends TestCase {
         StringBuilder result = new StringBuilder();
         result.append("Threads: ");
         result.append(threadCount);
-        result.append(",  Time(ms): ");
+        result.append(", Time(ms): ");
         result.append(end-start);
+        result.append(", Digests: ");
+        result.append(mgr.digests.size());
+        result.append(", Randoms: ");
+        result.append(mgr.randoms.size());
+        result.append(", RandomInputStreams: ");
+        result.append(mgr.randomInputStreams.size());
         System.out.println(result.toString());
     }
     
@@ -135,6 +144,9 @@ public class Benchmarks extends TestCase {
         doTestManagerBaseCreateSession(2, 1000000);
         doTestManagerBaseCreateSession(4, 1000000);
         doTestManagerBaseCreateSession(16, 1000000);
+        // Reduce iterations as context switching will slow things down
+        doTestManagerBaseCreateSession(100, 100000);
+        doTestManagerBaseCreateSession(400, 10000);
     }
     
     
@@ -173,8 +185,14 @@ public class Benchmarks extends TestCase {
         StringBuilder result = new StringBuilder();
         result.append("Threads: ");
         result.append(threadCount);
-        result.append(",  Time(ms): ");
+        result.append(", Time(ms): ");
         result.append(end-start);
+        result.append(", Digests: ");
+        result.append(mgr.digests.size());
+        result.append(", Randoms: ");
+        result.append(mgr.randoms.size());
+        result.append(", RandomInputStreams: ");
+        result.append(mgr.randomInputStreams.size());
         System.out.println(result.toString());
     }
     
