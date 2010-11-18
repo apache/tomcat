@@ -37,7 +37,9 @@
     </menu>
 
     <menu name="Reference">
+        <!--
         <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
+        -->
         <item name="JavaDoc"               href="../api/org/apache/catalina/tribes/package-summary.html"/>
     </menu>
 
