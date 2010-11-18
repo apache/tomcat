@@ -213,24 +213,30 @@ public interface Manager {
 
     /**
      * Gets the average time (in seconds) that expired sessions had been
-     * alive.
-     *
+     * alive. This may be based on sample data.
+     * 
      * @return Average time (in seconds) that expired sessions had been
      * alive.
      */
     public int getSessionAverageAliveTime();
 
+    
+    /**
+     * Gets the current rate of session creation (in session per minute). This
+     * may be based on sample data.
+     * 
+     * @return  The current rate (in sessions per minute) of session creation
+     */
+    public int getSessionCreateRate();
+    
 
     /**
-     * Sets the average time (in seconds) that expired sessions had been
-     * alive.
-     *
-     * @param sessionAverageAliveTime Average time (in seconds) that expired
-     * sessions had been alive.
+     * Gets the current rate of session expiration (in session per minute). This
+     * may be based on sample data
+     * 
+     * @return  The current rate (in sessions per minute) of session expiration
      */
-    public void setSessionAverageAliveTime(int sessionAverageAliveTime);
-
-
+    public int getSessionExpireRate();
     // --------------------------------------------------------- Public Methods
 
 
@@ -323,6 +329,15 @@ public interface Manager {
      * @param session Session to be removed
      */
     public void remove(Session session);
+
+
+    /**
+     * Remove this Session from the active Sessions for this Manager.
+     *
+     * @param session   Session to be removed
+     * @param update    Should the expiration statistics be updated
+     */
+    public void remove(Session session, boolean update);
 
 
     /**
