@@ -18,12 +18,11 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="introduction.html">
+<document url="faq.html">
 
     &project;
 
     <properties>
-        <author email="fhanik@apache.org">Filip Hanik</author>
         <title>Apache Tribes - Frequently Asked Questions</title>
     </properties>
 
@@ -31,6 +30,7 @@
 
 
 <section name="Frequently Asked Questions">
+    <p>TODO</p>
 </section>
 </body>
 
