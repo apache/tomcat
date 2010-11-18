@@ -18,18 +18,18 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="setup.html">
+<document url="interceptors.html">
 
     &project;
 
     <properties>
-        <title>Apache Tribes - Configuration</title>
+        <title>Apache Tribes - Interceptors</title>
     </properties>
 
 <body>
 
 
-<section name="Configuration Overview">
+<section name="Interceptors">
     <p>TODO</p>
 </section>
 </body>

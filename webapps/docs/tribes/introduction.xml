@@ -18,7 +18,7 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="tribes.html">
+<document url="introduction.html">
 
     &project;
 
