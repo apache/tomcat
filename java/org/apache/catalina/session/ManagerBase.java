@@ -34,15 +34,20 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -183,16 +188,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     private final Object sessionMaxAliveTimeUpdateLock = new Object();
 
 
-    /**
-     * Average time (in seconds) that expired sessions had been alive.
-     */
-    protected int sessionAverageAliveTime;
+    protected static final int TIMING_STATS_CACHE_SIZE = 100;
 
+    protected Deque<SessionTiming> sessionCreationTiming =
+        new LinkedList<SessionTiming>();
+
+    protected Deque<SessionTiming> sessionExpirationTiming =
+        new LinkedList<SessionTiming>();
 
     /**
      * Number of sessions that have expired.
      */
-    protected long expiredSessions = 0;
+    protected AtomicLong expiredSessions = new AtomicLong(0);
 
 
     /**
@@ -760,7 +767,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public long getExpiredSessions() {
-        return expiredSessions;
+        return expiredSessions.get();
     }
 
 
@@ -771,7 +778,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void setExpiredSessions(long expiredSessions) {
-        this.expiredSessions = expiredSessions;
+        this.expiredSessions.set(expiredSessions);
     }
 
     public long getProcessingTime() {
@@ -863,6 +870,15 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             randomInputStreams.add(is);
         }
 
+        // Ensure caches for timing stats are the right size by filling with
+        // nulls.
+        while (sessionCreationTiming.size() < TIMING_STATS_CACHE_SIZE) {
+            sessionCreationTiming.add(null);
+        }
+        while (sessionExpirationTiming.size() < TIMING_STATS_CACHE_SIZE) {
+            sessionExpirationTiming.add(null);
+        }
+
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
             log.debug("Force random number initialization starting");
@@ -948,6 +964,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         session.setId(id);
         sessionCounter++;
 
+        SessionTiming timing = new SessionTiming(session.getCreationTime(), 0);
+        synchronized (sessionCreationTiming) {
+            sessionCreationTiming.add(timing);
+            sessionCreationTiming.poll();
+        }
         return (session);
 
     }
@@ -1004,20 +1025,29 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void remove(Session session) {
+        remove(session, false);
+    }
+    
+    /**
+     * Remove this Session from the active Sessions for this Manager.
+     *
+     * @param session   Session to be removed
+     * @param update    Should the expiration statistics be updated
+     */
+    @Override
+    public void remove(Session session, boolean update) {
         
         // If the session has expired - as opposed to just being removed from
         // the manager because it is being persisted - update the expired stats
-        if (!session.isValid()) {
+        if (update) {
             long timeNow = System.currentTimeMillis();
             int timeAlive = (int) ((timeNow - session.getCreationTime())/1000);
             updateSessionMaxAliveTime(timeAlive);
-            synchronized (this) {
-                long numExpired = getExpiredSessions();
-                numExpired++;
-                setExpiredSessions(numExpired);
-                int average = getSessionAverageAliveTime();
-                average = (int) (((average * (numExpired-1)) + timeAlive)/numExpired);
-                setSessionAverageAliveTime(average);
+            expiredSessions.incrementAndGet();
+            SessionTiming timing = new SessionTiming(timeNow, timeAlive);
+            synchronized (sessionExpirationTiming) {
+                sessionExpirationTiming.add(timing);
+                sessionExpirationTiming.poll();
             }
         }
 
@@ -1322,27 +1352,124 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Gets the average time (in seconds) that expired sessions had been
-     * alive.
-     *
+     * alive based on the last 100 sessions to expire. If less than
+     * 100 sessions have expired then all available data is used.
+     * 
      * @return Average time (in seconds) that expired sessions had been
      * alive.
      */
     @Override
     public int getSessionAverageAliveTime() {
-        return sessionAverageAliveTime;
+        // Copy current stats
+        List<SessionTiming> copy = new ArrayList<SessionTiming>();
+        synchronized (sessionExpirationTiming) {
+            copy.addAll(sessionExpirationTiming);
+        }
+        
+        // Init
+        int counter = 0;
+        int result = 0;
+        Iterator<SessionTiming> iter = copy.iterator();
+        
+        // Calculate average
+        while (iter.hasNext()) {
+            SessionTiming timing = iter.next();
+            if (timing != null) {
+                int timeAlive = timing.getDuration();
+                counter++;
+                // Very careful not to overflow - probably not necessary
+                result =
+                    (result * ((counter - 1)/counter)) + (timeAlive/counter);
+            }
+        }
+        return result;
     }
 
-
+    
     /**
-     * Sets the average time (in seconds) that expired sessions had been
-     * alive.
-     *
-     * @param sessionAverageAliveTime Average time (in seconds) that expired
-     * sessions had been alive.
+     * Gets the current rate of session creation (in session per minute) based
+     * on the creation time of the previous 100 sessions created. If less than
+     * 100 sessions have been created then all available data is used.
+     * 
+     * @return  The current rate (in sessions per minute) of session creation
      */
     @Override
-    public void setSessionAverageAliveTime(int sessionAverageAliveTime) {
-        this.sessionAverageAliveTime = sessionAverageAliveTime;
+    public int getSessionCreateRate() {
+        long now = System.currentTimeMillis();
+        // Copy current stats
+        List<SessionTiming> copy = new ArrayList<SessionTiming>();
+        synchronized (sessionCreationTiming) {
+            copy.addAll(sessionCreationTiming);
+        }
+        
+        // Init
+        long oldest = now;
+        int counter = 0;
+        int result = 0;
+        Iterator<SessionTiming> iter = copy.iterator();
+        
+        // Calculate rate
+        while (iter.hasNext()) {
+            SessionTiming timing = iter.next();
+            if (timing != null) {
+                counter++;
+                if (timing.getTimestamp() < oldest) {
+                    oldest = timing.getTimestamp();
+                }
+            }
+        }
+        if (counter > 0) {
+            if (oldest < now) {
+                result = (int) ((1000*60*counter)/(now - oldest));
+            } else {
+                result = Integer.MAX_VALUE;
+            }
+        }
+        return result;
+    }
+    
+
+    /**
+     * Gets the current rate of session expiration (in session per minute) based
+     * on the expiry time of the previous 100 sessions expired. If less than
+     * 100 sessions have expired then all available data is used.
+     * 
+     * @return  The current rate (in sessions per minute) of session expiration
+     */
+    @Override
+    public int getSessionExpireRate() {
+        long now = System.currentTimeMillis();
+        // Copy current stats
+        List<SessionTiming> copy = new ArrayList<SessionTiming>();
+        synchronized (sessionExpirationTiming) {
+            copy.addAll(sessionExpirationTiming);
+        }
+        
+        // Init
+        long oldest = now;
+        int counter = 0;
+        int result = 0;
+        Iterator<SessionTiming> iter = copy.iterator();
+        
+        // Calculate rate
+        while (iter.hasNext()) {
+            SessionTiming timing = iter.next();
+            if (timing != null) {
+                counter++;
+                if (timing.getTimestamp() < oldest) {
+                    oldest = timing.getTimestamp();
+                }
+            }
+        }
+        if (counter > 0) {
+            if (oldest < now) {
+                result = (int) ((1000*60*counter)/(now - oldest));
+            } else {
+                // Better than reporting zero
+                result = Integer.MAX_VALUE;
+            }
+        }
+        return result;
     }
 
 
@@ -1550,6 +1677,33 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 log.error(sm.getString("managerBase.sessionTimeout",
                         event.getNewValue()));
             }
+        }
+    }
+    
+    // ----------------------------------------------------------- Inner classes
+    
+    protected static final class SessionTiming {
+        private long timestamp;
+        private int duration;
+        
+        public SessionTiming(long timestamp, int duration) {
+            this.timestamp = timestamp;
+            this.duration = duration;
+        }
+        
+        /**
+         * Time stamp associated with this piece of timing information in
+         * milliseconds.
+         */
+        public long getTimestamp() {
+            return timestamp;
+        }
+        
+        /**
+         * Duration associated with this piece of timing information in seconds.
+         */
+        public int getDuration() {
+            return duration;
         }
     }
 }

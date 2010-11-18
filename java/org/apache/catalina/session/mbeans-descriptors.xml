@@ -96,11 +96,22 @@
                
     <attribute   name="sessionAverageAliveTime"
           description="Average time an expired session had been alive"
-                 type="int" />
+                 type="int"
+            writeable="false" />
+
+    <attribute   name="sessionCreateRate"
+          description="Session creation rate in sessions per minute"
+                 type="int"
+            writeable="false" />
 
     <attribute   name="sessionCounter"
           description="Total number of sessions created by this manager"
                  type="long" />
+                 
+    <attribute   name="sessionExpireRate"
+          description="Session expiration rate in sessions per minute"
+                 type="int"
+            writeable="false" />
                  
     <attribute   name="sessionIdLength"
           description="The session id length (in bytes) of Sessions
@@ -300,12 +311,23 @@
                
     <attribute   name="sessionAverageAliveTime"
           description="Average time an expired session had been alive"
-                 type="int" />
+                 type="int"
+            writeable="false" />
+
+    <attribute   name="sessionCreateRate"
+          description="Session creation rate in sessions per minute"
+                 type="int"
+            writeable="false" />
 
     <attribute   name="sessionCounter"
           description="Total number of sessions created by this manager"
                  type="long" />
                  
+    <attribute   name="sessionExpireRate"
+          description="Session expiration rate in sessions per minute"
+                 type="int"
+            writeable="false" />
+
     <attribute   name="sessionIdLength"
           description="The session id length (in bytes) of Sessions
                        created by this Manager"
