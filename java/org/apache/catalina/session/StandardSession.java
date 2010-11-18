@@ -836,7 +836,7 @@ public class StandardSession
             setValid(false);
 
             // Remove this session from our manager's active sessions
-            manager.remove(this);
+            manager.remove(this, true);
 
             // Notify interested session event listeners
             if (notify) {

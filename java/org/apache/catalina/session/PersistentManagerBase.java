@@ -438,7 +438,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
              log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         for (int i = 0; i < sessions.length; i++) {
             if (!sessions[i].isValid()) {
-                expiredSessions++;
+                expiredSessions.incrementAndGet();
                 expireHere++;
             }
         }
