@@ -18,18 +18,18 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="setup.html">
+<document url="membership.html">
 
     &project;
 
     <properties>
-        <title>Apache Tribes - Configuration</title>
+        <title>Apache Tribes - Membership</title>
     </properties>
 
 <body>
 
 
-<section name="Configuration Overview">
+<section name="Membership">
     <p>TODO</p>
 </section>
 </body>
