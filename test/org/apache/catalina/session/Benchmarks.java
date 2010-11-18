@@ -31,10 +31,10 @@ public class Benchmarks extends TestCase {
 
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -  ~1,900ms
+     *  1 thread  -  ~2,000ms
      *  2 threads -  ~3,300ms
-     *  4 threads -  ~4,800ms
-     * 16 threads - ~21,000ms
+     *  4 threads -  ~4,900ms
+     * 16 threads - ~21,300ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -   ~5,600ms
@@ -68,6 +68,14 @@ public class Benchmarks extends TestCase {
         mgr.randomFileCurrent = mgr.randomFile;
         mgr.createRandomInputStream();
         mgr.generateSessionId();
+        while (mgr.sessionCreationTiming.size() <
+                ManagerBase.TIMING_STATS_CACHE_SIZE) {
+            mgr.sessionCreationTiming.add(null);
+        }
+        while (mgr.sessionExpirationTiming.size() <
+                ManagerBase.TIMING_STATS_CACHE_SIZE) {
+            mgr.sessionExpirationTiming.add(null);
+        }
 
         
         Thread[] threads = new Thread[threadCount];
@@ -128,10 +136,10 @@ public class Benchmarks extends TestCase {
     
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -  ~4,600ms
-     *  2 threads -  ~6,700ms
-     *  4 threads - ~10,400ms
-     * 16 threads - ~43,800ms
+     *  1 thread  -  ~4,300ms
+     *  2 threads -  ~7,600ms
+     *  4 threads - ~11,600ms
+     * 16 threads - ~49,000ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -  ~9,100ms
@@ -159,6 +167,14 @@ public class Benchmarks extends TestCase {
         mgr.randomFileCurrent = mgr.randomFile;
         mgr.createRandomInputStream();
         mgr.generateSessionId();
+        while (mgr.sessionCreationTiming.size() <
+                ManagerBase.TIMING_STATS_CACHE_SIZE) {
+            mgr.sessionCreationTiming.add(null);
+        }
+        while (mgr.sessionExpirationTiming.size() <
+                ManagerBase.TIMING_STATS_CACHE_SIZE) {
+            mgr.sessionExpirationTiming.add(null);
+        }
 
         Thread[] threads = new Thread[threadCount];
         
