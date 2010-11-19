@@ -254,6 +254,25 @@ public class TestParser extends TomcatBaseTest {
         assertEquals(500, sc);
     }
 
+    public void testBug49297Tag() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int sc = getUrl("http://localhost:" + getPort() +
+                "/test/bug49nnn/bug49297Tag.jsp", res,
+                new HashMap<String,List<String>>());
+
+        assertEquals(200, sc);
+        assertEcho(res.toString(), "OK");
+    }
+
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
