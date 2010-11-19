@@ -36,7 +36,7 @@ public class SessionIDMessage extends ClusterMessageBase {
     private String backupSessionID;
 
     private String host ;
-    private String contextPath;
+    private String contextName;
 
     @Override
     public String getUniqueId() {
@@ -44,7 +44,7 @@ public class SessionIDMessage extends ClusterMessageBase {
         result.append("#-#");
         result.append(getHost());
                 result.append("#-#");
-                result.append(getContextPath());
+                result.append(getContextName());
         result.append("#-#");
         result.append(getMessageNumber());
         result.append("#-#");
@@ -67,16 +67,16 @@ public class SessionIDMessage extends ClusterMessageBase {
     }
     
     /**
-     * @return Returns the contextPath.
+     * @return Returns the context name.
      */
-    public String getContextPath() {
-        return contextPath;
+    public String getContextName() {
+        return contextName;
     }
     /**
-     * @param contextPath The contextPath to set.
+     * @param contextName The context name to set.
      */
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
+    public void setContextName(String contextName) {
+        this.contextName = contextName;
     }
     /**
      * @return Returns the messageNumber.
@@ -126,7 +126,7 @@ public class SessionIDMessage extends ClusterMessageBase {
 
     @Override
     public String toString() {
-        return "SESSIONID-UPDATE#" + getHost() + "." + getContextPath() + "#" + getOrignalSessionID() + ":" + getBackupSessionID();
+        return "SESSIONID-UPDATE#" + getHost() + "." + getContextName() + "#" + getOrignalSessionID() + ":" + getBackupSessionID();
     }
 
 }

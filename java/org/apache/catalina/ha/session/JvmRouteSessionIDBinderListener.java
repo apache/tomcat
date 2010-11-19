@@ -128,7 +128,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
                         "jvmRoute.receiveMessage.sessionIDChanged", sessionmsg
                                 .getOrignalSessionID(), sessionmsg
                                 .getBackupSessionID(), sessionmsg
-                                .getContextPath()));
+                                .getContextName()));
             Container container = getCluster().getContainer();
             Container host = null ;
             if(container instanceof Engine) {
@@ -138,7 +138,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
             }
             if (host != null) {
                 Context context = (Context) host.findChild(sessionmsg
-                        .getContextPath());
+                        .getContextName());
                 if (context != null) {
                     try {
                         Session session = context.getManager().findSession(
@@ -148,17 +148,17 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
                         } else if (log.isInfoEnabled())
                             log.info(sm.getString("jvmRoute.lostSession",
                                     sessionmsg.getOrignalSessionID(),
-                                    sessionmsg.getContextPath()));
+                                    sessionmsg.getContextName()));
                     } catch (IOException e) {
                         log.error(e);
                     }
 
                 } else if (log.isErrorEnabled())
                     log.error(sm.getString("jvmRoute.contextNotFound",
-                            sessionmsg.getContextPath(), ((StandardEngine) host
+                            sessionmsg.getContextName(), ((StandardEngine) host
                                     .getParent()).getJvmRoute()));
             } else if (log.isErrorEnabled())
-                log.error(sm.getString("jvmRoute.hostNotFound", sessionmsg.getContextPath()));
+                log.error(sm.getString("jvmRoute.hostNotFound", sessionmsg.getContextName()));
         }
         return;
     }
