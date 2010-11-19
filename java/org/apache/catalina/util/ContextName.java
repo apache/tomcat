@@ -47,21 +47,21 @@ public final class ContextName {
             baseName = name;
         }
 
+        String tmp;
         // Extract version number
         int versionIndex = baseName.indexOf(VERSION_MARKER);
         if (versionIndex > -1) {
             version = baseName.substring(versionIndex + 2);
+            tmp = baseName.substring(0, versionIndex);
         } else {
             version = "";
+            tmp = baseName;
         }
 
-        if (ROOT_NAME.equals(baseName)) {
+        if (ROOT_NAME.equals(tmp)) {
             path = "";
-        } else if (versionIndex > -1) {
-            path = "/" + baseName.substring(0, versionIndex).replaceAll(
-                    FWD_SLASH_REPLACEMENT, "/");
         } else {
-            path = "/" + baseName.replaceAll(FWD_SLASH_REPLACEMENT, "/");
+            path = "/" + tmp.replaceAll(FWD_SLASH_REPLACEMENT, "/");
         }
         
         if (versionIndex > -1) {
@@ -101,7 +101,7 @@ public final class ContextName {
 
         // Base name is converted path + version
         StringBuilder tmp = new StringBuilder();
-        if ("".equals(path)) {
+        if ("".equals(this.path)) {
             tmp.append(ROOT_NAME);
         } else {
             tmp.append(this.path.substring(1).replaceAll("/",
@@ -128,5 +128,26 @@ public final class ContextName {
     
     public String getName() {
         return name;
+    }
+
+    public String getDisplayName() {
+        StringBuilder tmp = new StringBuilder();
+        if (path == "") {
+            tmp.append('/');
+        } else {
+            tmp.append(path);
+        }
+        
+        if (version != "") {
+            tmp.append(VERSION_MARKER);
+            tmp.append(version);
+        }
+        
+        return tmp.toString();
+    }
+    
+    @Override
+    public String toString() {
+        return getDisplayName();
     }
 }
