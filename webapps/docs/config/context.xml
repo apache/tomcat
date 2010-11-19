@@ -59,25 +59,85 @@
   Request URI against the <em>context path</em> of each defined Context.
   Once selected, that Context will select an appropriate servlet to
   process the incoming request, according to the servlet mappings defined
-  in the <em>web application deployment descriptor</em> file (which MUST
-  be located at <code>/WEB-INF/web.xml</code> within the web app's
-  directory hierarchy).</p>
+  by the web application deployment.</p>
 
   <p>You may define as many <strong>Context</strong> elements as you
-  wish.  Each such Context MUST have a unique context path. In
+  wish.  Each such Context MUST have a unique context name. In
   addition, a Context must be present with a context path equal to
   a zero-length string.  This Context becomes the <em>default</em>
   web application for this virtual host, and is used to process all
   requests that do not match any other Context's context path.</p>
 
-  <p><b>For the current versions of Tomcat, unlike Tomcat 4.x,
-  it is NOT recommended to place
-  &lt;Context&gt; elements directly in the server.xml file.</b> This
-  is because it makes modifying the <strong>Context</strong> configuration
-  more invasive since the main <code>conf/server.xml</code> file cannot be
-  reloaded without restarting Tomcat.</p>
+  <p>You may deploy multiple versions of a web application with the same context
+  path at the same time. The rules used to match requests to a context version
+  are as follows:
+  <ul>
+  <li>If no session information is present in the request, use the latest
+  version.</li>
+  <li>If session information is present in the request, check the session
+  manager of each version for a matching session and if one is found, use that
+  version.</li>
+  <li>If session information is present in the request but no matching session
+  can be found, use the latest version.</li>
+  </ul>
+  </p>
+  
+  <p>There is a close relationship between the <em>context name</em>,
+  <em>context path</em>, <em>context version</em> and the <em>base file
+  name</em> used for the WAR and/or directory that contains the web application.
+  When no version is specified, the rules are:
+  <ul>
+    <li>contextName = contextPath</li>
+    <li>If the contextPath is a zero length string, the base name is ROOT</li>
+    <li>If the contextPath is not a zero length string, the base name is the
+        contextPath with the leading '/' removed and any remaining '/'
+        characters in the path replaced with '#'.</li>
+  </ul>
+  When a version is specified, ##version is added to the contextName and base
+  name. To help clarify these rules, some examples are given in the following
+  table.</p>
+  
+  <table class="detail-table">
+    <tr><th>Context Path</th><th>Context Version</th><th>Context Name</th><th>Base filename</th></tr>
+    <tr><td>/foo</td><td><i>None</i></td><td>/foo</td><td>foo</td></tr>
+    <tr><td>/foo/bar</td><td><i>None</i></td><td>/foo/bar</td><td>foo#bar</td></tr>
+    <tr><td><i>Empty String</i></td><td><i>None</i></td><td><i>Empty String</i></td><td>ROOT</td></tr>
+    <tr><td>/foo</td><td>42</td><td>/foo##42</td><td>foo##42</td></tr>
+    <tr><td>/foo/bar</td><td>42</td><td>/foo/bar##42</td><td>foo#bar##42</td></tr>
+    <tr><td><i>Empty String</i></td><td>42</td><td>##42</td><td>ROOT##42</td></tr>
+  </table>
+  
+  <p><b>It is NOT recommended to place &lt;Context&gt; elements directly in the
+  server.xml file.</b> This is because it makes modifying the
+  <strong>Context</strong> configuration more invasive since the main
+  <code>conf/server.xml</code> file cannot be reloaded without restarting
+  Tomcat.</p>
 
-  <p><strong>Context</strong> elements may be explicitly defined:
+  <p>Individual <strong>Context</strong> elements may be explicitly defined:
+  <ul>
+  <li>In an individual file at <code>/META-INF/context.xml</code> inside the
+  application files. Optionally (based on the Host&apos;s copyXML attribute)
+  this may be copied to
+  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> and renamed to
+  application&apos;s base file name plus a ".xml" extension.</li>
+  <li>In individual files (with a ".xml" extension) in the
+  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
+  The context path and version will be derived from the base name of the file
+  (the file name less the .xml extension). This file will always take precedence
+  over any context.xml file packaged in the web application&apos;s META-INF
+  directory.</li>
+  <li>Inside a <a href="host.html">Host</a> element in the main
+  <code>conf/server.xml</code>.</li>
+  </ul>
+  </p>
+
+  <p>Default <strong>Context</strong> elements may be defined that apply to
+  multiple web applications. Configuration for an individual web application
+  will override anything configured in one of these defaults. Any nested
+  elements, e.g. &lt;Resource&gt; elements, that are defined in a default
+  <strong>Context</strong> will be created once for each
+  <strong>Context</strong> to which the default applies. They will <b>not</b> be
+  shared between <strong>Context</strong> elements.
   <ul>
   <li>In the <code>$CATALINA_BASE/conf/context.xml</code> file: 
   the Context element information will be loaded by all webapps.</li>
@@ -85,24 +145,6 @@
   <code>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml.default</code>
   file: the Context element information will be loaded by all webapps of that
   host.</li>
-  <li>In individual files (with a ".xml" extension) in the
-  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
-  The name of the file (less the .xml extension) will be used as the
-  context path. Multi-level context paths may be defined using #, e.g.
-  <code>foo#bar.xml</code> for a context path of <code>/foo/bar</code>. The
-  default web application may be defined by using a file called
-  <code>ROOT.xml</code>.</li>
-  <li>Only if a context file does not exist for the application in the 
-  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>, in an individual
-  file at <code>/META-INF/context.xml</code> inside the application files. If
-  the web application is packaged as a WAR then
-  <code>/META-INF/context.xml</code> will be copied to
-  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> and renamed to
-  match the application's context path. Once this file exists, it will not be
-  replaced if a new WAR with a newer <code>/META-INF/context.xml</code> is
-  placed in the host's appBase.</li>
-  <li>Inside a <a href="host.html">Host</a> element in the main
-  <code>conf/server.xml</code>.</li>
   </ul>
   </p>
 
