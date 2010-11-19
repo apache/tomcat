@@ -51,30 +51,30 @@ public class TestMapper extends TestCase {
         welcomes[0] = "boo/baba";
         welcomes[1] = "bobou";
         
-        mapper.addContext("iowejoiejfoiew", "blah7", "",
-                "context0", new String[0], null);
-        mapper.addContext("iowejoiejfoiew", "blah7", "/foo",
-                "context1", new String[0], null);
-        mapper.addContext("iowejoiejfoiew", "blah7", "/foo/bar",
-                "context2", welcomes, null);
-        mapper.addContext("iowejoiejfoiew", "blah7", "/foo/bar/bla",
-                "context3", new String[0], null);
+        mapper.addContextVersion("iowejoiejfoiew", "blah7", "",
+                "0", "context0", new String[0], null);
+        mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo",
+                "0", "context1", new String[0], null);
+        mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo/bar",
+                "0", "context2", welcomes, null);
+        mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo/bar/bla",
+                "0", "context3", new String[0], null);
 
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/fo/*",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/fo/*",
                 "wrapper0", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/",
                 "wrapper1", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blh",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blh",
                 "wrapper2", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "*.jsp",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "*.jsp",
                 "wrapper3", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blah/bou/*",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blah/bou/*",
                 "wrapper4", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "/blah/bobou/*",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blah/bobou/*",
                 "wrapper5", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "*.htm",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "*.htm",
                 "wrapper6", false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "/bobou/*",
+        mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "0", "/bobou/*",
                 "wrapper7", false, false);
     }
     
@@ -106,7 +106,7 @@ public class TestMapper extends TestCase {
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
 
-        mapper.map(host, uri, mappingData);
+        mapper.map(host, uri, null, mappingData);
         assertEquals("blah7", mappingData.host);
         assertEquals("context2", mappingData.context);
         assertEquals("wrapper5", mappingData.wrapper);
@@ -120,7 +120,7 @@ public class TestMapper extends TestCase {
         uri.setString("/foo/bar/bla/bobou/foo");
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
-        mapper.map(host, uri, mappingData);
+        mapper.map(host, uri, null, mappingData);
         assertEquals("blah7", mappingData.host);
         assertEquals("context3", mappingData.context);
         assertEquals("wrapper7", mappingData.wrapper);
@@ -143,7 +143,7 @@ public class TestMapper extends TestCase {
         long start = System.currentTimeMillis();
         for (int i = 0; i < 1000000; i++) {
             mappingData.recycle();
-            mapper.map(host, uri, mappingData);
+            mapper.map(host, uri, null, mappingData);
         }
         long time = System.currentTimeMillis() - start;
         

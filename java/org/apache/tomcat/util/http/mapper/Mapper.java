@@ -57,7 +57,7 @@ public final class Mapper {
     /**
      * Context associated with this wrapper, used for wrapper mapping.
      */
-    protected Context context = new Context();
+    protected ContextVersion context = new ContextVersion();
 
 
     // --------------------------------------------------------- Public Methods
@@ -189,7 +189,7 @@ public final class Mapper {
      */
     public void setContext(String path, String[] welcomeResources,
                            javax.naming.Context resources) {
-        context.name = path;
+        context.path = path;
         context.welcomeResources = welcomeResources;
         context.resources = resources;
     }
@@ -201,13 +201,14 @@ public final class Mapper {
      * @param hostName Virtual host name this context belongs to
      * @param host Host object
      * @param path Context path
+     * @param version Context version
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
      */
-    public void addContext
-        (String hostName, Object host, String path, Object context,
-         String[] welcomeResources, javax.naming.Context resources) {
+    public void addContextVersion(String hostName, Object host, String path,
+            String version, Object context, String[] welcomeResources,
+            javax.naming.Context resources) {
 
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
@@ -228,14 +229,30 @@ public final class Mapper {
                 if (slashCount > mappedHost.contextList.nesting) {
                     mappedHost.contextList.nesting = slashCount;
                 }
-                Context[] newContexts = new Context[contexts.length + 1];
-                Context newContext = new Context();
-                newContext.name = path;
-                newContext.object = context;
-                newContext.welcomeResources = welcomeResources;
-                newContext.resources = resources;
-                if (insertMap(contexts, newContexts, newContext)) {
-                    mappedHost.contextList.contexts = newContexts;
+                int pos2 = find(contexts, path);
+                if (pos2 < 0 || !path.equals(contexts[pos2].name)) {
+                    Context newContext = new Context();
+                    newContext.name = path;
+                    Context[] newContexts = new Context[contexts.length + 1];
+                    if (insertMap(contexts, newContexts, newContext)) {
+                        mappedHost.contextList.contexts = newContexts;
+                    }
+                    pos2 = find(newContexts, path);
+                }
+                
+                Context mappedContext = mappedHost.contextList.contexts[pos2];
+                
+                ContextVersion[] contextVersions = mappedContext.versions;
+                ContextVersion[] newContextVersions =
+                    new ContextVersion[contextVersions.length + 1];
+                ContextVersion newContextVersion = new ContextVersion();
+                newContextVersion.path = path;
+                newContextVersion.name = version;
+                newContextVersion.object = context;
+                newContextVersion.welcomeResources = welcomeResources;
+                newContextVersion.resources = resources;
+                if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
+                    mappedContext.versions = newContextVersions;
                 }
             }
         }
@@ -248,8 +265,10 @@ public final class Mapper {
      *
      * @param hostName Virtual host name this context belongs to
      * @param path Context path
+     * @param version Context version
      */
-    public void removeContext(String hostName, String path) {
+    public void removeContextVersion(String hostName, String path,
+            String version) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -259,18 +278,35 @@ public final class Mapper {
         if (host.name.equals(hostName)) {
             synchronized (host) {
                 Context[] contexts = host.contextList.contexts;
-                if( contexts.length == 0 ){
+                if (contexts.length == 0 ){
                     return;
                 }
-                Context[] newContexts = new Context[contexts.length - 1];
-                if (removeMap(contexts, newContexts, path)) {
-                    host.contextList.contexts = newContexts;
-                    // Recalculate nesting
-                    host.contextList.nesting = 0;
-                    for (int i = 0; i < newContexts.length; i++) {
-                        int slashCount = slashCount(newContexts[i].name);
-                        if (slashCount > host.contextList.nesting) {
-                            host.contextList.nesting = slashCount;
+                
+                int pos2 = find(contexts, path);
+                if (pos2 < 0 || !path.equals(contexts[pos2].name)) {
+                    return;
+                }
+                Context context = contexts[pos2];
+                
+                ContextVersion[] contextVersions = context.versions;
+                ContextVersion[] newContextVersions =
+                    new ContextVersion[contextVersions.length - 1];
+                if (removeMap(contextVersions, newContextVersions, version)) {
+                    context.versions = newContextVersions;
+                    
+                    if (context.versions.length == 0) {
+                        // Remove the context
+                        Context[] newContexts = new Context[contexts.length -1];
+                        if (removeMap(contexts, newContexts, path)) {
+                            host.contextList.contexts = newContexts;
+                            // Recalculate nesting
+                            host.contextList.nesting = 0;
+                            for (int i = 0; i < newContexts.length; i++) {
+                                int slashCount = slashCount(newContexts[i].name);
+                                if (slashCount > host.contextList.nesting) {
+                                    host.contextList.nesting = slashCount;
+                                }
+                            }
                         }
                     }
                 }
@@ -279,8 +315,8 @@ public final class Mapper {
     }
 
 
-    public void addWrapper(String hostName, String contextPath, String path,
-                           Object wrapper, boolean jspWildCard,
+    public void addWrapper(String hostName, String contextPath, String version,
+                           String path, Object wrapper, boolean jspWildCard,
                            boolean resourceOnly) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
@@ -291,13 +327,24 @@ public final class Mapper {
         if (host.name.equals(hostName)) {
             Context[] contexts = host.contextList.contexts;
             int pos2 = find(contexts, contextPath);
-            if( pos2<0 ) {
+            if (pos2 < 0) {
                 log.error("No context found: " + contextPath );
                 return;
             }
             Context context = contexts[pos2];
             if (context.name.equals(contextPath)) {
-                addWrapper(context, path, wrapper, jspWildCard, resourceOnly);
+                ContextVersion[] contextVersions = context.versions;
+                int pos3 = find(contextVersions, version);
+                if( pos3<0 ) {
+                    log.error("No context version found: " + contextPath + " " +
+                            version);
+                    return;
+                }
+                ContextVersion contextVersion = contextVersions[pos3];
+                if (contextVersion.name.equals(version)) {
+                    addWrapper(contextVersion, path, wrapper, jspWildCard,
+                            resourceOnly);
+                }
             }
         }
     }
@@ -320,8 +367,8 @@ public final class Mapper {
      *                     resource to be present (such as a JSP)
      * and the mapping path contains a wildcard; false otherwise
      */
-    protected void addWrapper(Context context, String path, Object wrapper,
-                              boolean jspWildCard, boolean resourceOnly) {
+    protected void addWrapper(ContextVersion context, String path,
+            Object wrapper, boolean jspWildCard, boolean resourceOnly) {
 
         synchronized (context) {
             Wrapper newWrapper = new Wrapper();
@@ -386,7 +433,7 @@ public final class Mapper {
      * @param path Wrapper mapping
      */
     public void removeWrapper
-        (String hostName, String contextPath, String path) {
+        (String hostName, String contextPath, String version, String path) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -401,12 +448,20 @@ public final class Mapper {
             }
             Context context = contexts[pos2];
             if (context.name.equals(contextPath)) {
-                removeWrapper(context, path);
+                ContextVersion[] contextVersions = context.versions;
+                int pos3 = find(contextVersions, version);
+                if( pos3<0 ) {
+                    return;
+                }
+                ContextVersion contextVersion = contextVersions[pos3];
+                if (contextVersion.name.equals(version)) {
+                    removeWrapper(contextVersion, path);
+                }
             }
         }
     }
 
-    protected void removeWrapper(Context context, String path) {
+    protected void removeWrapper(ContextVersion context, String path) {
         
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("mapper.removeWrapper", context.name, path));
@@ -473,7 +528,7 @@ public final class Mapper {
      * @param welcomeFile
      */
     public void addWelcomeFile(String hostName, String contextPath,
-            String welcomeFile) {
+            String version, String welcomeFile) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -483,18 +538,28 @@ public final class Mapper {
         if (host.name.equals(hostName)) {
             Context[] contexts = host.contextList.contexts;
             int pos2 = find(contexts, contextPath);
-            if( pos2<0 ) {
+            if (pos2 < 0) {
                 log.error("No context found: " + contextPath );
                 return;
             }
             Context context = contexts[pos2];
             if (context.name.equals(contextPath)) {
-                int len = context.welcomeResources.length + 1;
-                String[] newWelcomeResources = new String[len];
-                System.arraycopy(context.welcomeResources, 0,
-                        newWelcomeResources, 0, len - 1);
-                newWelcomeResources[len - 1] = welcomeFile;
-                context.welcomeResources = newWelcomeResources;
+                ContextVersion[] contextVersions = context.versions;
+                int pos3 = find(contextVersions, version);
+                if( pos3<0 ) {
+                    log.error("No context version found: " + contextPath + " " +
+                            version);
+                    return;
+                }
+                ContextVersion contextVersion = contextVersions[pos3];
+                if (contextVersion.name.equals(version)) {
+                    int len = contextVersion.welcomeResources.length + 1;
+                    String[] newWelcomeResources = new String[len];
+                    System.arraycopy(contextVersion.welcomeResources, 0,
+                            newWelcomeResources, 0, len - 1);
+                    newWelcomeResources[len - 1] = welcomeFile;
+                    contextVersion.welcomeResources = newWelcomeResources;
+                }
             }
         }
     }
@@ -508,7 +573,7 @@ public final class Mapper {
      * @param welcomeFile
      */
     public void removeWelcomeFile(String hostName, String contextPath,
-            String welcomeFile) {
+            String version, String welcomeFile) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -518,29 +583,39 @@ public final class Mapper {
         if (host.name.equals(hostName)) {
             Context[] contexts = host.contextList.contexts;
             int pos2 = find(contexts, contextPath);
-            if( pos2<0 ) {
+            if (pos2 < 0) {
                 log.error("No context found: " + contextPath );
                 return;
             }
             Context context = contexts[pos2];
             if (context.name.equals(contextPath)) {
-                int match = -1;
-                for (int i = 0; i < context.welcomeResources.length; i++) {
-                    if (welcomeFile.equals(context.welcomeResources[i])) {
-                        match = i;
-                        break;
-                    }
+                ContextVersion[] contextVersions = context.versions;
+                int pos3 = find(contextVersions, version);
+                if( pos3<0 ) {
+                    log.error("No context version found: " + contextPath + " " +
+                            version);
+                    return;
                 }
-                if (match > -1) {
-                    int len = context.welcomeResources.length - 1;
-                    String[] newWelcomeResources = new String[len];
-                    System.arraycopy(context.welcomeResources, 0,
-                            newWelcomeResources, 0, match);
-                    if (match < len) {
-                        System.arraycopy(context.welcomeResources, match + 1,
-                                newWelcomeResources, match, len - match);
+                ContextVersion contextVersion = contextVersions[pos3];
+                if (contextVersion.name.equals(version)) {
+                    int match = -1;
+                    for (int i = 0; i < contextVersion.welcomeResources.length; i++) {
+                        if (welcomeFile.equals(contextVersion.welcomeResources[i])) {
+                            match = i;
+                            break;
+                        }
                     }
-                    context.welcomeResources = newWelcomeResources;
+                    if (match > -1) {
+                        int len = contextVersion.welcomeResources.length - 1;
+                        String[] newWelcomeResources = new String[len];
+                        System.arraycopy(contextVersion.welcomeResources, 0,
+                                newWelcomeResources, 0, match);
+                        if (match < len) {
+                            System.arraycopy(contextVersion.welcomeResources, match + 1,
+                                    newWelcomeResources, match, len - match);
+                        }
+                        contextVersion.welcomeResources = newWelcomeResources;
+                    }
                 }
             }
         }
@@ -553,7 +628,8 @@ public final class Mapper {
      * @param hostName
      * @param contextPath
      */
-    public void clearWelcomeFiles(String hostName, String contextPath) {
+    public void clearWelcomeFiles(String hostName, String contextPath,
+            String version) {
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -563,13 +639,23 @@ public final class Mapper {
         if (host.name.equals(hostName)) {
             Context[] contexts = host.contextList.contexts;
             int pos2 = find(contexts, contextPath);
-            if( pos2<0 ) {
+            if (pos2 < 0) {
                 log.error("No context found: " + contextPath );
                 return;
             }
             Context context = contexts[pos2];
             if (context.name.equals(contextPath)) {
-                context.welcomeResources = new String[0];
+                ContextVersion[] contextVersions = context.versions;
+                int pos3 = find(contextVersions, version);
+                if( pos3<0 ) {
+                    log.error("No context version found: " + contextPath + " " +
+                            version);
+                    return;
+                }
+                ContextVersion contextVersion = contextVersions[pos3];
+                if (contextVersion.name.equals(version)) {
+                    contextVersion.welcomeResources = new String[0];
+                }
             }
         }
     }
@@ -583,7 +669,7 @@ public final class Mapper {
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
      */
-    public void map(MessageBytes host, MessageBytes uri,
+    public void map(MessageBytes host, MessageBytes uri, String version,
                     MappingData mappingData)
         throws Exception {
 
@@ -592,7 +678,8 @@ public final class Mapper {
         }
         host.toChars();
         uri.toChars();
-        internalMap(host.getCharChunk(), uri.getCharChunk(), mappingData);
+        internalMap(host.getCharChunk(), uri.getCharChunk(), version,
+                mappingData);
 
     }
 
@@ -623,13 +710,14 @@ public final class Mapper {
      * Map the specified URI.
      */
     private final void internalMap(CharChunk host, CharChunk uri,
-                                   MappingData mappingData)
-        throws Exception {
+            String version, MappingData mappingData) throws Exception {
 
         uri.setLimit(-1);
 
         Context[] contexts = null;
         Context context = null;
+        ContextVersion contextVersion = null;
+        
         int nesting = 0;
 
         // Virtual host mapping
@@ -695,14 +783,39 @@ public final class Mapper {
                 context = contexts[pos];
             }
             if (context != null) {
-                mappingData.context = context.object;
                 mappingData.contextPath.setString(context.name);
             }
         }
 
+        if (context != null) {
+            ContextVersion[] contextVersions = context.versions;
+            int versionCount = contextVersions.length;
+            if (versionCount > 1) {
+                Object[] contextObjects = new Object[contextVersions.length];
+                for (int i = 0; i < contextObjects.length; i++) {
+                    contextObjects[i] = contextVersions[i].object;
+                }
+                mappingData.contexts = contextObjects;
+            }
+            
+            if (version == null) {
+                // Return the latest version
+                contextVersion = contextVersions[versionCount - 1];
+            } else {
+                int pos = find(contextVersions, version);
+                if (pos < 0 || !contextVersions[pos].name.equals(version)) {
+                    // Return the latest version
+                    contextVersion = contextVersions[versionCount - 1];
+                } else {
+                    contextVersion = contextVersions[pos];
+                }
+            }
+            mappingData.context = contextVersion.object;
+        }
+
         // Wrapper mapping
-        if ((context != null) && (mappingData.wrapper == null)) {
-            internalMapWrapper(context, uri, mappingData);
+        if ((contextVersion != null) && (mappingData.wrapper == null)) {
+            internalMapWrapper(contextVersion, uri, mappingData);
         }
 
     }
@@ -711,7 +824,8 @@ public final class Mapper {
     /**
      * Wrapper mapping.
      */
-    private final void internalMapWrapper(Context context, CharChunk path,
+    private final void internalMapWrapper(ContextVersion contextVersion,
+                                          CharChunk path,
                                           MappingData mappingData)
         throws Exception {
 
@@ -720,7 +834,7 @@ public final class Mapper {
         int servletPath = pathOffset;
         boolean noServletPath = false;
 
-        int length = context.name.length();
+        int length = contextVersion.path.length();
         if (length != (pathEnd - pathOffset)) {
             servletPath = pathOffset + length;
         } else {
@@ -734,14 +848,14 @@ public final class Mapper {
         path.setOffset(servletPath);
 
         // Rule 1 -- Exact Match
-        Wrapper[] exactWrappers = context.exactWrappers;
+        Wrapper[] exactWrappers = contextVersion.exactWrappers;
         internalMapExactWrapper(exactWrappers, path, mappingData);
 
         // Rule 2 -- Prefix Match
         boolean checkJspWelcomeFiles = false;
-        Wrapper[] wildcardWrappers = context.wildcardWrappers;
+        Wrapper[] wildcardWrappers = contextVersion.wildcardWrappers;
         if (mappingData.wrapper == null) {
-            internalMapWildcardWrapper(wildcardWrappers, context.nesting, 
+            internalMapWildcardWrapper(wildcardWrappers, contextVersion.nesting, 
                                        path, mappingData);
             if (mappingData.wrapper != null && mappingData.jspWildCard) {
                 char[] buf = path.getBuffer();
@@ -774,7 +888,7 @@ public final class Mapper {
         }
 
         // Rule 3 -- Extension Match
-        Wrapper[] extensionWrappers = context.extensionWrappers;
+        Wrapper[] extensionWrappers = contextVersion.extensionWrappers;
         if (mappingData.wrapper == null && !checkJspWelcomeFiles) {
             internalMapExtensionWrapper(extensionWrappers, path, mappingData,
                     true);
@@ -788,12 +902,12 @@ public final class Mapper {
                 checkWelcomeFiles = (buf[pathEnd - 1] == '/');
             }
             if (checkWelcomeFiles) {
-                for (int i = 0; (i < context.welcomeResources.length)
+                for (int i = 0; (i < contextVersion.welcomeResources.length)
                          && (mappingData.wrapper == null); i++) {
                     path.setOffset(pathOffset);
                     path.setEnd(pathEnd);
-                    path.append(context.welcomeResources[i], 0,
-                                context.welcomeResources[i].length());
+                    path.append(contextVersion.welcomeResources[i], 0,
+                            contextVersion.welcomeResources[i].length());
                     path.setOffset(servletPath);
 
                     // Rule 4a -- Welcome resources processing for exact macth
@@ -802,18 +916,18 @@ public final class Mapper {
                     // Rule 4b -- Welcome resources processing for prefix match
                     if (mappingData.wrapper == null) {
                         internalMapWildcardWrapper
-                            (wildcardWrappers, context.nesting, 
+                            (wildcardWrappers, contextVersion.nesting, 
                              path, mappingData);
                     }
 
                     // Rule 4c -- Welcome resources processing
                     //            for physical folder
                     if (mappingData.wrapper == null
-                        && context.resources != null) {
+                        && contextVersion.resources != null) {
                         Object file = null;
                         String pathStr = path.toString();
                         try {
-                            file = context.resources.lookup(pathStr);
+                            file = contextVersion.resources.lookup(pathStr);
                         } catch(NamingException nex) {
                             // Swallow not found, since this is normal
                         }
@@ -821,9 +935,9 @@ public final class Mapper {
                             internalMapExtensionWrapper(extensionWrappers, path,
                                                         mappingData, true);
                             if (mappingData.wrapper == null
-                                && context.defaultWrapper != null) {
+                                && contextVersion.defaultWrapper != null) {
                                 mappingData.wrapper =
-                                    context.defaultWrapper.object;
+                                    contextVersion.defaultWrapper.object;
                                 mappingData.requestPath.setChars
                                     (path.getBuffer(), path.getStart(), 
                                      path.getLength());
@@ -857,12 +971,12 @@ public final class Mapper {
                 checkWelcomeFiles = (buf[pathEnd - 1] == '/');
             }
             if (checkWelcomeFiles) {
-                for (int i = 0; (i < context.welcomeResources.length)
+                for (int i = 0; (i < contextVersion.welcomeResources.length)
                          && (mappingData.wrapper == null); i++) {
                     path.setOffset(pathOffset);
                     path.setEnd(pathEnd);
-                    path.append(context.welcomeResources[i], 0,
-                                context.welcomeResources[i].length());
+                    path.append(contextVersion.welcomeResources[i], 0,
+                                contextVersion.welcomeResources[i].length());
                     path.setOffset(servletPath);
                     internalMapExtensionWrapper(extensionWrappers, path,
                                                 mappingData, false);
@@ -876,8 +990,8 @@ public final class Mapper {
 
         // Rule 7 -- Default servlet
         if (mappingData.wrapper == null && !checkJspWelcomeFiles) {
-            if (context.defaultWrapper != null) {
-                mappingData.wrapper = context.defaultWrapper.object;
+            if (contextVersion.defaultWrapper != null) {
+                mappingData.wrapper = contextVersion.defaultWrapper.object;
                 mappingData.requestPath.setChars
                     (path.getBuffer(), path.getStart(), path.getLength());
                 mappingData.wrapperPath.setChars
@@ -885,11 +999,11 @@ public final class Mapper {
             }
             // Redirection to a folder
             char[] buf = path.getBuffer();
-            if (context.resources != null && buf[pathEnd -1 ] != '/') {
+            if (contextVersion.resources != null && buf[pathEnd -1 ] != '/') {
                 Object file = null;
                 String pathStr = path.toString();
                 try {
-                    file = context.resources.lookup(pathStr);
+                    file = contextVersion.resources.lookup(pathStr);
                 } catch(NamingException nex) {
                     // Swallow, since someone else handles the 404
                 }
@@ -1371,9 +1485,13 @@ public final class Mapper {
     // ---------------------------------------------------- Context Inner Class
 
 
-    protected static final class Context
-        extends MapElement {
+    protected static final class Context extends MapElement {
+        public ContextVersion[] versions = new ContextVersion[0];
+    }
 
+
+    protected static final class ContextVersion extends MapElement {
+        public String path = null;
         public String[] welcomeResources = new String[0];
         public javax.naming.Context resources = null;
         public Wrapper defaultWrapper = null;
