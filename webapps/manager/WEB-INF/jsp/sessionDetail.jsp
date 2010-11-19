@@ -20,6 +20,7 @@
 <%@page import="javax.servlet.http.HttpSession" %>
 <%@page import="org.apache.catalina.Session" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
+<%@page import="org.apache.catalina.util.ContextName" %>
 <!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -28,11 +29,14 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <% String path = (String) request.getAttribute("path");
+   String version = (String) request.getAttribute("version");
+   ContextName cn = new ContextName(path, version);
    Session currentSession = (Session)request.getAttribute("currentSession");
    HttpSession currentHttpSession = currentSession.getSession();
    String currentSessionId = currentSession.getId();
    String submitUrl = response.encodeURL(((HttpServletRequest)
-           pageContext.getRequest()).getRequestURL().toString());
+           pageContext.getRequest()).getRequestURI() + "?path=" + path +
+           "&version=" + version);
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
@@ -89,7 +93,6 @@
 
 <form method="post" action="<%= submitUrl %>">
   <div>
-    <input type="hidden" name="path" value="<%= path %>" />
     <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
     <input type="hidden" name="action" value="sessionDetail" />
     <input type="submit" value="Refresh" />
@@ -131,7 +134,6 @@
             <td align="center">
                 <form method="post" action="<%= submitUrl %>">
                     <div>
-                        <input type="hidden" name="path" value="<%= path %>" />
                         <input type="hidden" name="action" value="removeSessionAttribute" />
                         <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
                         <input type="hidden" name="attributeName" value="<%= attributeName %>" />
