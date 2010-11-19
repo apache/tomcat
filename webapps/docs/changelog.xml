@@ -265,6 +265,10 @@
       <update>
         Improve Tomcat Logging documentation. (kkolinko)
       </update>
+      <fix>
+        <bug>50303</bug>: Update JNDI how-to to reflect new JavaMail download
+        location and that JAF is now included in Java SE 6. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
