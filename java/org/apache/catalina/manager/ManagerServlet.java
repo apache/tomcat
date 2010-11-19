@@ -159,8 +159,9 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Id$
  */
 
-public class ManagerServlet
-    extends HttpServlet implements ContainerServlet {
+public class ManagerServlet extends HttpServlet implements ContainerServlet {
+
+    private static final long serialVersionUID = 1L;
 
 
     // ----------------------------------------------------- Instance Variables
@@ -254,6 +255,7 @@ public class ManagerServlet
     /**
      * Return the Wrapper with which we are associated.
      */
+    @Override
     public Wrapper getWrapper() {
 
         return (this.wrapper);
@@ -266,6 +268,7 @@ public class ManagerServlet
      *
      * @param wrapper The new wrapper
      */
+    @Override
     public void setWrapper(Wrapper wrapper) {
 
         this.wrapper = wrapper;
@@ -327,6 +330,10 @@ public class ManagerServlet
             command = request.getServletPath();
         String config = request.getParameter("config");
         String path = request.getParameter("path");
+        ContextName cn = null;
+        if (path != null) {
+            cn = new ContextName(path, request.getParameter("version"));
+        }
         String type = request.getParameter("type");
         String war = request.getParameter("war");
         String tag = request.getParameter("tag");
@@ -345,14 +352,14 @@ public class ManagerServlet
             writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
             if (war != null || config != null) {
-                deploy(writer, config, path, war, update, smClient);
+                deploy(writer, config, cn, war, update, smClient);
             } else {
-                deploy(writer, path, tag, smClient);
+                deploy(writer, cn, tag, smClient);
             }
         } else if (command.equals("/list")) {
             list(writer, smClient);
         } else if (command.equals("/reload")) {
-            reload(writer, path, smClient);
+            reload(writer, cn, smClient);
         } else if (command.equals("/resources")) {
             resources(writer, type, smClient);
         } else if (command.equals("/roles")) {
@@ -362,15 +369,15 @@ public class ManagerServlet
         } else if (command.equals("/serverinfo")) {
             serverinfo(writer, smClient);
         } else if (command.equals("/sessions")) {
-            expireSessions(writer, path, request, smClient);
+            expireSessions(writer, cn, request, smClient);
         } else if (command.equals("/expire")) {
-            expireSessions(writer, path, request, smClient);
+            expireSessions(writer, cn, request, smClient);
         } else if (command.equals("/start")) {
-            start(writer, path, smClient);
+            start(writer, cn, smClient);
         } else if (command.equals("/stop")) {
-            stop(writer, path, smClient);
+            stop(writer, cn, smClient);
         } else if (command.equals("/undeploy")) {
-            undeploy(writer, path, smClient);
+            undeploy(writer, cn, smClient);
         } else if (command.equals("/findleaks")) {
             findleaks(writer, smClient);
         } else {
@@ -406,6 +413,10 @@ public class ManagerServlet
         if (command == null)
             command = request.getServletPath();
         String path = request.getParameter("path");
+        ContextName cn = null;
+        if (path != null) {
+            cn = new ContextName(path, request.getParameter("version"));
+        }
         String tag = request.getParameter("tag");
         boolean update = false;
         if ((request.getParameter("update") != null) 
@@ -421,7 +432,7 @@ public class ManagerServlet
         if (command == null) {
             writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
-            deploy(writer, path, tag, update, request, smClient);
+            deploy(writer, cn, tag, update, request, smClient);
         } else {
             writer.println(smClient.getString("managerServlet.unknownCommand",
                     command));
@@ -586,36 +597,32 @@ public class ManagerServlet
      * at the specified context path.
      *
      * @param writer Writer to render results to
-     * @param path Context path of the application to be installed
+     * @param cn Name of the application to be installed
      * @param tag Tag to be associated with the webapp
      * @param request Servlet request we are processing
      */
     protected synchronized void deploy
-        (PrintWriter writer, String path,
+        (PrintWriter writer, ContextName cn,
          String tag, boolean update, HttpServletRequest request,
          StringManager smClient) {
 
         if (debug >= 1) {
-            log("deploy: Deploying web application at '" + path + "'");
+            log("deploy: Deploying web application '" + cn + "'");
         }
 
         // Validate the requested context path
-        if ((path == null) || path.length() == 0 || !path.startsWith("/")) {
-            writer.println(smClient.getString(
-                    "managerServlet.invalidPath", path));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        
-        ContextName cn = new ContextName(path, null);
         String name = cn.getName();
         String baseName = cn.getBaseName();
+        String displayPath = cn.getDisplayName();
 
         // Check if app already exists, or undeploy it if updating
         Context context = (Context) host.findChild(name);
         if (update) {
             if (context != null) {
-                undeploy(writer, displayPath, smClient);
+                undeploy(writer, cn, smClient);
             }
             context = (Context) host.findChild(name);
         }
@@ -685,21 +692,19 @@ public class ManagerServlet
      *
      * @param writer Writer to render results to
      * @param tag Revision tag to deploy from
-     * @param path Context path of the application to be installed
+     * @param cn Name of the application to be installed
      */
-    protected void deploy(PrintWriter writer, String path, String tag,
+    protected void deploy(PrintWriter writer, ContextName cn, String tag,
             StringManager smClient) {
 
         // Validate the requested context path
-        if ((path == null) || path.length() == 0 || !path.startsWith("/")) {
-            writer.println(smClient.getString(
-                    "managerServlet.invalidPath", path));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        ContextName cn = new ContextName(path, null);
+
         String baseName = cn.getBaseName();
         String name = cn.getName();
+        String displayPath = cn.getDisplayName();
         
         // Calculate the base path
         File deployedPath = versioned;
@@ -713,7 +718,7 @@ public class ManagerServlet
         // Check if app already exists, or undeploy it if updating
         Context context = (Context) host.findChild(name);
         if (context != null) {
-            undeploy(writer, displayPath, smClient);
+            undeploy(writer, cn, smClient);
         }
 
         // Copy WAR to appBase
@@ -754,12 +759,12 @@ public class ManagerServlet
      *
      * @param writer Writer to render results to
      * @param config URL of the context configuration file to be installed
-     * @param path Context path of the application to be installed
+     * @param cn Name of the application to be installed
      * @param war URL of the web application archive to be installed
      * @param update true to override any existing webapp on the path
      */
-    protected void deploy(PrintWriter writer, String config,
-            String path, String war, boolean update,  StringManager smClient) {
+    protected void deploy(PrintWriter writer, String config, ContextName cn,
+            String war, boolean update,  StringManager smClient) {
         
         if (config != null && config.length() == 0) {
             config = null;
@@ -778,8 +783,8 @@ public class ManagerServlet
                             config + "'");
                 }
             } else {
-                if (path != null && path.length() > 0) {
-                    log("install: Installing web application at '" + path +
+                if (cn != null) {
+                    log("install: Installing web application '" + cn +
                             "' from '" + war + "'");
                 } else {
                     log("install: Installing web application from '" + war + "'");
@@ -787,21 +792,18 @@ public class ManagerServlet
             }
         }
         
-        if (path == null || path.length() == 0 || !path.startsWith("/")) {
-            writer.println(smClient.getString("managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        ContextName cn = new ContextName(path, null);
         String name = cn.getName();
         String baseName = cn.getBaseName();
+        String displayPath = cn.getDisplayName();
         
         // Check if app already exists, or undeploy it if updating
         Context context = (Context) host.findChild(name);
         if (update) {
             if (context != null) {
-                undeploy(writer, displayPath, smClient);
+                undeploy(writer, cn, smClient);
             }
             context = (Context) host.findChild(name);
         }
@@ -906,28 +908,23 @@ public class ManagerServlet
      * Reload the web application at the specified context path.
      *
      * @param writer Writer to render to
-     * @param path Context path of the application to be restarted
+     * @param cn Name of the application to be restarted
      */
-    protected void reload(PrintWriter writer, String path,
+    protected void reload(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
         if (debug >= 1)
-            log("restart: Reloading web application at '" + path + "'");
+            log("restart: Reloading web application '" + cn + "'");
 
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(smClient.getString("managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        if( path.equals("/") )
-            path = "";
 
         try {
-            Context context = (Context) host.findChild(path);
+            Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
-                        RequestUtil.filter(displayPath)));
+                        RequestUtil.filter(cn.getDisplayName())));
                 return;
             }
             // It isn't possible for the manager to reload itself
@@ -936,11 +933,11 @@ public class ManagerServlet
                 return;
             }
             context.reload();
-            writer.println
-                (smClient.getString("managerServlet.reloaded", displayPath));
+            writer.println(smClient.getString("managerServlet.reloaded",
+                    cn.getDisplayName()));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.reload[" + displayPath + "]", t);
+            log("ManagerServlet.reload[" + cn.getDisplayName() + "]", t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1124,28 +1121,26 @@ public class ManagerServlet
      * of sessions for each 10 minute interval up to 10 hours.
      *
      * @param writer Writer to render to
-     * @param path Context path of the application to list session information for
+     * @param cn Name of the application to list session information for
      * @param idle Expire all sessions with idle time &gt; idle for this context
      */
-    protected void sessions(PrintWriter writer, String path, int idle,
+    protected void sessions(PrintWriter writer, ContextName cn, int idle,
             StringManager smClient) {
 
         if (debug >= 1) {
-            log("sessions: Session information for web application at '" + path + "'");
+            log("sessions: Session information for web application '" + cn + "'");
             if (idle >= 0)
-                log("sessions: Session expiration for " + idle + " minutes '" + path + "'");
+                log("sessions: Session expiration for " + idle + " minutes '" + cn + "'");
         }
 
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(smClient.getString("managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        if( path.equals("/") )
-            path = "";
+
+        String displayPath = cn.getDisplayName();
+
         try {
-            Context context = (Context) host.findChild(path);
+            Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
                         RequestUtil.filter(displayPath)));
@@ -1232,11 +1227,11 @@ public class ManagerServlet
      * of sessions for each 10 minute interval up to 10 hours.
      *
      * @param writer Writer to render to
-     * @param path Context path of the application to list session information for
+     * @param cn Name of the application to list session information for
      */
-    protected void sessions(PrintWriter writer, String path,
+    protected void sessions(PrintWriter writer, ContextName cn,
             StringManager smClient) {
-        sessions(writer, path, -1, smClient);
+        sessions(writer, cn, -1, smClient);
     }
 
 
@@ -1244,10 +1239,10 @@ public class ManagerServlet
      *
      * Extract the expiration request parameter
      *
-     * @param path
+     * @param cn
      * @param req
      */
-    protected void expireSessions(PrintWriter writer, String path,
+    protected void expireSessions(PrintWriter writer, ContextName cn,
             HttpServletRequest req, StringManager smClient) {
         int idle = -1;
         String idleParam = req.getParameter("idle");
@@ -1258,32 +1253,29 @@ public class ManagerServlet
                 log("Could not parse idle parameter to an int: " + idleParam);
             }
         }
-        sessions(writer, path, idle, smClient);
+        sessions(writer, cn, idle, smClient);
     }
 
     /**
      * Start the web application at the specified context path.
      *
      * @param writer Writer to render to
-     * @param path Context path of the application to be started
+     * @param cn Name of the application to be started
      */
-    protected void start(PrintWriter writer, String path,
+    protected void start(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
         if (debug >= 1)
-            log("start: Starting web application at '" + path + "'");
+            log("start: Starting web application '" + cn + "'");
 
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(smClient.getString("managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        if( path.equals("/") )
-            path = "";
+
+        String displayPath = cn.getDisplayName();
 
         try {
-            Context context = (Context) host.findChild(path);
+            Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext", 
                         RequestUtil.filter(displayPath)));
@@ -1313,25 +1305,22 @@ public class ManagerServlet
      * Stop the web application at the specified context path.
      *
      * @param writer Writer to render to
-     * @param path Context path of the application to be stopped
+     * @param cn Name of the application to be stopped
      */
-    protected void stop(PrintWriter writer, String path,
+    protected void stop(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
         if (debug >= 1)
-            log("stop: Stopping web application at '" + path + "'");
+            log("stop: Stopping web application '" + cn + "'");
 
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(smClient.getString("managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        if( path.equals("/") )
-            path = "";
+
+        String displayPath = cn.getDisplayName();
 
         try {
-            Context context = (Context) host.findChild(path);
+            Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
                         RequestUtil.filter(displayPath)));
@@ -1359,23 +1348,21 @@ public class ManagerServlet
      * Undeploy the web application at the specified context path.
      *
      * @param writer Writer to render to
-     * @param path Context path of the application to be removed
+     * @param cn Name of the application to be removed
      */
-    protected void undeploy(PrintWriter writer, String path,
+    protected void undeploy(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
         if (debug >= 1)
-            log("undeploy: Undeploying web application at '" + path + "'");
+            log("undeploy: Undeploying web application at '" + cn + "'");
 
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
-            writer.println(smClient.getString("managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+        if (!validateContextName(cn, writer, smClient)) {
             return;
         }
-        String displayPath = path;
-        ContextName cn = new ContextName(path, null);
+
         String name = cn.getName();
         String baseName = cn.getBaseName();
+        String displayPath = cn.getDisplayName();
 
         try {
 
@@ -1613,6 +1600,24 @@ public class ManagerServlet
     }
 
 
+    protected static boolean validateContextName(ContextName cn,
+            PrintWriter writer, StringManager sm) {
+        
+        // ContextName should be non-null with a path that is empty or starts
+        // with /
+        if (cn != null &&
+                (cn.getPath().startsWith("/") || cn.getPath().equals(""))) {
+            return true;
+        }
+        
+        String path = null;
+        if (cn != null) {
+            path = RequestUtil.filter(cn.getPath());
+        }
+        writer.println(sm.getString("managerServlet.invalidPath", path));
+        return false;
+    }
+
     /**
      * Copy the specified file or directory to the destination.
      *
@@ -1680,12 +1685,14 @@ public class ManagerServlet
                         try {
                             is.close();
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                     if (os != null) {
                         try {
                             os.close();
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                 }
