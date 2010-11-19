@@ -197,6 +197,11 @@
         <bug>50192</bug>: Improve performance for EL when running under a
         security manager. Based on a patch by Robert Goff. (markt) 
       </fix>
+      <fix>
+        <bug>50293</bug>: Increase the size of internal ELResolver array from 2 
+        to 8 since in typical usage there are at least 5 resolvers. Based on a
+        patch by Robert Goff. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
