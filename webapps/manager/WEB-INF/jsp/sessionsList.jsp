@@ -21,6 +21,7 @@
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.Session" %>
 <%@page import="org.apache.catalina.ha.session.DeltaSession" %>
+<%@page import="org.apache.catalina.util.ContextName" %>
 <!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -28,8 +29,11 @@
 
 <%@page import="org.apache.catalina.manager.DummyProxySession"%><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <% String path = (String) request.getAttribute("path");
+   String version = (String) request.getAttribute("version");
+   ContextName cn = new ContextName(path, version);
    String submitUrl = response.encodeURL(((HttpServletRequest)
-           pageContext.getRequest()).getRequestURI() + "?path=" + path);
+           pageContext.getRequest()).getRequestURI() + "?path=" + path +
+           "&version=" + version);
    Collection activeSessions = (Collection) request.getAttribute("activeSessions");
 %>
 <head>
@@ -41,10 +45,10 @@
     <meta name="author" content="Cedrik LIME"/>
     <meta name="copyright" content="copyright 2005-2010 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
-    <title>Sessions Administration for <%= path %></title>
+    <title>Sessions Administration for <%= cn.getDisplayName() %></title>
 </head>
 <body>
-<h1>Sessions Administration for <%= path %></h1>
+<h1>Sessions Administration for <%= cn.getDisplayName() %></h1>
 
 <p>Tips:</p>
 <ul>

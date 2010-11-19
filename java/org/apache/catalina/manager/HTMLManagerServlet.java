@@ -125,6 +125,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String command = request.getPathInfo();
 
         String path = request.getParameter("path");
+        ContextName cn = null;
+        if (path != null) {
+            cn = new ContextName(path, request.getParameter("version"));
+        }
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
@@ -137,10 +141,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
             // List always displayed - nothing to do here
         } else if (command.equals("/sessions")) {
             try {
-                doSessions(path, request, response, smClient);
+                doSessions(cn, request, response, smClient);
                 return;
             } catch (Exception e) {
-                log("HTMLManagerServlet.sessions[" + path + "]", e);
+                log("HTMLManagerServlet.sessions[" + cn + "]", e);
                 message = smClient.getString("managerServlet.exception",
                         e.toString());
             }
@@ -180,7 +184,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String command = request.getPathInfo();
 
         String path = request.getParameter("path");
+        ContextName cn = null;
+        if (path != null) {
+            cn = new ContextName(path, request.getParameter("version"));
+        }
         String deployPath = request.getParameter("deployPath");
+        ContextName deployCn = null;
+        if (deployPath != null) {
+            deployCn = new ContextName(deployPath,
+                    request.getParameter("deployVersion")); 
+        }
         String deployConfig = request.getParameter("deployConfig");
         String deployWar = request.getParameter("deployWar");
 
@@ -195,18 +208,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else if (command.equals("/upload")) {
             message = upload(request, smClient);
         } else if (command.equals("/deploy")) {
-            message = deployInternal(deployConfig, deployPath, deployWar,
+            message = deployInternal(deployConfig, deployCn, deployWar,
                     smClient);
         } else if (command.equals("/reload")) {
-            message = reload(path, smClient);
+            message = reload(cn, smClient);
         } else if (command.equals("/undeploy")) {
-            message = undeploy(path, smClient);
+            message = undeploy(cn, smClient);
         } else if (command.equals("/expire")) {
-            message = expireSessions(path, request, smClient);
+            message = expireSessions(cn, request, smClient);
         } else if (command.equals("/start")) {
-            message = start(path, smClient);
+            message = start(cn, smClient);
         } else if (command.equals("/stop")) {
-            message = stop(path, smClient);
+            message = stop(cn, smClient);
         } else if (command.equals("/findleaks")) {
             message = findleaks(smClient);
         } else {
@@ -370,17 +383,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * web application archive.
      *
      * @param config URL of the context configuration file to be deployed
-     * @param path Context path of the application to be deployed
+     * @param cn Name of the application to be deployed
      * @param war URL of the web application archive to be deployed
      * @return message String
      */
-    protected String deployInternal(String config, String path, String war,
+    protected String deployInternal(String config, ContextName cn, String war,
             StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.deploy(printWriter, config, path, war, false, smClient);
+        super.deploy(printWriter, config, cn, war, false, smClient);
 
         return stringWriter.toString();
     }
@@ -493,6 +506,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     displayPath = "/";
                 }
 
+                StringBuilder tmp = new StringBuilder();
+                tmp.append("path=");
+                tmp.append(URL_ENCODER.encode(displayPath));
+                if (ctxt.getWebappVersion().length() > 0) {
+                    tmp.append("&version=");
+                    tmp.append(URL_ENCODER.encode(ctxt.getWebappVersion()));
+                }
+                String pathVersion = tmp.toString();
+
                 try {
                     isDeployed = isDeployed(contextName);
                 } catch (Exception e) {
@@ -512,9 +534,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     args[2] = "&nbsp;";
                 }
                 args[3] = new Boolean(ctxt.getAvailable());
-                args[4] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/sessions?path=" + URL_ENCODER.encode(displayPath));
+                args[4] = response.encodeURL(request.getContextPath() +
+                     "/html/sessions?" + pathVersion);
                 Manager manager = ctxt.getManager(); 
                 if (manager instanceof DistributedManager && showProxySessions) {
                     args[5] = new Integer(
@@ -531,26 +552,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
                 args = new Object[14];
-                args[0] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/start?path=" + URL_ENCODER.encode(displayPath));
+                args[0] = response.encodeURL(request.getContextPath() +
+                        "/html/start?" + pathVersion);
                 args[1] = appsStart;
-                args[2] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/stop?path=" + URL_ENCODER.encode(displayPath));
+                args[2] = response.encodeURL(request.getContextPath() +
+                        "/html/stop?" + pathVersion);
                 args[3] = appsStop;
-                args[4] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/reload?path=" + URL_ENCODER.encode(displayPath));
+                args[4] = response.encodeURL(request.getContextPath() +
+                     "/html/reload?" + pathVersion);
                 args[5] = appsReload;
-                args[6] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/undeploy?path=" + URL_ENCODER.encode(displayPath));
+                args[6] = response.encodeURL(request.getContextPath() +
+                     "/html/undeploy?" + pathVersion);
                 args[7] = appsUndeploy;
-                
-                args[8] = response.encodeURL
-                    (request.getContextPath() +
-                     "/html/expire?path=" + URL_ENCODER.encode(displayPath));
+                args[8] = response.encodeURL(request.getContextPath() +
+                     "/html/expire?" + pathVersion);
                 args[9] = appsExpire;
                 args[10] = smClient.getString(
                         "htmlManagerServlet.expire.explain");
@@ -645,17 +660,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Reload the web application at the specified context path.
      *
-     * @see ManagerServlet#reload(PrintWriter, String, StringManager)
+     * @see ManagerServlet#reload(PrintWriter, ContextName, StringManager)
      *
-     * @param path Context path of the application to be restarted
+     * @param cn Name of the application to be restarted
+     * @param smClient  StringManager for the client's locale
      * @return message String
      */
-    protected String reload(String path, StringManager smClient) {
+    protected String reload(ContextName cn, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.reload(printWriter, path, smClient);
+        super.reload(printWriter, cn, smClient);
 
         return stringWriter.toString();
     }
@@ -665,15 +681,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @see ManagerServlet#undeploy(PrintWriter, String, StringManager)
      *
-     * @param path Context path of the application to be undeployed
+     * @param cn Name of the application to be undeployed
+     * @param smClient  StringManager for the client's locale
      * @return message String
      */
-    protected String undeploy(String path, StringManager smClient) {
+    protected String undeploy(ContextName cn, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.undeploy(printWriter, path, smClient);
+        super.undeploy(printWriter, cn, smClient);
 
         return stringWriter.toString();
     }
@@ -683,16 +700,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @see ManagerServlet#sessions(PrintWriter, String, int, StringManager)
      *
-     * @param path Context path of the application to list session information
+     * @param cn Name of the application to list session information
      * @param idle Expire all sessions with idle time &ge; idle for this context
+     * @param smClient  StringManager for the client's locale
      * @return message String
      */
-    protected String sessions(String path, int idle, StringManager smClient) {
+    protected String sessions(ContextName cn, int idle, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.sessions(printWriter, path, idle, smClient);
+        super.sessions(printWriter, cn, idle, smClient);
 
         return stringWriter.toString();
     }
@@ -702,15 +720,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @see ManagerServlet#start(PrintWriter, String, StringManager)
      *
-     * @param path Context path of the application to be started
+     * @param cn Name of the application to be started
+     * @param smClient  StringManager for the client's locale
      * @return message String
      */
-    protected String start(String path, StringManager smClient) {
+    protected String start(ContextName cn, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.start(printWriter, path, smClient);
+        super.start(printWriter, cn, smClient);
 
         return stringWriter.toString();
     }
@@ -720,15 +739,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @see ManagerServlet#stop(PrintWriter, String, StringManager)
      *
-     * @param path Context path of the application to be stopped
+     * @param cn Name of the application to be stopped
+     * @param smClient  StringManager for the client's locale
      * @return message String
      */
-    protected String stop(String path, StringManager smClient) {
+    protected String stop(ContextName cn, StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.stop(printWriter, path, smClient);
+        super.stop(printWriter, cn, smClient);
 
         return stringWriter.toString();
     }
@@ -737,6 +757,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * Find potential memory leaks caused by web application reload.
      *
      * @see ManagerServlet#findleaks(PrintWriter, StringManager) 
+     * 
+     * @param smClient  StringManager for the client's locale
      *
      * @return message String
      */
@@ -787,10 +809,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * Extract the expiration request parameter
      * 
-     * @param path
+     * @param cn Name of the application from which to expire sessions
      * @param req
+     * @param smClient  StringManager for the client's locale
      */
-    protected String expireSessions(String path, HttpServletRequest req,
+    protected String expireSessions(ContextName cn, HttpServletRequest req,
             StringManager smClient) {
         int idle = -1;
         String idleParam = req.getParameter("idle");
@@ -801,58 +824,66 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 log("Could not parse idle parameter to an int: " + idleParam);
             }
         }
-        return sessions(path, idle, smClient);
+        return sessions(cn, idle, smClient);
     }
 
     /**
      * 
      * @param req
      * @param resp
+     * @param smClient  StringManager for the client's locale
      * @throws ServletException
      * @throws IOException 
      */
-    protected void doSessions(String path, HttpServletRequest req,
+    protected void doSessions(ContextName cn, HttpServletRequest req,
             HttpServletResponse resp, StringManager smClient)
             throws ServletException, IOException {
-        req.setAttribute("path", path);
+        req.setAttribute("path", cn.getPath());
+        req.setAttribute("version", cn.getVersion());
         String action = req.getParameter("action");
         if (debug >= 1) {
-            log("sessions: Session action '" + action + "' for web application at '" + path + "'");
+            log("sessions: Session action '" + action +
+                    "' for web application '" + cn.getDisplayName() + "'");
         }
         if ("sessionDetail".equals(action)) {
             String sessionId = req.getParameter("sessionId");
-            displaySessionDetailPage(req, resp, path, sessionId, smClient);
+            displaySessionDetailPage(req, resp, cn, sessionId, smClient);
             return;
         } else if ("invalidateSessions".equals(action)) {
             String[] sessionIds = req.getParameterValues("sessionIds");
-            int i = invalidateSessions(path, sessionIds, smClient);
+            int i = invalidateSessions(cn, sessionIds, smClient);
             req.setAttribute(APPLICATION_MESSAGE, "" + i + " sessions invalidated.");
         } else if ("removeSessionAttribute".equals(action)) {
             String sessionId = req.getParameter("sessionId");
             String name = req.getParameter("attributeName");
             boolean removed =
-                removeSessionAttribute(path, sessionId, name, smClient);
+                removeSessionAttribute(cn, sessionId, name, smClient);
             String outMessage = removed ? "Session attribute '" + name + "' removed." : "Session did not contain any attribute named '" + name + "'";
             req.setAttribute(APPLICATION_MESSAGE, outMessage);
-            resp.sendRedirect(resp.encodeRedirectURL(req.getRequestURL().append("?path=").append(path).append("&action=sessionDetail&sessionId=").append(sessionId).toString()));
+            resp.sendRedirect(resp.encodeRedirectURL(req.getRequestURL().append("?path=").append(cn.getPath()).append("&action=sessionDetail&sessionId=").append(sessionId).toString()));
             return;
         } // else
-        displaySessionsListPage(path, req, resp, smClient);
+        displaySessionsListPage(cn, req, resp, smClient);
     }
 
-    protected List<Session> getSessionsForPath(String path,
+    protected List<Session> getSessionsForName(ContextName cn,
             StringManager smClient) {
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
+        if ((cn == null) || (!cn.getPath().startsWith("/") &&
+                cn.getPath().equals(""))) {
+            String path = null;
+            if (cn != null) {
+                path = cn.getPath();
+            }
             throw new IllegalArgumentException(smClient.getString(
-                    "managerServlet.invalidPath", RequestUtil.filter(path)));
+                    "managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
         }
-        String searchPath = path;
-        if( path.equals("/") )
-            searchPath = "";
-        Context ctxt = (Context) host.findChild(searchPath);
+
+        Context ctxt = (Context) host.findChild(cn.getName());
         if (null == ctxt) {
             throw new IllegalArgumentException(smClient.getString(
-                    "managerServlet.noContext", RequestUtil.filter(path)));
+                    "managerServlet.noContext",
+                    RequestUtil.filter(cn.getDisplayName())));
         }
         Manager manager = ctxt.getManager();
         List<Session> sessions = new ArrayList<Session>();
@@ -872,19 +903,24 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
         return sessions;
     }
-    protected Session getSessionForPathAndId(String path, String id,
+    protected Session getSessionForNameAndId(ContextName cn, String id,
             StringManager smClient) throws IOException {
-        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
+        if ((cn == null) || (!cn.getPath().startsWith("/") &&
+                cn.getPath().equals(""))) {
+            String path = null;
+            if (cn != null) {
+                path = cn.getPath();
+            }
             throw new IllegalArgumentException(smClient.getString(
-                    "managerServlet.invalidPath", RequestUtil.filter(path)));
+                    "managerServlet.invalidPath",
+                    RequestUtil.filter(path)));
         }
-        String searchPath = path;
-        if( path.equals("/") )
-            searchPath = "";
-        Context ctxt = (Context) host.findChild(searchPath);
+        
+        Context ctxt = (Context) host.findChild(cn.getName());
         if (null == ctxt) {
             throw new IllegalArgumentException(smClient.getString(
-                    "managerServlet.noContext", RequestUtil.filter(path)));
+                    "managerServlet.noContext",
+                    RequestUtil.filter(cn.getDisplayName())));
         }
         Session session = ctxt.getManager().findSession(id);
         return session;
@@ -892,15 +928,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     /**
      * 
+     * @param cn Name of the application for which the sessions will be listed
      * @param req
      * @param resp
+     * @param smClient  StringManager for the client's locale
      * @throws ServletException
      * @throws IOException
      */
-    protected void displaySessionsListPage(String path, HttpServletRequest req,
-            HttpServletResponse resp, StringManager smClient)
+    protected void displaySessionsListPage(ContextName cn,
+            HttpServletRequest req, HttpServletResponse resp,
+            StringManager smClient)
             throws ServletException, IOException {
-        List<Session> sessions = getSessionsForPath(path, smClient);
+        List<Session> sessions = getSessionsForName(cn, smClient);
         String sortBy = req.getParameter("sort");
         String orderBy = null;
         if (null != sortBy && !"".equals(sortBy.trim())) {
@@ -940,13 +979,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * 
      * @param req
      * @param resp
+     * @param smClient  StringManager for the client's locale
      * @throws ServletException
      * @throws IOException
      */
     protected void displaySessionDetailPage(HttpServletRequest req,
-            HttpServletResponse resp, String path, String sessionId,
+            HttpServletResponse resp, ContextName cn, String sessionId,
             StringManager smClient) throws ServletException, IOException {
-        Session session = getSessionForPathAndId(path, sessionId, smClient);
+        Session session = getSessionForNameAndId(cn, sessionId, smClient);
         //strong>NOTE</strong> - This header will be overridden
         // automatically if a <code>RequestDispatcher.forward()</code> call is
         // ultimately invoked.
@@ -959,11 +999,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     /**
      * Invalidate HttpSessions
+     * @param cn Name of the application for which sessions are to be
+     *           invalidated
      * @param sessionIds
+     * @param smClient  StringManager for the client's locale
      * @return number of invalidated sessions
      * @throws IOException 
      */
-    protected int invalidateSessions(String path, String[] sessionIds,
+    protected int invalidateSessions(ContextName cn, String[] sessionIds,
             StringManager smClient) throws IOException {
         if (null == sessionIds) {
             return 0;
@@ -971,7 +1014,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         int nbAffectedSessions = 0;
         for (int i = 0; i < sessionIds.length; ++i) {
             String sessionId = sessionIds[i];
-            HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
+            HttpSession session =
+                getSessionForNameAndId(cn, sessionId, smClient).getSession();
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {
@@ -996,14 +1040,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     /**
      * Removes an attribute from an HttpSession
+     * @param cn Name of the application hosting the session from which the
+     *           attribute is to be removed
      * @param sessionId
      * @param attributeName
+     * @param smClient  StringManager for the client's locale
      * @return true if there was an attribute removed, false otherwise
      * @throws IOException 
      */
-    protected boolean removeSessionAttribute(String path, String sessionId,
+    protected boolean removeSessionAttribute(ContextName cn, String sessionId,
             String attributeName, StringManager smClient) throws IOException {
-        HttpSession session = getSessionForPathAndId(path, sessionId, smClient).getSession();
+        HttpSession session =
+            getSessionForNameAndId(cn, sessionId, smClient).getSession();
         if (null == session) {
             // Shouldn't happen, but let's play nice...
             if (debug >= 1) {
