@@ -572,7 +572,7 @@ class Parser implements TagConstants {
      * Attribute)*
      */
     private void parseTagDirective(Node parent) throws JasperException {
-        Attributes attrs = parseAttributes();
+        Attributes attrs = parseAttributes(true);
         Node.TagDirective n = new Node.TagDirective(attrs, start, parent);
 
         /*
