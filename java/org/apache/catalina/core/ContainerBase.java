@@ -799,29 +799,32 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                                                    "' is not unique");
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
+        }
 
-            // Start child
-            if ((getState().isAvailable() ||
-                    LifecycleState.STARTING_PREP.equals(getState())) &&
-                    startChildren) {
-                boolean success = false;
-                try {
-                    child.start();
-                    success = true;
-                } catch (LifecycleException e) {
-                    log.error("ContainerBase.addChild: start: ", e);
-                    throw new IllegalStateException
-                        ("ContainerBase.addChild: start: " + e);
-                } finally {
-                    if (!success) {
+        // Start child
+        // Don't do this inside sync block - start can be a slow process and
+        // locking the children object can cause problems elsewhere
+        if ((getState().isAvailable() ||
+                LifecycleState.STARTING_PREP.equals(getState())) &&
+                startChildren) {
+            boolean success = false;
+            try {
+                child.start();
+                success = true;
+            } catch (LifecycleException e) {
+                log.error("ContainerBase.addChild: start: ", e);
+                throw new IllegalStateException
+                    ("ContainerBase.addChild: start: " + e);
+            } finally {
+                if (!success) {
+                    synchronized (children) {
                         children.remove(child.getName());
                     }
                 }
             }
-
-            fireContainerEvent(ADD_CHILD_EVENT, child);
         }
 
+        fireContainerEvent(ADD_CHILD_EVENT, child);
     }
 
 
@@ -864,7 +867,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         if (name == null)
             return (null);
-        synchronized (children) {       // Required by post-start changes
+        synchronized (children) {
             return children.get(name);
         }
 
