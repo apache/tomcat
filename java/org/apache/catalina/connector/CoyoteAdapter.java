@@ -570,10 +570,113 @@ public class CoyoteAdapter implements Adapter {
             //reset mapping data, should prolly be done elsewhere
             request.getMappingData().recycle();
         }
-        connector.getMapper().map(serverName, decodedURI, 
-                                  request.getMappingData());
-        request.setContext((Context) request.getMappingData().context);
-        request.setWrapper((Wrapper) request.getMappingData().wrapper);
+        
+        boolean mapRequired = true;
+        String version = null;
+        
+        while (mapRequired) {
+            if (version != null) {
+                // Once we have a version - that is it
+                mapRequired = false;
+            }
+            // This will map the the latest version by default
+            connector.getMapper().map(serverName, decodedURI, version,
+                                      request.getMappingData());
+            request.setContext((Context) request.getMappingData().context);
+            request.setWrapper((Wrapper) request.getMappingData().wrapper);
+
+            // Single contextVersion therefore no possibility of remap
+            if (request.getMappingData().contexts == null) {
+                mapRequired = false;
+            }
+
+            // If there is no context at this point, it is likely no ROOT context
+            // has been deployed
+            if (request.getContext() == null) {
+                res.setStatus(404);
+                res.setMessage("Not found");
+                // No context, so use host
+                request.getHost().logAccess(request, response, 0, true);
+                return false;
+            }
+        
+            // Now we have the context, we can parse the session ID from the URL
+            // (if any). Need to do this before we redirect in case we need to
+            // include the session id in the redirect
+            String sessionID = null;
+            if (request.getServletContext().getEffectiveSessionTrackingModes()
+                    .contains(SessionTrackingMode.URL)) {
+                
+                // Get the session ID if there was one
+                sessionID = request.getPathParameter(
+                        ApplicationSessionCookieConfig.getSessionUriParamName(
+                                request.getContext()));
+                if (sessionID != null) {
+                    request.setRequestedSessionId(sessionID);
+                    request.setRequestedSessionURL(true);
+                }
+            }
+
+            // Look for session ID in cookies and SSL session
+            parseSessionCookiesId(req, request);
+            parseSessionSslId(request);
+            
+            sessionID = request.getRequestedSessionId();
+            
+            if (mapRequired) {
+                if (sessionID == null) {
+                    // No session means no possibility of needing to remap
+                    mapRequired = false;
+                } else {
+                    // Find the context associated with the session
+                    Object[] objs = request.getMappingData().contexts;
+                    for (int i = (objs.length); i > 0; i--) {
+                        Context ctxt = (Context) objs[i - 1];
+                        if (ctxt.getManager().findSession(sessionID) != null) {
+                            // Was the correct context already mapped?
+                            if (ctxt.equals(request.getMappingData().context)) {
+                                mapRequired = false;
+                            } else {
+                                // Set version so second time through mapping the
+                                // correct context is found
+                                version = ctxt.getWebappVersion();
+                                // Reset mapping 
+                                request.getMappingData().recycle();
+                                break;
+                            }
+                        }
+                    }
+                    if (version == null) {
+                        // No matching context found. No need to re-map
+                        mapRequired = false;
+                    }
+                }                
+            }
+
+        }
+
+        // Possible redirect
+        MessageBytes redirectPathMB = request.getMappingData().redirectPath;
+        if (!redirectPathMB.isNull()) {
+            String redirectPath = urlEncoder.encode(redirectPathMB.toString());
+            String query = request.getQueryString();
+            if (request.isRequestedSessionIdFromURL()) {
+                // This is not optimal, but as this is not very common, it
+                // shouldn't matter
+                redirectPath = redirectPath + ";" +
+                    ApplicationSessionCookieConfig.getSessionUriParamName(
+                            request.getContext()) +
+                    "=" + request.getRequestedSessionId();
+            }
+            if (query != null) {
+                // This is not optimal, but as this is not very common, it
+                // shouldn't matter
+                redirectPath = redirectPath + "?" + query;
+            }
+            response.sendRedirect(redirectPath);
+            request.getContext().logAccess(request, response, 0, true);
+            return false;
+        }
 
         // Filter trace method
         if (!connector.getAllowTrace() 
@@ -602,58 +705,6 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // If there is no context at this point, it is likely no ROOT context
-        // has been deployed
-        if (request.getContext() == null) {
-            res.setStatus(404);
-            res.setMessage("Not found");
-            // No context, so use host
-            request.getHost().logAccess(request, response, 0, true);
-            return false;
-        }
-        
-        // Now we have the context, we can parse the session ID from the URL
-        // (if any). Need to do this before we redirect in case we need to
-        // include the session id in the redirect
-        if (request.getServletContext().getEffectiveSessionTrackingModes()
-                .contains(SessionTrackingMode.URL)) {
-            
-            // Get the session ID if there was one
-            String sessionID = request.getPathParameter(
-                    ApplicationSessionCookieConfig.getSessionUriParamName(
-                            request.getContext()));
-            if (sessionID != null) {
-                request.setRequestedSessionId(sessionID);
-                request.setRequestedSessionURL(true);
-            }
-        }
-
-        // Possible redirect
-        MessageBytes redirectPathMB = request.getMappingData().redirectPath;
-        if (!redirectPathMB.isNull()) {
-            String redirectPath = urlEncoder.encode(redirectPathMB.toString());
-            String query = request.getQueryString();
-            if (request.isRequestedSessionIdFromURL()) {
-                // This is not optimal, but as this is not very common, it
-                // shouldn't matter
-                redirectPath = redirectPath + ";" +
-                    ApplicationSessionCookieConfig.getSessionUriParamName(
-                            request.getContext()) +
-                    "=" + request.getRequestedSessionId();
-            }
-            if (query != null) {
-                // This is not optimal, but as this is not very common, it
-                // shouldn't matter
-                redirectPath = redirectPath + "?" + query;
-            }
-            response.sendRedirect(redirectPath);
-            request.getContext().logAccess(request, response, 0, true);
-            return false;
-        }
-
-        // Finally look for session ID in cookies and SSL session
-        parseSessionCookiesId(req, request);
-        parseSessionSslId(request);
         return true;
     }
 

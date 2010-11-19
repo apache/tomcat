@@ -521,6 +521,28 @@
       <a href="{$link}">r<xsl:apply-templates/></a>
   </xsl:template>
 
+  <!-- specially process td tags ala site.vsl -->
+  <xsl:template match="table[@class='detail-table']/tr/td">
+    <td bgcolor="{$table-td-bg}" valign="top" align="left">
+        <xsl:if test="@colspan"><xsl:attribute name="colspan"><xsl:value-of select="@colspan"/></xsl:attribute></xsl:if>
+        <xsl:if test="@rowspan"><xsl:attribute name="rowspan"><xsl:value-of select="@rowspan"/></xsl:attribute></xsl:if>
+        <font color="#000000" size="-1" face="arial,helvetica,sanserif">
+            <xsl:apply-templates/>
+        </font>
+    </td>
+  </xsl:template>
+
+  <!-- handle th ala site.vsl -->
+  <xsl:template match="table[@class='detail-table']/tr/th">
+    <td bgcolor="{$table-th-bg}" valign="top">
+        <xsl:if test="@colspan"><xsl:attribute name="colspan"><xsl:value-of select="@colspan"/></xsl:attribute></xsl:if>
+        <xsl:if test="@rowspan"><xsl:attribute name="rowspan"><xsl:value-of select="@rowspan"/></xsl:attribute></xsl:if>
+        <font color="#000000" size="-1" face="arial,helvetica,sanserif">
+            <xsl:apply-templates />
+        </font>
+    </td>
+  </xsl:template>
+  
   <!-- Process everything else by just passing it through -->
   <xsl:template match="*|@*">
     <xsl:copy>
