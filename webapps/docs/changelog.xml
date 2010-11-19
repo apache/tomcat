@@ -146,6 +146,14 @@
         of children whilst the new child is being started since this can block
         other threads and cause issues such as lost cluster messages. (markt)
       </fix>
+      <add>
+        Implement support for parallel deployment. This allows multiple versions
+        of the same web application to be deployed to the same context path at
+        the same time. Users without a current session will be mapped to the
+        latest version of the web application. Users with a current session will
+        continue to use the version of the web application with which the
+        session is associated until the session expires. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

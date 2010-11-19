@@ -161,12 +161,13 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
+            String version = ((Context) wrapper.getParent()).getWebappVersion();
             String hostName = context.getParent().getName();
             String wrapperName = wrapper.getName();
             String mapping = (String) event.getData();
             boolean jspWildCard = ("jsp".equals(wrapperName)
                     && mapping.endsWith("/*"));
-            mapper.addWrapper(hostName, contextPath, mapping, wrapper,
+            mapper.addWrapper(hostName, contextPath, version, mapping, wrapper,
                     jspWildCard, context.isResourceOnlyServlet(wrapperName));
         } else if (event.getType() == Wrapper.REMOVE_MAPPING_EVENT) {
             // Handle dynamically removing wrappers
@@ -176,11 +177,12 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
+            String version = ((Context) wrapper.getParent()).getWebappVersion();
             String hostName = wrapper.getParent().getParent().getName();
 
             String mapping = (String) event.getData();
             
-            mapper.removeWrapper(hostName, contextPath, mapping);
+            mapper.removeWrapper(hostName, contextPath, version, mapping);
         } else if (event.getType() == Context.ADD_WELCOME_FILE_EVENT) {
             // Handle dynamically adding welcome files
             Context context = (Context) event.getSource();
@@ -194,7 +196,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             
             String welcomeFile = (String) event.getData();
             
-            mapper.addWelcomeFile(hostName, contextPath, welcomeFile);
+            mapper.addWelcomeFile(hostName, contextPath,
+                    context.getWebappVersion(), welcomeFile);
         } else if (event.getType() == Context.REMOVE_WELCOME_FILE_EVENT) {
             // Handle dynamically removing welcome files
             Context context = (Context) event.getSource();
@@ -208,7 +211,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             
             String welcomeFile = (String) event.getData();
             
-            mapper.removeWelcomeFile(hostName, contextPath, welcomeFile);
+            mapper.removeWelcomeFile(hostName, contextPath,
+                    context.getWebappVersion(), welcomeFile);
         } else if (event.getType() == Context.CLEAR_WELCOME_FILES_EVENT) {
             // Handle dynamically clearing welcome files
             Context context = (Context) event.getSource();
@@ -220,7 +224,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
                 contextPath = "";
             }
             
-            mapper.clearWelcomeFiles(hostName, contextPath);
+            mapper.clearWelcomeFiles(hostName, contextPath,
+                    context.getWebappVersion());
         }
     }
 
@@ -307,12 +312,13 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
+        String version = ((Context) wrapper.getParent()).getWebappVersion();
         String hostName = wrapper.getParent().getParent().getName();
 
         String[] mappings = wrapper.findMappings();
         
         for (String mapping : mappings) {
-            mapper.removeWrapper(hostName, contextPath, mapping);
+            mapper.removeWrapper(hostName, contextPath, version,  mapping);
         }
         
         if(log.isDebugEnabled()) {
@@ -336,8 +342,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         javax.naming.Context resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
 
-        mapper.addContext(host.getName(), host, contextPath, context,
-                welcomeFiles, resources);
+        mapper.addContextVersion(host.getName(), host, contextPath,
+                context.getWebappVersion(), context, welcomeFiles, resources);
 
         for (Container container : context.findChildren()) {
             registerWrapper((Wrapper) container);
@@ -370,7 +376,8 @@ public class MapperListener implements ContainerListener, LifecycleListener {
             log.debug(sm.getString("mapperListener.unregisterContext",
                     contextPath, connector));
 
-        mapper.removeContext(hostName, contextPath);
+        mapper.removeContextVersion(hostName, contextPath,
+                context.getWebappVersion());
     }
 
 
@@ -385,7 +392,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
-
+        String version = ((Context) wrapper.getParent()).getWebappVersion();
         String hostName = context.getParent().getName();
         
         String[] mappings = wrapper.findMappings();
@@ -393,7 +400,7 @@ public class MapperListener implements ContainerListener, LifecycleListener {
         for (String mapping : mappings) {
             boolean jspWildCard = (wrapperName.equals("jsp")
                                    && mapping.endsWith("/*"));
-            mapper.addWrapper(hostName, contextPath, mapping, wrapper,
+            mapper.addWrapper(hostName, contextPath, version, mapping, wrapper,
                               jspWildCard,
                               context.isResourceOnlyServlet(wrapperName));
         }
