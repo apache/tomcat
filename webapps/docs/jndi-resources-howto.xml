@@ -456,7 +456,7 @@ Context envCtx = (Context) initCtx.lookup("java:comp/env");
 Session session = (Session) envCtx.lookup("mail/Session");
 
 Message message = new MimeMessage(session);
-message.setFrom(new InternetAddress(request.getParameter("from"));
+message.setFrom(new InternetAddress(request.getParameter("from")));
 InternetAddress to[] = new InternetAddress[1];
 to[0] = new InternetAddress(request.getParameter("to"));
 message.setRecipients(Message.RecipientType.TO, to);
@@ -494,20 +494,21 @@ Transport.send(message);
 
     <h3>4.  Install the JavaMail libraries</h3>
 
-    <p><a href="http://java.sun.com/products/javamail/downloads/index.html" target="_blank">
-    Download the JavaMail API</a>.  The JavaMail API requires the Java Activation
-    Framework (JAF) API as well.  The Java Activation Framework can be downloaded
-    from <a href="http://java.sun.com/products/javabeans/glasgow/jaf.html">Sun's site</a>.
+    <p><a href="http://www.oracle.com/technetwork/java/index-138643.html">
+    Download the JavaMail API</a>.</p>
+
+    <p>Unpackage the distribution and place mail.jar  into $CATALINA_HOME/lib so
+    that it is available to Tomcat during the initialization of the mail Session
+    Resource. <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib
+    and a  web application's lib folder will cause an error, so ensure you have
+    it in the $CATALINA_HOME/lib location only.
     </p>
 
-    <p>This download includes 2 vital libraries for the configuration; 
-    activation.jar and mail.jar. Unpackage both distributions and place 
-    them into $CATALINA_HOME/lib so that they are available to
-    Tomcat during the initialization of the mail Session Resource.
-    <strong>Note:</strong> placing these jars in both $CATALINA_HOME/lib and a 
-    web application's lib folder will cause an error, so ensure you have
-    them in the $CATALINA_HOME/lib location only.
-    </p>
+    <h3>5.  Restart Tomcat</h3>
+    
+    <p>For the additional JAR to be visible to Tomcat, it is necessary for the
+    Tomcat instance to be restarted.</p>
+
 
     <h3>Example Application</h3>
 
