@@ -416,7 +416,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             msg.setOrignalSessionID(sessionId);
             msg.setBackupSessionID(newSessionID);
             Context context = request.getContext();
-            msg.setContextPath(context.getPath());
+            msg.setContextName(context.getName());
             msg.setHost(context.getParent().getName());
             c.send(msg);
         }
