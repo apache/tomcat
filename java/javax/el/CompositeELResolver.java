@@ -29,7 +29,7 @@ public class CompositeELResolver extends ELResolver {
 
     public CompositeELResolver() {
         this.size = 0;
-        this.resolvers = new ELResolver[2];
+        this.resolvers = new ELResolver[8];
     }
 
     public void add(ELResolver elResolver) {
