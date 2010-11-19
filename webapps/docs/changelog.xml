@@ -140,6 +140,12 @@
         Reduce synchronization in session managers to improve performance of
         session creation. (markt)
       </add>
+      <fix>
+        If starting children automatically when adding them to a container (e.g.
+        when adding a Context to a Host) don&apos;t lock the parent&apos;s set
+        of children whilst the new child is being started since this can block
+        other threads and cause issues such as lost cluster messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -204,6 +210,11 @@
         <bug>50184</bug>: Add an option to the RpcChannel to enable the Channel
         send options to be set for the reply message. Based on a patch by Ariel.
         (markt)
+      </fix>
+      <fix>
+        Ensure that a new Context waiting for session data from other nodes in
+        the cluster does not block the processing of clustering messages for
+        other Contexts. (markt) 
       </fix>
     </changelog>
   </subsection>
