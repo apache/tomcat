@@ -44,7 +44,7 @@ import org.apache.tools.ant.BuildException;
  *           host="127.0.0.1"
  *           port="9014"
  *           ref=""
- *           name="Catalina:type=Manager,path="/ClusterTest",host=localhost" 
+ *           name="Catalina:type=Manager,context="/ClusterTest",host=localhost" 
  *           attribute="maxActiveSessions"
  *           value="100"
  *           type="int"
