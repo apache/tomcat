@@ -184,6 +184,7 @@ public class StatusTransformer {
                 writer.print(formatTime(new Long(result[12] / 1000), true));
                 writer.print("</p>");
             } else if (mode == 1){
+                // NO-OP
             }
         }
         
@@ -626,7 +627,7 @@ public class StatusTransformer {
             }
 
             ObjectName queryManager = new ObjectName
-                (objectName.getDomain() + ":type=Manager,path=" + contextName 
+                (objectName.getDomain() + ":type=Manager,context=" + contextName 
                  + ",host=" + hostName + ",*");
             Set<ObjectName> managersON =
                 mBeanServer.queryNames(queryManager, null);
