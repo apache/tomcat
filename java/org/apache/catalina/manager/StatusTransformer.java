@@ -871,10 +871,20 @@ public class StatusTransformer {
         }
 
         if (mb) {
+            StringBuilder buff = new StringBuilder();
+            if (bytes < 0) {
+                buff.append('-');
+                bytes = -bytes;
+            }
             long mbytes = bytes / (1024 * 1024);
             long rest = 
                 ((bytes - (mbytes * (1024 * 1024))) * 100) / (1024 * 1024);
-            return (mbytes + "." + ((rest < 10) ? "0" : "") + rest + " MB");
+            buff.append(mbytes).append('.');
+            if (rest < 10) {
+                buff.append('0');
+            }
+            buff.append(rest).append(" MB");
+            return buff.toString();
         } else {
             return ((bytes / 1024) + " KB");
         }
