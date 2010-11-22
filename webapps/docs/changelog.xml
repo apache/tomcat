@@ -295,6 +295,9 @@
         <bug>50310</bug>: Fix display of Servlet information in Manager
         application. (markt)
       </fix>
+      <fix>
+        CVE-2010-4172: Multiple XSS in Manager application. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
