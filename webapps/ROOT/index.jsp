@@ -28,10 +28,6 @@ request.setAttribute("tomcat7DocUrl", "/docs/");
         <link href="favicon.ico" rel="icon" type="image/x-icon" />
         <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <link href="tomcat.css" rel="stylesheet" type="text/css" />
-        <!--[if lte IE 8]> <style type="text/css">
-         div.curved { behavior: url(border-radius.htc); }
-         br.separator { margin: 0 0 1px; padding: 0; line-height: 5px; }
-        </style> <![endif]-->
     </head>
 
     <body>
