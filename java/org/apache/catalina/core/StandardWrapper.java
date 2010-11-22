@@ -1720,7 +1720,7 @@ public class StandardWrapper extends ContainerBase
 
     private String getWebModuleKeyProperties() {
         
-        StringBuilder keyProperties = new StringBuilder(",WebModule=");
+        StringBuilder keyProperties = new StringBuilder(",WebModule=//");
         String hostName = getParent().getParent().getName();
         if (hostName == null) {
             keyProperties.append("DEFAULT");
