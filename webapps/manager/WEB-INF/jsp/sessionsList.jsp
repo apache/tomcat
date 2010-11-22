@@ -31,9 +31,9 @@
 <% String path = (String) request.getAttribute("path");
    String version = (String) request.getAttribute("version");
    ContextName cn = new ContextName(path, version);
-   String submitUrl = response.encodeURL(((HttpServletRequest)
-           pageContext.getRequest()).getRequestURI() + "?path=" + path +
-           "&version=" + version);
+   String submitUrl = JspHelper.escapeXml(response.encodeURL(
+           ((HttpServletRequest) pageContext.getRequest()).getRequestURI() +
+           "?path=" + path + "&version=" + version));
    Collection activeSessions = (Collection) request.getAttribute("activeSessions");
 %>
 <head>
@@ -45,10 +45,10 @@
     <meta name="author" content="Cedrik LIME"/>
     <meta name="copyright" content="copyright 2005-2010 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
-    <title>Sessions Administration for <%= cn.getDisplayName() %></title>
+    <title>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></title>
 </head>
 <body>
-<h1>Sessions Administration for <%= cn.getDisplayName() %></h1>
+<h1>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></h1>
 
 <p>Tips:</p>
 <ul>
@@ -62,13 +62,13 @@
 <form action="<%= submitUrl %>" method="post" id="sessionsForm">
     <fieldset><legend>Active HttpSessions informations</legend>
         <input type="hidden" name="action" id="sessionsFormAction" value="injectSessions"/>
-        <input type="hidden" name="sort" id="sessionsFormSort" value="<%= (String) request.getAttribute("sort") %>"/>
+        <input type="hidden" name="sort" id="sessionsFormSort" value="<%= JspHelper.escapeXml(request.getAttribute("sort")) %>"/>
         <% String order = (String) request.getAttribute("order");
            if (order == null || "".equals(order)) {
                order = "ASC";
            }
         %>
-        <input type="hidden" name="order" id="sessionsFormSortOrder" value="<%= order %>"/>
+        <input type="hidden" name="order" id="sessionsFormSortOrder" value="<%= JspHelper.escapeXml(order) %>"/>
         <input type="submit" name="refresh" id="refreshButton" value="Refresh Sessions list" onclick="document.getElementById('sessionsFormAction').value='refreshSessions'; return true;"/>
         <%= JspHelper.formatNumber(activeSessions.size()) %> active Sessions<br/>
         <table border="1" cellpadding="2" cellspacing="2" width="100%">
@@ -104,7 +104,7 @@
 <% Iterator iter = activeSessions.iterator();
    while (iter.hasNext()) {
        Session currentSession = (Session) iter.next();
-       String currentSessionId = currentSession.getId();
+       String currentSessionId = JspHelper.escapeXml(currentSession.getId());
        String type;
        if (currentSession instanceof DeltaSession) {
            if (((DeltaSession) currentSession).isPrimarySession()) {
@@ -125,7 +125,7 @@
                             out.print(currentSessionId);
                         } else {
                       %>
-                      <a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>&amp;sessionType=<%= type %>"><%= JspHelper.escapeXml(currentSessionId) %></a>
+                      <a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>&amp;sessionType=<%= type %>"><%= currentSessionId %></a>
                       <%
                         }
                       %>

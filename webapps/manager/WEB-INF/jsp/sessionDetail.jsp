@@ -33,10 +33,10 @@
    ContextName cn = new ContextName(path, version);
    Session currentSession = (Session)request.getAttribute("currentSession");
    HttpSession currentHttpSession = currentSession.getSession();
-   String currentSessionId = currentSession.getId();
-   String submitUrl = response.encodeURL(((HttpServletRequest)
-           pageContext.getRequest()).getRequestURI() + "?path=" + path +
-           "&version=" + version);
+   String currentSessionId = JspHelper.escapeXml(currentSession.getId());
+   String submitUrl = JspHelper.escapeXml(response.encodeURL(
+           ((HttpServletRequest) pageContext.getRequest()).getRequestURI() +
+           "?path=" + path + "&version=" + version));
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
@@ -50,7 +50,7 @@
     <title>Sessions Administration: details for <%= currentSessionId %></title>
 </head>
 <body>
-<h1>Details for Session <%= JspHelper.escapeXml(currentSessionId) %></h1>
+<h1>Details for Session <%= currentSessionId %></h1>
 
 <table style="text-align: left;" border="0">
   <tr>
@@ -142,7 +142,7 @@
                     <div>
                         <input type="hidden" name="action" value="removeSessionAttribute" />
                         <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
-                        <input type="hidden" name="attributeName" value="<%= attributeName %>" />
+                        <input type="hidden" name="attributeName" value="<%= JspHelper.escapeXml(attributeName) %>" />
                         <%
                           if ("Primary".equals(request.getParameter("sessionType"))) {
                         %>
@@ -165,7 +165,6 @@
 
 <form method="post" action="<%=submitUrl%>">
   <p style="text-align: center;">
-    <input type="hidden" name="path" value="<%= path %>" />
     <input type="submit" value="Return to session list" />
   </p>
 </form>
