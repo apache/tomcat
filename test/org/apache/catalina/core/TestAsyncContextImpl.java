@@ -314,14 +314,20 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
     public void testTimeoutListenerComplete() throws Exception {
-        doTestTimeout(true);
+        doTestTimeout(true, null);
     }
     
     public void testTimeoutListenerNoComplete() throws Exception {
-        doTestTimeout(false);
+        doTestTimeout(false, null);
+    }
+
+    public void testTimeoutListenerDispatch() throws Exception {
+        doTestTimeout(true, "/nonasync");
     }
     
-    private void doTestTimeout(boolean completeOnTimeout) throws Exception {
+
+    private void doTestTimeout(boolean completeOnTimeout, String dispatchUrl)
+    throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
         
@@ -336,11 +342,18 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
-        TimeoutServlet timeout = new TimeoutServlet(completeOnTimeout);
+        TimeoutServlet timeout =
+            new TimeoutServlet(completeOnTimeout, dispatchUrl);
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/async", "time");
+
+        if (dispatchUrl != null) {
+            NonAsyncServlet nonAsync = new NonAsyncServlet();
+            Tomcat.addServlet(ctx, "nonasync", nonAsync);
+            ctx.addServletMapping(dispatchUrl, "nonasync");
+        }
 
         tomcat.start();
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
@@ -349,7 +362,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         if (!completeOnTimeout) {
             expected.append("onError-");
         }
-        expected.append("onComplete-");
+        if (dispatchUrl == null) {
+            expected.append("onComplete-");
+        } else {
+            expected.append("NonAsyncServletGet-");
+        }
         assertEquals(expected.toString(), res.toString());
     }
     
@@ -357,9 +374,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         private boolean completeOnTimeout;
-        
-        public TimeoutServlet(boolean completeOnTimeout) {
+        private String dispatchUrl;
+
+        public TimeoutServlet(boolean completeOnTimeout, String dispatchUrl) {
             this.completeOnTimeout = completeOnTimeout;
+            this.dispatchUrl = dispatchUrl;
         }
         
         @Override
@@ -370,7 +389,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 final AsyncContext ac = req.startAsync();
                 ac.setTimeout(3000);
                 
-                ac.addListener(new TrackingListener(false, completeOnTimeout));
+                ac.addListener(new TrackingListener(
+                        false, completeOnTimeout, dispatchUrl));
             } else
                 resp.getWriter().print("FAIL: Async unsupported");
         }
@@ -463,7 +483,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             final AsyncContext ctxt = req.startAsync();
             if (addTrackingListener) {
                 TrackingListener listener =
-                    new TrackingListener(completeOnError, true); 
+                    new TrackingListener(completeOnError, true, null); 
                 ctxt.addListener(listener);
             }
             Runnable run = new Runnable() {
@@ -510,7 +530,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/stage1", "tracking");
 
-        TimeoutServlet timeout = new TimeoutServlet(true);
+        TimeoutServlet timeout = new TimeoutServlet(true, null);
         Wrapper wrapper2 = Tomcat.addServlet(ctx, "timeout", timeout);
         wrapper2.setAsyncSupported(true);
         ctx.addServletMapping("/stage2", "timeout");
@@ -546,7 +566,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             TrackingServlet.first = false;
 
             final AsyncContext ctxt = req.startAsync();
-            TrackingListener listener = new TrackingListener(false, true); 
+            TrackingListener listener = new TrackingListener(false, true, null); 
             ctxt.addListener(listener);
             ctxt.setTimeout(3000);
 
@@ -572,11 +592,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         private boolean completeOnError;
         private boolean completeOnTimeout;
+        private String dispatchUrl;
         
         public TrackingListener(boolean completeOnError,
-                boolean completeOnTimeout) {
+                boolean completeOnTimeout, String dispatchUrl) {
             this.completeOnError = completeOnError;
             this.completeOnTimeout = completeOnTimeout;
+            this.dispatchUrl = dispatchUrl;
         }
 
         @Override
@@ -592,7 +614,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             resp.getWriter().write("onTimeout-");
             resp.flushBuffer();
             if (completeOnTimeout){
-                event.getAsyncContext().complete();
+                if (dispatchUrl == null) {
+                    event.getAsyncContext().complete();
+                } else {
+                    event.getAsyncContext().dispatch(dispatchUrl);
+                }
             }
         }
 

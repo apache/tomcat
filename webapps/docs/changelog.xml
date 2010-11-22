@@ -154,6 +154,11 @@
         continue to use the version of the web application with which the
         session is associated until the session expires. (markt)
       </add>
+      <fix>
+        <bug>50308</bug>: Allow asynchronous request processing to call
+        <code>AsyncContext.dispatch()</code> once the asynchronous request has
+        timed out. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
