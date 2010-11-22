@@ -281,6 +281,10 @@
         Fix message not being displayed after session attribute removal in HTML
         Manager application. (markt)
       </fix>
+      <fix>
+        <bug>50310</bug>: Fix display of Servlet information in Manager
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
