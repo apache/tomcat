@@ -213,7 +213,8 @@ public class AsyncStateMachine {
         boolean doDispatch = false;
         if (state == AsyncState.STARTING) {
             state = AsyncState.MUST_DISPATCH;
-        } else if (state == AsyncState.STARTED) {
+        } else if (state == AsyncState.STARTED ||
+                state == AsyncState.TIMING_OUT) {
             state = AsyncState.DISPATCHING;
             doDispatch = true;
         } else {
