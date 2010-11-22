@@ -269,6 +269,18 @@
         <bug>50303</bug>: Update JNDI how-to to reflect new JavaMail download
         location and that JAF is now included in Java SE 6. (markt) 
       </fix>
+      <fix>
+        Fix ordering functionality on sessions page for HTML Manager 
+        application. (markt)
+      </fix>
+      <fix>
+        Fix primary sessions not always being treated as such in HTML Manager 
+        application. (markt)
+      </fix>
+      <fix>
+        Fix message not being displayed after session attribute removal in HTML
+        Manager application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
