@@ -70,7 +70,52 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.processRequest();
         assertEquals("null7TestTestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz", client.getResponseBody());
     }
-    
+
+    public void testTrailingHeadersSizeLimit() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        StringBuilder longText = new StringBuilder("Test1234567890");
+        while (longText.length() <= 8192) {
+            longText.append(longText.toString());
+        }
+
+        String[] request = new String[]{
+            "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: any" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            "Content-Type: application/x-www-form-urlencoded" +
+                    SimpleHttpClient.CRLF +
+            "Connection: close" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "3" + SimpleHttpClient.CRLF +
+            "a=0" + SimpleHttpClient.CRLF +
+            "4" + SimpleHttpClient.CRLF +
+            "&b=1" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            "x-trailer: Test" + longText + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF };
+
+        TrailerClient client = new TrailerClient();
+        client.setPort(getPort());
+        client.setRequest(request);
+
+        client.connect();
+        client.processRequest();
+        // Expected to fail because the trailers are longer
+        // than the default limit of 8Kb
+        assertTrue(client.isResponse500());
+    }
+
     public void testNoTrailingHeaders() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
