@@ -860,7 +860,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 removeSessionAttribute(cn, sessionId, name, smClient);
             String outMessage = removed ? "Session attribute '" + name + "' removed." : "Session did not contain any attribute named '" + name + "'";
             req.setAttribute(APPLICATION_MESSAGE, outMessage);
-            resp.sendRedirect(resp.encodeRedirectURL(req.getRequestURL().append("?path=").append(cn.getPath()).append("&action=sessionDetail&sessionId=").append(sessionId).toString()));
+            displaySessionDetailPage(req, resp, cn, sessionId, smClient);
             return;
         } // else
         displaySessionsListPage(cn, req, resp, smClient);
