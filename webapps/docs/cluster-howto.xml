@@ -666,8 +666,8 @@ List of Cluster Mbeans<br/>
   <tr>
     <td>DeltaManager</td>
     <td>This manager control the sessions and handle session replication </td>
-    <td><code>type=Manager,path=${APP.CONTEXT.PATH}, host=${HOST}</code></td>
-    <td><code>type=Manager,path=${APP.CONTEXT.PATH}, host=${HOST}</code></td>
+    <td><code>type=Manager,context=${APP.CONTEXT.PATH}, host=${HOST}</code></td>
+    <td><code>type=Manager,context=${APP.CONTEXT.PATH}, host=${HOST}</code></td>
   </tr>
 
   <tr>
@@ -681,9 +681,9 @@ List of Cluster Mbeans<br/>
     <td>JvmRouteBinderValve</td>
     <td>This is a cluster fallback valve to change the Session ID to the current tomcat jvmroute.</td>
     <td><code>type=Valve,name=JvmRouteBinderValve,
-              path=${APP.CONTEXT.PATH}</code></td>
+              context=${APP.CONTEXT.PATH}</code></td>
     <td><code>type=Valve,name=JvmRouteBinderValve,host=${HOST},
-              path=${APP.CONTEXT.PATH}</code></td>
+              context=${APP.CONTEXT.PATH}</code></td>
   </tr>
 
 </table>
