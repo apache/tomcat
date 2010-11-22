@@ -45,7 +45,7 @@ public class Error extends Exception {
      */
     private Error(int error, String description)
     {
-        super(description);
+        super(error + ": " + description);
         this.error = error;
         this.description = description;
     }
