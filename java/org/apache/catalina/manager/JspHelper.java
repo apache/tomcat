@@ -176,7 +176,7 @@ public class JspHelper {
     public static String escapeXml(Object obj) {
         String value = null;
         try {
-            value = (obj == null) ? null : String.valueOf(obj);
+            value = (obj == null) ? null : obj.toString();
         } catch (Exception e) {
             // Ignore
         }
