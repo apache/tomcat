@@ -44,10 +44,10 @@ import org.apache.tools.ant.BuildException;
  * <ul>
  * <li>
  * Get a session attribute hello from session with ref <em>${sessionid.0}</em> form 
- * app <em>Catalina:type=Manager,path=/ClusterTest,host=localhost</em> 
+ * app <em>Catalina:type=Manager,context=/ClusterTest,host=localhost</em> 
  * <pre>
  *   &lt;jmx:invoke
- *           name="Catalina:type=Manager,path=/ClusterTest,host=localhost" 
+ *           name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
  *           operation="getSessionAttribute"
  *           resultproperty="hello"&gt;
  *         &lt;arg value="${sessionid.0}"/&gt;
