@@ -95,7 +95,13 @@
   <div>
     <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
     <input type="hidden" name="action" value="sessionDetail" />
-    <input type="submit" value="Refresh" />
+    <%
+    if ("Primary".equals(request.getParameter("sessionType"))) {
+    %>
+      <input type="hidden" name="sessionType" value="Primary" />
+    <%
+    }
+    %>    <input type="submit" value="Refresh" />
   </div>
 </form>
 
@@ -138,9 +144,10 @@
                         <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
                         <input type="hidden" name="attributeName" value="<%= attributeName %>" />
                         <%
-                          if ("Primary".equals(request.getAttribute("sessionType"))) {
+                          if ("Primary".equals(request.getParameter("sessionType"))) {
                         %>
                           <input type="submit" value="Remove" />
+                          <input type="hidden" name="sessionType" value="Primary" />
                         <%
                           } else {
                             out.print("Primary sessions only");
