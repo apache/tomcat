@@ -102,7 +102,14 @@ public class ChunkedInputFilter implements InputFilter {
     /**
      * Byte chunk used to store trailing headers.
      */
-    protected ByteChunk trailingHeaders = new ByteChunk();
+    protected ByteChunk trailingHeaders;
+
+    {
+        trailingHeaders = new ByteChunk();
+        if (org.apache.coyote.Constants.MAX_TRAILER_SIZE > 0) {
+            trailingHeaders.setLimit(org.apache.coyote.Constants.MAX_TRAILER_SIZE);
+        }
+    }
 
 
     /**
