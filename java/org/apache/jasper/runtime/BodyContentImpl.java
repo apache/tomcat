@@ -605,7 +605,27 @@ public class BodyContentImpl extends BodyContent {
             clearBody();
         }
     }
-    
+
+    /**
+     * This method shall "reset" the internal state of a BodyContentImpl,
+     * releasing all internal references, and preparing it for potential
+     * reuse by a later invocation of {@link PageContextImpl#pushBody(Writer)}.
+     *
+     * <p>Note, that BodyContentImpl instances are usually owned by a
+     * PageContextImpl instance, and PageContextImpl instances are recycled
+     * and reused.
+     *
+     * @see PageContextImpl#release()
+     */
+    protected void recycle() {
+        this.writer = null;
+        try {
+            this.clear();
+        } catch (IOException ex) {
+            // ignore
+        }
+    }
+
     private void ensureOpen() throws IOException {
         if (closed) throw new IOException("Stream closed");
     }
