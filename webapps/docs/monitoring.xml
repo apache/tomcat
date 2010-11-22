@@ -126,7 +126,7 @@ controlRole tomcat
              property &lt;em&gt;clustertest.maxActiveSessions.orginal&lt;/em&gt;
         --&gt;
        &lt;jmx:get
-            name="Catalina:type=Manager,path=/ClusterTest,host=localhost" 
+            name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
             attribute="maxActiveSessions"
             resultproperty="clustertest.maxActiveSessions.orginal"
             echo="true"
@@ -134,7 +134,7 @@ controlRole tomcat
         &lt;!-- set maxActiveSession to 100
         --&gt;
         &lt;jmx:set
-            name="Catalina:type=Manager,path=/ClusterTest,host=localhost" 
+            name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
             attribute="maxActiveSessions"
             value="100"
             type="int"
@@ -143,7 +143,7 @@ controlRole tomcat
              access all session ids directly with Ant property sessions.[0..n].
         --&gt;
         &lt;jmx:invoke
-            name="Catalina:type=Manager,path=/ClusterTest,host=localhost" 
+            name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
             operation="listSessionIds"
             resultproperty="sessions"
             echo="false"
@@ -152,7 +152,7 @@ controlRole tomcat
         &lt;!-- Access session attribute &lt;em&gt;Hello&lt;/em&gt; from first session.
         --&gt;
         &lt;jmx:invoke
-            name="Catalina:type=Manager,path=/ClusterTest,host=localhost" 
+            name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
             operation="getSessionAttribute"
             resultproperty="Hello"
             echo="false"
@@ -391,7 +391,7 @@ List of Attributes<br/>
 Example to get remote MBean attribute from default JMX connection <br/>
 <source>
     &lt;jmx:get
-        name="Catalina:type=Manager,path=/servlets-examples,host=localhost" 
+        name="Catalina:type=Manager,context=/servlets-examples,host=localhost" 
         attribute="maxActiveSessions"
         resultproperty="servlets-examples.maxActiveSessions"
     /&gt;
@@ -493,7 +493,7 @@ List of Attributes<br/>
 Example to set remote MBean attribute value<br/>
 <source>
     &lt;jmx:set
-        name="Catalina:type=Manager,path=/servlets-examples,host=localhost" 
+        name="Catalina:type=Manager,context=/servlets-examples,host=localhost" 
         attribute="maxActiveSessions"
         value="500"
         type="int"
@@ -575,7 +575,7 @@ List of Attributes<br/>
 stop an application <br/>
 <source>
     &lt;jmx:invoke
-        name="Catalina:type=Manager,path=/servlets-examples,host=localhost" 
+        name="Catalina:type=Manager,context=/servlets-examples,host=localhost" 
         operation="stop"/&gt;
 </source>
 Now you can find the sessionid at <em>${sessions.[0..N}</em> properties and access the count
@@ -585,7 +585,7 @@ with ${sessions.length} property.
 Example to get all sessionids <br/>
 <source>
     &lt;jmx:invoke
-        name="Catalina:type=Manager,path=/servlets-examples,host=localhost" 
+        name="Catalina:type=Manager,context=/servlets-examples,host=localhost" 
         operation="listSessionIds"
         resultproperty="sessions"
         delimiter=" "        
@@ -598,7 +598,7 @@ with ${sessions.length} property.
 Example to get remote MBean session attribute from session ${sessionid.0}<br/>
 <source>
     &lt;jmx:invoke
-        name="Catalina:type=Manager,path=/ClusterTest,host=localhost" 
+        name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
         operation="getSessionAttribute"
         resultproperty="hello"&gt;
          &lt;arg value="${sessionid.0}"/&gt;
@@ -704,7 +704,7 @@ properties and access the result object counter with ${manager.length} property.
 Example to get the Manager from <em>servlet-examples</em> application an bind all MBean properties<br/>
 <source>
   &lt;jmx:query
-           name="Catalina:type=Manager,path=/servlet-examples,host=localhost*" 
+           name="Catalina:type=Manager,context=/servlet-examples,host=localhost*" 
            attributebinding="true"
            resultproperty="manager.servletExamples" /&gt;
 </source>
@@ -786,7 +786,7 @@ List of Attributes<br/>
     <td>classLoader</td>
     <td>ObjectName of server or web application classloader <br/>
     ( <em>Catalina:type=ServerClassLoader,name=[server,common,shared]</em> or<br/>
-     <em>Catalina:type=WebappClassLoader,path=/myapps,host=localhost</em>) 
+     <em>Catalina:type=WebappClassLoader,context=/myapps,host=localhost</em>) 
     </td>
     <td></td>
   </tr>
