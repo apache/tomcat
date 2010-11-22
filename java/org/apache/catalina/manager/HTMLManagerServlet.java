@@ -948,9 +948,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 orderBy = req.getParameter("order");
                 if ("DESC".equalsIgnoreCase(orderBy)) {
                     comparator = new ReverseComparator(comparator);
-                    // orderBy = "ASC";
+                    orderBy = "ASC";
                 } else {
-                    //orderBy = "DESC";
+                    orderBy = "DESC";
                 }
                 try {
                     Collections.sort(sessions, comparator);
