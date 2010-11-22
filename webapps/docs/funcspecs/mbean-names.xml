@@ -169,7 +169,7 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context</td>
     <td align="center">1..n</td>
     <td align="center"><code>path</code></td>
-    <td><code>type=${CONTEXT}, path=${path}, host=${host.name},
+    <td><code>type=${CONTEXT}, context=${name}, host=${host.name},
         service=${service.name}</code></td>
   </tr>
 
@@ -177,15 +177,16 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / InstanceListener</td>
     <td align="center">0..n</td>
     <td align="center">(none)</td>
-    <td><code>type=${INSTANCE-LISTENER}, sequence=${###}, path=${context.path},
-        host=${host.name}, service=${service.name}</code></td>
+    <td><code>type=${INSTANCE-LISTENER}, sequence=${###},
+        context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
   </tr>
 
   <tr>
     <td>Server / Service / Engine / Host / Context / Listener</td>
     <td align="center">0..n</td>
     <td align="center">(none)</td>
-    <td><code>type=${LISTENER}, sequence=${###}, path=${context.path},
+    <td><code>type=${LISTENER}, sequence=${###}, context=${context.name},
         host=${host.name}, service=${service.name}</code></td>
   </tr>
 
@@ -193,7 +194,7 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / Loader</td>
     <td align="center">0..1</td>
     <td align="center">(none)</td>
-    <td><code>type=${LOADER}, path=${context.path}, host=${host.name},
+    <td><code>type=${LOADER}, context=${context.name}, host=${host.name},
         service=${service.name}</code></td>
   </tr>
 
@@ -201,7 +202,7 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / Manager</td>
     <td align="center">0..1</td>
     <td align="center">(none)</td>
-    <td><code>type=${MANAGER}, path=${context.path}, host=${host.name},
+    <td><code>type=${MANAGER}, context=${context.name}, host=${host.name},
         service=${service.name}</code></td>
   </tr>
 
@@ -209,7 +210,7 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / Realm</td>
     <td align="center">0..1</td>
     <td align="center">(none)</td>
-    <td><code>type=${REALM}, path=${context.path}, host=${host.name},
+    <td><code>type=${REALM}, context=${context.name}, host=${host.name},
         service=${service.name}</code></td>
   </tr>
 
@@ -217,7 +218,7 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / Resources</td>
     <td align="center">0..1</td>
     <td align="center">(none)</td>
-    <td><code>type=${RESOURCES}, path=${context.path}, host=${host.name},
+    <td><code>type=${RESOURCES}, context=${context.name}, host=${host.name},
         service=${service.name}</code></td>
   </tr>
 
@@ -225,7 +226,7 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / Valve</td>
     <td align="center">0..n</td>
     <td align="center">(none)</td>
-    <td><code>type=${VALVE}, sequence=${###}, path=${context.path},
+    <td><code>type=${VALVE}, sequence=${###}, context=${context.name},
         host=${host.name}, service=${service.name}</code></td>
   </tr>
 
@@ -243,16 +244,18 @@ corresponding values:</p>
     <td>Server / Service / Engine / Host / Context / WrapperLifecycle</td>
     <td align="center">0..n</td>
     <td align="center">(none)</td>
-    <td><code>type=${WRAPPER-LIFECYCLE}, sequence=${###}, path=${context.path},
-        host=${host.name}, service=${service.name}</code></td>
+    <td><code>type=${WRAPPER-LIFECYCLE}, sequence=${###},
+        context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
   </tr>
 
   <tr>
     <td>Server / Service / Engine / Host / Context / WrapperListener</td>
     <td align="center">0..n</td>
     <td align="center">(none)</td>
-    <td><code>type=${WRAPPER-LISTENER}, sequence=${###}, path=${context.path},
-        host=${host.name}, service=${service.name}</code></td>
+    <td><code>type=${WRAPPER-LISTENER}, sequence=${###},
+        context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
   </tr>
 
   <tr>
