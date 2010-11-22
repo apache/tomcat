@@ -135,6 +135,10 @@ public class JspHelper {
 
     public static String secondsToTimeString(long in_seconds) {
         StringBuilder buff = new StringBuilder(9);
+        if (in_seconds < 0) {
+            buff.append('-');
+            in_seconds = -in_seconds;
+        }
         long rest = in_seconds;
         long hour = rest / 3600;
         rest = rest % 3600;
