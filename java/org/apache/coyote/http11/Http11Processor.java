@@ -61,7 +61,8 @@ public class Http11Processor extends AbstractHttp11Processor {
    // ------------------------------------------------------------ Constructor
 
 
-    public Http11Processor(int headerBufferSize, JIoEndpoint endpoint) {
+    public Http11Processor(int headerBufferSize, JIoEndpoint endpoint,
+            int maxTrailerSize) {
 
         this.endpoint = endpoint;
         
@@ -75,7 +76,7 @@ public class Http11Processor extends AbstractHttp11Processor {
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
-        initializeFilters();
+        initializeFilters(maxTrailerSize);
 
         // Cause loading of HexUtils
         HexUtils.load();

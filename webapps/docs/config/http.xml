@@ -335,6 +335,13 @@
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
+    <attribute name="maxTrailerSize">
+      <p>Limits the total length of trailing headers in the last chunk of
+      a chunked HTTP request. If the value is <code>-1</code>, no limit will be
+      imposed. If not specified, the default value of <code>8192</code> will be
+      used.</p>
+    </attribute>
+
     <attribute name="minSpareThreads" required="false">
       <p>The minimum number of threads always kept running. If not specified,
       the default of <code>10</code> is used.</p>
