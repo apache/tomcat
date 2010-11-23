@@ -771,13 +771,13 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     /**
      * Initialize standard input and output filters.
      */
-    protected void initializeFilters() {
+    protected void initializeFilters(int maxTrailerSize) {
         // Create and add the identity filters.
         getInputBuffer().addFilter(new IdentityInputFilter());
         getOutputBuffer().addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
-        getInputBuffer().addFilter(new ChunkedInputFilter());
+        getInputBuffer().addFilter(new ChunkedInputFilter(maxTrailerSize));
         getOutputBuffer().addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.
