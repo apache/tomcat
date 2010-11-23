@@ -332,6 +332,16 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public void setServer( String server ) { this.server = server; }
     public String getServer() { return server; }
     
+    // HTTP
+    /**
+     * Maximum size of trailing headers in bytes
+     */
+    private int maxTrailerSize = 8192;
+    public int getMaxTrailerSize() { return maxTrailerSize; }
+    public void setMaxTrailerSize(int maxTrailerSize) {
+        this.maxTrailerSize = maxTrailerSize;
+    }
+
     @Override
     public Executor getExecutor() { return endpoint.getExecutor(); }
     public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
