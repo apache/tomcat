@@ -177,6 +177,10 @@
         is configurable with a system property and is <code>8192</code>
         by default. (kkolinko)
       </add>
+      <fix>
+        <bug>50207</bug>: Ensure Comet timeout events are triggered. This bug
+        was a regression triggered by the fix for <bug>49884</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
