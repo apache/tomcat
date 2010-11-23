@@ -290,31 +290,35 @@
         Improve Tomcat Logging documentation. (kkolinko)
       </update>
       <fix>
-        <bug>50303</bug>: Update JNDI how-to to reflect new JavaMail download
-        location and that JAF is now included in Java SE 6. (markt) 
+        <bug>50303</bug>: Update JNDI how-to to reflect the new JavaMail
+        download location and that JAF is now included in Java SE 6. (markt) 
       </fix>
       <fix>
-        Fix ordering functionality on sessions page for HTML Manager 
+        Fix ordering functionality on sessions page for the HTML Manager 
         application. (markt)
       </fix>
       <fix>
-        Fix primary sessions not always being treated as such in HTML Manager 
-        application. (markt)
-      </fix>
-      <fix>
-        Fix message not being displayed after session attribute removal in HTML
+        Fix primary sessions not always being treated as such in the HTML
         Manager application. (markt)
       </fix>
       <fix>
-        <bug>50310</bug>: Fix display of Servlet information in Manager
+        Fix message not being displayed after session attribute removal in the
+        HTML Manager application. (markt)
+      </fix>
+      <fix>
+        <bug>50310</bug>: Fix display of Servlet information in the Manager
         application. (markt)
       </fix>
       <fix>
-        CVE-2010-4172: Multiple XSS in Manager application. (markt/kkolinko)
+        CVE-2010-4172: Multiple XSS in the Manager application. (markt/kkolinko)
       </fix>
       <fix>
-        <bug>50316</bug>: Fix display of negative values in Manager application.
-        (kkolinko)
+        <bug>50316</bug>: Fix display of negative values in the Manager 
+        application. (kkolinko)
+      </fix>
+      <fix>
+        <bug>50318</bug>: Avoid NPE when trying to view session detail for an
+        expired session in the Manager application. (markt)
       </fix>
     </changelog>
   </subsection>
