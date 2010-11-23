@@ -133,7 +133,7 @@ public class TestTomcat extends TomcatBaseTest {
     
     /**
      * Simple Realm that uses a configurable {@link Map} to link user names and
-     * passwords. No roles are supported at this stage.
+     * passwords.
      */
     public static final class MapRealm extends RealmBase {
         private Map<String,String> users = new HashMap<String,String>();
