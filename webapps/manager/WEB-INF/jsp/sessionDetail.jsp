@@ -32,8 +32,14 @@
    String version = (String) request.getAttribute("version");
    ContextName cn = new ContextName(path, version);
    Session currentSession = (Session)request.getAttribute("currentSession");
-   HttpSession currentHttpSession = currentSession.getSession();
-   String currentSessionId = JspHelper.escapeXml(currentSession.getId());
+   String currentSessionId = null;
+   HttpSession currentHttpSession = null;
+   if (currentSession != null) {
+       currentHttpSession = currentSession.getSession();
+       currentSessionId = JspHelper.escapeXml(currentSession.getId());
+   } else {
+       currentSessionId = "Session invalidated";
+   }
    String submitUrl = JspHelper.escapeXml(response.encodeURL(
            ((HttpServletRequest) pageContext.getRequest()).getRequestURI() +
            "?path=" + path + "&version=" + version));
@@ -50,118 +56,122 @@
     <title>Sessions Administration: details for <%= currentSessionId %></title>
 </head>
 <body>
-<h1>Details for Session <%= currentSessionId %></h1>
+<% if (currentHttpSession == null) { %>
+   <h1><%=currentSessionId%></h1>
+<% } else { %>
+   <h1>Details for Session <%= currentSessionId %></h1>
 
-<table style="text-align: left;" border="0">
-  <tr>
-    <th>Session Id</th>
-    <td><%= currentSessionId %></td>
-  </tr>
-  <tr>
-    <th>Guessed Locale</th>
-    <td><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
-  </tr>
-  <tr>
-    <th>Guessed User</th>
-    <td><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
-  </tr>
-  <tr>
-    <th>Creation Time</th>
-    <td><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
-  </tr>
-  <tr>
-    <th>Last Accessed Time</th>
-    <td><%= JspHelper.getDisplayLastAccessedTimeForSession(currentSession) %></td>
-  </tr>
-  <tr>
-    <th>Session Max Inactive Interval</th>
-    <td><%= JspHelper.secondsToTimeString(currentSession.getMaxInactiveInterval()) %></td>
-  </tr>
-  <tr>
-    <th>Used Time</th>
-    <td><%= JspHelper.getDisplayUsedTimeForSession(currentSession) %></td>
-  </tr>
-  <tr>
-    <th>Inactive Time</th>
-    <td><%= JspHelper.getDisplayInactiveTimeForSession(currentSession) %></td>
-  </tr>
-  <tr>
-    <th>TTL</th>
-    <td><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
-  </tr>
-</table>
-
-<form method="post" action="<%= submitUrl %>">
-  <div>
-    <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
-    <input type="hidden" name="action" value="sessionDetail" />
-    <%
-    if ("Primary".equals(request.getParameter("sessionType"))) {
-    %>
-      <input type="hidden" name="sessionType" value="Primary" />
-    <%
-    }
-    %>    <input type="submit" value="Refresh" />
-  </div>
-</form>
-
-<div class="error"><%= JspHelper.escapeXml(request.getAttribute("error")) %></div>
-<div class="message"><%= JspHelper.escapeXml(request.getAttribute("message")) %></div>
-
-<table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
-<% int nAttributes = 0;
-   Enumeration attributeNamesEnumeration = currentHttpSession.getAttributeNames();
-   while (attributeNamesEnumeration.hasMoreElements()) {
-       attributeNamesEnumeration.nextElement();
-       ++nAttributes;
-   }
-%>
-    <caption style="font-variant: small-caps;"><%= JspHelper.formatNumber(nAttributes) %> attributes</caption>
-    <thead>
-        <tr>
-            <th>Remove Attribute</th>
-            <th>Attribute name</th>
-            <th>Attribute value</th>
-        </tr>
-    </thead>
-    <%--tfoot>
-        <tr>
-            <td colspan="3" style="text-align: center;">
-                TODO: set Max Inactive Interval on sessions
-            </td>
-        </tr>
-    </tfoot--%>
-    <tbody>
-<% attributeNamesEnumeration = currentHttpSession.getAttributeNames();
-   while (attributeNamesEnumeration.hasMoreElements()) {
-       String attributeName = (String) attributeNamesEnumeration.nextElement();
-%>
-        <tr>
-            <td align="center">
-                <form method="post" action="<%= submitUrl %>">
-                    <div>
-                        <input type="hidden" name="action" value="removeSessionAttribute" />
-                        <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
-                        <input type="hidden" name="attributeName" value="<%= JspHelper.escapeXml(attributeName) %>" />
-                        <%
-                          if ("Primary".equals(request.getParameter("sessionType"))) {
-                        %>
-                          <input type="submit" value="Remove" />
-                          <input type="hidden" name="sessionType" value="Primary" />
-                        <%
-                          } else {
-                            out.print("Primary sessions only");
-                          }
-                        %>
-                    </div>
-                </form>
-            </td>
-            <td><%= JspHelper.escapeXml(attributeName) %></td>
-            <td><% Object attributeValue = currentHttpSession.getAttribute(attributeName); %><span title="<%= attributeValue == null ? "" : attributeValue.getClass().toString() %>"><%= JspHelper.escapeXml(attributeValue) %></span></td>
-        </tr>
-<% } // end while %>
-    </tbody>
-</table>
+   <table style="text-align: left;" border="0">
+     <tr>
+       <th>Session Id</th>
+       <td><%= currentSessionId %></td>
+     </tr>
+     <tr>
+       <th>Guessed Locale</th>
+       <td><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
+     </tr>
+     <tr>
+       <th>Guessed User</th>
+       <td><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
+     </tr>
+     <tr>
+       <th>Creation Time</th>
+       <td><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
+     </tr>
+     <tr>
+       <th>Last Accessed Time</th>
+       <td><%= JspHelper.getDisplayLastAccessedTimeForSession(currentSession) %></td>
+     </tr>
+     <tr>
+       <th>Session Max Inactive Interval</th>
+       <td><%= JspHelper.secondsToTimeString(currentSession.getMaxInactiveInterval()) %></td>
+     </tr>
+     <tr>
+       <th>Used Time</th>
+       <td><%= JspHelper.getDisplayUsedTimeForSession(currentSession) %></td>
+     </tr>
+     <tr>
+       <th>Inactive Time</th>
+       <td><%= JspHelper.getDisplayInactiveTimeForSession(currentSession) %></td>
+     </tr>
+     <tr>
+       <th>TTL</th>
+       <td><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
+     </tr>
+   </table>
+   
+   <form method="post" action="<%= submitUrl %>">
+     <div>
+       <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
+       <input type="hidden" name="action" value="sessionDetail" />
+       <%
+       if ("Primary".equals(request.getParameter("sessionType"))) {
+       %>
+         <input type="hidden" name="sessionType" value="Primary" />
+       <%
+       }
+       %>    <input type="submit" value="Refresh" />
+     </div>
+   </form>
+    
+   <div class="error"><%= JspHelper.escapeXml(request.getAttribute("error")) %></div>
+   <div class="message"><%= JspHelper.escapeXml(request.getAttribute("message")) %></div>
+   
+   <table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+   <% int nAttributes = 0;
+      Enumeration attributeNamesEnumeration = currentHttpSession.getAttributeNames();
+      while (attributeNamesEnumeration.hasMoreElements()) {
+          attributeNamesEnumeration.nextElement();
+          ++nAttributes;
+      }
+   %>
+       <caption style="font-variant: small-caps;"><%= JspHelper.formatNumber(nAttributes) %> attributes</caption>
+       <thead>
+           <tr>
+               <th>Remove Attribute</th>
+               <th>Attribute name</th>
+               <th>Attribute value</th>
+           </tr>
+       </thead>
+       <%--tfoot>
+           <tr>
+               <td colspan="3" style="text-align: center;">
+                   TODO: set Max Inactive Interval on sessions
+               </td>
+           </tr>
+       </tfoot--%>
+       <tbody>
+   <% attributeNamesEnumeration = currentHttpSession.getAttributeNames();
+      while (attributeNamesEnumeration.hasMoreElements()) {
+          String attributeName = (String) attributeNamesEnumeration.nextElement();
+   %>
+           <tr>
+               <td align="center">
+                   <form method="post" action="<%= submitUrl %>">
+                       <div>
+                           <input type="hidden" name="action" value="removeSessionAttribute" />
+                           <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
+                           <input type="hidden" name="attributeName" value="<%= JspHelper.escapeXml(attributeName) %>" />
+                           <%
+                             if ("Primary".equals(request.getParameter("sessionType"))) {
+                           %>
+                             <input type="submit" value="Remove" />
+                             <input type="hidden" name="sessionType" value="Primary" />
+                           <%
+                             } else {
+                               out.print("Primary sessions only");
+                             }
+                           %>
+                       </div>
+                   </form>
+               </td>
+               <td><%= JspHelper.escapeXml(attributeName) %></td>
+               <td><% Object attributeValue = currentHttpSession.getAttribute(attributeName); %><span title="<%= attributeValue == null ? "" : attributeValue.getClass().toString() %>"><%= JspHelper.escapeXml(attributeValue) %></span></td>
+           </tr>
+   <% } // end while %>
+       </tbody>
+   </table>
+<% } // endif%>
 
 <form method="post" action="<%=submitUrl%>">
   <p style="text-align: center;">
