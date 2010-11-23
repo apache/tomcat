@@ -317,13 +317,14 @@ public class StandardEngine extends ContainerBase implements Engine {
                 // If we reached this point, this Engine can't have an AccessLog
                 // Look in the defaultHost
                 Host host = (Host) findChild(getDefaultHost());
-                if (host != null) {
+                if (host != null && host.getState().isAvailable()) {
                     defaultAccessLog = host.getAccessLog();
 
                     if (defaultAccessLog == null) {
                         // Try the ROOT context of default host
                         Context context = (Context) host.findChild("");
-                        if (context != null) {
+                        if (context != null &&
+                                context.getState().isAvailable()) {
                             defaultAccessLog = context.getAccessLog();
                         }
                     }
@@ -359,4 +360,12 @@ public class StandardEngine extends ContainerBase implements Engine {
         return "type=Engine";
     }
 
+    // ----------------------------------------------------------- Inner classes
+    protected static final class NoopAccessLog implements AccessLog {
+
+        @Override
+        public void log(Request request, Response response, long time) {
+            // NOOP
+        }
+    }
 }
