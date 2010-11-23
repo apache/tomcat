@@ -433,8 +433,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         public Http11NioProcessor createProcessor() {
             Http11NioProcessor processor = new Http11NioProcessor(
-              proto.getMaxHttpHeaderSize(),
-              (NioEndpoint)proto.endpoint);
+                    proto.getMaxHttpHeaderSize(), (NioEndpoint)proto.endpoint,
+                    proto.getMaxTrailerSize());
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setTimeout(proto.getTimeout());

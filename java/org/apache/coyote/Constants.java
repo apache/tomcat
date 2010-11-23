@@ -67,14 +67,5 @@ public final class Constants {
     public static final boolean USE_CUSTOM_STATUS_MSG_IN_HEADER =
         Boolean.valueOf(System.getProperty(
                 "org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER",
-                "false")).booleanValue(); 
-
-    /**
-     * Limit on the total length of the trailer headers in
-     * a chunked HTTP request.
-     */
-    public static final int MAX_TRAILER_SIZE =
-        Integer.parseInt(System.getProperty(
-                "org.apache.coyote.MAX_TRAILER_SIZE",
-                "8192"));
+                "false")).booleanValue();
 }
