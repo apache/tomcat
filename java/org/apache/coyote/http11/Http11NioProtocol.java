@@ -329,19 +329,23 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     if (processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
-                    if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
+                    if (state == SocketState.OPEN || state == SocketState.CLOSED) {
                         release(socket);
                         if (state == SocketState.OPEN) {
                             socket.getPoller().add(socket);
                         }
-                    } else if (state == SocketState.ASYNC_END) {
-                        // No further work required
                     } else if (state == SocketState.LONG) {
-                        att.setAsync(true); // Re-enable timeouts
+                        if (processor.isAsync()) {
+                            att.setAsync(true); // Re-enable timeouts
+                        } else {
+                            // Comet
+                            if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
+                            //add correct poller events here based on Comet stuff
+                            socket.getPoller().add(socket,att.getCometOps());
+                        }
                     } else {
-                        if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
-                        //add correct poller events here based on Comet stuff
-                        socket.getPoller().add(socket,att.getCometOps());
+                        // state == SocketState.ASYNC_END
+                        // No further work required
                     }
                 }
             }
