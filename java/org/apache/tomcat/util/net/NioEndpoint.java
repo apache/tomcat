@@ -1322,7 +1322,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invocation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
-                    }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
+                    } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                               (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
@@ -1340,7 +1340,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             long nextTime = now+(timeout-delta);
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }
-                    }else if (ka.isAsync()) {
+                    } else if (ka.isAsync() || ka.getComet()) {
                         long delta = now - ka.getLastAccess();
                         long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
                         boolean isTimedout = delta > timeout;
