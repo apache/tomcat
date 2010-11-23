@@ -1404,14 +1404,5 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 }
             }
         }
-
-    }
-
-    protected static final class NoopAccessLog implements AccessLog {
-
-        @Override
-        public void log(Request request, Response response, long time) {
-            // NOOP
-        }
     }
 }
