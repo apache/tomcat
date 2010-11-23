@@ -82,12 +82,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
         ctx.addServletMapping("/", "servlet");
 
+        // Limit the size of the trailing header
+        tomcat.getConnector().setProperty("maxTrailerSize", "10");
         tomcat.start();
-
-        StringBuilder longText = new StringBuilder("Test1234567890");
-        while (longText.length() <= 8192) {
-            longText.append(longText.toString());
-        }
 
         String[] request = new String[]{
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -102,7 +99,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "4" + SimpleHttpClient.CRLF +
             "&b=1" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
-            "x-trailer: Test" + longText + SimpleHttpClient.CRLF +
+            "x-trailer: Test" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF };
 
         TrailerClient client = new TrailerClient();

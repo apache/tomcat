@@ -68,7 +68,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint) {
+    public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint,
+            int maxTrailerSize) {
 
         this.endpoint = endpoint;
 
@@ -84,7 +85,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
 
         ssl = endpoint.isSSLEnabled();
 
-        initializeFilters();
+        initializeFilters(maxTrailerSize);
 
         // Cause loading of HexUtils
         HexUtils.load();

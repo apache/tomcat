@@ -66,7 +66,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint) {
+    public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint,
+            int maxTrailerSize) {
 
         this.endpoint = endpoint;
         
@@ -82,7 +83,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         
         ssl = endpoint.isSSLEnabled();
 
-        initializeFilters();
+        initializeFilters(maxTrailerSize);
 
         // Cause loading of HexUtils
         HexUtils.load();

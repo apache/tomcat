@@ -474,13 +474,6 @@
       <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
-    <property name="org.apache.coyote.MAX_TRAILER_SIZE">
-      <p>Limits the total length of trailing headers in the last chunk of
-      a chunked HTTP request.
-      If the value is <code>-1</code>, no limit will be imposed.</p>
-      <p>If not specified, the default value of <code>8192</code> will be used.</p>
-    </property>
-
     <property name="catalina.useNaming">
       <p>If this is <code>false</code> it will override the
       <code>useNaming</code> attribute for all <a href="context.html">
