@@ -19,21 +19,32 @@ package org.apache.catalina.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.HttpConstraintElement;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.ServletSecurityElement;
+import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
+import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
+import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -120,8 +131,6 @@ public class TestStandardContext extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
         
-        // Must have a real docBase - just use temp
-        // Use the normal Tomcat ROOT context
         File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
         
@@ -235,6 +244,75 @@ public class TestStandardContext extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.getWriter().print("Servlet");
+        }
+        
+    }
+    
+    public void testBug50015() throws Exception {
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        // Setup realm
+        MapRealm realm = new MapRealm();
+        realm.addUser("tomcat", "tomcat");
+        realm.addUserRole("tomcat", "tomcat");
+        ctx.setRealm(realm);
+
+        // Configure app for BASIC auth
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("BASIC");
+        ctx.setLoginConfig(lc);
+        ctx.getPipeline().addValve(new BasicAuthenticator());
+
+        // Add ServletContainerInitializer
+        ServletContainerInitializer sci = new Bug50015SCI();
+        ctx.addServletContainerInitializer(sci, null);
+        
+        // Start the context
+        tomcat.start();
+        
+        // Request the first servlet
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/bug50015",
+                bc, null);
+        
+        // Check for a 401
+        assertNotSame("OK", bc.toString());
+        assertEquals(401, rc);
+    }
+    
+    public static final class Bug50015SCI
+            implements ServletContainerInitializer {
+
+        @Override
+        public void onStartup(Set<Class<?>> c, ServletContext ctx)
+                throws ServletException {
+            // Register and map servlet
+            Servlet s = new Bug50015Servlet();
+            ServletRegistration.Dynamic sr = ctx.addServlet("bug50015", s);
+            sr.addMapping("/bug50015");
+            
+            // Limit access to users in the Tomcat role
+            HttpConstraintElement hce = new HttpConstraintElement(
+                    TransportGuarantee.NONE, "tomcat");
+            ServletSecurityElement sse = new ServletSecurityElement(hce);
+            sr.setServletSecurity(sse);
+        }
+    }
+    
+    public static final class Bug50015Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().write("OK");
         }
         
     }
