@@ -159,6 +159,11 @@
         <code>AsyncContext.dispatch()</code> once the asynchronous request has
         timed out. (markt)
       </fix>
+      <add>
+        Make memory leak prevention code that clears ThreadLocal instances more
+        robust against objects with toString() methods that throw exceptions.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

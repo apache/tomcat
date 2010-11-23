@@ -2442,11 +2442,27 @@ public class WebappClassLoader
                             args[0] = contextName;
                             if (key != null) {
                                 args[1] = key.getClass().getCanonicalName();
-                                args[2] = key.toString();
+                                try {
+                                    args[2] = key.toString();
+                                } catch (Exception e) {
+                                    log.error(sm.getString(
+                                            "webappClassLoader.clearThreadLocal.badKey",
+                                            args[1]), e);
+                                    args[2] = sm.getString(
+                                            "webappClassLoader.clearThreadLocal.unknown");
+                                }
                             }
                             if (value != null) {
                                 args[3] = value.getClass().getCanonicalName();
-                                args[4] = value.toString();
+                                try {
+                                    args[4] = value.toString();
+                                } catch (Exception e) {
+                                    log.error(sm.getString(
+                                            "webappClassLoader.clearThreadLocal.badValue",
+                                            args[3]), e);
+                                    args[4] = sm.getString(
+                                    "webappClassLoader.clearThreadLocal.unknown");
+                                }
                             }
                             if (value == null) {
                                 if (log.isDebugEnabled()) {
