@@ -34,6 +34,8 @@ import java.util.Locale;
  * @author Costin Manolache
  */
 public final class MessageBytes implements Cloneable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     // primary type ( whatever is set as original value )
     private int type = T_NULL;
 

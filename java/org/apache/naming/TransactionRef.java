@@ -28,12 +28,11 @@ import javax.naming.Reference;
  * @version $Id$
  */
 
-public class TransactionRef
-    extends Reference {
+public class TransactionRef extends Reference {
 
+    private static final long serialVersionUID = 1L;
 
     // -------------------------------------------------------------- Constants
-
 
     /**
      * Default factory for this reference.

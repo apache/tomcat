@@ -33,6 +33,8 @@ import java.io.Serializable;
  */
 public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
+    private static final long serialVersionUID = 1L;
+
     // Input interface, used when the buffer is emptied.
     public static interface CharInputChannel {
         /** 

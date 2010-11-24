@@ -40,6 +40,7 @@ import javax.management.NotificationFilter;
  */
 public class FixedNotificationFilter implements NotificationFilter {
 
+    private static final long serialVersionUID = 1L;
     /**
      * The set of attribute names that are accepted by this filter.  If this
      * list is empty, all attribute names are accepted.
