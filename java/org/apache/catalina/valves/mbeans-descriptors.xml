@@ -85,7 +85,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
     <attribute name="suffix"
                description="The suffix that is added to log file filenames"
@@ -125,7 +126,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
   </mbean>
 
@@ -249,7 +251,8 @@
                
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
   </mbean>
 
@@ -284,7 +287,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
   </mbean>
 
@@ -319,7 +323,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
   </mbean>
 
@@ -376,7 +381,8 @@
                
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
     <attribute name="trustedProxies"
                description="Comma delimited list of trusted proxies"
