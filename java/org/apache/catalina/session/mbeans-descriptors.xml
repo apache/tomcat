@@ -339,7 +339,8 @@
                  
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="randomFile"
           description="File source of random - /dev/urandom or a pipe"

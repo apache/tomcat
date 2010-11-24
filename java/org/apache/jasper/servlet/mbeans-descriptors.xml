@@ -25,7 +25,8 @@
 
     <attribute   name="jspCount"
           description="The number of JSPs that have been loaded into a webapp"
-                 type="int"/>
+                 type="int"
+                 writeable="false"/>
 
     <attribute   name="jspReloadCount"
           description="The number of JSPs that have been reloaded"

@@ -57,7 +57,8 @@
     <attribute
       name="stateName"
       description="The name of the LifecycleState that this component is currently in"
-      type="java.lang.String"/>
+      type="java.lang.String"
+      writeable="false"/>
     <operation
       name="setProperty"
       description="set a property to all cluster managers (with prefix 'manager.')"
@@ -154,7 +155,8 @@
     <attribute
       name="stateName"
       description="The name of the LifecycleState that this component is currently in"
-      type="java.lang.String"/>
+      type="java.lang.String"
+      writeable="false"/>
     <attribute
       name="totalSendTime"
       description="total replicated send time"
