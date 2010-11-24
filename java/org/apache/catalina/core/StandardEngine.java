@@ -62,6 +62,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         try {
             setJvmRoute(System.getProperty("jvmRoute"));
         } catch(Exception ex) {
+            log.warn(sm.getString("standardEngine.jvmRouteFail"));
         }
         // By default, the engine will hold the reloading thread
         backgroundProcessorDelay = 10;
