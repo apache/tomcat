@@ -2183,7 +2183,7 @@ public class WebappClassLoader
         for (Thread thread : threads) {
             if (thread != null) {
                 ClassLoader ccl = thread.getContextClassLoader();
-                if (ccl != null && ccl == this) {
+                if (ccl == this) {
                     // Don't warn about this thread
                     if (thread == Thread.currentThread()) {
                         continue;
@@ -2424,8 +2424,8 @@ public class WebappClassLoader
                         boolean remove = false;
                         // Check the key
                         Object key = ((Reference<?>) table[j]).get();
-                        if (this.equals(key) || (key != null &&
-                                this == key.getClass().getClassLoader())) {
+                        if (this.equals(key) ||
+                                isLoadedByThisWebAppClassLoader(key)) {
                             remove = true;
                         }
                         // Check the value
@@ -2433,15 +2433,15 @@ public class WebappClassLoader
                             table[j].getClass().getDeclaredField("value");
                         valueField.setAccessible(true);
                         Object value = valueField.get(table[j]);
-                        if (this.equals(value) || (value != null &&
-                                this == value.getClass().getClassLoader())) {
+                        if (this.equals(value) ||
+                                isLoadedByThisWebAppClassLoader(value)) {
                             remove = true;
                         }
                         if (remove) {
                             Object[] args = new Object[5];
                             args[0] = contextName;
                             if (key != null) {
-                                args[1] = key.getClass().getCanonicalName();
+                                args[1] = getPrettyClassName(key.getClass());
                                 try {
                                     args[2] = key.toString();
                                 } catch (Exception e) {
@@ -2453,7 +2453,7 @@ public class WebappClassLoader
                                 }
                             }
                             if (value != null) {
-                                args[3] = value.getClass().getCanonicalName();
+                                args[3] = getPrettyClassName(value.getClass());
                                 try {
                                     args[4] = value.toString();
                                 } catch (Exception e) {
@@ -2503,6 +2503,33 @@ public class WebappClassLoader
         }
     }
 
+    private String getPrettyClassName(Class<?> clazz) {
+        String name = clazz.getCanonicalName();
+        if (name==null){
+            name = clazz.getName();
+        }
+        return name;
+    }
+    
+    /**
+     * @param o object to test
+     * @return <code>true</code> if o has been loaded by the current classloader
+     * or one of its descendants.
+     */
+    private boolean isLoadedByThisWebAppClassLoader(Object o) {
+        if (o == null) {
+            return false;
+        }
+        ClassLoader cl = o.getClass().getClassLoader();
+        while (cl != null) {
+            if(cl == this) {
+                return true;
+            }
+            cl = cl.getParent();
+        }
+        return false;
+    }
+        
     /*
      * Get the set of current threads as an array.
      */
