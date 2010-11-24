@@ -38,6 +38,14 @@
 <body>
 <!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.6 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>50108</bug>: Add get/set methods for Connector property
+        minSpareThreads. Patch provided by Eiji Takahashi. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
