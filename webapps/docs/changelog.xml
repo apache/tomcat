@@ -54,6 +54,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>50106</bug>: Correct several MBean descriptors. Patch provided by
+        Eiji Takahashi. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
