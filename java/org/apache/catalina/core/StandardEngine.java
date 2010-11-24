@@ -16,15 +16,22 @@
  */
 package org.apache.catalina.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Container;
+import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
@@ -62,6 +69,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         try {
             setJvmRoute(System.getProperty("jvmRoute"));
         } catch(Exception ex) {
+            log.warn(sm.getString("standardEngine.jvmRouteFail"));
         }
         // By default, the engine will hold the reloading thread
         backgroundProcessorDelay = 10;
@@ -320,12 +328,24 @@ public class StandardEngine extends ContainerBase implements Engine {
                 if (host != null && host.getState().isAvailable()) {
                     defaultAccessLog = host.getAccessLog();
 
-                    if (defaultAccessLog == null) {
+                    if (defaultAccessLog != null) {
+                        AccessLogListener l = new AccessLogListener(this);
+                        host.addPropertyChangeListener(l);
+                        host.addContainerListener(l);
+                        host.addLifecycleListener(l);
+                    } else {
                         // Try the ROOT context of default host
                         Context context = (Context) host.findChild("");
                         if (context != null &&
                                 context.getState().isAvailable()) {
                             defaultAccessLog = context.getAccessLog();
+                            
+                            if (defaultAccessLog != null) {
+                                AccessLogListener l =
+                                    new AccessLogListener(this);
+                                context.addPropertyChangeListener(l);
+                                context.addLifecycleListener(l);
+                            }
                         }
                     }
                 }
@@ -366,6 +386,64 @@ public class StandardEngine extends ContainerBase implements Engine {
         @Override
         public void log(Request request, Response response, long time) {
             // NOOP
+        }
+    }
+    
+    protected static final class AccessLogListener
+            implements PropertyChangeListener, LifecycleListener,
+            ContainerListener {
+
+        private StandardEngine engine;
+        private volatile boolean disabled = false;
+
+        public AccessLogListener(StandardEngine engine) {
+            this.engine = engine;
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (disabled) return;
+            
+            String type = event.getType();
+            if (Lifecycle.AFTER_START_EVENT.equals(type) ||
+                    Lifecycle.BEFORE_STOP_EVENT.equals(type)) {
+                // Container is being started/stopped
+                // Force re-calculation but do not disable listener since it
+                // might be re-used
+                engine.defaultAccessLog = null;
+            } else if (Lifecycle.BEFORE_DESTROY_EVENT.endsWith(type)) {
+                // Container is being removed
+                // Force re-calculation and disable listener since it won't
+                // be re-used
+                engine.defaultAccessLog = null;
+                disabled = true;
+            }
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (disabled) return;
+            if ("defaultHost".equals(evt.getPropertyName())) {
+                // Force re-calculation and disable listener since it won't
+                // be re-used
+                engine.defaultAccessLog = null;
+                disabled = true;
+            }
+        }
+
+        @Override
+        public void containerEvent(ContainerEvent event) {
+            // Only useful for hosts
+            if (disabled) return;
+            
+            if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
+                Context context = (Context) event.getData();
+                if ("".equals(context.getPath())) {
+                    // New ROOT context in default host
+                    // Force recalculation of default access log
+                    engine.defaultAccessLog = null;
+                }
+            }
         }
     }
 }
