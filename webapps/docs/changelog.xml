@@ -38,6 +38,14 @@
 <body>
 <!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.6 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>49650</bug>: Remove unnecessary entries package.access property
+        defined in catalina.properties. Patch provided by Owen Farrell. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
