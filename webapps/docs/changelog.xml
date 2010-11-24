@@ -40,6 +40,12 @@
 <section name="Tomcat 7.0.6 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>48837</bug>: Extend thread local memory leak detection to include
+        classes loaded by subordinate class loaders to the web
+        application&apos;s class loader such as the Jasper class loader. Based
+        on a patch by Sylvain Laurent. (markt)
+      </add>
       <fix>
         <bug>49650</bug>: Remove unnecessary entries package.access property
         defined in catalina.properties. Patch provided by Owen Farrell. (markt) 
