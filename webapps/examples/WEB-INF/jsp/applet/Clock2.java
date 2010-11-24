@@ -31,6 +31,7 @@ import java.util.Locale;
  */
 
 public class Clock2 extends Applet implements Runnable {
+    private static final long serialVersionUID = 1L;
     Thread timer;                // The thread that displays clock
     int lastxs, lastys, lastxm,
         lastym, lastxh, lastyh;  // Dimensions used to draw hands 

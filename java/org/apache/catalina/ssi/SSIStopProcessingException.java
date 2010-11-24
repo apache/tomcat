@@ -27,5 +27,7 @@ package org.apache.catalina.ssi;
  * @version $Id$
  */
 public class SSIStopProcessingException extends Exception {
+
+    private static final long serialVersionUID = 1L;
     // No specific functionality for this class
 }

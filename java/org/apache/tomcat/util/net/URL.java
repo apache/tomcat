@@ -47,9 +47,10 @@ import java.util.Locale;
 
 public final class URL implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
+    
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Create a URL object from the specified String representation.

@@ -31,13 +31,12 @@ import javax.naming.StringRefAddr;
  * @author Fabien Carrion
  */
 
-public class HandlerRef
-    extends Reference {
+public class HandlerRef extends Reference {
 
+    private static final long serialVersionUID = 1L;
 
+    
     // -------------------------------------------------------------- Constants
-
-
     /**
      * Default factory for this reference.
      */

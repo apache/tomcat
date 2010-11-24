@@ -27,6 +27,8 @@ package javax.servlet.jsp.el;
 @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
 public class ELException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates an ELException with no detail message.
      **/

@@ -29,12 +29,11 @@ import javax.naming.StringRefAddr;
  * @version $Id$
  */
 
-public class ResourceLinkRef
-    extends Reference {
+public class ResourceLinkRef extends Reference {
 
+    private static final long serialVersionUID = 1L;
 
     // -------------------------------------------------------------- Constants
-
 
     /**
      * Default factory for this reference.

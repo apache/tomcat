@@ -32,12 +32,11 @@ import javax.naming.StringRefAddr;
  * @author Fabien Carrion
  */
 
-public class ServiceRef
-    extends Reference {
+public class ServiceRef extends Reference {
 
+    private static final long serialVersionUID = 1L;
 
     // -------------------------------------------------------------- Constants
-
 
     /**
      * Default factory for this reference.

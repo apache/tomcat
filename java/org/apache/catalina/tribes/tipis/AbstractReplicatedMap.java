@@ -54,6 +54,8 @@ import org.apache.juli.logging.LogFactory;
  * @version 1.0
  */
 public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements RpcCallback, ChannelListener, MembershipListener, Heartbeat {
+    private static final long serialVersionUID = 1L;
+
     private static final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
 
     /**
@@ -1259,6 +1261,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 //------------------------------------------------------------------------------
 
     public static class MapMessage implements Serializable {
+        private static final long serialVersionUID = 1L;
         public static final int MSG_BACKUP = 1;
         public static final int MSG_RETRIEVE_BACKUP = 2;
         public static final int MSG_PROXY = 3;

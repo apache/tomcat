@@ -45,6 +45,8 @@ import org.apache.catalina.Globals;
  * @version $Id$
  */
 public class SSIServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
     /** Debug level for this servlet. */
     protected int debug = 0;
     /** Should the output be buffered. */
