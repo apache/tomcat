@@ -38,6 +38,8 @@ import java.security.BasicPermission;
 
 public final class JndiPermission extends BasicPermission {
 
+    private static final long serialVersionUID = 1L;
+
     // ----------------------------------------------------------- Constructors
 
     /**

@@ -23,6 +23,8 @@ package javax.servlet.jsp;
  */
 public class JspTagException extends JspException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructs a new JspTagException with the specified message. The message
      * can be written to the server log and/or displayed for the user.

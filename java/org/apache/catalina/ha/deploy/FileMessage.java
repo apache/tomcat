@@ -28,6 +28,8 @@ import org.apache.catalina.tribes.Member;
  */
 
 public class FileMessage extends ClusterMessageBase {
+    private static final long serialVersionUID = 1L;
+
     private int messageNumber;
     private byte[] data;
     private int dataLength;

@@ -28,12 +28,11 @@ import javax.naming.Reference;
  * @version $Id$
  */
 
-public class ResourceEnvRef
-    extends Reference {
+public class ResourceEnvRef extends Reference {
 
+    private static final long serialVersionUID = 1L;
 
     // -------------------------------------------------------------- Constants
-
 
     /**
      * Default factory for this reference.

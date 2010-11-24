@@ -38,6 +38,8 @@ import javax.servlet.jsp.PageContext;
  */
 public class TagSupport implements IterationTag, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Find the instance of a given class type that is closest to a given
      * instance.

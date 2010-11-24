@@ -36,6 +36,8 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * 
  */
 public class ChannelData implements ChannelMessage {
+    private static final long serialVersionUID = 1L;
+
     public static final ChannelData[] EMPTY_DATA_ARRAY = new ChannelData[0];
     
     public static volatile boolean USE_SECURE_RANDOM_FOR_UUID = false;

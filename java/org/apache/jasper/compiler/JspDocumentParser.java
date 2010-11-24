@@ -1445,7 +1445,9 @@ class JspDocumentParser
      * validation is turned off.
      */
     private static class EnableDTDValidationException
-        extends SAXParseException {
+            extends SAXParseException {
+
+        private static final long serialVersionUID = 1L;
 
         EnableDTDValidationException(String message, Locator loc) {
             super(message, loc);

@@ -43,6 +43,8 @@ public class ExecutorFactory {
     
      // ---------------------------------------------- TaskQueue Inner Class
     private static class TaskQueue extends LinkedBlockingQueue<Runnable> {
+        private static final long serialVersionUID = 1L;
+
         ThreadPoolExecutor parent = null;
 
         public TaskQueue() {

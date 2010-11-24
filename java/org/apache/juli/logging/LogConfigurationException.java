@@ -30,6 +30,9 @@ package org.apache.juli.logging;
 public class LogConfigurationException extends RuntimeException {
 
 
+    private static final long serialVersionUID = 1L;
+
+
     /**
      * Construct a new exception with <code>null</code> as its detail message.
      */

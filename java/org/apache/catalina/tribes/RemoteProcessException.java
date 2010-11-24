@@ -28,6 +28,8 @@ package org.apache.catalina.tribes;
  * @version 1.0
  */
 public class RemoteProcessException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     public RemoteProcessException() {
         super();
     }
