@@ -36,12 +36,12 @@ package javax.servlet.http;
  */
 public class HttpSessionBindingEvent extends HttpSessionEvent {
 
-    /* The name to which the object is being bound or unbound */
+    private static final long serialVersionUID = 1L;
 
+    /* The name to which the object is being bound or unbound */
     private final String name;
 
     /* The object is being bound or unbound */
-
     private final Object value;
 
     /**

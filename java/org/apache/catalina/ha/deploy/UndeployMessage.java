@@ -22,6 +22,8 @@ import java.io.Serializable;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
 public class UndeployMessage implements ClusterMessage,Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Member address;
     private long timestamp;
     private String uniqueId;

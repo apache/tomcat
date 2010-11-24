@@ -204,8 +204,11 @@ public class MapDemo implements ChannelListener, MembershipListener{
         }
     }
 
-    public static class SimpleTableDemo
-        extends JPanel implements ActionListener{
+    public static class SimpleTableDemo extends JPanel
+            implements ActionListener {
+
+        private static final long serialVersionUID = 1L;
+
         private static int WIDTH = 550;
         
         private LazyReplicatedMap map;
@@ -213,6 +216,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         AbstractTableModel dataModel = new AbstractTableModel() {
             
             
+            private static final long serialVersionUID = 1L;
             String[] columnNames = {
                                    "Rownum",
                                    "Key",
@@ -518,6 +522,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
     
     static class ColorRenderer extends DefaultTableCellRenderer {
         
+        private static final long serialVersionUID = 1L;
+
         public ColorRenderer() {
             super();
         }

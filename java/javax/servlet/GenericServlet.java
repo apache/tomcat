@@ -42,6 +42,8 @@ import java.util.Enumeration;
 public abstract class GenericServlet implements Servlet, ServletConfig,
         java.io.Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private transient ServletConfig config;
 
     /**

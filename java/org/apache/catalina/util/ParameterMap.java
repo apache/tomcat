@@ -38,10 +38,10 @@ import org.apache.tomcat.util.res.StringManager;
 
 public final class ParameterMap<K,V> extends HashMap<K,V> {
 
+    private static final long serialVersionUID = 1L;
+
 
     // ----------------------------------------------------------- Constructors
-
-
     /**
      * Construct a new, empty map with the default initial capacity and
      * load factor.

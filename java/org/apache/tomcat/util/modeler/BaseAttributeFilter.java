@@ -38,9 +38,9 @@ import javax.management.NotificationFilter;
 
 public class BaseAttributeFilter implements NotificationFilter {
 
+    private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a new filter that accepts only the specified attribute

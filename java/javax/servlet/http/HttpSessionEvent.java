@@ -23,6 +23,8 @@ package javax.servlet.http;
  * @since v 2.3
  */
 public class HttpSessionEvent extends java.util.EventObject {
+    private static final long serialVersionUID = 1L;
+
     /** Construct a session event from the given source. */
     public HttpSessionEvent(HttpSession source) {
         super(source);
