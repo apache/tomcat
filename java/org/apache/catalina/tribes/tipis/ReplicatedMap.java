@@ -48,9 +48,11 @@ import org.apache.catalina.tribes.Member;
  */
 public class ReplicatedMap extends AbstractReplicatedMap {
 
-//------------------------------------------------------------------------------
-//              CONSTRUCTORS / DESTRUCTORS
-//------------------------------------------------------------------------------
+    private static final long serialVersionUID = 1L;
+
+    //--------------------------------------------------------------------------
+    //              CONSTRUCTORS / DESTRUCTORS
+    //--------------------------------------------------------------------------
     /**
      * Creates a new map
      * @param channel The channel to use for communication

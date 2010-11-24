@@ -25,6 +25,8 @@ package javax.servlet;
  */
 public class ServletContextEvent extends java.util.EventObject {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Construct a ServletContextEvent from the given context.
      * 

@@ -38,10 +38,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 public final class ResourceSet<T> extends HashSet<T> {
 
+    private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
-
-
     /**
      * Construct a new, empty set with the default initial capacity and
      * load factor.

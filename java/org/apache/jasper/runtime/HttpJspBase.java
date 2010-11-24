@@ -35,6 +35,8 @@ import org.apache.jasper.compiler.Localizer;
  */
 public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     
+    private static final long serialVersionUID = 1L;
+
     protected HttpJspBase() {
     }
 

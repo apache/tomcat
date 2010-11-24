@@ -81,8 +81,9 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Id$
  */
 
-public class StandardSession
-    implements HttpSession, Session, Serializable {
+public class StandardSession implements HttpSession, Session, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     protected static final boolean STRICT_SERVLET_COMPLIANCE;
 
