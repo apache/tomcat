@@ -37,6 +37,16 @@
 
 <body>
 <!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
+<section name="Tomcat 7.0.6 (markt)">
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>50294</bug>: Add more information to documentation regarding format
+        of configuration files. Patch provided by Luke Meyer. (markt) 
+      </add>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.5 (markt)">
   <subsection name="General">
     <changelog>
