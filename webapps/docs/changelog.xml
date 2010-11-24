@@ -38,6 +38,14 @@
 <body>
 <!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
 <section name="Tomcat 7.0.6 (markt)">
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        <bug>50185</bug>: Add additional trace level logging to Tribes to assist
+        with fault diagnosis. Based on a patch by Ariel. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
