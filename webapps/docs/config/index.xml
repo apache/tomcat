@@ -39,8 +39,9 @@ attempt to describe which configuration directives should be used to perform
 specific tasks - for that, see the various <em>HOW-TO</em> documents on the
 main index page.</p>
 
-<p>The Tomcat configuration files support Apache Ant style variable
-substitution. A system property with the name <code>propname</code> may be
+<p>Tomcat configuration files are formatted as schemaless XML; elements and
+attributes are case-sensitive. Apache Ant-style variable substitution
+is supported; a system property with the name <code>propname</code> may be
 used in a configuration file using the syntax <code>${propname}</code>. All
 system properties are available including those set using the <code>-D</code>
 syntax, those automatically made available by the JVM and those configured in
