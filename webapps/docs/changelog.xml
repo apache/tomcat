@@ -44,6 +44,10 @@
         <bug>49650</bug>: Remove unnecessary entries package.access property
         defined in catalina.properties. Patch provided by Owen Farrell. (markt) 
       </fix>
+      <fix>
+        <bug>50106</bug>: Correct several MBean descriptors. Patch provided by
+        Eiji Takahashi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -52,14 +56,6 @@
         <bug>50108</bug>: Add get/set methods for Connector property
         minSpareThreads. Patch provided by Eiji Takahashi. (markt)
       </add>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <fix>
-        <bug>50106</bug>: Correct several MBean descriptors. Patch provided by
-        Eiji Takahashi. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
