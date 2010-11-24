@@ -172,7 +172,7 @@
                
     <attribute name="distributable"
                description="The distributable flag for this web application."
-               type="java.lang.String"/>
+               type="boolean"/>
                      
     <attribute name="docBase"
                description="The document root for this web application"
@@ -328,7 +328,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
           
     <attribute name="staticResources"
                description="Static resources associated with the context."
@@ -967,7 +968,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>      
+               type="java.lang.String"
+               writeable="false"/>      
   </mbean>
   
   <mbean name="StandardEngine"
@@ -1011,7 +1013,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
                
     <operation name="addChild"
                description="Add a virtual host"
@@ -1112,7 +1115,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
   
   <mbean name="StandardHost"
@@ -1192,7 +1196,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
       
     <attribute name="unpackWARs"
                description="Unpack WARs property"
@@ -1337,7 +1342,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
 
   <mbean name="StandardServer"
@@ -1374,7 +1380,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
    
     <operation name="await"
                description="Wait for the shutdown message"
@@ -1413,7 +1420,8 @@
       
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
     <operation name="addConnector"
                description="Add a new connector"
@@ -1544,7 +1552,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
                
     <attribute name="threadPriority"
                description="The thread priority for threads in this thread pool"
@@ -1608,7 +1617,7 @@
                
     <attribute name="maxInstances"
                description="Maximum number of STM instances."
-               type="long" />               
+               type="int" />               
 
     <attribute name="minTime"
                description="Minimum processing time of a request"
@@ -1652,7 +1661,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
 
     <attribute name="statisticsProvider"
                description="Performance statistics support for this managed object"
@@ -1817,7 +1827,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
 
 </mbeans-descriptors>

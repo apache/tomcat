@@ -52,7 +52,8 @@
       type="java.lang.String"/>
     <attribute name="stateName"
       description="The name of the LifecycleState that this component is currently in"
-      type="java.lang.String"/>
+      type="java.lang.String"
+      writeable="false"/>
     <operation
       name="start"
       description="Stops the Cluster JvmRouteBinderValve"
@@ -292,7 +293,8 @@
       writeable="false"/>
     <attribute name="stateName"
       description="The name of the LifecycleState that this component is currently in"
-      type="java.lang.String"/>
+      type="java.lang.String"
+      writeable="false"/>
     <attribute
       name="stateTransfered"
       is="true"
@@ -519,7 +521,8 @@
       type="int"/>
     <attribute name="stateName"
       description="The name of the LifecycleState that this component is currently in"
-      type="java.lang.String"/>
+      type="java.lang.String"
+      writeable="false"/>
     <attribute
       name="randomFile"
       description="File source of random - /dev/urandom or a pipe"
