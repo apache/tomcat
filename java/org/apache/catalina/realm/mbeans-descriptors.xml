@@ -59,7 +59,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="userCredCol"
           description="The column in the user table that holds the user's credentials"
@@ -126,7 +127,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="userClassNames"
           description="Comma-delimited list of javax.security.Principal classes that represent individual users"
@@ -197,7 +199,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="userCredCol"
           description="The column in the user table that holds the user's credentials"
@@ -319,7 +322,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="userBase"
           description="The base element for user searches"
@@ -389,7 +393,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="validate"
           description="The 'validate certificate chains' flag."
@@ -435,7 +440,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="validate"
           description="The 'validate certificate chains' flag."
@@ -482,7 +488,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="validate"
           description="The 'validate certificate chains' flag."

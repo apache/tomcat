@@ -42,7 +42,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
   
   
@@ -71,7 +72,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
   
   <mbean name="FormAuthenticator"
@@ -99,7 +101,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
   
   <mbean name="NonLoginAuthenticator"
@@ -127,7 +130,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
   
   
@@ -152,7 +156,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
 
 
@@ -181,7 +186,8 @@
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"/>
+               type="java.lang.String"
+               writeable="false"/>
   </mbean>
   
 </mbeans-descriptors>

@@ -51,7 +51,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="loaderRepositories"
           description="Repositories set in the real loader"
@@ -105,7 +106,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="loaderRepositories"
           description="Repositories set in the real loader"
@@ -155,7 +157,8 @@
 
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+                 writeable="false"/>
 
     <attribute   name="URLs"
           description="The URLs of this loader"
