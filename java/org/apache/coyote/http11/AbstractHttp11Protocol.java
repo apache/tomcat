@@ -350,6 +350,8 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public int getMaxThreads() { return endpoint.getMaxThreads(); }
     public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
 
+    public int getMinSpareThreads() { return endpoint.getMinSpareThreads(); }
+    public void setMinSpareThreads(int minSpareThreads) { endpoint.setMinSpareThreads(minSpareThreads); }
 
     public int getThreadPriority() { return endpoint.getThreadPriority(); }
     public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
