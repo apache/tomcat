@@ -2425,7 +2425,7 @@ public class WebappClassLoader
                         // Check the key
                         Object key = ((Reference<?>) table[j]).get();
                         if (this.equals(key) ||
-                                isLoadedByThisWebAppClassLoader(key)) {
+                                isLoadedByThisWebappClassLoader(key)) {
                             remove = true;
                         }
                         // Check the value
@@ -2434,7 +2434,7 @@ public class WebappClassLoader
                         valueField.setAccessible(true);
                         Object value = valueField.get(table[j]);
                         if (this.equals(value) ||
-                                isLoadedByThisWebAppClassLoader(value)) {
+                                isLoadedByThisWebappClassLoader(value)) {
                             remove = true;
                         }
                         if (remove) {
@@ -2516,7 +2516,7 @@ public class WebappClassLoader
      * @return <code>true</code> if o has been loaded by the current classloader
      * or one of its descendants.
      */
-    private boolean isLoadedByThisWebAppClassLoader(Object o) {
+    private boolean isLoadedByThisWebappClassLoader(Object o) {
         if (o == null) {
             return false;
         }
