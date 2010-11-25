@@ -868,7 +868,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     protected List<Session> getSessionsForName(ContextName cn,
             StringManager smClient) {
-        if ((cn == null) || (!cn.getPath().startsWith("/") &&
+        if ((cn == null) || !(cn.getPath().startsWith("/") ||
                 cn.getPath().equals(""))) {
             String path = null;
             if (cn != null) {
@@ -905,7 +905,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
     protected Session getSessionForNameAndId(ContextName cn, String id,
             StringManager smClient) throws IOException {
-        if ((cn == null) || (!cn.getPath().startsWith("/") &&
+        if ((cn == null) || !(cn.getPath().startsWith("/") ||
                 cn.getPath().equals(""))) {
             String path = null;
             if (cn != null) {
