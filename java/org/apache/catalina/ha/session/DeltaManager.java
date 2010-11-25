@@ -802,7 +802,7 @@ public CatalinaCluster getCluster() {
      * @see #findSessionMasterMember()
      */
     public synchronized void getAllClusterSessions() {
-        if (cluster != null && cluster.getMembers().length > 0) {
+        if (cluster != null && cluster.getMembers().length > 1) {
             long beforeSendTime = System.currentTimeMillis();
             Member mbr = findSessionMasterMember();
             if(mbr == null) { // No domain member found
@@ -820,8 +820,8 @@ public CatalinaCluster getCluster() {
                      receiverQueue = true ;
                 }
                 cluster.send(msg, mbr);
-                if (log.isWarnEnabled())
-                    log.warn(sm.getString("deltaManager.waitForSessionState",getName(), mbr, Integer.valueOf(getStateTransferTimeout())));
+                if (log.isInfoEnabled())
+                    log.info(sm.getString("deltaManager.waitForSessionState",getName(), mbr, Integer.valueOf(getStateTransferTimeout())));
                 // FIXME At sender ack mode this method check only the state transfer and resend is a problem!
                 waitForSendAllSessions(beforeSendTime);
             } finally {
