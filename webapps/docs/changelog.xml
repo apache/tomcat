@@ -70,6 +70,11 @@
         <bug>50185</bug>: Add additional trace level logging to Tribes to assist
         with fault diagnosis. Based on a patch by Ariel. (markt)
       </add>
+      <fix>
+        Don&apos;t try and obtain session data from the cluster if the current
+        node is the only node in the cluster. Log requesting session data as
+        INFO rather than WARNING. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
