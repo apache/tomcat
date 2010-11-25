@@ -80,6 +80,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Don&apos;t configure Windows installer to use PID file since it is not
+        removed when the service stops which prevents the service from starting.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.5 (markt)">
   <subsection name="General">
