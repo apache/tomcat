@@ -78,6 +78,10 @@
         <bug>50294</bug>: Add more information to documentation regarding format
         of configuration files. Patch provided by Luke Meyer. (markt) 
       </add>
+      <fix>
+        Correct validate provided context path so sessions for the ROOT web
+        application can be viewed through the HTML Manager. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
