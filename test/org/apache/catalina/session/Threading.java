@@ -55,7 +55,7 @@ public class Threading extends TestCase {
         // Assumes "ant release" has been run
         // Will need to be updated as new releases are made
         File file = new File(
-                "./output/release/v7.0.5-dev/bin/apache-tomcat-7.0.5-dev.zip");
+                "./output/release/v7.0.6-dev/bin/apache-tomcat-7.0.6-dev.zip");
         
         FileInputStream fis = new FileInputStream(file);
         
