@@ -41,7 +41,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -128,7 +127,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * designed this way since random number generator use a sync to make them
      * thread-safe and the sync makes using a a single object slow(er).
      */
-    protected Queue<Random> randoms = new ConcurrentLinkedQueue<Random>();
+    protected Queue<SecureRandom> randoms =
+        new ConcurrentLinkedQueue<SecureRandom>();
 
     /**
      * Random number generator used to see @{link {@link #randoms}.
@@ -136,9 +136,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected SecureRandom randomSeed = null;
 
     /**
-     * The Java class name of the random number generator class to be used
-     * when generating session identifiers. The random number generator(s) will
-     * always be seeded from a SecureRandom instance.
+     * The Java class name of the secure random number generator class to be
+     * used when generating session identifiers. The random number generator(s)
+     * will always be seeded from a SecureRandom instance.
      */
     protected String randomClass = "java.security.SecureRandom";
 
@@ -505,23 +505,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * Create a new random number generator instance we should use for
      * generating session identifiers.
      */
-    protected Random createRandom() {
+    protected SecureRandom createRandom() {
         if (randomSeed == null) {
             createRandomSeed();
         }
         
-        Random result = null;
+        SecureRandom result = null;
         
         long t1 = System.currentTimeMillis();
         try {
             // Construct and seed a new random number generator
             Class<?> clazz = Class.forName(randomClass);
-            result = (Random) clazz.newInstance();
+            result = (SecureRandom) clazz.newInstance();
         } catch (Exception e) {
-            // Fall back to the simple case
+            // Fall back to the default case
             log.error(sm.getString("managerBase.random",
                     randomClass), e);
-            result = new java.util.Random();
+            result = new java.security.SecureRandom();
         }
         byte[] seedBytes = randomSeed.generateSeed(64);
         ByteArrayInputStream bais = new ByteArrayInputStream(seedBytes);
@@ -966,7 +966,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             }
             closeRandomInputStreams();
         }
-        Random random = randoms.poll();
+        SecureRandom random = randoms.poll();
         if (random == null) {
             random = createRandom();
         }
