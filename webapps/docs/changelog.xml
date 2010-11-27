@@ -54,6 +54,10 @@
         <bug>50106</bug>: Correct several MBean descriptors. Patch provided by
         Eiji Takahashi. (markt)
       </fix>
+      <update>
+        Further performance improvements to session ID generation. Remove legacy
+        configuration options that are no longer required.
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

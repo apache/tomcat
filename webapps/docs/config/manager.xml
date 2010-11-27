@@ -99,14 +99,6 @@
 
     <attributes>
 
-      <attribute name="entropy" required="false">
-        <p>A String value that is utilized when seeding the random number
-        generator used to create session identifiers for this Manager.
-        If not specified, a semi-useful value is calculated, but a long
-        String value should be specified in security-conscious
-        environments.</p>
-      </attribute>
-
       <attribute name="maxActiveSessions" required="false">
         <p>The maximum number of active sessions that will be created by
         this Manager, or -1 (the default) for no limit.</p>
