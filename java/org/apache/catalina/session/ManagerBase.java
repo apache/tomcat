@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.security.AccessController;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -88,35 +86,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected volatile boolean randomFileCurrentIsValid = true;
 
     /**
-     * The default message digest algorithm to use if we cannot use
-     * the requested one.
-     */
-    protected static final String DEFAULT_ALGORITHM = "MD5";
-
-
-    /**
-     * The message digest algorithm to be used when generating session
-     * identifiers.  This must be an algorithm supported by the
-     * <code>java.security.MessageDigest</code> class on your platform.
-     */
-    protected String algorithm = DEFAULT_ALGORITHM;
-
-
-    /**
      * The Container with which this Manager is associated.
      */
     protected Container container;
-
-
-    /**
-     * Queue of MessageDigest objects to be used when creating session
-     * identifiers. If the queue is empty when a MessageDigest is required, a
-     * new MessageDigest object is created. This is designed this way since
-     * MessageDigest objects are not thread-safe and sync'ing on a single object
-     * is slow(er).
-     */
-    protected Queue<MessageDigest> digests =
-        new ConcurrentLinkedQueue<MessageDigest>();
 
 
     /**
@@ -293,30 +265,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the message digest algorithm for this Manager.
-     */
-    public String getAlgorithm() {
-
-        return (this.algorithm);
-
-    }
-
-
-    /**
-     * Set the message digest algorithm for this Manager.
-     *
-     * @param algorithm The new message digest algorithm
-     */
-    public void setAlgorithm(String algorithm) {
-
-        String oldAlgorithm = this.algorithm;
-        this.algorithm = algorithm;
-        support.firePropertyChange("algorithm", oldAlgorithm, this.algorithm);
-
-    }
-
-
-    /**
      * Return the Container with which this Manager is associated.
      */
     @Override
@@ -357,40 +305,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     public String getClassName() {
         return this.getClass().getName();
-    }
-
-
-    /**
-     * Return the MessageDigest object to be used for calculating
-     * session identifiers.  If none has been created yet, initialize
-     * one the first time this method is called.
-     */
-    protected MessageDigest createDigest() {
-
-        MessageDigest result;
-        
-        long t1=System.currentTimeMillis();
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("managerBase.getting", algorithm));
-        try {
-            result = MessageDigest.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            log.error(sm.getString("managerBase.digest", algorithm), e);
-            try {
-                result = MessageDigest.getInstance(DEFAULT_ALGORITHM);
-            } catch (NoSuchAlgorithmException f) {
-                log.error(sm.getString("managerBase.digest",
-                                 DEFAULT_ALGORITHM), e);
-                result = null;
-            }
-        }
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("managerBase.gotten"));
-        long t2=System.currentTimeMillis();
-        if( log.isDebugEnabled() )
-            log.debug("getDigest() " + (t2-t1));
-
-        return result;
     }
 
 
@@ -1148,14 +1062,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
             while (resultLenBytes < this.sessionIdLength) {
                 getRandomBytes(random);
-                MessageDigest md = digests.poll();
-                if (md == null) {
-                    // If this fails, NPEs will follow. This should never fail
-                    // since if it falls back to the default digest
-                    md = createDigest();
-                }
-                random = md.digest(random);
-                digests.add(md);
                 for (int j = 0;
                 j < random.length && resultLenBytes < this.sessionIdLength;
                 j++) {

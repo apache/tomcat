@@ -28,11 +28,6 @@
                  type="int" 
             writeable="false"/>
 
-    <attribute   name="algorithm"
-          description="The message digest algorithm to be used when generating
-                       session identifiers"
-                 type="java.lang.String"/>
-
     <attribute   name="className"
           description="Fully qualified class name of the managed object"
                  type="java.lang.String"
@@ -225,11 +220,6 @@
           description="Number of active sessions at this moment"
                  type="int" 
             writeable="false"/>
-
-    <attribute   name="algorithm"
-          description="The message digest algorithm to be used when generating
-                       session identifiers"
-                 type="java.lang.String"/>
 
     <attribute   name="className"
           description="Fully qualified class name of the managed object"

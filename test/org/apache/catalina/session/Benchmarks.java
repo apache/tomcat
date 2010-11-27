@@ -37,10 +37,10 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~21,300ms
      * 
      * Results on markt's 2-core OSX dev box
-     *  1 thread  -   ~5,600ms
-     *  2 threads -  ~ 7,300ms
-     *  4 threads -  ~14,400ms
-     * 16 threads -  ~57,559ms
+     *  1 thread  -   ~4,700ms
+     *  2 threads -  ~ 6,000ms
+     *  4 threads -  ~11,900ms
+     * 16 threads -  ~48,659ms
      */
     public void testManagerBaseGenerateSessionId() throws Exception {
         doTestManagerBaseGenerateSessionId(1, 1000000);
@@ -105,8 +105,6 @@ public class Benchmarks extends TestCase {
         result.append(threadCount);
         result.append(", Time(ms): ");
         result.append(end-start);
-        result.append(", Digests: ");
-        result.append(mgr.digests.size());
         result.append(", Randoms: ");
         result.append(mgr.randoms.size());
         result.append(", RandomInputStreams: ");
@@ -203,8 +201,6 @@ public class Benchmarks extends TestCase {
         result.append(threadCount);
         result.append(", Time(ms): ");
         result.append(end-start);
-        result.append(", Digests: ");
-        result.append(mgr.digests.size());
         result.append(", Randoms: ");
         result.append(mgr.randoms.size());
         result.append(", RandomInputStreams: ");
