@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
@@ -55,11 +54,9 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.apache.catalina.util.Base64;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -97,13 +94,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * session controlled by this Manager must be Serializable.
      */
     protected boolean distributable;
-
-
-    /**
-     * A String initialization parameter used to increase the entropy of
-     * the initialization of our random number generator.
-     */
-    protected String entropy = null;
 
 
     /**
@@ -339,58 +329,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the entropy increaser value, or compute a semi-useful value
-     * if this String has not yet been set.
-     */
-    public String getEntropy() {
-
-        // Calculate a semi-useful value if this has not been set
-        if (this.entropy == null) {
-            // Use APR to get a crypto secure entropy value
-            byte[] result = new byte[32];
-            boolean apr = false;
-            try {
-                String methodName = "random";
-                Class<?> paramTypes[] = new Class[2];
-                paramTypes[0] = result.getClass();
-                paramTypes[1] = int.class;
-                Object paramValues[] = new Object[2];
-                paramValues[0] = result;
-                paramValues[1] = Integer.valueOf(32);
-                Method method = Class.forName("org.apache.tomcat.jni.OS")
-                    .getMethod(methodName, paramTypes);
-                method.invoke(null, paramValues);
-                apr = true;
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-            }
-            if (apr) {
-                setEntropy(Base64.encode(result));
-            } else {
-                setEntropy(this.toString());
-            }
-        }
-
-        return (this.entropy);
-
-    }
-
-
-    /**
-     * Set the entropy increaser value.
-     *
-     * @param entropy The new entropy increaser value
-     */
-    public void setEntropy(String entropy) {
-
-        String oldEntropy = entropy;
-        this.entropy = entropy;
-        support.firePropertyChange("entropy", oldEntropy, this.entropy);
-
-    }
-
-
-    /**
      * Return descriptive information about this Manager implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
@@ -619,11 +557,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
         long seed = System.currentTimeMillis();
         long t1 = seed;
-        char entropy[] = getEntropy().toCharArray();
-        for (int i = 0; i < entropy.length; i++) {
-            long update = ((byte) entropy[i]) << ((i % 8) * 8);
-            seed ^= update;
-        }
 
         // Construct and seed a new random number generator
         SecureRandom result = new SecureRandom();
