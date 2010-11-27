@@ -171,27 +171,12 @@
 
     <attributes>
 
-      <attribute name="algorithm" required="false">
-        <p>Name of the <em>Message Digest</em> algorithm used to calculate
-        session identifiers produced by this Manager.  This value must
-        be supported by the <code>java.security.MessageDigest</code> class.
-        If not specified, the default value is "MD5".</p>
-      </attribute>
-
       <attribute name="className" required="false">
         <p>Java class name of the implementation to use.  This class must
         implement the <code>org.apache.catalina.Manager</code> interface.
         You <strong>must</strong> specify
         <code>org.apache.catalina.session.PersistentManager</code> to use
         this manager implementation.</p>
-      </attribute>
-
-      <attribute name="entropy" required="false">
-        <p>A String value that is utilized when seeding the random number
-        generator used to create session identifiers for this Manager.
-        If not specified, a semi-useful value is calculated, but a long
-        String value should be specified in security-conscious
-        environments.</p>
       </attribute>
 
       <attribute name="maxActiveSessions" required="false">
