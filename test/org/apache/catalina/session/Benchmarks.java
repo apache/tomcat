@@ -16,6 +16,12 @@
  */
 package org.apache.catalina.session;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.SecureRandom;
+
 import junit.framework.TestCase;
 
 import org.apache.catalina.Session;
@@ -59,7 +65,7 @@ public class Benchmarks extends TestCase {
     }
     
     
-    public void doTestManagerBaseGenerateSessionId(int threadCount,
+    private void doTestManagerBaseGenerateSessionId(int threadCount,
             int iterCount) throws Exception {
 
         // Create a default session manager
@@ -156,7 +162,7 @@ public class Benchmarks extends TestCase {
     }
     
     
-    public void doTestManagerBaseCreateSession(int threadCount, int iterCount) {
+    private void doTestManagerBaseCreateSession(int threadCount, int iterCount) {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
@@ -208,7 +214,6 @@ public class Benchmarks extends TestCase {
         System.out.println(result.toString());
     }
     
-    
     private static final class TestThreadCreateSession implements Runnable {
 
         private ManagerBase mgr;
@@ -224,6 +229,115 @@ public class Benchmarks extends TestCase {
             for (int i = 0; i < count; i++) {
                 Session session = mgr.createSession(mgr.generateSessionId());
                 session.expire();
+            }
+        }
+    }
+    
+    
+    /*
+     * SecureRandom vs. reading /dev/urandom. Very different performance noted
+     * on some platforms.
+     * 
+     * Results on markt's 2-core OSX dev box
+     *              SecureRandom  /dev/urandom
+     *  1 thread  -   ~4,100ms      ~3,500ms
+     *  2 threads -  ~10,700ms      ~5,100ms
+     *  4 threads -  ~20,700ms     ~10,700ms
+     */
+    public void testSecureRandomVsDevURandom() throws Exception {
+        doTestSecureRandomVsDevURandom(1, 1000000);
+        doTestSecureRandomVsDevURandom(2, 1000000);
+        doTestSecureRandomVsDevURandom(4, 1000000);
+    }
+
+    private void doTestSecureRandomVsDevURandom(int threadCount, int iterCount) {
+        doTestSecureRandomVsDevURandomInner(threadCount, iterCount, true);
+        doTestSecureRandomVsDevURandomInner(threadCount, iterCount, false);
+    }
+
+    private void doTestSecureRandomVsDevURandomInner(int threadCount,
+            int iterCount, boolean useSecureRandom) {
+
+        Thread[] threads = new Thread[threadCount];
+        
+        for (int i = 0; i < threadCount; i++) {
+            if (useSecureRandom) {
+                threads[i] = new Thread(new TestThreadSecureRandom(iterCount));
+            } else {
+                threads[i] = new Thread(new TestThreadDevUrandom(iterCount));
+            }
+        }
+        
+        long start = System.currentTimeMillis();
+        
+        for (int i = 0; i < threadCount; i++) {
+            threads[i].start();
+        }
+        for (int i = 0; i < threadCount; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+        }
+        long end = System.currentTimeMillis();
+        
+        StringBuilder result = new StringBuilder();
+        if (useSecureRandom) {
+            result.append("SecureRandom ");
+        } else {
+            result.append("/dev/urandom ");
+        }
+        result.append("Threads: ");
+        result.append(threadCount);
+        result.append(", Time(ms): ");
+        result.append(end-start);
+        System.out.println(result.toString());
+    }
+
+    private static final class TestThreadSecureRandom implements Runnable {
+        
+        private SecureRandom secureRandom = new SecureRandom();
+        private byte[] bytes = new byte[16];
+        private int count;
+        
+        TestThreadSecureRandom(int iterCount) {
+            this.count = iterCount;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < count; i++) {
+                secureRandom.nextBytes(bytes);
+            }
+        }
+        
+    }
+    
+    private static final class TestThreadDevUrandom implements Runnable {
+        
+        private InputStream is;
+        private byte[] bytes = new byte[16];
+        private int count;
+        
+        TestThreadDevUrandom(int iterCount) {
+            try {
+                is = new FileInputStream("/dev/urandom");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            this.count = iterCount;
+        }
+
+        @Override
+        public void run() {
+            try {
+                for (int i = 0; i < count; i++) {
+                    is.read(bytes);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
