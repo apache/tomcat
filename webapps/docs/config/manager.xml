@@ -134,8 +134,9 @@
       </attribute>
 
       <attribute name="randomClass" required="false">
-        <p>Java class name of the <code>java.util.Random</code>
-        implementation class to use.  If not specified, the default value is
+        <p>Name of the Java class that extends
+        <code>java.security.SecureRandom</code> to use to generate session IDs.
+        If not specified, the default value is
         <code>java.security.SecureRandom</code>.</p>
       </attribute>
 
@@ -222,8 +223,9 @@
       </attribute>
 
       <attribute name="randomClass" required="false">
-        <p>Java class name of the <code>java.util.Random</code>
-        implementation class to use.  If not specified, the default value is
+        <p>Name of the Java class that extends
+        <code>java.security.SecureRandom</code> to use to generate session IDs.
+        If not specified, the default value is
         <code>java.security.SecureRandom</code>.</p>
       </attribute>
 
