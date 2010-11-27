@@ -99,13 +99,6 @@
 
     <attributes>
 
-      <attribute name="algorithm" required="false">
-        <p>Name of the <em>Message Digest</em> algorithm used to calculate
-        session identifiers produced by this Manager.  This value must
-        be supported by the <code>java.security.MessageDigest</code> class.
-        If not specified, the default value is "MD5".</p>
-      </attribute>
-
       <attribute name="entropy" required="false">
         <p>A String value that is utilized when seeding the random number
         generator used to create session identifiers for this Manager.
