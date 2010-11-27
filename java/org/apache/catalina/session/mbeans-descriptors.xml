@@ -42,12 +42,6 @@
           description="Number of duplicated session ids generated"
                  type="int" />
 
-    <attribute   name="entropy"
-          description="A String initialization parameter used to increase the
-                       entropy of the initialization of our random number
-                       generator"
-                 type="java.lang.String"/>
-                 
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
                  type="long" />
@@ -235,12 +229,6 @@
           description="Number of duplicated session ids generated"
                  type="int" />
 
-    <attribute   name="entropy"
-          description="A String initialization parameter used to increase the
-                       entropy of the initialization of our random number
-                       generator"
-                 type="java.lang.String"/>
-                 
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
                  type="long" />
