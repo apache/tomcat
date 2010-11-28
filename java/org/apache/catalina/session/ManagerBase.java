@@ -555,12 +555,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             return;
         }
 
-        long seed = System.currentTimeMillis();
-        long t1 = seed;
+        long t1 = System.currentTimeMillis();
 
         // Construct and seed a new random number generator
         SecureRandom result = new SecureRandom();
-        result.setSeed(seed);
 
         if(log.isDebugEnabled()) {
             long t2=System.currentTimeMillis();
