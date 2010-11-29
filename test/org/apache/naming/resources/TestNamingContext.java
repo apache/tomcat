@@ -156,4 +156,55 @@ public class TestNamingContext extends TomcatBaseTest {
             }
         }
     }
+    
+    public void testBeanFactory() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+        
+        // Must have a real docBase - just use temp
+        StandardContext ctx = (StandardContext)
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        
+        // Create the resource
+        ContextResource cr = new ContextResource();
+        cr.setName("bug50351");
+        cr.setType("org.apache.naming.resources.TesterObject");
+        cr.setProperty("factory", "org.apache.naming.factory.BeanFactory");
+        cr.setProperty("foo", "value");
+        ctx.getNamingResources().addResource(cr);
+        
+        // Map the test Servlet
+        Bug50351Servlet bug50351Servlet = new Bug50351Servlet();
+        Tomcat.addServlet(ctx, "bug50351Servlet", bug50351Servlet);
+        ctx.addServletMapping("/", "bug50351Servlet");
+
+        tomcat.start();
+
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("value", bc.toString());
+    }
+
+    public final class Bug50351Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain;UTF-8");
+            PrintWriter out = resp.getWriter();
+
+            try {
+                Context ctx = new InitialContext();
+                Object obj = ctx.lookup("java:comp/env/bug50351");
+                TesterObject to = (TesterObject) obj;
+                out.print(to.getFoo());
+            } catch (NamingException ne) {
+                ne.printStackTrace(out);
+            }
+        }
+    }
+    
+
 }
