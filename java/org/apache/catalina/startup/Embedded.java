@@ -845,7 +845,7 @@ public class Embedded  extends StandardService {
             log.debug("Stopping embedded server");
 
         fireLifecycleEvent(STOP_EVENT, null);
-        setState(LifecycleState.STARTING);
+        setState(LifecycleState.STOPPING);
 
         // Stop our defined Connectors first
         for (int i = 0; i < connectors.length; i++) {
