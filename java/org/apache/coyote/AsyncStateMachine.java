@@ -129,7 +129,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "startAsync()", state));
+                            "asyncStart()", state));
         }
     }
     
@@ -205,7 +205,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "timeoutAsync()", state));
+                            "asyncTimeout()", state));
         }
     }
     
@@ -221,7 +221,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "dispatchAsync()", state));
+                            "asyncDispatch()", state));
         }
         return doDispatch;
     }
@@ -233,7 +233,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "dispatchAsync()", state));
+                            "asyncDispatched()", state));
         }
     }
     
@@ -246,7 +246,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "dispatchAsync()", state));
+                            "asyncError()", state));
         }
         return doDispatch;
     }
@@ -285,7 +285,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "runAsync()", state));
+                            "asyncRun()", state));
         }
 
     }
