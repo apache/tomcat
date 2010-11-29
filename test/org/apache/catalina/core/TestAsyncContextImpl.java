@@ -749,4 +749,60 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             throw new ServletException("Opps.");
         }
     }
+    
+    public void testBug50352() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        AsyncStartRunnable servlet = new AsyncStartRunnable();
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/", "servlet");
+
+        ErrorServlet error = new ErrorServlet();
+        Tomcat.addServlet(ctx, "error", error);
+        ctx.addServletMapping("/stage2", "error");
+
+        tomcat.start();
+        
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        
+        assertEquals("Runnable-onComplete-", res.toString());
+    }
+    
+    private static final class AsyncStartRunnable extends HttpServlet {
+        
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest request,
+                HttpServletResponse response)
+                throws ServletException, IOException {
+            
+            final AsyncContext asyncContext =
+                request.startAsync(request, response);
+
+            asyncContext.addListener(new TrackingListener(false, false, null));
+
+            asyncContext.start(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(3 * 1000);
+                        asyncContext.getResponse().getWriter().write(
+                                "Runnable-");
+                        asyncContext.complete();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
 }
