@@ -63,6 +63,10 @@
         caused by the previous fix for <bug>50159</bug>. (markt) 
       </fix>
       <fix>
+        <bug>50352</bug>: Ensure that <code>AsyncListener.onComplete()</code> is
+        fired when <code>AsyncContext.complete()</code> is called. (markt)
+      </fix>
+      <fix>
         <bug>50358</bug>: Set the correct LifecycleState when stopping instances
         of the deprecated Embedded class. (markt) 
       </fix>
