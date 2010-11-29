@@ -58,6 +58,10 @@
         Further performance improvements to session ID generation. Remove legacy
         configuration options that are no longer required.
       </update>
+      <fix>
+        <bug>50358</bug>: Set the correct LifecycleState when stopping instances
+        of the deprecated Embedded class. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
