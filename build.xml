@@ -197,6 +197,7 @@
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/*.classpath"/>
+    <include name="**/*.css"/>
     <include name="**/*.dtd"/>
     <include name="**/*.htm"/>
     <include name="**/*.html"/>
