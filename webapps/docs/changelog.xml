@@ -56,8 +56,12 @@
       </fix>
       <update>
         Further performance improvements to session ID generation. Remove legacy
-        configuration options that are no longer required.
+        configuration options that are no longer required. (markt)
       </update>
+      <fix>
+        <bug>50351</bug>: Fix the regression that broke BeanFactory resources
+        caused by the previous fix for <bug>50159</bug>. (markt) 
+      </fix>
       <fix>
         <bug>50358</bug>: Set the correct LifecycleState when stopping instances
         of the deprecated Embedded class. (markt) 
