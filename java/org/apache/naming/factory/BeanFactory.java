@@ -149,7 +149,8 @@ public class BeanFactory
                     String propName = ra.getType();
                     
                     if (propName.equals(Constants.FACTORY) ||
-                        propName.equals("scope") || propName.equals("auth")) {
+                        propName.equals("scope") || propName.equals("auth") ||
+                        propName.equals("singleton")) {
                         continue;
                     }
                     
