@@ -166,7 +166,7 @@ public class AsyncStateMachine {
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncLongPoll()", state));
+                            "asyncPostProcess()", state));
         }
     }
     
