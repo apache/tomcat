@@ -140,7 +140,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * used when generating session identifiers. The random number generator(s)
      * will always be seeded from a SecureRandom instance.
      */
-    protected String randomClass = "java.security.SecureRandom";
+    protected String secureRandomClass = "java.security.SecureRandom";
 
 
     /**
@@ -515,12 +515,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         long t1 = System.currentTimeMillis();
         try {
             // Construct and seed a new random number generator
-            Class<?> clazz = Class.forName(randomClass);
+            Class<?> clazz = Class.forName(secureRandomClass);
             result = (SecureRandom) clazz.newInstance();
         } catch (Exception e) {
             // Fall back to the default case
             log.error(sm.getString("managerBase.random",
-                    randomClass), e);
+                    secureRandomClass), e);
             result = new java.security.SecureRandom();
         }
         byte[] seedBytes = randomSeed.generateSeed(64);
@@ -573,9 +573,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Return the random number generator class name.
      */
-    public String getRandomClass() {
+    public String getSecureRandomClass() {
 
-        return (this.randomClass);
+        return (this.secureRandomClass);
 
     }
 
@@ -585,12 +585,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      *
      * @param randomClass The new random number generator class name
      */
-    public void setRandomClass(String randomClass) {
+    public void setSecureRandomClass(String randomClass) {
 
-        String oldRandomClass = this.randomClass;
-        this.randomClass = randomClass;
+        String oldRandomClass = this.secureRandomClass;
+        this.secureRandomClass = randomClass;
         support.firePropertyChange("randomClass", oldRandomClass,
-                                   this.randomClass);
+                                   this.secureRandomClass);
 
     }
 
