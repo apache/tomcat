@@ -37,10 +37,10 @@ public class Benchmarks extends TestCase {
 
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -  ~2,000ms
-     *  2 threads -  ~3,300ms
-     *  4 threads -  ~4,900ms
-     * 16 threads - ~21,300ms
+     *  1 thread  -  ~1,400ms
+     *  2 threads -  ~2,200ms
+     *  4 threads -  ~3,200ms
+     * 16 threads - ~14,800ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -   ~4,700ms
@@ -140,10 +140,10 @@ public class Benchmarks extends TestCase {
     
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -  ~4,300ms
-     *  2 threads -  ~7,600ms
-     *  4 threads - ~11,600ms
-     * 16 threads - ~49,000ms
+     *  1 thread  -  ~4,000ms
+     *  2 threads -  ~6,500ms
+     *  4 threads - ~10,400ms
+     * 16 threads - ~43,600ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -  ~9,100ms
@@ -238,6 +238,12 @@ public class Benchmarks extends TestCase {
      * SecureRandom vs. reading /dev/urandom. Very different performance noted
      * on some platforms.
      * 
+     * Results on markt's 4-core Windows dev box
+     *              SecureRandom  /dev/urandom
+     *  1 thread  -    ~766ms        N/A
+     *  2 threads -    ~843ms        N/A
+     *  4 threads -    ~766ms        N/A
+     *  
      * Results on markt's 2-core OSX dev box
      *              SecureRandom  /dev/urandom
      *  1 thread  -   ~4,100ms      ~3,500ms
