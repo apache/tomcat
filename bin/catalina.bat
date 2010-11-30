@@ -18,7 +18,7 @@ if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Start/Stop Script for the CATALINA Server
 rem
-rem Environment Variable Prequisites
+rem Environment Variable Prerequisites
 rem
 rem   CATALINA_HOME   May point at your Catalina "build" directory.
 rem
