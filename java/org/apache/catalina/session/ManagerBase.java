@@ -22,12 +22,9 @@ package org.apache.catalina.session;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,7 +43,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
@@ -72,12 +68,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     private final Log log = LogFactory.getLog(ManagerBase.class); // must not be static
 
     // ----------------------------------------------------- Instance Variables
-
-    protected volatile Queue<InputStream> randomInputStreams =
-        new ConcurrentLinkedQueue<InputStream>();
-    protected String randomFile = "/dev/urandom";
-    protected String randomFileCurrent = null;
-    protected volatile boolean randomFileCurrentIsValid = true;
 
     /**
      * The Container with which this Manager is associated.
@@ -136,6 +126,27 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     protected String secureRandomClass = null;
 
+    /**
+     * The name of the algorithm to use to create instances of
+     * {@link SecureRandom} which are used to generate session IDs. If no
+     * algorithm is specified, SHA1PRNG is used. To use the platform default
+     * (which may be SHA1PRNG), specify the empty string. If an invalid
+     * algorithm and/or provider is specified the {@link SecureRandom} instances
+     * will be created using the defaults. If that fails, the {@link
+     * SecureRandom} instances will be created using platform defaults.
+     */
+    protected String secureRandomAlgorithm = "SHA1PRNG";
+
+    /**
+     * The name of the provider to use to create instances of
+     * {@link SecureRandom} which are used to generate session IDs. If
+     * no algorithm is specified the of SHA1PRNG default is used. If an invalid
+     * algorithm and/or provider is specified the {@link SecureRandom} instances
+     * will be created using the defaults. If that fails, the {@link
+     * SecureRandom} instances will be created using platform defaults.
+     */
+    protected String secureRandomProvider = null;
+    
     /**
      * The longest time (in seconds) that an expired session had been alive.
      */
@@ -213,37 +224,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
     
-
-    // ------------------------------------------------------------- Security classes
-
-
-    private class PrivilegedCreateRandomInputStream
-            implements PrivilegedAction<InputStream> {
-        
-        @Override
-        public InputStream run(){
-            try {
-                File f = new File(randomFileCurrent);
-                if (!f.exists()) {
-                    randomFileCurrentIsValid = false;
-                    closeRandomInputStreams();
-                    return null;
-                }
-                InputStream is = new FileInputStream(f);
-                is.read();
-                if( log.isDebugEnabled() )
-                    log.debug( "Opening " + randomFileCurrent );
-                randomFileCurrentIsValid = true;
-                return is;
-            } catch (IOException ex){
-                log.warn("Error reading " + randomFileCurrent, ex);
-                randomFileCurrentIsValid = false;
-                closeRandomInputStreams();
-            }
-            return null;
-        }
-    }
-
 
     // ------------------------------------------------------------- Properties
 
@@ -405,95 +385,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     }
 
-    /** 
-     * Use /dev/random-type special device. This is new code, but may reduce
-     * the big delay in generating the random.
-     *
-     *  You must specify a path to a random generator file. Use /dev/urandom
-     *  for linux ( or similar ) systems. Use /dev/random for maximum security
-     *  ( it may block if not enough "random" exist ). You can also use
-     *  a pipe that generates random.
-     *
-     *  The code will check if the file exists, and default to java Random
-     *  if not found. There is a significant performance difference, very
-     *  visible on the first call to getSession ( like in the first JSP )
-     *  - so use it if available.
-     */
-    public void setRandomFile(String s) {
-        // as a hack, you can use a static file - and generate the same
-        // session ids ( good for strange debugging )
-        randomFile = s;
-    }
-    
-    protected InputStream createRandomInputStream() {
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                    new PrivilegedCreateRandomInputStream());
-        } else {
-            try{
-                File f = new File(randomFileCurrent);
-                if (!f.exists()) {
-                    randomFileCurrentIsValid = false;
-                    closeRandomInputStreams();
-                    return null;
-                }
-                InputStream is = new FileInputStream(f);
-                is.read();
-                if( log.isDebugEnabled() )
-                    log.debug( "Opening " + randomFileCurrent );
-                randomFileCurrentIsValid = true;
-                return is;
-            } catch( IOException ex ) {
-                log.warn("Error reading " + randomFileCurrent, ex);
-                randomFileCurrentIsValid = false;
-                closeRandomInputStreams();
-            }
-            return null;
-        }
-    }
-
-    
-    /**
-     * Obtain the value of the randomFile attribute currently configured for
-     * this Manager. Note that this will not return the same value as
-     * {@link #getRandomFileCurrent()} if the value for the randomFile attribute
-     * has been changed since this Manager was started.
-     * 
-     * @return  The file currently configured to provide random data for use in
-     *          generating session IDs
-     */
-    public String getRandomFile() {
-        return randomFile;
-    }
-
-
-    /**
-     * Obtain the value of the randomFile attribute currently being used by
-     * this Manager. Note that this will not return the same value as
-     * {@link #getRandomFile()} if the value for the randomFile attribute has
-     * been changed since this Manager was started.
-     * 
-     * @return  The file currently being used to provide random data for use in
-     *          generating session IDs
-     */
-    public String getRandomFileCurrent() {
-        return randomFileCurrent;
-    }
-    
-    
-    protected synchronized void closeRandomInputStreams() {
-        InputStream is = randomInputStreams.poll();
-        
-        while (is != null) {
-            try {
-                is.close();
-            } catch (Exception e) {
-                log.warn("Failed to close randomInputStream.");
-            }
-            is = randomInputStreams.poll();
-        }
-    }
-    
     /**
      * Create a new random number generator instance we should use for
      * generating session identifiers.
@@ -509,17 +400,46 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 Class<?> clazz = Class.forName(secureRandomClass);
                 result = (SecureRandom) clazz.newInstance();
             } catch (Exception e) {
-                // Fall back to the default case
                 log.error(sm.getString("managerBase.random",
                         secureRandomClass), e);
             }
         }
-        
+
         if (result == null) {
-            // No secureRandomClass or creation failed
-            result = new SecureRandom();
+            // No secureRandomClass or creation failed. Use SecureRandom.
+            try {
+                if (secureRandomProvider != null &&
+                        secureRandomProvider.length() > 0) {
+                    result = SecureRandom.getInstance(secureRandomAlgorithm,
+                            secureRandomProvider);
+                } else if (secureRandomAlgorithm != null &&
+                        secureRandomAlgorithm.length() > 0) {
+                    result = SecureRandom.getInstance(secureRandomAlgorithm);
+                }
+            } catch (NoSuchAlgorithmException e) {
+                log.error(sm.getString("managerBase.randomAlgorithm",
+                        secureRandomAlgorithm), e);
+            } catch (NoSuchProviderException e) {
+                log.error(sm.getString("managerBase.randomProvider",
+                        secureRandomProvider), e);
+            }
+        }
+
+        if (result == null) {
+            // Invalid provider / algorithm
+            try {
+                result = SecureRandom.getInstance("SHA1PRNG");
+            } catch (NoSuchAlgorithmException e) {
+                log.error(sm.getString("managerBase.randomAlgorithm",
+                        secureRandomAlgorithm), e);
+            }
         }
         
+        if (result == null) {
+            // Nothing works - use platform default
+            result = new SecureRandom();
+        }
+
         if(log.isDebugEnabled()) {
             long t2=System.currentTimeMillis();
             if( (t2-t1) > 100 )
@@ -531,7 +451,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the random number generator class name.
+     * Return the secure random number generator class name.
      */
     public String getSecureRandomClass() {
 
@@ -541,17 +461,55 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Set the random number generator class name.
+     * Set the secure random number generator class name.
      *
-     * @param randomClass The new random number generator class name
+     * @param randomClass The new secure random number generator class name
      */
-    public void setSecureRandomClass(String randomClass) {
+    public void setSecureRandomClass(String secureRandomClass) {
 
-        String oldRandomClass = this.secureRandomClass;
-        this.secureRandomClass = randomClass;
-        support.firePropertyChange("randomClass", oldRandomClass,
+        String oldSecureRandomClass = this.secureRandomClass;
+        this.secureRandomClass = secureRandomClass;
+        support.firePropertyChange("secureRandomClass", oldSecureRandomClass,
                                    this.secureRandomClass);
 
+    }
+
+
+    /**
+     * Return the secure random number generator algorithm name.
+     */
+    public String getSecureRandomAlgorithm() {
+        return secureRandomAlgorithm;
+    }
+
+
+    /**
+     * Set the secure random number generator algorithm name.
+     *
+     * @param secureRandomAlgorithm The new secure random number generator
+     *                              algorithm name
+     */
+    public void setSecureRandomAlgorithm(String secureRandomAlgorithm) {
+        this.secureRandomAlgorithm = secureRandomAlgorithm;
+    }
+
+
+    /**
+     * Return the secure random number generator provider name.
+     */
+    public String getSecureRandomProvider() {
+        return secureRandomProvider;
+    }
+
+
+    /**
+     * Set the secure random number generator provider name.
+     *
+     * @param secureRandomProvider The new secure random number generator
+     *                             provider name
+     */
+    public void setSecureRandomProvider(String secureRandomProvider) {
+        this.secureRandomProvider = secureRandomProvider;
     }
 
 
@@ -669,12 +627,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     @Override
     protected void startInternal() throws LifecycleException {
 
-        randomFileCurrent = randomFile;
-        InputStream is = createRandomInputStream();
-        if (is != null) {
-            randomInputStreams.add(is);
-        }
-
         // Ensure caches for timing stats are the right size by filling with
         // nulls.
         while (sessionCreationTiming.size() < TIMING_STATS_CACHE_SIZE) {
@@ -694,7 +646,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        closeRandomInputStreams();
+        this.randoms.clear();
     }
 
 
@@ -899,31 +851,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     protected void getRandomBytes(byte bytes[]) {
-        if (randomFileCurrentIsValid) {
-            InputStream is = null;
-            try {
-                // If one of the InputStreams fails, is will be null and the
-                // resulting NPE will trigger a fall-back to getRandom()
-                is = randomInputStreams.poll();
-                if (is == null) {
-                    is = createRandomInputStream();
-                }
-                int len = is.read(bytes);
-                if (len == bytes.length) {
-                    randomInputStreams.add(is);
-                    return;
-                }
-                if(log.isDebugEnabled())
-                    log.debug("Got " + len + " " + bytes.length );
-            } catch (Exception ex) {
-                // Ignore
-            }
-            randomFileCurrentIsValid = false;
-            if (is != null) {
-                randomInputStreams.add(is);
-            }
-            closeRandomInputStreams();
-        }
+
         SecureRandom random = randoms.poll();
         if (random == null) {
             random = createSecureRandom();

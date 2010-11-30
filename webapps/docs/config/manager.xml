@@ -133,11 +133,31 @@
         </p>
       </attribute>
 
-      <attribute name="randomClass" required="false">
+      <attribute name="secureRandomClass" required="false">
         <p>Name of the Java class that extends
         <code>java.security.SecureRandom</code> to use to generate session IDs.
         If not specified, the default value is
         <code>java.security.SecureRandom</code>.</p>
+      </attribute>
+
+      <attribute name="secureRandomProvider" required="false">
+        <p>Name of the provider to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the Manager
+        will use the platform default provider and the default algorithm. If not
+        specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the Manager
+        will use the platform default provider and the default algorithm. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
       </attribute>
 
       <attribute name="sessionIdLength" required="false">
