@@ -75,14 +75,18 @@
           description="Path name of the disk file in which active sessions"
                  type="java.lang.String"/>
 
-    <attribute name="processExpiresFrequency"
-               description="The frequency of the manager checks (expiration and passivation)"
-               type="int"/>
+    <attribute   name="processExpiresFrequency"
+          description="The frequency of the manager checks (expiration and passivation)"
+                 type="int"/>
 
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
                  type="long" />
                
+    <attribute   name="secureRandomClass"
+          description="The random number generator class name"
+                 type="java.lang.String"/>
+
     <attribute   name="sessionAverageAliveTime"
           description="Average time an expired session had been alive"
                  type="int"
@@ -113,7 +117,8 @@
                  
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+            writeable="false"/>
 
     <attribute   name="randomFile"
           description="File source of random - /dev/urandom or a pipe that will be used when the Manager is next started"
@@ -124,10 +129,6 @@
                  type="java.lang.String"
             writeable="false"/>
                  
-    <attribute   name="randomClass"
-          description="The random number generator class name"
-                 type="java.lang.String"/>
-
     <attribute   name="rejectedSessions"
           description="Number of sessions we rejected due to maxActive beeing reached"
                  type="int"
@@ -221,8 +222,7 @@
             writeable="false"/>
 
     <attribute   name="distributable"
-          description="The distributable flag for Sessions created by this
-                       Manager"
+          description="The distributable flag for Sessions created by this Manager"
                  type="boolean"/>
                  
     <attribute   name="duplicates"
@@ -261,8 +261,7 @@
                  type="int"/>
 
     <attribute   name="maxInactiveInterval"
-          description="The default maximum inactive interval for Sessions
-                       created by this Manager"
+          description="The default maximum inactive interval for Sessions created by this Manager"
                  type="int"/>
                  
     <attribute   name="minIdleSwap"
@@ -270,14 +269,13 @@
                  type="int"/>
 
     <attribute   name="name"
-          description="The descriptive name of this Manager implementation
-                       (for logging)"
+          description="The descriptive name of this Manager implementation (for logging)"
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute name="processExpiresFrequency"
-               description="The frequency of the manager checks (expiration and passivation)"
-               type="int"/>
+    <attribute   name="processExpiresFrequency"
+          description="The frequency of the manager checks (expiration and passivation)"
+                 type="int"/>
 
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
@@ -287,6 +285,10 @@
           description="Indicates whether sessions are saved when the Manager is shut down properly. This requires the unload() method to be called."
                  type="boolean" />
                
+    <attribute   name="secureRandomClass"
+          description="The random number generator class name"
+                 type="java.lang.String"/>
+
     <attribute   name="sessionAverageAliveTime"
           description="Average time an expired session had been alive"
                  type="int"
@@ -318,16 +320,12 @@
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
-                 writeable="false"/>
+            writeable="false"/>
 
     <attribute   name="randomFile"
           description="File source of random - /dev/urandom or a pipe"
                  type="java.lang.String"/>
                  
-    <attribute   name="randomClass"
-          description="The random number generator class name"
-                 type="java.lang.String"/>
-
     <attribute   name="rejectedSessions"
           description="Number of sessions we rejected due to maxActive beeing reached"
                  type="int"
