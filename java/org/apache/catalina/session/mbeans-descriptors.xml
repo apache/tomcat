@@ -83,8 +83,16 @@
           description="Time spent doing housekeeping and expiration"
                  type="long" />
                
+    <attribute   name="secureRandomAlgorithm"
+          description="The secure random number generator algorithm name"
+                 type="java.lang.String"/>
+
     <attribute   name="secureRandomClass"
-          description="The random number generator class name"
+          description="The secure random number generator class name"
+                 type="java.lang.String"/>
+
+    <attribute   name="secureRandomProvider"
+          description="The secure random number generator provider name"
                  type="java.lang.String"/>
 
     <attribute   name="sessionAverageAliveTime"
