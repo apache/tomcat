@@ -22,8 +22,6 @@ package org.apache.catalina.session;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -131,17 +129,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         new ConcurrentLinkedQueue<SecureRandom>();
 
     /**
-     * Random number generator used to see @{link {@link #randoms}.
-     */
-    protected SecureRandom randomSeed = null;
-
-    /**
      * The Java class name of the secure random number generator class to be
-     * used when generating session identifiers. The random number generator(s)
-     * will always be seeded from a SecureRandom instance.
+     * used when generating session identifiers. The random number generator
+     * class must be self-seeding and have a zero-argument constructor. If not
+     * specified, an instance of {@link SecureRandom} will be generated.
      */
-    protected String secureRandomClass = "java.security.SecureRandom";
-
+    protected String secureRandomClass = null;
 
     /**
      * The longest time (in seconds) that an expired session had been alive.
@@ -505,35 +498,26 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * Create a new random number generator instance we should use for
      * generating session identifiers.
      */
-    protected SecureRandom createRandom() {
-        if (randomSeed == null) {
-            createRandomSeed();
-        }
-        
+    protected SecureRandom createSecureRandom() {
+
         SecureRandom result = null;
         
         long t1 = System.currentTimeMillis();
-        try {
-            // Construct and seed a new random number generator
-            Class<?> clazz = Class.forName(secureRandomClass);
-            result = (SecureRandom) clazz.newInstance();
-        } catch (Exception e) {
-            // Fall back to the default case
-            log.error(sm.getString("managerBase.random",
-                    secureRandomClass), e);
-            result = new java.security.SecureRandom();
-        }
-        byte[] seedBytes = randomSeed.generateSeed(64);
-        ByteArrayInputStream bais = new ByteArrayInputStream(seedBytes);
-        DataInputStream dis = new DataInputStream(bais);
-        for (int i = 0; i < 8; i++) {
+        if (secureRandomClass != null) {
             try {
-                result.setSeed(dis.readLong());
-            } catch (IOException e) {
-                // Should never happen
-                log.error(sm.getString("managerBase.seedFailed",
-                        result.getClass().getName()), e);
+                // Construct and seed a new random number generator
+                Class<?> clazz = Class.forName(secureRandomClass);
+                result = (SecureRandom) clazz.newInstance();
+            } catch (Exception e) {
+                // Fall back to the default case
+                log.error(sm.getString("managerBase.random",
+                        secureRandomClass), e);
             }
+        }
+        
+        if (result == null) {
+            // No secureRandomClass or creation failed
+            result = new SecureRandom();
         }
         
         if(log.isDebugEnabled()) {
@@ -543,30 +527,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                         Long.valueOf(t2-t1)));
         }
         return result;
-    }
-
-
-    /**
-     * Create the random number generator that will be used to seed the random
-     * number generators that will create session IDs. 
-     */
-    protected synchronized void createRandomSeed() {
-        if (randomSeed != null) {
-            return;
-        }
-
-        long t1 = System.currentTimeMillis();
-
-        // Construct and seed a new random number generator
-        SecureRandom result = new SecureRandom();
-
-        if(log.isDebugEnabled()) {
-            long t2=System.currentTimeMillis();
-            if( (t2-t1) > 100 )
-                log.debug(sm.getString("managerBase.createRandomSeed",
-                        Long.valueOf(t2-t1)));
-        }
-        randomSeed = result;
     }
 
 
@@ -966,7 +926,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
         SecureRandom random = randoms.poll();
         if (random == null) {
-            random = createRandom();
+            random = createSecureRandom();
         }
         random.nextBytes(bytes);
         randoms.add(random);
