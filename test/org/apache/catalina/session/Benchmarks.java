@@ -43,10 +43,10 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~14,700ms
      * 
      * Results on markt's 2-core OSX dev box
-     *  1 thread  -   ~4,700ms
-     *  2 threads -  ~ 6,000ms
-     *  4 threads -  ~11,900ms
-     * 16 threads -  ~48,659ms
+     *  1 thread  -   ~1,400ms
+     *  2 threads -   ~1,700ms
+     *  4 threads -   ~3,500ms
+     * 16 threads -  ~14,465ms
      */
     public void testManagerBaseGenerateSessionId() throws Exception {
         doTestManagerBaseGenerateSessionId(1, 1000000);
@@ -141,10 +141,10 @@ public class Benchmarks extends TestCase {
      * 16 threads - ~43,500ms
      * 
      * Results on markt's 2-core OSX dev box
-     *  1 thread  -  ~9,100ms
-     *  2 threads - ~10,800ms
-     *  4 threads - ~21,400ms
-     * 16 threads - ~87,600ms
+     *  1 thread  -  ~4,100ms
+     *  2 threads -  ~5,700ms
+     *  4 threads - ~11,700ms
+     * 16 threads - ~45,600ms
      */
     public void testManagerBaseCreateSession() {
         doTestManagerBaseCreateSession(1, 1000000);
@@ -236,9 +236,9 @@ public class Benchmarks extends TestCase {
      *  
      * Results on markt's 2-core OSX dev box
      *              SecureRandom  /dev/urandom
-     *  1 thread  -   ~4,100ms      ~3,500ms
-     *  2 threads -  ~10,700ms      ~5,100ms
-     *  4 threads -  ~20,700ms     ~10,700ms
+     *  1 thread  -     ~759ms      ~3,500ms
+     *  2 threads -     ~725ms      ~5,200ms
+     *  4 threads -   ~1,265ms     ~10,500ms
      */
     public void testSecureRandomVsDevURandom() throws Exception {
         doTestSecureRandomVsDevURandom(1, 1000000);
@@ -246,13 +246,14 @@ public class Benchmarks extends TestCase {
         doTestSecureRandomVsDevURandom(4, 1000000);
     }
 
-    private void doTestSecureRandomVsDevURandom(int threadCount, int iterCount) {
+    private void doTestSecureRandomVsDevURandom(int threadCount, int iterCount)
+            throws Exception {
         doTestSecureRandomVsDevURandomInner(threadCount, iterCount, true);
         doTestSecureRandomVsDevURandomInner(threadCount, iterCount, false);
     }
 
     private void doTestSecureRandomVsDevURandomInner(int threadCount,
-            int iterCount, boolean useSecureRandom) {
+            int iterCount, boolean useSecureRandom) throws Exception {
 
         Thread[] threads = new Thread[threadCount];
         
@@ -294,12 +295,13 @@ public class Benchmarks extends TestCase {
 
     private static final class TestThreadSecureRandom implements Runnable {
         
-        private SecureRandom secureRandom = new SecureRandom();
+        private SecureRandom secureRandom;
         private byte[] bytes = new byte[16];
         private int count;
         
-        TestThreadSecureRandom(int iterCount) {
+        TestThreadSecureRandom(int iterCount) throws Exception {
             this.count = iterCount;
+            this.secureRandom = SecureRandom.getInstance("SHA1PRNG");
         }
 
         @Override
