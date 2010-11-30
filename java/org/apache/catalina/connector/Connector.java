@@ -879,11 +879,9 @@ public class Connector extends LifecycleMBeanBase  {
 
         onameProtocolHandler = register(protocolHandler,
                 createObjectNameKeyProperties("ProtocolHandler"));
-        
-        mapperListener.setDomain(getDomain());
 
-        onameMapper = register(mapperListener,
-                createObjectNameKeyProperties("Mapper"));
+        // Initialize mapper listener
+        mapperListener.init();
     }
 
 
@@ -910,8 +908,7 @@ public class Connector extends LifecycleMBeanBase  {
                  ("coyoteConnector.protocolHandlerStartFailed", e));
         }
 
-        // MapperListener doesn't follow Lifecycle conventions
-        mapperListener.init();
+        mapperListener.start();
     }
 
 
@@ -933,14 +930,13 @@ public class Connector extends LifecycleMBeanBase  {
                  ("coyoteConnector.protocolHandlerStopFailed", e));
         }
 
-        // MapperListener doesn't follow Lifecycle conventions
-        mapperListener.destroy();
+        mapperListener.stop();
     }
 
 
     @Override
     protected void destroyInternal() throws LifecycleException {
-        unregister(onameMapper);
+        mapperListener.destroy();
         unregister(onameProtocolHandler);
         
         try {
@@ -977,7 +973,6 @@ public class Connector extends LifecycleMBeanBase  {
     // -------------------- JMX registration  --------------------
 
     private ObjectName onameProtocolHandler;
-    private ObjectName onameMapper;
     
     @Override
     protected String getDomainInternal() {
