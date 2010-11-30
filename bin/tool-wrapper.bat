@@ -18,7 +18,7 @@ if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Wrapper script for command line tools
 rem
-rem Environment Variable Prequisites
+rem Environment Variable Prerequisites
 rem
 rem   CATALINA_HOME May point at your Catalina "build" directory.
 rem
