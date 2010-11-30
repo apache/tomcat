@@ -18,7 +18,7 @@
 # -----------------------------------------------------------------------------
 # Start/Stop Script for the CATALINA Server
 #
-# Environment Variable Prequisites
+# Environment Variable Prerequisites
 #
 #   CATALINA_HOME   May point at your Catalina "build" directory.
 #
@@ -71,7 +71,8 @@
 #                       address=$JPDA_ADDRESS,server=y,suspend=$JPDA_SUSPEND
 #
 #   CATALINA_PID    (Optional) Path of the file which should contains the pid
-#                   of catalina startup java process, when start (fork) is used
+#                   of the catalina startup java process, when start (fork) is
+#                   used
 #
 #   LOGGING_CONFIG  (Optional) Override Tomcat's logging config file
 #                   Example (all one line)
