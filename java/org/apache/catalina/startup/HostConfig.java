@@ -524,7 +524,7 @@ public class HostConfig
 
 
     /**
-     * @param contextPath
+     * @param cn
      * @param contextXml
      * @param file
      */
@@ -723,7 +723,7 @@ public class HostConfig
     }
 
     /**
-     * @param contextPath
+     * @param cn
      * @param war
      * @param file
      */
@@ -937,7 +937,7 @@ public class HostConfig
 
     
     /**
-     * @param contextPath
+     * @param cn
      * @param dir
      * @param file
      */
