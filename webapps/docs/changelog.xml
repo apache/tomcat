@@ -56,7 +56,9 @@
       </fix>
       <update>
         Further performance improvements to session ID generation. Remove legacy
-        configuration options that are no longer required. (markt)
+        configuration options that are no longer required. Provide additional
+        options to control the <code>SecureRandom</code> instances used to
+        generate session IDs. (markt)
       </update>
       <fix>
         <bug>50351</bug>: Fix the regression that broke BeanFactory resources

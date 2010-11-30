@@ -38,9 +38,9 @@ public class Benchmarks extends TestCase {
     /*
      * Results on markt's 4-core Windows dev box
      *  1 thread  -  ~1,400ms
-     *  2 threads -  ~2,200ms
-     *  4 threads -  ~3,200ms
-     * 16 threads - ~14,800ms
+     *  2 threads -  ~2,100ms
+     *  4 threads -  ~3,100ms
+     * 16 threads - ~14,700ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -   ~4,700ms
@@ -70,9 +70,6 @@ public class Benchmarks extends TestCase {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
-        // Calling start requires a valid container so do the equivalent
-        mgr.randomFileCurrent = mgr.randomFile;
-        mgr.createRandomInputStream();
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
                 ManagerBase.TIMING_STATS_CACHE_SIZE) {
@@ -113,8 +110,6 @@ public class Benchmarks extends TestCase {
         result.append(end-start);
         result.append(", Randoms: ");
         result.append(mgr.randoms.size());
-        result.append(", RandomInputStreams: ");
-        result.append(mgr.randomInputStreams.size());
         System.out.println(result.toString());
     }
     
@@ -140,10 +135,10 @@ public class Benchmarks extends TestCase {
     
     /*
      * Results on markt's 4-core Windows dev box
-     *  1 thread  -  ~4,000ms
-     *  2 threads -  ~6,500ms
-     *  4 threads - ~10,400ms
-     * 16 threads - ~43,600ms
+     *  1 thread  -  ~3,800ms
+     *  2 threads -  ~6,700ms
+     *  4 threads - ~11,000ms
+     * 16 threads - ~43,500ms
      * 
      * Results on markt's 2-core OSX dev box
      *  1 thread  -  ~9,100ms
@@ -167,9 +162,6 @@ public class Benchmarks extends TestCase {
         // Create a default session manager
         StandardManager mgr = new StandardManager();
         mgr.setContainer(new StandardContext());
-        // Calling start requires a valid container so do the equivalent
-        mgr.randomFileCurrent = mgr.randomFile;
-        mgr.createRandomInputStream();
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
                 ManagerBase.TIMING_STATS_CACHE_SIZE) {
@@ -209,8 +201,6 @@ public class Benchmarks extends TestCase {
         result.append(end-start);
         result.append(", Randoms: ");
         result.append(mgr.randoms.size());
-        result.append(", RandomInputStreams: ");
-        result.append(mgr.randomInputStreams.size());
         System.out.println(result.toString());
     }
     
