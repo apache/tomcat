@@ -679,7 +679,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Undeploy the web application at the specified context path.
      *
-     * @see ManagerServlet#undeploy(PrintWriter, String, StringManager)
+     * @see ManagerServlet#undeploy(PrintWriter, ContextName, StringManager)
      *
      * @param cn Name of the application to be undeployed
      * @param smClient  StringManager for the client's locale
@@ -698,7 +698,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Display session information and invoke list.
      *
-     * @see ManagerServlet#sessions(PrintWriter, String, int, StringManager)
+     * @see ManagerServlet#sessions(PrintWriter, ContextName, int,
+     *          StringManager)
      *
      * @param cn Name of the application to list session information
      * @param idle Expire all sessions with idle time &ge; idle for this context
@@ -718,7 +719,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Start the web application at the specified context path.
      *
-     * @see ManagerServlet#start(PrintWriter, String, StringManager)
+     * @see ManagerServlet#start(PrintWriter, ContextName, StringManager)
      *
      * @param cn Name of the application to be started
      * @param smClient  StringManager for the client's locale
@@ -737,7 +738,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Stop the web application at the specified context path.
      *
-     * @see ManagerServlet#stop(PrintWriter, String, StringManager)
+     * @see ManagerServlet#stop(PrintWriter, ContextName, StringManager)
      *
      * @param cn Name of the application to be stopped
      * @param smClient  StringManager for the client's locale
