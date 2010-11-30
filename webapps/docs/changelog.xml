@@ -76,6 +76,9 @@
         Further Lifecycle refactoring for Connectors and associated components.
         (markt)
       </fix>
+      <fix>
+        Correct handling of versioned web applications in deployer. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
