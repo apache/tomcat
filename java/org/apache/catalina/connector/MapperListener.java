@@ -27,6 +27,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.mapper.Mapper;
@@ -39,7 +40,8 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class MapperListener implements ContainerListener, LifecycleListener {
+public class MapperListener extends LifecycleMBeanBase
+        implements ContainerListener, LifecycleListener {
 
 
     private static final Log log = LogFactory.getLog(MapperListener.class);
@@ -82,18 +84,17 @@ public class MapperListener implements ContainerListener, LifecycleListener {
 
     // --------------------------------------------------------- Public Methods
 
-    public String getDomain() {
-        return domain;
+    public String getConnectorName() {
+        return this.connector.toString();
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
+    
+    // ------------------------------------------------------- Lifecycle Methods
 
-    /**
-     * Initialize associated mapper.
-     */
-    public void init() {
+    @Override
+    public void startInternal() {
+
+        setState(LifecycleState.STARTING);
 
         // Find any components that have already been initialized since the
         // MBean listener won't be notified as those components will have
@@ -114,13 +115,24 @@ public class MapperListener implements ContainerListener, LifecycleListener {
     }
         
 
-    /**
-     * Clean-up.
-     */
-    public void destroy() {
-        // NO-OP?
+    @Override
+    public void stopInternal() {
+        setState(LifecycleState.STOPPING);
     }
 
+
+    @Override
+    protected String getDomainInternal() {
+        // Should be the same as the connector
+        return connector.getDomainInternal();
+    }
+
+
+    @Override
+    protected String getObjectNameKeyProperties() {
+        // Same as connector but Mapper rather than Connector
+        return connector.createObjectNameKeyProperties("Mapper");
+    }
 
     // --------------------------------------------- Container Listener methods
 

@@ -190,4 +190,15 @@
 
   </mbean>
 
+  <mbean   name="Mapper"
+    description="Maps requests received by the associated connector to Hosts, Contexts and Wrappers"
+         domain="Catalina"
+          group="Mapper"
+           type="org.apache.catalina.connector.MapperListener">
+
+    <attribute name="connectorName"
+        description="Name of the associated connector"
+               type="java.lang.String"
+          writeable="false"/>
+  </mbean>
 </mbeans-descriptors>
