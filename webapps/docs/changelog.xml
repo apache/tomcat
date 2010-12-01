@@ -37,7 +37,7 @@
 
 <body>
 <!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
-<section name="Tomcat 7.0.6 (markt)">
+<section name="Tomcat 7.0.6 (markt)" rtext="Not yet released">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -124,7 +124,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.5 (markt)">
+<section name="Tomcat 7.0.5 (markt)" rtext="beta, 2010-12-01>
   <subsection name="General">
     <changelog>
       <update>
