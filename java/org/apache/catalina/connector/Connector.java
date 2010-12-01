@@ -864,6 +864,7 @@ public class Connector extends LifecycleMBeanBase  {
         // Initialize adapter
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
+        protocolHandler.setDomain(getDomain());
 
         try {
             protocolHandler.init();

@@ -362,14 +362,10 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Initialize the endpoint.
+     * Start the APR endpoint, creating acceptor, poller and sendfile threads.
      */
     @Override
-    public void init()
-        throws Exception {
-
-        if (initialized)
-            return;
+    public void start() throws Exception {
 
         // Create the root APR memory pool
         try {
@@ -519,21 +515,6 @@ public class AprEndpoint extends AbstractEndpoint {
             useSendfile = false;
         }
 
-        initialized = true;
-
-    }
-
-
-    /**
-     * Start the APR endpoint, creating acceptor, poller and sendfile threads.
-     */
-    @Override
-    public void start()
-        throws Exception {
-        // Initialize socket if not done before
-        if (!initialized) {
-            init();
-        }
         if (!running) {
             running = true;
             paused = false;
@@ -658,18 +639,7 @@ public class AprEndpoint extends AbstractEndpoint {
             }
         }
         shutdownExecutor();
-    }
-
-
-    /**
-     * Deallocate APR memory pools, and close server socket.
-     */
-    @Override
-    public void destroy() throws Exception {
-        if (running) {
-            stop();
-        }
-
+        
         // Destroy pool if it was initialised
         if (serverSockPool != 0) {
             Pool.destroy(serverSockPool);
@@ -689,8 +659,17 @@ public class AprEndpoint extends AbstractEndpoint {
             Pool.destroy(rootPool);
             rootPool = 0;
         }
+    }
 
-        initialized = false;
+
+    /**
+     * Deallocate APR memory pools, and close server socket.
+     */
+    @Override
+    public void destroy() throws Exception {
+        if (running) {
+            stop();
+        }
     }
 
 
