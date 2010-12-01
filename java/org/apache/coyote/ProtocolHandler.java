@@ -91,4 +91,11 @@ public interface ProtocolHandler {
      * Destroy the protocol (optional).
      */
     public void destroy() throws Exception;
+    
+    
+    /**
+     * Domain for registering handler with JMX.
+     */
+    public void setDomain(String domain);
+    public String getDomain();
 }
