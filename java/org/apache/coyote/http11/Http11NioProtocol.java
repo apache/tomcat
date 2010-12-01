@@ -76,39 +76,16 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
      */
     @Override
     public void init() throws Exception {
-        endpoint.setName(getName());
-        ((NioEndpoint)endpoint).setHandler(cHandler);
         
-        try {
-            endpoint.init();
-            sslImplementation = new JSSEImplementation();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
-            throw ex;
-        }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.init", getName()));
+        ((NioEndpoint)endpoint).setHandler(cHandler);
 
+        super.init();
     }
 
     @Override
     public void start() throws Exception {
-        if( this.domain != null ) {
-            try {
-                tpOname=new ObjectName
-                    (domain + ":" + "type=ThreadPool,name=" + getName());
-                Registry.getRegistry(null, null)
-                .registerComponent(endpoint, tpOname, null );
-            } catch (Exception e) {
-                log.error("Can't register threadpool" );
-            }
-            rgOname=new ObjectName
-                (domain + ":type=GlobalRequestProcessor,name=" + getName());
-            Registry.getRegistry(null, null).registerComponent
-                ( cHandler.global, rgOname, null );
-        }
-
         try {
+            sslImplementation = new JSSEImplementation();
             endpoint.start();
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
@@ -116,6 +93,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
         if(log.isInfoEnabled())
             log.info(sm.getString("http11protocol.start", getName()));
+    }
+
+
+    @Override
+    protected RequestGroupInfo getRequestGroupInfo() {
+        return cHandler.global;
     }
 
 
