@@ -802,7 +802,7 @@ public CatalinaCluster getCluster() {
      * @see #findSessionMasterMember()
      */
     public synchronized void getAllClusterSessions() {
-        if (cluster != null && cluster.getMembers().length > 1) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             long beforeSendTime = System.currentTimeMillis();
             Member mbr = findSessionMasterMember();
             if(mbr == null) { // No domain member found
