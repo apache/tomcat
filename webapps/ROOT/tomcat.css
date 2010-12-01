@@ -283,8 +283,8 @@ a img {
     font-size: 12pt;
 }
 #lower ul {
-	padding: 0;
-	margin: 0.5em 0;
+    padding: 0;
+    margin: 0.5em 0;
 }
 #lower p,
 #lower li {
@@ -299,7 +299,7 @@ a img {
     color: #a53;
 }
 #lower li#list-announce {
-	border: 1px solid #f90;
+    border: 1px solid #f90;
     background-color: #ffe8c8;
 }
 #lower p {
