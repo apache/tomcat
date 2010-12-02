@@ -311,7 +311,7 @@ public final class IntrospectionUtils {
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
-                        params[0] = new Boolean(value);
+                        params[0] = Boolean.valueOf(value);
 
                         // Try a setFoo ( InetAddress )
                     } else if ("java.net.InetAddress".equals(paramType
@@ -863,7 +863,7 @@ public final class IntrospectionUtils {
             // Try a setFoo ( boolean )
         } else if ("java.lang.Boolean".equals(paramType.getName())
                 || "boolean".equals(paramType.getName())) {
-            result = new Boolean(object);
+            result = Boolean.valueOf(object);
 
             // Try a setFoo ( InetAddress )
         } else if ("java.net.InetAddress".equals(paramType

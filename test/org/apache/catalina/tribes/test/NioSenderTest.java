@@ -51,7 +51,7 @@ public class NioSenderTest {
     }
     
     public synchronized ChannelData getMessage(Member mbr) {
-        String msg = new String("Thread-"+Thread.currentThread().getName()+" Message:"+inc());
+        String msg = "Thread-"+Thread.currentThread().getName()+" Message:"+inc();
         ChannelData data = new ChannelData(true);
         data.setMessage(new XByteBuffer(msg.getBytes(),false));
         data.setAddress(mbr);

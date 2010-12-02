@@ -1498,7 +1498,7 @@ public class Response
 
                 @Override
                 public Boolean run(){
-                    return new Boolean(doIsEncodeable(hreq, session, location));
+                    return Boolean.valueOf(doIsEncodeable(hreq, session, location));
                 }
             })).booleanValue();
         } else {

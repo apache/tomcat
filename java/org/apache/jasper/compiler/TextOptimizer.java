@@ -33,7 +33,7 @@ public class TextOptimizer {
         private int textNodeCount = 0;
         private Node.TemplateText firstTextNode = null;
         private StringBuilder textBuffer;
-        private final String emptyText = new String("");
+        private final String emptyText = "";
 
         public TextCatVisitor(Compiler compiler) {
             options = compiler.getCompilationContext().getOptions();

@@ -598,14 +598,14 @@ public class ReplicationValve
             if ( (nrOfRequests % 100) == 0 ) {
                  log.info(sm.getString("ReplicationValve.stats",
                      new Object[]{
-                         new Long(totalRequestTime/nrOfRequests),
-                         new Long(totalSendTime/nrOfRequests),
-                         new Long(nrOfRequests),
-                         new Long(nrOfSendRequests),
-                         new Long(nrOfCrossContextSendRequests),
-                         new Long(nrOfFilterRequests),
-                         new Long(totalRequestTime),
-                         new Long(totalSendTime)}));
+                         Long.valueOf(totalRequestTime/nrOfRequests),
+                         Long.valueOf(totalSendTime/nrOfRequests),
+                         Long.valueOf(nrOfRequests),
+                         Long.valueOf(nrOfSendRequests),
+                         Long.valueOf(nrOfCrossContextSendRequests),
+                         Long.valueOf(nrOfFilterRequests),
+                         Long.valueOf(totalRequestTime),
+                         Long.valueOf(totalSendTime)}));
              }
         }
     }

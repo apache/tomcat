@@ -1961,7 +1961,7 @@ abstract class Node implements TagConstants {
 
                 @Override
                 public void visit(TemplateText txt) {
-                    attrValue = new String(txt.getText());
+                    attrValue = txt.getText();
                 }
 
                 public String getAttrValue() {

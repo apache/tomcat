@@ -637,7 +637,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             objValue=new Long( value );
         } else if( "java.lang.Boolean".equals( type ) ||
                 "boolean".equals( type )) {
-            objValue=new Boolean( value );
+            objValue=Boolean.valueOf( value );
         }
         return objValue;
     }

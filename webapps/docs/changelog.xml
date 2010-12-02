@@ -90,6 +90,10 @@
       <fix>
         Don&apos;t use <code>null</code>s to construct log messages. (markt)
       </fix>
+      <fix>
+        Code clean-up. Replace use of inefficient constructors with more
+        efficient alternatives. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

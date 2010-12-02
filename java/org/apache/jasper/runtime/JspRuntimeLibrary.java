@@ -183,7 +183,7 @@ public class JspRuntimeLibrary {
             if (isNullOrEmpty) {
                 s = "false";
             }
-            return new Boolean(s);
+            return Boolean.valueOf(s);
         } else if (target == Byte.class) {
             if (isNullOrEmpty)
                 return new Byte((byte) 0);
@@ -244,7 +244,7 @@ public class JspRuntimeLibrary {
                     s = "true";
                 else
                     s = "false";
-                return new Boolean(s);
+                return Boolean.valueOf(s);
             } else if ( t.equals(Byte.class) || t.equals(Byte.TYPE) ) {
                 return new Byte(s);
             } else if (t.equals(Character.class) || t.equals(Character.TYPE)) {
@@ -389,7 +389,7 @@ public class JspRuntimeLibrary {
     }
 
     public static String toString(boolean b) {
-        return new Boolean(b).toString();
+        return Boolean.valueOf(b).toString();
     }
 
     public static String toString(short s) {
@@ -452,7 +452,7 @@ public class JspRuntimeLibrary {
             } else if (t.equals(Boolean.class)) {
                 Boolean[] tmpval = new Boolean[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = new Boolean (values[i]);
+                    tmpval[i] = Boolean.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Short.class)) {
                 Short[] tmpval = new Short[values.length];
@@ -719,7 +719,7 @@ public class JspRuntimeLibrary {
     {
         try {
             Method method = getWriteMethod(bean.getClass(), prop);
-            method.invoke(bean, new Object[] { new Boolean(value) });
+            method.invoke(bean, new Object[] { Boolean.valueOf(value) });
         } catch (Exception ex) {
             throw new JasperException(ex);
         }        

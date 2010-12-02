@@ -220,8 +220,8 @@ public class Embedded  extends StandardService {
 
         boolean oldUseNaming = this.useNaming;
         this.useNaming = useNaming;
-        support.firePropertyChange("useNaming", new Boolean(oldUseNaming),
-                                   new Boolean(this.useNaming));
+        support.firePropertyChange("useNaming", Boolean.valueOf(oldUseNaming),
+                                   Boolean.valueOf(this.useNaming));
 
     }
 
@@ -245,8 +245,9 @@ public class Embedded  extends StandardService {
 
         boolean oldRedirectStreams = this.redirectStreams;
         this.redirectStreams = redirectStreams;
-        support.firePropertyChange("redirectStreams", new Boolean(oldRedirectStreams),
-                                   new Boolean(this.redirectStreams));
+        support.firePropertyChange("redirectStreams",
+                                   Boolean.valueOf(oldRedirectStreams),
+                                   Boolean.valueOf(this.redirectStreams));
 
     }
 

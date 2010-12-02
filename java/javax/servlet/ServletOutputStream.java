@@ -72,7 +72,7 @@ public abstract class ServletOutputStream extends OutputStream {
             if ((c & 0xff00) != 0) { // high order byte must be zero
                 String errMsg = lStrings.getString("err.not_iso8859_1");
                 Object[] errArgs = new Object[1];
-                errArgs[0] = new Character(c);
+                errArgs[0] = Character.valueOf(c);
                 errMsg = MessageFormat.format(errMsg, errArgs);
                 throw new CharConversionException(errMsg);
             }
