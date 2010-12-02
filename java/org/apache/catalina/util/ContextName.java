@@ -23,9 +23,9 @@ import java.util.Locale;
  * conversions between baseName, path and version take place.
  */
 public final class ContextName {
-    private final String ROOT_NAME = "ROOT";
-    private final String VERSION_MARKER = "##";
-    private final String FWD_SLASH_REPLACEMENT = "#";
+    private static final String ROOT_NAME = "ROOT";
+    private static final String VERSION_MARKER = "##";
+    private static final String FWD_SLASH_REPLACEMENT = "#";
 
     private final String baseName;
     private final String path;
