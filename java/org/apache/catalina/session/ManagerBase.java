@@ -463,7 +463,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Set the secure random number generator class name.
      *
-     * @param randomClass The new secure random number generator class name
+     * @param secureRandomClass The new secure random number generator class
+     *                          name
      */
     public void setSecureRandomClass(String secureRandomClass) {
 
