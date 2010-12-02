@@ -268,7 +268,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             if(manager != null)
                 log.debug(sm.getString("jvmRoute.foundManager", manager,  request.getContext().getName()));
             else 
-                log.debug(sm.getString("jvmRoute.notFoundManager", manager,  request.getContext().getName()));
+                log.debug(sm.getString("jvmRoute.notFoundManager", request.getContext().getName()));
         }
         return manager;
     }
