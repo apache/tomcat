@@ -189,9 +189,6 @@
         which is better for embedded systems. Patch provided by Christopher
         Schultz. (markt) 
       </add>
-      <fix>
-        <bug>50228</bug>: Improve recycling of BodyContentImpl. (kkolinko)
-      </fix>
       <add>
         Improve debug logging for MapperListener registration. (markt)
       </add>
@@ -306,6 +303,11 @@
       <fix>
         <bug>50192</bug>: Improve performance for EL when running under a
         security manager. Based on a patch by Robert Goff. (markt) 
+      </fix>
+      <fix>
+        <bug>50228</bug>: Improve recycling of <code>BodyContentImpl</code>.
+        This avoids keeping a cached reference to a webapp-provided Writer
+        used in JspFragment.invoke() calls. (kkolinko)
       </fix>
       <add>
         <bug>50273</bug>: Provide a workaround for an HP-UX issue that can
