@@ -133,9 +133,11 @@ The documentation can be easly built:
     cd ${tomcat.source}
     ant extras
 
-(7) Building a full release (as provided via the ASF download pages):
+(7) Building the embedded packages.
+    cd ${tomcat.source}
+    ant embed
+
+(8) Building a full release (as provided via the ASF download pages):
 
     cd ${tomcat.source}
     ant release
-
-

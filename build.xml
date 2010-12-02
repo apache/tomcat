@@ -896,7 +896,7 @@
       </fileset>
     </txt2html>
   </target>
-  <target name="embed" description="Create experimental embedded jars"
+  <target name="embed-jars" description="Create experimental embedded jars"
     depends="build-manifests,compile" >
 
     <mkdir dir="${tomcat.embed}" />
@@ -943,9 +943,44 @@
 
   </target>
 
-  <target name="embed-release"
+  <target name="embed"
           description="Creates the experimental embedded release"
-          depends="embed,embed-sources,embed-extras" />
+          depends="embed-jars,embed-sources,embed-extras" >
+
+    <fixcrlf srcdir="${tomcat.embed}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <zip destfile="${tomcat.embed}/${final.name}-embed.zip">
+      <fileset dir="${tomcat.embed}">
+        <include name="**" />
+        <exclude name="*.md5" />
+        <exclude name="*.zip" />
+        <exclude name="*.tar.gz" />
+      </fileset>
+    </zip>
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.embed}/${final.name}-embed.zip" />
+    </antcall>
+
+    <fixcrlf srcdir="${tomcat.embed}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.embed}/${final.name}-embed.tar.gz">
+      <tarfileset dir="${tomcat.embed}" prefix="${final.name}-embed">
+        <include name="**" />
+        <exclude name="*.md5" />
+        <exclude name="*.zip" />
+        <exclude name="*.tar.gz" />
+      </tarfileset>
+    </tar>
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.embed}/${final.name}-embed.tar.gz" />
+    </antcall>
+
+  </target>
 
   <target name="test-compile" depends="compile,download-test-compile" >
     <mkdir dir="${test.classes}"/>
@@ -1320,7 +1355,7 @@
     <mkdir dir="${tomcat.release}/v${version}/src" />
   </target>
 
-  <target name="dist-static" depends="dist-prepare, deploy, extras">
+  <target name="dist-static" depends="dist-prepare, deploy, extras, embed">
 
     <!-- Copy the top-level documentation files -->
     <copy todir="${tomcat.dist}" encoding="ISO-8859-1">
@@ -1599,6 +1634,15 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <copy todir="${tomcat.release}/v${version}/bin/extras">
       <fileset dir="${tomcat.extras}">
         <include name="*.*"/>
+      </fileset>
+    </copy>
+
+    <mkdir dir="${tomcat.release}/v${version}/bin/embed" />
+    <copy todir="${tomcat.release}/v${version}/bin/embed">
+      <fileset dir="${tomcat.embed}">
+        <include name="*.zip"/>
+        <include name="*.tar.gz"/>
+        <include name="*.md5"/>
       </fileset>
     </copy>
 
