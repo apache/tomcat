@@ -50,7 +50,7 @@ public final class ContextName {
         }
         
         // Replace any remaining /
-        tmp1.replaceAll("/", FWD_SLASH_REPLACEMENT);
+        tmp1 = tmp1.replaceAll("/", FWD_SLASH_REPLACEMENT);
         
         // Insert the ROOT name if required
         if (tmp1.startsWith(VERSION_MARKER) || "".equals(tmp1)) {
