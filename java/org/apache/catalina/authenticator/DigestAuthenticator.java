@@ -343,7 +343,7 @@ public class DigestAuthenticator
         } else if (quotedString.length() > 2) {
             return quotedString.substring(1, quotedString.length() - 1);
         } else {
-            return new String();
+            return "";
         }
     }
 

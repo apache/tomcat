@@ -238,7 +238,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             if (log.isDebugEnabled()) {
                 long t2 = System.currentTimeMillis();
                 long time = t2 - t1;
-                log.debug(sm.getString("jvmRoute.turnoverInfo", new Long(time)));
+                log.debug(sm.getString("jvmRoute.turnoverInfo", Long.valueOf(time)));
             }
         }
     }

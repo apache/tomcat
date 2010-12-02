@@ -117,7 +117,7 @@ public class CometEventImpl implements CometEvent {
     public void setTimeout(int timeout) throws IOException, ServletException,
             UnsupportedOperationException {
         if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
-            request.setAttribute("org.apache.tomcat.comet.timeout", new Integer(timeout));
+            request.setAttribute("org.apache.tomcat.comet.timeout", Integer.valueOf(timeout));
             if (request.isComet()) request.setCometTimeout(timeout);
         } else {
             throw new UnsupportedOperationException();

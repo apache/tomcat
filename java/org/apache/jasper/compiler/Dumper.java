@@ -171,7 +171,7 @@ class Dumper {
         
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
-            printString( "${" + new String( n.getText() ) + "}" );
+            printString( "${" + n.getText() + "}" );
         }
 
         @Override
@@ -191,7 +191,7 @@ class Dumper {
 
         @Override
         public void visit(Node.TemplateText n) throws JasperException {
-            printString(new String(n.getText()));
+            printString(n.getText());
         }
 
         private void printIndent() {

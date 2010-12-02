@@ -229,7 +229,7 @@ class Generator {
             @Override
             public void visit(Node.Declaration n) throws JasperException {
                 n.setBeginJavaLine(out.getJavaLine());
-                out.printMultiLn(new String(n.getText()));
+                out.printMultiLn(n.getText());
                 out.println();
                 n.setEndJavaLine(out.getJavaLine());
             }
@@ -902,12 +902,12 @@ class Generator {
             n.setBeginJavaLine(out.getJavaLine());
             if (!pageInfo.isELIgnored() && (n.getEL() != null)) {
                 out.printil("out.write("
-                        + JspUtil.interpreterCall(this.isTagFile, n.getType() + "{"
-                                + new String(n.getText()) + "}", String.class,
+                        + JspUtil.interpreterCall(this.isTagFile, n.getType() +
+                                "{" + n.getText() + "}", String.class,
                                 n.getEL().getMapName(), false) + ");");
             } else {
                 out.printil("out.write("
-                        + quote(n.getType() + "{" + new String(n.getText()) + "}") + ");");
+                        + quote(n.getType() + "{" + n.getText() + "}") + ");");
             }
             n.setEndJavaLine(out.getJavaLine());
         }
@@ -3255,9 +3255,8 @@ class Generator {
                         out.printil("String "
                                 + varName
                                 + " = "
-                                + quote(new String(
-                                        ((Node.TemplateText) bodyElement)
-                                                .getText())) + ";");
+                                + quote(((Node.TemplateText) bodyElement)
+                                                .getText()) + ";");
                     }
                 }
 

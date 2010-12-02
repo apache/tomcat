@@ -257,7 +257,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public boolean getRecoveryEnabled() {
         String p = properties.getProperty("recoveryEnabled");
         if(p != null){
-            return new Boolean(p).booleanValue();
+            return Boolean.valueOf(p).booleanValue();
         }
         return false;
     }
@@ -281,7 +281,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public boolean getLocalLoopbackDisabled(boolean localLoopbackDisabled) {
         String p = properties.getProperty("localLoopbackDisabled");
         if(p != null){
-            return new Boolean(p).booleanValue();
+            return Boolean.valueOf(p).booleanValue();
         }
         return false;
     }

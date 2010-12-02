@@ -323,8 +323,8 @@ public class StandardWrapper extends ContainerBase
             this.available = available;
         else
             this.available = 0L;
-        support.firePropertyChange("available", new Long(oldAvailable),
-                                   new Long(this.available));
+        support.firePropertyChange("available", Long.valueOf(oldAvailable),
+                                   Long.valueOf(this.available));
 
     }
 
@@ -396,8 +396,8 @@ public class StandardWrapper extends ContainerBase
         int oldLoadOnStartup = this.loadOnStartup;
         this.loadOnStartup = value;
         support.firePropertyChange("loadOnStartup",
-                                   new Integer(oldLoadOnStartup),
-                                   new Integer(this.loadOnStartup));
+                                   Integer.valueOf(oldLoadOnStartup),
+                                   Integer.valueOf(this.loadOnStartup));
 
     }
 

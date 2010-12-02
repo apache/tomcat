@@ -470,7 +470,8 @@ public CatalinaCluster getCluster() {
             sendCreateSession(session.getId(), session);
         }
         if (log.isDebugEnabled())
-            log.debug(sm.getString("deltaManager.createSession.newSession",session.getId(), new Integer(sessions.size())));
+            log.debug(sm.getString("deltaManager.createSession.newSession",
+                    session.getId(), Integer.valueOf(sessions.size())));
         return (session);
     }
 
@@ -705,7 +706,7 @@ public CatalinaCluster getCluster() {
         try {
             fos = new ByteArrayOutputStream();
             oos = new ObjectOutputStream(new BufferedOutputStream(fos));
-            oos.writeObject(new Integer(currentSessions.length));
+            oos.writeObject(Integer.valueOf(currentSessions.length));
             for(int i=0 ; i < currentSessions.length;i++) {
                 ((DeltaSession)currentSessions[i]).writeObjectData(oos);                
             }
@@ -923,10 +924,10 @@ public CatalinaCluster getCluster() {
         }
         if (isTimeout || (!getStateTransfered())) {
             counterNoStateTransfered++ ;
-            log.error(sm.getString("deltaManager.noSessionState",getName(),new Date(beforeSendTime),new Long(reqNow - beforeSendTime)));
+            log.error(sm.getString("deltaManager.noSessionState",getName(),new Date(beforeSendTime),Long.valueOf(reqNow - beforeSendTime)));
         } else {
             if (log.isInfoEnabled())
-                log.info(sm.getString("deltaManager.sessionReceived",getName(), new Date(beforeSendTime), new Long(reqNow - beforeSendTime)));
+                log.info(sm.getString("deltaManager.sessionReceived",getName(), new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
         }
     }
 
@@ -1303,7 +1304,7 @@ public CatalinaCluster getCluster() {
      */
     protected void handleALL_SESSION_TRANSFERCOMPLETE(SessionMessage msg, Member sender) {
         counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE++ ;
-        if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.receiveMessage.transfercomplete",getName(), sender.getHost(), new Integer(sender.getPort())));
+        if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.receiveMessage.transfercomplete",getName(), sender.getHost(), Integer.valueOf(sender.getPort())));
         stateTransferCreateSendTime = msg.getTimestamp() ;
         stateTransfered = true ;
     }

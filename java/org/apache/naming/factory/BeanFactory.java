@@ -190,7 +190,7 @@ public class BeanFactory
                                 valueArray[0] = new Double(value);
                             } else if (propType.equals(Boolean.class)
                                        || propType.equals(boolean.class)) {
-                                valueArray[0] = new Boolean(value);
+                                valueArray[0] = Boolean.valueOf(value);
                             } else {
                                 throw new NamingException
                                     ("String conversion for property type '"
