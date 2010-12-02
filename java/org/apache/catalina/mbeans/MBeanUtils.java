@@ -1648,7 +1648,7 @@ public class MBeanUtils {
         
         Container c = container;
         
-        while (!(c instanceof Engine)) {
+        while (!(c instanceof Engine) && c != null) {
             c = c.getParent();
         }
         
