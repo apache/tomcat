@@ -263,7 +263,7 @@ public class ContainerMBean extends BaseModelMBean {
         
         LifecycleListener[] listeners = container.findLifecycleListeners();
         for(LifecycleListener listener: listeners){
-            if(listener.getClass().equals(type)){
+            if(listener.getClass().getName().equals(type)){
                 container.removeLifecycleListener(listener);
             }
         }

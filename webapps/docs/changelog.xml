@@ -83,6 +83,10 @@
       <fix>
         Correct handling of versioned web applications in deployer. (markt)
       </fix>
+      <fix>
+        Correct removal of <code>LifeCycleListenter</code>s from
+        <code>Container</code>s via JMX. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
