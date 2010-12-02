@@ -18,6 +18,8 @@
 
 package org.apache.catalina;
 
+import java.util.EventListener;
+
 
 /**
  * Interface defining a listener for significant Session generated events.
@@ -26,7 +28,7 @@ package org.apache.catalina;
  * @version $Id$
  */
 
-public interface SessionListener {
+public interface SessionListener extends EventListener {
 
 
     /**
