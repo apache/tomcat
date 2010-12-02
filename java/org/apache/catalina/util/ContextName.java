@@ -33,35 +33,53 @@ public final class ContextName {
     private final String name;
     
     /**
-     * Creates an instance from a base name, directory name, WAR name or
-     * context.xml name.
+     * Creates an instance from a context name, display name, base name,
+     * directory name, WAR name or context.xml name.
      * 
      * @param name  The name to use as the basis for this object
      */
     public ContextName(String name) {
-        // Remove file extension, if any
-        if (name.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
-                name.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
-            baseName = name.substring(0, name.length() -4);
-        } else {
-            baseName = name;
+        
+        String tmp1 = name;
+        
+        // Convert Context names and display names to base names
+        
+        // Strip off any leading "/"
+        if (tmp1.startsWith("/")) {
+            tmp1 = tmp1.substring(1);
+        }
+        
+        // Replace any remaining /
+        tmp1.replaceAll("/", FWD_SLASH_REPLACEMENT);
+        
+        // Insert the ROOT name if required
+        if (tmp1.startsWith(VERSION_MARKER) || "".equals(tmp1)) {
+            tmp1 = ROOT_NAME + tmp1;
         }
 
-        String tmp;
+        // Remove any file extensions
+        if (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
+                tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+            tmp1 = tmp1.substring(0, tmp1.length() -4);
+        }
+
+        baseName = tmp1;
+        
+        String tmp2;
         // Extract version number
         int versionIndex = baseName.indexOf(VERSION_MARKER);
         if (versionIndex > -1) {
             version = baseName.substring(versionIndex + 2);
-            tmp = baseName.substring(0, versionIndex);
+            tmp2 = baseName.substring(0, versionIndex);
         } else {
             version = "";
-            tmp = baseName;
+            tmp2 = baseName;
         }
 
-        if (ROOT_NAME.equals(tmp)) {
+        if (ROOT_NAME.equals(tmp2)) {
             path = "";
         } else {
-            path = "/" + tmp.replaceAll(FWD_SLASH_REPLACEMENT, "/");
+            path = "/" + tmp2.replaceAll(FWD_SLASH_REPLACEMENT, "/");
         }
         
         if (versionIndex > -1) {
