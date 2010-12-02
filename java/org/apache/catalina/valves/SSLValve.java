@@ -72,7 +72,7 @@ public class SSLValve
         if (strcert0 != null && strcert0.length()>28) {
             String strcert1 = strcert0.replace(' ', '\n');
             String strcert2 = strcert1.substring(28, strcert1.length()-26);
-            String strcert3 = new String("-----BEGIN CERTIFICATE-----\n");
+            String strcert3 = "-----BEGIN CERTIFICATE-----\n";
             String strcert4 = strcert3.concat(strcert2);
             String strcerts = strcert4.concat("\n-----END CERTIFICATE-----\n");
             // ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes("UTF-8"));

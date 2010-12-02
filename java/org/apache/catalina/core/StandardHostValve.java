@@ -364,7 +364,7 @@ final class StandardHostValve
         if (errorPage != null) {
             response.setAppCommitted(false);
             request.setAttribute(Globals.STATUS_CODE_ATTR,
-                              new Integer(statusCode));
+                              Integer.valueOf(statusCode));
 
             String message = response.getMessage();
             if (message == null)

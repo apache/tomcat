@@ -168,20 +168,20 @@ public class StatusTransformer {
 
                 writer.print("<p>");
                 writer.print(" Physical memory: ");
-                writer.print(formatSize(new Long(result[0]), true));
+                writer.print(formatSize(Long.valueOf(result[0]), true));
                 writer.print(" Available memory: ");
-                writer.print(formatSize(new Long(result[1]), true));
+                writer.print(formatSize(Long.valueOf(result[1]), true));
                 writer.print(" Total page file: ");
-                writer.print(formatSize(new Long(result[2]), true));
+                writer.print(formatSize(Long.valueOf(result[2]), true));
                 writer.print(" Free page file: ");
-                writer.print(formatSize(new Long(result[3]), true));
+                writer.print(formatSize(Long.valueOf(result[3]), true));
                 writer.print(" Memory load: ");
-                writer.print(new Long(result[6]));
+                writer.print(Long.valueOf(result[6]));
                 writer.print("<br>");
                 writer.print(" Process kernel time: ");
-                writer.print(formatTime(new Long(result[11] / 1000), true));
+                writer.print(formatTime(Long.valueOf(result[11] / 1000), true));
                 writer.print(" Process user time: ");
-                writer.print(formatTime(new Long(result[12] / 1000), true));
+                writer.print(formatTime(Long.valueOf(result[12] / 1000), true));
                 writer.print("</p>");
             } else if (mode == 1){
                 // NO-OP
@@ -203,14 +203,14 @@ public class StatusTransformer {
 
             writer.print("<p>");
             writer.print(" Free memory: ");
-            writer.print(formatSize
-                         (new Long(Runtime.getRuntime().freeMemory()), true));
+            writer.print(formatSize(
+                    Long.valueOf(Runtime.getRuntime().freeMemory()), true));
             writer.print(" Total memory: ");
-            writer.print(formatSize
-                         (new Long(Runtime.getRuntime().totalMemory()), true));
+            writer.print(formatSize(
+                    Long.valueOf(Runtime.getRuntime().totalMemory()), true));
             writer.print(" Max memory: ");
-            writer.print(formatSize
-                         (new Long(Runtime.getRuntime().maxMemory()), true));
+            writer.print(formatSize(
+                    Long.valueOf(Runtime.getRuntime().maxMemory()), true));
             writer.print("</p>");
         } else if (mode == 1){
             writer.write("<jvm>");

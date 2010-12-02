@@ -1123,7 +1123,7 @@ public class WebdavServlet
                 }
 
             } else {
-                lock.owner = new String();
+                lock.owner = "";
             }
 
         }
@@ -2064,9 +2064,8 @@ public class WebdavServlet
         }
 
         generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-        String status = new String("HTTP/1.1 " + WebdavStatus.SC_OK + " "
-                                   + WebdavStatus.getStatusText
-                                   (WebdavStatus.SC_OK));
+        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " +
+                WebdavStatus.getStatusText(WebdavStatus.SC_OK);
 
         // Generating href element
         generatedXML.writeElement("D", "href", XMLWriter.OPENING);
@@ -2293,9 +2292,8 @@ public class WebdavServlet
 
             if (propertiesNotFoundList.hasMoreElements()) {
 
-                status = new String("HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND
-                                    + " " + WebdavStatus.getStatusText
-                                    (WebdavStatus.SC_NOT_FOUND));
+                status = "HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND + " " +
+                        WebdavStatus.getStatusText(WebdavStatus.SC_NOT_FOUND);
 
                 generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
@@ -2349,9 +2347,8 @@ public class WebdavServlet
             return;
 
         generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-        String status = new String("HTTP/1.1 " + WebdavStatus.SC_OK + " "
-                                   + WebdavStatus.getStatusText
-                                   (WebdavStatus.SC_OK));
+        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " +
+                WebdavStatus.getStatusText(WebdavStatus.SC_OK);
 
         // Generating href element
         generatedXML.writeElement("D", "href", XMLWriter.OPENING);
@@ -2529,9 +2526,8 @@ public class WebdavServlet
 
             if (propertiesNotFoundList.hasMoreElements()) {
 
-                status = new String("HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND
-                                    + " " + WebdavStatus.getStatusText
-                                    (WebdavStatus.SC_NOT_FOUND));
+                status = "HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND + " " +
+                        WebdavStatus.getStatusText(WebdavStatus.SC_NOT_FOUND);
 
                 generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
@@ -3111,7 +3107,7 @@ class WebdavStatus {
      *                  HTTP status code (e.g., "OK").
      */
     public static String getStatusText(int nHttpStatusCode) {
-        Integer intKey = new Integer(nHttpStatusCode);
+        Integer intKey = Integer.valueOf(nHttpStatusCode);
 
         if (!mapStatusCodes.containsKey(intKey)) {
             return "";
@@ -3132,7 +3128,7 @@ class WebdavStatus {
      * @param   strVal  [IN] HTTP status text
      */
     private static void addStatusCodeMap(int nKey, String strVal) {
-        mapStatusCodes.put(new Integer(nKey), strVal);
+        mapStatusCodes.put(Integer.valueOf(nKey), strVal);
     }
 
 }

@@ -389,8 +389,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
         boolean oldSaveOnRestart = this.saveOnRestart;
         this.saveOnRestart = saveOnRestart;
         support.firePropertyChange("saveOnRestart",
-                                   new Boolean(oldSaveOnRestart),
-                                   new Boolean(this.saveOnRestart));
+                                   Boolean.valueOf(oldSaveOnRestart),
+                                   Boolean.valueOf(this.saveOnRestart));
 
     }
 

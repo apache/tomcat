@@ -428,7 +428,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             if (log.isDebugEnabled())
                 log.debug(sm.getString("deltaSession.notifying",
                                        ((ClusterManager)manager).getName(), 
-                                       new Boolean(isPrimarySession()), 
+                                       Boolean.valueOf(isPrimarySession()), 
                                        expiredId));
             if ( manager instanceof DeltaManager ) {
                 ( (DeltaManager) manager).sessionExpired(expiredId);
@@ -722,13 +722,13 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     
     private void writeObject(ObjectOutput stream) throws IOException {
         // Write the scalar instance variables (except Manager)
-        stream.writeObject(new Long(creationTime));
-        stream.writeObject(new Long(lastAccessedTime));
-        stream.writeObject(new Integer(maxInactiveInterval));
-        stream.writeObject(new Boolean(isNew));
-        stream.writeObject(new Boolean(isValid));
-        stream.writeObject(new Long(thisAccessedTime));
-        stream.writeObject(new Long(version));
+        stream.writeObject(Long.valueOf(creationTime));
+        stream.writeObject(Long.valueOf(lastAccessedTime));
+        stream.writeObject(Integer.valueOf(maxInactiveInterval));
+        stream.writeObject(Boolean.valueOf(isNew));
+        stream.writeObject(Boolean.valueOf(isValid));
+        stream.writeObject(Long.valueOf(thisAccessedTime));
+        stream.writeObject(Long.valueOf(version));
         stream.writeBoolean(getPrincipal() != null);
         if (getPrincipal() != null) {
             SerializablePrincipal.writePrincipal((GenericPrincipal) principal,stream);
@@ -754,7 +754,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
         // Serialize the attribute count and the Serializable attributes
         int n = saveNames.size();
-        stream.writeObject(new Integer(n));
+        stream.writeObject(Integer.valueOf(n));
         for (int i = 0; i < n; i++) {
             stream.writeObject( saveNames.get(i));
             try {
