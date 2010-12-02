@@ -83,12 +83,7 @@ public abstract class AbstractAjpProtocol implements ProtocolHandler, MBeanRegis
      */
     public boolean setProperty(String name, String value) {
         setAttribute(name, value); //store all settings
-        if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
-            return endpoint.setProperty(name, value);
-        } else {
-            return endpoint.setProperty(name,value); //make sure we at least try to set all properties
-        }
-        
+        return endpoint.setProperty(name, value);
     }
 
     /**
