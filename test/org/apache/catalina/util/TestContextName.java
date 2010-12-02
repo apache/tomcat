@@ -137,4 +137,41 @@ public class TestContextName extends TestCase {
         assertEquals("/foo/bar##E", cn16.getDisplayName());
     }
 
+    public void testConstructorStringWithName() {
+        assertEquals("", new ContextName(cn1.getName()).getName());
+        assertEquals("", new ContextName(cn2.getName()).getName());
+        assertEquals("", new ContextName(cn3.getName()).getName());
+        assertEquals("/foo", new ContextName(cn4.getName()).getName());
+        assertEquals("/foo/bar", new ContextName(cn5.getName()).getName());
+        assertEquals("##A", new ContextName(cn6.getName()).getName());
+        assertEquals("##B", new ContextName(cn7.getName()).getName());
+        assertEquals("##C", new ContextName(cn8.getName()).getName());
+        assertEquals("/foo##D", new ContextName(cn9.getName()).getName());
+        assertEquals("/foo/bar##E", new ContextName(cn10.getName()).getName());
+        assertEquals("", new ContextName(cn11.getName()).getName());
+        assertEquals("/foo", new ContextName(cn12.getName()).getName());
+        assertEquals("/foo/bar", new ContextName(cn13.getName()).getName());
+        assertEquals("##A", new ContextName(cn14.getName()).getName());
+        assertEquals("/foo##D", new ContextName(cn15.getName()).getName());
+        assertEquals("/foo/bar##E", new ContextName(cn16.getName()).getName());
+    }
+
+    public void testConstructorStringWithDisplayName() {
+        assertEquals("", new ContextName(cn1.getDisplayName()).getName());
+        assertEquals("", new ContextName(cn2.getDisplayName()).getName());
+        assertEquals("", new ContextName(cn3.getDisplayName()).getName());
+        assertEquals("/foo", new ContextName(cn4.getDisplayName()).getName());
+        assertEquals("/foo/bar", new ContextName(cn5.getDisplayName()).getName());
+        assertEquals("##A", new ContextName(cn6.getDisplayName()).getName());
+        assertEquals("##B", new ContextName(cn7.getDisplayName()).getName());
+        assertEquals("##C", new ContextName(cn8.getDisplayName()).getName());
+        assertEquals("/foo##D", new ContextName(cn9.getDisplayName()).getName());
+        assertEquals("/foo/bar##E", new ContextName(cn10.getDisplayName()).getName());
+        assertEquals("", new ContextName(cn11.getDisplayName()).getName());
+        assertEquals("/foo", new ContextName(cn12.getDisplayName()).getName());
+        assertEquals("/foo/bar", new ContextName(cn13.getDisplayName()).getName());
+        assertEquals("##A", new ContextName(cn14.getDisplayName()).getName());
+        assertEquals("/foo##D", new ContextName(cn15.getDisplayName()).getName());
+        assertEquals("/foo/bar##E", new ContextName(cn16.getDisplayName()).getName());
+    }
 }
