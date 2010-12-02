@@ -535,7 +535,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             }
         } else if ("java.lang.Boolean".equals(valueType)
                 || "boolean".equals(valueType)) {
-            convertValue = new Boolean(value);
+            convertValue = Boolean.valueOf(value);
         } else if ("java.lang.Float".equals(valueType)
                 || "float".equals(valueType)) {
             try {

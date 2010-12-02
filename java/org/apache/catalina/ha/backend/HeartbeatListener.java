@@ -117,8 +117,8 @@ public class HeartbeatListener
                 coll = null;
                 return;
             }
-            String output = new String();
-            output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy + "&port=" + port;
+            String output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy +
+                    "&port=" + port;
             try {
                 sender.send(output);
             } catch (Exception ex) {

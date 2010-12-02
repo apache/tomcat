@@ -2446,7 +2446,7 @@ public class Request
     }
     
     public void setCometTimeout(long timeout) {
-        coyoteRequest.action(ActionCode.COMET_SETTIMEOUT,new Long(timeout));
+        coyoteRequest.action(ActionCode.COMET_SETTIMEOUT, Long.valueOf(timeout));
     }
     
     /**

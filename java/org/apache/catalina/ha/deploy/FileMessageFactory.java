@@ -243,7 +243,7 @@ public class FileMessageFactory {
         }
         
         FileMessage previous =
-            msgBuffer.put(new Long(msg.getMessageNumber()), msg);
+            msgBuffer.put(Long.valueOf(msg.getMessageNumber()), msg);
         if (previous !=null) {
             // Duplicate of message not yet processed
             log.warn("Receive Message again -- Sender ActTimeout too short [ path: "
@@ -259,7 +259,7 @@ public class FileMessageFactory {
         FileMessage next = null;
         synchronized (this) {
             if (!isWriting) {
-                next = msgBuffer.get(new Long(lastMessageProcessed.get() + 1));
+                next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
                 if (next != null) {
                     isWriting = true;
                 } else {
@@ -281,7 +281,7 @@ public class FileMessageFactory {
             }
             synchronized(this) {
                 next =
-                    msgBuffer.get(new Long(lastMessageProcessed.get() + 1));
+                    msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
                 if (next == null) {
                     isWriting = false;
                 }

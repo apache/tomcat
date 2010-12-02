@@ -533,17 +533,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 if (args[2] == null) {
                     args[2] = "&nbsp;";
                 }
-                args[3] = new Boolean(ctxt.getAvailable());
+                args[3] = Boolean.valueOf(ctxt.getAvailable());
                 args[4] = response.encodeURL(request.getContextPath() +
                      "/html/sessions?" + pathVersion);
                 Manager manager = ctxt.getManager(); 
                 if (manager instanceof DistributedManager && showProxySessions) {
-                    args[5] = new Integer(
+                    args[5] = Integer.valueOf(
                             ((DistributedManager)manager).getActiveSessionsFull());
                 } else if (ctxt.getManager() != null){
-                    args[5] = new Integer(manager.getActiveSessions());
+                    args[5] = Integer.valueOf(manager.getActiveSessions());
                 } else {
-                    args[5] = new Integer(0);
+                    args[5] = Integer.valueOf(0);
                 }
 
                 args[6] = highlightColor;
@@ -573,7 +573,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     args[11] = smClient.getString(
                             "htmlManagerServlet.noManager");
                 } else {
-                    args[11] = new Integer(
+                    args[11] = Integer.valueOf(
                             ctxt.getManager().getMaxInactiveInterval()/60);
                 }
                 args[12] = smClient.getString("htmlManagerServlet.expire.unit");

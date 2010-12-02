@@ -91,7 +91,7 @@ public class DeltaRequest implements Externalizable {
 
     public void setMaxInactiveInterval(int interval) {
         int action = ACTION_SET;
-        addAction(TYPE_MAXINTERVAL,action,NAME_MAXINTERVAL,new Integer(interval));
+        addAction(TYPE_MAXINTERVAL,action,NAME_MAXINTERVAL,Integer.valueOf(interval));
     }
     
     /**
@@ -116,7 +116,7 @@ public class DeltaRequest implements Externalizable {
 
     public void setNew(boolean n) {
         int action = ACTION_SET;
-        addAction(TYPE_ISNEW,action,NAME_ISNEW,new Boolean(n));
+        addAction(TYPE_ISNEW,action,NAME_ISNEW,Boolean.valueOf(n));
     }
 
     protected void addAction(int type,
