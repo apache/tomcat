@@ -106,7 +106,7 @@ public class TestSenderConnections extends TestCase {
             for (int i=0; i<size; i++ ) {
                 int length = Math.abs(r.nextInt() %65000);
                 ArrayList<Object> list = new ArrayList<Object>(length);
-                map.put(new Integer(i),list);
+                map.put(Integer.valueOf(i),list);
             }
         }
     }
