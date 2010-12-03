@@ -44,4 +44,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         socket.close();
         tomcat.getConnector().start();
     }
+    
+    public void testDummy() throws Exception {
+        // NO-OP
+    }
 }
