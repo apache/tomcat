@@ -82,12 +82,8 @@
         of the deprecated Embedded class. (markt) 
       </fix>
       <fix>
-        <bug>50360</bug>: Further Lifecycle refactoring for Connectors and
-        associated components. The socket is now bound on
-        <code>Connector.start()</code> rather than
-        <code>Connector.init()</code> and the socket is released on
-        <code>Connector.stop()</code> rather than
-        <code>Connector.destroy()</code>.(markt)
+        Further Lifecycle refactoring for Connectors and associated components.
+        (markt)
       </fix>
       <fix>
         Correct handling of versioned web applications in deployer. (markt)

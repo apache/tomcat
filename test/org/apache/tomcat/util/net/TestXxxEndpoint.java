@@ -29,7 +29,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
  */
 public class TestXxxEndpoint extends TomcatBaseTest {
 
-    public void testStartStop() throws Exception {
+    public void disbaletestStartStop() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());

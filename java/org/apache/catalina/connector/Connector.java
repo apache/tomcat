@@ -895,7 +895,6 @@ public class Connector extends LifecycleMBeanBase  {
         // Initialize adapter
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
-        protocolHandler.setDomain(getDomain());
 
         // Make sure parseBodyMethodsSet has a default
         if(null == parseBodyMethodsSet)
