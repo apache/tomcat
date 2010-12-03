@@ -115,6 +115,18 @@
       to 4096 (4 kilobytes).</p>
     </attribute>
 
+    <attribute name="parseBodyMethods" required="false">
+      <p>A comma-separated list of HTTP methods for which request
+      bodies will be parsed for request parameters identically
+      to POST. This is useful in RESTful applications that want to
+      support POST-style semantics for PUT requests.
+      Note that any setting other than <code>POST</code> causes Tomcat
+      to behave in a way that violates the servlet specification.
+      The HTTP method TRACE is specifically forbidden here in accordance
+      with the HTTP specification.
+      The default is <code>POST</code></p>
+    </attribute>
+
     <attribute name="port" required="true">
       <p>The TCP port number on which this <strong>Connector</strong>
       will create a server socket and await incoming connections.  Your
