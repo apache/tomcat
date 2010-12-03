@@ -73,14 +73,37 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
      */
     @Override
     public void init() throws Exception {
-
+        endpoint.setName(getName());
         ((AprEndpoint)endpoint).setHandler(cHandler);
-        
-        super.init();
+
+        try {
+            endpoint.init();
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
+            throw ex;
+        }
+        if(log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.init", getName()));
+
     }
 
     @Override
     public void start() throws Exception {
+        if( this.domain != null ) {
+            try {
+                tpOname=new ObjectName
+                    (domain + ":" + "type=ThreadPool,name=" + getName());
+                Registry.getRegistry(null, null)
+                .registerComponent(endpoint, tpOname, null );
+            } catch (Exception e) {
+                log.error("Can't register threadpool" );
+            }
+            rgOname=new ObjectName
+                (domain + ":type=GlobalRequestProcessor,name=" + getName());
+            Registry.getRegistry(null, null).registerComponent
+                ( cHandler.global, rgOname, null );
+        }
+
         try {
             endpoint.start();
         } catch (Exception ex) {
@@ -96,12 +119,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         cHandler.recycledProcessors.clear();
         super.destroy();
     }
-
-    @Override
-    protected RequestGroupInfo getRequestGroupInfo() {
-        return cHandler.global;
-    }
-
 
     private Http11ConnectionHandler cHandler;
 

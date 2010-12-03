@@ -28,7 +28,6 @@ import javax.management.ObjectName;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
-import org.apache.coyote.RequestGroupInfo;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -118,38 +117,7 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         return ("http-" + encodedAddr + endpoint.getPort());
     }
     
-    @Override
-    public void init() throws Exception {
-        if (this.domain != null) {
-            try {
-                tpOname = new ObjectName
-                    (domain + ":" + "type=ThreadPool,name=" + getName());
-                Registry.getRegistry(null, null)
-                    .registerComponent(endpoint, tpOname, null );
-            } catch (Exception e) {
-                getLog().error("Can't register endpoint");
-            }
-            rgOname=new ObjectName(domain +
-                    ":type=GlobalRequestProcessor,name=" + getName());
-            Registry.getRegistry(null, null).registerComponent(
-                    getRequestGroupInfo(), rgOname, null );
-        }
-        
-        endpoint.setName(getName());
-        
-        try {
-            endpoint.init();
-        } catch (Exception ex) {
-            getLog().error(
-                    sm.getString("http11protocol.endpoint.initerror"), ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.init", getName()));
-    }
     
-    protected abstract RequestGroupInfo getRequestGroupInfo();
-
     @Override
     public void pause() throws Exception {
         try {
@@ -396,6 +364,9 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
     public int getSoLinger() { return endpoint.getSoLinger(); }
     public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
     
+    @Override
+    public abstract void init() throws Exception;
+    
     // -------------------- JMX related methods --------------------
 
     protected String domain;
@@ -406,14 +377,8 @@ public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRe
         return oname;
     }
 
-    @Override
     public String getDomain() {
         return domain;
-    }
-
-    @Override
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
     @Override
