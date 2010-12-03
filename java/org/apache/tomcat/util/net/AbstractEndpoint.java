@@ -128,6 +128,11 @@ public abstract class AbstractEndpoint {
     protected volatile boolean paused = false;
 
     /**
+     * Track the initialization state of the endpoint.
+     */
+    protected boolean initialized = false;
+
+    /**
      * Are we using an internal executor
      */
     protected volatile boolean internalExecutor = false;
@@ -444,10 +449,7 @@ public abstract class AbstractEndpoint {
     }
 
 
-    public void init() throws Exception {
-        // TODO JMX Registration?
-    }
-
+    public abstract void init() throws Exception;
     public abstract void start() throws Exception;
 
     /**
