@@ -251,12 +251,6 @@ public abstract class AbstractAjpProtocol implements ProtocolHandler, MBeanRegis
         return oname;
     }
 
-    @Override
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    @Override
     public String getDomain() {
         return domain;
     }

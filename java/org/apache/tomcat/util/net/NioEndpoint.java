@@ -448,28 +448,18 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
-    public KeyManager[] wrap(KeyManager[] managers) {
-        if (managers==null) return null;
-        KeyManager[] result = new KeyManager[managers.length];
-        for (int i=0; i<result.length; i++) {
-            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
-                result[i] = new NioX509KeyManager((X509KeyManager)managers[i],getKeyAlias());
-            } else {
-                result[i] = managers[i];
-            }
-        }
-        return result;
-    }
-
-
     // ----------------------------------------------- Public Lifecycle Methods
 
 
     /**
-     * Start the NIO endpoint, creating acceptor, poller threads.
+     * Initialize the endpoint.
      */
     @Override
-    public void start() throws Exception {
+    public void init()
+        throws Exception {
+
+        if (initialized)
+            return;
 
         serverSock = ServerSocketChannel.open();
         socketProperties.setProperties(serverSock.socket());
@@ -535,7 +525,34 @@ public class NioEndpoint extends AbstractEndpoint {
         
         if (oomParachute>0) reclaimParachute(true);
         selectorPool.open();
+        initialized = true;
 
+    }
+    
+    public KeyManager[] wrap(KeyManager[] managers) {
+        if (managers==null) return null;
+        KeyManager[] result = new KeyManager[managers.length];
+        for (int i=0; i<result.length; i++) {
+            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
+                result[i] = new NioX509KeyManager((X509KeyManager)managers[i],getKeyAlias());
+            } else {
+                result[i] = managers[i];
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Start the NIO endpoint, creating acceptor, poller threads.
+     */
+    @Override
+    public void start()
+        throws Exception {
+        // Initialize socket if not done before
+        if (!initialized) {
+            init();
+        }
         if (!running) {
             running = true;
             paused = false;
@@ -570,7 +587,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         if (!paused) {
             pause();
         }
@@ -590,13 +607,6 @@ public class NioEndpoint extends AbstractEndpoint {
         processorCache.clear();
         shutdownExecutor();
         
-        // Close server socket
-        serverSock.socket().close();
-        serverSock.close();
-        serverSock = null;
-        sslContext = null;
-        releaseCaches();
-        selectorPool.close();
     }
 
 
@@ -611,7 +621,14 @@ public class NioEndpoint extends AbstractEndpoint {
         if (running) {
             stop();
         }
-
+        // Close server socket
+        serverSock.socket().close();
+        serverSock.close();
+        serverSock = null;
+        sslContext = null;
+        initialized = false;
+        releaseCaches();
+        selectorPool.close();
         if (log.isDebugEnabled()) {
             log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
         }

@@ -322,8 +322,12 @@ public class JIoEndpoint extends AbstractEndpoint {
     // -------------------- Public methods --------------------
 
     @Override
-    public void start() throws Exception {
+    public void init()
+        throws Exception {
 
+        if (initialized)
+            return;
+        
         // Initialize thread count defaults for acceptor
         if (acceptorThreadCount == 0) {
             acceptorThreadCount = 1;
@@ -393,7 +397,19 @@ public class JIoEndpoint extends AbstractEndpoint {
                 throw be;
             }
         }
-
+        //if( serverTimeout >= 0 )
+        //    serverSocket.setSoTimeout( serverTimeout );
+        
+        initialized = true;
+        
+    }
+    
+    @Override
+    public void start() throws Exception {
+        // Initialize socket if not done before
+        if (!initialized) {
+            init();
+        }
         if (!running) {
             running = true;
             paused = false;
@@ -431,16 +447,6 @@ public class JIoEndpoint extends AbstractEndpoint {
             unlockAccept();
         }
         shutdownExecutor();
-
-        if (serverSocket != null) {
-            try {
-                if (serverSocket != null)
-                    serverSocket.close();
-            } catch (Exception e) {
-                log.error(sm.getString("endpoint.err.close"), e);
-            }
-            serverSocket = null;
-        }
     }
 
     /**
@@ -451,6 +457,16 @@ public class JIoEndpoint extends AbstractEndpoint {
         if (running) {
             stop();
         }
+        if (serverSocket != null) {
+            try {
+                if (serverSocket != null)
+                    serverSocket.close();
+            } catch (Exception e) {
+                log.error(sm.getString("endpoint.err.close"), e);
+            }
+            serverSocket = null;
+        }
+        initialized = false ;
     }
 
 
