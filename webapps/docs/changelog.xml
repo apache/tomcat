@@ -43,6 +43,12 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>50282</bug>: Load <code>javax.security.auth.login.Configuration</code>
+        with <code>JreMemoryLeakPreventionListener</code> to avoid memory leak
+        when stopping a webapp that would use JAAS.
+        (slaurent)
+      </add>
+      <add>
         <bug>48973</bug>: Avoid creating a SESSIONS.ser file when stopping an 
         application if there's no session. Patch provided by Marc Guillemot.
         (slaurent)
