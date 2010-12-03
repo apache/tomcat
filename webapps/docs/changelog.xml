@@ -109,6 +109,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>50408</bug>: Fix <code>NoSuchMethodException</code> when using
+        scoped variables with EL method invocation. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
