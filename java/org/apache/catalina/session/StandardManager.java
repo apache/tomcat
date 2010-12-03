@@ -366,6 +366,11 @@ public class StandardManager extends ManagerBase {
 
         if (log.isDebugEnabled())
             log.debug("Unloading persisted sessions");
+        
+        if (sessions.isEmpty()) {
+            log.debug("No persisted sessions to unload");
+            return; // nothing to do
+        }
 
         // Open an output stream to the specified pathname, if any
         File file = file();
