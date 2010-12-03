@@ -18,7 +18,9 @@
 
 package org.apache.catalina.connector;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.management.ObjectName;
 
@@ -38,7 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Implementation of a Coyote connector for Tomcat 5.x.
+ * Implementation of a Coyote connector.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -182,6 +184,11 @@ public class Connector extends LifecycleMBeanBase  {
      * during authentication. 4kB by default
      */
     protected int maxSavePostSize = 4 * 1024;
+
+
+    protected String parseBodyMethods = "POST";
+
+    protected HashSet parseBodyMethodsSet;
 
 
     /**
@@ -448,6 +455,30 @@ public class Connector extends LifecycleMBeanBase  {
         setProperty("maxSavePostSize", String.valueOf(maxSavePostSize));
     }
 
+
+    public String getParseBodyMethods()
+    {
+        return (this.parseBodyMethods);
+    }
+
+    public void setParseBodyMethods(String methods)
+    {
+        HashSet methodSet = new HashSet();
+
+        if(null != methods)
+            methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));
+
+        if(methodSet.contains("TRACE"))
+            throw new IllegalArgumentException("TRACE method MUST NOT include an entity (see RFC 2616 Section 9.6)");
+
+        this.parseBodyMethods = methods;
+        this.parseBodyMethodsSet = methodSet;
+    }
+
+    public boolean isParseBodyMethod(String method)
+    {
+        return parseBodyMethodsSet.contains(method);
+    }
 
     /**
      * Return the port number on which we listen for requests.
@@ -865,6 +896,10 @@ public class Connector extends LifecycleMBeanBase  {
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
         protocolHandler.setDomain(getDomain());
+
+        // Make sure parseBodyMethodsSet has a default
+        if(null == parseBodyMethodsSet)
+            setParseBodyMethods(getParseBodyMethods());
 
         try {
             protocolHandler.init();
