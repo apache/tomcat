@@ -85,14 +85,9 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
     @Override
     public void init() throws Exception {
-
+        ((JIoEndpoint)endpoint).setName(getName());
         ((JIoEndpoint)endpoint).setHandler(cHandler);
 
-        super.init();
-    }
-
-    @Override
-    public void start() throws Exception {
         // Verify the validity of the configured socket factory
         try {
             if (isSSLEnabled()) {
@@ -120,6 +115,34 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         }
         
         try {
+            endpoint.init();
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
+            throw ex;
+        }
+        if (log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.init", getName()));
+
+    }
+
+    @Override
+    public void start() throws Exception {
+        if (this.domain != null) {
+            try {
+                tpOname = new ObjectName
+                    (domain + ":" + "type=ThreadPool,name=" + getName());
+                Registry.getRegistry(null, null)
+                    .registerComponent(endpoint, tpOname, null );
+            } catch (Exception e) {
+                log.error("Can't register endpoint");
+            }
+            rgOname=new ObjectName
+                (domain + ":type=GlobalRequestProcessor,name=" + getName());
+            Registry.getRegistry(null, null).registerComponent
+                ( cHandler.global, rgOname, null );
+        }
+
+        try {
             endpoint.start();
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
@@ -135,14 +158,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         cHandler.recycledProcessors.clear();
         super.destroy();
     }
-    
-
-    @Override
-    protected RequestGroupInfo getRequestGroupInfo() {
-        return cHandler.global;
-    }
-
-
     // ------------------------------------------------------------- Properties
 
 
@@ -354,4 +369,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         }
 
     }
+
+
 }
