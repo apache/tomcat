@@ -33,6 +33,7 @@
     <author email="timw@apache.org">Tim Whittington</author>    
     <author email="mturk@apache.org">Mladen Turk</author>
     <author email="schultz@apache.org">Christopher Schultz</author>
+    <author email="slaurent@apache.org">Sylvain Laurent</author>
     <title>Changelog</title>
   </properties>
 
@@ -41,6 +42,11 @@
 <section name="Tomcat 7.0.6 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>48973</bug>: Avoid creating a SESSIONS.ser file when stopping an 
+        application if there's no session. Patch provided by Marc Guillemot.
+        (slaurent)
+      </add>
       <update>
         <bug>48692</bug>: Provide option to parse
         <code>application/x-www-form-urlencoded</code> PUT requests. (schultz)
