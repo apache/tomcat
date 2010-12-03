@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -329,6 +330,198 @@ public class TestRequest extends TomcatBaseTest {
         conn.setChunkedStreamingMode(8 * 1024);
         InputStream is = conn.getInputStream();
         assertNotNull(is);
+    }
+
+    /**
+     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48692
+     * PUT requests should be able to fetch request parameters coming from
+     * the request body (when properly configured using the new parseBodyMethod
+     * setting).
+     */
+    public void testBug48692() {
+        Bug48692Client client = new Bug48692Client();
+        client.setPort(getPort());
+
+        // Make sure GET works properly
+        client.doRequest("GET", "foo=bar", null, null, false);
+
+        assertTrue("Non-200 response for GET request",
+                   client.isResponse200());
+        assertEquals("Incorrect response for GET request",
+                     "foo=bar",
+                     client.getResponseBody());
+
+        client.reset();
+
+        //
+        // Make sure POST works properly
+        //
+        // POST with separate GET and POST parameters
+        client.doRequest("POST", "foo=bar", "application/x-www-form-urlencoded", "bar=baz", true);
+
+        assertTrue("Non-200 response for POST request",
+                   client.isResponse200());
+        assertEquals("Incorrect response for POST request",
+                     "bar=baz,foo=bar",
+                     client.getResponseBody());
+
+        client.reset();
+
+        // POST with overlapping GET and POST parameters
+        client.doRequest("POST", "foo=bar&bar=foo", "application/x-www-form-urlencoded", "bar=baz&foo=baz", true);
+
+        assertTrue("Non-200 response for POST request",
+                   client.isResponse200());
+        assertEquals("Incorrect response for POST request",
+                     "bar=baz,bar=foo,foo=bar,foo=baz",
+                     client.getResponseBody());
+
+        client.reset();
+
+        // PUT without POST-style parsing
+        client.doRequest("PUT", "foo=bar&bar=foo", "application/x-www-form-urlencoded", "bar=baz&foo=baz", false);
+
+        assertTrue("Non-200 response for PUT/noparse request",
+                   client.isResponse200());
+        assertEquals("Incorrect response for PUT request",
+                     "bar=foo,foo=bar",
+                     client.getResponseBody());
+
+        client.reset();
+
+        // PUT with POST-style parsing
+        client.doRequest("PUT", "foo=bar&bar=foo", "application/x-www-form-urlencoded", "bar=baz&foo=baz", true);
+
+        assertTrue("Non-200 response for PUT request",
+                   client.isResponse200());
+        assertEquals("Incorrect response for PUT/parse request",
+                     "bar=baz,bar=foo,foo=bar,foo=baz",
+                     client.getResponseBody());
+
+        client.reset();
+
+        /*
+        private Exception doRequest(String method,
+                                    String queryString,
+                                    String contentType,
+                                    String requestBody,
+                                    boolean allowBody) {
+        */
+    }
+
+    /**
+     *
+     */
+    private static class EchoParametersServlet extends HttpServlet {
+        
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Only interested in the parameters and values for requests.
+         * Note: echos parameters in alphabetical order.
+         */
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+            // Just echo the parameters and values back as plain text
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            PrintWriter out = resp.getWriter();
+            
+            TreeMap<String,String[]> parameters = new TreeMap<String,String[]>(req.getParameterMap());
+
+            boolean first = true;
+            
+            for(String name: parameters.keySet()) {
+                String[] values = req.getParameterValues(name);
+
+                java.util.Arrays.sort(values);
+
+                for(int i=0; i<values.length; ++i)
+                {
+                    if(first)
+                        first = false;
+                    else
+                        out.print(",");
+
+                    out.print(name + "=" + values[i]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Bug 48692 test client: test for allowing PUT request bodies.
+     */
+    private class Bug48692Client extends SimpleHttpClient {
+
+        private boolean init;
+        
+        private synchronized void init() throws Exception {
+            if (init) return;
+            
+            Tomcat tomcat = getTomcatInstance();
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "EchoParameters", new EchoParametersServlet());
+            root.addServletMapping("/echo", "EchoParameters");
+            tomcat.start();
+            
+            init = true;
+        }
+        
+        private Exception doRequest(String method,
+                                    String queryString,
+                                    String contentType,
+                                    String requestBody,
+                                    boolean allowBody) {
+            Tomcat tomcat = getTomcatInstance();
+            
+            try {
+                init();
+                if(allowBody)
+                    tomcat.getConnector().setParseBodyMethods(method);
+                else
+                    tomcat.getConnector().setParseBodyMethods(""); // never parse
+
+                // Open connection
+                connect();
+
+                // Re-encode the request body so that bytes = characters
+                if(null != requestBody)
+                    requestBody = new String(requestBody.getBytes("UTF-8"), "ASCII");
+
+                // Send specified request body using method
+                String[] request = {
+                    (
+                     method + " http://localhost:" + getPort() + "/echo"
+                     + (null == queryString ? "" : ("?" + queryString))
+                     + " HTTP/1.1" + CRLF
+                     + "Host: localhost" + CRLF
+                     + (null == contentType ? ""
+                        : ("Content-Type: " + contentType + CRLF))
+                     + "Connection: close" + CRLF
+                     + (null == requestBody ? "" : "Content-Length: " + requestBody.length() + CRLF)
+                     + CRLF
+                     + (null == requestBody ? "" : requestBody)
+                     )
+                };
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+                
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return false; // Don't care
+        }
     }
 
     private HttpURLConnection getConnection() throws IOException {
