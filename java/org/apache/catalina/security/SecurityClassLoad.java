@@ -50,7 +50,7 @@ public final class SecurityClassLoad {
     
     private final static void loadCorePackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.core.";
+        final String basePackage = "org.apache.catalina.core.";
         loader.loadClass
             (basePackage +
              "ApplicationContextFacade$1");
@@ -98,7 +98,7 @@ public final class SecurityClassLoad {
     
     private final static void loadLoaderPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.loader.";
+        final String basePackage = "org.apache.catalina.loader.";
         loader.loadClass
             (basePackage +
              "WebappClassLoader$PrivilegedFindResourceByName");
@@ -107,7 +107,7 @@ public final class SecurityClassLoad {
     
     private final static void loadSessionPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.session.";
+        final String basePackage = "org.apache.catalina.session.";
         loader.loadClass
             (basePackage + "StandardSession");
         loader.loadClass
@@ -121,7 +121,7 @@ public final class SecurityClassLoad {
     
     private final static void loadUtilPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.util.";
+        final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "Enumerator");
         loader.loadClass(basePackage + "ParameterMap");
     }
@@ -129,7 +129,7 @@ public final class SecurityClassLoad {
     
     private final static void loadCoyotePackage(ClassLoader loader)
             throws Exception {
-        String basePackage = "org.apache.coyote.";
+        final String basePackage = "org.apache.coyote.";
         loader.loadClass(basePackage + "http11.AbstractOutputBuffer$1");
     }
 
@@ -142,7 +142,7 @@ public final class SecurityClassLoad {
 
     private final static void loadConnectorPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.catalina.connector.";
+        final String basePackage = "org.apache.catalina.connector.";
         loader.loadClass
             (basePackage +
              "RequestFacade$GetAttributePrivilegedAction");
@@ -225,7 +225,7 @@ public final class SecurityClassLoad {
 
     private final static void loadTomcatPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "org.apache.tomcat.";
+        final String basePackage = "org.apache.tomcat.";
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(
                 basePackage + "util.http.FastHttpDateFormat");
