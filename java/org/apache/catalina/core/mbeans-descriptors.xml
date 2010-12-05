@@ -120,10 +120,6 @@
                description="Should Tomcat attempt to terminate threads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
                
-    <attribute name="clearReferencesThreadLocals"
-               description="Should Tomcat attempt to clear any ThreadLocal objects that are instances of classes loaded by this class loader. "
-               type="boolean"/>
-               
     <attribute name="clearReferencesStopTimerThreads"
                description="Should Tomcat attempt to terminate TimerThreads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
@@ -279,6 +275,10 @@
       
     <attribute name="reloadable"
                description="The reloadable flag for this web application"
+               type="boolean"/>
+
+    <attribute name="renewThreadsWhenStoppingContext"
+               description="Should Tomcat renew the threads of the thread pool when the application is stopped to avoid memory leaks because of uncleaned ThreadLocal variables." 
                type="boolean"/>
 
     <attribute name="saveConfig"
@@ -1558,6 +1558,11 @@
     <attribute name="threadPriority"
                description="The thread priority for threads in this thread pool"
                type="int"/>
+
+    <attribute name="threadRenewalDelay"
+               description="After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time, this delay is observed between 2 threads being renewed. Value is in ms, default value is 1000ms. If negative, threads are not renewed."
+               type="long"/>
+               
   </mbean>
 
   <mbean name="StandardWrapper"

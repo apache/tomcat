@@ -16,12 +16,19 @@
  */
 package org.apache.tomcat.util.threads;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Same as a java.util.concurrent.ThreadPoolExecutor but implements a much more efficient
  * {@link #getSubmittedCount()} method, to be used to properly handle the work queue.
@@ -31,7 +38,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor {
-    
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm = StringManager
+            .getManager(Constants.Package);
+
+    private static final Log log = LogFactory.getLog(ThreadPoolExecutor.class);
+
     /**
      * The number of tasks submitted but not yet finished. This includes tasks
      * in the queue and tasks that have been handed to a worker thread but the
@@ -39,7 +53,20 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * This number is always greater or equal to {@link #getActiveCount()}.
      */
     private final AtomicInteger submittedCount = new AtomicInteger(0);
-    
+    private final AtomicLong lastContextStoppedTime = new AtomicLong(0L);
+
+    /**
+     * Most recent time in ms when a thread decided to kill itself to avoid
+     * potential memory leaks. Useful to throttle the rate of renewals of
+     * threads.
+     */
+    private final AtomicLong lastTimeThreadKilledItself = new AtomicLong(0L);
+
+    /**
+     * Delay in ms between 2 threads being renewed. If negative, do not renew threads.
+     */
+    private long threadRenewalDelay = 1000L;
+
     public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
     }
@@ -56,10 +83,63 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, new RejectHandler());
     }
+    
+    public long getThreadRenewalDelay() {
+        return threadRenewalDelay;
+    }
+
+    public void setThreadRenewalDelay(long threadRenewalDelay) {
+        this.threadRenewalDelay = threadRenewalDelay;
+    }
 
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
         submittedCount.decrementAndGet();
+
+        if (t == null) {
+            stopCurrentThreadIfNeeded();
+        }
+    }
+
+    /**
+     * If the current thread was started before the last time when a context was
+     * stopped, an exception is thrown so that the current thread is stopped.
+     */
+    protected void stopCurrentThreadIfNeeded() {
+        if (currentThreadShouldBeStopped()) {
+            long lastTime = lastTimeThreadKilledItself.longValue();
+            if (lastTime + threadRenewalDelay < System.currentTimeMillis()) {
+                if (lastTimeThreadKilledItself.compareAndSet(lastTime,
+                        System.currentTimeMillis() + 1)) {
+                    // OK, it's really time to dispose of this thread
+
+                    final String msg = sm.getString(
+                                    "threadPoolExecutor.threadStoppedToAvoidPotentialLeak",
+                                    Thread.currentThread().getName());
+
+                    Thread.currentThread().setUncaughtExceptionHandler(
+                            new UncaughtExceptionHandler() {
+                                @Override
+                                public void uncaughtException(Thread t,
+                                        Throwable e) {
+                                    // yes, swallow the exception
+                                    log.debug(msg);
+                                }
+                            });
+                    throw new RuntimeException(msg);
+                }
+            }
+        }
+    }
+    
+    protected boolean currentThreadShouldBeStopped() {
+        if (threadRenewalDelay >= 0 && Thread.currentThread() instanceof TaskThread) {
+            TaskThread currentTaskThread = (TaskThread) Thread.currentThread();
+            if (currentTaskThread.getCreationTime() < this.lastContextStoppedTime.longValue()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getSubmittedCount() {
@@ -110,6 +190,41 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
             }
             
         }
+    }
+
+    public void contextStopping() {
+        this.lastContextStoppedTime.set(System.currentTimeMillis());
+
+        // save the current pool parameters to restore them later
+        int savedCorePoolSize = this.getCorePoolSize();
+        TaskQueue taskQueue = getQueue() instanceof TaskQueue ? (TaskQueue) getQueue() : null;
+        if (taskQueue != null) {
+            // note by slaurent : quite oddly threadPoolExecutor.setCorePoolSize
+            // checks that queue.remainingCapacity()==0. I did not understand
+            // why, but to get the intended effect of waking up idle threads, I
+            // temporarily fake this condition.
+            taskQueue.setForcedRemainingCapacity(0);
+        }
+
+        // setCorePoolSize(0) wakes idle threads
+        this.setCorePoolSize(0);
+
+        // wait a little so that idle threads wake and poll the queue again,
+        // this time always with a timeout (queue.poll() instead of queue.take())
+        // even if we did not wait enough, TaskQueue.take() takes care of timing out
+        // so that we are sure that all threads of the pool are renewed in a limited
+        // time, something like (threadKeepAlive + longest request time)
+        try {
+            Thread.sleep(200L);
+        } catch (InterruptedException e) {
+            //yes, ignore
+        }
+        
+        if (taskQueue != null) {
+            // ok, restore the state of the queue and pool
+            taskQueue.setForcedRemainingCapacity(null);
+        }
+        this.setCorePoolSize(savedCorePoolSize);
     }
     
     private static class RejectHandler implements RejectedExecutionHandler {
