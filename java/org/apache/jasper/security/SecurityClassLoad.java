@@ -37,7 +37,7 @@ public final class SecurityClassLoad {
             return;
         }
 
-        String basePackage = "org.apache.jasper.";
+        final String basePackage = "org.apache.jasper.";
         try {
             loader.loadClass( basePackage +
                 "runtime.JspFactoryImpl$PrivilegedGetPageContext");
