@@ -584,9 +584,9 @@ public abstract class PersistentManagerBase extends ManagerBase {
      * @param session Session to be removed
      */
     @Override
-    public void remove(Session session) {
+    public void remove(Session session, boolean update) {
 
-        super.remove (session);
+        super.remove (session, update);
 
         if (store != null){
             removeSession(session.getIdInternal());
