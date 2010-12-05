@@ -321,41 +321,54 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
 
         if (!logged && useDefault) {
-            if (defaultAccessLog == null) {
+            AccessLog newDefaultAccessLog = defaultAccessLog;
+            if (newDefaultAccessLog == null) {
                 // If we reached this point, this Engine can't have an AccessLog
                 // Look in the defaultHost
                 Host host = (Host) findChild(getDefaultHost());
+                Context context = null;
                 if (host != null && host.getState().isAvailable()) {
-                    defaultAccessLog = host.getAccessLog();
+                    newDefaultAccessLog = host.getAccessLog();
 
-                    if (defaultAccessLog != null) {
+                    if (newDefaultAccessLog != null) {
                         AccessLogListener l = new AccessLogListener(this);
-                        host.addPropertyChangeListener(l);
+                        this.addPropertyChangeListener(l);
                         host.addContainerListener(l);
                         host.addLifecycleListener(l);
                     } else {
                         // Try the ROOT context of default host
-                        Context context = (Context) host.findChild("");
+                        context = (Context) host.findChild("");
                         if (context != null &&
                                 context.getState().isAvailable()) {
-                            defaultAccessLog = context.getAccessLog();
+                            newDefaultAccessLog = context.getAccessLog();
                             
-                            if (defaultAccessLog != null) {
+                            if (newDefaultAccessLog != null) {
                                 AccessLogListener l =
                                     new AccessLogListener(this);
-                                context.addPropertyChangeListener(l);
+                                this.addPropertyChangeListener(l);
                                 context.addLifecycleListener(l);
                             }
                         }
                     }
                 }
 
-                if (defaultAccessLog == null) {
-                    defaultAccessLog = new NoopAccessLog();
+                if (newDefaultAccessLog == null) {
+                    newDefaultAccessLog = new NoopAccessLog();
+                    AccessLogListener l = new AccessLogListener(this);
+                    this.addPropertyChangeListener(l);
+                    if (host != null) {
+                        host.addContainerListener(l);
+                        host.addLifecycleListener(l);
+                    }
+                    if (context != null) {
+                        context.addLifecycleListener(l);
+                    }
+                    
                 }
+                defaultAccessLog = newDefaultAccessLog;
             }
 
-            defaultAccessLog.log(request, response, time);
+            newDefaultAccessLog.log(request, response, time);
         }
     }
 
