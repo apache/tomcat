@@ -61,6 +61,10 @@
         application if there's no session. Patch provided by Marc Guillemot.
         (slaurent)
       </add>
+      <add>
+        <bug>49159</bug>: Improve memory leak protection by renewing threads of
+        the pool when a web application is stopped. (slaurent)
+      </add>
       <fix>
         <bug>49650</bug>: Remove unnecessary entries package.access property
         defined in catalina.properties. Patch provided by Owen Farrell. (markt) 
