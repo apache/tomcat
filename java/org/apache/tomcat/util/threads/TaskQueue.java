@@ -34,6 +34,10 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
     private static final long serialVersionUID = 1L;
 
     private ThreadPoolExecutor parent = null;
+    
+    // no need to be volatile, the one times when we change and read it occur in
+    // a single thread (the one that did stop a context and fired listeners)
+    private Integer forcedRemainingCapacity = null;
 
     public TaskQueue() {
         super();
@@ -74,4 +78,44 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
         //if we reached here, we need to add it to the queue
         return super.offer(o);
     }
+
+
+    @Override
+    public Runnable poll(long timeout, TimeUnit unit) throws InterruptedException {
+        Runnable runnable = super.poll(timeout, unit);
+        if (runnable == null && parent != null) {
+            // the poll timed out, it gives an opportunity to stop the current
+            // thread if needed to avoid memory leaks.
+            parent.stopCurrentThreadIfNeeded();
+        }
+        return runnable;
+    }
+    
+
+    @Override
+    public Runnable take() throws InterruptedException {
+        if (parent != null && parent.currentThreadShouldBeStopped()) {
+            return poll(parent.getKeepAliveTime(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+            //yes, this may return null (in case of timeout) which normally does not occur with take()
+            //but the ThreadPoolExecutor implementation allows this
+        }
+        return super.take();
+    }
+
+    @Override
+    public int remainingCapacity() {
+        if(forcedRemainingCapacity != null) {
+            // ThreadPoolExecutor.setCorePoolSize checks that
+            // remainingCapacity==0 to allow to interrupt idle threads
+            // I don't see why, but this hack allows to conform to this
+            // "requirement"
+            return forcedRemainingCapacity.intValue();
+        }
+        return super.remainingCapacity();
+    }
+
+    public void setForcedRemainingCapacity(Integer forcedRemainingCapacity) {
+        this.forcedRemainingCapacity = forcedRemainingCapacity;
+    }
+
 }

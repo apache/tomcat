@@ -458,15 +458,6 @@ public class WebappClassLoader
     private boolean clearReferencesStopTimerThreads = false;
 
     /**
-     * Should Tomcat attempt to clear any ThreadLocal objects that are instances
-     * of classes loaded by this class loader. Failure to remove any such
-     * objects will result in a memory leak on web application stop, undeploy or
-     * reload. It is disabled by default since the clearing of the ThreadLocal
-     * objects is not performed in a thread-safe manner.
-     */
-    private boolean clearReferencesThreadLocals = false;
-    
-    /**
      * Should Tomcat call {@link org.apache.juli.logging.LogFactory#release()}
      * when the class loader is stopped? If not specified, the default value
      * of <code>true</code> is used. Changing the default setting is likely to
@@ -751,25 +742,6 @@ public class WebappClassLoader
              boolean clearReferencesLogFactoryRelease) {
          this.clearReferencesLogFactoryRelease =
              clearReferencesLogFactoryRelease;
-     }
-
-
-     /**
-      * Return the clearReferencesThreadLocals flag for this Context.
-      */
-     public boolean getClearReferencesThreadLocals() {
-         return (this.clearReferencesThreadLocals);
-     }
-
-
-     /**
-      * Set the clearReferencesThreadLocals feature for this Context.
-      *
-      * @param clearReferencesThreadLocals The new flag value
-      */
-     public void setClearReferencesThreadLocals(
-             boolean clearReferencesThreadLocals) {
-         this.clearReferencesThreadLocals = clearReferencesThreadLocals;
      }
 
 
@@ -1949,8 +1921,8 @@ public class WebappClassLoader
         // Stop any threads the web application started
         clearReferencesThreads();
         
-        // Clear any ThreadLocals loaded by this class loader
-        clearReferencesThreadLocals();
+        // Check for leaks triggered by ThreadLocals loaded by this class loader
+        checkThreadLocalsForLeaks();
         
         // Clear RMI Targets loaded by this class loader
         clearReferencesRmiTargets();
@@ -2347,7 +2319,7 @@ public class WebappClassLoader
         }
     }
 
-    private void clearReferencesThreadLocals() {
+    private void checkThreadLocalsForLeaks() {
         Thread[] threads = getThreads();
 
         try {
@@ -2371,73 +2343,66 @@ public class WebappClassLoader
                 if (threads[i] != null) {
                     // Clear the first map
                     threadLocalMap = threadLocalsField.get(threads[i]);
-                    clearThreadLocalMap(threadLocalMap, tableField);
+                    checkThreadLocalMapForLeaks(threadLocalMap, tableField);
                     // Clear the second map
                     threadLocalMap =
                         inheritableThreadLocalsField.get(threads[i]);
-                    clearThreadLocalMap(threadLocalMap, tableField);
+                    checkThreadLocalMapForLeaks(threadLocalMap, tableField);
                 }
             }
         } catch (SecurityException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         } catch (NoSuchFieldException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         } catch (ClassNotFoundException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         } catch (IllegalArgumentException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         } catch (IllegalAccessException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         } catch (NoSuchMethodException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         } catch (InvocationTargetException e) {
-            log.warn(sm.getString("webappClassLoader.clearThreadLocalFail",
+            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
         }       
     }
 
 
     /*
-     * Clears the given thread local map object. Also pass in the field that
+     * Analyzes the given thread local map object. Also pass in the field that
      * points to the internal table to save re-calculating it on every
      * call to this method.
      */
-    private void clearThreadLocalMap(Object map, Field internalTableField)
+    private void checkThreadLocalMapForLeaks(Object map, Field internalTableField)
             throws NoSuchMethodException, IllegalAccessException,
             NoSuchFieldException, InvocationTargetException {
         if (map != null) {
-            Method mapRemove =
-                map.getClass().getDeclaredMethod("remove",
-                        ThreadLocal.class);
-            mapRemove.setAccessible(true);
             Object[] table = (Object[]) internalTableField.get(map);
-            int staleEntriesCount = 0;
             if (table != null) {
                 for (int j =0; j < table.length; j++) {
                     if (table[j] != null) {
-                        boolean remove = false;
+                        boolean potentialLeak = false;
                         // Check the key
                         Object key = ((Reference<?>) table[j]).get();
-                        if (this.equals(key) ||
-                                isLoadedByThisWebappClassLoader(key)) {
-                            remove = true;
+                        if (this.equals(key) || loadedByThisOrChild(key)) {
+                            potentialLeak = true;
                         }
                         // Check the value
                         Field valueField =
                             table[j].getClass().getDeclaredField("value");
                         valueField.setAccessible(true);
                         Object value = valueField.get(table[j]);
-                        if (this.equals(value) ||
-                                isLoadedByThisWebappClassLoader(value)) {
-                            remove = true;
+                        if (this.equals(value) || loadedByThisOrChild(value)) {
+                            potentialLeak = true;
                         }
-                        if (remove) {
+                        if (potentialLeak) {
                             Object[] args = new Object[5];
                             args[0] = contextName;
                             if (key != null) {
@@ -2446,10 +2411,10 @@ public class WebappClassLoader
                                     args[2] = key.toString();
                                 } catch (Exception e) {
                                     log.error(sm.getString(
-                                            "webappClassLoader.clearThreadLocal.badKey",
+                                            "webappClassLoader.checkThreadLocalsForLeaks.badKey",
                                             args[1]), e);
                                     args[2] = sm.getString(
-                                            "webappClassLoader.clearThreadLocal.unknown");
+                                            "webappClassLoader.checkThreadLocalsForLeaks.unknown");
                                 }
                             }
                             if (value != null) {
@@ -2458,47 +2423,26 @@ public class WebappClassLoader
                                     args[4] = value.toString();
                                 } catch (Exception e) {
                                     log.error(sm.getString(
-                                            "webappClassLoader.clearThreadLocal.badValue",
+                                            "webappClassLoader.checkThreadLocalsForLeaks.badValue",
                                             args[3]), e);
                                     args[4] = sm.getString(
-                                    "webappClassLoader.clearThreadLocal.unknown");
+                                    "webappClassLoader.checkThreadLocalsForLeaks.unknown");
                                 }
                             }
                             if (value == null) {
                                 if (log.isDebugEnabled()) {
                                     log.debug(sm.getString(
-                                            "webappClassLoader.clearThreadLocalDebug",
+                                            "webappClassLoader.checkThreadLocalsForLeaksDebug",
                                             args));
-                                    if (clearReferencesThreadLocals) {
-                                        log.debug(sm.getString(
-                                                "webappClassLoader.clearThreadLocalDebugClear"));
-                                    }
                                 }
                             } else {
                                 log.error(sm.getString(
-                                        "webappClassLoader.clearThreadLocal",
+                                        "webappClassLoader.checkThreadLocalsForLeaks",
                                         args));
-                                if (clearReferencesThreadLocals) {
-                                    log.info(sm.getString(
-                                            "webappClassLoader.clearThreadLocalClear"));
-                                }
-                            }
-                            if (clearReferencesThreadLocals) {
-                                if (key == null) {
-                                  staleEntriesCount++;
-                                } else {
-                                  mapRemove.invoke(map, key);
-                                }
                             }
                         }
                     }
                 }
-            }
-            if (staleEntriesCount > 0) {
-                Method mapRemoveStale =
-                    map.getClass().getDeclaredMethod("expungeStaleEntries");
-                mapRemoveStale.setAccessible(true);
-                mapRemoveStale.invoke(map);
             }
         }
     }
@@ -2512,15 +2456,23 @@ public class WebappClassLoader
     }
     
     /**
-     * @param o object to test
+     * @param o object to test, may be null
      * @return <code>true</code> if o has been loaded by the current classloader
      * or one of its descendants.
      */
-    private boolean isLoadedByThisWebappClassLoader(Object o) {
+    private boolean loadedByThisOrChild(Object o) {
         if (o == null) {
             return false;
         }
-        ClassLoader cl = o.getClass().getClassLoader();
+
+        Class<?> clazz;
+        if (o instanceof Class) {
+            clazz = (Class<?>) o;
+        } else {
+            clazz = o.getClass();
+        }
+
+        ClassLoader cl = clazz.getClassLoader();
         while (cl != null) {
             if(cl == this) {
                 return true;
@@ -2715,24 +2667,6 @@ public class WebappClassLoader
                     contextName), e);
         }
     }
-
-
-    /**
-     * Determine whether a class was loaded by this class loader or one of
-     * its child class loaders.
-     */
-    protected boolean loadedByThisOrChild(Class<? extends Object> clazz)
-    {
-        boolean result = false;
-        for (ClassLoader classLoader = clazz.getClassLoader();
-                null != classLoader; classLoader = classLoader.getParent()) {
-            if (classLoader.equals(this)) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }    
 
 
     /**
