@@ -497,19 +497,20 @@
         not specified, the default value of <code>false</code> will be used.</p>
       </attribute>
 
-      <attribute name="clearReferencesThreadLocals" required="false">
-        <p>If <code>true</code>, Tomcat attempts to clear any ThreadLocal
-        objects that are instances of classes loaded by this class loader.
-        Failure to remove any such objects will result in a memory leak on web
-        application stop, undeploy or reload.  If not specified, the default
-        value of <code>false</code> will be used since the clearing of the
-        ThreadLocal objects is not performed in a thread-safe manner.</p>
-      </attribute>
-
       <attribute name="processTlds" required="false">
         <p>Whether the context should process TLDs on startup.  The default
         is true.  The false setting is intended for special cases
         that know in advance TLDs are not part of the webapp.</p>
+      </attribute>
+
+      <attribute name="renewThreadsWhenStoppingContext" required="false">
+        <p>If <code>true</code>, when this context is stopped, Tomcat renews all
+        the threads from the thread pool that was used to serve this context.
+        This also requires that the 
+        <code>ThreadLocalLeakPreventionListener</code> be configured in 
+        <code>server.xml</code> and that the <code>threadRenewalDelay</code>
+        property of the <code>Executor</code> be &gt;=0. If not specified, the 
+        default value of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="swallowOutput" required="false">

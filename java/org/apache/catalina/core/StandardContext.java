@@ -789,15 +789,14 @@ public class StandardContext extends ContainerBase
      * default value of <code>false</code> will be used.
      */
     private boolean clearReferencesStopTimerThreads = false;
-    
+
     /**
-     * Should Tomcat attempt to clear any ThreadLocal objects that are instances
-     * of classes loaded by this class loader. Failure to remove any such
-     * objects will result in a memory leak on web application stop, undeploy or
-     * reload. It is disabled by default since the clearing of the ThreadLocal
-     * objects is not performed in a thread-safe manner.
+     * Should Tomcat renew the threads of the thread pool when the application
+     * is stopped to avoid memory leaks because of uncleaned ThreadLocal
+     * variables. This also requires that the threadRenewalDelay property of the
+     * StandardThreadExecutor of ThreadPoolExecutor be set to a positive value.
      */
-    private boolean clearReferencesThreadLocals = false;
+    private boolean renewThreadsWhenStoppingContext = true;
     
     /**
      * Should the effective web.xml be logged when the context starts?
@@ -2486,33 +2485,18 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the clearReferencesThreadLocals flag for this Context.
-     */
-    public boolean getClearReferencesThreadLocals() {
-
-        return (this.clearReferencesThreadLocals);
-
+    public boolean getRenewThreadsWhenStoppingContext() {
+        return this.renewThreadsWhenStoppingContext;
     }
 
-
-    /**
-     * Set the clearReferencesThreadLocals feature for this Context.
-     *
-     * @param clearReferencesThreadLocals The new flag value
-     */
-    public void setClearReferencesThreadLocals(
-            boolean clearReferencesThreadLocals) {
-
-        boolean oldClearReferencesThreadLocals =
-            this.clearReferencesThreadLocals;
-        this.clearReferencesThreadLocals = clearReferencesThreadLocals;
-        support.firePropertyChange("clearReferencesStopThreads",
-                                   oldClearReferencesThreadLocals,
-                                   this.clearReferencesThreadLocals);
-
+    public void setRenewThreadsWhenStoppingContext(boolean renewThreadsWhenStoppingContext) {
+        boolean oldRenewThreadsWhenStoppingContext =
+            this.renewThreadsWhenStoppingContext;
+        this.renewThreadsWhenStoppingContext = renewThreadsWhenStoppingContext;
+        support.firePropertyChange("renewThreadsWhenStoppingContext",
+                oldRenewThreadsWhenStoppingContext,
+                this.renewThreadsWhenStoppingContext);
     }
-
 
     // -------------------------------------------------------- Context Methods
 
