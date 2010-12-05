@@ -771,7 +771,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
 
         ((StandardSession)session).passivate();
         writeSession(session);
-        super.remove(session);
+        super.remove(session, true);
         session.recycle();
 
     }
