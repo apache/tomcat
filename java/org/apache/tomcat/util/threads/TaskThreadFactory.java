@@ -39,7 +39,7 @@ public class TaskThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
+        TaskThread t = new TaskThread(group, r, namePrefix + threadNumber.getAndIncrement());
         t.setDaemon(daemon);
         t.setPriority(threadPriority);
         return t;

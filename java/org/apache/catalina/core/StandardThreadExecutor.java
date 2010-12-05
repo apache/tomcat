@@ -83,6 +83,13 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
     
+    /**
+     * After a context is stopped, threads in the pool are renewed. To avoid
+     * renewing all threads at the same time, this delay is observed between 2
+     * threads being renewed.
+     */
+    protected long threadRenewalDelay = 1000L;
+    
     private TaskQueue taskqueue = null;
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
@@ -163,6 +170,12 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
                 if ( !( (TaskQueue) executor.getQueue()).force(command) ) throw new RejectedExecutionException("Work queue full.");
             }
         } else throw new IllegalStateException("StandardThreadPool not started.");
+    }
+    
+    public void contextStopping() {
+        if (executor != null) {
+            executor.contextStopping();
+        }
     }
 
     public int getThreadPriority() {
@@ -249,6 +262,17 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         return maxQueueSize;
     }
     
+    public long getThreadRenewalDelay() {
+        return threadRenewalDelay;
+    }
+
+    public void setThreadRenewalDelay(long threadRenewalDelay) {
+        this.threadRenewalDelay = threadRenewalDelay;
+        if (executor != null) {
+            executor.setThreadRenewalDelay(threadRenewalDelay);
+        }
+    }
+
     // Statistics from the thread pool
     @Override
     public int getActiveCount() {
