@@ -111,6 +111,11 @@
         Code clean-up. Replace use of inefficient constructors with more
         efficient alternatives. (markt)
       </fix>
+      <fix>
+        <bug>50411</bug>: Ensure sessions are removed from the
+        <code>Store</code> associated with a <code>PersistentManager</code>.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
