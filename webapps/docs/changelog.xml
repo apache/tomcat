@@ -42,30 +42,24 @@
 <section name="Tomcat 7.0.6 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <add>
-        <bug>50282</bug>: Load <code>javax.security.auth.login.Configuration</code>
-        with <code>JreMemoryLeakPreventionListener</code> to avoid memory leak
-        when stopping a webapp that would use JAAS.
-        (slaurent)
-      </add>
-      <add>
-        <bug>48973</bug>: Avoid creating a SESSIONS.ser file when stopping an 
-        application if there's no session. Patch provided by Marc Guillemot.
-        (slaurent)
-      </add>
-      <update>
-        <bug>48692</bug>: Provide option to parse
-        <code>application/x-www-form-urlencoded</code> PUT requests. (schultz)
-      </update>
       <fix>
         <bug>8705</bug>: <code>org.apache.catalina.SessionListener</code> now
         extends <code>java.util.EventListener</code>. (markt)
       </fix>
+      <update>
+        <bug>48692</bug>: Provide option to parse
+        <code>application/x-www-form-urlencoded</code> PUT requests. (schultz)
+      </update>
       <add>
         <bug>48837</bug>: Extend thread local memory leak detection to include
         classes loaded by subordinate class loaders to the web
         application&apos;s class loader such as the Jasper class loader. Based
         on a patch by Sylvain Laurent. (markt)
+      </add>
+      <add>
+        <bug>48973</bug>: Avoid creating a SESSIONS.ser file when stopping an 
+        application if there's no session. Patch provided by Marc Guillemot.
+        (slaurent)
       </add>
       <fix>
         <bug>49650</bug>: Remove unnecessary entries package.access property
@@ -81,6 +75,12 @@
         options to control the <code>SecureRandom</code> instances used to
         generate session IDs. (markt)
       </update>
+      <add>
+        <bug>50282</bug>: Load <code>javax.security.auth.login.Configuration</code>
+        with <code>JreMemoryLeakPreventionListener</code> to avoid memory leak
+        when stopping a web application that would use JAAS.
+        (slaurent)
+      </add>
       <fix>
         <bug>50351</bug>: Fix the regression that broke BeanFactory resources
         caused by the previous fix for <bug>50159</bug>. (markt) 
