@@ -273,11 +273,11 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
       <attribute name="securityLoginConfigurationProtection" required="false">
         <p>Enables protection so that usage of the
         <code>javax.security.auth.login.Configuration</code> class by a web 
-        application does not in a memory leak. The first access of this class will
-        trigger the initializer that will retain a static reference to the context
-        class loader. The protection loads the class with the system classloader 
-        to ensure that the static initializer is not triggered by web application.
-        Defaults to <code>true</code>.</p>
+        application does not provoke a memory leak. The first access of this 
+        class will trigger the initializer that will retain a static reference 
+        to the context class loader. The protection loads the class with the 
+        system class loader to ensure that the static initializer is not 
+        triggered by web application. Defaults to <code>true</code>.</p>
       </attribute>
 
       <attribute name="securityPolicyProtection" required="false">
