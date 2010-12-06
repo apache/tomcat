@@ -26,9 +26,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.coyote.AbstractProtocolHandler;
-import org.apache.coyote.Adapter;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -37,23 +35,9 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
-    
-    protected ObjectName tpOname = null;
-    protected ObjectName rgOname = null;
 
-    protected AbstractEndpoint endpoint = null;
-    
     protected SSLImplementation sslImplementation = null;
     
-    /**
-     * The adapter, used to call the connector.
-     */
-    protected Adapter adapter;
-    @Override
-    public void setAdapter(Adapter adapter) { this.adapter = adapter; }
-    @Override
-    public Adapter getAdapter() { return adapter; }
-
     
     protected HashMap<String, Object> attributes = new HashMap<String, Object>();
 
