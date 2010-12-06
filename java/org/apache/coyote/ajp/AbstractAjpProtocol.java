@@ -18,9 +18,6 @@ package org.apache.coyote.ajp;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.concurrent.Executor;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -35,48 +32,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
         
-    protected HashMap<String, Object> attributes = new HashMap<String, Object>();
-    
-    /** 
-     * Pass config info
-     */
-    @Override
-    public void setAttribute(String name, Object value) {
-        if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("ajpprotocol.setattribute", name, value));
-        }
-        attributes.put(name, value);
-    }
-
-    @Override
-    public Object getAttribute(String key) {
-        if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("ajpprotocol.getattribute", key));
-        }
-        return attributes.get(key);
-    }
-
-
-    @Override
-    public Iterator<String> getAttributeNames() {
-        return attributes.keySet().iterator();
-    }
-
-    /**
-     * Set a property.
-     */
-    public boolean setProperty(String name, String value) {
-        setAttribute(name, value); //store all settings
-        return endpoint.setProperty(name, value);
-    }
-
-    /**
-     * Get a property
-     */
-    public String getProperty(String name) {
-        return (String)getAttribute(name);
-    }
-
     @Override
     public void pause() throws Exception {
         try {
@@ -143,34 +98,9 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
     public int getProcessorCache() { return this.processorCache; }
     public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
-    @Override
-    public Executor getExecutor() { return endpoint.getExecutor(); }
-    public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
-    
-    public int getMaxThreads() { return endpoint.getMaxThreads(); }
-    public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
-
-    public int getMinSpareThreads() { return endpoint.getMinSpareThreads(); }
-    public void setMinSpareThreads(int minSpareThreads) { endpoint.setMinSpareThreads(minSpareThreads); }
-
-
-    public int getThreadPriority() { return endpoint.getThreadPriority(); }
-    public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
-
-    public int getBacklog() { return endpoint.getBacklog(); }
-    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
-
-    public int getPort() { return endpoint.getPort(); }
-    public void setPort(int port) { endpoint.setPort(port); }
 
     public InetAddress getAddress() { return endpoint.getAddress(); }
     public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
-
-    public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
-    public void setTcpNoDelay(boolean tcpNoDelay) { endpoint.setTcpNoDelay(tcpNoDelay); }
-
-    public int getSoLinger() { return endpoint.getSoLinger(); }
-    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
     public int getSoTimeout() { return endpoint.getSoTimeout(); }
     public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
