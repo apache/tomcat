@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -51,6 +52,13 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
 
     @Override
     protected Log getLog() { return log; }
+
+
+    @Override
+    protected AbstractEndpoint.Handler getHandler() {
+        return cHandler;
+    }
+
 
     // ------------------------------------------------------------ Constructor
 
@@ -143,6 +151,10 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
         protected AjpAprProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
 
         protected ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor> connections =
             new ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor>();
