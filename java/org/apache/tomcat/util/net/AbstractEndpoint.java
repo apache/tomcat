@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.KeyManagerFactory;
 
 import org.apache.catalina.Globals;
+import org.apache.coyote.RequestGroupInfo;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
@@ -73,13 +74,19 @@ public abstract class AbstractEndpoint {
      */
     public static final String SESSION_MGR = "javax.servlet.request.ssl_session_mgr";
 
-    /**
-     * Different types of socket states to react upon
-     */
     public static interface Handler {
+        /**
+         * Different types of socket states to react upon
+         */
         public enum SocketState {
             OPEN, CLOSED, LONG, ASYNC_END
         }
+        
+
+        /**
+         * Obtain the GlobalRequestProcessor associated with the handler
+         */
+        public RequestGroupInfo getGlobal();
     }
 
     // Standard SSL Configuration attributes

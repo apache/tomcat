@@ -27,6 +27,7 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractProtocolHandler implements ProtocolHandler,
@@ -286,6 +287,12 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
      * handler. The name will be prefix-address-port.
      */
     protected abstract String getNamePrefix();
+
+
+    /**
+     * Obtain the handler associated with the underlying Endpoint
+     */
+    protected abstract Handler getHandler();
 
 
     // ----------------------------------------------------- JMX related methods
