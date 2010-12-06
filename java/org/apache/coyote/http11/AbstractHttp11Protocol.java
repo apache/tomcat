@@ -22,25 +22,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 
-import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.apache.coyote.AbstractProtocolHandler;
 import org.apache.coyote.Adapter;
-import org.apache.coyote.ProtocolHandler;
-import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Protocol implements ProtocolHandler, MBeanRegistration {
+public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     /**
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
-    
-    protected abstract Log getLog();
     
     protected ObjectName tpOname = null;
     protected ObjectName rgOname = null;
