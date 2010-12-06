@@ -32,6 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -51,8 +52,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
+
     @Override
     protected Log getLog() { return log; }
+
+
+    @Override
+    protected AbstractEndpoint.Handler getHandler() {
+        return cHandler;
+    }
+
 
     /**
      * The string manager for this package.
@@ -236,6 +245,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         protected Http11AprProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
         
         protected ConcurrentHashMap<SocketWrapper<Long>, Http11AprProcessor> connections =
             new ConcurrentHashMap<SocketWrapper<Long>, Http11AprProcessor>();

@@ -33,6 +33,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
@@ -53,10 +54,18 @@ import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
-    
+
+
     @Override
     protected Log getLog() { return log; }
     
+
+    @Override
+    protected AbstractEndpoint.Handler getHandler() {
+        return cHandler;
+    }
+
+
     public Http11NioProtocol() {
         endpoint=new NioEndpoint();
         cHandler = new Http11ConnectionHandler( this );
@@ -198,6 +207,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected Http11NioProtocol proto;
         protected static int count = 0;
         protected RequestGroupInfo global = new RequestGroupInfo();
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
 
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
