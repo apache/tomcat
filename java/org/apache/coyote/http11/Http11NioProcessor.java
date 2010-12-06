@@ -339,7 +339,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                 }
                 request.setStartTime(System.currentTimeMillis());
                 if (!disableUploadTimeout) { //only for body, not for request headers
-                    socket.getIOChannel().socket().setSoTimeout(timeout);
+                    socket.getIOChannel().socket().setSoTimeout(
+                            connectionUploadTimeout);
                 }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {
