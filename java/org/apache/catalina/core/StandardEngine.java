@@ -424,7 +424,7 @@ public class StandardEngine extends ContainerBase implements Engine {
                 // Force re-calculation but do not disable listener since it
                 // might be re-used
                 engine.defaultAccessLog = null;
-            } else if (Lifecycle.BEFORE_DESTROY_EVENT.endsWith(type)) {
+            } else if (Lifecycle.BEFORE_DESTROY_EVENT.equals(type)) {
                 // Container is being removed
                 // Force re-calculation and disable listener since it won't
                 // be re-used
