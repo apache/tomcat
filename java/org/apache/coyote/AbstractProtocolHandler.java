@@ -17,14 +17,48 @@
 package org.apache.coyote;
 
 import javax.management.MBeanRegistration;
+import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 
 public abstract class AbstractProtocolHandler implements ProtocolHandler,
         MBeanRegistration {
 
-    // Concrete implementations need to provide access to their logger to be
-    // used by the abstract classes.
-    protected abstract Log getLog();
+    /**
+     * Name of MBean for the Global Request Processor.
+     */
+    protected ObjectName rgOname = null;
 
+    
+    /**
+     * Name of MBean for the ThreadPool.
+     */
+    protected ObjectName tpOname = null;
+
+    
+    /**
+     * Endpoint that provides low-level network I/O - must be matched to the
+     * ProtocolHandler implementation (ProtocolHandler using BIO, requires BIO
+     * Endpoint etc.).
+     */
+    protected AbstractEndpoint endpoint = null;
+
+    
+    /**
+     * The adapter provides the link between the ProtocolHandler and the
+     * connector.
+     */
+    protected Adapter adapter;
+    @Override
+    public void setAdapter(Adapter adapter) { this.adapter = adapter; }
+    @Override
+    public Adapter getAdapter() { return adapter; }
+
+
+    /**
+     * Concrete implementations need to provide access to their logger to be
+     * used by the abstract classes.
+     */
+    protected abstract Log getLog();
 }
