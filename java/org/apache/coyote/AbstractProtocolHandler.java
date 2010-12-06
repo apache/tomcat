@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
@@ -145,6 +146,19 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public Adapter getAdapter() { return adapter; }
 
 
+    /**
+     * The maximum number of idle processors that will be retained in the cache
+     * and re-used with a subsequent request. The default is -1, unlimited,
+     * although in that case there will never be more Processor objects than
+     * there are threads in the associated thread pool.
+     */
+    protected int processorCache = -1;
+    public int getProcessorCache() { return this.processorCache; }
+    public void setProcessorCache(int processorCache) {
+        this.processorCache = processorCache;
+    }
+
+
     // ---------------------- Properties that are passed through to the EndPoint
 
     @Override
@@ -190,11 +204,16 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
 
-    // ------------------------ Properties that are made available as attributes
-    // -------------------------------------(and passed through to the EndPoint)
+    // ---------------------- Properties that are passed through to the EndPoint
+    // ------------------------------------ and are made available as attributes
 
-    
-    
+    public InetAddress getAddress() { return endpoint.getAddress(); }
+    public void setAddress(InetAddress ia) {
+        endpoint.setAddress( ia );
+        setAttribute("address", "" + ia);
+    }
+
+
     // -------------------------------------------------------- Abstract methods
     /**
      * Concrete implementations need to provide access to their logger to be
