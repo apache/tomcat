@@ -152,14 +152,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
         return endpoint.getKeepAliveTimeout();
     }
 
-    public int getTimeout() {
-        return getSoTimeout();
-    }
-
-    public void setTimeout( int timeout ) {
-        setSoTimeout(timeout);
-    }
-    
     public int getConnectionTimeout() {
         return getSoTimeout();
     }
@@ -198,14 +190,27 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
     
+    /**
+     * Specifies a different (usually  longer) connection timeout during data
+     * upload. 
+     */
+    private int connectionUploadTimeout = 300000;
+    public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
+    public void setConnectionUploadTimeout(int i) {
+        connectionUploadTimeout = i;
+    }
+
+
     // HTTP
     /**
-     * If true, the regular socket timeout will be used for the full duration
-     * of the connection.
+     * If true, the connectionUploadTimeout will be ignored and the regular
+     * socket timeout will be used for the full duration of the connection.
      */
     private boolean disableUploadTimeout = true;
     public boolean getDisableUploadTimeout() { return disableUploadTimeout; }
-    public void setDisableUploadTimeout(boolean isDisabled) { disableUploadTimeout = isDisabled; }
+    public void setDisableUploadTimeout(boolean isDisabled) {
+        disableUploadTimeout = isDisabled;
+    }
     
     
     // HTTP

@@ -299,7 +299,8 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
-            processor.setTimeout(proto.getTimeout());
+            processor.setConnectionUploadTimeout(
+                    proto.getConnectionUploadTimeout());
             processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
             processor.setCompressionMinSize(proto.getCompressionMinSize());
             processor.setCompression(proto.getCompression());
