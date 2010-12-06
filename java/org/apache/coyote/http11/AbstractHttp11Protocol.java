@@ -141,37 +141,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     }
 
     /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection.
-     */
-    public void setKeepAliveTimeout(int keepAliveTimeout) {
-        endpoint.setKeepAliveTimeout(keepAliveTimeout);
-    }
-    
-    public int getKeepAliveTimeout() {
-        return endpoint.getKeepAliveTimeout();
-    }
-
-    public int getConnectionTimeout() {
-        return getSoTimeout();
-    }
-
-    public void setConnectionTimeout( int timeout ) {
-        setSoTimeout(timeout);
-    }
-
-    public int getSoTimeout() {
-        return endpoint.getSoTimeout();
-    }
-
-    public void setSoTimeout( int i ) {
-        endpoint.setSoTimeout(i);
-        setAttribute("soTimeout", "" + i);
-        setAttribute("connectionTimeout", "" + i);
-    }
-    
-    // *
-    /**
      * Maximum size of the post which will be saved when processing certain
      * requests, such as a POST.
      */

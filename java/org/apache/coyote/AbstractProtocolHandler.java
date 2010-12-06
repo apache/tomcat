@@ -200,6 +200,13 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
 
+    public int getKeepAliveTimeout() { return endpoint.getKeepAliveTimeout(); }
+    public void setKeepAliveTimeout(int keepAliveTimeout) {
+        endpoint.setKeepAliveTimeout(keepAliveTimeout);
+    }
+
+
+
     // ---------------------- Properties that are passed through to the EndPoint
     // ------------------------------------ and are made available as attributes
 
@@ -214,6 +221,34 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public void setPort(int port) {
         endpoint.setPort(port);
         setAttribute("port", Integer.toString(port));
+    }
+
+
+    /*
+     * When Tomcat expects data from the client, this is the time Tomcat will
+     * wait for that data to arrive before closing the connection.
+     */
+    public int getConnectionTimeout() {
+        // Note that the endpoint uses the alternative name
+        return endpoint.getSoTimeout();
+    }
+    public void setConnectionTimeout(int timeout) {
+        // Note that the endpoint uses the alternative name
+        endpoint.setSoTimeout(timeout);
+        String str = Integer.toString(timeout);
+        setAttribute("connectionTimeout", str);
+        // Also set the attribute for the alternative name
+        setAttribute("soTimeout", str);
+    }
+
+    /*
+     * Alternative name for connectionTimeout property
+     */
+    public int getSoTimeout() {
+        return getConnectionTimeout();
+    }
+    public void setSoTimeout(int timeout) {
+        setConnectionTimeout(timeout);
     }
 
 

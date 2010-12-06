@@ -189,9 +189,11 @@ public abstract class AbstractEndpoint {
     /**
      * Keepalive timeout, if lesser or equal to 0 then soTimeout will be used.
      */
-    private int keepAliveTimeout = 0;
-    public void setKeepAliveTimeout(int keepAliveTimeout) { this.keepAliveTimeout = keepAliveTimeout; }
+    private int keepAliveTimeout = -1;
     public int getKeepAliveTimeout() { return keepAliveTimeout;}
+    public void setKeepAliveTimeout(int keepAliveTimeout) {
+        this.keepAliveTimeout = keepAliveTimeout;
+    }
 
 
     /**
