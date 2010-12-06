@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.net.InetAddress;
 import java.net.URLEncoder;
 
 import javax.management.MBeanServer;
@@ -35,12 +34,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
 
     protected SSLImplementation sslImplementation = null;
     
-    
-    public InetAddress getAddress() { return endpoint.getAddress(); }
-    public void setAddress(InetAddress ia) {
-        endpoint.setAddress( ia );
-        setAttribute("address", "" + ia);
-    }
     
     public String getName() {
         String encodedAddr = "";
@@ -115,12 +108,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
         setAttribute("secure", "" + b);
     }
     
-    /**
-     * Processor cache.
-     */
-    private int processorCache;
-    public int getProcessorCache() { return this.processorCache; }
-    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
     private int socketBuffer = 9000;
     public int getSocketBuffer() { return socketBuffer; }
