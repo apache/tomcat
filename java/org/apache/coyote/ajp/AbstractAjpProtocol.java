@@ -26,9 +26,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.coyote.AbstractProtocolHandler;
-import org.apache.coyote.Adapter;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
@@ -37,16 +35,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
         
-    protected ObjectName tpOname = null;
-    protected ObjectName rgOname = null;
-
-    protected AbstractEndpoint endpoint = null;
-    
-    /**
-     * The adapter, used to call the connector.
-     */
-    protected Adapter adapter;
-    
     protected HashMap<String, Object> attributes = new HashMap<String, Object>();
     
     /** 
@@ -87,20 +75,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
      */
     public String getProperty(String name) {
         return (String)getAttribute(name);
-    }
-
-    /**
-     * The adapter, used to call the connector
-     */
-    @Override
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
-    }
-
-
-    @Override
-    public Adapter getAdapter() {
-        return adapter;
     }
 
     @Override
