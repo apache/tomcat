@@ -994,7 +994,7 @@
            includeantruntime="false">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
-      <include name="javax/servlet/**" />
+      <include name="javax/**" />
     </javac>
   </target>
 
