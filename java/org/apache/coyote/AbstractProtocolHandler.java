@@ -186,10 +186,6 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     }
 
 
-    public int getPort() { return endpoint.getPort(); }
-    public void setPort(int port) { endpoint.setPort(port); }
-
-
     public int getBacklog() { return endpoint.getBacklog(); }
     public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
 
@@ -209,8 +205,15 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
 
     public InetAddress getAddress() { return endpoint.getAddress(); }
     public void setAddress(InetAddress ia) {
-        endpoint.setAddress( ia );
-        setAttribute("address", "" + ia);
+        endpoint.setAddress(ia);
+        setAttribute("address", ia.toString());
+    }
+
+
+    public int getPort() { return endpoint.getPort(); }
+    public void setPort(int port) {
+        endpoint.setPort(port);
+        setAttribute("port", Integer.toString(port));
     }
 
 
