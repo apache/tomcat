@@ -65,7 +65,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     /**
      * Delay in ms between 2 threads being renewed. If negative, do not renew threads.
      */
-    private long threadRenewalDelay = 1000L;
+    private long threadRenewalDelay = Constants.DEFAULT_THREAD_RENEWAL_DELAY;
 
     public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
@@ -133,9 +133,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
     
     protected boolean currentThreadShouldBeStopped() {
-        if (threadRenewalDelay >= 0 && Thread.currentThread() instanceof TaskThread) {
+        if (threadRenewalDelay >= 0
+            && Thread.currentThread() instanceof TaskThread) {
             TaskThread currentTaskThread = (TaskThread) Thread.currentThread();
-            if (currentTaskThread.getCreationTime() < this.lastContextStoppedTime.longValue()) {
+            if (currentTaskThread.getCreationTime() < 
+                    this.lastContextStoppedTime.longValue()) {
                 return true;
             }
         }
@@ -160,7 +162,8 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * thread, at the discretion of the <tt>Executor</tt> implementation.
      * If no threads are available, it will be added to the work queue.
      * If the work queue is full, the system will wait for the specified 
-     * time and it throw a RejectedExecutionException if the queue is still full after that.
+     * time and it throw a RejectedExecutionException if the queue is still 
+     * full after that.
      *
      * @param command the runnable task
      * @throws RejectedExecutionException if this task cannot be
@@ -197,7 +200,8 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
         // save the current pool parameters to restore them later
         int savedCorePoolSize = this.getCorePoolSize();
-        TaskQueue taskQueue = getQueue() instanceof TaskQueue ? (TaskQueue) getQueue() : null;
+        TaskQueue taskQueue =
+                getQueue() instanceof TaskQueue ? (TaskQueue) getQueue() : null;
         if (taskQueue != null) {
             // note by slaurent : quite oddly threadPoolExecutor.setCorePoolSize
             // checks that queue.remainingCapacity()==0. I did not understand
@@ -210,16 +214,18 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         this.setCorePoolSize(0);
 
         // wait a little so that idle threads wake and poll the queue again,
-        // this time always with a timeout (queue.poll() instead of queue.take())
-        // even if we did not wait enough, TaskQueue.take() takes care of timing out
-        // so that we are sure that all threads of the pool are renewed in a limited
-        // time, something like (threadKeepAlive + longest request time)
+        // this time always with a timeout (queue.poll() instead of
+        // queue.take())
+        // even if we did not wait enough, TaskQueue.take() takes care of timing
+        // out, so that we are sure that all threads of the pool are renewed in
+        // a limited time, something like 
+        // (threadKeepAlive + longest request time)
         try {
             Thread.sleep(200L);
         } catch (InterruptedException e) {
-            //yes, ignore
+            // yes, ignore
         }
-        
+
         if (taskQueue != null) {
             // ok, restore the state of the queue and pool
             taskQueue.setForcedRemainingCapacity(null);

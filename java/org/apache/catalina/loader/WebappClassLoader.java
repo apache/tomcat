@@ -2365,24 +2365,18 @@ public class WebappClassLoader
         } catch (IllegalAccessException e) {
             log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
-        } catch (NoSuchMethodException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (InvocationTargetException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
         }       
     }
 
 
-    /*
+    /**
      * Analyzes the given thread local map object. Also pass in the field that
      * points to the internal table to save re-calculating it on every
      * call to this method.
      */
-    private void checkThreadLocalMapForLeaks(Object map, Field internalTableField)
-            throws NoSuchMethodException, IllegalAccessException,
-            NoSuchFieldException, InvocationTargetException {
+    private void checkThreadLocalMapForLeaks(Object map,
+            Field internalTableField) throws IllegalAccessException,
+            NoSuchFieldException {
         if (map != null) {
             Object[] table = (Object[]) internalTableField.get(map);
             if (table != null) {
