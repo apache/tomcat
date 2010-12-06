@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.ajp;
 
-import java.net.InetAddress;
 import java.net.URLEncoder;
 
 import javax.management.MBeanServer;
@@ -90,17 +89,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
         }
         return ("ajp-" + encodedAddr + endpoint.getPort());
     }
-
-    /**
-     * Processor cache.
-     */
-    protected int processorCache = -1;
-    public int getProcessorCache() { return this.processorCache; }
-    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
-
-
-    public InetAddress getAddress() { return endpoint.getAddress(); }
-    public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
 
     public int getSoTimeout() { return endpoint.getSoTimeout(); }
     public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
