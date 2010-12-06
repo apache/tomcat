@@ -904,7 +904,7 @@ public class Connector extends LifecycleMBeanBase  {
         } catch (Exception e) {
             throw new LifecycleException
                 (sm.getString
-                 ("coyoteConnector.protocolHandlerInitializationFailed", e));
+                 ("coyoteConnector.protocolHandlerInitializationFailed"), e);
         }
 
         onameProtocolHandler = register(protocolHandler,
@@ -935,7 +935,7 @@ public class Connector extends LifecycleMBeanBase  {
 
             throw new LifecycleException
                 (errPrefix + " " + sm.getString
-                 ("coyoteConnector.protocolHandlerStartFailed", e));
+                 ("coyoteConnector.protocolHandlerStartFailed"), e);
         }
 
         mapperListener.start();
@@ -957,7 +957,7 @@ public class Connector extends LifecycleMBeanBase  {
         } catch (Exception e) {
             throw new LifecycleException
                 (sm.getString
-                 ("coyoteConnector.protocolHandlerStopFailed", e));
+                 ("coyoteConnector.protocolHandlerStopFailed"), e);
         }
 
         mapperListener.stop();
@@ -974,7 +974,7 @@ public class Connector extends LifecycleMBeanBase  {
         } catch (Exception e) {
             throw new LifecycleException
                 (sm.getString
-                 ("coyoteConnector.protocolHandlerDestroyFailed", e));
+                 ("coyoteConnector.protocolHandlerDestroyFailed"), e);
         }
 
         if (getService() != null) {
