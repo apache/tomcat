@@ -427,7 +427,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     proto.getMaxTrailerSize());
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
-            processor.setTimeout(proto.getTimeout());
+            processor.setConnectionUploadTimeout(
+                    proto.getConnectionUploadTimeout());
             processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
             processor.setCompressionMinSize(proto.getCompressionMinSize());
             processor.setCompression(proto.getCompression());

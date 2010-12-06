@@ -300,12 +300,18 @@
       presented.  The default value is 60000 (i.e. 60 seconds).</p>
     </attribute>
     
+    <attribute name="connectionUploadTimeout" required="false">
+      <p>Specifies the timeout, in milliseconds, to use while a data upload is
+      in progress. The only takes effect if
+      <strong>disableUploadTimeout</strong> is set to <code>false</code>.
+      </p>
+    </attribute>
+
     <attribute name="disableUploadTimeout" required="false">
-      <p>This flag allows the servlet container to use a different, longer
-      connection timeout while a servlet is being executed, which in the end
-      allows either the servlet a longer amount of time to complete its
-      execution, or a longer timeout during data upload. If not specified,
-      this attribute is set to "true".</p>
+      <p>This flag allows the servlet container to use a different, usually
+      longer connection timeout during data upload. If not specified, this
+      attribute is set to <code>true</code> which disables this longer timeout.
+      </p>
     </attribute>
 
     <attribute name="executor" required="false">
