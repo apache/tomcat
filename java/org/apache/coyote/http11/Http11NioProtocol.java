@@ -174,16 +174,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     }
     
     // -------------------- Tcp setup --------------------
-    public String getProtocol() {
-        return getProperty("protocol");
-    }
-
-    public void setProtocol( String k ) {
-        setSecure(true);
-        setAttribute("protocol", k);
-    }
-
-
     public int getSocketCloseDelay() {
         return socketCloseDelay;
     }
