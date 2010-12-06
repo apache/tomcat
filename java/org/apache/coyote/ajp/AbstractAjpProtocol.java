@@ -78,7 +78,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 
-    // *
     public String getName() {
         String encodedAddr = "";
         if (getAddress() != null) {
@@ -89,9 +88,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
         }
         return ("ajp-" + encodedAddr + endpoint.getPort());
     }
-
-    public int getSoTimeout() { return endpoint.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
 
     /**
      * Should authentication be done in the native webserver layer, 
@@ -121,14 +117,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
     }
 
     
-    /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection.
-     */
-    protected int keepAliveTimeout = -1;
-    public int getKeepAliveTimeout() { return keepAliveTimeout; }
-    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
-
     // -------------------- JMX related methods --------------------
 
     protected String domain;
