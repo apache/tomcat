@@ -302,7 +302,7 @@
     
     <attribute name="connectionUploadTimeout" required="false">
       <p>Specifies the timeout, in milliseconds, to use while a data upload is
-      in progress. The only takes effect if
+      in progress. This only takes effect if
       <strong>disableUploadTimeout</strong> is set to <code>false</code>.
       </p>
     </attribute>
