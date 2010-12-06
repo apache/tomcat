@@ -38,7 +38,9 @@
   </properties>
 
 <body>
-<!-- General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other -->
+<!--
+  General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
+-->
 <section name="Tomcat 7.0.6 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -80,10 +82,10 @@
         generate session IDs. (markt)
       </update>
       <add>
-        <bug>50282</bug>: Load <code>javax.security.auth.login.Configuration</code>
-        with <code>JreMemoryLeakPreventionListener</code> to avoid memory leak
-        when stopping a web application that would use JAAS.
-        (slaurent)
+        <bug>50282</bug>: Load
+        <code>javax.security.auth.login.Configuration</code> with
+        <code>JreMemoryLeakPreventionListener</code> to avoid memory leak when
+        stopping a web application that would use JAAS. (slaurent)
       </add>
       <fix>
         <bug>50351</bug>: Fix the regression that broke BeanFactory resources
