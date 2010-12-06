@@ -117,7 +117,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      * stored in the ThreadWithAttributes extra folders, or alternately in
      * thread local fields.
      */
-    public interface Handler {
+    public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(SocketWrapper<Socket> socket);
         public SocketState process(SocketWrapper<Socket> socket, SocketStatus status);
     }
