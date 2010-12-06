@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
@@ -252,10 +253,76 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     }
 
 
+    // ---------------------------------------------------------- Public methods
+
+    /**
+     * The name will be prefix-address-port if address is non-null and
+     * prefix-port if the address is null. The name will be appropriately quoted
+     * so it can be used directly in an ObjectName.
+     */
+    public String getName() {
+        StringBuilder name = new StringBuilder(getNamePrefix());
+        name.append('-');
+        if (getAddress() != null) {
+            name.append(getAddress());
+            name.append('-');
+        }
+        name.append(endpoint.getPort());
+        return ObjectName.quote(name.toString());
+    }
+
+    
     // -------------------------------------------------------- Abstract methods
+    
     /**
      * Concrete implementations need to provide access to their logger to be
      * used by the abstract classes.
      */
     protected abstract Log getLog();
+    
+    
+    /**
+     * Obtain the prefix to be used when construction a name for this protocol
+     * handler. The name will be prefix-address-port.
+     */
+    protected abstract String getNamePrefix();
+
+
+    // ----------------------------------------------------- JMX related methods
+
+    protected String domain;
+    protected ObjectName oname;
+    protected MBeanServer mserver;
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    @Override
+    public ObjectName preRegister(MBeanServer server, ObjectName name)
+            throws Exception {
+        oname = name;
+        mserver = server;
+        domain = name.getDomain();
+        return name;
+    }
+
+    @Override
+    public void postRegister(Boolean registrationDone) {
+        // NOOP
+    }
+
+    @Override
+    public void preDeregister() throws Exception {
+        // NOOP
+    }
+
+    @Override
+    public void postDeregister() {
+        // NOOP
+    }
 }
