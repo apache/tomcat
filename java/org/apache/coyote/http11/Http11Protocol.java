@@ -33,7 +33,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
@@ -58,6 +58,12 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     
     @Override
     protected Log getLog() { return log; }
+
+
+    @Override
+    protected AbstractEndpoint.Handler getHandler() {
+        return cHandler;
+    }
 
 
     // ------------------------------------------------------------ Constructor
@@ -185,6 +191,11 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         protected Http11Protocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
+            
         protected ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor> connections =
             new ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor>();
 
