@@ -277,7 +277,7 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
         class will trigger the initializer that will retain a static reference 
         to the context class loader. The protection loads the class with the 
         system class loader to ensure that the static initializer is not 
-        triggered by web application. Defaults to <code>true</code>.</p>
+        triggered by a web application. Defaults to <code>true</code>.</p>
       </attribute>
 
       <attribute name="securityPolicyProtection" required="false">
