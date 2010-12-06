@@ -88,7 +88,8 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
      * renewing all threads at the same time, this delay is observed between 2
      * threads being renewed.
      */
-    protected long threadRenewalDelay = 1000L;
+    protected long threadRenewalDelay = 
+        org.apache.tomcat.util.threads.Constants.DEFAULT_THREAD_RENEWAL_DELAY;
     
     private TaskQueue taskqueue = null;
     // ---------------------------------------------- Constructors

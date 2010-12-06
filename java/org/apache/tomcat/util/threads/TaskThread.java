@@ -19,8 +19,6 @@ package org.apache.tomcat.util.threads;
 /**
  * A Thread implementation that records the time at which it was created.
  * 
- * @author slaurent
- * 
  */
 public class TaskThread extends Thread {
 

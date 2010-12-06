@@ -2489,9 +2489,10 @@ public class StandardContext extends ContainerBase
         return this.renewThreadsWhenStoppingContext;
     }
 
-    public void setRenewThreadsWhenStoppingContext(boolean renewThreadsWhenStoppingContext) {
+    public void setRenewThreadsWhenStoppingContext(
+            boolean renewThreadsWhenStoppingContext) {
         boolean oldRenewThreadsWhenStoppingContext =
-            this.renewThreadsWhenStoppingContext;
+                this.renewThreadsWhenStoppingContext;
         this.renewThreadsWhenStoppingContext = renewThreadsWhenStoppingContext;
         support.firePropertyChange("renewThreadsWhenStoppingContext",
                 oldRenewThreadsWhenStoppingContext,
