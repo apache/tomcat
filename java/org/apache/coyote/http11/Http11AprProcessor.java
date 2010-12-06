@@ -238,7 +238,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
                 request.setStartTime(System.currentTimeMillis());
                 keptAlive = true;
                 if (!disableUploadTimeout) {
-                    Socket.timeoutSet(socketRef, timeout * 1000);
+                    Socket.timeoutSet(socketRef,
+                            connectionUploadTimeout * 1000);
                 }
                 inputBuffer.parseHeaders();
             } catch (IOException e) {

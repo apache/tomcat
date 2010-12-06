@@ -199,7 +199,7 @@ public class Http11Processor extends AbstractHttp11Processor {
                 if (disableUploadTimeout) {
                     socket.getSocket().setSoTimeout(soTimeout);
                 } else {
-                    socket.getSocket().setSoTimeout(timeout);
+                    socket.getSocket().setSoTimeout(connectionUploadTimeout);
                 }
                 inputBuffer.parseHeaders();
             } catch (IOException e) {

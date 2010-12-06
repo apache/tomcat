@@ -181,7 +181,7 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     /**
      * Maximum timeout on uploads. 5 minutes as in Apache HTTPD server.
      */
-    protected int timeout = 300000;
+    protected int connectionUploadTimeout = 300000;
 
 
     /**
@@ -582,15 +582,15 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     /**
      * Set the upload timeout.
      */
-    public void setTimeout( int timeouts ) {
-        timeout = timeouts ;
+    public void setConnectionUploadTimeout(int timeout) {
+        connectionUploadTimeout = timeout ;
     }
 
     /**
      * Get the upload timeout.
      */
-    public int getTimeout() {
-        return timeout;
+    public int getConnectionUploadTimeout() {
+        return connectionUploadTimeout;
     }
 
 

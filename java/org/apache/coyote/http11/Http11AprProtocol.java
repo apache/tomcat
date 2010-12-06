@@ -143,19 +143,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     public boolean getDeferAccept() { return ((AprEndpoint)endpoint).getDeferAccept(); }
     public void setDeferAccept(boolean deferAccept) { ((AprEndpoint)endpoint).setDeferAccept(deferAccept); }
 
-    /**
-     * This timeout represents the socket timeout which will be used while
-     * the adapter execution is in progress, unless disableUploadTimeout
-     * is set to true. The default is the same as for Apache HTTP Server
-     * (300 000 milliseconds).
-     * TODO: Make the timeout attribute names consistent across the connectors
-     */
-    protected int timeout = 300000;
-    @Override
-    public int getTimeout() { return timeout; }
-    @Override
-    public void setTimeout(int timeout) { this.timeout = timeout; }
-
     // --------------------  SSL related properties --------------------
 
     /**
@@ -437,7 +424,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     proto.getMaxTrailerSize());
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
-            processor.setTimeout(proto.timeout);
+            processor.setConnectionUploadTimeout(
+                    proto.getConnectionUploadTimeout());
             processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
             processor.setCompressionMinSize(proto.getCompressionMinSize());
             processor.setCompression(proto.getCompression());
