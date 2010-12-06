@@ -41,7 +41,6 @@ public final class Constants {
     public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = -1;
     public static final int DEFAULT_CONNECTION_UPLOAD_TIMEOUT = 300000;
-    public static final int DEFAULT_SERVER_SOCKET_TIMEOUT = 0;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
     // Prefix codes for message types from server to container
