@@ -167,7 +167,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     public void setSoTimeout( int i ) {
         endpoint.setSoTimeout(i);
         setAttribute("soTimeout", "" + i);
-        setAttribute("timeout", "" + i);
         setAttribute("connectionTimeout", "" + i);
     }
     
