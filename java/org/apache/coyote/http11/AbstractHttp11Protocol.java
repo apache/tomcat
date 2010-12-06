@@ -16,130 +16,29 @@
  */
 package org.apache.coyote.http11;
 
-import java.net.URLEncoder;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.apache.coyote.AbstractProtocolHandler;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
+
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
-    protected SSLImplementation sslImplementation = null;
-    
-    
-    public String getName() {
-        String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
-            if (encodedAddr.startsWith("/"))
-                encodedAddr = encodedAddr.substring(1);
-            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
-        }
-        return ("http-" + encodedAddr + endpoint.getPort());
-    }
-    
-    
-    @Override
-    public void pause() throws Exception {
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("http11protocol.endpoint.pauseerror"), ex);
-            throw ex;
-        }
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.pause", getName()));
-    }
 
-    @Override
-    public void resume() throws Exception {
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("http11protocol.endpoint.resumeerror"), ex);
-            throw ex;
-        }
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.resume", getName()));
-    }
-
-    @Override
-    public void stop() throws Exception {
-        try {
-            endpoint.stop();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("http11protocol.endpoint.stoperror"), ex);
-            throw ex;
-        }
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.stop", getName()));
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.destroy", getName()));
-        endpoint.destroy();
-        if( tpOname!=null )
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if( rgOname != null )
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-    }
-    
-    public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
-    public void setSSLEnabled(boolean SSLEnabled) { endpoint.setSSLEnabled(SSLEnabled);}    
-    
-    /**
-     * This field indicates if the protocol is secure from the perspective of
-     * the client (= https is used).
-     */
-    private boolean secure;
-    public boolean getSecure() { return secure; }
-    public void setSecure(boolean b) { 
-        secure = b;         
-        setAttribute("secure", "" + b);
-    }
-    
+    // ------------------------------------------------ HTTP specific properties
+    // ------------------------------------------ managed in the ProtocolHandler
 
     private int socketBuffer = 9000;
     public int getSocketBuffer() { return socketBuffer; }
-    public void setSocketBuffer(int socketBuffer) { this.socketBuffer = socketBuffer; }
-
-    // HTTP
-    /**
-     * Maximum number of requests which can be performed over a keepalive 
-     * connection. The default is the same as for Apache HTTP Server.
-     */
-    public int getMaxKeepAliveRequests() { return endpoint.getMaxKeepAliveRequests(); }
-    public void setMaxKeepAliveRequests(int mkar) {
-        endpoint.setMaxKeepAliveRequests(mkar);
-        setAttribute("maxKeepAliveRequests", "" + mkar);
+    public void setSocketBuffer(int socketBuffer) {
+        this.socketBuffer = socketBuffer;
     }
+
     
-    /**
-     * Return the Keep-Alive policy for the connection.
-     */
-    public boolean getKeepAlive() {
-        return ((endpoint.getMaxKeepAliveRequests() != 0) && (endpoint.getMaxKeepAliveRequests() != 1));
-    }
-
-    /**
-     * Set the keep-alive policy for this connection.
-     */
-    public void setKeepAlive(boolean keepAlive) {
-        if (!keepAlive) {
-            setMaxKeepAliveRequests(1);
-        }
-    }
-
     /**
      * Maximum size of the post which will be saved when processing certain
      * requests, such as a POST.
@@ -149,7 +48,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
     
 
-    // HTTP
     /**
      * Maximum size of the HTTP message header.
      */
@@ -169,7 +67,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     }
 
 
-    // HTTP
     /**
      * If true, the connectionUploadTimeout will be ignored and the regular
      * socket timeout will be used for the full duration of the connection.
@@ -179,51 +76,66 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     public void setDisableUploadTimeout(boolean isDisabled) {
         disableUploadTimeout = isDisabled;
     }
-    
-    
-    // HTTP
+
+
     /**
      * Integrated compression support.
      */
     private String compression = "off";
     public String getCompression() { return compression; }
     public void setCompression(String valueS) { compression = valueS; }
-        
 
-    // HTTP
+
     private String noCompressionUserAgents = null;
-    public String getNoCompressionUserAgents() { return noCompressionUserAgents; }
-    public void setNoCompressionUserAgents(String valueS) { noCompressionUserAgents = valueS; }
-    
-    // HTTP
+    public String getNoCompressionUserAgents() {
+        return noCompressionUserAgents;
+    }
+    public void setNoCompressionUserAgents(String valueS) {
+        noCompressionUserAgents = valueS;
+    }
+
+
     private String compressableMimeTypes = "text/html,text/xml,text/plain";
     public String getCompressableMimeType() { return compressableMimeTypes; }
-    public void setCompressableMimeType(String valueS) { compressableMimeTypes = valueS; }
-    public String getCompressableMimeTypes() { return getCompressableMimeType(); }
-    public void setCompressableMimeTypes(String valueS) { setCompressableMimeType(valueS); }
-    
-    // HTTP
+    public void setCompressableMimeType(String valueS) {
+        compressableMimeTypes = valueS;
+    }
+    public String getCompressableMimeTypes() {
+        return getCompressableMimeType();
+    }
+    public void setCompressableMimeTypes(String valueS) {
+        setCompressableMimeType(valueS);
+    }
+
+
     private int compressionMinSize = 2048;
     public int getCompressionMinSize() { return compressionMinSize; }
-    public void setCompressionMinSize(int valueI) { compressionMinSize = valueI; }
- 
-    // HTTP
+    public void setCompressionMinSize(int valueI) {
+        compressionMinSize = valueI;
+    }
+
+
     /**
-     * User agents regular expressions which should be restricted to HTTP/1.0 support.
+     * User agents regular expressions which should be restricted to HTTP/1.0
+     * support.
      */
     private String restrictedUserAgents = null;
     public String getRestrictedUserAgents() { return restrictedUserAgents; }
-    public void setRestrictedUserAgents(String valueS) { restrictedUserAgents = valueS; }
+    public void setRestrictedUserAgents(String valueS) {
+        restrictedUserAgents = valueS;
+    }
 
-    // HTTP
+
     /**
      * Server header.
      */
     private String server;
-    public void setServer( String server ) { this.server = server; }
     public String getServer() { return server; }
-    
-    // HTTP
+    public void setServer( String server ) {
+        this.server = server;
+    }
+
+
     /**
      * Maximum size of trailing headers in bytes
      */
@@ -233,44 +145,107 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
         this.maxTrailerSize = maxTrailerSize;
     }
 
+
+    // ------------------------------------------------ HTTP specific properties
+    // ------------------------------------------ passed through to the EndPoint
+    
+    public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
+    public void setSSLEnabled(boolean SSLEnabled) {
+        endpoint.setSSLEnabled(SSLEnabled);
+    }    
+
+
+    // ------------------------------------------------ HTTP specific properties
+    // --------- passed through to the EndPoint and made available as attributes
+
+    /**
+     * This field indicates if the protocol is treated as if it is secure. This
+     * normally means https is being used but can be used to fake https e.g
+     * behind a reverse proxy.
+     */
+    private boolean secure;
+    public boolean getSecure() { return secure; }
+    public void setSecure(boolean b) { 
+        secure = b;         
+        setAttribute("secure", "" + b);
+    }
+    
+
+    /**
+     * Maximum number of requests which can be performed over a keepalive 
+     * connection. The default is the same as for Apache HTTP Server.
+     */
+    public int getMaxKeepAliveRequests() { 
+        return endpoint.getMaxKeepAliveRequests();
+    }
+    public void setMaxKeepAliveRequests(int mkar) {
+        endpoint.setMaxKeepAliveRequests(mkar);
+        setAttribute("maxKeepAliveRequests", "" + mkar);
+    }
+
+    
+    // ----------------------------------------------------- JMX related methods
+
+    @Override
+    protected String getNamePrefix() {
+        return ("http");
+    }
+    
+    
+    // ------------------------------------------------------- Lifecycle methods
+    
     @Override
     public abstract void init() throws Exception;
+
+    @Override
+    public void pause() throws Exception {
+        try {
+            endpoint.pause();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("http11protocol.endpoint.pauseerror"),
+                    ex);
+            throw ex;
+        }
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.pause", getName()));
+    }
+
+    @Override
+    public void resume() throws Exception {
+        try {
+            endpoint.resume();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("http11protocol.endpoint.resumeerror"),
+                    ex);
+            throw ex;
+        }
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.resume", getName()));
+    }
+
+    @Override
+    public void stop() throws Exception {
+        try {
+            endpoint.stop();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("http11protocol.endpoint.stoperror"),
+                    ex);
+            throw ex;
+        }
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.stop", getName()));
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("http11protocol.destroy", getName()));
+        endpoint.destroy();
+        if( tpOname!=null )
+            Registry.getRegistry(null, null).unregisterComponent(tpOname);
+        if( rgOname != null )
+            Registry.getRegistry(null, null).unregisterComponent(rgOname);
+    }
     
-    // -------------------- JMX related methods --------------------
 
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
-
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
-    }
-
-    @Override
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
-    }
-
-    @Override
-    public void preDeregister() throws Exception {
-        // NOOP
-    }
-
-    @Override
-    public void postDeregister() {
-        // NOOP
-    }
 }

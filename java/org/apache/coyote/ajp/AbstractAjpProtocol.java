@@ -16,93 +16,42 @@
  */
 package org.apache.coyote.ajp;
 
-import java.net.URLEncoder;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.apache.coyote.AbstractProtocolHandler;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
+    
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
-        
-    @Override
-    public void pause() throws Exception {
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("ajpprotocol.endpoint.pauseerror"), ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.pause", getName()));
-    }
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
-    @Override
-    public void resume() throws Exception {
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("ajpprotocol.endpoint.resumeerror"), ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.resume", getName()));
-    }
 
-    @Override
-    public void stop() throws Exception {
-        try {
-            endpoint.stop();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("ajpprotocol.endpoint.stoperror"), ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.stop", getName()));
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.destroy", getName()));
-        endpoint.destroy();
-        if (tpOname!=null)
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if (rgOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-    }
-
-    public String getName() {
-        String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
-            if (encodedAddr.startsWith("/"))
-                encodedAddr = encodedAddr.substring(1);
-            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
-        }
-        return ("ajp-" + encodedAddr + endpoint.getPort());
-    }
-
+    // ------------------------------------------------- AJP specific properties
+    // ------------------------------------------ managed in the ProtocolHandler
+    
     /**
      * Should authentication be done in the native webserver layer, 
      * or in the Servlet container ?
      */
     protected boolean tomcatAuthentication = true;
     public boolean getTomcatAuthentication() { return tomcatAuthentication; }
-    public void setTomcatAuthentication(boolean tomcatAuthentication) { this.tomcatAuthentication = tomcatAuthentication; }
+    public void setTomcatAuthentication(boolean tomcatAuthentication) {
+        this.tomcatAuthentication = tomcatAuthentication;
+    }
+
 
     /**
      * Required secret.
      */
     protected String requiredSecret = null;
-    public void setRequiredSecret(String requiredSecret) { this.requiredSecret = requiredSecret; }
-    
+    public void setRequiredSecret(String requiredSecret) {
+        this.requiredSecret = requiredSecret;
+    }
+
+
     /**
      * AJP packet size.
      */
@@ -116,42 +65,65 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
         }
     }
 
+
+    // ----------------------------------------------------- JMX related methods
+
+    @Override
+    protected String getNamePrefix() {
+        return ("ajp");
+    }
     
-    // -------------------- JMX related methods --------------------
-
-    protected String domain;
-    protected ObjectName oname;
-    protected MBeanServer mserver;
-
-    public ObjectName getObjectName() {
-        return oname;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
+    
+    // ------------------------------------------------------- Lifecycle methods
 
     @Override
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-        return name;
+    public void pause() throws Exception {
+        try {
+            endpoint.pause();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("ajpprotocol.endpoint.pauseerror"), ex);
+            throw ex;
+        }
+        if (getLog().isInfoEnabled())
+            getLog().info(sm.getString("ajpprotocol.pause", getName()));
     }
 
-    @Override
-    public void postRegister(Boolean registrationDone) {
-        // NOOP
-    }
 
     @Override
-    public void preDeregister() throws Exception {
-        // NOOP
+    public void resume() throws Exception {
+        try {
+            endpoint.resume();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("ajpprotocol.endpoint.resumeerror"),
+                    ex);
+            throw ex;
+        }
+        if (getLog().isInfoEnabled())
+            getLog().info(sm.getString("ajpprotocol.resume", getName()));
     }
 
+
     @Override
-    public void postDeregister() {
-        // NOOP
+    public void stop() throws Exception {
+        try {
+            endpoint.stop();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("ajpprotocol.endpoint.stoperror"), ex);
+            throw ex;
+        }
+        if (getLog().isInfoEnabled())
+            getLog().info(sm.getString("ajpprotocol.stop", getName()));
+    }
+
+
+    @Override
+    public void destroy() throws Exception {
+        if (getLog().isInfoEnabled())
+            getLog().info(sm.getString("ajpprotocol.destroy", getName()));
+        endpoint.destroy();
+        if (tpOname!=null)
+            Registry.getRegistry(null, null).unregisterComponent(tpOname);
+        if (rgOname != null)
+            Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 }

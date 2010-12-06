@@ -16,8 +16,12 @@
  */
 package org.apache.coyote.http11;
 
+import org.apache.tomcat.util.net.SSLImplementation;
+
 public abstract class AbstractHttp11JsseProtocol
         extends AbstractHttp11Protocol {
+
+    protected SSLImplementation sslImplementation = null;
 
     public String getAlgorithm() { return endpoint.getAlgorithm();}
     public void setAlgorithm(String s ) { endpoint.setAlgorithm(s);}
