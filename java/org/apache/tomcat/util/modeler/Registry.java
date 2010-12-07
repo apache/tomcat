@@ -150,7 +150,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      *
      * @since 1.1
      */
-    public synchronized static Registry getRegistry(Object key, Object guard) {
+    public static synchronized Registry getRegistry(Object key, Object guard) {
         Registry localRegistry;
         if( perLoaderRegistries!=null ) {
             if( key==null ) 

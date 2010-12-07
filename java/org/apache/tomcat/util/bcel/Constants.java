@@ -27,71 +27,71 @@ public interface Constants {
 
   /** One of the access flags for fields, methods, or classes.
    */
-  public final static short ACC_FINAL        = 0x0010;
+  public static final short ACC_FINAL        = 0x0010;
 
   /** One of the access flags for fields, methods, or classes.
    */
-  public final static short ACC_INTERFACE    = 0x0200;
+  public static final short ACC_INTERFACE    = 0x0200;
 
   /** One of the access flags for fields, methods, or classes.
    */
-  public final static short ACC_ABSTRACT     = 0x0400;
+  public static final short ACC_ABSTRACT     = 0x0400;
 
   /** One of the access flags for fields, methods, or classes.
    */
-  public final static short ACC_ENUM         = 0x4000;
+  public static final short ACC_ENUM         = 0x4000;
 
   // Applies to classes compiled by new compilers only
   /** One of the access flags for fields, methods, or classes.
    */
-  public final static short ACC_SUPER        = 0x0020;
+  public static final short ACC_SUPER        = 0x0020;
 
   /** One of the access flags for fields, methods, or classes.
    */
-  public final static short MAX_ACC_FLAG     = ACC_ENUM;
+  public static final short MAX_ACC_FLAG     = ACC_ENUM;
 
   /** The names of the access flags. */
-  public final static String[] ACCESS_NAMES = {
+  public static final String[] ACCESS_NAMES = {
     "public", "private", "protected", "static", "final", "synchronized",
     "volatile", "transient", "native", "interface", "abstract", "strictfp",
     "synthetic", "annotation", "enum"
   };
 
   /** Marks a constant pool entry as type UTF-8.  */
-  public final static byte CONSTANT_Utf8               = 1;
+  public static final byte CONSTANT_Utf8               = 1;
 
   /** Marks a constant pool entry as type Integer.  */
-  public final static byte CONSTANT_Integer            = 3;
+  public static final byte CONSTANT_Integer            = 3;
 
   /** Marks a constant pool entry as type Float.  */
-  public final static byte CONSTANT_Float              = 4;
+  public static final byte CONSTANT_Float              = 4;
 
   /** Marks a constant pool entry as type Long.  */
-  public final static byte CONSTANT_Long               = 5;
+  public static final byte CONSTANT_Long               = 5;
 
   /** Marks a constant pool entry as type Double.  */
-  public final static byte CONSTANT_Double             = 6;
+  public static final byte CONSTANT_Double             = 6;
 
   /** Marks a constant pool entry as a Class.  */
-  public final static byte CONSTANT_Class              = 7;
+  public static final byte CONSTANT_Class              = 7;
 
   /** Marks a constant pool entry as a Field Reference.  */
-  public final static byte CONSTANT_Fieldref           = 9;
+  public static final byte CONSTANT_Fieldref           = 9;
 
   /** Marks a constant pool entry as type String.  */
-  public final static byte CONSTANT_String             = 8;
+  public static final byte CONSTANT_String             = 8;
 
   /** Marks a constant pool entry as a Method Reference.  */
-  public final static byte CONSTANT_Methodref          = 10;
+  public static final byte CONSTANT_Methodref          = 10;
 
   /** Marks a constant pool entry as an Interface Method Reference.  */
-  public final static byte CONSTANT_InterfaceMethodref = 11;
+  public static final byte CONSTANT_InterfaceMethodref = 11;
 
   /** Marks a constant pool entry as a name and type.  */
-  public final static byte CONSTANT_NameAndType        = 12;
+  public static final byte CONSTANT_NameAndType        = 12;
 
   /** The names of the types of entries in a constant pool. */
-  public final static String[] CONSTANT_NAMES = {
+  public static final String[] CONSTANT_NAMES = {
     "", "CONSTANT_Utf8", "", "CONSTANT_Integer",
     "CONSTANT_Float", "CONSTANT_Long", "CONSTANT_Double",
     "CONSTANT_Class", "CONSTANT_String", "CONSTANT_Fieldref",
