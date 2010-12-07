@@ -224,7 +224,7 @@ public class JNDIRealm extends RealmBase {
      * Constant that holds the name of the environment property for specifying
      * the manner in which aliases should be dereferenced.
      */
-    public final static String DEREF_ALIASES = "java.naming.ldap.derefAliases";
+    public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
     /**
      * Descriptive information about this Realm implementation.
@@ -2222,10 +2222,10 @@ public class JNDIRealm extends RealmBase {
       */
      protected static class User {
          
-         final private String username;
-         final private String dn;
-         final private String password;
-         final private List<String> roles;
+         private final String username;
+         private final String dn;
+         private final String password;
+         private final List<String> roles;
 
          public User(String username, String dn, String password,
                  List<String> roles) {

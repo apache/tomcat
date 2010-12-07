@@ -1022,7 +1022,7 @@ public class MBeanUtils {
      * Create and configure (if necessary) and return the registry of
      * managed object descriptions.
      */
-    public synchronized static Registry createRegistry() {
+    public static synchronized Registry createRegistry() {
 
         if (registry == null) {
             registry = Registry.getRegistry(null, null);
@@ -1052,7 +1052,7 @@ public class MBeanUtils {
      * <code>MBeanServer</code> with which we will be
      * registering our <code>DynamicMBean</code> implementations.
      */
-    public synchronized static MBeanServer createServer() {
+    public static synchronized MBeanServer createServer() {
 
         if (mserver == null) {
             try {

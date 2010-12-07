@@ -87,7 +87,7 @@ public class DigestAuthenticator
     /**
      * MD5 message digest provider.
      */
-    protected volatile static MessageDigest md5Helper;
+    protected static volatile MessageDigest md5Helper;
 
 
     /**

@@ -57,8 +57,8 @@ import org.apache.tomcat.util.res.StringManager;
 final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
-    private final static ThreadLocal<ServletRequest> lastServicedRequest;
-    private final static ThreadLocal<ServletResponse> lastServicedResponse;
+    private static final ThreadLocal<ServletRequest> lastServicedRequest;
+    private static final ThreadLocal<ServletResponse> lastServicedResponse;
 
     static {
         if (ApplicationDispatcher.WRAP_SAME_OBJECT) {

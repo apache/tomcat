@@ -48,7 +48,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     private static final String CONTENT_TYPE = "content-type";
     private static final String LAST_MODIFIED = "last-modified";
     private static final DateFormat RFC1123_FORMAT;
-    private final static String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
+    private static final String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
     protected long lastModified = -1;
     private String contentType = null;
