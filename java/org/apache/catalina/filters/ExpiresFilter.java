@@ -418,9 +418,9 @@ public class ExpiresFilter extends FilterBase {
             return new Duration(amount, DurationUnit.SECOND);
         }
 
-        final protected int amount;
+        protected final int amount;
 
-        final protected DurationUnit unit;
+        protected final DurationUnit unit;
 
         public Duration(int amount, DurationUnit unit) {
             super();

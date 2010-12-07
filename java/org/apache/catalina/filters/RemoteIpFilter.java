@@ -417,7 +417,7 @@ import org.apache.juli.logging.LogFactory;
 public class RemoteIpFilter implements Filter {
     public static class XForwardedRequest extends HttpServletRequestWrapper {
         
-        final static ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
+        static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
             @Override
             protected SimpleDateFormat[] initialValue() {
                 return new SimpleDateFormat[] {

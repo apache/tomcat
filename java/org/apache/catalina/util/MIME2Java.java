@@ -472,8 +472,8 @@ import java.util.Locale;
  */
 public class MIME2Java {
 
-    static private Hashtable<String,String> s_enchash;
-    static private Hashtable<String,String> s_revhash;
+    private static Hashtable<String,String> s_enchash;
+    private static Hashtable<String,String> s_revhash;
 
     static {
         s_enchash = new Hashtable<String,String>();

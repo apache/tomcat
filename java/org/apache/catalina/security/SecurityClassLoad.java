@@ -48,7 +48,7 @@ public final class SecurityClassLoad {
     }
     
     
-    private final static void loadCorePackage(ClassLoader loader)
+    private static final void loadCorePackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.core.";
         loader.loadClass
@@ -96,7 +96,7 @@ public final class SecurityClassLoad {
     }
     
     
-    private final static void loadLoaderPackage(ClassLoader loader)
+    private static final void loadLoaderPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
         loader.loadClass
@@ -105,7 +105,7 @@ public final class SecurityClassLoad {
     }
     
     
-    private final static void loadSessionPackage(ClassLoader loader)
+    private static final void loadSessionPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.session.";
         loader.loadClass
@@ -119,7 +119,7 @@ public final class SecurityClassLoad {
     }
     
     
-    private final static void loadUtilPackage(ClassLoader loader)
+    private static final void loadUtilPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "Enumerator");
@@ -127,20 +127,20 @@ public final class SecurityClassLoad {
     }
     
     
-    private final static void loadCoyotePackage(ClassLoader loader)
+    private static final void loadCoyotePackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.coyote.";
         loader.loadClass(basePackage + "http11.AbstractOutputBuffer$1");
     }
 
 
-    private final static void loadJavaxPackage(ClassLoader loader)
+    private static final void loadJavaxPackage(ClassLoader loader)
         throws Exception {
         loader.loadClass("javax.servlet.http.Cookie");
     }
     
 
-    private final static void loadConnectorPackage(ClassLoader loader)
+    private static final void loadConnectorPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
         loader.loadClass
@@ -223,7 +223,7 @@ public final class SecurityClassLoad {
              "Response$3");
     }
 
-    private final static void loadTomcatPackage(ClassLoader loader)
+    private static final void loadTomcatPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.tomcat.";
         // Make sure system property is read at this point

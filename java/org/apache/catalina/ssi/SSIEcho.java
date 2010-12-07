@@ -28,8 +28,8 @@ import java.io.PrintWriter;
  * @version $Id$
  */
 public class SSIEcho implements SSICommand {
-    protected final static String DEFAULT_ENCODING = "entity";
-    protected final static String MISSING_VARIABLE_VALUE = "(none)";
+    protected static final String DEFAULT_ENCODING = "entity";
+    protected static final String MISSING_VARIABLE_VALUE = "(none)";
 
 
     /**

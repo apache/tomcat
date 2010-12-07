@@ -42,9 +42,9 @@ import org.apache.tomcat.util.http.HttpMessages;
  * @version $Id$
  */
 public class SSIMediator {
-    protected final static String DEFAULT_CONFIG_ERR_MSG = "[an error occurred while processing this directive]";
-    protected final static String DEFAULT_CONFIG_TIME_FMT = "%A, %d-%b-%Y %T %Z";
-    protected final static String DEFAULT_CONFIG_SIZE_FMT = "abbrev";
+    protected static final String DEFAULT_CONFIG_ERR_MSG = "[an error occurred while processing this directive]";
+    protected static final String DEFAULT_CONFIG_TIME_FMT = "%A, %d-%b-%Y %T %Z";
+    protected static final String DEFAULT_CONFIG_SIZE_FMT = "abbrev";
     protected static URLEncoder urlEncoder;
     protected String configErrMsg = DEFAULT_CONFIG_ERR_MSG;
     protected String configTimeFmt = DEFAULT_CONFIG_TIME_FMT;
