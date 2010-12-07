@@ -48,9 +48,9 @@ import org.apache.jasper.el.ELContextImpl;
  */
 public class JspApplicationContextImpl implements JspApplicationContext {
 
-    private final static String KEY = JspApplicationContextImpl.class.getName();
+    private static final String KEY = JspApplicationContextImpl.class.getName();
 
-    private final static ExpressionFactory expressionFactory =
+    private static final ExpressionFactory expressionFactory =
         ExpressionFactory.newInstance();
 
     private final List<ELContextListener> contextListeners = new ArrayList<ELContextListener>();

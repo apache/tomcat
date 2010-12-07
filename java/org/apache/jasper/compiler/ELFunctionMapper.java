@@ -198,7 +198,7 @@ public class ELFunctionMapper {
         
             // Generate declaration for the map statically
             decName = getMapName();
-            ss.append("static private org.apache.jasper.runtime.ProtectedFunctionMapper " + decName + ";\n");
+            ss.append("private static org.apache.jasper.runtime.ProtectedFunctionMapper " + decName + ";\n");
 
             ds.append("  " + decName + "= ");
             ds.append("org.apache.jasper.runtime.ProtectedFunctionMapper");

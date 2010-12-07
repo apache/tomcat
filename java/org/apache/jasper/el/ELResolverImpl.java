@@ -35,7 +35,7 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.apache.jasper.Constants;
 
 public final class ELResolverImpl extends ELResolver {
-    private final static ELResolver DefaultResolver;
+    private static final ELResolver DefaultResolver;
 
     static {
         if (Constants.IS_SECURITY_ENABLED) {
