@@ -27,7 +27,7 @@ import javax.net.ssl.SSLSession;
 
  @author EKR
  */
-abstract public class SSLImplementation {
+public abstract class SSLImplementation {
     private static final org.apache.juli.logging.Log logger = org.apache.juli.logging.LogFactory
             .getLog(SSLImplementation.class);
 
@@ -78,11 +78,11 @@ abstract public class SSLImplementation {
         }
     }
 
-    abstract public String getImplementationName();
+    public abstract String getImplementationName();
 
-    abstract public ServerSocketFactory getServerSocketFactory();
+    public abstract ServerSocketFactory getServerSocketFactory();
 
-    abstract public SSLSupport getSSLSupport(Socket sock);
+    public abstract SSLSupport getSSLSupport(Socket sock);
 
-    abstract public SSLSupport getSSLSupport(SSLSession session);
+    public abstract SSLSupport getSSLSupport(SSLSession session);
 }
