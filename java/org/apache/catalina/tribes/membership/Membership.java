@@ -18,6 +18,7 @@
 package org.apache.catalina.tribes.membership;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -37,8 +38,8 @@ import org.apache.catalina.tribes.Member;
  * @author Peter Rossbach
  * @version $Id$
  */
-public class Membership
-{
+public class Membership implements Cloneable {
+
     protected static final MemberImpl[] EMPTY_MEMBERS = new MemberImpl[0];
     
     private final Object membersLock = new Object();
@@ -270,8 +271,12 @@ public class Membership
     
     // --------------------------------------------- Inner Class
 
-    private class MemberComparator implements Comparator<Member> {
+    private static class MemberComparator implements Comparator<Member>,
+            Serializable {
 
+        private static final long serialVersionUID = 1L;
+
+        @Override
         public int compare(Member m1, Member m2) {
             //longer alive time, means sort first
             long result = m2.getMemberAliveTime() - m1.getMemberAliveTime();
