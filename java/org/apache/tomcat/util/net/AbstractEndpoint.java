@@ -76,7 +76,7 @@ public abstract class AbstractEndpoint {
 
     public static interface Handler {
         /**
-         * Different types of socket states to react upon
+         * Different types of socket states to react upon.
          */
         public enum SocketState {
             OPEN, CLOSED, LONG, ASYNC_END
@@ -84,9 +84,15 @@ public abstract class AbstractEndpoint {
         
 
         /**
-         * Obtain the GlobalRequestProcessor associated with the handler
+         * Obtain the GlobalRequestProcessor associated with the handler.
          */
         public RequestGroupInfo getGlobal();
+        
+        
+        /**
+         * Recycle resources associated with the handler.
+         */
+        public void recycle();
     }
 
     // Standard SSL Configuration attributes

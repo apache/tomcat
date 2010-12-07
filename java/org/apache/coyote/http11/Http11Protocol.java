@@ -159,13 +159,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     }
 
 
-    @Override
-    public void destroy() throws Exception {
-        cHandler.recycledProcessors.clear();
-        super.destroy();
-    }
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Name of the socket factory.
@@ -191,10 +185,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         protected Http11Protocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
-        @Override
-        public RequestGroupInfo getGlobal() {
-            return global;
-        }
             
         protected ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor> connections =
             new ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor>();
@@ -241,6 +231,16 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
         Http11ConnectionHandler(Http11Protocol proto) {
             this.proto = proto;
+        }
+
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
+
+        @Override
+        public void recycle() {
+            recycledProcessors.clear();
         }
 
         @Override

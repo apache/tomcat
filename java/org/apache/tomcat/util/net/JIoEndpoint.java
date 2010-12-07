@@ -466,6 +466,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             }
             serverSocket = null;
         }
+        handler.recycle();
         initialized = false ;
     }
 

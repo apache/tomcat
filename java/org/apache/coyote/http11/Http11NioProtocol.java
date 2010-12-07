@@ -207,13 +207,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected Http11NioProtocol proto;
         protected static int count = 0;
         protected RequestGroupInfo global = new RequestGroupInfo();
-        @Override
-        public RequestGroupInfo getGlobal() {
-            return global;
-        }
 
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
+
         protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors = new ConcurrentLinkedQueue<Http11NioProcessor>() {
             private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
@@ -258,7 +255,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
         
         @Override
-        public void releaseCaches() {
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
+
+        @Override
+        public void recycle() {
             recycledProcessors.clear();
         }
         

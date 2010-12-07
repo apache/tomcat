@@ -123,12 +123,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             log.info(sm.getString("http11protocol.start", getName()));
     }
 
-    @Override
-    public void destroy() throws Exception {
-        cHandler.recycledProcessors.clear();
-        super.destroy();
-    }
-
     private Http11ConnectionHandler cHandler;
 
     public boolean getUseSendfile() { return ((AprEndpoint)endpoint).getUseSendfile(); }
@@ -245,13 +239,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         protected Http11AprProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
-        @Override
-        public RequestGroupInfo getGlobal() {
-            return global;
-        }
         
         protected ConcurrentHashMap<SocketWrapper<Long>, Http11AprProcessor> connections =
             new ConcurrentHashMap<SocketWrapper<Long>, Http11AprProcessor>();
+
         protected ConcurrentLinkedQueue<Http11AprProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11AprProcessor>() {
             private static final long serialVersionUID = 1L;
@@ -297,6 +288,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             this.proto = proto;
         }
 
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
+        
+        @Override
+        public void recycle() {
+            recycledProcessors.clear();
+        }
+        
         @Override
         public SocketState event(SocketWrapper<Long> socket, SocketStatus status) {
             Http11AprProcessor processor = connections.get(socket);
