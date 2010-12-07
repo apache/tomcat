@@ -45,14 +45,14 @@ public class JspConfig {
     private ServletContext ctxt;
     private volatile boolean initialized = false;
 
-    private final static String defaultIsXml = null;    // unspecified
+    private static final String defaultIsXml = null;    // unspecified
     private String defaultIsELIgnored = null;           // unspecified
-    private final static String defaultIsScriptingInvalid = null;
+    private static final String defaultIsScriptingInvalid = null;
     private String defaultDeferedSyntaxAllowedAsLiteral = null;
-    private final static String defaultTrimDirectiveWhitespaces = null;
-    private final static String defaultDefaultContentType = null;
-    private final static String defaultBuffer = null;
-    private final static String defaultErrorOnUndeclaredNamespace = "false";
+    private static final String defaultTrimDirectiveWhitespaces = null;
+    private static final String defaultDefaultContentType = null;
+    private static final String defaultBuffer = null;
+    private static final String defaultErrorOnUndeclaredNamespace = "false";
     private JspProperty defaultJspProperty;
 
     public JspConfig(ServletContext ctxt) {
@@ -515,7 +515,7 @@ public class JspConfig {
         }
     }
 
-    static public class JspProperty {
+    public static class JspProperty {
 
         private String isXml;
         private String elIgnored;

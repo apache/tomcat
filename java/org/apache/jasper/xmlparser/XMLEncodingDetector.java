@@ -69,9 +69,9 @@ public class XMLEncodingDetector {
     private XMLString fString = new XMLString();    
     private XMLStringBuffer fStringBuffer = new XMLStringBuffer();
     private XMLStringBuffer fStringBuffer2 = new XMLStringBuffer();
-    private final static String fVersionSymbol = "version";
-    private final static String fEncodingSymbol = "encoding";
-    private final static String fStandaloneSymbol = "standalone";
+    private static final String fVersionSymbol = "version";
+    private static final String fEncodingSymbol = "encoding";
+    private static final String fStandaloneSymbol = "standalone";
     
     // org.apache.xerces.impl.XMLDocumentFragmentScannerImpl fields
     private int fMarkupDepth = 0;
