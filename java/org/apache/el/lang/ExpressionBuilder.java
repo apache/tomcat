@@ -99,12 +99,12 @@ public final class ExpressionBuilder implements NodeVisitor {
         }
     }
 
-    public final static Node createNode(String expr) throws ELException {
+    public static final Node createNode(String expr) throws ELException {
         Node n = createNodeInternal(expr);
         return n;
     }
 
-    private final static Node createNodeInternal(String expr)
+    private static final Node createNodeInternal(String expr)
             throws ELException {
         if (expr == null) {
             throw new ELException(MessageFactory.get("error.null"));
