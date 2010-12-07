@@ -46,32 +46,32 @@ import javax.servlet.jsp.PageContext;
  */
 public class ImplicitObjectELResolver extends ELResolver {
 
-    private final static String[] SCOPE_NAMES = new String[] {
+    private static final String[] SCOPE_NAMES = new String[] {
             "applicationScope", "cookie", "header", "headerValues",
             "initParam", "pageContext", "pageScope", "param", "paramValues",
             "requestScope", "sessionScope" };
 
-    private final static int APPLICATIONSCOPE = 0;
+    private static final int APPLICATIONSCOPE = 0;
 
-    private final static int COOKIE = 1;
+    private static final int COOKIE = 1;
 
-    private final static int HEADER = 2;
+    private static final int HEADER = 2;
 
-    private final static int HEADERVALUES = 3;
+    private static final int HEADERVALUES = 3;
 
-    private final static int INITPARAM = 4;
+    private static final int INITPARAM = 4;
 
-    private final static int PAGECONTEXT = 5;
+    private static final int PAGECONTEXT = 5;
 
-    private final static int PAGESCOPE = 6;
+    private static final int PAGESCOPE = 6;
 
-    private final static int PARAM = 7;
+    private static final int PARAM = 7;
 
-    private final static int PARAM_VALUES = 8;
+    private static final int PARAM_VALUES = 8;
 
-    private final static int REQUEST_SCOPE = 9;
+    private static final int REQUEST_SCOPE = 9;
 
-    private final static int SESSION_SCOPE = 10;
+    private static final int SESSION_SCOPE = 10;
 
     public ImplicitObjectELResolver() {
         super();
@@ -200,7 +200,7 @@ public class ImplicitObjectELResolver extends ELResolver {
     }
 
     private static class ScopeManager {
-        private final static String MNGR_KEY = ScopeManager.class.getName();
+        private static final String MNGR_KEY = ScopeManager.class.getName();
 
         private final PageContext page;
 

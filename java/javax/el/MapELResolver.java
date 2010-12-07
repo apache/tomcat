@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class MapELResolver extends ELResolver {
 
-    private final static Class<?> UNMODIFIABLE = Collections.unmodifiableMap(
+    private static final Class<?> UNMODIFIABLE = Collections.unmodifiableMap(
             new HashMap<Object, Object>()).getClass();
 
     private final boolean readOnly;

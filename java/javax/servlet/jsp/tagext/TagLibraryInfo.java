@@ -22,7 +22,7 @@ package javax.servlet.jsp.tagext;
  * underlying TLD file. Most of the information is directly from the TLD, except
  * for the prefix and the uri values used in the taglib directive
  */
-abstract public class TagLibraryInfo {
+public abstract class TagLibraryInfo {
 
     /**
      * Constructor. This will invoke the constructors for TagInfo, and

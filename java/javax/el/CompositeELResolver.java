@@ -153,7 +153,7 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
-    private final static class FeatureIterator implements Iterator<FeatureDescriptor> {
+    private static final class FeatureIterator implements Iterator<FeatureDescriptor> {
 
         private final ELContext context;
 

@@ -91,7 +91,7 @@ public abstract class JspContext {
      * @throws NullPointerException if the name is null
      */
 
-    abstract public void setAttribute(String name, Object value);
+    public abstract void setAttribute(String name, Object value);
 
     /**
      * Register the name and value specified with appropriate 
@@ -112,7 +112,7 @@ public abstract class JspContext {
      *     invalidated.
      */
 
-    abstract public void setAttribute(String name, Object value, int scope);
+    public abstract void setAttribute(String name, Object value, int scope);
 
     /**
      * Returns the object associated with the name in the page scope or null
@@ -125,7 +125,7 @@ public abstract class JspContext {
      * @throws NullPointerException if the name is null
      */
 
-    abstract public Object getAttribute(String name);
+    public abstract Object getAttribute(String name);
 
     /**
      * Return the object associated with the name in the specified
@@ -144,7 +144,7 @@ public abstract class JspContext {
      *     invalidated.
      */
 
-    abstract public Object getAttribute(String name, int scope);
+    public abstract Object getAttribute(String name, int scope);
 
     /**
      * Searches for the named attribute in page, request, session (if valid),
@@ -156,7 +156,7 @@ public abstract class JspContext {
      * @throws NullPointerException if the name is null
      */
 
-    abstract public Object findAttribute(String name);
+    public abstract Object findAttribute(String name);
 
     /**
      * Remove the object reference associated with the given name
@@ -166,7 +166,7 @@ public abstract class JspContext {
      * @throws NullPointerException if the name is null
      */
 
-    abstract public void removeAttribute(String name);
+    public abstract void removeAttribute(String name);
 
     /**
      * Remove the object reference associated with the specified name
@@ -182,7 +182,7 @@ public abstract class JspContext {
      * @throws NullPointerException if the name is null
      */
 
-    abstract public void removeAttribute(String name, int scope);
+    public abstract void removeAttribute(String name, int scope);
 
     /**
      * Get the scope where a given attribute is defined.
@@ -192,7 +192,7 @@ public abstract class JspContext {
      * @throws NullPointerException if the name is null
      */
 
-    abstract public int getAttributesScope(String name);
+    public abstract int getAttributesScope(String name);
 
     /**
      * Enumerate all the attributes in a given scope.
@@ -207,14 +207,14 @@ public abstract class JspContext {
      *     invalidated.
      */
 
-    abstract public Enumeration<String> getAttributeNamesInScope(int scope);
+    public abstract Enumeration<String> getAttributeNamesInScope(int scope);
 
     /**
      * The current value of the out object (a JspWriter).
      *
      * @return the current JspWriter stream being used for client response
      */
-    abstract public JspWriter getOut();
+    public abstract JspWriter getOut();
     
     /**
      * Provides programmatic access to the ExpressionEvaluator.
