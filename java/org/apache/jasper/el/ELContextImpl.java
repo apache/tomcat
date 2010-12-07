@@ -33,14 +33,14 @@ import javax.el.VariableMapper;
  */
 public final class ELContextImpl extends ELContext {
 
-    private final static FunctionMapper NullFunctionMapper = new FunctionMapper() {
+    private static final FunctionMapper NullFunctionMapper = new FunctionMapper() {
         @Override
         public Method resolveFunction(String prefix, String localName) {
             return null;
         }
     };
 
-    private final static class VariableMapperImpl extends VariableMapper {
+    private static final class VariableMapperImpl extends VariableMapper {
 
         private Map<String, ValueExpression> vars;
 
