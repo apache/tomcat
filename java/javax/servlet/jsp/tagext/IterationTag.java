@@ -84,7 +84,7 @@ public interface IterationTag extends Tag {
      * 
      */
  
-    public final static int EVAL_BODY_AGAIN = 2;
+    public static final int EVAL_BODY_AGAIN = 2;
 
     /**
      * Process body (re)evaluation.  This method is invoked by the

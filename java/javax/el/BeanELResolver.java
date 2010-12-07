@@ -197,7 +197,7 @@ public class BeanELResolver extends ELResolver {
         return null;
     }
 
-    protected final static class BeanProperties {
+    protected static final class BeanProperties {
         private final Map<String, BeanProperty> properties;
 
         private final Class<?> type;
@@ -236,7 +236,7 @@ public class BeanELResolver extends ELResolver {
         }
     }
 
-    protected final static class BeanProperty {
+    protected static final class BeanProperty {
         private final Class<?> type;
 
         private final Class<?> owner;
@@ -254,7 +254,8 @@ public class BeanELResolver extends ELResolver {
         }
 
         // Can't use Class<?> because API needs to match specification
-        public @SuppressWarnings("rawtypes") Class getPropertyType() {
+        @SuppressWarnings("rawtypes")
+        public Class getPropertyType() {
             return this.type;
         }
 
@@ -310,7 +311,7 @@ public class BeanELResolver extends ELResolver {
         return props.get(ctx, prop);
     }
 
-    private final static Method getMethod(Class<?> type, Method m) {
+    private static final Method getMethod(Class<?> type, Method m) {
         if (m == null || Modifier.isPublic(type.getModifiers())) {
             return m;
         }
@@ -342,7 +343,7 @@ public class BeanELResolver extends ELResolver {
         return null;
     }
     
-    private final static class ConcurrentCache<K,V> {
+    private static final class ConcurrentCache<K,V> {
 
         private final int size;
         private final Map<K,V> eden;

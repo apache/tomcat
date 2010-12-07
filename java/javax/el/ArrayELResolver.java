@@ -145,14 +145,14 @@ public class ArrayELResolver extends ELResolver {
         return null;
     }
 
-    private final static void checkBounds(Object base, int idx) {
+    private static final void checkBounds(Object base, int idx) {
         if (idx < 0 || idx >= Array.getLength(base)) {
             throw new PropertyNotFoundException(
                     new ArrayIndexOutOfBoundsException(idx).getMessage());
         }
     }
 
-    private final static int coerce(Object property) {
+    private static final int coerce(Object property) {
         if (property instanceof Number) {
             return ((Number) property).intValue();
         }
