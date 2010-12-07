@@ -219,9 +219,9 @@ public abstract class ExpressionFactory {
 
         if (is != null) {
             String line = null;
+            BufferedReader br = null;
             try {
-                BufferedReader br =
-                    new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 line = br.readLine();
                 if (line != null && line.trim().length() > 0) {
                     return line.trim();
@@ -234,10 +234,13 @@ public abstract class ExpressionFactory {
                         e);
             } finally {
                 try {
+                    if (br != null) {
+                        br.close();
+                    }
+                } catch (IOException ioe) {/*Ignore*/}
+                try {
                     is.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
+                } catch (IOException ioe) {/*Ignore*/}
             }
         }
         

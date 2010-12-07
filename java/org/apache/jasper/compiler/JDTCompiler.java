@@ -98,17 +98,21 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 this.sourceFile = sourceFile;
             }
 
+            @Override
             public char[] getFileName() {
                 return sourceFile.toCharArray();
             }
             
+            @Override
             public char[] getContents() {
                 char[] result = null;
                 FileInputStream is = null;
+                Reader reader = null;
                 try {
                     is = new FileInputStream(sourceFile);
-                    Reader reader = 
-                        new BufferedReader(new InputStreamReader(is, ctxt.getOptions().getJavaEncoding()));
+                     
+                    reader = new BufferedReader(new InputStreamReader(is,
+                            ctxt.getOptions().getJavaEncoding()));
                     char[] chars = new char[8192];
                     StringBuilder buf = new StringBuilder();
                     int count;
@@ -121,17 +125,21 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 } catch (IOException e) {
                     log.error("Compilation error", e);
                 } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException ioe) {/*Ignore*/}
+                    }
                     if (is != null) {
                         try {
                             is.close();
-                        } catch (IOException exc) {
-                            // Ignore
-                        }
+                        } catch (IOException exc) {/*Ignore*/}
                     }
                 }
                 return result;
             }
             
+            @Override
             public char[] getMainTypeName() {
                 int dot = className.lastIndexOf('.');
                 if (dot > 0) {
@@ -140,6 +148,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 return className.toCharArray();
             }
             
+            @Override
             public char[][] getPackageName() {
                 StringTokenizer izer = 
                     new StringTokenizer(className, ".");
@@ -154,6 +163,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
         final INameEnvironment env = new INameEnvironment() {
 
+                @Override
                 public NameEnvironmentAnswer 
                     findType(char[][] compoundTypeName) {
                     String result = "";
@@ -166,6 +176,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     return findType(result);
                 }
 
+                @Override
                 public NameEnvironmentAnswer 
                     findType(char[] typeName, 
                              char[][] packageName) {
@@ -238,6 +249,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     return is == null;
                 }
 
+                @Override
                 public boolean isPackage(char[][] parentPackageName, 
                                          char[] packageName) {
                     String result = "";
@@ -261,6 +273,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     return isPackage(result);
                 }
 
+                @Override
                 public void cleanup() {
                 }
 
@@ -367,6 +380,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             new DefaultProblemFactory(Locale.getDefault());
         
         final ICompilerRequestor requestor = new ICompilerRequestor() {
+                @Override
                 public void acceptResult(CompilationResult result) {
                     try {
                         if (result.hasProblems()) {
