@@ -32,7 +32,7 @@ public final class Library {
     /*
      * A handle to the unique Library singleton instance.
      */
-    static private Library _instance = null;
+    private static Library _instance = null;
 
     private Library()
         throws Exception
@@ -163,7 +163,7 @@ public final class Library {
      * called for any APR library.
      * @param libraryName the name of the library to load
      */
-    static public boolean initialize(String libraryName)
+    public static boolean initialize(String libraryName)
         throws Exception
     {
         if (_instance == null) {
