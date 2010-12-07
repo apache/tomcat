@@ -152,7 +152,7 @@ public class ResourceAttributes implements Attributes {
     };
     
     
-    protected final static TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+    protected static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
 
 
     /**
