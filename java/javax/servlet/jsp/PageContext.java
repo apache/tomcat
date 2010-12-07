@@ -89,7 +89,7 @@ import javax.servlet.jsp.tagext.BodyContent;
  * and  <code>handlePageException()</code>.
  */
 
-abstract public class PageContext 
+public abstract class PageContext 
     extends JspContext
 {
     
@@ -221,7 +221,7 @@ abstract public class PageContext
      *     is invalid
      */
  
-    abstract public void initialize(Servlet servlet, ServletRequest request, 
+    public abstract void initialize(Servlet servlet, ServletRequest request, 
         ServletResponse response, String errorPageURL, boolean needsSession, 
         int bufferSize, boolean autoFlush)  
         throws IOException, IllegalStateException, IllegalArgumentException;
@@ -241,7 +241,7 @@ abstract public class PageContext
      *
      */
 
-    abstract public void release();
+    public abstract void release();
 
     /**
      * The current value of the session object (an HttpSession).
@@ -249,7 +249,7 @@ abstract public class PageContext
      * @return the HttpSession for this PageContext or null
      */
 
-    abstract public HttpSession getSession();
+    public abstract HttpSession getSession();
 
     /**
      * The current value of the page object (In a Servlet environment, 
@@ -259,7 +259,7 @@ abstract public class PageContext
      *     with this PageContext
      */
 
-    abstract public Object getPage();
+    public abstract Object getPage();
 
 
     /**
@@ -268,7 +268,7 @@ abstract public class PageContext
      * @return The ServletRequest for this PageContext
      */
 
-    abstract public ServletRequest getRequest();
+    public abstract ServletRequest getRequest();
 
     /**
      * The current value of the response object (a ServletResponse).
@@ -276,7 +276,7 @@ abstract public class PageContext
      * @return the ServletResponse for this PageContext
      */
 
-    abstract public ServletResponse getResponse();
+    public abstract ServletResponse getResponse();
 
     /**
      * The current value of the exception object (an Exception).
@@ -284,7 +284,7 @@ abstract public class PageContext
      * @return any exception passed to this as an errorpage
      */
 
-    abstract public Exception getException();
+    public abstract Exception getException();
 
     /**
      * The ServletConfig instance.
@@ -292,7 +292,7 @@ abstract public class PageContext
      * @return the ServletConfig for this PageContext
      */
 
-    abstract public ServletConfig getServletConfig();
+    public abstract ServletConfig getServletConfig();
 
     /**
      * The ServletContext instance.
@@ -300,7 +300,7 @@ abstract public class PageContext
      * @return the ServletContext for this PageContext
      */
 
-    abstract public ServletContext getServletContext();
+    public abstract ServletContext getServletContext();
 
     /**
      * <p>
@@ -337,7 +337,7 @@ abstract public class PageContext
      * @throws IOException if an I/O error occurred while forwarding
      */
 
-    abstract public void forward(String relativeUrlPath) 
+    public abstract void forward(String relativeUrlPath) 
         throws ServletException, IOException;
 
     /**
@@ -370,7 +370,7 @@ abstract public class PageContext
      *     a ServletException
      * @throws IOException if an I/O error occurred while forwarding
      */
-    abstract public void include(String relativeUrlPath) 
+    public abstract void include(String relativeUrlPath) 
         throws ServletException, IOException;
 
     /**
@@ -407,7 +407,7 @@ abstract public class PageContext
      * @throws IOException if an I/O error occurred while forwarding
      * @since 2.0
      */
-    abstract public void include(String relativeUrlPath, boolean flush) 
+    public abstract void include(String relativeUrlPath, boolean flush) 
         throws ServletException, IOException;
 
     /**
@@ -444,7 +444,7 @@ abstract public class PageContext
      * @see #handlePageException(Throwable)
      */
 
-    abstract public void handlePageException(Exception e) 
+    public abstract void handlePageException(Exception e) 
         throws ServletException, IOException;
 
     /**
@@ -483,7 +483,7 @@ abstract public class PageContext
      * @see #handlePageException(Exception)
      */
 
-    abstract public void handlePageException(Throwable t) 
+    public abstract void handlePageException(Throwable t) 
         throws ServletException, IOException;
 
     /**

@@ -29,7 +29,7 @@ import java.io.InputStream;
  * when being passed to a TagLibraryValidator instance.
  */
 
-abstract public class PageData {
+public abstract class PageData {
 
     /**
      * Sole constructor. (For invocation by subclass constructors, 
@@ -46,5 +46,5 @@ abstract public class PageData {
      * 
      * @return An input stream on the document.
      */
-   abstract public InputStream getInputStream();
+   public abstract InputStream getInputStream();
 }
