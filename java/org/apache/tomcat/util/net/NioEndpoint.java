@@ -492,13 +492,33 @@ public class NioEndpoint extends AbstractEndpoint {
             String ttype = (getTruststoreType()!=null)?getTruststoreType():getKeystoreType();
             
             KeyStore ks = KeyStore.getInstance(getKeystoreType());
-            ks.load(new FileInputStream(getKeystoreFile()), passphrase);
+            FileInputStream fisKeyStore = null;
+            try {
+                fisKeyStore = new FileInputStream(getKeystoreFile());
+                ks.load(fisKeyStore, passphrase);
+            } finally {
+                if (fisKeyStore != null) {
+                    try {
+                        fisKeyStore.close();
+                    } catch (IOException ioe) {/*Ignore*/}
+                }
+            }
             KeyStore ts = null;
             if (getTruststoreFile()==null) {
                 //no op, same as for BIO connector
             }else {
                 ts = KeyStore.getInstance(ttype);
-                ts.load(new FileInputStream(getTruststoreFile()), tpassphrase);
+                FileInputStream fisTrustStore = null;
+                try {
+                    fisTrustStore = new FileInputStream(getTruststoreFile());
+                    ts.load(fisTrustStore, tpassphrase);
+                } finally {
+                    if (fisTrustStore != null) {
+                        try {
+                            fisTrustStore.close();
+                        } catch (IOException ioe) {/*Ignore*/}
+                    }
+                }
             }
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(getAlgorithm());
@@ -855,7 +875,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * 
      * PollerEvent, cacheable object for poller events to avoid GC
      */
-    public class PollerEvent implements Runnable {
+    public static class PollerEvent implements Runnable {
         
         protected NioChannel socket;
         protected int interestOps;
@@ -1444,7 +1464,7 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
     // ------------------------------------------------ Application Buffer Handler
-    public class NioBufferHandler implements ApplicationBufferHandler {
+    public static class NioBufferHandler implements ApplicationBufferHandler {
         protected ByteBuffer readbuf = null;
         protected ByteBuffer writebuf = null;
         
