@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import org.apache.coyote.AbstractProtocolHandler;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
@@ -195,9 +194,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     // ------------------------------------------------------- Lifecycle methods
     
     @Override
-    public abstract void init() throws Exception;
-
-    @Override
     public void pause() throws Exception {
         try {
             endpoint.pause();
@@ -235,17 +231,4 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("http11protocol.stop", getName()));
     }
-
-    @Override
-    public void destroy() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.destroy", getName()));
-        endpoint.destroy();
-        if( tpOname!=null )
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if( rgOname != null )
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-    }
-    
-
 }
