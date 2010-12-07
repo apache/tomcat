@@ -30,8 +30,8 @@ import java.text.DecimalFormat;
  * @version $Id$
  */
 public final class SSIFsize implements SSICommand {
-    protected final static int ONE_KILOBYTE = 1024;
-    protected final static int ONE_MEGABYTE = 1024 * 1024;
+    protected static final int ONE_KILOBYTE = 1024;
+    protected static final int ONE_MEGABYTE = 1024 * 1024;
 
 
     /**

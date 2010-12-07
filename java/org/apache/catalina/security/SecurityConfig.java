@@ -33,13 +33,13 @@ public final class SecurityConfig{
         org.apache.juli.logging.LogFactory.getLog( SecurityConfig.class );
 
     
-    private final static String PACKAGE_ACCESS =  "sun.,"
+    private static final String PACKAGE_ACCESS =  "sun.,"
                                                 + "org.apache.catalina." 
                                                 + ",org.apache.jasper."
                                                 + ",org.apache.coyote."
                                                 + ",org.apache.tomcat.";
     
-    private final static String PACKAGE_DEFINITION= "java.,sun."
+    private static final String PACKAGE_DEFINITION= "java.,sun."
                                                 + ",org.apache.catalina." 
                                                 + ",org.apache.coyote."
                                                 + ",org.apache.tomcat."
