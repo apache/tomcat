@@ -182,7 +182,7 @@ public class Benchmarks extends TestCase {
         benchmark.doTest(5, tests);
     }
 
-    private static abstract class TimeDateElementBenchmarkTestBase {
+    private abstract static class TimeDateElementBenchmarkTestBase {
         protected static final String months[] = { "Jan", "Feb", "Mar", "Apr",
                 "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 

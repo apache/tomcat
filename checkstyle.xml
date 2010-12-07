@@ -44,9 +44,7 @@
     <module name="UnusedImports"/>
     
     <!--  Modifiers -->
-    <!-- ~250 errors
     <module name="ModifierOrder"/>
-    -->
     <!-- ~1750 errors
     <module name="RedundantModifier"/>
     -->
