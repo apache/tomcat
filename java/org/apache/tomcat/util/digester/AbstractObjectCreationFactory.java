@@ -25,7 +25,7 @@ import org.xml.sax.Attributes;
  * <p>Abstract base class for <code>ObjectCreationFactory</code>
  * implementations.</p>
  */
-abstract public class AbstractObjectCreationFactory implements ObjectCreationFactory {
+public abstract class AbstractObjectCreationFactory implements ObjectCreationFactory {
 
 
     // ----------------------------------------------------- Instance Variables
