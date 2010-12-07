@@ -37,17 +37,17 @@ public class DateTool {
     /**
      * US locale - all HTTP dates are in English
      */
-    public final static Locale LOCALE_US = Locale.US;
+    public static final Locale LOCALE_US = Locale.US;
 
     /**
      * GMT timezone - all HTTP dates are on GMT
      */
-    public final static TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
+    public static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
 
     /**
      * format for RFC 1123 date string -- "Sun, 06 Nov 1994 08:49:37 GMT"
      */
-    public final static String RFC1123_PATTERN =
+    public static final String RFC1123_PATTERN =
         "EEE, dd MMM yyyyy HH:mm:ss z";
 
     /** 
@@ -57,22 +57,22 @@ public class DateTool {
         "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // format for RFC 1036 date string -- "Sunday, 06-Nov-94 08:49:37 GMT"
-    private final static String rfc1036Pattern =
+    private static final String rfc1036Pattern =
         "EEEEEEEEE, dd-MMM-yy HH:mm:ss z";
 
     // format for C asctime() date string -- "Sun Nov  6 08:49:37 1994"
-    private final static String asctimePattern =
+    private static final String asctimePattern =
         "EEE MMM d HH:mm:ss yyyyy";
 
     /**
      * Pattern used for old cookies
      */
-    public final static String OLD_COOKIE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
+    public static final String OLD_COOKIE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
 
     /**
      * DateFormat to be used to format dates
      */
-    public final static ThreadLocal<DateFormat> rfc1123Format = new ThreadLocal<DateFormat>() {
+    public static final ThreadLocal<DateFormat> rfc1123Format = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
             DateFormat result = new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
@@ -84,7 +84,7 @@ public class DateTool {
     /**
      * DateFormat to be used to format old netscape cookies
      */
-    public final static ThreadLocal<DateFormat> oldCookieFormat = new ThreadLocal<DateFormat>() {
+    public static final ThreadLocal<DateFormat> oldCookieFormat = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
             DateFormat result = new SimpleDateFormat(OLD_COOKIE_PATTERN, LOCALE_US);
@@ -94,7 +94,7 @@ public class DateTool {
     };
 
 
-    public final static ThreadLocal<DateFormat> rfc1036Format = new ThreadLocal<DateFormat>() {
+    public static final ThreadLocal<DateFormat> rfc1036Format = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
             DateFormat result = new SimpleDateFormat(rfc1036Pattern, LOCALE_US);
@@ -103,7 +103,7 @@ public class DateTool {
         }
     };
 
-    public final static ThreadLocal<DateFormat> asctimeFormat = new ThreadLocal<DateFormat>() {
+    public static final ThreadLocal<DateFormat> asctimeFormat = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
             DateFormat result = new SimpleDateFormat(asctimePattern, LOCALE_US);

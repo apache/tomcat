@@ -1192,7 +1192,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param algorithm Algorithm used to do the digest
      * @param encoding Character encoding of the string to digest
      */
-    public final static String Digest(String credentials, String algorithm,
+    public static final String Digest(String credentials, String algorithm,
                                       String encoding) {
 
         try {

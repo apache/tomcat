@@ -34,16 +34,16 @@ import org.apache.tomcat.util.buf.CharChunk;
  */
 public final class  Base64
 {
-    static private final int  BASELENGTH         = 255;
-    static private final int  LOOKUPLENGTH       = 64;
-    static private final int  TWENTYFOURBITGROUP = 24;
-    static private final int  EIGHTBIT           = 8;
-    static private final int  SIXTEENBIT         = 16;
-    static private final int  FOURBYTE           = 4;
-    static private final int  SIGN               = -128;
-    static private final byte PAD                = (byte) '=';
-    static private byte [] base64Alphabet       = new byte[BASELENGTH];
-    static private byte [] lookUpBase64Alphabet = new byte[LOOKUPLENGTH];
+    private static final int  BASELENGTH         = 255;
+    private static final int  LOOKUPLENGTH       = 64;
+    private static final int  TWENTYFOURBITGROUP = 24;
+    private static final int  EIGHTBIT           = 8;
+    private static final int  SIXTEENBIT         = 16;
+    private static final int  FOURBYTE           = 4;
+    private static final int  SIGN               = -128;
+    private static final byte PAD                = (byte) '=';
+    private static byte [] base64Alphabet       = new byte[BASELENGTH];
+    private static byte [] lookUpBase64Alphabet = new byte[LOOKUPLENGTH];
 
     static
     {
