@@ -427,7 +427,7 @@ public class NioEndpoint extends AbstractEndpoint {
         this.keyCache.clear();
         this.nioChannels.clear();
         this.processorCache.clear();
-        if ( handler != null ) handler.releaseCaches();
+        if ( handler != null ) handler.recycle();
         
     }
     
@@ -1478,7 +1478,6 @@ public class NioEndpoint extends AbstractEndpoint {
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(NioChannel socket);
         public SocketState event(NioChannel socket, SocketStatus status);
-        public void releaseCaches();
         public void release(NioChannel socket);
         public void release(SocketChannel socket);
     }

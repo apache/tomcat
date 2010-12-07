@@ -26,6 +26,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
@@ -331,5 +332,34 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     @Override
     public void postDeregister() {
         // NOOP
+    }
+
+
+    // ------------------------------------------------------- Lifecycle methods
+
+    // TODO Keep current state and check for invalid transitions
+
+    @Override
+    public abstract void init() throws Exception;
+
+
+    @Override
+    public final void destroy() {
+        if(getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.destroy",
+                    getName()));
+        }
+        try {
+            endpoint.destroy();
+        } catch (Exception e) {
+            getLog().error(sm.getString(
+                    "abstractProtocolHandler.endPointDestroyError", getName()),
+                    e);
+        }
+        
+        if( tpOname!=null )
+            Registry.getRegistry(null, null).unregisterComponent(tpOname);
+        if( rgOname != null )
+            Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 }
