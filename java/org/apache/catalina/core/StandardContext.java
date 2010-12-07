@@ -5897,21 +5897,26 @@ public class StandardContext extends ContainerBase
         if (stream == null) {
             return "";
         }
-        BufferedReader br = new BufferedReader(
-                                new InputStreamReader(stream));
         StringBuilder sb = new StringBuilder();
-        String strRead = "";
+        BufferedReader br = null;
         try {
+            br = new BufferedReader(new InputStreamReader(stream));
+            String strRead = "";
             while (strRead != null) {
                 sb.append(strRead);
                 strRead = br.readLine();
             }
         } catch (IOException e) {
             return "";
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ioe) {/*Ignore*/}
+            }
         }
 
         return sb.toString(); 
-    
     }
     
     
