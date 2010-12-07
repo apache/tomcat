@@ -151,10 +151,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
         protected AjpAprProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
-        @Override
-        public RequestGroupInfo getGlobal() {
-            return global;
-        }
 
         protected ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor> connections =
             new ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor>();
@@ -203,6 +199,16 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
             this.proto = proto;
         }
 
+        @Override
+        public RequestGroupInfo getGlobal() {
+            return global;
+        }
+
+        @Override
+        public void recycle() {
+            recycledProcessors.clear();
+        }
+        
         // FIXME: Support for this could be added in AJP as well
         @Override
         public SocketState event(SocketWrapper<Long> socket, SocketStatus status) {

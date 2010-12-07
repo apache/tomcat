@@ -690,6 +690,8 @@ public class AprEndpoint extends AbstractEndpoint {
             rootPool = 0;
         }
 
+        handler.recycle();
+
         initialized = false;
     }
 
