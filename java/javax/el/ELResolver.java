@@ -51,9 +51,9 @@ public abstract class ELResolver {
         }
     }
 
-    public final static String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
+    public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
     
-    public final static String TYPE = "type";
+    public static final String TYPE = "type";
     
     public abstract Object getValue(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
     

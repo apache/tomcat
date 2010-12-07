@@ -80,7 +80,7 @@ import java.util.Map;
  * attribute.
  */
 
-abstract public class TagLibraryValidator {
+public abstract class TagLibraryValidator {
 
     /**
      * Sole constructor. (For invocation by subclass constructors, 

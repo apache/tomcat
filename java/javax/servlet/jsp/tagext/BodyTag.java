@@ -110,7 +110,7 @@ public interface BodyTag extends IterationTag {
      */
     @SuppressWarnings("dep-ann")
     // TCK signature test fails with annotation
-    public final static int EVAL_BODY_TAG = 2;
+    public static final int EVAL_BODY_TAG = 2;
 
     /**
      * Request the creation of new buffer, a BodyContent on which to evaluate
@@ -118,7 +118,7 @@ public interface BodyTag extends IterationTag {
      * BodyTag. This is an illegal return value for doStartTag when the class
      * does not implement BodyTag.
      */
-    public final static int EVAL_BODY_BUFFERED = 2;
+    public static final int EVAL_BODY_BUFFERED = 2;
 
     /**
      * Set the bodyContent property. This method is invoked by the JSP page

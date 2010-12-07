@@ -79,7 +79,7 @@ public class HttpUtils {
      *                                                is invalid
      *
      */
-    static public Hashtable<String,String[]> parseQueryString(String s) {
+    public static Hashtable<String,String[]> parseQueryString(String s) {
 
         String valArray[] = null;
         
@@ -154,7 +154,7 @@ public class HttpUtils {
      *                        sent by the POST method is invalid
      *
      */
-    static public Hashtable<String,String[]> parsePostData(int len, 
+    public static Hashtable<String,String[]> parsePostData(int len, 
                                           ServletInputStream in) {
         // XXX
         // should a length of 0 be an IllegalArgumentException
@@ -202,7 +202,7 @@ public class HttpUtils {
     /*
      * Parse a name in the query string.
      */
-    static private String parseName(String s, StringBuilder sb) {
+    private static String parseName(String s, StringBuilder sb) {
         sb.setLength(0);
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i); 

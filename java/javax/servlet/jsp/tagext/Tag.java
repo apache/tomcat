@@ -96,28 +96,28 @@ public interface Tag extends JspTag {
      * Valid return value for doStartTag and doAfterBody.
      */
  
-    public final static int SKIP_BODY = 0;
+    public static final int SKIP_BODY = 0;
  
     /**
      * Evaluate body into existing out stream.
      * Valid return value for doStartTag.
      */
  
-    public final static int EVAL_BODY_INCLUDE = 1;
+    public static final int EVAL_BODY_INCLUDE = 1;
 
     /**
      * Skip the rest of the page.
      * Valid return value for doEndTag.
      */
 
-    public final static int SKIP_PAGE = 5;
+    public static final int SKIP_PAGE = 5;
 
     /**
      * Continue evaluating the page.
      * Valid return value for doEndTag().
      */
 
-    public final static int EVAL_PAGE = 6;
+    public static final int EVAL_PAGE = 6;
 
     // Setters for Tag handler data
 

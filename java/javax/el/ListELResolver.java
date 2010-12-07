@@ -28,7 +28,7 @@ public class ListELResolver extends ELResolver {
 
     private final boolean readOnly;
 
-    private final static Class<?> UNMODIFIABLE =
+    private static final Class<?> UNMODIFIABLE =
         Collections.unmodifiableList(new ArrayList<Object>()).getClass();
 
     public ListELResolver() {
@@ -160,7 +160,7 @@ public class ListELResolver extends ELResolver {
         return null;
     }
 
-    private final static int coerce(Object property) {
+    private static final int coerce(Object property) {
         if (property instanceof Number) {
             return ((Number) property).intValue();
         }
