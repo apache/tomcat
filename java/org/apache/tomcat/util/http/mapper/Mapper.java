@@ -1452,7 +1452,7 @@ public final class Mapper {
     // ------------------------------------------------- MapElement Inner Class
 
 
-    protected static abstract class MapElement {
+    protected abstract static class MapElement {
 
         public String name = null;
         public Object object = null;
