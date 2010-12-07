@@ -17,7 +17,6 @@
 package org.apache.coyote.ajp;
 
 import org.apache.coyote.AbstractProtocolHandler;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
@@ -113,17 +112,5 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
         }
         if (getLog().isInfoEnabled())
             getLog().info(sm.getString("ajpprotocol.stop", getName()));
-    }
-
-
-    @Override
-    public void destroy() throws Exception {
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.destroy", getName()));
-        endpoint.destroy();
-        if (tpOname!=null)
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if (rgOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 }
