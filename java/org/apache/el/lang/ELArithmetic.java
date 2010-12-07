@@ -30,7 +30,7 @@ import org.apache.el.util.MessageFactory;
  */
 public abstract class ELArithmetic {
 
-    public final static class BigDecimalDelegate extends ELArithmetic {
+    public static final class BigDecimalDelegate extends ELArithmetic {
 
         @Override
         protected Number add(Number num0, Number num1) {
@@ -78,7 +78,7 @@ public abstract class ELArithmetic {
         }
     }
 
-    public final static class BigIntegerDelegate extends ELArithmetic {
+    public static final class BigIntegerDelegate extends ELArithmetic {
 
         @Override
         protected Number add(Number num0, Number num1) {
@@ -123,7 +123,7 @@ public abstract class ELArithmetic {
         }
     }
 
-    public final static class DoubleDelegate extends ELArithmetic {
+    public static final class DoubleDelegate extends ELArithmetic {
 
         @Override
         protected Number add(Number num0, Number num1) {
@@ -194,7 +194,7 @@ public abstract class ELArithmetic {
         }
     }
 
-    public final static class LongDelegate extends ELArithmetic {
+    public static final class LongDelegate extends ELArithmetic {
 
         @Override
         protected Number add(Number num0, Number num1) {
@@ -239,17 +239,17 @@ public abstract class ELArithmetic {
         }
     }
 
-    public final static BigDecimalDelegate BIGDECIMAL = new BigDecimalDelegate();
+    public static final BigDecimalDelegate BIGDECIMAL = new BigDecimalDelegate();
 
-    public final static BigIntegerDelegate BIGINTEGER = new BigIntegerDelegate();
+    public static final BigIntegerDelegate BIGINTEGER = new BigIntegerDelegate();
 
-    public final static DoubleDelegate DOUBLE = new DoubleDelegate();
+    public static final DoubleDelegate DOUBLE = new DoubleDelegate();
 
-    public final static LongDelegate LONG = new LongDelegate();
+    public static final LongDelegate LONG = new LongDelegate();
 
-    private final static Long ZERO = new Long(0);
+    private static final Long ZERO = new Long(0);
 
-    public final static Number add(final Object obj0, final Object obj1) {
+    public static final Number add(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return new Long(0);
         }
@@ -270,7 +270,7 @@ public abstract class ELArithmetic {
         return delegate.add(num0, num1);
     }
 
-    public final static Number mod(final Object obj0, final Object obj1) {
+    public static final Number mod(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return new Long(0);
         }
@@ -291,7 +291,7 @@ public abstract class ELArithmetic {
         return delegate.mod(num0, num1);
     }
 
-    public final static Number subtract(final Object obj0, final Object obj1) {
+    public static final Number subtract(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return new Long(0);
         }
@@ -312,7 +312,7 @@ public abstract class ELArithmetic {
         return delegate.subtract(num0, num1);
     }
 
-    public final static Number divide(final Object obj0, final Object obj1) {
+    public static final Number divide(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return ZERO;
         }
@@ -331,7 +331,7 @@ public abstract class ELArithmetic {
         return delegate.divide(num0, num1);
     }
 
-    public final static Number multiply(final Object obj0, final Object obj1) {
+    public static final Number multiply(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return new Long(0);
         }
@@ -352,11 +352,11 @@ public abstract class ELArithmetic {
         return delegate.multiply(num0, num1);
     }
 
-    public final static boolean isNumber(final Object obj) {
+    public static final boolean isNumber(final Object obj) {
         return (obj != null && isNumberType(obj.getClass()));
     }
 
-    public final static boolean isNumberType(final Class<?> type) {
+    public static final boolean isNumberType(final Class<?> type) {
         return type == Long.TYPE || type == Double.TYPE ||
             type == Byte.TYPE || type == Short.TYPE ||
             type == Integer.TYPE || type == Float.TYPE ||
