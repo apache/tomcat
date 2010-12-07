@@ -37,10 +37,10 @@ import org.apache.catalina.util.IOTools;
  */
 public class SSIProcessor {
     /** The start pattern */
-    protected final static String COMMAND_START = "<!--#";
+    protected static final String COMMAND_START = "<!--#";
     /** The end pattern */
-    protected final static String COMMAND_END = "-->";
-    protected final static int BUFFER_SIZE = 4096;
+    protected static final String COMMAND_END = "-->";
+    protected static final int BUFFER_SIZE = 4096;
     protected SSIExternalResolver ssiExternalResolver;
     protected HashMap<String,SSICommand> commands =
         new HashMap<String,SSICommand>();
