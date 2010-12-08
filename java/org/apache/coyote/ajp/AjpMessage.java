@@ -147,17 +147,6 @@ public class AjpMessage {
 
     
     /**
-     * Append an int (4 bytes) to the message.
-     */
-    public void appendLongInt(int val) {
-        buf[pos++] = (byte) ((val >>> 24) & 0xFF);
-        buf[pos++] = (byte) ((val >>> 16) & 0xFF);
-        buf[pos++] = (byte) ((val >>> 8) & 0xFF);
-        buf[pos++] = (byte) (val & 0xFF);
-    }
-
-    
-    /**
      * Write a MessageBytes out at the current write position.
      * A null MessageBytes is encoded as a string with length 0.  
      */
@@ -318,12 +307,6 @@ public class AjpMessage {
     }
 
     
-    public byte peekByte() {
-        byte res = buf[pos];
-        return res;
-    }
-
-    
     public void getBytes(MessageBytes mb) {
         int length = getInt();
         if ((length == 0xFFFF) || (length == -1)) {
@@ -336,31 +319,6 @@ public class AjpMessage {
         pos++; // Skip the terminating \0
     }
     
-    
-    /**
-     * Copy a chunk of bytes from the packet into an array and advance
-     * the read position past the chunk.  See appendBytes() for details
-     * on the encoding.
-     *
-     * @return The number of bytes copied.
-     */
-    public int getBytes(byte[] dest) {
-        int length = getInt();
-        if (pos + length > buf.length) {
-            log.error(sm.getString("ajpmessage.read", "" + length));
-            return 0;
-        }
-
-        if ((length == 0xFFFF) || (length == -1)) {
-            return 0;
-        }
-
-        System.arraycopy(buf, pos, dest, 0, length);
-        pos += length;
-        pos++; // Skip terminating \0
-        return length;
-    }
-
     
     /**
      * Read a 32 bits integer from packet, and advance the read position past
@@ -444,7 +402,7 @@ public class AjpMessage {
         sb.append(" | ");
         for (int i = start; i < start + 16 && i < len + 4; i++) {
             if (!Character.isISOControl((char) buf[i])) {
-                sb.append(new Character((char) buf[i]));
+                sb.append(Character.valueOf((char) buf[i]));
             } else {
                 sb.append(".");
             }
