@@ -571,7 +571,7 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
 
            case Constants.SC_A_SSL_KEY_SIZE :
                request.setAttribute(AbstractEndpoint.KEY_SIZE_KEY,
-                                    new Integer(requestHeaderMessage.getInt()));
+                       Integer.valueOf(requestHeaderMessage.getInt()));
                break;
 
            case Constants.SC_A_STORED_METHOD:
