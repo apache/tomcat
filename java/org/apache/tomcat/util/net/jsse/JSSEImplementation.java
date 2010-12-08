@@ -32,15 +32,11 @@ import org.apache.tomcat.util.net.ServerSocketFactory;
    @author EKR
 */
         
-public class JSSEImplementation extends SSLImplementation
-{
-    static final String SSLSocketClass = "javax.net.ssl.SSLSocket";
+public class JSSEImplementation extends SSLImplementation {
 
     private JSSEFactory factory = null;
 
-    public JSSEImplementation() throws ClassNotFoundException {
-        // Check to see if JSSE is floating around somewhere
-        Class.forName(SSLSocketClass);
+    public JSSEImplementation() {
         factory = new JSSEFactory();
     }
 
