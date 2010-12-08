@@ -345,13 +345,13 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     @Override
     public final void pause() throws Exception {
         if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.action",
-                    "Pausing", getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.pause",
+                    getName()));
         try {
             endpoint.pause();
         } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.actionError",
-                    "pause", getName()), ex);
+            getLog().error(sm.getString("abstractProtocolHandler.pauseError",
+                    getName()), ex);
             throw ex;
         }
     }
@@ -359,13 +359,13 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     @Override
     public final void resume() throws Exception {
         if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.action",
-                    "Resuming", getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.resume",
+                    getName()));
         try {
             endpoint.resume();
         } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.actionError",
-                    "resume", getName()), ex);
+            getLog().error(sm.getString("abstractProtocolHandler.resumeError",
+                    getName()), ex);
             throw ex;
         }
     }
@@ -376,27 +376,27 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
         try {
             endpoint.stop();
         } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.action",
-                    "Stopping"), ex);
+            getLog().error(sm.getString("abstractProtocolHandler.stop",
+                    getName()), ex);
             throw ex;
         }
         if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.actionError",
-                    "stop", getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.stopError",
+                    getName()));
     }
 
 
     @Override
     public final void destroy() {
         if(getLog().isInfoEnabled()) {
-            getLog().info(sm.getString("abstractProtocolHandler.action",
-                    "Destroying", getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.destroy",
+                    getName()));
         }
         try {
             endpoint.destroy();
         } catch (Exception e) {
-            getLog().error(sm.getString("abstractProtocolHandler.actionError",
-                    "destroy", getName()), e);
+            getLog().error(sm.getString("abstractProtocolHandler.destroyError",
+                    getName()), e);
         }
         
         if( tpOname!=null )
