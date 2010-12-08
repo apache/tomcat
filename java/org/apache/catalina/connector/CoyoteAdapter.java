@@ -464,6 +464,12 @@ public class CoyoteAdapter implements Adapter {
     }
     
     
+    @Override
+    public String getDomain() {
+        return connector.getDomain();
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
 

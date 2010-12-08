@@ -27,6 +27,11 @@
   <module name="FileTabCharacter"/>
 
   <module name="TreeWalker">
+    <!-- Block Checks -->
+    <!--  ~60 errors
+    <module name="AvoidNestedBlocks"/>
+    -->
+
     <!-- Coding -->
     <module name="IllegalInstantiation"/>
     
@@ -54,12 +59,12 @@
     https://sourceforge.net/tracker/?func=detail&aid=3039718&group_id=29721&atid=397078
     <module name="GenericWhitespace"/>
     -->
+    <module name="EmptyForInitializerPad"/>
+    <module name="EmptyForIteratorPad"/>
     <!--  ~ 1000 errors
     <module name="OperatorWrap">
       <property name="option" value="oel"/>
     </module>
     -->
-    <module name="EmptyForInitializerPad"/>
-    <module name="EmptyForIteratorPad"/>
   </module>
 </module>
