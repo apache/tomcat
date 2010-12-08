@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.StringTokenizer;
 
-import org.apache.catalina.Globals;
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -75,8 +75,8 @@ public class AntCompiler extends Compiler {
         logger.setErrorPrintStream(System.err);
         logger.setMessageOutputLevel(Project.MSG_INFO);
         project.addBuildListener( logger);
-        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null) {
-            project.setBasedir(System.getProperty(Globals.CATALINA_HOME_PROP));
+        if (System.getProperty(Constants.CATALINA_HOME_PROP) != null) {
+            project.setBasedir(System.getProperty(Constants.CATALINA_HOME_PROP));
         }
         
         if( options.getCompiler() != null ) {
@@ -88,7 +88,7 @@ public class AntCompiler extends Compiler {
         return project;
     }
     
-    public class JasperAntLogger extends DefaultLogger {
+    public static class JasperAntLogger extends DefaultLogger {
         
         protected StringBuilder reportBuf = new StringBuilder();
         
@@ -101,7 +101,7 @@ public class AntCompiler extends Compiler {
         @Override
         protected void log(String message) {
             reportBuf.append(message);
-            reportBuf.append(System.getProperty("line.separator"));
+            reportBuf.append(Constants.NEWLINE);
         }
         
         protected String getReport() {
@@ -245,7 +245,7 @@ public class AntCompiler extends Compiler {
         // Stop capturing the System.err output for this thread
         String errorCapture = SystemLogHandler.unsetThread();
         if (errorCapture != null) {
-            errorReport.append(System.getProperty("line.separator"));
+            errorReport.append(Constants.NEWLINE);
             errorReport.append(errorCapture);
         }
 

@@ -214,4 +214,15 @@ public class Constants {
         System.getProperty("org.apache.catalina.SESSION_PARAMETER_NAME",
                 "jsessionid");
 
+    /**
+     * Name of the system property containing
+     * the tomcat product installation path
+     */
+    public static final String CATALINA_HOME_PROP = "catalina.home";
+
+    /**
+     * Name of the system property containing
+     * the tomcat instance installation path
+     */
+    public static final String CATALINA_BASE_PROP = "catalina.base";
 }
