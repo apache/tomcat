@@ -349,6 +349,23 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
             getLog().info(sm.getString("abstractProtocolHandler.init",
                     getName()));
 
+        if (this.domain != null) {
+            try {
+                tpOname = new ObjectName(domain + ":" +
+                        "type=ThreadPool,name=" + getName());
+                Registry.getRegistry(null, null).registerComponent(endpoint,
+                        tpOname, null);
+            } catch (Exception e) {
+                getLog().error(sm.getString(
+                        "abstractProtocolHandler.mbeanRegistrationFailed",
+                        tpOname, getName()), e);
+            }
+            rgOname=new ObjectName(domain +
+                    ":type=GlobalRequestProcessor,name=" + getName());
+            Registry.getRegistry(null, null).registerComponent(getHandler(),
+                    rgOname, null );
+        }
+
         endpoint.setName(getName());
 
         try {
@@ -418,9 +435,9 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
                     getName()), e);
         }
         
-        if( tpOname!=null )
+        if (tpOname != null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if( rgOname != null )
+        if (rgOname != null)
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 }
