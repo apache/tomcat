@@ -79,18 +79,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         setProcessorCache(-1);
     }
 
-    @Override
-    public void start() throws Exception {
-        try {
-            endpoint.start();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
-            throw ex;
-        }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.start", getName()));
-    }
-
     private final Http11ConnectionHandler cHandler;
 
     public boolean getUseSendfile() { return ((AprEndpoint)endpoint).getUseSendfile(); }
