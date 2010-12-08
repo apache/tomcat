@@ -3021,7 +3021,6 @@ public class StandardContext extends ContainerBase
             results[welcomeFiles.length] = name;
             welcomeFiles = results;
         }
-        postWelcomeFiles();
         if(this.getState().equals(LifecycleState.STARTED))
             fireContainerEvent(ADD_WELCOME_FILE_EVENT, name);
     }
@@ -4115,7 +4114,6 @@ public class StandardContext extends ContainerBase
         }
 
         // Inform interested listeners
-        postWelcomeFiles();
         if(this.getState().equals(LifecycleState.STARTED))
             fireContainerEvent(REMOVE_WELCOME_FILE_EVENT, name);
 
@@ -4976,10 +4974,6 @@ public class StandardContext extends ContainerBase
                         JarScanner.class.getName(), getJarScanner());
             }
 
-            if (ok) {
-                postWelcomeFiles();
-            }
-            
             // Set up the context init params
             mergeParameters();
 
@@ -5654,17 +5648,6 @@ public class StandardContext extends ContainerBase
 
     }
 
-
-    /**
-     * Post a copy of our current list of welcome files as a servlet context
-     * attribute, so that the default servlet can find them.
-     */
-    private void postWelcomeFiles() {
-
-        getServletContext().setAttribute("org.apache.catalina.WELCOME_FILES",
-                                         welcomeFiles);
-
-    }
 
     public String getHostname() {
         Container parentHost = getParent();
