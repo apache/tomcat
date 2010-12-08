@@ -35,6 +35,7 @@ public final class Globals {
     public static final String ALT_DD_ATTR = 
         "org.apache.catalina.deploy.alt_dd";
 
+
     /**
      * The request attribute under which we store the array of X509Certificate
      * objects representing the certificate chain presented by our client,
@@ -42,6 +43,7 @@ public final class Globals {
      */
     public static final String CERTIFICATES_ATTR =
         "javax.servlet.request.X509Certificate";
+
 
     /**
      * The request attribute under which we store the name of the cipher suite
@@ -53,23 +55,18 @@ public final class Globals {
 
 
     /**
-     * The servlet context attribute under which we store the class loader
-     * used for loading servlets (as an object of type java.lang.ClassLoader).
-     */
-    public static final String CLASS_LOADER_ATTR =
-        "org.apache.catalina.classloader";
-
-    /**
      * Request dispatcher state.
      */
     public static final String DISPATCHER_TYPE_ATTR = 
         "org.apache.catalina.core.DISPATCHER_TYPE";
+
 
     /**
      * Request dispatcher path.
      */
     public static final String DISPATCHER_REQUEST_PATH_ATTR = 
         "org.apache.catalina.core.DISPATCHER_REQUEST_PATH";
+
 
     /**
      * The JNDI directory context which is associated with the context. This
@@ -119,12 +116,14 @@ public final class Globals {
     public static final String ERROR_MESSAGE_ATTR =
         "javax.servlet.error.message";
 
+
     /**
      * The request attribute under which we store the key size being used for
      * this SSL connection (as an object of type java.lang.Integer).
      */
     public static final String KEY_SIZE_ATTR =
         "javax.servlet.request.key_size";
+
 
     /**
      * The request attribute under which we store the session id being used
@@ -166,12 +165,6 @@ public final class Globals {
         "org.apache.catalina.NAMED";
 
 
-    /**
-     * Platform specific new line sequence.
-     */
-    public static final String NEWLINE = System.getProperty("line.separator");
-    
-    
     /**
      * The request attribute under which the request URI of the included
      * servlet is stored on an included dispatcher request.
@@ -287,14 +280,6 @@ public final class Globals {
 
     
     /**
-     * The servlet context attribute under which we record the set of
-     * welcome files (as an object of type String[]) for this application.
-     */
-    public static final String WELCOME_FILES_ATTR =
-        "org.apache.catalina.WELCOME_FILES";
-
-
-    /**
      * The master flag which controls strict servlet specification 
      * compliance.
      */
@@ -320,11 +305,13 @@ public final class Globals {
      */
     public static final String DEFAULT_MBEAN_DOMAIN = "Catalina";
 
+
     /**
      * Name of the system property containing
      * the tomcat product installation path
      */
     public static final String CATALINA_HOME_PROP = "catalina.home";
+
 
     /**
      * Name of the system property containing
