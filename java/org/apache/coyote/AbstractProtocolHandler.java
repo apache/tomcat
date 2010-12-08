@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
@@ -334,6 +335,24 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
         // NOOP
     }
 
+    private ObjectName createObjectName() throws MalformedObjectNameException {
+        // Use the same domain as the connector
+        domain = adapter.getDomain();
+        
+        if (domain == null) {
+            return null;
+        }
+
+        StringBuilder name = new StringBuilder(getDomain());
+        name.append(":type=ProtocolHandler,port=");
+        name.append(getPort());
+        InetAddress address = getAddress();
+        if (address != null) {
+            name.append(",address=");
+            name.append(ObjectName.quote(address.toString()));
+        }
+        return new ObjectName(name.toString());
+    }
 
     // ------------------------------------------------------- Lifecycle methods
 
@@ -348,6 +367,15 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
         if (getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.init",
                     getName()));
+
+        if (oname == null) {
+            // Component not pre-registered so register it
+            oname = createObjectName();
+            if (oname != null) {
+                Registry.getRegistry(null, null).registerComponent(this, oname,
+                    null);
+            }
+        }
 
         if (this.domain != null) {
             try {
@@ -450,6 +478,12 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
                     getName()), e);
         }
         
+        // If object was pre-registered (mserver != null) what ever registered
+        // the ProtocolHandler should de-register it
+        if (oname != null && mserver == null) {
+                Registry.getRegistry(null, null).unregisterComponent(oname);
+        }
+
         if (tpOname != null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
         if (rgOname != null)
