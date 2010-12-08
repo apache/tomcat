@@ -14,10 +14,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
-import java.util.Locale;
 
 /**
  * Constants.
@@ -32,13 +30,6 @@ public final class Constants {
     public static final String Package = "org.apache.coyote";
     
     public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
-
-
-    public static final String LOCALE_DEFAULT = "en";
-
-
-    public static final Locale DEFAULT_LOCALE = new Locale(LOCALE_DEFAULT, "");
-
 
     public static final int MAX_NOTES = 32;
 
