@@ -68,7 +68,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
     public Http11NioProtocol() {
         endpoint=new NioEndpoint();
-        cHandler = new Http11ConnectionHandler( this );
+        cHandler = new Http11ConnectionHandler(this);
+        ((NioEndpoint) endpoint).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
@@ -86,7 +87,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     @Override
     public void init() throws Exception {
         endpoint.setName(getName());
-        ((NioEndpoint)endpoint).setHandler(cHandler);
         
         try {
             endpoint.init();
