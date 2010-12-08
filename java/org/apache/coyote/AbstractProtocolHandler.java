@@ -365,9 +365,24 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
             endpoint.resume();
         } catch (Exception ex) {
             getLog().error(sm.getString("abstractProtocolHandler.actionError",
-                    "resule", getName()), ex);
+                    "resume", getName()), ex);
             throw ex;
         }
+    }
+
+
+    @Override
+    public final void stop() throws Exception {
+        try {
+            endpoint.stop();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("abstractProtocolHandler.action",
+                    "Stopping"), ex);
+            throw ex;
+        }
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("abstractProtocolHandler.actionError",
+                    "stop", getName()));
     }
 
 
