@@ -72,6 +72,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     public Http11AprProtocol() {
         endpoint = new AprEndpoint();
         cHandler = new Http11ConnectionHandler(this);
+        ((AprEndpoint) endpoint).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
@@ -83,7 +84,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     @Override
     public void init() throws Exception {
         endpoint.setName(getName());
-        ((AprEndpoint)endpoint).setHandler(cHandler);
 
         try {
             endpoint.init();
@@ -123,7 +123,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             log.info(sm.getString("http11protocol.start", getName()));
     }
 
-    private Http11ConnectionHandler cHandler;
+    private final Http11ConnectionHandler cHandler;
 
     public boolean getUseSendfile() { return ((AprEndpoint)endpoint).getUseSendfile(); }
     public void setUseSendfile(boolean useSendfile) { ((AprEndpoint)endpoint).setUseSendfile(useSendfile); }
