@@ -79,23 +79,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         setProcessorCache(-1);
     }
 
-    /** Start the protocol
-     */
-    @Override
-    public void init() throws Exception {
-        endpoint.setName(getName());
-
-        try {
-            endpoint.init();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
-            throw ex;
-        }
-        if(log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.init", getName()));
-
-    }
-
     @Override
     public void start() throws Exception {
         if( this.domain != null ) {
