@@ -82,21 +82,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     protected Http11ConnectionHandler cHandler;
 
 
-    // ----------------------------------------- ProtocolHandler Implementation
-
-    @Override
-    public void start() throws Exception {
-        try {
-            endpoint.start();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.start", getName()));
-    }
-
-
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
     protected static class Http11ConnectionHandler implements Handler {
