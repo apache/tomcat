@@ -39,20 +39,6 @@ public final class LifecycleEvent extends EventObject {
 
     // ----------------------------------------------------------- Constructors
 
-
-    /**
-     * Construct a new LifecycleEvent with the specified parameters.
-     *
-     * @param lifecycle Component on which this event occurred
-     * @param type Event type (required)
-     */
-    public LifecycleEvent(Lifecycle lifecycle, String type) {
-
-        this(lifecycle, type, null);
-
-    }
-
-
     /**
      * Construct a new LifecycleEvent with the specified parameters.
      *
