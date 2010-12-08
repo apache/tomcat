@@ -189,20 +189,4 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     protected String getNamePrefix() {
         return ("http");
     }
-    
-    
-    // ------------------------------------------------------- Lifecycle methods
-    
-    @Override
-    public void stop() throws Exception {
-        try {
-            endpoint.stop();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("http11protocol.endpoint.stoperror"),
-                    ex);
-            throw ex;
-        }
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.stop", getName()));
-    }
 }

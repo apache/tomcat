@@ -71,19 +71,4 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
     protected String getNamePrefix() {
         return ("ajp");
     }
-    
-    
-    // ------------------------------------------------------- Lifecycle methods
-
-    @Override
-    public void stop() throws Exception {
-        try {
-            endpoint.stop();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("ajpprotocol.endpoint.stoperror"), ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.stop", getName()));
-    }
 }
