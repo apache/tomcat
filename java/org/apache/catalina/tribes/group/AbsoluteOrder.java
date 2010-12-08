@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.group;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -57,7 +58,12 @@ public class AbsoluteOrder {
     }
     
     
-    public static class AbsoluteComparator implements Comparator<Member> {
+    public static class AbsoluteComparator implements Comparator<Member>,
+            Serializable {
+        
+        private static final long serialVersionUID = 1L;
+
+        @Override
         public int compare(Member m1, Member m2) {
             int result = compareIps(m1,m2);
             if ( result == 0 ) result = comparePorts(m1,m2);
