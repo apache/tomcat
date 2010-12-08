@@ -337,13 +337,32 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
 
     // ------------------------------------------------------- Lifecycle methods
 
-    // TODO Keep current state and check for invalid transitions
+    /*
+     * NOTE: There is no maintenance of state or checking for valid transitions
+     * within this class. It is expected that the connector will maintain state
+     * and prevent invalid state transitions.
+     */
 
     @Override
-    public abstract void init() throws Exception;
+    public void init() throws Exception {
+        if (getLog().isInfoEnabled())
+            getLog().info(sm.getString("abstractProtocolHandler.init",
+                    getName()));
+
+        endpoint.setName(getName());
+
+        try {
+            endpoint.init();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("abstractProtocolHandler.initError",
+                    getName()), ex);
+            throw ex;
+        }
+    }
+
 
     @Override
-    public final void pause() throws Exception {
+    public void pause() throws Exception {
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.pause",
                     getName()));
@@ -357,7 +376,7 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     }
 
     @Override
-    public final void resume() throws Exception {
+    public void resume() throws Exception {
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.resume",
                     getName()));
@@ -372,7 +391,7 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
 
 
     @Override
-    public final void stop() throws Exception {
+    public void stop() throws Exception {
         try {
             endpoint.stop();
         } catch (Exception ex) {
@@ -387,7 +406,7 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
 
 
     @Override
-    public final void destroy() {
+    public void destroy() {
         if(getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.destroy",
                     getName()));

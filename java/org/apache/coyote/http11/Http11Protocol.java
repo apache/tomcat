@@ -37,7 +37,6 @@ import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
-import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 
 /**
@@ -84,22 +83,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
 
     // ----------------------------------------- ProtocolHandler Implementation
-
-    @Override
-    public void init() throws Exception {
-        endpoint.setName(getName());
-
-        try {
-            endpoint.init();
-            sslImplementation = new JSSEImplementation();
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("http11protocol.init", getName()));
-
-    }
 
     @Override
     public void start() throws Exception {
