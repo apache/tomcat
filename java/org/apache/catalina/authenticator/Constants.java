@@ -29,11 +29,6 @@ public class Constants {
     public static final String DIGEST_METHOD = "DIGEST";
     public static final String FORM_METHOD = "FORM";
 
-    // User data constraints for transport guarantee
-    public static final String NONE_TRANSPORT = "NONE";
-    public static final String INTEGRAL_TRANSPORT = "INTEGRAL";
-    public static final String CONFIDENTIAL_TRANSPORT = "CONFIDENTIAL";
-
     // Form based authentication constants
     public static final String FORM_ACTION = "/j_security_check";
     public static final String FORM_PASSWORD = "j_password";
@@ -47,42 +42,6 @@ public class Constants {
 
 
     // --------------------------------------------------------- Request Notes
-
-
-    /**
-     * <p>If a user has been authenticated by the web layer, by means of a
-     * login method other than CLIENT_CERT, the username and password
-     * used to authenticate the user will be attached to the request as
-     * Notes for use by other server components.  A server component can
-     * also call several existing methods on Request to determine whether
-     * or not any user has been authenticated:</p>
-     * <ul>
-     * <li><strong>request.getAuthType()</strong>
-     *     will return BASIC, CLIENT_CERT, DIGEST, FORM, or <code>null</code>
-     *     if there is no authenticated user.</li>
-     * <li><strong>request.getUserPrincipal()</strong>
-     *     will return the authenticated <code>Principal</code> returned by the
-     *     <code>Realm</code> that authenticated this user.</li>
-     * </ul>
-     * <p>If CLIENT_CERT authentication was performed, the certificate chain
-     * will be available as a request attribute, as defined in the
-     * servlet specification.</p>
-     */
-
-
-    /**
-     * The notes key for the password used to authenticate this user.
-     */
-    public static final String REQ_PASSWORD_NOTE =
-      "org.apache.catalina.request.PASSWORD";
-
-
-    /**
-     * The notes key for the username used to authenticate this user.
-     */
-    public static final String REQ_USERNAME_NOTE =
-      "org.apache.catalina.request.USERNAME";
-
 
     /**
      * The notes key to track the single-sign-on identity with which this
