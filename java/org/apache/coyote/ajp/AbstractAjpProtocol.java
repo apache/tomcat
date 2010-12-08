@@ -76,33 +76,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
     // ------------------------------------------------------- Lifecycle methods
 
     @Override
-    public void pause() throws Exception {
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("ajpprotocol.endpoint.pauseerror"), ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.pause", getName()));
-    }
-
-
-    @Override
-    public void resume() throws Exception {
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("ajpprotocol.endpoint.resumeerror"),
-                    ex);
-            throw ex;
-        }
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("ajpprotocol.resume", getName()));
-    }
-
-
-    @Override
     public void stop() throws Exception {
         try {
             endpoint.stop();
