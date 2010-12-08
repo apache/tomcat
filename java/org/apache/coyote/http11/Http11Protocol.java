@@ -72,6 +72,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     public Http11Protocol() {
         endpoint = new JIoEndpoint();
         cHandler = new Http11ConnectionHandler(this);
+        ((JIoEndpoint) endpoint).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
@@ -91,8 +92,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
     @Override
     public void init() throws Exception {
-        ((JIoEndpoint)endpoint).setName(getName());
-        ((JIoEndpoint)endpoint).setHandler(cHandler);
+        endpoint.setName(getName());
 
         // Verify the validity of the configured socket factory
         try {
