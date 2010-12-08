@@ -342,19 +342,46 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     @Override
     public abstract void init() throws Exception;
 
+    @Override
+    public final void pause() throws Exception {
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("abstractProtocolHandler.action",
+                    "Pausing", getName()));
+        try {
+            endpoint.pause();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("abstractProtocolHandler.actionError",
+                    "pause", getName()), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public final void resume() throws Exception {
+        if(getLog().isInfoEnabled())
+            getLog().info(sm.getString("abstractProtocolHandler.action",
+                    "Resuming", getName()));
+        try {
+            endpoint.resume();
+        } catch (Exception ex) {
+            getLog().error(sm.getString("abstractProtocolHandler.actionError",
+                    "resule", getName()), ex);
+            throw ex;
+        }
+    }
+
 
     @Override
     public final void destroy() {
         if(getLog().isInfoEnabled()) {
-            getLog().info(sm.getString("abstractProtocolHandler.destroy",
-                    getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.action",
+                    "Destroying", getName()));
         }
         try {
             endpoint.destroy();
         } catch (Exception e) {
-            getLog().error(sm.getString(
-                    "abstractProtocolHandler.endPointDestroyError", getName()),
-                    e);
+            getLog().error(sm.getString("abstractProtocolHandler.actionError",
+                    "destroy", getName()), e);
         }
         
         if( tpOname!=null )

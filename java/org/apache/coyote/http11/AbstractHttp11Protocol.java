@@ -194,32 +194,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     // ------------------------------------------------------- Lifecycle methods
     
     @Override
-    public void pause() throws Exception {
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("http11protocol.endpoint.pauseerror"),
-                    ex);
-            throw ex;
-        }
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.pause", getName()));
-    }
-
-    @Override
-    public void resume() throws Exception {
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("http11protocol.endpoint.resumeerror"),
-                    ex);
-            throw ex;
-        }
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("http11protocol.resume", getName()));
-    }
-
-    @Override
     public void stop() throws Exception {
         try {
             endpoint.stop();
