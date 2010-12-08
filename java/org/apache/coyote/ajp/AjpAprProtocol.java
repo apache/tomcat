@@ -86,19 +86,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
     // --------------------------------------------------------- Public Methods
 
 
-    @Override
-    public void start() throws Exception {
-        try {
-            endpoint.start();
-        } catch (Exception ex) {
-            log.error(sm.getString("ajpprotocol.endpoint.starterror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled())
-            log.info(sm.getString("ajpprotocol.start", getName()));
-    }
-
-
     public boolean getUseSendfile() { return endpoint.getUseSendfile(); }
     public void setUseSendfile(@SuppressWarnings("unused") boolean useSendfile) {
         /* No sendfile for AJP */
