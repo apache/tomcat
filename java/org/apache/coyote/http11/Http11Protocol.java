@@ -86,21 +86,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
     @Override
     public void start() throws Exception {
-        if (this.domain != null) {
-            try {
-                tpOname = new ObjectName
-                    (domain + ":" + "type=ThreadPool,name=" + getName());
-                Registry.getRegistry(null, null)
-                    .registerComponent(endpoint, tpOname, null );
-            } catch (Exception e) {
-                log.error("Can't register endpoint");
-            }
-            rgOname=new ObjectName
-                (domain + ":type=GlobalRequestProcessor,name=" + getName());
-            Registry.getRegistry(null, null).registerComponent
-                ( cHandler.global, rgOname, null );
-        }
-
         try {
             endpoint.start();
         } catch (Exception ex) {
