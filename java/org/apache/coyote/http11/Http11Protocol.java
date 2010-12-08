@@ -20,7 +20,6 @@ package org.apache.coyote.http11;
 import java.net.Socket;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,10 +35,9 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
-import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 
 /**
@@ -85,43 +83,15 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     protected Http11ConnectionHandler cHandler;
 
 
-    protected ServerSocketFactory socketFactory = null;
-   
-
     // ----------------------------------------- ProtocolHandler Implementation
 
     @Override
     public void init() throws Exception {
         endpoint.setName(getName());
 
-        // Verify the validity of the configured socket factory
-        try {
-            if (isSSLEnabled()) {
-                sslImplementation =
-                    SSLImplementation.getInstance(sslImplementationName);
-                socketFactory = sslImplementation.getServerSocketFactory();
-                ((JIoEndpoint)endpoint).setServerSocketFactory(socketFactory);
-            } else if (socketFactoryName != null) {
-                socketFactory = (ServerSocketFactory) Class.forName(socketFactoryName).newInstance();
-                ((JIoEndpoint)endpoint).setServerSocketFactory(socketFactory);
-            }
-        } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.socketfactory.initerror"),
-                      ex);
-            throw ex;
-        }
-
-        if (socketFactory!=null) {
-            Iterator<String> attE = attributes.keySet().iterator();
-            while( attE.hasNext() ) {
-                String key = attE.next();
-                Object v=attributes.get(key);
-                socketFactory.setAttribute(key, v);
-            }
-        }
-        
         try {
             endpoint.init();
+            sslImplementation = new JSSEImplementation();
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
             throw ex;
@@ -159,25 +129,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     }
 
 
-    // ------------------------------------------------------------- Properties
-
-    /**
-     * Name of the socket factory.
-     */
-    protected String socketFactoryName = null;
-    public String getSocketFactory() { return socketFactoryName; }
-    public void setSocketFactory(String valueS) { socketFactoryName = valueS; }
-    
-    /**
-     * Name of the SSL implementation.
-     */
-    protected String sslImplementationName=null;
-    public String getSSLImplementation() { return sslImplementationName; }
-    public void setSSLImplementation( String valueS) {
-        sslImplementationName = valueS;
-        setSecure(true);
-    }
-    
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
     protected static class Http11ConnectionHandler implements Handler {
