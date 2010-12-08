@@ -358,19 +358,4 @@ public abstract class BaseRedirectorHelperTask extends Task {
             handleOutput(output);
         }
     }
-  
-    /**
-     * Handles output with ERR priority to error stream and all other
-     * priorities to output stream, then flushes the stream.
-     *
-     * @param output The output to log. Should not be <code>null</code>.
-     */
-    protected void handleFlush(String output, int priority) {
-        if (priority == Project.MSG_ERR) {
-            handleErrorFlush(output);
-        } else {
-            handleFlush(output);
-        }
-    }
-
 }
