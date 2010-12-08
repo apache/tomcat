@@ -54,4 +54,12 @@ public interface Adapter {
             throws Exception;
 
     public void log(Request req, Response res, long time);
+
+    /**
+     * Provide the name of the domain to use to register MBeans for conponents
+     * associated with the connector.
+     * 
+     * @return  The MBean domain name
+     */
+    public String getDomain();
 }
