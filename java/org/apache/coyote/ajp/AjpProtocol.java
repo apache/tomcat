@@ -86,24 +86,6 @@ public class AjpProtocol extends AbstractAjpProtocol {
     // --------------------------------------------------------- Public Methods
 
 
-    /** Start the protocol
-     */
-    @Override
-    public void init() throws Exception {
-        endpoint.setName(getName());
-
-        try {
-            endpoint.init();
-        } catch (Exception ex) {
-            log.error(sm.getString("ajpprotocol.endpoint.initerror"), ex);
-            throw ex;
-        }
-        if (log.isInfoEnabled()) {
-            log.info(sm.getString("ajpprotocol.init", getName()));
-        }
-    }
-
-
     @Override
     public void start() throws Exception {
         if (this.domain != null ) {

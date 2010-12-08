@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import org.apache.tomcat.util.net.SSLImplementation;
+import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 public abstract class AbstractHttp11JsseProtocol
         extends AbstractHttp11Protocol {
@@ -101,5 +102,14 @@ public abstract class AbstractHttp11JsseProtocol
     }
     public String getAllowUnsafeLegacyRenegotiation() {
         return endpoint.getAllowUnsafeLegacyRenegotiation();
+    }
+
+
+    // ------------------------------------------------------- Lifecycle methods
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        sslImplementation = new JSSEImplementation();
     }
 }
