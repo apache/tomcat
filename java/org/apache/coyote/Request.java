@@ -191,10 +191,6 @@ public final class Request {
         return decodedUriMB;
     }
 
-    public MessageBytes query() {
-        return queryMB;
-    }
-
     public MessageBytes queryString() {
         return queryMB;
     }
