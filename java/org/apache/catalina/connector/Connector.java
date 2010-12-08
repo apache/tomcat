@@ -907,9 +907,6 @@ public class Connector extends LifecycleMBeanBase  {
                  ("coyoteConnector.protocolHandlerInitializationFailed"), e);
         }
 
-        onameProtocolHandler = register(protocolHandler,
-                createObjectNameKeyProperties("ProtocolHandler"));
-
         // Initialize mapper listener
         mapperListener.init();
     }
@@ -967,7 +964,6 @@ public class Connector extends LifecycleMBeanBase  {
     @Override
     protected void destroyInternal() throws LifecycleException {
         mapperListener.destroy();
-        unregister(onameProtocolHandler);
         
         try {
             protocolHandler.destroy();
