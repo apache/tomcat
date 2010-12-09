@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -117,6 +118,7 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.apache.tomcat.util.threads.DedicatedThreadExecutor;
 
 /**
  * Standard implementation of the <b>Context</b> interface.  Each
@@ -4966,6 +4968,7 @@ public class StandardContext extends ContainerBase
             }
         }
 
+        DedicatedThreadExecutor temporaryExecutor = new DedicatedThreadExecutor();
         try {
             
             // Create context attributes that will be required
@@ -4992,7 +4995,21 @@ public class StandardContext extends ContainerBase
 
             // Configure and call application event listeners
             if (ok) {
-                if (!listenerStart()) {
+                // we do it in a dedicated thread for memory leak protection, in
+                // case the Listeners registers some ThreadLocals that they
+                // forget to cleanup
+                Boolean listenerStarted =
+                    temporaryExecutor.execute(new Callable<Boolean>() {
+                        public Boolean call() throws Exception {
+                            ClassLoader old = bindThread();
+                            try {
+                                return listenerStart();
+                            } finally {
+                                unbindThread(old);
+                            }
+                        }
+                    });
+                if (!listenerStarted) {
                     log.error( "Error listenerStart");
                     ok = false;
                 }
@@ -5013,20 +5030,48 @@ public class StandardContext extends ContainerBase
 
             // Configure and call application filters
             if (ok) {
-                if (!filterStart()) {
-                    log.error( "Error filterStart");
+                // we do it in a dedicated thread for memory leak protection, in
+                // case the Filters register some ThreadLocals that they forget
+                // to cleanup
+                Boolean filterStarted =
+                    temporaryExecutor.execute(new Callable<Boolean>() {
+                        public Boolean call() throws Exception {
+                            ClassLoader old = bindThread();
+                            try {
+                                return filterStart();
+                            } finally {
+                                unbindThread(old);
+                            }
+                        }
+                    });
+                if (!filterStarted) {
+                    log.error("Error filterStart");
                     ok = false;
                 }
             }
             
             // Load and initialize all "load on startup" servlets
             if (ok) {
-                loadOnStartup(findChildren());
+                // we do it in a dedicated thread for memory leak protection, in
+                // case the Servlets register some ThreadLocals that they forget
+                // to cleanup
+                temporaryExecutor.execute(new Callable<Void>() {
+                    public Void call() throws Exception {
+                        ClassLoader old = bindThread();
+                        try {
+                            loadOnStartup(findChildren());
+                            return null;
+                        } finally {
+                            unbindThread(old);
+                        }
+                    }
+                });
             }
             
         } finally {
             // Unbinding thread
             unbindThread(oldCCL);
+            temporaryExecutor.shutdown();
         }
 
         // Set available status depending upon startup success
@@ -5159,23 +5204,38 @@ public class StandardContext extends ContainerBase
         try {
 
             // Stop our child containers, if any
-            Container[] children = findChildren();
-            for (int i = 0; i < children.length; i++) {
-                children[i].stop();
-            }
-
-            // Stop our filters
-            filterStop();
-
-            // Stop ContainerBackgroundProcessor thread
-            super.threadStop();
-
-            if ((manager != null) && (manager instanceof Lifecycle)) {
-                ((Lifecycle) manager).stop();
-            }
-
-            // Stop our application listeners
-            listenerStop();
+            final Container[] children = findChildren();
+            // we do it in a dedicated thread for memory leak protection, in
+            // case some webapp code registers some ThreadLocals that they
+            // forget to cleanup
+            DedicatedThreadExecutor.executeInOwnThread(
+                new Callable<Void>() {
+                public Void call() throws Exception {
+                    ClassLoader old = bindThread();
+                    try {
+                        for (int i = 0; i < children.length; i++) {
+                            children[i].stop();
+                        }
+            
+                        // Stop our filters
+                        filterStop();
+            
+                        // Stop ContainerBackgroundProcessor thread
+                        threadStop();
+            
+                        if ((manager != null) && 
+                                (manager instanceof Lifecycle)) {
+                            ((Lifecycle) manager).stop();
+                        }
+            
+                        // Stop our application listeners
+                        listenerStop();
+                        return null;
+                    }finally{
+                        unbindThread(old);
+                    }
+                }
+            });
 
             // Finalize our character set mapper
             setCharsetMapper(null);
