@@ -346,6 +346,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     /**
      * VariableResolver interface
      */
+    @Override
     @Deprecated
     public Object resolveVariable(String pName) throws ELException {
         ELContext ctx = this.getELContext();

@@ -65,6 +65,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 
     }
 
+    @Override
     public void addELContextListener(ELContextListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("ELConextListener was null");
@@ -96,6 +97,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         if (Constants.IS_SECURITY_ENABLED) {
             ctx = AccessController.doPrivileged(
                     new PrivilegedAction<ELContextImpl>() {
+                        @Override
                         public ELContextImpl run() {
                             return new ELContextImpl(r);
                         }
@@ -134,6 +136,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         return this.resolver;
     }
 
+    @Override
     public void addELResolver(ELResolver resolver) throws IllegalStateException {
         if (resolver == null) {
             throw new IllegalArgumentException("ELResolver was null");
@@ -145,6 +148,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         this.resolvers.add(resolver);
     }
 
+    @Override
     public ExpressionFactory getExpressionFactory() {
         return expressionFactory;
     }

@@ -70,18 +70,21 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
         _jspService(request, response);
     }
     
+    @Override
     public void jspInit() {
     }
 
     public void _jspInit() {
     }
 
+    @Override
     public void jspDestroy() {
     }
 
     protected void _jspDestroy() {
     }
 
+    @Override
     public abstract void _jspService(HttpServletRequest request, 
                                      HttpServletResponse response) 
         throws ServletException, IOException;
