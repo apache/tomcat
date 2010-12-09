@@ -121,7 +121,8 @@
       to POST. This is useful in RESTful applications that want to
       support POST-style semantics for PUT requests.
       Note that any setting other than <code>POST</code> causes Tomcat
-      to behave in a way that violates the servlet specification.
+      to behave in a way that does against the intent of the servlet
+      specification.
       The HTTP method TRACE is specifically forbidden here in accordance
       with the HTTP specification.
       The default is <code>POST</code></p>
