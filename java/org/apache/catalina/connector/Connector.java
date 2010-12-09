@@ -249,7 +249,6 @@ public class Connector extends LifecycleMBeanBase  {
          replacements.put("connectionTimeout", "soTimeout");
          replacements.put("randomFile", "randomfile");
          replacements.put("rootFile", "rootfile");
-         replacements.put("sslProtocols", "protocols");
      }
 
 

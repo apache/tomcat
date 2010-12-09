@@ -119,7 +119,9 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(SocketWrapper<Socket> socket);
-        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status);
+        public SocketState process(SocketWrapper<Socket> socket,
+                SocketStatus status);
+        public SSLImplementation getSslImplementation(); 
     }
 
 
@@ -333,57 +335,22 @@ public class JIoEndpoint extends AbstractEndpoint {
             acceptorThreadCount = 1;
         }
         if (serverSocketFactory == null) {
-            serverSocketFactory = ServerSocketFactory.getDefault();
-        }
-        if (isSSLEnabled()) {
-            serverSocketFactory.setAttribute(SSL_ATTR_ALGORITHM,
-                    getAlgorithm());
-            serverSocketFactory.setAttribute(SSL_ATTR_CLIENT_AUTH,
-                    getClientAuth());
-            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_FILE,
-                    getKeystoreFile());
-            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_PASS,
-                    getKeystorePass());
-            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_TYPE,
-                    getKeystoreType());
-            serverSocketFactory.setAttribute(SSL_ATTR_KEYSTORE_PROVIDER,
-                    getKeystoreProvider());
-            serverSocketFactory.setAttribute(SSL_ATTR_SSL_PROTOCOL,
-                    getSslProtocol());
-            serverSocketFactory.setAttribute(SSL_ATTR_CIPHERS,
-                    getCiphers());
-            serverSocketFactory.setAttribute(SSL_ATTR_KEY_ALIAS,
-                    getKeyAlias());
-            serverSocketFactory.setAttribute(SSL_ATTR_KEY_PASS,
-                    getKeyPass());
-            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_FILE,
-                    getTruststoreFile());
-            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_PASS,
-                    getTruststorePass());
-            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_TYPE,
-                    getTruststoreType());
-            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_PROVIDER,
-                    getTruststoreProvider());
-            serverSocketFactory.setAttribute(SSL_ATTR_TRUSTSTORE_ALGORITHM,
-                    getTruststoreAlgorithm());
-            serverSocketFactory.setAttribute(SSL_ATTR_CRL_FILE,
-                    getCrlFile());
-            serverSocketFactory.setAttribute(SSL_ATTR_TRUST_MAX_CERT_LENGTH,
-                    getTrustMaxCertLength());
-            serverSocketFactory.setAttribute(SSL_ATTR_SESSION_CACHE_SIZE,
-                    getSessionCacheSize());
-            serverSocketFactory.setAttribute(SSL_ATTR_SESSION_TIMEOUT,
-                    getSessionTimeout());
-            serverSocketFactory.setAttribute(SSL_ATTR_ALLOW_UNSAFE_RENEG,
-                    getAllowUnsafeLegacyRenegotiation());
+            if (isSSLEnabled()) {
+                serverSocketFactory =
+                    handler.getSslImplementation().getServerSocketFactory(this);
+            } else {
+                serverSocketFactory = new DefaultServerSocketFactory(this);
+            }
         }
 
         if (serverSocket == null) {
             try {
                 if (getAddress() == null) {
-                    serverSocket = serverSocketFactory.createSocket(getPort(), getBacklog());
+                    serverSocket = serverSocketFactory.createSocket(getPort(),
+                            getBacklog());
                 } else {
-                    serverSocket = serverSocketFactory.createSocket(getPort(), getBacklog(), getAddress());
+                    serverSocket = serverSocketFactory.createSocket(getPort(),
+                            getBacklog(), getAddress());
                 }
             } catch (BindException orig) {
                 String msg;
@@ -397,11 +364,8 @@ public class JIoEndpoint extends AbstractEndpoint {
                 throw be;
             }
         }
-        //if( serverTimeout >= 0 )
-        //    serverSocket.setSoTimeout( serverTimeout );
         
         initialized = true;
-        
     }
     
     @Override
@@ -475,8 +439,6 @@ public class JIoEndpoint extends AbstractEndpoint {
      * Configure the socket.
      */
     protected boolean setSocketOptions(Socket socket) {
-        serverSocketFactory.initSocket(socket);
-        
         try {
             // 1: Set socket options: timeout, linger, etc
             socketProperties.setProperties(socket);
