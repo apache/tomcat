@@ -56,6 +56,7 @@ public class TcpSender
     protected BufferedWriter[] connectionWriters = null;
 
 
+    @Override
     public void init(HeartbeatListener config) throws Exception {
         this.config = config;
         StringTokenizer tok = new StringTokenizer(config.getProxyList(), ",");
@@ -81,6 +82,7 @@ public class TcpSender
 
     }
 
+    @Override
     public int send(String mess) throws Exception {
         if (connections == null) {
             log.error("Not initialized");
