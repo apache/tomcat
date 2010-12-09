@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 public abstract class AbstractHttp11JsseProtocol
         extends AbstractHttp11Protocol {
@@ -104,12 +103,19 @@ public abstract class AbstractHttp11JsseProtocol
         return endpoint.getAllowUnsafeLegacyRenegotiation();
     }
 
+    private String sslImplemenationName = null;
+    public String getSslImplemenationName() { return sslImplemenationName; }
+    public void setSslImplemenationName(String s) {
+        this.sslImplemenationName = s;
+    }
 
     // ------------------------------------------------------- Lifecycle methods
 
     @Override
     public void init() throws Exception {
+        // SSL implementation needs to be in place before end point is
+        // initialized
+        sslImplementation = SSLImplementation.getInstance(sslImplemenationName);
         super.init();
-        sslImplementation = new JSSEImplementation();
     }
 }

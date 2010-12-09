@@ -21,6 +21,7 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSession;
 
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
@@ -47,8 +48,8 @@ public class JSSEImplementation extends SSLImplementation {
     }
       
     @Override
-    public ServerSocketFactory getServerSocketFactory()  {
-        ServerSocketFactory ssf = factory.getSocketFactory();
+    public ServerSocketFactory getServerSocketFactory(AbstractEndpoint endpoint)  {
+        ServerSocketFactory ssf = factory.getSocketFactory(endpoint);
         return ssf;
     } 
 

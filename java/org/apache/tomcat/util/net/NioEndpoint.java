@@ -1500,6 +1500,7 @@ public class NioEndpoint extends AbstractEndpoint {
         public SocketState event(NioChannel socket, SocketStatus status);
         public void release(NioChannel socket);
         public void release(SocketChannel socket);
+        public SSLImplementation getSslImplementation();
     }
 
 
