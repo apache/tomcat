@@ -139,6 +139,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /*--Logic---------------------------------------------------*/
+    @Override
     public void start() throws Exception {
         if (started)
             return;
@@ -174,12 +175,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         }
          
         configBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
-        if (engine != null) {
-            configBase = new File(configBase, engine.getName());
-        } 
-        if (host != null) {
-            configBase = new File(configBase, hostname);
-        }
+        configBase = new File(configBase, engine.getName());
+        configBase = new File(configBase, hostname);
 
         // Retrieve the MBean server
         mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
@@ -198,6 +195,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * 
      * @see org.apache.catalina.ha.ClusterDeployer#stop()
      */
+    @Override
     public void stop() throws LifecycleException {
         started = false;
         getCluster().removeClusterListener(this);
@@ -367,6 +365,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      *                if an input/output error was encountered during
      *                installation
      */
+    @Override
     public void install(String contextPath, URL war) throws IOException {
         Member[] members = getCluster().getMembers();
         Member localMember = getCluster().getLocalMember();
@@ -414,6 +413,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * @exception IOException
      *                if an input/output error occurs during removal
      */
+    @Override
     public void remove(String contextPath, boolean undeploy) throws IOException {
         if (log.isInfoEnabled())
             log.info("Cluster wide remove of web app " + contextPath);
@@ -451,6 +451,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * 
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(java.io.File)
      */
+    @Override
     public void fileModified(File newWar) {
         try {
             File deployWar = new File(getDeployDir(), newWar.getName());
@@ -475,6 +476,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * 
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(java.io.File)
      */
+    @Override
     public void fileRemoved(File removeWar) {
         try {
             String contextName = getContextName(removeWar);
@@ -581,6 +583,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * 
      * @see org.apache.catalina.ha.ClusterDeployer#backgroundProcess()
      */
+    @Override
     public void backgroundProcess() {
         if (started) {
             count = (count + 1) % processDeployFrequency;
