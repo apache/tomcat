@@ -418,10 +418,8 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
                     getName()), e);
         }
         
-        // If object was pre-registered (mserver != null) what ever registered
-        // the ProtocolHandler should de-register it
-        if (oname != null && mserver == null) {
-                Registry.getRegistry(null, null).unregisterComponent(oname);
+        if (oname != null) {
+            Registry.getRegistry(null, null).unregisterComponent(oname);
         }
 
         if (tpOname != null)
