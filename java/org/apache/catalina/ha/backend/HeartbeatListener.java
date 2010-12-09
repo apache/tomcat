@@ -74,9 +74,11 @@ public class HeartbeatListener
 
     private Sender sender = null;
 
+    @Override
     public void containerEvent(ContainerEvent event) {
     }
 
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
