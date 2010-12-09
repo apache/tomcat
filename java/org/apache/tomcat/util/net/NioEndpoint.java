@@ -455,11 +455,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Initialize the endpoint.
      */
     @Override
-    public void init()
-        throws Exception {
-
-        if (initialized)
-            return;
+    public void bind() throws Exception {
 
         serverSock = ServerSocketChannel.open();
         socketProperties.setProperties(serverSock.socket());
@@ -545,8 +541,6 @@ public class NioEndpoint extends AbstractEndpoint {
         
         if (oomParachute>0) reclaimParachute(true);
         selectorPool.open();
-        initialized = true;
-
     }
     
     public KeyManager[] wrap(KeyManager[] managers) {
@@ -567,12 +561,8 @@ public class NioEndpoint extends AbstractEndpoint {
      * Start the NIO endpoint, creating acceptor, poller threads.
      */
     @Override
-    public void start()
-        throws Exception {
-        // Initialize socket if not done before
-        if (!initialized) {
-            init();
-        }
+    public void startInternal() throws Exception {
+
         if (!running) {
             running = true;
             paused = false;
@@ -607,7 +597,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     @Override
-    public void stop() {
+    public void stopInternal() {
         if (!paused) {
             pause();
         }
@@ -634,7 +624,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * Deallocate NIO memory pools, and close server socket.
      */
     @Override
-    public void destroy() throws Exception {
+    public void unbind() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("Destroy initiated for "+new InetSocketAddress(getAddress(),getPort()));
         }
@@ -646,7 +636,6 @@ public class NioEndpoint extends AbstractEndpoint {
         serverSock.close();
         serverSock = null;
         sslContext = null;
-        initialized = false;
         releaseCaches();
         selectorPool.close();
         if (log.isDebugEnabled()) {

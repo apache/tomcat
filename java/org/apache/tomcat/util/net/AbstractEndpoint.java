@@ -97,6 +97,10 @@ public abstract class AbstractEndpoint {
         public void recycle();
     }
 
+    protected enum BindState {
+        UNBOUND, BOUND_ON_INIT, BOUND_ON_START
+    }
+
     // Standard SSL Configuration attributes
     // JSSE
     // Standard configuration attribute names
@@ -141,11 +145,6 @@ public abstract class AbstractEndpoint {
      * Will be set to true whenever the endpoint is paused.
      */
     protected volatile boolean paused = false;
-
-    /**
-     * Track the initialization state of the endpoint.
-     */
-    protected boolean initialized = false;
 
     /**
      * Are we using an internal executor
@@ -200,6 +199,17 @@ public abstract class AbstractEndpoint {
     private int backlog = 100;
     public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
     public int getBacklog() { return backlog; }
+
+    /**
+     * Controls when the Endpoint binds the port. <code>true</code>, the default
+     * binds the port on {@link #init()} and unbinds it on {@link #destroy()}.
+     * If set to <code>false</code> the port is bound on {@link #start()} and
+     * unbound on {@link #stop()}.  
+     */
+    private boolean bindOnInit = true;
+    public boolean getBindOnInit() { return bindOnInit; }
+    public void setBindOnInit(boolean b) { this.bindOnInit = b; }
+    private BindState bindState = BindState.UNBOUND;
 
     /**
      * Keepalive timeout, if lesser or equal to 0 then soTimeout will be used.
@@ -503,8 +513,34 @@ public abstract class AbstractEndpoint {
     }
 
 
-    public abstract void init() throws Exception;
-    public abstract void start() throws Exception;
+    // ------------------------------------------------------- Lifecycle methods
+
+    /*
+     * NOTE: There is no maintenance of state or checking for valid transitions
+     * within this class other than ensuring that bind/unbind are called in the
+     * right place. It is expected that the calling code will maintain state and
+     * prevent invalid state transitions.
+     */
+
+    public abstract void bind() throws Exception;
+    public abstract void unbind() throws Exception;
+    public abstract void startInternal() throws Exception;
+    public abstract void stopInternal() throws Exception;
+
+    public final void init() throws Exception {
+        if (bindOnInit) {
+            bind();
+            bindState = BindState.BOUND_ON_INIT;
+        }
+    }
+    
+    public final void start() throws Exception {
+        if (bindState == BindState.UNBOUND) {
+            bind();
+            bindState = BindState.BOUND_ON_START;
+        }
+        startInternal();
+    }
 
     /**
      * Pause the endpoint, which will stop it accepting new connections.
@@ -532,8 +568,21 @@ public abstract class AbstractEndpoint {
         }
     }
 
-    public abstract void stop() throws Exception;
-    public abstract void destroy() throws Exception;
+    public final void stop() throws Exception {
+        stopInternal();
+        if (bindState == BindState.BOUND_ON_START) {
+            unbind();
+            bindState = BindState.UNBOUND;
+        }
+    }
+
+    public final void destroy() throws Exception {
+        if (bindState == BindState.BOUND_ON_INIT) {
+            unbind();
+            bindState = BindState.UNBOUND;
+        }
+    }
+
 
     public String adjustRelativePath(String path, String relativeTo) {
         String newPath = path;
