@@ -34,6 +34,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
+import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -145,6 +146,12 @@ public class AjpProtocol extends AbstractAjpProtocol {
         }
 
         @Override
+        public SSLImplementation getSslImplementation() {
+            // AJP does not support SSL
+            return null;
+        }
+
+        @Override
         public void recycle() {
             recycledProcessors.clear();
         }
@@ -251,7 +258,6 @@ public class AjpProtocol extends AbstractAjpProtocol {
                 }
             }
         }
-
     }
 
 }
