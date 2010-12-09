@@ -23,6 +23,7 @@ import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
 public class Catch implements TagPlugin {
     
+    @Override
     public void doTag(TagPluginContext ctxt) {
         
         //flag for the existence of the var attribute
