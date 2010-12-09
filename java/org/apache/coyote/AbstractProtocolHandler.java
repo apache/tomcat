@@ -330,8 +330,8 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
             }
             rgOname=new ObjectName(domain +
                     ":type=GlobalRequestProcessor,name=" + getName());
-            Registry.getRegistry(null, null).registerComponent(getHandler(),
-                    rgOname, null );
+            Registry.getRegistry(null, null).registerComponent(
+                    getHandler().getGlobal(), rgOname, null );
         }
 
         endpoint.setName(getName());
