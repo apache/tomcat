@@ -365,11 +365,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * Initialize the endpoint.
      */
     @Override
-    public void init()
-        throws Exception {
-
-        if (initialized)
-            return;
+    public void bind() throws Exception {
 
         // Create the root APR memory pool
         try {
@@ -518,9 +514,6 @@ public class AprEndpoint extends AbstractEndpoint {
             // For now, sendfile is not supported with SSL
             useSendfile = false;
         }
-
-        initialized = true;
-
     }
 
 
@@ -528,12 +521,8 @@ public class AprEndpoint extends AbstractEndpoint {
      * Start the APR endpoint, creating acceptor, poller and sendfile threads.
      */
     @Override
-    public void start()
-        throws Exception {
-        // Initialize socket if not done before
-        if (!initialized) {
-            init();
-        }
+    public void startInternal() throws Exception {
+
         if (!running) {
             running = true;
             paused = false;
@@ -602,7 +591,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     @Override
-    public void stop() {
+    public void stopInternal() {
         if (!paused) {
             pause();
         }
@@ -665,7 +654,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * Deallocate APR memory pools, and close server socket.
      */
     @Override
-    public void destroy() throws Exception {
+    public void unbind() throws Exception {
         if (running) {
             stop();
         }
@@ -691,8 +680,6 @@ public class AprEndpoint extends AbstractEndpoint {
         }
 
         handler.recycle();
-
-        initialized = false;
     }
 
 
