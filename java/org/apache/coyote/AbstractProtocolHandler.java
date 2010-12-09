@@ -17,8 +17,6 @@
 package org.apache.coyote;
 
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import javax.management.MBeanRegistration;
@@ -65,55 +63,6 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     // ----------------------------------------------- Generic property handling
 
     /**
-     * Attributes provide a way for configuration to be passed to sub-components
-     * without the {@link ProtocolHandler} being aware of the properties
-     * available on those sub-components. One example of such a sub-component is
-     * the {@link org.apache.tomcat.util.net.ServerSocketFactory}.
-     */
-    protected HashMap<String, Object> attributes =
-        new HashMap<String, Object>();
-
-
-    /** 
-     * Generic property setter called when a property for which a specific
-     * setter already exists within the {@link ProtocolHandler} needs to be
-     * made available to sub-components. The specific setter will call this
-     * method to populate the attributes.
-     */
-    @Override
-    public void setAttribute(String name, Object value) {
-        if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("abstractProtocolHandler.setAttribute",
-                    name, value));
-        }
-        attributes.put(name, value);
-    }
-
-    
-    /**
-     * Used by sub-components to retrieve configuration information.
-     */
-    @Override
-    public Object getAttribute(String key) {
-        Object value = attributes.get(key);
-        if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("abstractProtocolHandler.getAttribute",
-                    key, value));
-        }
-        return value;
-    }
-
-
-    /**
-     * Used by sub-components to retrieve configuration information.
-     */
-    @Override
-    public Iterator<String> getAttributeNames() {
-        return attributes.keySet().iterator();
-    }
-
-
-    /**
      * Generic property setter used by the digester. Other code should not need
      * to use this. The digester will only use this method if it can't find a
      * more specific setter. That means the property belongs to the Endpoint,
@@ -121,7 +70,6 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
      * ensures that it is visible to both.
      */
     public boolean setProperty(String name, String value) {
-        setAttribute(name, value);
         return endpoint.setProperty(name, value);
     }
 
@@ -131,9 +79,7 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
      * to use this.
      */
     public String getProperty(String name) {
-        // Since all calls to setProperty() will place the property in the
-        // attributes list, just retrieve it from there. 
-        return (String)getAttribute(name);
+        return endpoint.getProperty(name);
     }
 
 
@@ -217,14 +163,12 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public InetAddress getAddress() { return endpoint.getAddress(); }
     public void setAddress(InetAddress ia) {
         endpoint.setAddress(ia);
-        setAttribute("address", ia.toString());
     }
 
 
     public int getPort() { return endpoint.getPort(); }
     public void setPort(int port) {
         endpoint.setPort(port);
-        setAttribute("port", Integer.toString(port));
     }
 
 
@@ -239,10 +183,6 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public void setConnectionTimeout(int timeout) {
         // Note that the endpoint uses the alternative name
         endpoint.setSoTimeout(timeout);
-        String str = Integer.toString(timeout);
-        setAttribute("connectionTimeout", str);
-        // Also set the attribute for the alternative name
-        setAttribute("soTimeout", str);
     }
 
     /*

@@ -166,7 +166,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     public boolean getSecure() { return secure; }
     public void setSecure(boolean b) { 
         secure = b;         
-        setAttribute("secure", "" + b);
     }
     
 
@@ -179,7 +178,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     }
     public void setMaxKeepAliveRequests(int mkar) {
         endpoint.setMaxKeepAliveRequests(mkar);
-        setAttribute("maxKeepAliveRequests", "" + mkar);
     }
 
     

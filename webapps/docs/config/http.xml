@@ -817,7 +817,7 @@
   connector uses OpenSSL. Therefore, in addition to using different attributes
   to configure SSL, the APR/native connector also requires keys and certificates
   to be provided in a different format.</p>
-  
+
   <p>The BIO and NIO connectors use the following attributes to configure SSL:
   </p>
 
@@ -916,8 +916,15 @@
     </attribute>
 
     <attribute name="sslEnabledProtocols" required="false">
-      <p><strong>NIO only</strong>. The version of the SSL protocols to use. If
-      not specified, the default is "<code>TLSv1,SSLv3,SSLv2Hello</code>".</p>
+      <p>The list of SSL protocols to use. If not specified, the JVM default is
+      used.</p>
+    </attribute>
+
+    <attribute name="sslImplemenationName" required="false">
+      <p>The class name of the SSL implementation to use. If not specified, the
+      default of <code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code>
+      will be used which wraps JVM&apos;s default JSSE provider. Note that the
+      JVM can be configured to use a different JSSE provider as the default.</p>
     </attribute>
 
     <attribute name="sslProtocol" required="false">

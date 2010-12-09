@@ -80,7 +80,8 @@ public abstract class SSLImplementation {
 
     public abstract String getImplementationName();
 
-    public abstract ServerSocketFactory getServerSocketFactory();
+    public abstract ServerSocketFactory getServerSocketFactory(
+            AbstractEndpoint endpoint);
 
     public abstract SSLSupport getSSLSupport(Socket sock);
 

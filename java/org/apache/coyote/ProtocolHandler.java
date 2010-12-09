@@ -17,7 +17,6 @@
 
 package org.apache.coyote;
 
-import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 
@@ -36,14 +35,6 @@ import java.util.concurrent.Executor;
  */
 public interface ProtocolHandler {
 
-    /**
-     * Pass config info.
-     */
-    public void setAttribute(String name, Object value);
-    public Object getAttribute(String name);
-    public Iterator<String> getAttributeNames();
-
-    
     /**
      * The adapter, used to call the connector.
      */
