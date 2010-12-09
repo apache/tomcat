@@ -20,7 +20,6 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
 
 /**
  * A byte message is not serialized and deserialized by the channel
@@ -40,7 +39,7 @@ import java.io.Serializable;
  * @version $Id$
  */
 
-public class ByteMessage implements Serializable, Externalizable {
+public class ByteMessage implements Externalizable {
     /**
      * Storage for the message to be sent
      */
@@ -83,6 +82,7 @@ public class ByteMessage implements Serializable, Externalizable {
      * @param in ObjectInput
      * @throws IOException
      */
+    @Override
     public void readExternal(ObjectInput in ) throws IOException {
         int length = in.readInt();
         message = new byte[length];
@@ -94,6 +94,7 @@ public class ByteMessage implements Serializable, Externalizable {
      * @param out ObjectOutput
      * @throws IOException
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(message!=null?message.length:0);
         if ( message!=null ) out.write(message,0,message.length);

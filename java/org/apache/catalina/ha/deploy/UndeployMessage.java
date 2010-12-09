@@ -17,11 +17,10 @@
 
 package org.apache.catalina.ha.deploy;
 
-import java.io.Serializable;
-
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
-public class UndeployMessage implements ClusterMessage,Serializable {
+
+public class UndeployMessage implements ClusterMessage {
     private static final long serialVersionUID = 1L;
 
     private Member address;
@@ -46,26 +45,32 @@ public class UndeployMessage implements ClusterMessage,Serializable {
         this.contextPath = contextPath;
     }
 
+    @Override
     public Member getAddress() {
         return address;
     }
 
+    @Override
     public void setAddress(Member address) {
         this.address = address;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
 
+    @Override
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
+    @Override
     public String getUniqueId() {
         return uniqueId;
     }
 
+    @Override
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
