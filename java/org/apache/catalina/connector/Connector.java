@@ -188,7 +188,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     protected String parseBodyMethods = "POST";
 
-    protected HashSet parseBodyMethodsSet;
+    protected HashSet<String> parseBodyMethodsSet;
 
 
     /**
@@ -455,28 +455,31 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
 
-    public String getParseBodyMethods()
-    {
-        return (this.parseBodyMethods);
+    public String getParseBodyMethods() {
+
+        return this.parseBodyMethods;
+
     }
 
-    public void setParseBodyMethods(String methods)
-    {
-        HashSet methodSet = new HashSet();
+    public void setParseBodyMethods(String methods) {
 
-        if(null != methods)
+        HashSet<String> methodSet = new HashSet<String>();
+
+        if( null != methods )
             methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));
 
-        if(methodSet.contains("TRACE"))
-            throw new IllegalArgumentException("TRACE method MUST NOT include an entity (see RFC 2616 Section 9.6)");
+        if( methodSet.contains("TRACE") )
+            throw new IllegalArgumentException(sm.getString("coyoteConnector.parseBodyMethodNoTrace"));
 
         this.parseBodyMethods = methods;
         this.parseBodyMethodsSet = methodSet;
+
     }
 
-    public boolean isParseBodyMethod(String method)
-    {
+    protected boolean isParseBodyMethod(String method) {
+
         return parseBodyMethodsSet.contains(method);
+
     }
 
     /**
@@ -896,7 +899,7 @@ public class Connector extends LifecycleMBeanBase  {
         protocolHandler.setAdapter(adapter);
 
         // Make sure parseBodyMethodsSet has a default
-        if(null == parseBodyMethodsSet)
+        if( null == parseBodyMethodsSet )
             setParseBodyMethods(getParseBodyMethods());
 
         try {
