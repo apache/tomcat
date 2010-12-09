@@ -698,6 +698,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void comment(char[] buf, int offset, int len) throws SAXException {
 
         processChars();  // Flush char buffer and remove white spaces
@@ -717,6 +718,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void startCDATA() throws SAXException {
 
         processChars();  // Flush char buffer and remove white spaces
@@ -727,6 +729,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void endCDATA() throws SAXException {
         processChars();  // Flush char buffer and remove white spaces
     }
@@ -734,6 +737,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void startEntity(String name) throws SAXException {
         // do nothing
     }
@@ -741,6 +745,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void endEntity(String name) throws SAXException {
         // do nothing
     }
@@ -748,6 +753,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void startDTD(String name, String publicId, String systemId)
         throws SAXException {
         if (!isValidating) {
@@ -760,6 +766,7 @@ class JspDocumentParser
     /*
      * See org.xml.sax.ext.LexicalHandler.
      */
+    @Override
     public void endDTD() throws SAXException {
         inDTD = false;
     }

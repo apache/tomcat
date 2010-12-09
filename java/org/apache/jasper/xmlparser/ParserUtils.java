@@ -191,6 +191,7 @@ public class ParserUtils {
 
 class MyEntityResolver implements EntityResolver {
 
+    @Override
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException {
         for (int i = 0; i < Constants.CACHED_DTD_PUBLIC_IDS.size(); i++) {
@@ -219,6 +220,7 @@ class MyEntityResolver implements EntityResolver {
 
 class MyErrorHandler implements ErrorHandler {
 
+    @Override
     public void warning(SAXParseException ex) throws SAXException {
         Log log = LogFactory.getLog(MyErrorHandler.class);
         if (log.isDebugEnabled())
@@ -226,10 +228,12 @@ class MyErrorHandler implements ErrorHandler {
         // We ignore warnings
     }
 
+    @Override
     public void error(SAXParseException ex) throws SAXException {
         throw ex;
     }
 
+    @Override
     public void fatalError(SAXParseException ex) throws SAXException {
         throw ex;
     }
