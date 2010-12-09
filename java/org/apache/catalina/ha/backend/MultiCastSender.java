@@ -41,10 +41,12 @@ public class MultiCastSender
     MulticastSocket s = null;
     InetAddress group = null;
 
+    @Override
     public void init(HeartbeatListener config) throws Exception {
         this.config = config;
     }
 
+    @Override
     public int send(String mess) throws Exception {
         if (s == null) {
             try {
