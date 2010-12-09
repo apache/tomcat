@@ -130,6 +130,16 @@
         <bug>50108</bug>: Add get/set methods for Connector property
         minSpareThreads. Patch provided by Eiji Takahashi. (markt)
       </add>
+      <fix>
+        <bug>50360</bug>:  Provide an option to control when the socket
+        associated with a connector is bound. By default, the socket is bound on
+        <code>Connector.init()</code> and released on
+        <code>Connector.destroy()</code> as per the current behaviour but this
+        can be changed so that the socket is bound on
+        <code>Connector.start()</code> and released on
+        <code>Connector.stop()</code>. This fix also includes further Lifecycle
+        refactoring for Connectors and associated components. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

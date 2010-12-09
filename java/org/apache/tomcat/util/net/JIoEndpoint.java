@@ -324,12 +324,8 @@ public class JIoEndpoint extends AbstractEndpoint {
     // -------------------- Public methods --------------------
 
     @Override
-    public void init()
-        throws Exception {
+    public void bind() throws Exception {
 
-        if (initialized)
-            return;
-        
         // Initialize thread count defaults for acceptor
         if (acceptorThreadCount == 0) {
             acceptorThreadCount = 1;
@@ -365,15 +361,11 @@ public class JIoEndpoint extends AbstractEndpoint {
             }
         }
         
-        initialized = true;
     }
     
     @Override
-    public void start() throws Exception {
-        // Initialize socket if not done before
-        if (!initialized) {
-            init();
-        }
+    public void startInternal() throws Exception {
+
         if (!running) {
             running = true;
             paused = false;
@@ -402,7 +394,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     }
 
     @Override
-    public void stop() {
+    public void stopInternal() {
         if (!paused) {
             pause();
         }
@@ -417,7 +409,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      * Deallocate APR memory pools, and close server socket.
      */
     @Override
-    public void destroy() throws Exception {
+    public void unbind() throws Exception {
         if (running) {
             stop();
         }
@@ -431,7 +423,6 @@ public class JIoEndpoint extends AbstractEndpoint {
             serverSocket = null;
         }
         handler.recycle();
-        initialized = false ;
     }
 
 

@@ -20,6 +20,7 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.net.ServerSocket;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -29,7 +30,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
  */
 public class TestXxxEndpoint extends TomcatBaseTest {
 
-    public void disbaletestStartStop() throws Exception {
+    public void testStartStopBindOnInit() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
@@ -39,13 +40,52 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         tomcat.start();
         
         tomcat.getConnector().stop();
-        // This will throw an exception if the socket is not released
-        ServerSocket socket = new ServerSocket(port);
-        socket.close();
+        // This will should throw an Exception
+        Exception e = null;
+        ServerSocket s = null;
+        try {
+            s = new ServerSocket(port);
+        } catch (Exception e1) {
+            e = e1;
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (Exception e2) { /* Ignore */ }
+            }
+        }
+        assertNotNull(e);
         tomcat.getConnector().start();
     }
-    
-    public void testDummy() throws Exception {
-        // NO-OP
+
+    public void testStartStopBindOnStart() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Connector c = tomcat.getConnector();
+        c.setProperty("bindOnInit", "false");
+        
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        
+        int port = getPort();
+
+        tomcat.start();
+        
+        tomcat.getConnector().stop();
+        // This should not throw an Exception
+        Exception e = null;
+        ServerSocket s = null;
+        try {
+            s = new ServerSocket(port);
+        } catch (Exception e1) {
+            e = e1;
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (Exception e2) { /* Ignore */ }
+            }
+        }
+        assertNull(e);
+        tomcat.getConnector().start();
     }
 }
