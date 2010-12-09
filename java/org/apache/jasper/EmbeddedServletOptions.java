@@ -213,6 +213,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Are we keeping generated code around?
      */
+    @Override
     public boolean getKeepGenerated() {
         return keepGenerated;
     }
@@ -220,10 +221,12 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Should white spaces between directives or actions be trimmed?
      */
+    @Override
     public boolean getTrimSpaces() {
         return trimSpaces;
     }
     
+    @Override
     public boolean isPoolingEnabled() {
         return isPoolingEnabled;
     }
@@ -231,6 +234,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Are we supporting HTML mapped servlets?
      */
+    @Override
     public boolean getMappedFile() {
         return mappedFile;
     }
@@ -238,6 +242,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Should class files be compiled with debug information?
      */
+    @Override
     public boolean getClassDebugInfo() {
         return classDebugInfo;
     }
@@ -245,6 +250,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Background JSP compile thread check interval
      */
+    @Override
     public int getCheckInterval() {
         return checkInterval;
     }
@@ -252,6 +258,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Modification test interval.
      */
+    @Override
     public int getModificationTestInterval() {
         return modificationTestInterval;
     }
@@ -259,6 +266,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Re-compile on failure.
      */
+    @Override
     public boolean getRecompileOnFail() {
         return recompileOnFail;
     }
@@ -266,6 +274,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Is Jasper being used in development mode?
      */
+    @Override
     public boolean getDevelopment() {
         return development;
     }
@@ -273,6 +282,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Is the generation of SMAP info for JSR45 debugging suppressed?
      */
+    @Override
     public boolean isSmapSuppressed() {
         return isSmapSuppressed;
     }
@@ -280,6 +290,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Should SMAP info for JSR45 debugging be dumped to a file?
      */
+    @Override
     public boolean isSmapDumped() {
         return isSmapDumped;
     }
@@ -287,6 +298,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Are Text strings to be generated as char arrays?
      */
+    @Override
     public boolean genStringAsCharArray() {
         return this.genStringAsCharArray;
     }
@@ -294,6 +306,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Class ID for use in the plugin tag when the browser is IE. 
      */
+    @Override
     public String getIeClassId() {
         return ieClassId;
     }
@@ -301,6 +314,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * What is my scratch dir?
      */
+    @Override
     public File getScratchDir() {
         return scratchDir;
     }
@@ -309,6 +323,7 @@ public final class EmbeddedServletOptions implements Options {
      * What classpath should I use while compiling the servlets
      * generated from JSP files?
      */
+    @Override
     public String getClassPath() {
         return classpath;
     }
@@ -316,6 +331,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Is generation of X-Powered-By response header enabled/disabled?
      */
+    @Override
     public boolean isXpoweredBy() {
         return xpoweredBy;
     }
@@ -323,6 +339,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Compiler to use.
      */
+    @Override
     public String getCompiler() {
         return compiler;
     }
@@ -330,6 +347,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * @see Options#getCompilerTargetVM
      */
+    @Override
     public String getCompilerTargetVM() {
         return compilerTargetVM;
     }
@@ -337,6 +355,7 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * @see Options#getCompilerSourceVM
      */
+    @Override
     public String getCompilerSourceVM() {
         return compilerSourceVM;
     }
@@ -344,10 +363,12 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Java compiler class to use.
      */
+    @Override
     public String getCompilerClassName() {
         return compilerClassName;
     }
 
+    @Override
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
     }
@@ -356,6 +377,7 @@ public final class EmbeddedServletOptions implements Options {
         errorOnUseBeanInvalidClassAttribute = b;
     }
     
+    @Override
     public TldLocationsCache getTldLocationsCache() {
         return tldLocationsCache;
     }
@@ -364,26 +386,32 @@ public final class EmbeddedServletOptions implements Options {
         tldLocationsCache = tldC;
     }
     
+    @Override
     public String getJavaEncoding() {
         return javaEncoding;
     }
     
+    @Override
     public boolean getFork() {
         return fork;
     }
     
+    @Override
     public JspConfig getJspConfig() {
         return jspConfig;
     }
     
+    @Override
     public TagPluginManager getTagPluginManager() {
         return tagPluginManager;
     }
     
+    @Override
     public boolean isCaching() {
         return false;
     }
     
+    @Override
     public Map<String, TagLibraryInfo> getCache() {
         return null;
     }
@@ -392,6 +420,7 @@ public final class EmbeddedServletOptions implements Options {
      * Should we include a source fragment in exception messages, which could be displayed
      * to the developer ?
      */
+    @Override
     public boolean getDisplaySourceFragment() {
         return displaySourceFragment;
     }
@@ -400,6 +429,7 @@ public final class EmbeddedServletOptions implements Options {
      * Should jsps be unloaded if to many are loaded?
      * If set to a value greater than 0 eviction of jsps is started. Default: -1
      */
+    @Override
     public int getMaxLoadedJsps() {
         return maxLoadedJsps;
     }
@@ -408,6 +438,7 @@ public final class EmbeddedServletOptions implements Options {
      * Should any jsps be unloaded when being idle for this time in seconds?
      * If set to a value greater than 0 eviction of jsps is started. Default: -1
      */
+    @Override
     public int getJspIdleTimeout() {
         return jspIdleTimeout;
     }

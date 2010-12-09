@@ -100,11 +100,13 @@ public final class JspMethodExpression extends MethodExpression implements
         return this.target.isLiteralText();
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.mark);
         out.writeObject(this.target);
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
         this.mark = in.readUTF();

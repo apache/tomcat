@@ -35,6 +35,7 @@ public class JarURLResource implements JarResource {
         this.jarUrl = jarUrl;
     }
     
+    @Override
     public JarFile getJarFile() throws IOException {
         URL jarFileUrl = new URL("jar:" + jarUrl + "!/");
         JarURLConnection conn = (JarURLConnection) jarFileUrl.openConnection();
@@ -43,10 +44,12 @@ public class JarURLResource implements JarResource {
         return conn.getJarFile();
     }
        
+    @Override
     public String getUrl() {
         return jarUrl;
     }
     
+    @Override
     public URL getEntry(String name) {
         try {
             return new URL("jar:" + jarUrl + "!/" + name);

@@ -154,6 +154,7 @@ public class TagPluginManager {
             pluginAttributes = new HashMap<String, Object>();
         }
 
+        @Override
         public TagPluginContext getParentContext() {
             Node parent = node.getParent();
             if (! (parent instanceof Node.CustomTag)) {
@@ -162,18 +163,22 @@ public class TagPluginManager {
             return ((Node.CustomTag) parent).getTagPluginContext();
         }
 
+        @Override
         public void setPluginAttribute(String key, Object value) {
             pluginAttributes.put(key, value);
         }
 
+        @Override
         public Object getPluginAttribute(String key) {
             return pluginAttributes.get(key);
         }
 
+        @Override
         public boolean isScriptless() {
             return node.getChildInfo().isScriptless();
         }
 
+        @Override
         public boolean isConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
             if (attr == null)
@@ -181,6 +186,7 @@ public class TagPluginManager {
             return attr.isLiteral();
         }
 
+        @Override
         public String getConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
             if (attr == null)
@@ -188,18 +194,22 @@ public class TagPluginManager {
             return attr.getValue();
         }
 
+        @Override
         public boolean isAttributeSpecified(String attribute) {
             return getNodeAttribute(attribute) != null;
         }
 
+        @Override
         public String getTemporaryVariableName() {
             return node.getRoot().nextTemporaryVariableName();
         }
 
+        @Override
         public void generateImport(String imp) {
             pageInfo.addImport(imp);
         }
 
+        @Override
         public void generateDeclaration(String id, String text) {
             if (pageInfo.isPluginDeclared(id)) {
                 return;
@@ -207,21 +217,25 @@ public class TagPluginManager {
             curNodes.add(new Node.Declaration(text, node.getStart(), null));
         }
 
+        @Override
         public void generateJavaSource(String sourceCode) {
             curNodes.add(new Node.Scriptlet(sourceCode, node.getStart(),
                                             null));
         }
 
+        @Override
         public void generateAttribute(String attributeName) {
             curNodes.add(new Node.AttributeGenerator(node.getStart(),
                                                      attributeName,
                                                      node));
         }
 
+        @Override
         public void dontUseTagPlugin() {
             node.setUseTagPlugin(false);
         }
 
+        @Override
         public void generateBody() {
             // Since we'll generate the body anyway, this is really a nop, 
             // except for the fact that it lets us put the Java sources the
