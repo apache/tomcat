@@ -221,6 +221,7 @@ public class PageContextImpl extends PageContext {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return AccessController.doPrivileged(
                     new PrivilegedAction<Object>() {
+                @Override
                 public Object run() {
                     return doGetAttribute(name);
                 }
@@ -246,6 +247,7 @@ public class PageContextImpl extends PageContext {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return AccessController.doPrivileged(
                     new PrivilegedAction<Object>() {
+                @Override
                 public Object run() {
                     return doGetAttribute(name, scope);
                 }
@@ -289,6 +291,7 @@ public class PageContextImpl extends PageContext {
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                @Override
                 public Void run() {
                     doSetAttribute(name, attribute);
                     return null;
@@ -317,6 +320,7 @@ public class PageContextImpl extends PageContext {
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                @Override
                 public Void run() {
                     doSetAttribute(name, o, scope);
                     return null;
@@ -368,6 +372,7 @@ public class PageContextImpl extends PageContext {
         }
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                @Override
                 public Void run() {
                     doRemoveAttribute(name, scope);
                     return null;
@@ -416,6 +421,7 @@ public class PageContextImpl extends PageContext {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (AccessController
                     .doPrivileged(new PrivilegedAction<Integer>() {
+                        @Override
                         public Integer run() {
                             return new Integer(doGetAttributeScope(name));
                         }
@@ -453,6 +459,7 @@ public class PageContextImpl extends PageContext {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return AccessController.doPrivileged(
                     new PrivilegedAction<Object>() {
+                @Override
                 public Object run() {
                     if (name == null) {
                         throw new NullPointerException(Localizer
@@ -501,6 +508,7 @@ public class PageContextImpl extends PageContext {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return AccessController.doPrivileged(
                     new PrivilegedAction<Enumeration<String>>() {
+                        @Override
                         public Enumeration<String> run() {
                             return doGetAttributeNamesInScope(scope);
                         }
@@ -543,6 +551,7 @@ public class PageContextImpl extends PageContext {
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                @Override
                 public Void run() {
                     doRemoveAttribute(name);
                     return null;
@@ -654,6 +663,7 @@ public class PageContextImpl extends PageContext {
             try {
                 AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Void>() {
+                    @Override
                     public Void run() throws Exception {
                         doInclude(relativeUrlPath, flush);
                         return null;
@@ -691,6 +701,7 @@ public class PageContextImpl extends PageContext {
             try {
                 AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Void>() {
+                    @Override
                     public Void run() throws Exception {
                         doForward(relativeUrlPath);
                         return null;
@@ -813,6 +824,7 @@ public class PageContextImpl extends PageContext {
             try {
                 AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Void>() {
+                    @Override
                     public Void run() throws Exception {
                         doHandlePageException(t);
                         return null;
@@ -952,6 +964,7 @@ public class PageContextImpl extends PageContext {
                 retValue = AccessController
                         .doPrivileged(new PrivilegedExceptionAction<Object>() {
 
+                            @Override
                             public Object run() throws Exception {
                                 ELContextImpl ctx = (ELContextImpl) pageContext.getELContext();
                                 ctx.setFunctionMapper(new FunctionMapperImpl(functionMap));

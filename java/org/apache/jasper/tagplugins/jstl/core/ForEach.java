@@ -25,6 +25,7 @@ public final class ForEach implements TagPlugin {
     
     private boolean hasVar, hasBegin, hasEnd, hasStep;
     
+    @Override
     public void doTag(TagPluginContext ctxt) {
         
         String index = null;

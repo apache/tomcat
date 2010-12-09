@@ -67,6 +67,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
         if (SecurityUtil.isPackageProtectionEnabled()) {
             funcMapper = AccessController.doPrivileged(
                     new PrivilegedAction<ProtectedFunctionMapper>() {
+                        @Override
                         public ProtectedFunctionMapper run() {
                             return new ProtectedFunctionMapper();
                         }
@@ -100,6 +101,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
             try {
                 method = AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Method>() {
+                            @Override
                             public Method run() throws Exception {
                                 return c.getDeclaredMethod(methodName, args);
                             }
@@ -145,6 +147,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
         if (SecurityUtil.isPackageProtectionEnabled()) {
             funcMapper = AccessController.doPrivileged(
                     new PrivilegedAction<ProtectedFunctionMapper>() {
+                        @Override
                         public ProtectedFunctionMapper run() {
                             return new ProtectedFunctionMapper();
                         }
@@ -153,6 +156,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
             try {
                 method = AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Method>() {
+                            @Override
                             public Method run() throws Exception {
                                 return c.getDeclaredMethod(methodName, args);
                             }

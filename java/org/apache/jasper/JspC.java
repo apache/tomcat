@@ -388,6 +388,7 @@ public class JspC implements Options {
      * In JspC this always returns <code>true</code>.
      * {@inheritDoc}
      */
+    @Override
     public boolean getKeepGenerated() {
         // isn't this why we are running jspc?
         return true;
@@ -396,6 +397,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getTrimSpaces() {
         return trimSpaces;
     }
@@ -410,6 +412,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isPoolingEnabled() {
         return poolingEnabled;
     }
@@ -424,6 +427,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isXpoweredBy() {
         return xpoweredBy;
     }
@@ -439,14 +443,17 @@ public class JspC implements Options {
      * In JspC this always returns <code>true</code>.
      * {@inheritDoc}
      */
+    @Override
     public boolean getDisplaySourceFragment() {
         return true;
     }
 
+    @Override
     public int getMaxLoadedJsps() {
         return -1;
     }
 
+    @Override
     public int getJspIdleTimeout() {
         return -1;
     }
@@ -454,6 +461,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
     }
@@ -469,6 +477,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getMappedFile() {
         return mappedFile;
     }
@@ -483,6 +492,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getClassDebugInfo() {
         // compile with debug info
         return classDebugInfo;
@@ -491,6 +501,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isCaching() {
         return caching;
     }
@@ -507,6 +518,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map<String, TagLibraryInfo> getCache() {
         return cache;
     }
@@ -515,6 +527,7 @@ public class JspC implements Options {
      * In JspC this always returns <code>0</code>.
      * {@inheritDoc}
      */
+    @Override
     public int getCheckInterval() {
         return 0;
     }
@@ -523,6 +536,7 @@ public class JspC implements Options {
      * In JspC this always returns <code>0</code>.
      * {@inheritDoc}
      */
+    @Override
     public int getModificationTestInterval() {
         return 0;
     }
@@ -532,6 +546,7 @@ public class JspC implements Options {
      * In JspC this always returns <code>false</code>.
      * {@inheritDoc}
      */
+    @Override
     public boolean getRecompileOnFail() {
         return false;
     }
@@ -541,6 +556,7 @@ public class JspC implements Options {
      * In JspC this always returns <code>false</code>.
      * {@inheritDoc}
      */
+    @Override
     public boolean getDevelopment() {
         return false;
     }
@@ -548,6 +564,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSmapSuppressed() {
         return smapSuppressed;
     }
@@ -562,6 +579,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSmapDumped() {
         return smapDumped;
     }
@@ -590,6 +608,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean genStringAsCharArray() {
         return genStringAsCharArray;
     }
@@ -608,6 +627,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getIeClassId() {
         return ieClassId;
     }
@@ -615,6 +635,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getScratchDir() {
         return scratchDir;
     }
@@ -622,6 +643,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCompiler() {
         return compiler;
     }
@@ -638,6 +660,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCompilerClassName() {
         return null;
     }
@@ -645,6 +668,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCompilerTargetVM() {
         return compilerTargetVM;
     }
@@ -661,7 +685,8 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
-     public String getCompilerSourceVM() {
+     @Override
+    public String getCompilerSourceVM() {
          return compilerSourceVM;
      }
 
@@ -677,6 +702,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TldLocationsCache getTldLocationsCache() {
         return tldLocationsCache;
     }
@@ -687,6 +713,7 @@ public class JspC implements Options {
      *
      * @return String The encoding
      */
+    @Override
     public String getJavaEncoding() {
         return javaEncoding;
     }
@@ -704,6 +731,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean getFork() {
         return false;
     }
@@ -711,6 +739,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getClassPath() {
         if( classPath != null )
             return classPath;
@@ -924,6 +953,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JspConfig getJspConfig() {
         return jspConfig;
     }
@@ -931,6 +961,7 @@ public class JspC implements Options {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TagPluginManager getTagPluginManager() {
         return tagPluginManager;
     }
@@ -1513,7 +1544,7 @@ public class JspC implements Options {
         try {
             if (f.exists()) {
                 f = new File(f.getAbsolutePath());
-                while (f != null) {
+                while (true) {
                     File g = new File(f, "WEB-INF");
                     if (g.exists() && g.isDirectory()) {
                         uriRoot = f.getCanonicalPath();
