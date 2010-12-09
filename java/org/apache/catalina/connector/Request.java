@@ -2798,7 +2798,7 @@ public class Request
         if (usingInputStream || usingReader)
             return;
 
-        if(!getConnector().isParseBodyMethod(getMethod()))
+        if( !getConnector().isParseBodyMethod(getMethod()) )
             return;
 
         String contentType = getContentType();
