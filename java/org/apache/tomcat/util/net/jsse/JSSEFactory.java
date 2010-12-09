@@ -22,6 +22,7 @@ import java.net.Socket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 
@@ -38,8 +39,8 @@ public class JSSEFactory {
     /**
      * Returns the ServerSocketFactory to use.
      */
-    public ServerSocketFactory getSocketFactory() {
-        return new JSSESocketFactory();
+    public ServerSocketFactory getSocketFactory(AbstractEndpoint endpoint) {
+        return new JSSESocketFactory(endpoint);
     }
 
     /**

@@ -37,6 +37,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
+import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
 
@@ -110,12 +111,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     
     public void setAcceptorThreadPriority(int threadPriority) {
         ((NioEndpoint)endpoint).setAcceptorThreadPriority(threadPriority);
-      setAttribute("acceptorThreadPriority", "" + threadPriority);
     }
 
     public void setPollerThreadPriority(int threadPriority) {
         ((NioEndpoint)endpoint).setPollerThreadPriority(threadPriority);
-      setAttribute("pollerThreadPriority", "" + threadPriority);
     }
 
     public int getAcceptorThreadPriority() {
@@ -142,12 +141,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
     public void setSocketCloseDelay( int d ) {
         socketCloseDelay=d;
-        setAttribute("socketCloseDelay", "" + d);
     }
 
     public void setOomParachute(int oomParachute) {
         ((NioEndpoint)endpoint).setOomParachute(oomParachute);
-        setAttribute("oomParachute", Integer.valueOf(oomParachute));
     }
 
     // --------------------  SSL related properties --------------------
@@ -217,6 +214,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             recycledProcessors.clear();
         }
         
+        public SSLImplementation getSslImplementation() {
+            return proto.sslImplementation;
+        }
+
         @Override
         public void release(SocketChannel socket) {
             if (log.isDebugEnabled()) 

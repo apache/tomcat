@@ -35,6 +35,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
+import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -140,6 +141,10 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         @Override
         public RequestGroupInfo getGlobal() {
             return global;
+        }
+
+        public SSLImplementation getSslImplementation() {
+            return proto.sslImplementation;
         }
 
         @Override

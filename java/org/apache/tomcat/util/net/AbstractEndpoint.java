@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -320,10 +322,44 @@ public abstract class AbstractEndpoint {
 
     protected abstract boolean getDeferAccept();
 
+
     /**
-     * Generic properties, introspected
+     * Attributes provide a way for configuration to be passed to sub-components
+     * without the {@link ProtocolHandler} being aware of the properties
+     * available on those sub-components. One example of such a sub-component is
+     * the {@link org.apache.tomcat.util.net.ServerSocketFactory}.
      */
+    protected HashMap<String, Object> attributes =
+        new HashMap<String, Object>();
+    /** 
+     * Generic property setter called when a property for which a specific
+     * setter already exists within the {@link ProtocolHandler} needs to be
+     * made available to sub-components. The specific setter will call this
+     * method to populate the attributes.
+     */
+    public void setAttribute(String name, Object value) {
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("abstractProtocolHandler.setAttribute",
+                    name, value));
+        }
+        attributes.put(name, value);
+    }
+    /**
+     * Used by sub-components to retrieve configuration information.
+     */
+    public Object getAttribute(String key) {
+        Object value = attributes.get(key);
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("abstractProtocolHandler.getAttribute",
+                    key, value));
+        }
+        return value;
+    }
+
+
+
     public boolean setProperty(String name, String value) {
+        setAttribute(name, value);
         final String socketName = "socket.";
         try {
             if (name.startsWith(socketName)) {
@@ -336,7 +372,10 @@ public abstract class AbstractEndpoint {
             return false;
         }
     }
-
+    public String getProperty(String name) {
+        return (String) getAttribute(name);
+    }
+    
     /**
      * Return the amount of threads that are managed by the pool.
      *
@@ -632,11 +671,24 @@ public abstract class AbstractEndpoint {
 
 
     private String[] sslEnabledProtocolsarr =  new String[0];
-    public String[] getSslEnabledProtocolsArray() { return this.sslEnabledProtocolsarr;}
+    public String[] getSslEnabledProtocolsArray() {
+        return this.sslEnabledProtocolsarr;
+    }
     public void setSslEnabledProtocols(String s) {
-        StringTokenizer t = new StringTokenizer(s,",");
-        sslEnabledProtocolsarr = new String[t.countTokens()];
-        for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
+        if (s == null) {
+            this.sslEnabledProtocolsarr = new String[0];
+        } else {
+            ArrayList<String> sslEnabledProtocols = new ArrayList<String>();
+            StringTokenizer t = new StringTokenizer(s,",");
+            while (t.hasMoreTokens()) {
+                String p = t.nextToken().trim();
+                if (p.length() > 0) {
+                    sslEnabledProtocols.add(p);
+                }
+            }
+            sslEnabledProtocolsarr = sslEnabledProtocols.toArray(
+                    new String[sslEnabledProtocols.size()]);
+        }
     }
 
 }
