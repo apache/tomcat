@@ -25,6 +25,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -292,7 +293,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
              * Check to see if the requested JSP has been the target of a
              * RequestDispatcher.include()
              */
-            jspUri = (String) request.getAttribute(Constants.INC_SERVLET_PATH);
+            jspUri = (String) request.getAttribute(
+                    RequestDispatcher.INCLUDE_SERVLET_PATH);
             if (jspUri != null) {
                 /*
                  * Requested JSP has been target of
@@ -300,7 +302,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                  * relevant javax.servlet.include.* request attributes
                  */
                 String pathInfo = (String) request.getAttribute(
-                                    "javax.servlet.include.path_info");
+                        RequestDispatcher.INCLUDE_PATH_INFO);
                 if (pathInfo != null) {
                     jspUri += pathInfo;
                 }
@@ -399,7 +401,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             throws ServletException, IOException {
 
         String includeRequestUri =
-            (String)request.getAttribute("javax.servlet.include.request_uri");
+            (String)request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI);
 
         if (includeRequestUri != null) {
             // This file was included. Throw an exception as
