@@ -22,10 +22,10 @@ package org.apache.catalina.core;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -56,11 +56,16 @@ class ApplicationRequest extends ServletRequestWrapper {
      * The set of attribute names that are special for request dispatchers.
      */
     protected static final String specials[] =
-    { Globals.INCLUDE_REQUEST_URI_ATTR, Globals.INCLUDE_CONTEXT_PATH_ATTR,
-      Globals.INCLUDE_SERVLET_PATH_ATTR, Globals.INCLUDE_PATH_INFO_ATTR,
-      Globals.INCLUDE_QUERY_STRING_ATTR, Globals.FORWARD_REQUEST_URI_ATTR, 
-      Globals.FORWARD_CONTEXT_PATH_ATTR, Globals.FORWARD_SERVLET_PATH_ATTR, 
-      Globals.FORWARD_PATH_INFO_ATTR, Globals.FORWARD_QUERY_STRING_ATTR };
+    { RequestDispatcher.INCLUDE_REQUEST_URI,
+      RequestDispatcher.INCLUDE_CONTEXT_PATH,
+      RequestDispatcher.INCLUDE_SERVLET_PATH,
+      RequestDispatcher.INCLUDE_PATH_INFO,
+      RequestDispatcher.INCLUDE_QUERY_STRING,
+      RequestDispatcher.FORWARD_REQUEST_URI, 
+      RequestDispatcher.FORWARD_CONTEXT_PATH,
+      RequestDispatcher.FORWARD_SERVLET_PATH, 
+      RequestDispatcher.FORWARD_PATH_INFO,
+      RequestDispatcher.FORWARD_QUERY_STRING };
 
 
     // ----------------------------------------------------------- Constructors

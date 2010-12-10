@@ -30,7 +30,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
@@ -378,7 +377,7 @@ public class FormAuthenticator
             ExceptionUtils.handleThrowable(t);
             String msg = sm.getString("formAuthenticator.forwardLoginFail");
             log.warn(msg, t);
-            request.setAttribute(Globals.EXCEPTION_ATTR, t);
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     msg);
         }
@@ -411,7 +410,7 @@ public class FormAuthenticator
             ExceptionUtils.handleThrowable(t);
             String msg = sm.getString("formAuthenticator.forwardErrorFail");
             log.warn(msg, t);
-            request.setAttribute(Globals.EXCEPTION_ATTR, t);
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     msg);
         }

@@ -39,6 +39,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -48,7 +49,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.catalina.util.RequestUtil;
@@ -429,9 +429,10 @@ public class WebdavServlet
     @Override
     protected String getRelativePath(HttpServletRequest request) {
         // Are we being processed by a RequestDispatcher.include()?
-        if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
+        if (request.getAttribute(
+                RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
             String result = (String) request.getAttribute(
-                                            Globals.INCLUDE_PATH_INFO_ATTR);
+                    RequestDispatcher.INCLUDE_PATH_INFO);
             if ((result == null) || (result.equals("")))
                 result = "/";
             return (result);
