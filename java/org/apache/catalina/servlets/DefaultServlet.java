@@ -184,7 +184,7 @@ public class DefaultServlet
     /**
      * Proxy directory context.
      */
-    protected ProxyDirContext resources = null;
+    protected transient ProxyDirContext resources = null;
 
 
     /**
@@ -2158,12 +2158,17 @@ public class DefaultServlet
         if (debug > 10)
             log("Serving bytes:" + start + "-" + end);
 
+        long skipped = 0;
         try {
-            istream.skip(start);
+            skipped = istream.skip(start);
         } catch (IOException e) {
             return e;
         }
-
+        if (skipped < start) {
+            return new IOException(sm.getString("defaultservlet.skipfail",
+                    Long.valueOf(skipped), Long.valueOf(start)));
+        }
+        
         IOException exception = null;
         long bytesToRead = end - start + 1;
 
@@ -2206,10 +2211,15 @@ public class DefaultServlet
     protected IOException copyRange(Reader reader, PrintWriter writer,
                                   long start, long end) {
 
+        long skipped = 0;
         try {
-            reader.skip(start);
+            skipped = reader.skip(start);
         } catch (IOException e) {
             return e;
+        }
+        if (skipped < start) {
+            return new IOException(sm.getString("defaultservlet.skipfail",
+                    Long.valueOf(skipped), Long.valueOf(start)));
         }
 
         IOException exception = null;
@@ -2244,7 +2254,7 @@ public class DefaultServlet
     // ------------------------------------------------------ Range Inner Class
 
 
-    protected class Range {
+    protected static class Range {
 
         public long start;
         public long end;
@@ -2256,17 +2266,7 @@ public class DefaultServlet
         public boolean validate() {
             if (end >= length)
                 end = length - 1;
-            return ( (start >= 0) && (end >= 0) && (start <= end)
-                     && (length > 0) );
+            return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
         }
-
-        public void recycle() {
-            start = 0;
-            end = 0;
-            length = 0;
-        }
-
     }
-
-
 }
