@@ -90,6 +90,13 @@ public interface Session {
 
 
     /**
+     * Return the creation time for this session, bypassing the session validity
+     * checks.
+     */
+    public long getCreationTimeInternal();
+
+
+    /**
      * Set the creation time for this session.  This method is called by the
      * Manager when an existing Session instance is reused.
      *

@@ -1102,6 +1102,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
+     * Return the time when this session was created, in milliseconds since
+     * midnight, January 1, 1970 GMT, bypassing the session validation checks.
+     */
+    @Override
+    public long getCreationTimeInternal() {
+        return this.creationTime;
+    }
+
+
+    /**
      * Return the ServletContext to which this session belongs.
      */
     @Override

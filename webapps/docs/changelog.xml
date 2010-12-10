@@ -126,6 +126,10 @@
         <bug>50413</bug>: Ensure 304 responses are not returned when using
         static files as error pages. (markt)
       </fix>
+      <fix>
+        <bug>50448</bug>: Fix possible <code>IllegalStateException</code>
+        caused by recent session management refactoring. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
