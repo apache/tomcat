@@ -799,7 +799,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         // the manager because it is being persisted - update the expired stats
         if (update) {
             long timeNow = System.currentTimeMillis();
-            int timeAlive = (int) ((timeNow - session.getCreationTime())/1000);
+            int timeAlive =
+                (int) (timeNow - session.getCreationTimeInternal())/1000;
             updateSessionMaxAliveTime(timeAlive);
             expiredSessions.incrementAndGet();
             SessionTiming timing = new SessionTiming(timeNow, timeAlive);
