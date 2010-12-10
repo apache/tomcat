@@ -43,6 +43,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -345,15 +346,16 @@ public class DefaultServlet
         // subclasses can change this behaviour.
 
         // Are we being processed by a RequestDispatcher.include()?
-        if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
+        if (request.getAttribute(
+                RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
             String result = (String) request.getAttribute(
-                                            Globals.INCLUDE_PATH_INFO_ATTR);
+                    RequestDispatcher.INCLUDE_PATH_INFO);
             if (result == null) {
                 result = (String) request.getAttribute(
-                                            Globals.INCLUDE_SERVLET_PATH_ATTR);
+                        RequestDispatcher.INCLUDE_SERVLET_PATH);
             } else {
                 result = (String) request.getAttribute(
-                                  Globals.INCLUDE_SERVLET_PATH_ATTR) + result;
+                        RequestDispatcher.INCLUDE_SERVLET_PATH) + result;
             }
             if ((result == null) || (result.equals(""))) {
                 result = "/";
@@ -759,7 +761,7 @@ public class DefaultServlet
             // Check if we're included so we can return the appropriate 
             // missing resource name in the error
             String requestUri = (String) request.getAttribute(
-                                            Globals.INCLUDE_REQUEST_URI_ATTR);
+                    RequestDispatcher.INCLUDE_REQUEST_URI);
             if (requestUri == null) {
                 requestUri = request.getRequestURI();
             } else {
@@ -782,7 +784,7 @@ public class DefaultServlet
                 // Check if we're included so we can return the appropriate 
                 // missing resource name in the error
                 String requestUri = (String) request.getAttribute(
-                                            Globals.INCLUDE_REQUEST_URI_ATTR);
+                        RequestDispatcher.INCLUDE_REQUEST_URI);
                 if (requestUri == null) {
                     requestUri = request.getRequestURI();
                 }
@@ -800,8 +802,8 @@ public class DefaultServlet
         if (cacheEntry.context == null) {
 
             // Checking If headers
-            boolean included =
-                (request.getAttribute(Globals.INCLUDE_CONTEXT_PATH_ATTR) != null);
+            boolean included = (request.getAttribute(
+                    RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
             if (!included && !isError &&
                     !checkIfHeaders(request, response, cacheEntry.attributes)) {
                 return;
