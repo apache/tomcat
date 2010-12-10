@@ -64,6 +64,11 @@ public class DummyProxySession implements Session {
     }
 
     @Override
+    public long getCreationTimeInternal() {
+        return 0;
+    }
+
+    @Override
     public String getId() {
         return sessionId;
     }
