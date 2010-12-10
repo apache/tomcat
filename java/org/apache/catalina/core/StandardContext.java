@@ -51,6 +51,7 @@ import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -5749,7 +5750,7 @@ public class StandardContext extends ContainerBase
                     getLogger().error(sm.getString(
                             "standardContext.requestListener.requestInit",
                             instances[i].getClass().getName()), t);
-                    request.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     return false;
                 }
             }
@@ -5787,7 +5788,7 @@ public class StandardContext extends ContainerBase
                     getLogger().error(sm.getString(
                             "standardContext.requestListener.requestInit",
                             instances[j].getClass().getName()), t);
-                    request.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     return false;
                 }
             }

@@ -55,11 +55,6 @@ import org.apache.jasper.compiler.Localizer;
  */
 public class JspRuntimeLibrary {
     
-    private static final String SERVLET_EXCEPTION
-        = "javax.servlet.error.exception";
-    private static final String JSP_EXCEPTION
-        = "javax.servlet.jsp.jspException";
-
     protected static class PrivilegedIntrospectHelper
         implements PrivilegedExceptionAction<Void> {
 
@@ -100,9 +95,10 @@ public class JspRuntimeLibrary {
      * variable is initialized.
      */
     public static Throwable getThrowable(ServletRequest request) {
-        Throwable error = (Throwable) request.getAttribute(SERVLET_EXCEPTION);
+        Throwable error = (Throwable) request.getAttribute(
+                RequestDispatcher.ERROR_EXCEPTION);
         if (error == null) {
-            error = (Throwable) request.getAttribute(JSP_EXCEPTION);
+            error = (Throwable) request.getAttribute(PageContext.EXCEPTION);
             if (error != null) {
                 /*
                  * The only place that sets JSP_EXCEPTION is
@@ -111,7 +107,7 @@ public class JspRuntimeLibrary {
                  * ErrorReportValve. Therefore, if JSP_EXCEPTION is set, we
                  * need to set SERVLET_EXCEPTION.
                  */
-                request.setAttribute(SERVLET_EXCEPTION, error);
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, error);
             }
         }
 
@@ -875,11 +871,11 @@ public class JspRuntimeLibrary {
         if (!(request instanceof HttpServletRequest))
             return (relativePath);
         HttpServletRequest hrequest = (HttpServletRequest) request;
-        String uri = (String)
-            request.getAttribute("javax.servlet.include.servlet_path");
+        String uri = (String) request.getAttribute(
+                RequestDispatcher.INCLUDE_SERVLET_PATH);
         if (uri != null) {
             String pathInfo = (String)
-                request.getAttribute("javax.servlet.include.path_info");
+                request.getAttribute(RequestDispatcher.INCLUDE_PATH_INFO);
             if (pathInfo == null) {
                 if (uri.lastIndexOf('/') >= 0) 
                     uri = uri.substring(0, uri.lastIndexOf('/'));

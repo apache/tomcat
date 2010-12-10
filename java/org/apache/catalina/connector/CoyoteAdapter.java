@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.EnumSet;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
@@ -207,7 +207,8 @@ public class CoyoteAdapter implements Adapter {
             // Calling the container
             connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
 
-            if (!error && !response.isClosed() && (request.getAttribute(Globals.EXCEPTION_ATTR) != null)) {
+            if (!error && !response.isClosed() && (request.getAttribute(
+                    RequestDispatcher.ERROR_EXCEPTION) != null)) {
                 // An unexpected exception occurred while processing the event, so
                 // error should be called
                 request.getEvent().setEventType(CometEvent.EventType.ERROR);
@@ -275,7 +276,7 @@ public class CoyoteAdapter implements Adapter {
                 success = true;
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
                 Throwable t = (Throwable) request.getAttribute(
-                        Globals.EXCEPTION_ATTR);
+                        RequestDispatcher.ERROR_EXCEPTION);
                 if (t != null) {
                     asyncConImpl.setErrorState(t);
                 }

@@ -120,12 +120,6 @@ public class Constants {
     public static final String TAG_FILE_PACKAGE_NAME = 
         System.getProperty("org.apache.jasper.Constants.TAG_FILE_PACKAGE_NAME", "org.apache.jsp.tag");
 
-    /**
-     * Servlet context and request attributes that the JSP engine
-     * uses. 
-     */
-    public static final String INC_SERVLET_PATH = "javax.servlet.include.servlet_path";
-
     // Must be kept in sync with org/apache/catalina/Globals.java
     public static final String ALT_DD_ATTR = 
         System.getProperty("org.apache.jasper.Constants.ALT_DD_ATTR", "org.apache.catalina.deploy.alt_dd");

@@ -69,11 +69,16 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * The set of attribute names that are special for request dispatchers.
      */
     protected static final String specials[] =
-    { Globals.INCLUDE_REQUEST_URI_ATTR, Globals.INCLUDE_CONTEXT_PATH_ATTR,
-      Globals.INCLUDE_SERVLET_PATH_ATTR, Globals.INCLUDE_PATH_INFO_ATTR,
-      Globals.INCLUDE_QUERY_STRING_ATTR, Globals.FORWARD_REQUEST_URI_ATTR, 
-      Globals.FORWARD_CONTEXT_PATH_ATTR, Globals.FORWARD_SERVLET_PATH_ATTR, 
-      Globals.FORWARD_PATH_INFO_ATTR, Globals.FORWARD_QUERY_STRING_ATTR };
+    { RequestDispatcher.INCLUDE_REQUEST_URI,
+      RequestDispatcher.INCLUDE_CONTEXT_PATH,
+      RequestDispatcher.INCLUDE_SERVLET_PATH,
+      RequestDispatcher.INCLUDE_PATH_INFO,
+      RequestDispatcher.INCLUDE_QUERY_STRING,
+      RequestDispatcher.FORWARD_REQUEST_URI, 
+      RequestDispatcher.FORWARD_CONTEXT_PATH,
+      RequestDispatcher.FORWARD_SERVLET_PATH, 
+      RequestDispatcher.FORWARD_PATH_INFO,
+      RequestDispatcher.FORWARD_QUERY_STRING };
 
 
     /**
@@ -307,7 +312,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         // Convert a request-relative path to a context-relative one
         String servletPath = 
-            (String) getAttribute(Globals.INCLUDE_SERVLET_PATH_ATTR);
+            (String) getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
         if (servletPath == null)
             servletPath = getServletPath();
 

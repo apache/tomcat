@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -43,8 +44,7 @@ import org.apache.catalina.connector.Response;
  * @version $Id$
  */
 
-public class SSLValve
-    extends ValveBase {
+public class SSLValve extends ValveBase {
     
     
     //------------------------------------------------------ Constructor
@@ -87,19 +87,19 @@ public class SSLValve
                 System.out.println("SSLValve failed " + strcerts);
                 System.out.println("SSLValve failed " + e);
             }
-            request.setAttribute("javax.servlet.request.X509Certificate", jsseCerts);
+            request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
         }
         strcert0 = mygetHeader(request, "ssl_cipher");
         if (strcert0 != null) {
-            request.setAttribute("javax.servlet.request.cipher_suite", strcert0);
+            request.setAttribute(Globals.CIPHER_SUITE_ATTR, strcert0);
         }
         strcert0 = mygetHeader(request, "ssl_session_id");
         if (strcert0 != null) {
-            request.setAttribute("javax.servlet.request.ssl_session", strcert0);
+            request.setAttribute(Globals.SSL_SESSION_ID_ATTR, strcert0);
         }
         strcert0 = mygetHeader(request, "ssl_cipher_usekeysize");
         if (strcert0 != null) {
-            request.setAttribute("javax.servlet.request.key_size", strcert0);
+            request.setAttribute(Globals.KEY_SIZE_ATTR, strcert0);
         }
         getNext().invoke(request, response);
     }

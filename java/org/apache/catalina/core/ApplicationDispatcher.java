@@ -376,16 +376,17 @@ final class ApplicationDispatcher
                 (ApplicationHttpRequest) wrapRequest(state);
             String contextPath = context.getPath();
             HttpServletRequest hrequest = state.hrequest;
-            if (hrequest.getAttribute(Globals.FORWARD_REQUEST_URI_ATTR) == null) {
-                wrequest.setAttribute(Globals.FORWARD_REQUEST_URI_ATTR,
+            if (hrequest.getAttribute(
+                    RequestDispatcher.FORWARD_REQUEST_URI) == null) {
+                wrequest.setAttribute(RequestDispatcher.FORWARD_REQUEST_URI,
                                       hrequest.getRequestURI());
-                wrequest.setAttribute(Globals.FORWARD_CONTEXT_PATH_ATTR,
+                wrequest.setAttribute(RequestDispatcher.FORWARD_CONTEXT_PATH,
                                       hrequest.getContextPath());
-                wrequest.setAttribute(Globals.FORWARD_SERVLET_PATH_ATTR,
+                wrequest.setAttribute(RequestDispatcher.FORWARD_SERVLET_PATH,
                                       hrequest.getServletPath());
-                wrequest.setAttribute(Globals.FORWARD_PATH_INFO_ATTR,
+                wrequest.setAttribute(RequestDispatcher.FORWARD_PATH_INFO,
                                       hrequest.getPathInfo());
-                wrequest.setAttribute(Globals.FORWARD_QUERY_STRING_ATTR,
+                wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING,
                                       hrequest.getQueryString());
             }
  
@@ -555,19 +556,19 @@ final class ApplicationDispatcher
                 (ApplicationHttpRequest) wrapRequest(state);
             String contextPath = context.getPath();
             if (requestURI != null)
-                wrequest.setAttribute(Globals.INCLUDE_REQUEST_URI_ATTR,
+                wrequest.setAttribute(RequestDispatcher.INCLUDE_REQUEST_URI,
                                       requestURI);
             if (contextPath != null)
-                wrequest.setAttribute(Globals.INCLUDE_CONTEXT_PATH_ATTR,
+                wrequest.setAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH,
                                       contextPath);
             if (servletPath != null)
-                wrequest.setAttribute(Globals.INCLUDE_SERVLET_PATH_ATTR,
+                wrequest.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH,
                                       servletPath);
             if (pathInfo != null)
-                wrequest.setAttribute(Globals.INCLUDE_PATH_INFO_ATTR,
+                wrequest.setAttribute(RequestDispatcher.INCLUDE_PATH_INFO,
                                       pathInfo);
             if (queryString != null) {
-                wrequest.setAttribute(Globals.INCLUDE_QUERY_STRING_ATTR,
+                wrequest.setAttribute(RequestDispatcher.INCLUDE_QUERY_STRING,
                                       queryString);
                 wrequest.setQueryParams(queryString);
             }
@@ -866,8 +867,8 @@ final class ApplicationDispatcher
                 (state.outerRequest instanceof HttpServletRequest)) {
                 HttpServletRequest houterRequest = 
                     (HttpServletRequest) state.outerRequest;
-                Object contextPath = houterRequest.getAttribute
-                    (Globals.INCLUDE_CONTEXT_PATH_ATTR);
+                Object contextPath = houterRequest.getAttribute(
+                        RequestDispatcher.INCLUDE_CONTEXT_PATH);
                 if (contextPath == null) {
                     // Forward
                     contextPath = houterRequest.getContextPath();

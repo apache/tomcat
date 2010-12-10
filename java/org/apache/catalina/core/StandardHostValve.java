@@ -172,7 +172,8 @@ final class StandardHostValve
         // Error page processing
         response.setSuspended(false);
 
-        Throwable t = (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
+        Throwable t = (Throwable) request.getAttribute(
+                RequestDispatcher.ERROR_EXCEPTION);
 
         if (t != null) {
             throwable(request, response, t);
@@ -230,7 +231,8 @@ final class StandardHostValve
         // Error page processing
         response.setSuspended(false);
 
-        Throwable t = (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
+        Throwable t = (Throwable) request.getAttribute(
+                RequestDispatcher.ERROR_EXCEPTION);
 
         if (t != null) {
             throwable(request, response, t);
@@ -296,20 +298,19 @@ final class StandardHostValve
                  errorPage.getLocation());
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                               DispatcherType.ERROR);
-            request.setAttribute
-                (Globals.STATUS_CODE_ATTR,
-                 new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
-            request.setAttribute(Globals.ERROR_MESSAGE_ATTR,
+            request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
+                    new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+            request.setAttribute(RequestDispatcher.ERROR_MESSAGE,
                               throwable.getMessage());
-            request.setAttribute(Globals.EXCEPTION_ATTR,
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,
                               realError);
             Wrapper wrapper = request.getWrapper();
             if (wrapper != null)
-                request.setAttribute(Globals.SERVLET_NAME_ATTR,
+                request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
                                   wrapper.getName());
-            request.setAttribute(Globals.EXCEPTION_PAGE_ATTR,
+            request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                  request.getRequestURI());
-            request.setAttribute(Globals.EXCEPTION_TYPE_ATTR,
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE,
                               realError.getClass());
             if (custom(request, response, errorPage)) {
                 try {
@@ -363,13 +364,13 @@ final class StandardHostValve
         ErrorPage errorPage = context.findErrorPage(statusCode);
         if (errorPage != null) {
             response.setAppCommitted(false);
-            request.setAttribute(Globals.STATUS_CODE_ATTR,
+            request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                               Integer.valueOf(statusCode));
 
             String message = response.getMessage();
             if (message == null)
                 message = "";
-            request.setAttribute(Globals.ERROR_MESSAGE_ATTR, message);
+            request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
             request.setAttribute
                 (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                  errorPage.getLocation());
@@ -379,9 +380,9 @@ final class StandardHostValve
 
             Wrapper wrapper = request.getWrapper();
             if (wrapper != null)
-                request.setAttribute(Globals.SERVLET_NAME_ATTR,
+                request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
                                   wrapper.getName());
-            request.setAttribute(Globals.EXCEPTION_PAGE_ATTR,
+            request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                  request.getRequestURI());
             if (custom(request, response, errorPage)) {
                 try {
