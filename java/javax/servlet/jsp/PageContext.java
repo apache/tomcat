@@ -19,6 +19,7 @@ package javax.servlet.jsp;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -514,17 +515,21 @@ public abstract class PageContext
         int status = 0;
         
         Integer status_code = (Integer)getRequest().getAttribute( 
-                "javax.servlet.error.status_code");
+                RequestDispatcher.ERROR_STATUS_CODE);
         // Avoid NPE if attribute is not set
         if (status_code != null) {
             status = status_code.intValue();
         }
 
         return new ErrorData( 
-            (Throwable)getRequest().getAttribute( "javax.servlet.error.exception" ),
+            (Throwable)getRequest().getAttribute(
+                    RequestDispatcher.ERROR_EXCEPTION),
             status,
-            (String)getRequest().getAttribute( "javax.servlet.error.request_uri" ),
-            (String)getRequest().getAttribute( "javax.servlet.error.servlet_name" ) );
+            (String)getRequest().getAttribute(
+                    RequestDispatcher.ERROR_REQUEST_URI),
+            (String)getRequest().getAttribute(
+                    RequestDispatcher.ERROR_SERVLET_NAME)
+            );
     }
     
 }

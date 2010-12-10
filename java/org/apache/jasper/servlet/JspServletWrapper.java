@@ -20,6 +20,7 @@ package org.apache.jasper.servlet;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -417,7 +418,7 @@ public class JspServletWrapper {
             }
         } catch (UnavailableException ex) {
             String includeRequestUri = (String)
-                request.getAttribute("javax.servlet.include.request_uri");
+                request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI);
             if (includeRequestUri != null) {
                 // This file was included. Throw an exception as
                 // a response.sendError() will be ignored by the

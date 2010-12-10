@@ -30,7 +30,8 @@ public interface SSLSupport {
     /**
      * The Request attribute key for the cipher suite.
      */
-    public static final String CIPHER_SUITE_KEY = "javax.servlet.request.cipher_suite";
+    public static final String CIPHER_SUITE_KEY =
+            "javax.servlet.request.cipher_suite";
 
     /**
      * The Request attribute key for the key size.
@@ -40,20 +41,22 @@ public interface SSLSupport {
     /**
      * The Request attribute key for the client certificate chain.
      */
-    public static final String CERTIFICATE_KEY = "javax.servlet.request.X509Certificate";
+    public static final String CERTIFICATE_KEY =
+            "javax.servlet.request.X509Certificate";
 
     /**
      * The Request attribute key for the session id.
      * This one is a Tomcat extension to the Servlet spec.
      */
-    public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
+    public static final String SESSION_ID_KEY =
+            "javax.servlet.request.ssl_session";
 
     /**
      * The request attribute key for the session manager.
      * This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SESSION_MGR =
-        "javax.servlet.request.ssl_session_mgr";
+            "javax.servlet.request.ssl_session_mgr";
 
     
     /**

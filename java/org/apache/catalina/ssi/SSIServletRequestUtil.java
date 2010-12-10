@@ -17,6 +17,7 @@
 package org.apache.catalina.ssi;
 
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.util.RequestUtil;
@@ -31,12 +32,13 @@ public class SSIServletRequestUtil {
      */
     public static String getRelativePath(HttpServletRequest request) {
         // Are we being processed by a RequestDispatcher.include()?
-        if (request.getAttribute("javax.servlet.include.request_uri") != null) {
-            String result = (String)request
-                    .getAttribute("javax.servlet.include.path_info");
+        if (request.getAttribute(
+                RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
+            String result = (String)request.getAttribute(
+                    RequestDispatcher.INCLUDE_PATH_INFO);
             if (result == null)
-                result = (String)request
-                        .getAttribute("javax.servlet.include.servlet_path");
+                result = (String)request.getAttribute(
+                        RequestDispatcher.INCLUDE_SERVLET_PATH);
             if ((result == null) || (result.equals(""))) result = "/";
             return (result);
         }

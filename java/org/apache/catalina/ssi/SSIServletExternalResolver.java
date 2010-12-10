@@ -293,7 +293,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             else if (nameParts[1].equals("URI")) {
                 // If this is an error page, get the original URI
                 retVal = (String) req.getAttribute(
-                        "javax.servlet.forward.request_uri");
+                        RequestDispatcher.FORWARD_REQUEST_URI);
                 if (retVal == null) retVal=req.getRequestURI();
             }
         } else if (nameParts[0].equals("SCRIPT")) {

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -47,7 +48,6 @@ import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 import javax.servlet.jsp.tagext.BodyContent;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.el.ExpressionEvaluatorImpl;
@@ -170,7 +170,8 @@ public class PageContextImpl extends PageContext {
         setAttribute(PAGECONTEXT, this);
         setAttribute(APPLICATION, context);
 
-        isIncluded = request.getAttribute("javax.servlet.include.servlet_path") != null;
+        isIncluded = request.getAttribute(
+                RequestDispatcher.INCLUDE_SERVLET_PATH) != null;
     }
 
     @Override
@@ -638,8 +639,8 @@ public class PageContextImpl extends PageContext {
         String path = relativeUrlPath;
 
         if (!path.startsWith("/")) {
-            String uri = (String) request
-                    .getAttribute("javax.servlet.include.servlet_path");
+            String uri = (String) request.getAttribute(
+                    RequestDispatcher.INCLUDE_SERVLET_PATH);
             if (uri == null)
                 uri = ((HttpServletRequest) request).getServletPath();
             String baseURI = uri.substring(0, uri.lastIndexOf('/'));
@@ -739,16 +740,17 @@ public class PageContextImpl extends PageContext {
         }
 
         final String path = getAbsolutePathRelativeToContext(relativeUrlPath);
-        String includeUri = (String) request
-                .getAttribute(Constants.INC_SERVLET_PATH);
+        String includeUri = (String) request.getAttribute(
+                RequestDispatcher.INCLUDE_SERVLET_PATH);
 
         if (includeUri != null)
-            request.removeAttribute(Constants.INC_SERVLET_PATH);
+            request.removeAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
         try {
             context.getRequestDispatcher(path).forward(request, response);
         } finally {
             if (includeUri != null)
-                request.setAttribute(Constants.INC_SERVLET_PATH, includeUri);
+                request.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH,
+                        includeUri);
         }
     }
 
@@ -858,13 +860,13 @@ public class PageContextImpl extends PageContext {
              * not been committed (the response will have been committed if the
              * error page is a JSP page).
              */
-            request.setAttribute("javax.servlet.jsp.jspException", t);
-            request.setAttribute("javax.servlet.error.status_code",
+            request.setAttribute(PageContext.EXCEPTION, t);
+            request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                     new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
-            request.setAttribute("javax.servlet.error.request_uri",
+            request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                     ((HttpServletRequest) request).getRequestURI());
-            request.setAttribute("javax.servlet.error.servlet_name", config
-                    .getServletName());
+            request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
+                    config.getServletName());
             try {
                 forward(errorPageURL);
             } catch (IllegalStateException ise) {
@@ -873,19 +875,19 @@ public class PageContextImpl extends PageContext {
 
             // The error page could be inside an include.
 
-            Object newException = request
-                    .getAttribute("javax.servlet.error.exception");
+            Object newException =
+                    request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
             // t==null means the attribute was not set.
             if ((newException != null) && (newException == t)) {
-                request.removeAttribute("javax.servlet.error.exception");
+                request.removeAttribute(RequestDispatcher.ERROR_EXCEPTION);
             }
 
             // now clear the error code - to prevent double handling.
-            request.removeAttribute("javax.servlet.error.status_code");
-            request.removeAttribute("javax.servlet.error.request_uri");
-            request.removeAttribute("javax.servlet.error.status_code");
-            request.removeAttribute("javax.servlet.jsp.jspException");
+            request.removeAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+            request.removeAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+            request.removeAttribute(RequestDispatcher.ERROR_SERVLET_NAME);
+            request.removeAttribute(PageContext.EXCEPTION);
 
         } else {
             // Otherwise throw the exception wrapped inside a ServletException.

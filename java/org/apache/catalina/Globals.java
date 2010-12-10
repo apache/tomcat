@@ -86,38 +86,6 @@ public final class Globals {
 
 
     /**
-     * The request attribute under which we forward a Java exception
-     * (as an object of type Throwable) to an error page.
-     */
-    public static final String EXCEPTION_ATTR =
-        "javax.servlet.error.exception";
-
-
-    /**
-     * The request attribute under which we forward the request URI
-     * (as an object of type String) of the page on which an error occurred.
-     */
-    public static final String EXCEPTION_PAGE_ATTR =
-        "javax.servlet.error.request_uri";
-
-
-    /**
-     * The request attribute under which we forward a Java exception type
-     * (as an object of type Class) to an error page.
-     */
-    public static final String EXCEPTION_TYPE_ATTR =
-        "javax.servlet.error.exception_type";
-
-
-    /**
-     * The request attribute under which we forward an HTTP status message
-     * (as an object of type STring) to an error page.
-     */
-    public static final String ERROR_MESSAGE_ATTR =
-        "javax.servlet.error.message";
-
-
-    /**
      * The request attribute under which we store the key size being used for
      * this SSL connection (as an object of type java.lang.Integer).
      */
@@ -166,94 +134,6 @@ public final class Globals {
 
 
     /**
-     * The request attribute under which the request URI of the included
-     * servlet is stored on an included dispatcher request.
-     */
-    public static final String INCLUDE_REQUEST_URI_ATTR =
-        "javax.servlet.include.request_uri";
-
-
-    /**
-     * The request attribute under which the context path of the included
-     * servlet is stored on an included dispatcher request.
-     */
-    public static final String INCLUDE_CONTEXT_PATH_ATTR =
-        "javax.servlet.include.context_path";
-
-
-    /**
-     * The request attribute under which the path info of the included
-     * servlet is stored on an included dispatcher request.
-     */
-    public static final String INCLUDE_PATH_INFO_ATTR =
-        "javax.servlet.include.path_info";
-
-
-    /**
-     * The request attribute under which the servlet path of the included
-     * servlet is stored on an included dispatcher request.
-     */
-    public static final String INCLUDE_SERVLET_PATH_ATTR =
-        "javax.servlet.include.servlet_path";
-
-
-    /**
-     * The request attribute under which the query string of the included
-     * servlet is stored on an included dispatcher request.
-     */
-    public static final String INCLUDE_QUERY_STRING_ATTR =
-        "javax.servlet.include.query_string";
-
-
-    /**
-     * The request attribute under which the original request URI is stored
-     * on an forwarded dispatcher request.
-     */
-    public static final String FORWARD_REQUEST_URI_ATTR =
-        "javax.servlet.forward.request_uri";
-    
-    
-    /**
-     * The request attribute under which the original context path is stored
-     * on an forwarded dispatcher request.
-     */
-    public static final String FORWARD_CONTEXT_PATH_ATTR =
-        "javax.servlet.forward.context_path";
-
-
-    /**
-     * The request attribute under which the original path info is stored
-     * on an forwarded dispatcher request.
-     */
-    public static final String FORWARD_PATH_INFO_ATTR =
-        "javax.servlet.forward.path_info";
-
-
-    /**
-     * The request attribute under which the original servlet path is stored
-     * on an forwarded dispatcher request.
-     */
-    public static final String FORWARD_SERVLET_PATH_ATTR =
-        "javax.servlet.forward.servlet_path";
-
-
-    /**
-     * The request attribute under which the original query string is stored
-     * on an forwarded dispatcher request.
-     */
-    public static final String FORWARD_QUERY_STRING_ATTR =
-        "javax.servlet.forward.query_string";
-
-
-    /**
-     * The request attribute under which we forward a servlet name to
-     * an error page.
-     */
-    public static final String SERVLET_NAME_ATTR =
-        "javax.servlet.error.servlet_name";
-
-    
-    /**
      * The servlet context attribute under which we store a flag used
      * to mark this request as having been processed by the SSIServlet.
      * We do this because of the pathInfo mangling happening when using
@@ -262,14 +142,6 @@ public final class Globals {
      */
      public static final String SSI_FLAG_ATTR =
          "org.apache.catalina.ssi.SSIServlet";
-
-
-    /**
-     * The request attribute under which we forward an HTTP status code
-     * (as an object of type Integer) to an error page.
-     */
-    public static final String STATUS_CODE_ATTR =
-        "javax.servlet.error.status_code";
 
 
     /**
