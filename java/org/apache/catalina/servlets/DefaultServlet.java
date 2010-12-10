@@ -792,6 +792,9 @@ public class DefaultServlet
             }
         }
 
+        boolean isError =
+            response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+
         // Check if the conditions specified in the optional If headers are
         // satisfied.
         if (cacheEntry.context == null) {
@@ -799,8 +802,8 @@ public class DefaultServlet
             // Checking If headers
             boolean included =
                 (request.getAttribute(Globals.INCLUDE_CONTEXT_PATH_ATTR) != null);
-            if (!included
-                && !checkIfHeaders(request, response, cacheEntry.attributes)) {
+            if (!included && !isError &&
+                    !checkIfHeaders(request, response, cacheEntry.attributes)) {
                 return;
             }
 
@@ -828,20 +831,22 @@ public class DefaultServlet
             contentType = "text/html;charset=UTF-8";
 
         } else {
-            if (useAcceptRanges) {
-                // Accept ranges header
-                response.setHeader("Accept-Ranges", "bytes");
+            if (!isError) {
+                if (useAcceptRanges) {
+                    // Accept ranges header
+                    response.setHeader("Accept-Ranges", "bytes");
+                }
+    
+                // Parse range specifier
+                ranges = parseRange(request, response, cacheEntry.attributes);
+    
+                // ETag header
+                response.setHeader("ETag", cacheEntry.attributes.getETag());
+    
+                // Last-Modified header
+                response.setHeader("Last-Modified",
+                        cacheEntry.attributes.getLastModifiedHttp());
             }
-
-            // Parse range specifier
-            ranges = parseRange(request, response, cacheEntry.attributes);
-
-            // ETag header
-            response.setHeader("ETag", cacheEntry.attributes.getETag());
-
-            // Last-Modified header
-            response.setHeader("Last-Modified",
-                    cacheEntry.attributes.getLastModifiedHttp());
 
             // Get content length
             contentLength = cacheEntry.attributes.getContentLength();

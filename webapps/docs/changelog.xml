@@ -122,6 +122,10 @@
         <code>Store</code> associated with a <code>PersistentManager</code>.
         (markt) 
       </fix>
+      <fix>
+        <bug>50413</bug>: Ensure 304 responses are not returned when using
+        static files as error pages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
