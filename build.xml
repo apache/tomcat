@@ -424,7 +424,7 @@
   <target name="validate" depends="download-validate" if="${execute.validate}">
     <taskdef resource="checkstyletask.properties"
              classpath="${checkstyle.jar}" />
-    <checkstyle config="checkstyle.xml">
+    <checkstyle config="res/checkstyle/checkstyle.xml">
       <fileset dir="." >
         <patternset refid="text.files" />
         <exclude name=".*/**"/>
@@ -436,6 +436,18 @@
         <!-- Exclude these else Gump runs validate on them -->
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
         <exclude name="**/tomcat-deps/**"/>
+      </fileset>
+    </checkstyle>
+    <!-- javax package checks -->
+    <checkstyle config="res/checkstyle/javax-checkstyle.xml">
+      <fileset dir="java/javax" >
+        <include name="**/*.java"/>
+      </fileset>
+    </checkstyle>
+    <!-- org package checks -->
+    <checkstyle config="res/checkstyle/org-checkstyle.xml">
+      <fileset dir="java/org" >
+        <include name="**/*.java"/>
       </fileset>
     </checkstyle>
   </target>
