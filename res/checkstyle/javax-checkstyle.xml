@@ -27,7 +27,7 @@
 
   <module name="TreeWalker">
     <module name="ImportControl">
-      <property name="file" value="res/checkstyle/javax-import-control.xml"/>
+      <property name="file" value="${basedir}/res/checkstyle/javax-import-control.xml"/>
     </module>
   </module>
 </module>
