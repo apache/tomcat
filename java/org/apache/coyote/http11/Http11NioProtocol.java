@@ -205,7 +205,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
         
         @Override
-        public RequestGroupInfo getGlobal() {
+        public Object getGlobal() {
             return global;
         }
 
