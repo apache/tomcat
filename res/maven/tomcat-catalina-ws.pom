@@ -20,7 +20,7 @@
   <groupId>org.apache.tomcat</groupId>
   <artifactId>tomcat-catalina-ws</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat Remote JMX listener</description>
+  <description>Tomcat JNDI Factory for Web Services</description>
   <dependencies>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
