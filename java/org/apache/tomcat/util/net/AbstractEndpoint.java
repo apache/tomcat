@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.KeyManagerFactory;
 
-import org.apache.coyote.RequestGroupInfo;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
@@ -60,7 +59,7 @@ public abstract class AbstractEndpoint {
         /**
          * Obtain the GlobalRequestProcessor associated with the handler.
          */
-        public RequestGroupInfo getGlobal();
+        public Object getGlobal();
         
         
         /**
