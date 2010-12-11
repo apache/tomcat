@@ -23,10 +23,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
@@ -915,7 +915,7 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
         } else if (actionCode == ActionCode.ASYNC_START) {
-            asyncStateMachine.asyncStart((AsyncContextImpl) param);
+            asyncStateMachine.asyncStart((AsyncContextCallback) param);
         } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
             asyncStateMachine.asyncDispatched();
         } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
