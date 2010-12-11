@@ -245,7 +245,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
 
         @Override
-        public RequestGroupInfo getGlobal() {
+        public Object getGlobal() {
             return global;
         }
         
