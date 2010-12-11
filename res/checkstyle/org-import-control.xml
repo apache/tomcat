@@ -72,7 +72,6 @@
     <allow pkg="javax.mail"/>
     <allow pkg="javax.wsdl"/>
     <allow pkg="org.apache.naming"/>
-    <!-- To remove? -->
     <allow class="org.apache.catalina.util.RequestUtil"/>
     <allow class="org.apache.tomcat.util.http.FastHttpDateFormat"/>
   </subpackage>
@@ -81,10 +80,7 @@
     <subpackage name="buildutil">
       <allow pkg="org.apache.tools.ant"/>
     </subpackage>
-    <subpackage name="jni">
-      <!-- To remove? -->
-      <allow class="org.apache.tomcat.util.ExceptionUtils"/>
-    </subpackage>
+    <subpackage name="jni"/>
     <subpackage name="util">
       <allow pkg="org.apache.juli"/>
       <allow pkg="org.apache.tomcat.jni"/>
