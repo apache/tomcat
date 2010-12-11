@@ -39,7 +39,6 @@ import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * @author Filip Hanik
@@ -318,9 +317,14 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                 // ignore is normal at shutdown or stop listen socket
             } catch (java.nio.channels.CancelledKeyException nx) {
                 log.warn("Replication client disconnected, error when polling key. Ignoring client.");
-            } catch (Throwable x) {
-                ExceptionUtils.handleThrowable(x);
-                log.error("Unable to process request in NioReceiver", x);
+            } catch (Throwable t) {
+                if (t instanceof ThreadDeath) {
+                    throw (ThreadDeath) t;
+                }
+                if (t instanceof VirtualMachineError) {
+                    throw (VirtualMachineError) t;
+                }
+                log.error("Unable to process request in NioReceiver", t);
             }
 
         }
