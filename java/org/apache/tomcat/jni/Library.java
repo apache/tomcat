@@ -17,8 +17,6 @@
 
 package org.apache.tomcat.jni;
 
-import org.apache.tomcat.util.ExceptionUtils;
-
 /** Library
  *
  * @author Mladen Turk
@@ -44,8 +42,13 @@ public final class Library {
                 System.loadLibrary(NAMES[i]);
                 loaded = true;
             }
-            catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
+            catch (Throwable t) {
+                if (t instanceof ThreadDeath) {
+                    throw (ThreadDeath) t;
+                }
+                if (t instanceof VirtualMachineError) {
+                    throw (VirtualMachineError) t;
+                }
                 String name = System.mapLibraryName(NAMES[i]);
                 String path = System.getProperty("java.library.path");
                 String sep = System.getProperty("path.separator");
@@ -53,12 +56,12 @@ public final class Library {
                 for (int j=0; j<paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
                     if (fd.exists()) {
-                        e.printStackTrace();
+                        t.printStackTrace();
                     }
                 }
                 if ( i > 0)
                     err += ", ";
-                err +=  e.getMessage();
+                err +=  t.getMessage();
             }
             if (loaded)
                 break;
