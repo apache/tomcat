@@ -43,6 +43,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -52,7 +53,7 @@ import org.apache.tomcat.InstanceManager;
  * @author fhanik
  *
  */
-public class AsyncContextImpl implements AsyncContext {
+public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
     
