@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -508,7 +507,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 try {
                     //threads should not be created by the webapp classloader
-                    if (Globals.IS_SECURITY_ENABLED) {
+                    if (Constants.IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                                 getClass().getClassLoader());
                         AccessController.doPrivileged(pa);
@@ -522,7 +521,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                     }
                     getExecutor().execute(proc);
                 }finally {
-                    if (Globals.IS_SECURITY_ENABLED) {
+                    if (Constants.IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
                         AccessController.doPrivileged(pa);
                     } else {
