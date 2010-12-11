@@ -21,8 +21,6 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.servlet.jsp.el.ScopedAttributeELResolver;
-
 public class CompositeELResolver extends ELResolver {
 
     private int size;
@@ -120,8 +118,10 @@ public class CompositeELResolver extends ELResolver {
         for (int i = 0; i < sz; i++) {
             type = this.resolvers[i].getType(context, base, property);
             if (context.isPropertyResolved()) {
-                if (resolvers[i] instanceof ScopedAttributeELResolver) {
+                if (resolvers[i].getClass().getName().equals(
+                        "javax.servlet.jsp.el.ScopedAttributeELResolver")) {
                     // Special case since this will always return Object.class
+                    // for type
                     Object value =
                         resolvers[i].getValue(context, base, property);
                     if (value != null) {
