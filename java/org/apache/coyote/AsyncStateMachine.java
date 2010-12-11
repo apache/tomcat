@@ -19,7 +19,6 @@ package org.apache.coyote;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -96,7 +95,7 @@ public class AsyncStateMachine {
 
     private volatile AsyncState state = AsyncState.DISPATCHED;
     // Need this to fire listener on complete
-    private AsyncContextImpl asyncCtxt = null;
+    private AsyncContextCallback asyncCtxt = null;
     private Processor processor;
     
     
@@ -122,7 +121,7 @@ public class AsyncStateMachine {
     }
 
 
-    public synchronized void asyncStart(AsyncContextImpl asyncCtxt) {
+    public synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
         if (state == AsyncState.DISPATCHED) {
             state = AsyncState.STARTING;
             this.asyncCtxt = asyncCtxt;

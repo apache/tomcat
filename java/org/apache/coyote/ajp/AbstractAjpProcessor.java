@@ -25,10 +25,10 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Processor;
@@ -334,7 +334,7 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
            replay = true;
 
        } else if (actionCode == ActionCode.ASYNC_START) {
-           asyncStateMachine.asyncStart((AsyncContextImpl) param);
+           asyncStateMachine.asyncStart((AsyncContextCallback) param);
        } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
            asyncStateMachine.asyncDispatched();
        } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
