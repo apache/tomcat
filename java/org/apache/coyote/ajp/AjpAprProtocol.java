@@ -154,7 +154,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
         }
 
         @Override
-        public RequestGroupInfo getGlobal() {
+        public Object getGlobal() {
             return global;
         }
 
