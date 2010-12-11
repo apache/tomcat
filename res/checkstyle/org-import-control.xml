@@ -91,7 +91,6 @@
       <allow pkg="org.apache.tomcat.util"/>
       <disallow pkg="org.apache.util.scan"/>
       <!-- To remove? -->
-      <allow class="org.apache.catalina.Globals"/>
       <allow class="org.apache.coyote.RequestGroupInfo"/>
       <!-- end to remove -->
       <subpackage name="scan">
