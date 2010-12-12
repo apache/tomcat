@@ -28,6 +28,10 @@ public class TesterBeanB {
         this.name = name;
     }
     
+    public String sayHello() {
+        return "Hello from " + name;
+    }
+
     public String sayHello(String to) {
         return "Hello " + to + " from " + name;
     }

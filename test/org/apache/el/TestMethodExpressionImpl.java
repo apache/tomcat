@@ -335,4 +335,18 @@ public class TestMethodExpressionImpl extends TestCase {
                 "#{beanA.valLong}", java.lang.String.class);
         assertEquals("5", ve.getValue(context));
     }
+    
+    public void testBug50449a() throws Exception {
+        MethodExpression me1 = factory.createMethodExpression(context,
+                "${beanB.sayHello()}", null, null);
+        String actual = (String) me1.invoke(context, null);
+        assertEquals("Hello from B", actual);
+    }
+
+    public void testBug50449b() throws Exception {
+        MethodExpression me1 = factory.createMethodExpression(context,
+                "${beanB.sayHello('Tomcat')}", null, null);
+        String actual = (String) me1.invoke(context, null);
+        assertEquals("Hello Tomcat from B", actual);
+    }
 }
