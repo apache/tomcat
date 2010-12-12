@@ -202,7 +202,7 @@ public class SessionIdGenerator {
                 Class<?> clazz = Class.forName(secureRandomClass);
                 result = (SecureRandom) clazz.newInstance();
             } catch (Exception e) {
-                log.error(sm.getString("managerBase.random",
+                log.error(sm.getString("sessionIdGenerator.random",
                         secureRandomClass), e);
             }
         }
@@ -219,10 +219,10 @@ public class SessionIdGenerator {
                     result = SecureRandom.getInstance(secureRandomAlgorithm);
                 }
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("managerBase.randomAlgorithm",
+                log.error(sm.getString("sessionIdGenerator.randomAlgorithm",
                         secureRandomAlgorithm), e);
             } catch (NoSuchProviderException e) {
-                log.error(sm.getString("managerBase.randomProvider",
+                log.error(sm.getString("sessionIdGenerator.randomProvider",
                         secureRandomProvider), e);
             }
         }
@@ -232,7 +232,7 @@ public class SessionIdGenerator {
             try {
                 result = SecureRandom.getInstance("SHA1PRNG");
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("managerBase.randomAlgorithm",
+                log.error(sm.getString("sessionIdGenerator.randomAlgorithm",
                         secureRandomAlgorithm), e);
             }
         }
@@ -245,7 +245,7 @@ public class SessionIdGenerator {
         if(log.isDebugEnabled()) {
             long t2=System.currentTimeMillis();
             if( (t2-t1) > 100 )
-                log.debug(sm.getString("managerBase.createRandom",
+                log.debug(sm.getString("sessionIdGenerator.createRandom",
                         Long.valueOf(t2-t1)));
         }
         return result;
