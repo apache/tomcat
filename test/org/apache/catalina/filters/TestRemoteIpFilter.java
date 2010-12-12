@@ -72,7 +72,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        HttpServletRequest request;
+        private transient HttpServletRequest request;
 
         public HttpServletRequest getRequest() {
             return request;
