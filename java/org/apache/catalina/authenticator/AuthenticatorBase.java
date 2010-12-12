@@ -20,13 +20,10 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -45,6 +42,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.DateTool;
+import org.apache.catalina.util.SessionIdGenerator;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -137,20 +135,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     /**
-     * Return the MessageDigest implementation to be used when
-     * creating session identifiers.
-     */
-    protected MessageDigest digest = null;
-
-
-    /**
-     * A String initialization parameter used to increase the entropy of
-     * the initialization of our random number generator.
-     */
-    protected String entropy = null;
-
-
-    /**
      * Descriptive information about this implementation.
      */
     protected static final String info =
@@ -169,17 +153,36 @@ public abstract class AuthenticatorBase extends ValveBase
     protected boolean securePagesWithPragma = true;
     
     /**
-     * A random number generator to use when generating session identifiers.
+     * The Java class name of the secure random number generator class to be
+     * used when generating SSO session identifiers. The random number generator
+     * class must be self-seeding and have a zero-argument constructor. If not
+     * specified, an instance of {@link java.secure.SecureRandom} will be
+     * generated.
      */
-    protected Random random = null;
-
+    protected String secureRandomClass = null;
 
     /**
-     * The Java class name of the random number generator class to be used
-     * when generating session identifiers.
+     * The name of the algorithm to use to create instances of
+     * {@link java.secure.SecureRandom} which are used to generate SSO session
+     * IDs. If no algorithm is specified, SHA1PRNG is used. To use the platform
+     * default (which may be SHA1PRNG), specify the empty string. If an invalid
+     * algorithm and/or provider is specified the SecureRandom instances will be
+     * created using the defaults. If that fails, the SecureRandom instances
+     * will be created using platform defaults.
      */
-    protected String randomClass = "java.security.SecureRandom";
+    protected String secureRandomAlgorithm = "SHA1PRNG";
 
+    /**
+     * The name of the provider to use to create instances of
+     * {@link java.secure.SecureRandom} which are used to generate session SSO
+     * IDs. If no algorithm is specified the of SHA1PRNG default is used. If an
+     * invalid algorithm and/or provider is specified the SecureRandom instances
+     * will be created using the defaults. If that fails, the SecureRandom
+     * instances will be created using platform defaults.
+     */
+    protected String secureRandomProvider = null;
+
+    protected SessionIdGenerator sessionIdGenerator = null;
 
     /**
      * The string manager for this package.
@@ -280,33 +283,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     /**
-     * Return the entropy increaser value, or compute a semi-useful value
-     * if this String has not yet been set.
-     */
-    public String getEntropy() {
-
-        // Calculate a semi-useful value if this has not been set
-        if (this.entropy == null)
-            setEntropy(this.toString());
-
-        return (this.entropy);
-
-    }
-
-
-    /**
-     * Set the entropy increaser value.
-     *
-     * @param entropy The new entropy increaser value
-     */
-    public void setEntropy(String entropy) {
-
-        this.entropy = entropy;
-
-    }
-
-
-    /**
      * Return descriptive information about this Valve implementation.
      */
     @Override
@@ -316,27 +292,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
     }
 
-
-    /**
-     * Return the random number generator class name.
-     */
-    public String getRandomClass() {
-
-        return (this.randomClass);
-
-    }
-
-
-    /**
-     * Set the random number generator class name.
-     *
-     * @param randomClass The new random number generator class name
-     */
-    public void setRandomClass(String randomClass) {
-
-        this.randomClass = randomClass;
-
-    }
 
     /**
      * Return the flag that states if we add headers to disable caching by
@@ -399,6 +354,66 @@ public abstract class AuthenticatorBase extends ValveBase
             boolean changeSessionIdOnAuthentication) {
         this.changeSessionIdOnAuthentication = changeSessionIdOnAuthentication;
     }
+
+    /**
+     * Return the secure random number generator class name.
+     */
+    public String getSecureRandomClass() {
+
+        return (this.secureRandomClass);
+
+    }
+
+
+    /**
+     * Set the secure random number generator class name.
+     *
+     * @param secureRandomClass The new secure random number generator class
+     *                          name
+     */
+    public void setSecureRandomClass(String secureRandomClass) {
+        this.secureRandomClass = secureRandomClass;
+    }
+
+
+    /**
+     * Return the secure random number generator algorithm name.
+     */
+    public String getSecureRandomAlgorithm() {
+        return secureRandomAlgorithm;
+    }
+
+
+    /**
+     * Set the secure random number generator algorithm name.
+     *
+     * @param secureRandomAlgorithm The new secure random number generator
+     *                              algorithm name
+     */
+    public void setSecureRandomAlgorithm(String secureRandomAlgorithm) {
+        this.secureRandomAlgorithm = secureRandomAlgorithm;
+    }
+
+
+    /**
+     * Return the secure random number generator provider name.
+     */
+    public String getSecureRandomProvider() {
+        return secureRandomProvider;
+    }
+
+
+    /**
+     * Set the secure random number generator provider name.
+     *
+     * @param secureRandomProvider The new secure random number generator
+     *                             provider name
+     */
+    public void setSecureRandomProvider(String secureRandomProvider) {
+        this.secureRandomProvider = secureRandomProvider;
+    }
+
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -603,88 +618,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     /**
-     * Generate and return a new session identifier for the cookie that
-     * identifies an SSO principal.
-     */
-    protected synchronized String generateSessionId() {
-
-        // Generate a byte array containing a session identifier
-        byte bytes[] = new byte[SESSION_ID_BYTES];
-        getRandom().nextBytes(bytes);
-        bytes = getDigest().digest(bytes);
-
-        // Render the result as a String of hexadecimal digits
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            byte b1 = (byte) ((bytes[i] & 0xf0) >> 4);
-            byte b2 = (byte) (bytes[i] & 0x0f);
-            if (b1 < 10)
-                result.append((char) ('0' + b1));
-            else
-                result.append((char) ('A' + (b1 - 10)));
-            if (b2 < 10)
-                result.append((char) ('0' + b2));
-            else
-                result.append((char) ('A' + (b2 - 10)));
-        }
-        return (result.toString());
-
-    }
-
-
-    /**
-     * Return the MessageDigest object to be used for calculating
-     * session identifiers.  If none has been created yet, initialize
-     * one the first time this method is called.
-     */
-    protected synchronized MessageDigest getDigest() {
-
-        if (this.digest == null) {
-            try {
-                this.digest = MessageDigest.getInstance(algorithm);
-            } catch (NoSuchAlgorithmException e) {
-                try {
-                    this.digest = MessageDigest.getInstance(DEFAULT_ALGORITHM);
-                } catch (NoSuchAlgorithmException f) {
-                    this.digest = null;
-                }
-            }
-        }
-
-        return (this.digest);
-
-    }
-
-
-    /**
-     * Return the random number generator instance we should use for
-     * generating session identifiers.  If there is no such generator
-     * currently defined, construct and seed a new one.
-     */
-    protected synchronized Random getRandom() {
-
-        if (this.random == null) {
-            try {
-                Class<?> clazz = Class.forName(randomClass);
-                this.random = (Random) clazz.newInstance();
-                long seed = System.currentTimeMillis();
-                char entropy[] = getEntropy().toCharArray();
-                for (int i = 0; i < entropy.length; i++) {
-                    long update = ((byte) entropy[i]) << ((i % 8) * 8);
-                    seed ^= update;
-                }
-                this.random.setSeed(seed);
-            } catch (Exception e) {
-                this.random = new java.util.Random();
-            }
-        }
-
-        return (this.random);
-
-    }
-
-
-    /**
      * Attempts reauthentication to the <code>Realm</code> using
      * the credentials included in argument <code>entry</code>.
      *
@@ -780,7 +713,7 @@ public abstract class AuthenticatorBase extends ValveBase
         String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
         if (ssoId == null) {
             // Construct a cookie to be returned to the client
-            ssoId = generateSessionId();
+            ssoId = sessionIdGenerator.generateSessionId();
             Cookie cookie = new Cookie(Constants.SINGLE_SIGN_ON_COOKIE, ssoId);
             cookie.setMaxAge(-1);
             cookie.setPath("/");
@@ -885,6 +818,11 @@ public abstract class AuthenticatorBase extends ValveBase
             else
                 log.debug("No SingleSignOn Valve is present");
         }
+
+        sessionIdGenerator = new SessionIdGenerator();
+        sessionIdGenerator.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+        sessionIdGenerator.setSecureRandomClass(getSecureRandomClass());
+        sessionIdGenerator.setSecureRandomProvider(getSecureRandomProvider());
 
         super.startInternal();
     }
