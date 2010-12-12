@@ -23,9 +23,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
@@ -35,9 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.catalina.Container;
@@ -48,6 +43,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.catalina.util.SessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -109,44 +105,37 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Queue of random number generator objects to be used when creating session
-     * identifiers. If the queue is empty when a random number generator is
-     * required, a new random number generator object is created. This is
-     * designed this way since random number generator use a sync to make them
-     * thread-safe and the sync makes using a a single object slow(er).
-     */
-    protected Queue<SecureRandom> randoms =
-        new ConcurrentLinkedQueue<SecureRandom>();
-
-    /**
      * The Java class name of the secure random number generator class to be
      * used when generating session identifiers. The random number generator
      * class must be self-seeding and have a zero-argument constructor. If not
-     * specified, an instance of {@link SecureRandom} will be generated.
+     * specified, an instance of {@link java.secure.SecureRandom} will be
+     * generated.
      */
     protected String secureRandomClass = null;
 
     /**
      * The name of the algorithm to use to create instances of
-     * {@link SecureRandom} which are used to generate session IDs. If no
-     * algorithm is specified, SHA1PRNG is used. To use the platform default
-     * (which may be SHA1PRNG), specify the empty string. If an invalid
-     * algorithm and/or provider is specified the {@link SecureRandom} instances
-     * will be created using the defaults. If that fails, the {@link
-     * SecureRandom} instances will be created using platform defaults.
+     * {@link java.secure.SecureRandom} which are used to generate session IDs.
+     * If no algorithm is specified, SHA1PRNG is used. To use the platform
+     * default (which may be SHA1PRNG), specify the empty string. If an invalid
+     * algorithm and/or provider is specified the SecureRandom instances will be
+     * created using the defaults. If that fails, the SecureRandom instances
+     * will be created using platform defaults.
      */
     protected String secureRandomAlgorithm = "SHA1PRNG";
 
     /**
      * The name of the provider to use to create instances of
-     * {@link SecureRandom} which are used to generate session IDs. If
-     * no algorithm is specified the of SHA1PRNG default is used. If an invalid
-     * algorithm and/or provider is specified the {@link SecureRandom} instances
-     * will be created using the defaults. If that fails, the {@link
-     * SecureRandom} instances will be created using platform defaults.
+     * {@link java.secure.SecureRandom} which are used to generate session IDs. 
+     * If no algorithm is specified the of SHA1PRNG default is used. If an
+     * invalid algorithm and/or provider is specified the SecureRandom instances
+     * will be created using the defaults. If that fails, the SecureRandom
+     * instances will be created using platform defaults.
      */
     protected String secureRandomProvider = null;
-    
+
+    protected SessionIdGenerator sessionIdGenerator = null;
+
     /**
      * The longest time (in seconds) that an expired session had been alive.
      */
@@ -386,71 +375,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     /**
-     * Create a new random number generator instance we should use for
-     * generating session identifiers.
-     */
-    protected SecureRandom createSecureRandom() {
-
-        SecureRandom result = null;
-        
-        long t1 = System.currentTimeMillis();
-        if (secureRandomClass != null) {
-            try {
-                // Construct and seed a new random number generator
-                Class<?> clazz = Class.forName(secureRandomClass);
-                result = (SecureRandom) clazz.newInstance();
-            } catch (Exception e) {
-                log.error(sm.getString("managerBase.random",
-                        secureRandomClass), e);
-            }
-        }
-
-        if (result == null) {
-            // No secureRandomClass or creation failed. Use SecureRandom.
-            try {
-                if (secureRandomProvider != null &&
-                        secureRandomProvider.length() > 0) {
-                    result = SecureRandom.getInstance(secureRandomAlgorithm,
-                            secureRandomProvider);
-                } else if (secureRandomAlgorithm != null &&
-                        secureRandomAlgorithm.length() > 0) {
-                    result = SecureRandom.getInstance(secureRandomAlgorithm);
-                }
-            } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("managerBase.randomAlgorithm",
-                        secureRandomAlgorithm), e);
-            } catch (NoSuchProviderException e) {
-                log.error(sm.getString("managerBase.randomProvider",
-                        secureRandomProvider), e);
-            }
-        }
-
-        if (result == null) {
-            // Invalid provider / algorithm
-            try {
-                result = SecureRandom.getInstance("SHA1PRNG");
-            } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("managerBase.randomAlgorithm",
-                        secureRandomAlgorithm), e);
-            }
-        }
-        
-        if (result == null) {
-            // Nothing works - use platform default
-            result = new SecureRandom();
-        }
-
-        if(log.isDebugEnabled()) {
-            long t2=System.currentTimeMillis();
-            if( (t2-t1) > 100 )
-                log.debug(sm.getString("managerBase.createRandom",
-                        Long.valueOf(t2-t1)));
-        }
-        return result;
-    }
-
-
-    /**
      * Return the secure random number generator class name.
      */
     public String getSecureRandomClass() {
@@ -637,17 +561,24 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             sessionExpirationTiming.add(null);
         }
 
+        sessionIdGenerator = new SessionIdGenerator();
+        sessionIdGenerator.setJvmRoute(getJvmRoute());
+        sessionIdGenerator.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+        sessionIdGenerator.setSecureRandomClass(getSecureRandomClass());
+        sessionIdGenerator.setSecureRandomProvider(getSecureRandomProvider());
+        sessionIdGenerator.setSessionIdLength(getSessionIdLength());
+
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
             log.debug("Force random number initialization starting");
-        generateSessionId();
+        sessionIdGenerator.generateSessionId();
         if (log.isDebugEnabled())
             log.debug("Force random number initialization completed");
     }
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        this.randoms.clear();
+        this.sessionIdGenerator = null;
     }
 
 
@@ -852,60 +783,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    protected void getRandomBytes(byte bytes[]) {
-
-        SecureRandom random = randoms.poll();
-        if (random == null) {
-            random = createSecureRandom();
-        }
-        random.nextBytes(bytes);
-        randoms.add(random);
-    }
-
-
     /**
      * Generate and return a new session identifier.
      */
     protected String generateSessionId() {
 
-        byte random[] = new byte[16];
-        String jvmRoute = getJvmRoute();
         String result = null;
 
-        // Render the result as a String of hexadecimal digits
-        StringBuilder buffer = new StringBuilder();
         do {
-            int resultLenBytes = 0;
             if (result != null) {
-                buffer = new StringBuilder();
                 duplicates++;
             }
 
-            while (resultLenBytes < this.sessionIdLength) {
-                getRandomBytes(random);
-                for (int j = 0;
-                j < random.length && resultLenBytes < this.sessionIdLength;
-                j++) {
-                    byte b1 = (byte) ((random[j] & 0xf0) >> 4);
-                    byte b2 = (byte) (random[j] & 0x0f);
-                    if (b1 < 10)
-                        buffer.append((char) ('0' + b1));
-                    else
-                        buffer.append((char) ('A' + (b1 - 10)));
-                    if (b2 < 10)
-                        buffer.append((char) ('0' + b2));
-                    else
-                        buffer.append((char) ('A' + (b2 - 10)));
-                    resultLenBytes++;
-                }
-            }
-            if (jvmRoute != null) {
-                buffer.append('.').append(jvmRoute);
-            }
-            result = buffer.toString();
+            result = sessionIdGenerator.generateSessionId();
+            
         } while (sessions.containsKey(result));
-        return (result);
-
+        
+        return result;
     }
 
 

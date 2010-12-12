@@ -24,6 +24,7 @@ import java.security.SecureRandom;
 
 import junit.framework.TestCase;
 
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 
 import org.apache.catalina.core.StandardContext;
@@ -70,6 +71,7 @@ public class Benchmarks extends TestCase {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
+        mgr.startInternal();
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
                 ManagerBase.TIMING_STATS_CACHE_SIZE) {
@@ -108,8 +110,6 @@ public class Benchmarks extends TestCase {
         result.append(threadCount);
         result.append(", Time(ms): ");
         result.append(end-start);
-        result.append(", Randoms: ");
-        result.append(mgr.randoms.size());
         System.out.println(result.toString());
     }
     
@@ -146,7 +146,7 @@ public class Benchmarks extends TestCase {
      *  4 threads - ~11,700ms
      * 16 threads - ~45,600ms
      */
-    public void testManagerBaseCreateSession() {
+    public void testManagerBaseCreateSession() throws LifecycleException {
         doTestManagerBaseCreateSession(1, 1000000);
         doTestManagerBaseCreateSession(2, 1000000);
         doTestManagerBaseCreateSession(4, 1000000);
@@ -157,10 +157,12 @@ public class Benchmarks extends TestCase {
     }
     
     
-    private void doTestManagerBaseCreateSession(int threadCount, int iterCount) {
+    private void doTestManagerBaseCreateSession(int threadCount, int iterCount)
+            throws LifecycleException {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
+        mgr.startInternal();
         mgr.setContainer(new StandardContext());
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
@@ -199,8 +201,6 @@ public class Benchmarks extends TestCase {
         result.append(threadCount);
         result.append(", Time(ms): ");
         result.append(end-start);
-        result.append(", Randoms: ");
-        result.append(mgr.randoms.size());
         System.out.println(result.toString());
     }
     
@@ -331,8 +331,12 @@ public class Benchmarks extends TestCase {
         @Override
         public void run() {
             try {
+                int read = 0;
                 for (int i = 0; i < count; i++) {
-                    is.read(bytes);
+                    read = is.read(bytes);
+                    if (read < bytes.length) {
+                        throw new IOException("Only read " + read + " bytes");
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
