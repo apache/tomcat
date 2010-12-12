@@ -1026,8 +1026,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         int oldMaxActiveSessions = this.maxActiveSessions;
         this.maxActiveSessions = max;
         support.firePropertyChange("maxActiveSessions",
-                                   new Integer(oldMaxActiveSessions),
-                                   new Integer(this.maxActiveSessions));
+                                   Integer.valueOf(oldMaxActiveSessions),
+                                   Integer.valueOf(this.maxActiveSessions));
 
     }
 
@@ -1147,7 +1147,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
         if (counter > 0) {
             if (oldest < now) {
-                result = (int) ((1000*60*counter)/(now - oldest));
+                result = (1000*60*counter)/(int) (now - oldest);
             } else {
                 result = Integer.MAX_VALUE;
             }
@@ -1190,7 +1190,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
         if (counter > 0) {
             if (oldest < now) {
-                result = (int) ((1000*60*counter)/(now - oldest));
+                result = (1000*60*counter)/(int) (now - oldest);
             } else {
                 // Better than reporting zero
                 result = Integer.MAX_VALUE;
