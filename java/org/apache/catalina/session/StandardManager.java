@@ -365,10 +365,10 @@ public class StandardManager extends ManagerBase {
     protected void doUnload() throws IOException {
 
         if (log.isDebugEnabled())
-            log.debug("Unloading persisted sessions");
-        
+            log.debug(sm.getString("standardManager.unloading.debug"));
+
         if (sessions.isEmpty()) {
-            log.debug("No persisted sessions to unload");
+            log.debug(sm.getString("standardManager.unloading.nosessions"));
             return; // nothing to do
         }
 
