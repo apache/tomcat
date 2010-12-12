@@ -80,7 +80,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
     }
 
-    public final class Bug49994Servlet extends HttpServlet {
+    public static final class Bug49994Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
@@ -132,7 +132,7 @@ public class TestNamingContext extends TomcatBaseTest {
         assertEquals("org.apache.naming.resources.TesterObject", bc.toString());
     }
     
-    public final class Bug23950Servlet extends HttpServlet {
+    public static final class Bug23950Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
@@ -184,7 +184,7 @@ public class TestNamingContext extends TomcatBaseTest {
         assertEquals("value", bc.toString());
     }
 
-    public final class Bug50351Servlet extends HttpServlet {
+    public static final class Bug50351Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
