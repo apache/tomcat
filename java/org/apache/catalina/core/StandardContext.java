@@ -4863,8 +4863,9 @@ public class StandardContext extends ContainerBase
                     ((Lifecycle) loader).start();
 
                 // since the loader just started, the webapp classloader is now
-                // created by calling unbindThread and bindThread in a row, we
-                // setup the current Thread CCL to be the webapp classloader
+                // created.
+                // By calling unbindThread and bindThread in a row, we setup the
+                // current Thread CCL to be the webapp classloader
                 unbindThread(oldCCL);
                 oldCCL = bindThread();
 
