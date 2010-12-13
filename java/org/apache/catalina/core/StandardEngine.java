@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Container;
@@ -115,7 +116,8 @@ public class StandardEngine extends ContainerBase implements Engine {
      * Default access log to use for request/response pairs where we can't ID
      * the intended host and context.
      */
-    private volatile AccessLog defaultAccessLog;
+    private final AtomicReference<AccessLog> defaultAccessLog =
+        new AtomicReference<AccessLog>();
 
     // ------------------------------------------------------------- Properties
 
@@ -321,7 +323,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
 
         if (!logged && useDefault) {
-            AccessLog newDefaultAccessLog = defaultAccessLog;
+            AccessLog newDefaultAccessLog = defaultAccessLog.get();
             if (newDefaultAccessLog == null) {
                 // If we reached this point, this Engine can't have an AccessLog
                 // Look in the defaultHost
@@ -331,22 +333,25 @@ public class StandardEngine extends ContainerBase implements Engine {
                     newDefaultAccessLog = host.getAccessLog();
 
                     if (newDefaultAccessLog != null) {
-                        AccessLogListener l = new AccessLogListener(this);
-                        this.addPropertyChangeListener(l);
-                        host.addContainerListener(l);
-                        host.addLifecycleListener(l);
+                        if (defaultAccessLog.compareAndSet(null,
+                                newDefaultAccessLog)) {
+                            AccessLogListener l = new AccessLogListener(this,
+                                    host, null);
+                            l.install();
+                        }
                     } else {
                         // Try the ROOT context of default host
                         context = (Context) host.findChild("");
                         if (context != null &&
                                 context.getState().isAvailable()) {
                             newDefaultAccessLog = context.getAccessLog();
-                            
                             if (newDefaultAccessLog != null) {
-                                AccessLogListener l =
-                                    new AccessLogListener(this);
-                                this.addPropertyChangeListener(l);
-                                context.addLifecycleListener(l);
+                                if (defaultAccessLog.compareAndSet(null,
+                                        newDefaultAccessLog)) {
+                                    AccessLogListener l = new AccessLogListener(
+                                            this, null, context);
+                                    l.install();
+                                }
                             }
                         }
                     }
@@ -354,18 +359,13 @@ public class StandardEngine extends ContainerBase implements Engine {
 
                 if (newDefaultAccessLog == null) {
                     newDefaultAccessLog = new NoopAccessLog();
-                    AccessLogListener l = new AccessLogListener(this);
-                    this.addPropertyChangeListener(l);
-                    if (host != null) {
-                        host.addContainerListener(l);
-                        host.addLifecycleListener(l);
+                    if (defaultAccessLog.compareAndSet(null,
+                            newDefaultAccessLog)) {
+                        AccessLogListener l = new AccessLogListener(this, host,
+                                context);
+                        l.install();
                     }
-                    if (context != null) {
-                        context.addLifecycleListener(l);
-                    }
-                    
                 }
-                defaultAccessLog = newDefaultAccessLog;
             }
 
             newDefaultAccessLog.log(request, response, time);
@@ -407,29 +407,53 @@ public class StandardEngine extends ContainerBase implements Engine {
             ContainerListener {
 
         private StandardEngine engine;
+        private Host host;
+        private Context context;
         private volatile boolean disabled = false;
 
-        public AccessLogListener(StandardEngine engine) {
+        public AccessLogListener(StandardEngine engine, Host host,
+                Context context) {
             this.engine = engine;
+            this.host = host;
+            this.context = context;
+        }
+
+        public void install() {
+            engine.addPropertyChangeListener(this);
+            if (host != null) {
+                host.addContainerListener(this);
+                host.addLifecycleListener(this);
+            }
+            if (context != null) {
+                context.addLifecycleListener(this);
+            }
+        }
+
+        private void uninstall() {
+            disabled = true;
+            if (context != null) {
+                context.removeLifecycleListener(this);
+            }
+            if (host != null) {
+                host.removeLifecycleListener(this);
+                host.removeContainerListener(this);
+            }
+            engine.removePropertyChangeListener(this);
         }
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (disabled) return;
-            
+
             String type = event.getType();
             if (Lifecycle.AFTER_START_EVENT.equals(type) ||
-                    Lifecycle.BEFORE_STOP_EVENT.equals(type)) {
-                // Container is being started/stopped
-                // Force re-calculation but do not disable listener since it
-                // might be re-used
-                engine.defaultAccessLog = null;
-            } else if (Lifecycle.BEFORE_DESTROY_EVENT.equals(type)) {
-                // Container is being removed
+                    Lifecycle.BEFORE_STOP_EVENT.equals(type) ||
+                    Lifecycle.BEFORE_DESTROY_EVENT.equals(type)) {
+                // Container is being started/stopped/removed
                 // Force re-calculation and disable listener since it won't
                 // be re-used
-                engine.defaultAccessLog = null;
-                disabled = true;
+                engine.defaultAccessLog.set(null);
+                uninstall();
             }
         }
 
@@ -439,8 +463,8 @@ public class StandardEngine extends ContainerBase implements Engine {
             if ("defaultHost".equals(evt.getPropertyName())) {
                 // Force re-calculation and disable listener since it won't
                 // be re-used
-                engine.defaultAccessLog = null;
-                disabled = true;
+                engine.defaultAccessLog.set(null);
+                uninstall();
             }
         }
 
@@ -448,13 +472,13 @@ public class StandardEngine extends ContainerBase implements Engine {
         public void containerEvent(ContainerEvent event) {
             // Only useful for hosts
             if (disabled) return;
-            
             if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
                 Context context = (Context) event.getData();
                 if ("".equals(context.getPath())) {
-                    // New ROOT context in default host
-                    // Force recalculation of default access log
-                    engine.defaultAccessLog = null;
+                    // Force re-calculation and disable listener since it won't
+                    // be re-used
+                    engine.defaultAccessLog.set(null);
+                    uninstall();
                 }
             }
         }

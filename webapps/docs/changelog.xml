@@ -81,6 +81,11 @@
         options to control the <code>SecureRandom</code> instances used to
         generate session IDs. (markt)
       </update>
+      <fix>
+        <bug>50201</bug>: Update the access log reference in
+        <code>StandardEngine</code> when the ROOT web application is redeployed,
+        started, stopped or defaultHost is changed. (markt/kkolinko)
+      </fix>
       <add>
         <bug>50282</bug>: Load
         <code>javax.security.auth.login.Configuration</code> with
