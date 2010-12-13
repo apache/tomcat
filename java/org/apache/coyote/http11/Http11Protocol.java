@@ -83,6 +83,14 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     protected Http11ConnectionHandler cHandler;
 
 
+    // ----------------------------------------------------- JMX related methods
+
+    @Override
+    protected String getNamePrefix() {
+        return ("http-bio");
+    }
+
+
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
     protected static class Http11ConnectionHandler implements Handler {

@@ -147,9 +147,14 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         ((NioEndpoint)endpoint).setOomParachute(oomParachute);
     }
 
-    // --------------------  SSL related properties --------------------
+    // ----------------------------------------------------- JMX related methods
 
-    
+    @Override
+    protected String getNamePrefix() {
+        return ("http-nio");
+    }
+
+
     // --------------------  Connection handler --------------------
 
     static class Http11ConnectionHandler implements Handler {
