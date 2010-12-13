@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -73,7 +74,6 @@ import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.InstanceListener;
@@ -558,7 +558,7 @@ public class StandardContext extends ContainerBase
     /**
      * The notification sequence number.
      */
-    private long sequenceNumber = 0;
+    private AtomicLong sequenceNumber = new AtomicLong(0);
     
     /**
      * The status code error pages for this web application, keyed by
@@ -2578,7 +2578,6 @@ public class StandardContext extends ContainerBase
                 (sm.getString("standardContext.notWrapper"));
         }
 
-        Wrapper wrapper = (Wrapper) child;
         boolean isJspServlet = "jsp".equals(child.getName());
 
         // Allow webapp to override JspServlet inherited from global web.xml.
@@ -2954,30 +2953,30 @@ public class StandardContext extends ContainerBase
         if (findChild(name) == null)
             throw new IllegalArgumentException
                 (sm.getString("standardContext.servletMap.name", name));
-        pattern = adjustURLPattern(RequestUtil.URLDecode(pattern));
-        if (!validateURLPattern(pattern))
+        String decodedPattern = adjustURLPattern(RequestUtil.URLDecode(pattern));
+        if (!validateURLPattern(decodedPattern))
             throw new IllegalArgumentException
-                (sm.getString("standardContext.servletMap.pattern", pattern));
+                (sm.getString("standardContext.servletMap.pattern", decodedPattern));
 
         // Add this mapping to our registered set
         synchronized (servletMappingsLock) {
-            String name2 = servletMappings.get(pattern);
+            String name2 = servletMappings.get(decodedPattern);
             if (name2 != null) {
                 // Don't allow more than one servlet on the same pattern
                 Wrapper wrapper = (Wrapper) findChild(name2);
-                wrapper.removeMapping(pattern);
-                mapper.removeWrapper(pattern);
+                wrapper.removeMapping(decodedPattern);
+                mapper.removeWrapper(decodedPattern);
             }
-            servletMappings.put(pattern, name);
+            servletMappings.put(decodedPattern, name);
         }
         Wrapper wrapper = (Wrapper) findChild(name);
-        wrapper.addMapping(pattern);
+        wrapper.addMapping(decodedPattern);
 
         // Update context mapper
-        mapper.addWrapper(pattern, wrapper, jspWildCard,
+        mapper.addWrapper(decodedPattern, wrapper, jspWildCard,
                 resourceOnlyServlets.contains(name));
 
-        fireContainerEvent("addServletMapping", pattern);
+        fireContainerEvent("addServletMapping", decodedPattern);
 
     }
 
@@ -4282,16 +4281,6 @@ public class StandardContext extends ContainerBase
         private int insertPoint = 0;
 
         /**
-         * Reset the set to the initial state.
-         */
-        public void clear() {
-            synchronized (lock) {
-                array = new FilterMap[0];
-                insertPoint = 0;
-            }
-        }
-
-        /**
          * Return the set of filter mappings.
          */
         public FilterMap[] asArray() {
@@ -4774,9 +4763,8 @@ public class StandardContext extends ContainerBase
 
         // Send j2ee.state.starting notification 
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.starting", 
-                                                        this.getObjectName(), 
-                                                        sequenceNumber++);
+            Notification notification = new Notification("j2ee.state.starting",
+                    this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -4788,7 +4776,8 @@ public class StandardContext extends ContainerBase
             if (log.isDebugEnabled())
                 log.debug("Configuring default Resources");
             try {
-                if ((docBase != null) && (docBase.endsWith(".war")) && (!(new File(getBasePath())).isDirectory()))
+                if ((getDocBase() != null) && (getDocBase().endsWith(".war")) &&
+                        (!(new File(getBasePath())).isDirectory()))
                     setResources(new WARDirContext());
                 else
                     setResources(new FileDirContext());
@@ -4839,10 +4828,11 @@ public class StandardContext extends ContainerBase
         }
 
         if (ok && isUseNaming()) {
-            if (namingContextListener == null) {
-                namingContextListener = new NamingContextListener();
-                namingContextListener.setName(getNamingContextName());
-                addLifecycleListener(namingContextListener);
+            if (getNamingContextListener() == null) {
+                NamingContextListener ncl = new NamingContextListener();
+                ncl.setName(getNamingContextName());
+                addLifecycleListener(ncl);
+                setNamingContextListener(ncl);
             }
         }
         
@@ -4957,16 +4947,17 @@ public class StandardContext extends ContainerBase
         oldCCL = bindThread();
 
         if (ok ) {
-            if (instanceManager == null) {
+            if (getInstanceManager() == null) {
                 javax.naming.Context context = null;
-                if (isUseNaming() && namingContextListener != null) {
-                    context = namingContextListener.getEnvContext();
+                if (isUseNaming() && getNamingContextListener() != null) {
+                    context = getNamingContextListener().getEnvContext();
                 }
                 Map<String, Map<String, String>> injectionMap = buildInjectionMap(
                         getIgnoreAnnotations() ? new NamingResources(): getNamingResources());
-                instanceManager = new DefaultInstanceManager(
-                        context, injectionMap, this, this.getClass().getClassLoader());
-                getServletContext().setAttribute(InstanceManager.class.getName(), instanceManager);
+                setInstanceManager(new DefaultInstanceManager(context,
+                        injectionMap, this, this.getClass().getClassLoader()));
+                getServletContext().setAttribute(
+                        InstanceManager.class.getName(), getInstanceManager());
             }
         }
 
@@ -5002,16 +4993,17 @@ public class StandardContext extends ContainerBase
                 // forget to cleanup
                 Boolean listenerStarted =
                     temporaryExecutor.execute(new Callable<Boolean>() {
+                        @Override
                         public Boolean call() throws Exception {
                             ClassLoader old = bindThread();
                             try {
-                                return listenerStart();
+                                return Boolean.valueOf(listenerStart());
                             } finally {
                                 unbindThread(old);
                             }
                         }
                     });
-                if (!listenerStarted) {
+                if (!listenerStarted.booleanValue()) {
                     log.error( "Error listenerStart");
                     ok = false;
                 }
@@ -5037,16 +5029,17 @@ public class StandardContext extends ContainerBase
                 // to cleanup
                 Boolean filterStarted =
                     temporaryExecutor.execute(new Callable<Boolean>() {
+                        @Override
                         public Boolean call() throws Exception {
                             ClassLoader old = bindThread();
                             try {
-                                return filterStart();
+                                return Boolean.valueOf(filterStart());
                             } finally {
                                 unbindThread(old);
                             }
                         }
                     });
-                if (!filterStarted) {
+                if (!filterStarted.booleanValue()) {
                     log.error("Error filterStart");
                     ok = false;
                 }
@@ -5058,6 +5051,7 @@ public class StandardContext extends ContainerBase
                 // case the Servlets register some ThreadLocals that they forget
                 // to cleanup
                 temporaryExecutor.execute(new Callable<Void>() {
+                    @Override
                     public Void call() throws Exception {
                         ClassLoader old = bindThread();
                         try {
@@ -5089,8 +5083,8 @@ public class StandardContext extends ContainerBase
         // Send j2ee.state.running notification 
         if (ok && (this.getObjectName() != null)) {
             Notification notification = 
-                new Notification("j2ee.state.running", this.getObjectName(), 
-                                sequenceNumber++);
+                new Notification("j2ee.state.running", this.getObjectName(),
+                                 sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5194,7 +5188,7 @@ public class StandardContext extends ContainerBase
         if (this.getObjectName() != null) {
             Notification notification = 
                 new Notification("j2ee.state.stopping", this.getObjectName(), 
-                                sequenceNumber++);
+                                 sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
         
@@ -5212,6 +5206,7 @@ public class StandardContext extends ContainerBase
             // forget to cleanup
             DedicatedThreadExecutor.executeInOwnThread(
                 new Callable<Void>() {
+                @Override
                 public Void call() throws Exception {
                     ClassLoader old = bindThread();
                     try {
@@ -5284,7 +5279,7 @@ public class StandardContext extends ContainerBase
         if (this.getObjectName() != null) {
             Notification notification = 
                 new Notification("j2ee.state.stopped", this.getObjectName(), 
-                                sequenceNumber++);
+                                sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
         
@@ -5340,7 +5335,7 @@ public class StandardContext extends ContainerBase
         // Send j2ee.object.deleted notification 
         Notification notification = 
             new Notification("j2ee.object.deleted", this.getObjectName(), 
-                            sequenceNumber++);
+                             sequenceNumber.getAndIncrement());
         broadcaster.sendNotification(notification);
 
         unregister(onameNamingResources);
@@ -5624,38 +5619,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Get config base.
-     */
-    public File getConfigBase() {
-        File configBase = 
-            new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
-        if (!configBase.exists()) {
-            return null;
-        }
-        Container container = this;
-        Container host = null;
-        Container engine = null;
-        while (container != null) {
-            if (container instanceof Host)
-                host = container;
-            if (container instanceof Engine)
-                engine = container;
-            container = container.getParent();
-        }
-        if (engine != null) {
-            configBase = new File(configBase, engine.getName());
-        }
-        if (host != null) {
-            configBase = new File(configBase, host.getName());
-        }
-        if (saveConfig) {
-            configBase.mkdirs();
-        }
-        return configBase;
-    }
-
-
-    /**
      * Get naming context full name.
      */
     private String getNamingContextName() {
@@ -5849,9 +5812,14 @@ public class StandardContext extends ContainerBase
                 catalinaHomePath = catalinaHome.getCanonicalPath();
                 dir = new File(catalinaHomePath, workDir);
             } catch (IOException e) {
+                log.warn(sm.getString("standardContext.workCreateException",
+                        workDir, catalinaHomePath, getName()), e);
             }
         }
-        dir.mkdirs();
+        if (!dir.exists() && !dir.mkdirs()) {
+            log.warn(sm.getString("standardContext.workCreateFail", dir,
+                    getName()));
+        }
 
         // Set the appropriate servlet context attribute
         if (context == null) {
@@ -6031,10 +5999,8 @@ public class StandardContext extends ContainerBase
 
         // Send j2ee.object.created notification 
         if (this.getObjectName() != null) {
-            Notification notification = new Notification(
-                                                "j2ee.object.created", 
-                                                this.getObjectName(), 
-                                                sequenceNumber++);
+            Notification notification = new Notification("j2ee.object.created",
+                    this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
     }
