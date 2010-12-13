@@ -97,6 +97,15 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
     public void setPollerSize(int pollerSize) { ((AprEndpoint)endpoint).setPollerSize(pollerSize); }
     public int getPollerSize() { return ((AprEndpoint)endpoint).getPollerSize(); }
 
+
+    // ----------------------------------------------------- JMX related methods
+
+    @Override
+    protected String getNamePrefix() {
+        return ("ajp-apr");
+    }
+
+
     // --------------------------------------  AjpConnectionHandler Inner Class
 
 

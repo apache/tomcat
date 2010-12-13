@@ -179,12 +179,4 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     public void setMaxKeepAliveRequests(int mkar) {
         endpoint.setMaxKeepAliveRequests(mkar);
     }
-
-    
-    // ----------------------------------------------------- JMX related methods
-
-    @Override
-    protected String getNamePrefix() {
-        return ("http");
-    }
 }
