@@ -4636,6 +4636,8 @@ public class StandardContext extends ContainerBase
                 ((BaseDirContext) webappResources).setCacheMaxSize
                     (getCacheMaxSize());
                 ((BaseDirContext) webappResources).allocate();
+                // Alias support
+                ((BaseDirContext) webappResources).setAliases(getAliases());
             }
             // Register the cache in JMX
             if (isCachingAllowed()) {
