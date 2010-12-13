@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -519,6 +520,13 @@ public class ContextConfig
     protected Digester createContextDigester() {
         Digester digester = new Digester();
         digester.setValidating(false);
+        digester.setRulesValidation(true);
+        HashMap<Class<?>, List<String>> fakeAttributes =
+            new HashMap<Class<?>, List<String>>();
+        ArrayList<String> attrs = new ArrayList<String>();
+        attrs.add("className");
+        fakeAttributes.put(Object.class, attrs);
+        digester.setFakeAttributes(fakeAttributes);
         RuleSet contextRuleSet = new ContextRuleSet("", false);
         digester.addRuleSet(contextRuleSet);
         RuleSet namingRuleSet = new NamingRuleSet("Context/");

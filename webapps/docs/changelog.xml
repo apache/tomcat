@@ -139,6 +139,10 @@
         Ensure aliases settings for a context are retained after a context is
         reloaded. (markt)
       </fix>
+      <fix>
+        Log a warning if context.xml files define values for properties  that do
+        not exist (e.g. if there is a typo in a property name). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
