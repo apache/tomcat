@@ -44,4 +44,9 @@ public class ImmutableNameNotFoundException
     @Override
     public void setRootCause(Throwable e) {/*NOOP*/}
 
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        // This class does not provide a stack trace
+        return this;
+    }
 }
