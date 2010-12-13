@@ -63,12 +63,4 @@ public abstract class AbstractAjpProtocol extends AbstractProtocolHandler {
             this.packetSize = packetSize;
         }
     }
-
-
-    // ----------------------------------------------------- JMX related methods
-
-    @Override
-    protected String getNamePrefix() {
-        return ("ajp");
-    }
 }
