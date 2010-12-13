@@ -84,6 +84,14 @@ public class AjpProtocol extends AbstractAjpProtocol {
     private AjpConnectionHandler cHandler;
 
 
+    // ----------------------------------------------------- JMX related methods
+
+    @Override
+    protected String getNamePrefix() {
+        return ("ajp-bio");
+    }
+
+
     // --------------------------------------  AjpConnectionHandler Inner Class
 
 

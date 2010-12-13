@@ -188,6 +188,14 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     public int getSSLVerifyDepth() { return ((AprEndpoint)endpoint).getSSLVerifyDepth(); }
     public void setSSLVerifyDepth(int SSLVerifyDepth) { ((AprEndpoint)endpoint).setSSLVerifyDepth(SSLVerifyDepth); }
     
+    // ----------------------------------------------------- JMX related methods
+
+    @Override
+    protected String getNamePrefix() {
+        return ("http-apr");
+    }
+
+
     // --------------------  Connection handler --------------------
 
     static class Http11ConnectionHandler implements Handler {
