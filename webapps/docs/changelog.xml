@@ -156,6 +156,11 @@
         <bug>50408</bug>: Fix <code>NoSuchMethodException</code> when using
         scoped variables with EL method invocation. (markt)
       </fix>
+      <fix>
+        <bug>50460</bug>: Avoid leak caused by using a cached exception
+        instance in <code>JspDocumentParser</code> and
+        <code>ProxyDirContext</code>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
