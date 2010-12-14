@@ -21,6 +21,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -372,7 +373,7 @@ public class AjpMessage {
      */
     public void dump(String msg) {
         if (log.isDebugEnabled()) {
-            log.debug(msg + ": " + buf + " " + pos +"/" + (len + 4));
+            log.debug(msg + ": " + HexUtils.toHexString(buf) + " " + pos +"/" + (len + 4));
         }
         int max = pos;
         if (len + 4 > pos)
