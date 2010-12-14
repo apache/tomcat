@@ -63,6 +63,11 @@ public final class HexUtils {
       (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f' };
 
 
+    /**
+     * Table for byte to hex string translation.
+     */
+    private static final char[] hex = "0123456789abcdef".toCharArray();
+
     // --------------------------------------------------------- Static Methods
 
 
@@ -79,5 +84,19 @@ public final class HexUtils {
 
     public static byte getHex(int index){
         return HEX[index];
+    }
+
+    public static String toHexString(byte[] bytes)
+    {
+        if(null == bytes) return null;
+
+        StringBuilder sb = new StringBuilder(bytes.length << 1);
+
+        for(int i=0; i<bytes.length; ++i)
+            sb.append(hex[(bytes[i] & 0xf0) >> 4])
+                .append(hex[(bytes[i] & 0x0f)])
+                ;
+
+        return sb.toString();
     }
 }
