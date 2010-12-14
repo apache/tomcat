@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.HexUtils;
 
 /**
  * This factory is used to read files and write files by splitting them up into
@@ -227,7 +228,7 @@ public class FileMessageFactory {
             throw new IllegalArgumentException(
                     "Can't write message, this factory is reading.");
         if (log.isDebugEnabled())
-            log.debug("Message " + msg + " data " + msg.getData()
+            log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData())
                     + " data length " + msg.getDataLength() + " out " + out);
         
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
