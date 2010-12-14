@@ -185,9 +185,15 @@ public class Connector extends LifecycleMBeanBase  {
      */
     protected int maxSavePostSize = 4 * 1024;
 
-
+    /**
+     * Comma-separated list of HTTP methods that will be parsed according
+     * to POST-style rules for application/x-www-form-urlencoded request bodies.
+     */
     protected String parseBodyMethods = "POST";
 
+    /**
+     * A Set of methods determined by {@link #parseBodyMethods}.
+     */
     protected HashSet<String> parseBodyMethodsSet;
 
 
