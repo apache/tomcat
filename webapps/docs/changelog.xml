@@ -54,6 +54,10 @@
         performance benefits. (markt)
       </add>
       <update>
+        <bug>10972</bug>: Improve error message if the className attribute is
+        missing on an element in server.xml where it is required. (markt)
+      </update>
+      <update>
         <bug>48692</bug>: Provide option to parse
         <code>application/x-www-form-urlencoded</code> PUT requests. (schultz)
       </update>

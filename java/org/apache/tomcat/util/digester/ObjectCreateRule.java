@@ -136,11 +136,15 @@ public class ObjectCreateRule extends Rule {
                     "}New " + realClassName);
         }
 
+        if (realClassName == null) {
+            throw new NullPointerException("No class name specified for " +
+                    namespace + " " + name);
+        }
+
         // Instantiate the new object and push it on the context stack
         Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
         Object instance = clazz.newInstance();
         digester.push(instance);
-
     }
 
 

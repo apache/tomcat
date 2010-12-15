@@ -45,6 +45,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 
 /**
@@ -532,9 +533,12 @@ public class Catalina {
             digester.push(this);
             digester.parse(inputSource);
             inputStream.close();
+        } catch (SAXParseException spe) {
+            log.warn("Catalina.start using " + getConfigFile() + ": " +
+                    spe.getMessage());
+            return;
         } catch (Exception e) {
-            log.warn("Catalina.start using "
-                               + getConfigFile() + ": " , e);
+            log.warn("Catalina.start using " + getConfigFile() + ": " , e);
             return;
         }
 
