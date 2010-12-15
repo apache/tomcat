@@ -150,13 +150,13 @@ public final class ContextName {
 
     public String getDisplayName() {
         StringBuilder tmp = new StringBuilder();
-        if (path == "") {
+        if ("".equals(path)) {
             tmp.append('/');
         } else {
             tmp.append(path);
         }
         
-        if (version != "") {
+        if (!"".equals(version)) {
             tmp.append(VERSION_MARKER);
             tmp.append(version);
         }
