@@ -116,6 +116,19 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     /**
+     * Should a session always be used once a user is authenticated? This may
+     * offer some performance benefits since the session can then be used to
+     * cache the authenticated Principal, hence removing the need to
+     * authenticate the user via the Realm on every request. This may be of help
+     * for combinations such as BASIC authentication used with the JNDIRealm or
+     * DataSourceRealms. However there will also be the performance cost of
+     * creating and GC'ing the session. By default, a session will not be
+     * created. 
+     */
+    protected boolean alwaysUseSession = false;
+
+
+    /**
      * Should we cache authenticated Principals if the request is part of
      * an HTTP session?
      */
@@ -681,10 +694,14 @@ public abstract class AuthenticatorBase extends ValveBase
 
         Session session = request.getSessionInternal(false);
         
-        if (session != null && changeSessionIdOnAuthentication) {
-            Manager manager = request.getContext().getManager();
-            manager.changeSessionId(session);
-            request.changeSessionId(session.getId());
+        if (session != null) {
+            if (changeSessionIdOnAuthentication) {
+                Manager manager = request.getContext().getManager();
+                manager.changeSessionId(session);
+                request.changeSessionId(session.getId());
+            }
+        } else if (alwaysUseSession) {
+            session = request.getSessionInternal(true);
         }
 
         // Cache the authentication information in our session, if any

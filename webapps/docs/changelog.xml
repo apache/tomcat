@@ -48,6 +48,11 @@
         <bug>8705</bug>: <code>org.apache.catalina.SessionListener</code> now
         extends <code>java.util.EventListener</code>. (markt)
       </fix>
+      <add>
+        <bug>10526</bug>: Add an option to the <code>Authenticator</code>s to
+        force the creation of a session on authentication which may offer some
+        performance benefits. (markt)
+      </add>
       <update>
         <bug>48692</bug>: Provide option to parse
         <code>application/x-www-form-urlencoded</code> PUT requests. (schultz)
