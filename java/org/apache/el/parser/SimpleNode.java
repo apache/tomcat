@@ -47,22 +47,27 @@ public abstract class SimpleNode extends ELSupport implements Node {
         id = i;
     }
 
+    @Override
     public void jjtOpen() {
         // NOOP by default
     }
 
+    @Override
     public void jjtClose() {
         // NOOP by default
     }
 
+    @Override
     public void jjtSetParent(Node n) {
         parent = n;
     }
 
+    @Override
     public Node jjtGetParent() {
         return parent;
     }
 
+    @Override
     public void jjtAddChild(Node n, int i) {
         if (children == null) {
             children = new Node[i + 1];
@@ -74,10 +79,12 @@ public abstract class SimpleNode extends ELSupport implements Node {
         children[i] = n;
     }
 
+    @Override
     public Node jjtGetChild(int i) {
         return children[i];
     }
 
+    @Override
     public int jjtGetNumChildren() {
         return (children == null) ? 0 : children.length;
     }
@@ -102,23 +109,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
         return prefix + toString();
     }
 
-    /*
-     * Override this method if you want to customize how the node dumps out its
-     * children.
-     */
-
-    public void dump(String prefix) {
-        System.out.println(toString(prefix));
-        if (children != null) {
-            for (int i = 0; i < children.length; ++i) {
-                SimpleNode n = (SimpleNode) children[i];
-                if (n != null) {
-                    n.dump(prefix + " ");
-                }
-            }
-        }
-    }
-
+    @Override
     public String getImage() {
         return image;
     }
@@ -127,26 +118,31 @@ public abstract class SimpleNode extends ELSupport implements Node {
         this.image = image;
     }
 
+    @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean isReadOnly(EvaluationContext ctx)
             throws ELException {
         return true;
     }
 
+    @Override
     public void setValue(EvaluationContext ctx, Object value)
             throws ELException {
         throw new PropertyNotWritableException(MessageFactory.get("error.syntax.set"));
     }
 
+    @Override
     public void accept(NodeVisitor visitor) throws Exception {
         visitor.visit(this);
         if (this.children != null && this.children.length > 0) {
@@ -156,11 +152,13 @@ public abstract class SimpleNode extends ELSupport implements Node {
         }
     }
 
+    @Override
     public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
             Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public MethodInfo getMethodInfo(EvaluationContext ctx,
             Class<?>[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
@@ -208,6 +206,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
     /**
      * @since EL 2.2
      */
+    @Override
     public ValueReference getValueReference(EvaluationContext ctx) {
         return null;
     }
@@ -215,6 +214,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
     /**
      * @since EL 2.2
      */
+    @Override
     public boolean isParametersProvided() {
         return false;
     }
