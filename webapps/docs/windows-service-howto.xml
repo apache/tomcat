@@ -167,7 +167,7 @@
     <tr>
     <td>--JavaHome</td>
     <td>JAVA_HOME</td>
-    <td>Set a different JAVA_HOME then defined by JAVA_HOME environment
+    <td>Set a different JAVA_HOME than defined by JAVA_HOME environment
         variable</td>
     </tr>
     <tr>
