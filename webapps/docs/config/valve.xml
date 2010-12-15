@@ -412,6 +412,17 @@
         <strong>org.apache.catalina.authenticator.BasicAuthenticator</strong>.</p>
       </attribute>
 
+      <attribute name="alwaysUseSession" required="false">
+        <p>Should a session always be used once a user is authenticated? This
+        may offer some performance benefits since the session can then be used
+        to cache the authenticated Principal, hence removing the need to
+        authenticate the user via the Realm on every request. This may be of
+        help for combinations such as BASIC authentication used with the
+        JNDIRealm or DataSourceRealms. However there will also be the
+        performance cost of creating and GC'ing the session. If not set, the
+        default value of <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="changeSessionIdOnAuthentication" required="false">
         <p>Controls if the session ID is changed if a session exists at the
         point where users are authenticated. This is to prevent session fixation
