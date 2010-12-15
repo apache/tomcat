@@ -1,7 +1,18 @@
 <FindBugsFilter>
+  <!--  Considered to be false positives -->
   <Match>
     <Class name="org.apache.catalina.startup.HostConfig" />
     <Method name="checkResources" />
     <Bug code="SWL" />
+  </Match>
+  <!--  Generated code -->
+  <Match>
+    <Class name="org.apache.el.parser.ELParserTokenManager" />
+  </Match>
+  <Match>
+    <Class name="org.apache.el.parser.TokenMgrError" />
+  </Match>
+  <Match>
+    <Class name="org.apache.el.parser.ParseException" />
   </Match>
 </FindBugsFilter>
