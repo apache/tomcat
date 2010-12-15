@@ -1,0 +1,7 @@
+<FindBugsFilter>
+  <Match>
+    <Class name="org.apache.catalina.startup.HostConfig" />
+    <Method name="checkResources" />
+    <Bug code="SWL" />
+  </Match>
+</FindBugsFilter>
