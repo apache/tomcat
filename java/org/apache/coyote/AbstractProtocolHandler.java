@@ -122,6 +122,11 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
     public void setMaxThreads(int maxThreads) {
         endpoint.setMaxThreads(maxThreads);
     }
+    
+    public int getMaxConnections() { return endpoint.getMaxConnections(); }
+    public void setMaxConnections(int maxConnections) {
+        endpoint.setMaxConnections(maxConnections);
+    }
 
 
     public int getMinSpareThreads() { return endpoint.getMinSpareThreads(); }
