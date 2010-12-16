@@ -206,7 +206,7 @@ public class Benchmarks extends TestCase {
         }
 
         private volatile Date currentDate = new Date();
-        private String currentDateString = null;
+        private volatile String currentDateString = null;
         private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
         private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
         private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
