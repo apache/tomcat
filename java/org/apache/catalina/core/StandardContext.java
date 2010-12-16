@@ -3649,13 +3649,15 @@ public class StandardContext extends ContainerBase
         try {
             stop();
         } catch (LifecycleException e) {
-            log.error(sm.getString("standardContext.stoppingContext"), e);
+            log.error(
+                sm.getString("standardContext.stoppingContext", logName()), e);
         }
 
         try {
             start();
         } catch (LifecycleException e) {
-            log.error(sm.getString("standardContext.startingContext"), e);
+            log.error(
+                sm.getString("standardContext.startingContext", logName()), e);
         }
 
         setPaused(false);
