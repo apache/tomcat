@@ -179,6 +179,10 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <add>
+        <bug>13731</bug>: Make variables in <code>_jspService()</code> method
+        final where possible. (markt)
+      </add>
       <fix>
         <bug>50408</bug>: Fix <code>NoSuchMethodException</code> when using
         scoped variables with EL method invocation. (markt)
