@@ -180,7 +180,10 @@ class Generator {
         if (this.jspIdPrefix == null) {
             StringBuilder sb = new StringBuilder(32);
             String name = ctxt.getServletJavaFileName();
-            sb.append("jsp_").append(Math.abs(name.hashCode())).append('_');
+            sb.append("jsp_");
+            // Cast to long to avoid issue with Integer.MIN_VALUE
+            sb.append(Math.abs((long) name.hashCode()));
+            sb.append('_');
             this.jspIdPrefix = sb.toString();
         }
         return this.jspIdPrefix + (this.jspId++);
@@ -303,9 +306,9 @@ class Generator {
             private String createTagHandlerPoolName(String prefix,
                     String shortName, Attributes attrs, Node.Nodes namedAttrs,
                     boolean hasEmptyBody) {
-                String poolName = null;
+                StringBuilder poolName = new StringBuilder("_jspx_tagPool_" +
+                        prefix + "_" + shortName);
 
-                poolName = "_jspx_tagPool_" + prefix + "_" + shortName;
                 if (attrs != null) {
                     String[] attrNames =
                         new String[attrs.getLength() + namedAttrs.size()];
@@ -318,16 +321,17 @@ class Generator {
                     }
                     Arrays.sort(attrNames, Collections.reverseOrder());
                     if (attrNames.length > 0) {
-                        poolName = poolName + "&";
+                        poolName.append('&');
                     }
                     for (int i = 0; i < attrNames.length; i++) {
-                        poolName = poolName + "_" + attrNames[i];
+                        poolName.append("_");
+                        poolName.append(attrNames[i]);
                     }
                 }
                 if (hasEmptyBody) {
-                    poolName = poolName + "_nobody";
+                    poolName.append("_nobody");
                 }
-                return JspUtil.makeJavaIdentifier(poolName);
+                return JspUtil.makeJavaIdentifier(poolName.toString());
             }
         }
 
@@ -1806,31 +1810,34 @@ class Generator {
             out.print(n.getQName());
 
             Attributes attrs = n.getNonTaglibXmlnsAttributes();
-            int attrsLen = (attrs == null) ? 0 : attrs.getLength();
-            for (int i = 0; i < attrsLen; i++) {
-                out.print(" ");
-                out.print(attrs.getQName(i));
-                out.print("=");
-                out.print(DOUBLE_QUOTE);
-                out.print(attrs.getValue(i).replace("\"", "&quot;"));
-                out.print(DOUBLE_QUOTE);
-            }
-
-            attrs = n.getAttributes();
-            attrsLen = (attrs == null) ? 0 : attrs.getLength();
-            Node.JspAttribute[] jspAttrs = n.getJspAttributes();
-            for (int i = 0; i < attrsLen; i++) {
-                out.print(" ");
-                out.print(attrs.getQName(i));
-                out.print("=");
-                if (jspAttrs[i].isELInterpreterInput()) {
-                    out.print("\\\"\" + ");
-                    out.print(attributeValue(jspAttrs[i], false, String.class));
-                    out.print(" + \"\\\"");
-                } else {
+            if (attrs != null) {
+                for (int i = 0; i < attrs.getLength(); i++) {
+                    out.print(" ");
+                    out.print(attrs.getQName(i));
+                    out.print("=");
                     out.print(DOUBLE_QUOTE);
                     out.print(attrs.getValue(i).replace("\"", "&quot;"));
                     out.print(DOUBLE_QUOTE);
+                }
+            }
+
+            attrs = n.getAttributes();
+            if (attrs != null) {
+                Node.JspAttribute[] jspAttrs = n.getJspAttributes();
+                for (int i = 0; i < attrs.getLength(); i++) {
+                    out.print(" ");
+                    out.print(attrs.getQName(i));
+                    out.print("=");
+                    if (jspAttrs[i].isELInterpreterInput()) {
+                        out.print("\\\"\" + ");
+                        out.print(attributeValue(jspAttrs[i], false,
+                                String.class));
+                        out.print(" + \"\\\"");
+                    } else {
+                        out.print(DOUBLE_QUOTE);
+                        out.print(attrs.getValue(i).replace("\"", "&quot;"));
+                        out.print(DOUBLE_QUOTE);
+                    }
                 }
             }
 
@@ -2806,15 +2813,17 @@ class Generator {
                 if (tagVarNumbers.get(fullName) != null) {
                     Integer i = tagVarNumbers.get(fullName);
                     varName = varName + i.intValue();
-                    tagVarNumbers.put(fullName, new Integer(i.intValue() + 1));
+                    tagVarNumbers.put(fullName,
+                            Integer.valueOf(i.intValue() + 1));
                 } else {
-                    tagVarNumbers.put(fullName, new Integer(1));
+                    tagVarNumbers.put(fullName, Integer.valueOf(1));
                     varName = varName + "0";
                 }
             }
             return JspUtil.makeJavaIdentifier(varName);
         }
 
+        @SuppressWarnings("null")
         private String evaluateAttribute(TagHandlerInfo handlerInfo,
                 Node.JspAttribute attr, Node.CustomTag n, String tagHandlerVar)
                 throws JasperException {
@@ -2912,13 +2921,14 @@ class Generator {
                     // should the expression be evaluated before passing to
                     // the setter?
                     boolean evaluate = false;
-                    if (tai.canBeRequestTime()) {
+                    if (tai != null && tai.canBeRequestTime()) {
                         evaluate = true; // JSP.2.3.2
                     }
                     if (attr.isDeferredInput()) {
                         evaluate = false; // JSP.2.3.3
                     }
-                    if (attr.isDeferredInput() && tai.canBeRequestTime()) {
+                    if (attr.isDeferredInput() && tai != null &&
+                            tai.canBeRequestTime()) {
                         evaluate = !attrValue.contains("#{"); // JSP.2.3.5
                     }
                     if (evaluate) {
