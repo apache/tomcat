@@ -61,6 +61,11 @@
         <bug>48692</bug>: Provide option to parse
         <code>application/x-www-form-urlencoded</code> PUT requests. (schultz)
       </update>
+      <update>
+        <bug>48822</bug>: Include context name in case of error while stopping
+        or starting a context during its reload. Patch provided by Marc 
+        Guillemot. (slaurent)
+      </update>
       <add>
         <bug>48837</bug>: Extend thread local memory leak detection to include
         classes loaded by subordinate class loaders to the web
