@@ -614,23 +614,20 @@ class Generator {
         // Class variable declarations
         genPreambleClassVariableDeclarations();
 
-        // Constructor
-        // generateConstructor(className);
-
         // Methods here
         genPreambleMethods();
 
         // Now the service method
         out.printin("public void ");
         out.print(serviceMethodName);
-        out.println("(HttpServletRequest request, HttpServletResponse response)");
+        out.println("(final HttpServletRequest request, final HttpServletResponse response)");
         out.println("        throws java.io.IOException, ServletException {");
 
         out.pushIndent();
         out.println();
 
         // Local variable declarations
-        out.printil("PageContext pageContext = null;");
+        out.printil("final PageContext pageContext;");
 
         if (pageInfo.isSession())
             out.printil("HttpSession session = null;");
@@ -644,10 +641,10 @@ class Generator {
             out.printil("}");
         }
 
-        out.printil("ServletContext application = null;");
-        out.printil("ServletConfig config = null;");
+        out.printil("final ServletContext application;");
+        out.printil("final ServletConfig config;");
         out.printil("JspWriter out = null;");
-        out.printil("Object page = this;");
+        out.printil("final Object page = this;");
 
         out.printil("JspWriter _jspx_out = null;");
         out.printil("PageContext _jspx_page_context = null;");
@@ -667,8 +664,7 @@ class Generator {
             out.printil("response.addHeader(\"X-Powered-By\", \"JSP/2.1\");");
         }
 
-        out
-                .printil("pageContext = _jspxFactory.getPageContext(this, request, response,");
+        out.printil("pageContext = _jspxFactory.getPageContext(this, request, response,");
         out.printin("\t\t\t");
         out.print(quote(pageInfo.getErrorPage()));
         out.print(", " + pageInfo.isSession());
