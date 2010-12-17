@@ -165,8 +165,7 @@ public class SetCharacterEncodingFilter implements Filter {
      *
      * @param request The servlet request we are processing
      */
-    protected String selectEncoding(
-            @SuppressWarnings("unused") ServletRequest request) {
+    protected String selectEncoding(ServletRequest request) {
 
         return (this.encoding);
 
