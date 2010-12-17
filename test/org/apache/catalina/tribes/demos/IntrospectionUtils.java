@@ -258,6 +258,7 @@ public final class IntrospectionUtils {
      * int or boolean we'll convert value to the right type before) - that means
      * you can have setDebug(1).
      */
+    @SuppressWarnings("null")
     public static boolean setProperty(Object o, String name, String value) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
@@ -355,7 +356,8 @@ public final class IntrospectionUtils {
                 params[1] = value;
                 if (setPropertyMethodBool != null) {
                     try {
-                        return (Boolean) setPropertyMethodBool.invoke(o, params);
+                        return ((Boolean) setPropertyMethodBool.invoke(o,
+                                params)).booleanValue();
                     }catch (IllegalArgumentException biae) {
                         //the boolean method had the wrong
                         //parameter types. lets try the other
@@ -712,6 +714,7 @@ public final class IntrospectionUtils {
         return methods;
     }
 
+    @SuppressWarnings("null")
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
@@ -775,30 +778,6 @@ public final class IntrospectionUtils {
         p[0] = args.getClass();
         Method m = c.getMethod("main", p);
         m.invoke(c, new Object[] { args });
-    }
-
-    public static Object callMethod1(Object target, String methodN,
-            Object param1, String typeParam1, ClassLoader cl) throws Exception {
-        if (target == null || param1 == null) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Assert: Illegal params " +
-                        target + " " + param1);
-        }
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: callMethod1 " +
-                    target.getClass().getName() + " " +
-                    param1.getClass().getName() + " " + typeParam1);
-
-        Class<?> params[] = new Class[1];
-        if (typeParam1 == null)
-            params[0] = param1.getClass();
-        else
-            params[0] = cl.loadClass(typeParam1);
-        Method m = findMethod(target.getClass(), methodN, params);
-        if (m == null)
-            throw new NoSuchMethodException(target.getClass().getName() + " "
-                    + methodN);
-        return m.invoke(target, new Object[] { param1 });
     }
 
     public static Object callMethod0(Object target, String methodN)
