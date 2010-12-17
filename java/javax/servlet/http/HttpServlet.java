@@ -200,8 +200,7 @@ public abstract class HttpServlet extends GenericServlet {
      *              since midnight, January 1, 1970 GMT, or
      *              -1 if the time is not known
      */
-    protected long getLastModified(
-            @SuppressWarnings("unused") HttpServletRequest req) {
+    protected long getLastModified(HttpServletRequest req) {
         return -1;
     }
 
@@ -475,8 +474,7 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException  if the request for the
      *                                  OPTIONS cannot be handled
      */
-    protected void doOptions(
-            @SuppressWarnings("unused") HttpServletRequest req,
+    protected void doOptions(HttpServletRequest req,
             HttpServletResponse resp)
         throws ServletException, IOException {
 
