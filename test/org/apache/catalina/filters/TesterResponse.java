@@ -105,7 +105,7 @@ public class TesterResponse
      * @param b
      * @throws IOException
      */
-    public void write(@SuppressWarnings("unused") int b) throws IOException {
+    public void write(int b) throws IOException {
         // NOOP
     }
     /**
@@ -113,8 +113,8 @@ public class TesterResponse
      * @param b
      * @throws IOException
      */
-    public void write(@SuppressWarnings("unused") byte b[]) throws IOException {
-     // NOOP
+    public void write(byte b[]) throws IOException {
+        // NOOP
     }
     /**
      * 
@@ -123,9 +123,9 @@ public class TesterResponse
      * @param len
      * @throws IOException
      */
-    public void write(@SuppressWarnings("unused") byte b[],
-            @SuppressWarnings("unused") int off,
-            @SuppressWarnings("unused") int len) throws IOException {/* NOOP */}
+    public void write(byte b[], int off, int len) throws IOException {
+        // NOOP
+    }
     @Override
     public void flushBuffer() throws IOException {/* NOOP */}
     @Override
