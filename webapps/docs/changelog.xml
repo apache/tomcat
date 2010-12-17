@@ -230,6 +230,10 @@
         removed when the service stops which prevents the service from starting.
         (markt)
       </fix>
+      <fix>
+        <bug>14416</bug>: Make <code>TagLibraryInfo.getTag()</code> more robust
+        at handling <code>null</code>s. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

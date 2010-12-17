@@ -137,12 +137,12 @@ public abstract class TagLibraryInfo {
     public TagInfo getTag(String shortname) {
         TagInfo tags[] = getTags();
 
-        if (tags == null || tags.length == 0) {
+        if (tags == null || tags.length == 0 || shortname == null) {
             return null;
         }
 
         for (int i = 0; i < tags.length; i++) {
-            if (tags[i].getTagName().equals(shortname)) {
+            if (shortname.equals(tags[i].getTagName())) {
                 return tags[i];
             }
         }
