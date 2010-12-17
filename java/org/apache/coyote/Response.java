@@ -445,6 +445,7 @@ public final class Response {
      *
      * @param type the content type
      */
+    @SuppressWarnings("deprecation")
     public void setContentType(String type) {
 
         int semicolonIndex = -1;
@@ -466,6 +467,7 @@ public final class Response {
         while (index != -1) {
             semicolonIndex = index;
             index++;
+            // Yes, isSpace() is deprecated but it does exactly what we need
             while (index < len && Character.isSpace(type.charAt(index))) {
                 index++;
             }
