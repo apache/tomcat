@@ -321,11 +321,10 @@ public /* abstract */ class LogFactory {
      *
      * @param classLoader ClassLoader for which to release the LogFactory
      */
-    public static void release(
-            @SuppressWarnings("unused") ClassLoader classLoader) {
-        // JULI's log manager looks at the current classLoader, the default
-        // implementation does not so calling reset in that case will break
-        // things
+    public static void release(ClassLoader classLoader) {
+        // JULI's log manager looks at the current classLoader so there is no
+        // need to use the passed in classLoader, the default implementation
+        // does not so calling reset in that case will break things
         if (!LogManager.getLogManager().getClass().getName().equals(
                 "java.util.logging.LogManager")) {
             LogManager.getLogManager().reset();
