@@ -19,8 +19,6 @@ package javax.servlet.jsp;
 import java.util.Enumeration;
 
 import javax.el.ELContext;
-import javax.servlet.jsp.el.ExpressionEvaluator;
-import javax.servlet.jsp.el.VariableResolver;
 
 /**
  * <p>
@@ -227,7 +225,7 @@ public abstract class JspContext {
      *             JspApplicationContext.getExpressionFactory()
      */
     @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
-    public abstract ExpressionEvaluator getExpressionEvaluator();
+    public abstract javax.servlet.jsp.el.ExpressionEvaluator getExpressionEvaluator();
     
     
     public abstract ELContext getELContext();
@@ -245,7 +243,7 @@ public abstract class JspContext {
      *             jspContext.getELContext().getELResolver()
      */
     @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
-    public abstract VariableResolver getVariableResolver();
+    public abstract javax.servlet.jsp.el.VariableResolver getVariableResolver();
     
     /**
      * Return a new JspWriter object that sends output to the
