@@ -219,6 +219,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             recycledProcessors.clear();
         }
         
+        @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
         }
