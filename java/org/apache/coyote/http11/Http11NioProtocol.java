@@ -244,6 +244,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
         }
         
+        /**
+         * Use this only if the processor is not available, otherwise use
+         * {@link #release(NioChannel, Http11NioProcessor).
+         */
         @Override
         public void release(NioChannel socket) {
             Http11NioProcessor result = connections.remove(socket);
@@ -252,6 +256,14 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 recycledProcessors.offer(result);
             }
         }
+
+
+        public void release(NioChannel socket, Http11NioProcessor processor) {
+            connections.remove(socket);
+            processor.recycle();
+            recycledProcessors.offer(processor);
+        }
+
 
         @Override
         public SocketState event(NioChannel socket, SocketStatus status) {
@@ -294,7 +306,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         state = processor.asyncPostProcess();
                     }
                     if (state == SocketState.OPEN || state == SocketState.CLOSED) {
-                        release(socket);
+                        release(socket, processor);
                         if (state == SocketState.OPEN) {
                             socket.getPoller().add(socket);
                         }
@@ -362,11 +374,11 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socket);
+                    release(socket, processor);
                     socket.getPoller().add(socket);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket);
+                    release(socket, processor);
                 }
                 return state;
 
