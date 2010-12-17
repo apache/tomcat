@@ -86,6 +86,7 @@ public class MembersWithProperties implements MembershipListener{
                            "java MembersWithProperties -bind 192.168.0.45 -port 4005 -mbind 192.168.0.45 -count 100 -stats 10\n");
     }
 
+    @SuppressWarnings("unused")
     public static void main(String[] args) throws Exception {
         if (args.length==0) usage();
         main = Thread.currentThread();

@@ -137,6 +137,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
      * @param args
      * @throws Exception
      */
+    @SuppressWarnings("unused")
     public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
         //create a channel object
