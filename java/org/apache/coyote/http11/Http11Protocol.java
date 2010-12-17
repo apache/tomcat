@@ -151,6 +151,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             return global;
         }
 
+        @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
         }
