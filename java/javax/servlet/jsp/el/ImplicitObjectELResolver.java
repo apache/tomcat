@@ -504,10 +504,12 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         protected abstract V getAttribute(String name);
 
+        @SuppressWarnings("unused")
         protected void removeAttribute(String name) {
             throw new UnsupportedOperationException();
         }
 
+        @SuppressWarnings("unused")
         protected void setAttribute(String name, Object value) {
             throw new UnsupportedOperationException();
         }
