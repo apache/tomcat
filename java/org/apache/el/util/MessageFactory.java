@@ -25,11 +25,9 @@ import java.util.ResourceBundle;
  */
 public final class MessageFactory {
 
-    protected static final ResourceBundle bundle = ResourceBundle
-            .getBundle("org.apache.el.Messages");
-    /**
-     * 
-     */
+    protected static final ResourceBundle bundle =
+            ResourceBundle.getBundle("org.apache.el.Messages");
+
     public MessageFactory() {
         super();
     }
@@ -38,33 +36,13 @@ public final class MessageFactory {
         return bundle.getString(key);
     }
 
-    public static String get(final String key, final Object obj0) {
-        return getArray(key, new Object[] { obj0 });
-    }
+    public static String get(final String key, final Object... args) {
+        String value = get(key);
+        if (value == null) {
+            value = key;
+        }
 
-    public static String get(final String key, final Object obj0,
-            final Object obj1) {
-        return getArray(key, new Object[] { obj0, obj1 });
+        MessageFormat mf = new MessageFormat(value);
+        return mf.format(args, new StringBuffer(), null).toString();
     }
-
-    public static String get(final String key, final Object obj0,
-            final Object obj1, final Object obj2) {
-        return getArray(key, new Object[] { obj0, obj1, obj2 });
-    }
-
-    public static String get(final String key, final Object obj0,
-            final Object obj1, final Object obj2, final Object obj3) {
-        return getArray(key, new Object[] { obj0, obj1, obj2, obj3 });
-    }
-
-    public static String get(final String key, final Object obj0,
-            final Object obj1, final Object obj2, final Object obj3,
-            final Object obj4) {
-        return getArray(key, new Object[] { obj0, obj1, obj2, obj3, obj4 });
-    }
-
-    public static String getArray(final String key, final Object[] objA) {
-        return MessageFormat.format(bundle.getString(key), objA);
-    }
-
 }
