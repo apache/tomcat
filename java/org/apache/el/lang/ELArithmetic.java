@@ -198,39 +198,39 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number add(Number num0, Number num1) {
-            return new Long(num0.longValue() + num1.longValue());
+            return Long.valueOf(num0.longValue() + num1.longValue());
         }
 
         @Override
         protected Number coerce(Number num) {
             if (num instanceof Long)
                 return num;
-            return new Long(num.longValue());
+            return Long.valueOf(num.longValue());
         }
 
         @Override
         protected Number coerce(String str) {
-            return new Long(str);
+            return Long.valueOf(str);
         }
 
         @Override
         protected Number divide(Number num0, Number num1) {
-            return new Long(num0.longValue() / num1.longValue());
+            return Long.valueOf(num0.longValue() / num1.longValue());
         }
 
         @Override
         protected Number mod(Number num0, Number num1) {
-            return new Long(num0.longValue() % num1.longValue());
+            return Long.valueOf(num0.longValue() % num1.longValue());
         }
 
         @Override
         protected Number subtract(Number num0, Number num1) {
-            return new Long(num0.longValue() - num1.longValue());
+            return Long.valueOf(num0.longValue() - num1.longValue());
         }
 
         @Override
         protected Number multiply(Number num0, Number num1) {
-            return new Long(num0.longValue() * num1.longValue());
+            return Long.valueOf(num0.longValue() * num1.longValue());
         }
 
         @Override
@@ -247,11 +247,11 @@ public abstract class ELArithmetic {
 
     public static final LongDelegate LONG = new LongDelegate();
 
-    private static final Long ZERO = new Long(0);
+    private static final Long ZERO = Long.valueOf(0);
 
     public static final Number add(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
-            return new Long(0);
+            return Long.valueOf(0);
         }
 
         final ELArithmetic delegate;
@@ -272,7 +272,7 @@ public abstract class ELArithmetic {
 
     public static final Number mod(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
-            return new Long(0);
+            return Long.valueOf(0);
         }
 
         final ELArithmetic delegate;
@@ -293,7 +293,7 @@ public abstract class ELArithmetic {
 
     public static final Number subtract(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
-            return new Long(0);
+            return Long.valueOf(0);
         }
 
         final ELArithmetic delegate;
@@ -333,7 +333,7 @@ public abstract class ELArithmetic {
 
     public static final Number multiply(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
-            return new Long(0);
+            return Long.valueOf(0);
         }
 
         final ELArithmetic delegate;
@@ -393,7 +393,7 @@ public abstract class ELArithmetic {
         }
 
         if (obj instanceof Character) {
-            return coerce(new Short((short) ((Character) obj).charValue()));
+            return coerce(Short.valueOf((short) ((Character) obj).charValue()));
         }
 
         throw new IllegalArgumentException(MessageFactory.get("error.convert",

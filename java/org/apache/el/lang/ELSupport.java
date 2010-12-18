@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.el.ELException;
-import javax.el.PropertyNotFoundException;
 
 import org.apache.el.util.MessageFactory;
 
@@ -36,18 +35,7 @@ import org.apache.el.util.MessageFactory;
  */
 public class ELSupport {
 
-    private static final Long ZERO = new Long(0L);
-
-    public static final void throwUnhandled(Object base, Object property)
-            throws ELException {
-        if (base == null) {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled.null", property));
-        } else {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled", base.getClass(), property));
-        }
-    }
+    private static final Long ZERO = Long.valueOf(0L);
 
     /**
      * Compare two objects, after coercing to the same type if appropriate.
@@ -222,13 +210,13 @@ public class ELSupport {
     public static final Character coerceToCharacter(final Object obj)
             throws ELException {
         if (obj == null || "".equals(obj)) {
-            return new Character((char) 0);
+            return Character.valueOf((char) 0);
         }
         if (obj instanceof String) {
-            return new Character(((String) obj).charAt(0));
+            return Character.valueOf(((String) obj).charAt(0));
         }
         if (ELArithmetic.isNumber(obj)) {
-            return new Character((char) ((Number) obj).shortValue());
+            return Character.valueOf((char) ((Number) obj).shortValue());
         }
         Class<?> objType = obj.getClass();
         if (obj instanceof Character) {
@@ -239,31 +227,16 @@ public class ELSupport {
                 obj, objType, Character.class));
     }
 
-    public static final Number coerceToNumber(final Object obj) {
-        if (obj == null) {
-            return ZERO;
-        } else if (obj instanceof Number) {
-            return (Number) obj;
-        } else {
-            String str = coerceToString(obj);
-            if (isStringFloat(str)) {
-                return toFloat(str);
-            } else {
-                return toNumber(str);
-            }
-        }
-    }
-
     protected static final Number coerceToNumber(final Number number,
             final Class<?> type) throws ELException {
         if (Long.TYPE == type || Long.class.equals(type)) {
-            return new Long(number.longValue());
+            return Long.valueOf(number.longValue());
         }
         if (Double.TYPE == type || Double.class.equals(type)) {
             return new Double(number.doubleValue());
         }
         if (Integer.TYPE == type || Integer.class.equals(type)) {
-            return new Integer(number.intValue());
+            return Integer.valueOf(number.intValue());
         }
         if (BigInteger.class.equals(type)) {
             if (number instanceof BigDecimal) {
@@ -284,10 +257,10 @@ public class ELSupport {
             return new BigDecimal(number.doubleValue());
         }
         if (Byte.TYPE == type || Byte.class.equals(type)) {
-            return new Byte(number.byteValue());
+            return Byte.valueOf(number.byteValue());
         }
         if (Short.TYPE == type || Short.class.equals(type)) {
-            return new Short(number.shortValue());
+            return Short.valueOf(number.shortValue());
         }
         if (Float.TYPE == type || Float.class.equals(type)) {
             return new Float(number.floatValue());
@@ -313,7 +286,7 @@ public class ELSupport {
         }
 
         if (obj instanceof Character) {
-            return coerceToNumber(new Short((short) ((Character) obj)
+            return coerceToNumber(Short.valueOf((short) ((Character) obj)
                     .charValue()), type);
         }
 
@@ -447,20 +420,6 @@ public class ELSupport {
                 obj, obj.getClass(), type));
     }
 
-    /**
-     * Check if an array contains any {@code null} entries.
-     * @param obj array to be checked
-     * @return true if the array contains a {@code null}
-     */
-    public static final boolean containsNulls(final Object[] obj) {
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[0] == null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static final boolean isBigDecimalOp(final Object obj0,
             final Object obj1) {
         return (obj0 instanceof BigDecimal || obj1 instanceof BigDecimal);
@@ -476,12 +435,6 @@ public class ELSupport {
                 || obj1 instanceof Double
                 || obj0 instanceof Float
                 || obj1 instanceof Float);
-    }
-
-    public static final boolean isDoubleStringOp(final Object obj0,
-            final Object obj1) {
-        return (isDoubleOp(obj0, obj1)
-                || (obj0 instanceof String && isStringFloat((String) obj0)) || (obj1 instanceof String && isStringFloat((String) obj1)));
     }
 
     public static final boolean isLongOp(final Object obj0, final Object obj1) {
@@ -512,30 +465,6 @@ public class ELSupport {
             }
         }
         return false;
-    }
-
-    public static final Number toFloat(final String value) {
-        try {
-            if (Double.parseDouble(value) > Double.MAX_VALUE) {
-                return new BigDecimal(value);
-            } else {
-                return new Double(value);
-            }
-        } catch (NumberFormatException e0) {
-            return new BigDecimal(value);
-        }
-    }
-
-    public static final Number toNumber(final String value) {
-        try {
-            return new Integer(Integer.parseInt(value));
-        } catch (NumberFormatException e0) {
-            try {
-                return new Long(Long.parseLong(value));
-            } catch (NumberFormatException e1) {
-                return new BigInteger(value);
-            }
-        }
     }
 
     /**
