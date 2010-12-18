@@ -16,9 +16,6 @@
  */
 package org.apache.el.util;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -26,11 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.el.ELException;
 import javax.el.MethodNotFoundException;
-import javax.el.PropertyNotFoundException;
-
-import org.apache.el.lang.ELSupport;
 
 
 /**
@@ -40,8 +33,6 @@ import org.apache.el.lang.ELSupport;
  * @version $Id$
  */
 public class ReflectionUtil {
-
-    protected static final String[] EMPTY_STRING = new String[0];
 
     protected static final String[] PRIMITIVE_NAMES = new String[] { "boolean",
             "byte", "char", "double", "float", "int", "long", "short", "void" };
@@ -320,23 +311,5 @@ public class ReflectionUtil {
             return sb.toString();
         }
         return null;
-    }
-
-    public static PropertyDescriptor getPropertyDescriptor(Object base,
-            Object property) throws ELException, PropertyNotFoundException {
-        String name = ELSupport.coerceToString(property);
-        try {
-            PropertyDescriptor[] desc = Introspector.getBeanInfo(
-                    base.getClass()).getPropertyDescriptors();
-            for (int i = 0; i < desc.length; i++) {
-                if (desc[i].getName().equals(name)) {
-                    return desc[i];
-                }
-            }
-        } catch (IntrospectionException ie) {
-            throw new ELException(ie);
-        }
-        throw new PropertyNotFoundException(MessageFactory.get(
-                "error.property.notfound", base, name));
     }
 }
