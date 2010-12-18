@@ -42,8 +42,8 @@ public class Clock2 extends Applet implements Runnable {
     Color handColor;             // Color of main hands and dial
     Color numberColor;           // Color of second hand and numbers
 
+    @Override
     public void init() {
-        int x,y;
         lastxs = lastys = lastxm = lastym = lastxh = lastyh = 0;
         formatter = new SimpleDateFormat ("EEE MMM dd hh:mm:ss yyyy", Locale.getDefault());
         currentDate = new Date();
@@ -101,6 +101,7 @@ public class Clock2 extends Applet implements Runnable {
     }
 
     // Paint is the main part of the program
+    @Override
     public void paint(Graphics g) {
         int xh, yh, xm, ym, xs, ys, s = 0, m = 10, h = 10, xcenter, ycenter;
         String today;
@@ -179,34 +180,40 @@ public class Clock2 extends Applet implements Runnable {
         currentDate=null;
     }
 
+    @Override
     public void start() {
         timer = new Thread(this);
         timer.start();
     }
 
+    @Override
     public void stop() {
         timer = null;
     }
 
+    @Override
     public void run() {
         Thread me = Thread.currentThread();
         while (timer == me) {
             try {
-                Thread.currentThread().sleep(100);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
             }
             repaint();
         }
     }
 
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
 
+    @Override
     public String getAppletInfo() {
         return "Title: A Clock \nAuthor: Rachel Gollub, 1995 \nAn analog clock.";
     }
   
+    @Override
     public String[][] getParameterInfo() {
         String[][] info = {
             {"bgcolor", "hexadecimal RGB number", "The background color. Default is the color of your browser."},
