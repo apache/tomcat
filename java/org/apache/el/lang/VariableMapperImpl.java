@@ -48,10 +48,13 @@ public class VariableMapperImpl extends VariableMapper implements Externalizable
         return this.vars.put(variable, expression);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.vars = (Map<String, ValueExpression>) in.readObject();
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(this.vars);
     }

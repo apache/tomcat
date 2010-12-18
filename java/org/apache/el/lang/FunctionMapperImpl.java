@@ -71,6 +71,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
      * 
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(this.functions);
     }
@@ -80,6 +81,8 @@ public class FunctionMapperImpl extends FunctionMapper implements
      * 
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
         this.functions = (Map<String, Function>) in.readObject();
@@ -118,6 +121,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
          * 
          * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
          */
+        @Override
         public void writeExternal(ObjectOutput out) throws IOException {
             out.writeUTF((this.prefix != null) ? this.prefix : "");
             out.writeUTF(this.localName);
@@ -140,6 +144,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
          * 
          * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
          */
+        @Override
         public void readExternal(ObjectInput in) throws IOException,
                 ClassNotFoundException {
 
@@ -162,14 +167,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
                 }
             }
             return this.m;
-        }
-
-        public boolean matches(String prefix, String localName) {
-            if (this.prefix != null) {
-                if (prefix == null) return false;
-                if (!this.prefix.equals(prefix)) return false;
-            }
-            return this.localName.equals(localName);
         }
 
         /* (non-Javadoc)
