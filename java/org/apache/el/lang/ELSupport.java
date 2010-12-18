@@ -161,7 +161,12 @@ public class ELSupport {
         }
     }
 
-    public static final Enum<?> coerceToEnum(final Object obj, Class type) {
+    // Going to have have some casts /raw types somewhere so doing it here
+    // keeps them all in one place. There might be a neater / better solution
+    // but I couldn;t find it
+    @SuppressWarnings("unchecked")
+    public static final Enum<?> coerceToEnum(final Object obj,
+            @SuppressWarnings("rawtypes") Class type) {
         if (obj == null || "".equals(obj)) {
             return null;
         }
