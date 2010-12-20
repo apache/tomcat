@@ -57,6 +57,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
+import org.apache.tomcat.util.threads.CounterLatch;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -567,6 +568,7 @@ public class NioEndpoint extends AbstractEndpoint {
             running = true;
             paused = false;
             
+            connectionCounterLatch = new CounterLatch(0, getMaxConnections()); 
             // Create worker collection
             if ( getExecutor() == null ) {
                 createExecutor();
@@ -598,6 +600,8 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     @Override
     public void stopInternal() {
+        connectionCounterLatch.releaseAll();
+        connectionCounterLatch = null;
         if (!paused) {
             pause();
         }
@@ -808,6 +812,8 @@ public class NioEndpoint extends AbstractEndpoint {
                     break;
                 }
                 try {
+                    //if we have reached max connections, wait
+                    connectionCounterLatch.await();
                     // Accept the next incoming connection from the server socket
                     SocketChannel socket = serverSock.accept();
                     // Hand this socket off to an appropriate processor
@@ -824,7 +830,9 @@ public class NioEndpoint extends AbstractEndpoint {
                                 if (log.isDebugEnabled())
                                     log.debug("", ix);
                             }
-                        } 
+                        } else {
+                            connectionCounterLatch.countUp();
+                        }
                     }
                 } catch (SocketTimeoutException sx) {
                     //normal condition
@@ -1056,7 +1064,12 @@ public class NioEndpoint extends AbstractEndpoint {
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {if (ka!=null) ka.getSocket().close(true);}catch (Exception ignore){}
                 try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
-                if (ka!=null) ka.reset();
+                if (ka!=null) {
+                    ka.reset();
+                    if (connectionCounterLatch.countDown()<0) {
+                        log.warn("Incorrect connection count, multiple cancel called on the same key?" );
+                    }
+                }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if ( log.isDebugEnabled() ) log.error("",e);
