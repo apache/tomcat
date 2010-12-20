@@ -36,12 +36,6 @@
   <property name="project"               value="apache-tomcat" />
     
   <!-- Version numbers -->
-  <property name="version.major"         value="7" />
-  <property name="version.minor"         value="0" />
-  <property name="version.build"         value="0" />
-  <property name="version.patch"         value="0" />
-  <property name="version.suffix"        value="-dev" />
-
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
