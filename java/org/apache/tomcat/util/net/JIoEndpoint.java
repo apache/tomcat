@@ -109,7 +109,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         return false;
     }
     
-    protected CounterLatch connectionCounterLatch = null;
+    
 
 
     // ------------------------------------------------ Handler Inner Interface
