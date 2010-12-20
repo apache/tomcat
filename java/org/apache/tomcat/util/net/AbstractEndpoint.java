@@ -32,6 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.CounterLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
@@ -121,6 +122,11 @@ public abstract class AbstractEndpoint {
      * Are we using an internal executor
      */
     protected volatile boolean internalExecutor = false;
+
+    /**
+     * counter for nr of connections handled by an endpoint
+     */
+    protected volatile CounterLatch connectionCounterLatch = null;
 
     /**
      * Socket properties
