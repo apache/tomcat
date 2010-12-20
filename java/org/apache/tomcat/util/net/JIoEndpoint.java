@@ -32,6 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.threads.CounterLatch;
 
 
 /**
@@ -107,6 +108,8 @@ public class JIoEndpoint extends AbstractEndpoint {
         // Not supported
         return false;
     }
+    
+    protected CounterLatch connectionCounterLatch = null;
 
 
     // ------------------------------------------------ Handler Inner Interface
@@ -197,20 +200,24 @@ public class JIoEndpoint extends AbstractEndpoint {
                     break;
                 }
                 try {
+                    //if we have reached max connections, wait
+                    connectionCounterLatch.await();
                     // Accept the next incoming connection from the server socket
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
                     
                     // Configure the socket
                     if (setSocketOptions(socket)) {
-                    // Hand this socket off to an appropriate processor
-                    if (!processSocket(socket)) {
-                        // Close socket right away
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            // Ignore
+                        // Hand this socket off to an appropriate processor
+                        if (!processSocket(socket)) {
+                            // Close socket right away
+                            try {
+                                socket.close();
+                            } catch (IOException e) {
+                                // Ignore
+                            }
+                        } else {
+                            connectionCounterLatch.countUp();
                         }
-                    }
                     } else {
                         // Close socket right away
                         try {
@@ -286,6 +293,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         if (log.isTraceEnabled()) {
                             log.trace("Closing socket:"+socket);
                         }
+                        connectionCounterLatch.countDown();
                         try {
                             socket.getSocket().close();
                         } catch (IOException e) {
@@ -373,6 +381,8 @@ public class JIoEndpoint extends AbstractEndpoint {
             if (getExecutor() == null) {
                 createExecutor();
             }
+            
+            connectionCounterLatch = new CounterLatch(0,getMaxConnections());
 
             // Start acceptor threads
             for (int i = 0; i < acceptorThreadCount; i++) {
@@ -394,6 +404,8 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     @Override
     public void stopInternal() {
+        connectionCounterLatch.releaseAll();
+        connectionCounterLatch = null;
         if (!paused) {
             pause();
         }
