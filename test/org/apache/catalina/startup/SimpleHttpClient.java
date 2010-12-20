@@ -25,7 +25,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,13 +111,19 @@ public abstract class SimpleHttpClient {
         return null;
     }
 
-    public void connect() throws UnknownHostException, IOException {
-        socket = new Socket("localhost", port);
+    public void connect(int connectTimeout, int soTimeout) throws UnknownHostException, IOException {
+        SocketAddress addr = new InetSocketAddress("localhost", port);
+        socket = new Socket();
+        socket.setSoTimeout(soTimeout);
+        socket.connect(addr,connectTimeout);
         OutputStream os = socket.getOutputStream();
         writer = new OutputStreamWriter(os);
         InputStream is = socket.getInputStream();
         Reader r = new InputStreamReader(is);
         reader = new BufferedReader(r);
+    }
+    public void connect() throws UnknownHostException, IOException {
+        connect(0,0);
     }
     
     public void processRequest() throws IOException, InterruptedException {
