@@ -27,16 +27,21 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http11.Http11NioProtocol;
+import org.apache.coyote.http11.Http11Protocol;
 
 public class TestMaxConnections extends TomcatBaseTest{
 
-    Tomcat tomcat = null;
     static int soTimeout = 3000;
     static int connectTimeout = 1000;
     
-    public void test1() throws Exception {
-        init();
-        start();
+    @Override
+    public void setUp() throws Exception {
+        //do nothing
+    }
+    
+    public void testBio() throws Exception {
+        init(Http11Protocol.class.getName());
         ConnectThread[] t = new ConnectThread[10];
         int passcount = 0;
         int connectfail = 0;
@@ -52,54 +57,62 @@ public class TestMaxConnections extends TomcatBaseTest{
         }
         assertEquals("The number of successful requests should have been 5.",5, passcount);
         assertEquals("The number of failed connects should have been 5.",5, connectfail);
-        stop();
     }
     
+    public void testNio() throws Exception {
+        init(Http11NioProtocol.class.getName());
+        ConnectThread[] t = new ConnectThread[10];
+        int passcount = 0;
+        int connectfail = 0;
+        for (int i=0; i<t.length; i++) {
+            t[i] = new ConnectThread();
+            t[i].setName("ConnectThread["+i+"+]");
+            t[i].start();
+        }
+        for (int i=0; i<t.length; i++) {
+            t[i].join();
+            if (t[i].passed) passcount++;
+            if (t[i].connectfailed) connectfail++;
+        }
+        
+        assertTrue("The number of successful requests should have been 4-5, actual "+passcount,4==passcount || 5==passcount);
+        
+    }
 
     private class ConnectThread extends Thread {
         public boolean passed = true;
         public boolean connectfailed = false;
         public void run() {
             try {
-                TestKeepAliveClient client = new TestKeepAliveClient();
+                TestClient client = new TestClient();
                 client.doHttp10Request();
             }catch (Exception x) {
                 passed = false;
                 System.err.println(Thread.currentThread().getName()+" Error:"+x.getMessage());
-                connectfailed = "connect timed out".equals(x.getMessage());
+                connectfailed = "connect timed out".equals(x.getMessage()) || "Connection refused: connect".equals(x.getMessage());
             }
         }
     }
 
-    private boolean init;
     
-    private synchronized void init() {
-        if (init) return;
-        
+    private synchronized void init(String protocol) throws Exception {
+        System.setProperty("tomcat.test.protocol", protocol);
+        super.setUp();
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
         Tomcat.addServlet(root, "Simple", new SimpleServlet());
         root.addServletMapping("/test", "Simple");
-        tomcat.getConnector().setProperty("maxKeepAliveRequests", "5");
+        tomcat.getConnector().setProperty("maxKeepAliveRequests", "1");
         tomcat.getConnector().setProperty("soTimeout", "20000");
         tomcat.getConnector().setProperty("keepAliveTimeout", "50000");
         tomcat.getConnector().setProperty("port", "8080");
         tomcat.getConnector().setProperty("maxConnections", "4");
         tomcat.getConnector().setProperty("acceptCount", "1");
-        init = true;
+        tomcat.start();
+        Thread.sleep(5000);
     }
 
-    private synchronized void start() throws Exception {
-        tomcat = getTomcatInstance();
-        init();
-        tomcat.start();
-    }
-    
-    private synchronized void stop() throws Exception {
-        tomcat.stop();
-    }
-    
-    private class TestKeepAliveClient extends SimpleHttpClient {
+    private class TestClient extends SimpleHttpClient {
 
         private void doHttp10Request() throws Exception {
             
@@ -120,35 +133,6 @@ public class TestMaxConnections extends TomcatBaseTest{
             // Close the connection
             disconnect();
             reset();
-            assertTrue(passed);
-        }
-        
-        private void doHttp11Request() throws Exception {
-            Tomcat tomcat = getTomcatInstance();
-            init();
-            tomcat.start();
-            // Open connection
-            connect();
-            
-            // Send request in two parts
-            String[] request = new String[1];
-            request[0] =
-                "GET /test HTTP/1.1" + CRLF + 
-                "Host: localhost" + CRLF +
-                "Connection: Keep-Alive" + CRLF+
-                "Keep-Alive: 300"+ CRLF+ CRLF;
-            
-            setRequest(request);
-            
-            for (int i=0; i<5; i++) {
-                processRequest(false); // blocks until response has been read
-                assertTrue(getResponseLine()!=null && getResponseLine().trim().startsWith("HTTP/1.1 200"));
-            }
-            boolean passed = (this.readLine()==null);
-            // Close the connection
-            disconnect();
-            reset();
-            tomcat.stop();
             assertTrue(passed);
         }
         
