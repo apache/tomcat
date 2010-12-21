@@ -22,10 +22,7 @@ public class TestCounterLatch extends TestCase {
 
     private volatile CounterLatch latch = null;
 
-    public void setUp() {
-
-    }
-
+    @Override
     public void tearDown() {
         CounterLatch temp = latch;
         if (temp!=null) temp.releaseAll();
@@ -41,6 +38,7 @@ public class TestCounterLatch extends TestCase {
         latch = new CounterLatch(0,1);
         assertEquals("No threads should be waiting", false, latch.hasQueuedThreads());
         Thread testThread = new Thread() {
+            @Override
             public void run() {
                 try {
                     latch.await();
@@ -61,6 +59,7 @@ public class TestCounterLatch extends TestCase {
         latch = new CounterLatch(0,1);
         assertEquals("No threads should be waiting", false, latch.hasQueuedThreads());
         Thread testThread = new Thread() {
+            @Override
             public void run() {
                 try {
                     latch.await();
@@ -82,6 +81,7 @@ public class TestCounterLatch extends TestCase {
         latch = new CounterLatch(1,0);
         assertEquals("No threads should be waiting", false, latch.hasQueuedThreads());
         Thread testThread = new Thread() {
+            @Override
             public void run() {
                 try {
                     //System.out.println("Entering ["+Thread.currentThread().getName()+"]");
@@ -105,6 +105,7 @@ public class TestCounterLatch extends TestCase {
         latch = new CounterLatch(1,0);
         assertEquals("No threads should be waiting", false, latch.hasQueuedThreads());
         Thread testThread = new Thread() {
+            @Override
             public void run() {
                 try {
                     latch.await();
