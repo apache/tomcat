@@ -1999,7 +1999,7 @@ public class WebappClassLoader
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
-                log.error(sm.getString("webappClassLoader.clearJbdc",
+                log.error(sm.getString("webappClassLoader.clearJdbc",
                         contextName, name));
             }
         } catch (Exception e) {
