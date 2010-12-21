@@ -42,7 +42,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager
-            .getManager(Constants.Package);
+            .getManager("org.apache.tomcat.util.threads.res");
 
     private static final Log log = LogFactory.getLog(ThreadPoolExecutor.class);
 
