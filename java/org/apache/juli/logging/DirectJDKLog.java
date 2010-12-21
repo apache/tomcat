@@ -23,7 +23,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /** 
  * Hardcoded java.util.logging commons-logging implementation.
  * 
@@ -36,8 +35,9 @@ class DirectJDKLog implements Log {
     
     /** Alternate config reader and console format 
      */
-    private static final String SIMPLE_FMT="org.apache.tomcat.util.log.JdkLoggerFormatter";
-    private static final String SIMPLE_CFG="org.apache.tomcat.util.log.JdkLoggerConfig";
+    private static final String SIMPLE_FMT="java.util.logging.SimpleFormatter";
+    private static final String SIMPLE_CFG="org.apache.juli.JdkLoggerConfig"; //doesn't exist
+    private static final String FORMATTER="org.apache.juli.formatter";
 
     static {
         if( System.getProperty("java.util.logging.config.class") ==null  &&
@@ -49,7 +49,7 @@ class DirectJDKLog implements Log {
             } catch( Throwable t ) {                
             }
             try {
-                Formatter fmt=(Formatter)Class.forName(SIMPLE_FMT).newInstance();
+                Formatter fmt=(Formatter)Class.forName(System.getProperty(FORMATTER, SIMPLE_FMT)).newInstance(); 
                 // it is also possible that the user modified jre/lib/logging.properties - 
                 // but that's really stupid in most cases
                 Logger root=Logger.getLogger("");
