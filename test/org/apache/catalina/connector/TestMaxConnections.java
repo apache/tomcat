@@ -27,46 +27,25 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.coyote.http11.Http11NioProtocol;
-import org.apache.coyote.http11.Http11Protocol;
+import org.apache.juli.logging.LogFactory;
+import org.apache.juli.logging.Log;
 
 public class TestMaxConnections extends TomcatBaseTest{
-
+    private static Log log = LogFactory.getLog(TestMaxConnections.class);
     static int soTimeout = 3000;
     static int connectTimeout = 1000;
     
-    @Override
-    public void setUp() throws Exception {
-        //do nothing
-    }
     
-    public void testBio() throws Exception {
-        init(Http11Protocol.class.getName());
+    public void testConnector() throws Exception {
+        init();
         ConnectThread[] t = new ConnectThread[10];
         int passcount = 0;
         int connectfail = 0;
         for (int i=0; i<t.length; i++) {
             t[i] = new ConnectThread();
-            t[i].setName("ConnectThread["+i+"+]");
-            t[i].start();
+            t[i].setName("ConnectThread["+i+"]");
         }
         for (int i=0; i<t.length; i++) {
-            t[i].join();
-            if (t[i].passed) passcount++;
-            if (t[i].connectfailed) connectfail++;
-        }
-        assertEquals("The number of successful requests should have been 5.",5, passcount);
-        assertEquals("The number of failed connects should have been 5.",5, connectfail);
-    }
-    
-    public void testNio() throws Exception {
-        init(Http11NioProtocol.class.getName());
-        ConnectThread[] t = new ConnectThread[10];
-        int passcount = 0;
-        int connectfail = 0;
-        for (int i=0; i<t.length; i++) {
-            t[i] = new ConnectThread();
-            t[i].setName("ConnectThread["+i+"+]");
             t[i].start();
         }
         for (int i=0; i<t.length; i++) {
@@ -88,28 +67,26 @@ public class TestMaxConnections extends TomcatBaseTest{
                 client.doHttp10Request();
             }catch (Exception x) {
                 passed = false;
-                System.err.println(Thread.currentThread().getName()+" Error:"+x.getMessage());
+                log.error(Thread.currentThread().getName()+" Error:"+x.getMessage());
                 connectfailed = "connect timed out".equals(x.getMessage()) || "Connection refused: connect".equals(x.getMessage());
             }
         }
     }
 
     
-    private synchronized void init(String protocol) throws Exception {
-        System.setProperty("tomcat.test.protocol", protocol);
-        super.setUp();
+    private synchronized void init() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
         Tomcat.addServlet(root, "Simple", new SimpleServlet());
         root.addServletMapping("/test", "Simple");
         tomcat.getConnector().setProperty("maxKeepAliveRequests", "1");
+        tomcat.getConnector().setProperty("maxThreads", "10");
         tomcat.getConnector().setProperty("soTimeout", "20000");
         tomcat.getConnector().setProperty("keepAliveTimeout", "50000");
         tomcat.getConnector().setProperty("port", "8080");
         tomcat.getConnector().setProperty("maxConnections", "4");
         tomcat.getConnector().setProperty("acceptCount", "1");
         tomcat.start();
-        Thread.sleep(5000);
     }
 
     private class TestClient extends SimpleHttpClient {
@@ -128,7 +105,7 @@ public class TestMaxConnections extends TomcatBaseTest{
             boolean passed = false;
             processRequest(false); // blocks until response has been read
             long stop = System.currentTimeMillis();
-            System.out.println(Thread.currentThread().getName()+" Request complete:"+(stop-start)+" ms.");
+            log.info(Thread.currentThread().getName()+" Request complete:"+(stop-start)+" ms.");
             passed = (this.readLine()==null);
             // Close the connection
             disconnect();
