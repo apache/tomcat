@@ -143,6 +143,8 @@
 
   <!-- Tests To Run -->
   <property name="test.name" value="**/Test*.java"/>
+  <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
+  
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
@@ -1047,6 +1049,7 @@
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
 
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
+        <jvmarg value="${test.formatter}"/>
 
         <classpath refid="tomcat.test.classpath" />
 
