@@ -201,7 +201,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
                 try {
                     //if we have reached max connections, wait
-                    connectionCounterLatch.await();
+                    awaitConnection();                    
                     // Accept the next incoming connection from the server socket
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
                     
@@ -216,7 +216,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                                 // Ignore
                             }
                         } else {
-                            connectionCounterLatch.countUp();
+                            countUpConnection();
                         }
                     } else {
                         // Close socket right away
@@ -293,7 +293,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         if (log.isTraceEnabled()) {
                             log.trace("Closing socket:"+socket);
                         }
-                        connectionCounterLatch.countDown();
+                        countDownConnection();
                         try {
                             socket.getSocket().close();
                         } catch (IOException e) {
@@ -382,7 +382,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 createExecutor();
             }
             
-            connectionCounterLatch = new CounterLatch(0,getMaxConnections());
+            initializeConnectionLatch();
 
             // Start acceptor threads
             for (int i = 0; i < acceptorThreadCount; i++) {
@@ -404,8 +404,7 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     @Override
     public void stopInternal() {
-        connectionCounterLatch.releaseAll();
-        connectionCounterLatch = null;
+        releaseConnectionLatch();
         if (!paused) {
             pause();
         }

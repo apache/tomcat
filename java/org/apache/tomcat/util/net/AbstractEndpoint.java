@@ -126,7 +126,7 @@ public abstract class AbstractEndpoint {
     /**
      * counter for nr of connections handled by an endpoint
      */
-    protected volatile CounterLatch connectionCounterLatch = null;
+    private volatile CounterLatch connectionCounterLatch = null;
 
     /**
      * Socket properties
@@ -576,6 +576,43 @@ public abstract class AbstractEndpoint {
 
     protected abstract Log getLog();
     public abstract boolean getUseSendfile();
+    
+    protected CounterLatch initializeConnectionLatch() {
+        if (connectionCounterLatch==null) {
+            connectionCounterLatch = new CounterLatch(0,getMaxConnections());
+        }
+        return connectionCounterLatch;
+    }
+    
+    protected void releaseConnectionLatch() {
+        CounterLatch latch = connectionCounterLatch;
+        if (latch!=null) latch.releaseAll();
+        connectionCounterLatch = null;
+    }
+    
+    protected void awaitConnection() throws InterruptedException {
+        CounterLatch latch = connectionCounterLatch;
+        if (latch!=null) latch.await();
+    }
+    
+    protected long countUpConnection() {
+        CounterLatch latch = connectionCounterLatch;
+        if (latch!=null) return latch.countUp();
+        else return -1;
+    }
+    
+    protected long countDownConnection() {
+        CounterLatch latch = connectionCounterLatch;
+        if (latch!=null) {
+            long result = latch.countDown();
+            if (result<0) {
+                getLog().warn("Incorrect connection count, multiple socket.close called on the same socket." );
+            }
+            return result;
+        } else return -1;
+    }
+    
+    
 
     // --------------------  SSL related properties --------------------
 
