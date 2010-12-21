@@ -141,6 +141,8 @@
   <property name="catalina-jmx-remote-src.jar" value="${tomcat.extras.sources}/catalina-jmx-remote-src.jar"/>
   <property name="tomcat-embed-log4j-src.jar" value="${tomcat.embed.sources}/tomcat-embed-logging-log4j-src.jar"/>
 
+  <!-- Tests To Run -->
+  <property name="test.name" value="**/Test*.java"/>
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
@@ -1063,7 +1065,7 @@
                    haltonfailure="${test.haltonfailure}">
           <fileset dir="test" >
             <!-- Include all by default -->
-            <include name="**/Test*.java" />
+            <include name="${test.name}" />
             <!-- Exclude helper classes -->
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
