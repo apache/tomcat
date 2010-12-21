@@ -429,6 +429,14 @@
 
   <properties>
 
+    <property name="org.apache.juli.formatter">
+      <p>If no logging configuration file is specified and no logging configuration class is specified
+         using the <code>java.util.logging.config.class</code> and <code>java.util.logging.config.file</code>
+         properties the default logging framework <code>org.apache.juli</code> will use the default 
+         <code>java.util.logging.SimpleFormatter</code> for all console output. 
+         To simply override the console output formatter, one can use the described property. Example: 
+         <code>-Dorg.apache.juli.formatter=org.apache.juli.OneLineFormatter</code></p>
+    </property>
     <property name="org.apache.juli.AsyncOverflowDropType">
       <p>When the memory limit of records has been reached the system needs to determine what action to take.
          Currently there are three actions that can be taken:
