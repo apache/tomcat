@@ -592,8 +592,10 @@ public class SimpleTcpCluster extends LifecycleBase
             Container context = manager.getContainer() ;
             if(context != null && context instanceof Context) {
                 Container host = ((Context)context).getParent();
-                if(host != null && host instanceof Host && clusterName!=null && !(clusterName.indexOf("#")>=0))
+                if(host != null && host instanceof Host && clusterName!=null && 
+                        !(clusterName.startsWith(host.getName() +"#"))) {
                     clusterName = host.getName() +"#" + clusterName ;
+                }
             }
         }
         return clusterName;
