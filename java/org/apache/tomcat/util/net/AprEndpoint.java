@@ -40,6 +40,7 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.threads.CounterLatch;
 
 
 /**
@@ -531,6 +532,8 @@ public class AprEndpoint extends AbstractEndpoint {
             if (getExecutor() == null) {
                 createExecutor();
             }
+            
+            initializeConnectionLatch();
 
             // Start poller threads
             pollers = new Poller[pollerThreadCount];
@@ -592,6 +595,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     @Override
     public void stopInternal() {
+        releaseConnectionLatch();
         if (!paused) {
             pause();
         }
@@ -885,6 +889,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // parent pool or acceptor socket.
             // In any case disable double free which would cause JVM core.
             Socket.destroy(socket);
+            countDownConnection();
         }
     }
 
@@ -926,8 +931,12 @@ public class AprEndpoint extends AbstractEndpoint {
                     break;
                 }
                 try {
+                    //if we have reached max connections, wait
+                    awaitConnection();
                     // Accept the next incoming connection from the server socket
                     long socket = Socket.accept(serverSock);
+                    //increment socket count
+                    countUpConnection();
                     /*
                      * In the case of a deferred accept unlockAccept needs to
                      * send data. This data will be rubbish, so destroy the
