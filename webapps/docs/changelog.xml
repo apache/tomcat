@@ -209,6 +209,10 @@
         node is the only node in the cluster. Log requesting session data as
         INFO rather than WARNING. (markt)
       </fix>
+      <fix>
+        <bug>50503</bug>: When web application has a version, Engine level 
+        Clustering works correctly. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
