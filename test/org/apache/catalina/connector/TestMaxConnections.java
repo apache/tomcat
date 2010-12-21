@@ -27,8 +27,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.juli.logging.LogFactory;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 public class TestMaxConnections extends TomcatBaseTest{
     private static Log log = LogFactory.getLog(TestMaxConnections.class);
@@ -61,6 +61,7 @@ public class TestMaxConnections extends TomcatBaseTest{
     private class ConnectThread extends Thread {
         public boolean passed = true;
         public boolean connectfailed = false;
+        @Override
         public void run() {
             try {
                 TestClient client = new TestClient();
