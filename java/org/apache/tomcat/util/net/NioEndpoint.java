@@ -567,13 +567,14 @@ public class NioEndpoint extends AbstractEndpoint {
         if (!running) {
             running = true;
             paused = false;
-            
-            connectionCounterLatch = new CounterLatch(0, getMaxConnections()); 
+             
             // Create worker collection
             if ( getExecutor() == null ) {
                 createExecutor();
             }
 
+            initializeConnectionLatch();
+            
             // Start poller threads
             pollers = new Poller[getPollerThreadCount()];
             for (int i=0; i<pollers.length; i++) {
@@ -600,8 +601,7 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     @Override
     public void stopInternal() {
-        connectionCounterLatch.releaseAll();
-        connectionCounterLatch = null;
+        releaseConnectionLatch();
         if (!paused) {
             pause();
         }
@@ -813,7 +813,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
                 try {
                     //if we have reached max connections, wait
-                    connectionCounterLatch.await();
+                    awaitConnection();
                     // Accept the next incoming connection from the server socket
                     SocketChannel socket = serverSock.accept();
                     // Hand this socket off to an appropriate processor
@@ -831,7 +831,7 @@ public class NioEndpoint extends AbstractEndpoint {
                                     log.debug("", ix);
                             }
                         } else {
-                            connectionCounterLatch.countUp();
+                            countUpConnection();
                         }
                     }
                 } catch (SocketTimeoutException sx) {
@@ -1066,9 +1066,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
                 if (ka!=null) {
                     ka.reset();
-                    if (connectionCounterLatch.countDown()<0) {
-                        log.warn("Incorrect connection count, multiple cancel called on the same key?" );
-                    }
+                    countDownConnection(); 
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
