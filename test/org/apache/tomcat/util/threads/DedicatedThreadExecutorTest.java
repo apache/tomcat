@@ -32,7 +32,7 @@ public class DedicatedThreadExecutorTest extends TestCase {
                 dedicatedThread = Thread.currentThread();
                 DedicatedThreadExecutorTest.assertNotSame(testingThread,
                     dedicatedThread);
-                return 123L;
+                return Long.valueOf(123);
             }
         });
         assertEquals(123, result.longValue());
@@ -60,7 +60,7 @@ public class DedicatedThreadExecutorTest extends TestCase {
                     dedicatedThread = Thread.currentThread();
                     DedicatedThreadExecutorTest.assertNotSame(testingThread,
                         dedicatedThread);
-                    return 456L;
+                    return Long.valueOf(456);
                 }
             });
         assertEquals(456, result.longValue());
