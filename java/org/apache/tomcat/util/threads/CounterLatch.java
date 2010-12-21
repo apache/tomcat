@@ -49,7 +49,7 @@ public class CounterLatch {
 
     private final Sync sync;
     private final AtomicLong count;
-    private long signal;
+    private volatile long signal;
     private volatile boolean released = false;
     
     /**
