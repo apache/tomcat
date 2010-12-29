@@ -664,24 +664,108 @@ conn.close();
     <ul>
     <li><strong>driverClassName</strong> - Fully qualified Java class name
         of the JDBC driver to be used.</li>
-    <li><strong>maxActive</strong> - The maximum number of active instances
-        that can be allocated from this pool at the same time.</li>
-    <li><strong>maxIdle</strong> - The maximum number of connections that
-        can sit idle in this pool at the same time.</li>
-    <li><strong>maxWait</strong> - The maximum number of milliseconds that the
-        pool will wait (when there are no available connections) for a
-        connection to be returned before throwing an exception.</li>
+    <li><strong>username</strong> - Database username to be passed to our
+        JDBC driver.</li>
     <li><strong>password</strong> - Database password to be passed to our
         JDBC driver.</li>
     <li><strong>url</strong> - Connection URL to be passed to our JDBC driver.
         (For backwards compatibility, the property <code>driverName</code>
         is also recognized.)</li>
-    <li><strong>username</strong> - Database username to be passed to our
-        JDBC driver.</li>
+    <li><strong>initialSize</strong> - The initial number of connections
+        that will be created in the pool during pool initialization. Default: 0</li>
+    <li><strong>maxActive</strong> - The maximum number of connections
+        that can be allocated from this pool at the same time. Default: 8</li>
+    <li><strong>minIdle</strong> - The minimum number of connections that
+        will sit idle in this pool at the same time. Default: 0</li>
+    <li><strong>maxIdle</strong> - The maximum number of connections that
+        can sit idle in this pool at the same time. Default: 8</li>
+    <li><strong>maxWait</strong> - The maximum number of milliseconds that the
+        pool will wait (when there are no available connections) for a
+        connection to be returned before throwing an exception. Default: -1 (infinite)</li>
+    </ul>
+    <p>Some additional properties handle connection validation:</p>
+    <ul>
     <li><strong>validationQuery</strong> - SQL query that can be used by the
         pool to validate connections before they are returned to the
         application.  If specified, this query MUST be an SQL SELECT
         statement that returns at least one row.</li>
+    <li><strong>validationQueryTimeout</strong> - Timeout in seconds
+        for the validation query to return. Default: -1 (infinite)</li>
+    <li><strong>testOnBorrow</strong> - true or false: whether a connection
+        should be validated using the validation query each time it is
+        borrowed from the pool. Default: true</li>
+    <li><strong>testOnReturn</strong> - true or false: whether a connection
+        should be validated using the validation query each time it is
+        returned to the pool. Default: false</li>
+    </ul>
+    <p>The optional evictor thread is responsible for shrinking the pool
+    by removing any conections which are idle for a long time. The evictor
+    does not respect <code>minIdle</code>. Note that you do not need to
+    activate the evictor thread if you only want the pool to shrink according
+    to the configured <code>maxIdle</code> property.</p>
+    <p>The evictor is disabled by default and can be configured using
+    the following properties:</p>
+    <ul>
+    <li><strong>timeBetweenEvictionRunsMillis</strong> - The number of
+        milliseconds between consecutive runs of the evictor.
+        Default: 30*60*1000 (30 minutes)</li>
+    <li><strong>numTestsPerEvictionRun</strong> - The number of connections
+        that will be checked for idleness by the evitor during each
+        run of the evictor. Default: 3</li>
+    <li><strong>minEvictableIdleTimeMillis</strong> - The idle time in
+        milliseconds after which a connection can be removed from the pool
+        by the evictor. Default: -1 (disabled)</li>
+    <li><strong>testWhileIdle</strong> - true or false: whether a connection
+        should be validated by the evictor thread using the validation query
+        while sitting idle in the pool. Default: false</li>
+    </ul>
+    <p>Another optional feature is the removal of abandoned connections.
+    A connection is called abandoned if the application does not return it
+    to the pool for a long time. The pool can close such connections
+    automatically and remove them from the pool. This is a workaround
+    for applications leaking connections.</p>
+    <p>The abandoning feature is disabled by default and can be configured
+    using the following properties:</p>
+    <ul>
+    <li><strong>removeAbandoned</strong> - true or false: whether to
+        remove abandoned connections from the pool. Default: false</li>
+    <li><strong>removeAbandonedTimeout</strong> - The number of
+        seconds after which a borrowed connection is assumed to be abandoned.
+        Default: 300</li>
+    <li><strong>logAbandoned</strong> - true or false: whether to log
+        stack traces for application code which abandoned a statement
+        or connection. This adds serious overhead. Default: false</li>
+    </ul>
+    <p>Finally there are various properties that allow further fine tuning
+    of the pool behaviour:</p>
+    <ul>
+    <li><strong>defaultAutoCommit</strong> - true or false: default
+        auto-commit state of the connections created by this pool.
+        Default: true</li>
+    <li><strong>defaultReadOnly</strong> - true or false: default
+        read-only state of the connections created by this pool.
+        Default: false</li>
+    <li><strong>defaultTransactionIsolation</strong> - This sets the
+        default transaction isolation level. Can be one of
+        <code>NONE</code>, <code>READ_COMMITTED</code>,
+        <code>READ_UNCOMMITTED</code>, <code>REPEATABLE_READ</code>,
+        <code>SERIALIZABLE</code>. Default: no default set</li>
+    <li><strong>poolPreparedStatements</strong> - true or false: whether to
+        pool PreparedStatements and CallableStatements. Default: false</li>
+    <li><strong>maxOpenPreparedStatements</strong> - The maximum number of open
+        statements that can be allocated from the statement pool at the same time.
+        Default: -1 (unlimited)</li>
+    <li><strong>defaultCatalog</strong> - The name of the default catalog.
+        Default: not set</li>
+    <li><strong>connectionInitSqls</strong> - A list of SQL statements
+        run once after a Connection is created. Separate multiple statements
+        by semicolons (<code>;</code>). Default: no statement</li>
+    <li><strong>connectionProperties</strong> - A list of driver specific
+        properties passed to the driver for creating connections. Each
+        property is given as <code>name=value</code>, multiple properties
+        are separated by semicolons (<code>;</code>). Default: no properties</li>
+    <li><strong>accessToUnderlyingConnectionAllowed</strong> - true or false: whether
+        accessing the underlying connections is allowed. Default: false</li>
     </ul>
     <p>For more details, please refer to the commons-dbcp documentation.</p>
 

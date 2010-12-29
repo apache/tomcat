@@ -225,6 +225,9 @@
         Correctly validate provided context path so sessions for the ROOT web
         application can be viewed through the HTML Manager. (markt)
       </fix>
+      <update>
+        Improve documentation of database connection factory. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
