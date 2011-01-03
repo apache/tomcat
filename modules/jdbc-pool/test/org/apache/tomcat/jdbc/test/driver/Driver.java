@@ -46,7 +46,7 @@ public class Driver implements java.sql.Driver {
     }
     
     public boolean acceptsURL(String url) throws SQLException {
-        return url == Driver.url;
+        return url!=null && url.equals(Driver.url);
     }
 
     public Connection connect(String url, Properties info) throws SQLException {
