@@ -416,6 +416,19 @@
            logged and a JMX notification gets sent once. 
       </p>
     </attribute>
+    <attribute name="alternateUsernameAllowed" required="false">
+      <p>(boolean) By default, the jdbc-pool will ignore the 
+         <a href="http://download.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
+         call, and simply return a previously pooled connection under the globally configured properties <code>username</code> and <code>password</code>, for performance reasons.
+         The pool can however be used with different credentials each time a connection is used. Should you request a connection with the credentials user1/password1 and the connection
+         was previously connected using user2/password2, the connection will be closed, and reopened with the requested credentials. This way, the pool size is still managed
+         on a global level, and not on a per schema level. To enable the functionality described in the 
+         <a href="http://download.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
+         call, simply set the property <code>alternateUsernameAllowed</code> to true. <br/>
+         The default value is <code>false</code>.<br/>
+         This property was added as an enhancement to <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=50025">bug 50025</a>.
+      </p>
+    </attribute>
     <attribute name="dataSource" required="false">
       <p>(javax.sql.DataSource)  
       </p>

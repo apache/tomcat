@@ -33,8 +33,23 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 
-public class Connection implements java.sql.Connection {
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
+public class Connection implements java.sql.Connection {
+    Properties info;
+    
+    public Connection(Properties info) {
+        this.info = info;
+    }
+    
+    public String getUsername() {
+        return info.getProperty(PooledConnection.PROP_USER);
+    }
+    
+    public String getPassword() {
+        return info.getProperty(PooledConnection.PROP_PASSWORD);
+    }
+    
     public void clearWarnings() throws SQLException {
     }
 
