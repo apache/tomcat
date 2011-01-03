@@ -34,7 +34,7 @@ import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class AlternateUsernameTest extends DefaultTestCase {
 
-    private static final int iterations = (new Random(System.currentTimeMillis())).nextInt(100000)+1000;
+    private static final int iterations = (new Random(System.currentTimeMillis())).nextInt(10000000)+100000;
     public AlternateUsernameTest(String name) {
         super(name);
     }
