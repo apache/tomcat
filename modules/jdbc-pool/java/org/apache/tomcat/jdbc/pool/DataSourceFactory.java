@@ -112,6 +112,8 @@ public class DataSourceFactory implements ObjectFactory {
     
     protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
     
+    protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
+    
     
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
     
@@ -159,6 +161,7 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_USE_CON_LOCK,
         PROP_DATASOURCE,
         PROP_DATASOURCE_JNDI,
+        PROP_ALTERNATE_USERNAME_ALLOWED
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -465,6 +468,12 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setSuspectTimeout(Integer.parseInt(value));
         }
+        
+        value = properties.getProperty(PROP_ALTERNATE_USERNAME_ALLOWED);
+        if (value != null) {
+            poolProperties.setAlternateUsernameAllowed(Boolean.parseBoolean(value));
+        }
+        
         return poolProperties;
     }
 

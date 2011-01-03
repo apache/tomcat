@@ -51,7 +51,7 @@ public class Driver implements java.sql.Driver {
 
     public Connection connect(String url, Properties info) throws SQLException {
         connectCount.addAndGet(1);
-        return new org.apache.tomcat.jdbc.test.driver.Connection();
+        return new org.apache.tomcat.jdbc.test.driver.Connection(info);
     }
 
     public int getMajorVersion() {
