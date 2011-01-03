@@ -34,12 +34,12 @@ import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class AlternateUsernameTest extends DefaultTestCase {
 
-    private static final int iterations = (new Random(System.currentTimeMillis())).nextInt(10000000)+100000;
+    private static final int iterations = (new Random(System.currentTimeMillis())).nextInt(1000000)+100000;
     public AlternateUsernameTest(String name) {
         super(name);
     }
     
-    public void testGeneric() throws Exception {
+    public void testUsernameCompare() throws Exception {
         
         this.init();
         this.datasource.setDriverClassName(Driver.class.getName());
@@ -72,6 +72,10 @@ public class AlternateUsernameTest extends DefaultTestCase {
         System.out.println("Nr of disconnect() calls:"+Driver.disconnectCount.get());
         System.out.println("Nr of iterations:"+total);
 
+    }
+    
+    public void testUsernameCompareAgain() throws Exception {
+        testUsernameCompare();
     }
     
     public static class TestResult {
