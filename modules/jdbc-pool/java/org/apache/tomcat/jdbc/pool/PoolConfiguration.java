@@ -770,5 +770,22 @@ public interface PoolConfiguration {
      */
     public String getDataSourceJNDI();
     
+    /**
+     * Returns true if the call {@link DataSource#getConnection(String, String) getConnection(username,password)} is 
+     * allowed. This is used for when the pool is used by an application accessing multiple schemas.
+     * There is a performance impact turning this option on.
+     * @return true if {@link DataSource#getConnection(String, String) getConnection(username,password)} is honored, false if it is ignored.
+     */
+    public boolean isAlternateUsernameAllowed();
+    
+    /**
+     * Set to true if the call {@link DataSource#getConnection(String, String) getConnection(username,password)} is 
+     * allowed and honored.. This is used for when the pool is used by an application accessing multiple schemas.
+     * There is a performance impact turning this option on, even when not used due to username checks.
+     * @param alternateUsernameAllowed - set true if {@link DataSource#getConnection(String, String) getConnection(username,password)} is honored, 
+     * false if it is to be ignored.
+     */
+    public void setAlternateUsernameAllowed(boolean alternateUsernameAllowed);
+    
 
 }

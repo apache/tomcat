@@ -161,10 +161,29 @@ public class ConnectionPool {
      */
     public Connection getConnection() throws SQLException {
         //check out a connection
-        PooledConnection con = borrowConnection(-1);
+        PooledConnection con = borrowConnection(-1,null,null);
         return setupConnection(con);
     }
 
+       
+    /**
+     * Borrows a connection from the pool. If a connection is available (in the
+     * idle queue) or the pool has not reached {@link PoolProperties#maxActive
+     * maxActive} connections a connection is returned immediately. If no
+     * connection is available, the pool will attempt to fetch a connection for
+     * {@link PoolProperties#maxWait maxWait} milliseconds.
+     * 
+     * @return Connection - a java.sql.Connection/javax.sql.PooledConnection
+     *         reflection proxy, wrapping the underlying object.
+     * @throws SQLException
+     *             - if the wait times out or a failure occurs creating a
+     *             connection
+     */
+    public Connection getConnection(String username, String password) throws SQLException {
+        // check out a connection
+        PooledConnection con = borrowConnection(-1, username, password);
+        return setupConnection(con);
+    }
     
     /**
      * Returns the name of this pool
@@ -422,7 +441,7 @@ public class ConnectionPool {
         PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
         try {
             for (int i = 0; i < initialPool.length; i++) {
-                initialPool[i] = this.borrowConnection(0); //don't wait, should be no contention
+                initialPool[i] = this.borrowConnection(0, null, null); //don't wait, should be no contention
             } //for
 
         } catch (SQLException x) {
@@ -529,7 +548,7 @@ public class ConnectionPool {
      * @return PooledConnection
      * @throws SQLException
      */
-    private PooledConnection borrowConnection(int wait) throws SQLException {
+    private PooledConnection borrowConnection(int wait, String username, String password) throws SQLException {
 
         if (isClosed()) {
             throw new SQLException("Connection pool closed.");
@@ -543,7 +562,7 @@ public class ConnectionPool {
         while (true) {
             if (con!=null) {
                 //configure the connection and return it
-                PooledConnection result = borrowConnection(now, con);
+                PooledConnection result = borrowConnection(now, con, username, password);
                 //null should never be returned, but was in a previous impl.
                 if (result!=null) return result;
             }
@@ -559,7 +578,7 @@ public class ConnectionPool {
                     size.decrementAndGet();
                 } else {
                     //create a connection, we're below the limit
-                    return createConnection(now, con);
+                    return createConnection(now, con, username, password);
                 }
             } //end if
 
@@ -608,10 +627,11 @@ public class ConnectionPool {
      * @return a PooledConnection that has been connected
      * @throws SQLException
      */
-    protected PooledConnection createConnection(long now,
-            PooledConnection notUsed) throws SQLException {
+    protected PooledConnection createConnection(long now, PooledConnection notUsed, String username, String password) throws SQLException {
         //no connections where available we'll create one
         PooledConnection con = create();
+        if (username!=null) con.getAttributes().put(con.PROP_USER, username);
+        if (password!=null) con.getAttributes().put(con.PROP_PASSWORD, password);
         boolean error = false;
         try {
             //connect and validate the connection
@@ -660,13 +680,14 @@ public class ConnectionPool {
      * @return con
      * @throws SQLException if a validation error happens
      */
-    protected PooledConnection borrowConnection(long now, PooledConnection con) throws SQLException {
+    protected PooledConnection borrowConnection(long now, PooledConnection con, String username, String password) throws SQLException {
         //we have a connection, lets set it up
         
         //flag to see if we need to nullify
         boolean setToNull = false;
         try {
             con.lock();
+            boolean usercheck = con.checkUser(username, password);
             
             if (con.isReleased()) {
                 return null;
@@ -676,20 +697,23 @@ public class ConnectionPool {
                 //attempt to connect
                 con.connect();
             }
-            if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
-                //set the timestamp
-                con.setTimestamp(now);
-                if (getPoolProperties().isLogAbandoned()) {
-                    //set the stack trace for this pool
-                    con.setStackTrace(getThreadDump());
+            
+            if (usercheck) {
+                if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
+                    //set the timestamp
+                    con.setTimestamp(now);
+                    if (getPoolProperties().isLogAbandoned()) {
+                        //set the stack trace for this pool
+                        con.setStackTrace(getThreadDump());
+                    }
+                    if (!busy.offer(con)) {
+                        log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+                    }
+                    return con;
                 }
-                if (!busy.offer(con)) {
-                    log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
-                }
-                return con;
             }
             //if we reached here, that means the connection
-            //is either discarded or validation failed.
+            //is either has another principal, is discarded or validation failed.
             //we will make one more attempt
             //in order to guarantee that the thread that just acquired
             //the connection shouldn't have to poll again.
@@ -1051,7 +1075,7 @@ public class ConnectionPool {
                 if (result!=null) return result;
                 if (configured.compareAndSet(false, true)) {
                     try {
-                        pc = borrowConnection(System.currentTimeMillis(),pc);
+                        pc = borrowConnection(System.currentTimeMillis(),pc, null, null);
                         result = ConnectionPool.this.setupConnection(pc);
                     } catch (SQLException x) {
                         cause = x;
