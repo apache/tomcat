@@ -20,6 +20,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.juli.logging.Log;
@@ -40,6 +41,10 @@ public class PooledConnection {
      */
     private static final Log log = LogFactory.getLog(PooledConnection.class);
 
+    public static final String PROP_USER = "user";
+    
+    public static final String PROP_PASSWORD = "password";
+    
     /**
      * Validate when connection is borrowed flag
      */
@@ -122,6 +127,26 @@ public class PooledConnection {
         this.parent = parent;
     }
 
+    public boolean checkUser(String username, String password) {
+        if (!getPoolProperties().isAlternateUsernameAllowed()) return true;
+        
+        if (username==null) username = poolProperties.getUsername();
+        if (password==null) password = poolProperties.getPassword();
+        
+        String storedUsr = (String)getAttributes().get(PROP_USER);
+        String storedPwd = (String)getAttributes().get(PROP_PASSWORD);
+        
+        boolean result = (username==null && storedUsr==null);
+        result = (result || (username!=null && username.equals(storedUsr)));
+                
+        result = result && ((password==null && storedPwd==null) || (password!=null && password.equals(storedPwd)));
+        
+        if (username==null)  getAttributes().remove(PROP_USER); else getAttributes().put(PROP_USER, username);
+        if (password==null)  getAttributes().remove(PROP_PASSWORD); else getAttributes().put(PROP_PASSWORD, password);
+        
+        return result;
+    }
+    
     /**
      * Connects the underlying connection to the database.
      * @throws SQLException if the method {@link #release()} has been called.
@@ -162,10 +187,24 @@ public class PooledConnection {
     }
     
     protected void connectUsingDataSource() throws SQLException {
+        String usr = null;
+        String pwd = null;
+        if (getAttributes().containsKey(PROP_USER)) {
+            usr = (String) getAttributes().get(PROP_USER);
+        } else {
+            usr = poolProperties.getUsername();
+            getAttributes().put(PROP_USER, usr);
+        }
+        if (getAttributes().containsKey(PROP_PASSWORD)) {
+            pwd = (String) getAttributes().get(PROP_PASSWORD);
+        } else {
+            pwd = poolProperties.getPassword();
+            getAttributes().put(PROP_PASSWORD, pwd);
+        }
         if (poolProperties.getDataSource() instanceof javax.sql.XADataSource) {
             javax.sql.XADataSource xds = (javax.sql.XADataSource)poolProperties.getDataSource();
-            if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
-                xaConnection = xds.getXAConnection(poolProperties.getUsername(), poolProperties.getPassword());
+            if (usr!=null && pwd!=null) {
+                xaConnection = xds.getXAConnection(usr, pwd);
                 connection = xaConnection.getConnection();
             } else {
                 xaConnection = xds.getXAConnection();
@@ -173,15 +212,15 @@ public class PooledConnection {
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.DataSource){
             javax.sql.DataSource ds = (javax.sql.DataSource)poolProperties.getDataSource();
-            if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
-                connection = ds.getConnection(poolProperties.getUsername(), poolProperties.getPassword());
+            if (usr!=null && pwd!=null) {
+                connection = ds.getConnection(usr, pwd);
             } else {
                 connection = ds.getConnection();
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource){
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource)poolProperties.getDataSource();
-            if (poolProperties.getUsername()!=null && poolProperties.getPassword()!=null) {
-                connection = ds.getPooledConnection(poolProperties.getUsername(), poolProperties.getPassword()).getConnection();
+            if (usr!=null && pwd!=null) {
+                connection = ds.getPooledConnection(usr, pwd).getConnection();
             } else {
                 connection = ds.getPooledConnection().getConnection();
             }
@@ -203,17 +242,26 @@ public class PooledConnection {
             throw ex;
         }
         String driverURL = poolProperties.getUrl();
-        String usr = poolProperties.getUsername();
-        String pwd = poolProperties.getPassword();
-        if (usr != null) {
-            poolProperties.getDbProperties().setProperty("user", usr);
+        String usr = null;
+        String pwd = null;
+        if (getAttributes().containsKey(PROP_USER)) {
+            usr = (String) getAttributes().get(PROP_USER);
+        } else {
+            usr = poolProperties.getUsername();
+            getAttributes().put(PROP_USER, usr);
         }
-        if (pwd != null) {
-            poolProperties.getDbProperties().setProperty("password", pwd);
+        if (getAttributes().containsKey(PROP_PASSWORD)) {
+            pwd = (String) getAttributes().get(PROP_PASSWORD);
+        } else {
+            pwd = poolProperties.getPassword();
+            getAttributes().put(PROP_PASSWORD, pwd);
         }
-        
+        Properties properties = clone(poolProperties.getDbProperties());
+        if (usr != null) properties.setProperty(PROP_USER, usr);
+        if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
+
         try {
-            connection = driver.connect(driverURL, poolProperties.getDbProperties());
+            connection = connection = driver.connect(driverURL, properties);
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to connect to database.", x);
@@ -233,6 +281,12 @@ public class PooledConnection {
         if (connection==null) {
             throw new SQLException("Driver:"+driver+" returned null for URL:"+driverURL);
         }
+    }
+    
+    private Properties clone(Properties p) {
+        Properties c = new Properties();
+        c.putAll(p);
+        return c;
     }
     
     /**

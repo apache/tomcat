@@ -74,7 +74,13 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@link javax.sql.DataSource#getConnection()}
      */
     public Connection getConnection(String username, String password) throws SQLException {
-        return getConnection();
+        if (this.getPoolProperties().isAlternateUsernameAllowed()) {
+            if (pool == null)
+                return createPool().getConnection(username,password);
+            return pool.getConnection(username,password);
+        } else {
+            return getConnection();
+        }
     }
 
     public PoolConfiguration getPoolProperties() {
@@ -1059,6 +1065,20 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public String getDataSourceJNDI() {
         return getPoolProperties().getDataSourceJNDI();
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public boolean isAlternateUsernameAllowed() {
+        return getPoolProperties().isAlternateUsernameAllowed();
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void setAlternateUsernameAllowed(boolean alternateUsernameAllowed) {
+        getPoolProperties().setAlternateUsernameAllowed(alternateUsernameAllowed);
     }
     
 }

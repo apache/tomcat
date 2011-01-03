@@ -80,6 +80,7 @@ public class PoolProperties implements PoolConfiguration {
     protected int suspectTimeout = 0;
     protected Object dataSource = null;
     protected String dataSourceJNDI = null;
+    protected boolean alternateUsernameAllowed = false;
     
     
     /** 
@@ -1032,4 +1033,19 @@ public class PoolProperties implements PoolConfiguration {
         }
         return props;
     }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public boolean isAlternateUsernameAllowed() {
+        return alternateUsernameAllowed;
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setAlternateUsernameAllowed(boolean alternateUsernameAllowed) {
+        this.alternateUsernameAllowed = alternateUsernameAllowed;
+    }
+    
 }
