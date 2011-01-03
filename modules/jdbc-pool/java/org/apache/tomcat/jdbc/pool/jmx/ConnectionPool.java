@@ -622,5 +622,19 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public String getDataSourceJNDI() {
         return getPoolProperties().getDataSourceJNDI();
     }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public boolean isAlternateUsernameAllowed() {
+        return getPoolProperties().isAlternateUsernameAllowed();
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setAlternateUsernameAllowed(boolean alternateUsernameAllowed) {
+        //noop
+    }
 
 }
