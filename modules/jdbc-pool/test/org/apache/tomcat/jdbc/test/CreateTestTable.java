@@ -55,18 +55,30 @@ public class CreateTestTable extends DefaultTestCase {
             
             if (rs.next())
                 count = rs.getInt(1);
+            rs.close();
+            st.close();
             System.out.println("Count:"+count);
         }catch (Exception ignore) {}
+        con.close();
         return count;
     }
     
     public void testPopulateData() throws Exception {
-        init();
+        int count = 100000;
+        int actual = testCheckData();
+        if (actual>=count) {
+            System.out.println("Test tables has "+actual+" rows of data. No need to populate.");
+            return;
+        }
+        
         datasource.setJdbcInterceptors(ResetAbandonedTimer.class.getName());
         String insert = "insert into test values (?,?,?,?,?)";
         this.init();
         this.datasource.setRemoveAbandoned(false);
         Connection con = datasource.getConnection();
+        
+        boolean commit = con.getAutoCommit();
+        con.setAutoCommit(false);
         if (recreate) {
             Statement st = con.createStatement();
             try {
@@ -75,9 +87,11 @@ public class CreateTestTable extends DefaultTestCase {
             st.execute("create table test(id int not null, val1 varchar(255), val2 varchar(255), val3 varchar(255), val4 varchar(255))");
             st.close();
         }
+        
+        
         PreparedStatement ps = con.prepareStatement(insert);
         ps.setQueryTimeout(0);
-        for (int i=testCheckData(); i<100000; i++) {
+        for (int i=actual; i<count; i++) {
             ps.setInt(1,i);
             String s = getRandom();
             ps.setString(2, s);
@@ -93,12 +107,14 @@ public class CreateTestTable extends DefaultTestCase {
                 System.out.print("\n"+(i+1));
                 ps.executeBatch();
                 ps.close();
+                con.commit();
                 ps = con.prepareStatement(insert);
                 ps.setQueryTimeout(0);
             }
 
         }
         ps.close();
+        con.setAutoCommit(commit);
         con.close();
     }
     
