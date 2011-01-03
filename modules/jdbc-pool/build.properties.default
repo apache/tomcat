@@ -74,7 +74,7 @@ c3p0.loc=http://superb-east.dl.sourceforge.net/sourceforge/c3p0/c3p0-0.9.1.2.bin
 
 mysql.home=${base.path}/mysql-connector-java-5.1.12
 mysql.jar=${mysql.home}/mysql-connector-java-5.1.12-bin.jar
-mysql.loc=http://mysql.he.net/Downloads/Connector-J/mysql-connector-java-5.1.12.zip
+mysql.loc=http://mysql.mirrors.hoobly.com/Downloads/Connector-J/mysql-connector-java-5.1.12.zip
 
 dbcp.home=${base.path}/commons-dbcp-1.3
 dbcp.jar=${dbcp.home}/commons-dbcp-1.3.jar
