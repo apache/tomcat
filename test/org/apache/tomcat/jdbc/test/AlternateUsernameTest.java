@@ -34,7 +34,7 @@ import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class AlternateUsernameTest extends DefaultTestCase {
 
-    private static final int iterations = (new Random(System.currentTimeMillis())).nextInt(1000000)+100000;
+    private static final int iterations = 500000; //(new Random(System.currentTimeMillis())).nextInt(1000000)+100000;
     public AlternateUsernameTest(String name) {
         super(name);
     }
@@ -44,13 +44,15 @@ public class AlternateUsernameTest extends DefaultTestCase {
     
     private void testUsername(boolean allowUsernameChange) throws Exception {
         long start = System.currentTimeMillis();
+        int withoutuser =10;
+        int withuser = withoutuser;
         this.init();
+        this.datasource.setMaxActive(withuser+withoutuser);
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         this.datasource.setAlternateUsernameAllowed(allowUsernameChange);
         this.datasource.getConnection().close();
-        int withoutuser =10;
-        int withuser = withoutuser;
+        
         TestRunner[] runners = new TestRunner[withuser+withoutuser];
         for (int i=0; i<withuser; i++) {
             TestRunner with = new TestRunner("foo","bar",datasource.getPoolProperties().getUsername(),datasource.getPoolProperties().getPassword());
