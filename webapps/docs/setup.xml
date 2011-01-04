@@ -124,7 +124,7 @@
         org.apache.catalina.startup.Bootstrap
 </source>
 
-    <p>You may also need to specify <code>-jvm server</code> if you JVM defaults
+    <p>You may also need to specify <code>-jvm server</code> if the JVM defaults
        to using a server VM rather than a client VM. This has been observed on
        OSX.</p>
 
