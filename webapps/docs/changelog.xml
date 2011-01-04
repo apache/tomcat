@@ -82,6 +82,12 @@
         the pool when a web application is stopped. (slaurent)
       </add>
       <fix>
+        <bug>49372</bug>: Re-fix after connector re-factoring. If connector
+        initialisation fails (e.g. if a port is alreasy in use) do not trigger
+        an <code>LifecycleException</code> for an invalid state transition.
+        (markt)
+      </fix>
+      <fix>
         <bug>49650</bug>: Remove unnecessary entries package.access property
         defined in catalina.properties. Patch provided by Owen Farrell. (markt) 
       </fix>
