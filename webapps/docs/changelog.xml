@@ -77,6 +77,11 @@
         application if there's no session. Patch provided by Marc Guillemot.
         (slaurent)
       </add>
+      <fix>
+        <bug>49000</bug>: No longer accept specification invalid name only
+        cookies by default. This behaviour can be restored using a system
+        property. (markt)
+      </fix>
       <add>
         <bug>49159</bug>: Improve memory leak protection by renewing threads of
         the pool when a web application is stopped. (slaurent)
