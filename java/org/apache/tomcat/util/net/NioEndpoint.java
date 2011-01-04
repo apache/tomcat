@@ -57,7 +57,6 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
-import org.apache.tomcat.util.threads.CounterLatch;
 
 /**
  * NIO tailored thread pool, providing the following services:
