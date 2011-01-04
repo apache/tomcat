@@ -102,12 +102,12 @@ public class TestCookies extends TestCase {
 
     public void testNameOnlyCookies() throws Exception {
         // Bug 49000
-        test("fred=1; jim=2; bob", "fred", "1", "jim", "2", "bob", "");
-        test("fred=1; jim=2; bob; george=3", "fred", "1", "jim", "2", "bob", "",
+        test("fred=1; jim=2; bob", "fred", "1", "jim", "2");
+        test("fred=1; jim=2; bob; george=3", "fred", "1", "jim", "2",
                 "george", "3");
         test("fred=1; jim=2; bob=; george=3", "fred", "1", "jim", "2",
-                "bob", "", "george", "3");
-        test("fred=1; jim=2; bob=", "fred", "1", "jim", "2", "bob", "");
+                "george", "3");
+        test("fred=1; jim=2; bob=", "fred", "1", "jim", "2");
     }
 
 
