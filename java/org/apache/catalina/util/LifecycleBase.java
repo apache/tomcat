@@ -97,7 +97,12 @@ public abstract class LifecycleBase implements Lifecycle {
         }
         setState(LifecycleState.INITIALIZING);
 
-        initInternal();
+        try {
+            initInternal();
+        } catch (LifecycleException e) {
+            setState(LifecycleState.FAILED);
+            throw e;
+        }
 
         setState(LifecycleState.INITIALIZED);
     }
@@ -213,7 +218,12 @@ public abstract class LifecycleBase implements Lifecycle {
         
         setState(LifecycleState.STOPPING_PREP);
 
-        stopInternal();
+        try {
+            stopInternal();
+        } catch (LifecycleException e) {
+            setState(LifecycleState.FAILED);
+            throw e;
+        }
 
         if (state.equals(LifecycleState.MUST_DESTROY)) {
             // Complete stop process first
@@ -221,8 +231,8 @@ public abstract class LifecycleBase implements Lifecycle {
 
             destroy();
         } else {
-            // Shouldn't be necessary but acts as a check that sub-classes are doing
-            // what they are supposed to.
+            // Shouldn't be necessary but acts as a check that sub-classes are
+            // doing what they are supposed to.
             if (!state.equals(LifecycleState.STOPPING)) {
                 invalidTransition(Lifecycle.AFTER_STOP_EVENT);
             }
@@ -271,7 +281,12 @@ public abstract class LifecycleBase implements Lifecycle {
 
         setState(LifecycleState.DESTROYING);
         
-        destroyInternal();
+        try {
+            destroyInternal();
+        } catch (LifecycleException e) {
+            setState(LifecycleState.FAILED);
+            throw e;
+        }
         
         setState(LifecycleState.DESTROYED);
     }

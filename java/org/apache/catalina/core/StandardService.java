@@ -453,7 +453,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         synchronized (connectors) {
             for (Connector connector: connectors) {
                 try {
-                    connector.start();
+                    // If it has already failed, don't try and start it
+                    if (connector.getState() != LifecycleState.FAILED) {
+                        connector.start();
+                    }
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "standardService.connector.startFailed",
