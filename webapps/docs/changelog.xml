@@ -234,6 +234,10 @@
       <update>
         Improve documentation of database connection factory. (rjung)
       </update>
+      <fix>
+        <bug>50488</bug>: Update classpath required when using jsvc and add a
+        note regarding server VMs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
