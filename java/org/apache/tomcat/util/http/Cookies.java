@@ -283,7 +283,7 @@ public final class Cookies { // extends MultiMap {
             // cookie at the end of the cookie header, so if we
             // are past the end of the header, but we have a name
             // skip to the name-only part.
-            if (pos < end && bytes[pos] == '=') {                
+            if (pos < (end - 1) && bytes[pos] == '=') {                
 
                 // Skip whitespace
                 do {
