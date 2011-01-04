@@ -420,6 +420,19 @@
         to be searched.</p>
       </attribute>
 
+      <attribute name="sizeLimit" required="false">
+        <p>Specifies the maximum number of records to return when using the
+        <code>userSearch</code> attribute. If not specified, the default of
+        <code>0</code> is used which indicates no limit.</p>
+      </attribute>
+
+      <attribute name="timeLimit" required="false">
+        <p>Specifies the time (in milliseconds) to wait for records to be
+        returned when using the <code>userSearch</code> attribute. If not
+        specified, the default of <code>0</code> is used which indicates no
+        limit.</p>
+      </attribute>
+
       <attribute name="userBase" required="false">
         <p>The base element for user searches performed using the
         <code>userSearch</code> expression.  Not used if you are using
