@@ -389,6 +389,18 @@ public class JNDIRealm extends RealmBase {
      */
     protected String connectionTimeout = "5000";
     
+    /**
+     * The sizeLimit (also known as the countLimit) to use when the realm is
+     * configured with {@link #userSearch}. Zero for no limit.
+     */
+    protected long sizeLimit = 0;
+
+    /**
+     * The timeLimit (in milliseconds) to use when the realm is configured with
+     * {@link #userSearch}. Zero for no limit.
+     */
+    protected int timeLimit = 0;
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -900,6 +912,26 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    public long getSizeLimit() {
+        return sizeLimit;
+    }
+
+
+    public void setSizeLimit(long sizeLimit) {
+        this.sizeLimit = sizeLimit;
+    }
+
+
+    public int getTimeLimit() {
+        return timeLimit;
+    }
+
+
+    public void setTimeLimit(int timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+
     /**
      * Return descriptive information about this Realm implementation and
      * the corresponding version number, in the format
@@ -1333,6 +1365,9 @@ public class JNDIRealm extends RealmBase {
         else {
             constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
         }
+
+        constraints.setCountLimit(sizeLimit);
+        constraints.setTimeLimit(timeLimit);
 
         // Specify the attributes to be retrieved
         if (attrIds == null)
