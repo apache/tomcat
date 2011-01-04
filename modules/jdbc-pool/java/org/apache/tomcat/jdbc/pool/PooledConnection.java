@@ -74,7 +74,7 @@ public class PooledConnection {
     /**
      * If using a XAConnection underneath.
      */
-    private volatile javax.sql.XAConnection xaConnection;
+    protected volatile javax.sql.XAConnection xaConnection;
     /**
      * When we track abandon traces, this string holds the thread dump
      */
@@ -116,6 +116,8 @@ public class PooledConnection {
     private AtomicBoolean released = new AtomicBoolean(false);
     
     private volatile boolean suspect = false;
+    
+    private java.sql.Driver driver = null;
     
     /**
      * Constructor
@@ -229,10 +231,12 @@ public class PooledConnection {
         }
     }
     protected void connectUsingDriver() throws SQLException {
-        java.sql.Driver driver = null;
+        
         try {
-            driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
-                                                     true, PooledConnection.class.getClassLoader()).newInstance();
+            if (driver==null)
+                driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
+                                                         true, PooledConnection.class.getClassLoader()
+                                                         ).newInstance();
         } catch (java.lang.Exception cn) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to instantiate JDBC driver.", cn);
