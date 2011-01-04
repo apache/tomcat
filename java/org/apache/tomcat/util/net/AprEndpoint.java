@@ -40,7 +40,6 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.threads.CounterLatch;
 
 
 /**
