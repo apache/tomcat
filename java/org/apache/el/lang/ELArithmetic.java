@@ -257,9 +257,12 @@ public abstract class ELArithmetic {
         final ELArithmetic delegate;
         if (BIGDECIMAL.matches(obj0, obj1))
             delegate = BIGDECIMAL;
-        else if (DOUBLE.matches(obj0, obj1))
-            delegate = DOUBLE;
-        else if (BIGINTEGER.matches(obj0, obj1))
+        else if (DOUBLE.matches(obj0, obj1)) {
+            if (BIGINTEGER.matches(obj0, obj1))
+                delegate = BIGDECIMAL;
+            else
+                delegate = DOUBLE;
+        } else if (BIGINTEGER.matches(obj0, obj1))
             delegate = BIGINTEGER;
         else
             delegate = LONG;
@@ -277,7 +280,7 @@ public abstract class ELArithmetic {
 
         final ELArithmetic delegate;
         if (BIGDECIMAL.matches(obj0, obj1))
-            delegate = BIGDECIMAL;
+            delegate = DOUBLE;
         else if (DOUBLE.matches(obj0, obj1))
             delegate = DOUBLE;
         else if (BIGINTEGER.matches(obj0, obj1))
@@ -299,9 +302,12 @@ public abstract class ELArithmetic {
         final ELArithmetic delegate;
         if (BIGDECIMAL.matches(obj0, obj1))
             delegate = BIGDECIMAL;
-        else if (DOUBLE.matches(obj0, obj1))
-            delegate = DOUBLE;
-        else if (BIGINTEGER.matches(obj0, obj1))
+        else if (DOUBLE.matches(obj0, obj1)) {
+            if (BIGINTEGER.matches(obj0, obj1))
+                delegate = BIGDECIMAL;
+            else
+                delegate = DOUBLE;
+        } else if (BIGINTEGER.matches(obj0, obj1))
             delegate = BIGINTEGER;
         else
             delegate = LONG;
@@ -339,9 +345,12 @@ public abstract class ELArithmetic {
         final ELArithmetic delegate;
         if (BIGDECIMAL.matches(obj0, obj1))
             delegate = BIGDECIMAL;
-        else if (DOUBLE.matches(obj0, obj1))
-            delegate = DOUBLE;
-        else if (BIGINTEGER.matches(obj0, obj1))
+        else if (DOUBLE.matches(obj0, obj1)) {
+            if (BIGINTEGER.matches(obj0, obj1))
+                delegate = BIGDECIMAL;
+            else
+                delegate = DOUBLE;
+        } else if (BIGINTEGER.matches(obj0, obj1))
             delegate = BIGINTEGER;
         else
             delegate = LONG;
