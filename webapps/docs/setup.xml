@@ -119,10 +119,14 @@
 
 <source>
     cd $CATALINA_HOME
-    ./bin/jsvc -cp ./bin/bootstrap.jar \
+    ./bin/jsvc -cp ./bin/bootstrap.jar:./bin/tomcat-juli.jar \
         -outfile ./logs/catalina.out -errfile ./logs/catalina.err \
         org.apache.catalina.startup.Bootstrap
 </source>
+
+    <p>You may also need to specify <code>-jvm server</code> if you JVM defaults
+       to using a server VM rather than a client VM. This has been observed on
+       OSX.</p>
 
     <p>jsvc has other useful parameters, such as <code>-user</code> which 
        causes it to switch to another user after the daemon initialization is
