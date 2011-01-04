@@ -38,13 +38,16 @@ public class AlternateUsernameTest extends DefaultTestCase {
     public AlternateUsernameTest(String name) {
         super(name);
     }
-    
     public void testUsernameCompare() throws Exception {
-        
+        testUsername(true);
+    }
+    
+    private void testUsername(boolean allowUsernameChange) throws Exception {
+        long start = System.currentTimeMillis();
         this.init();
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
-        this.datasource.setAlternateUsernameAllowed(true);
+        this.datasource.setAlternateUsernameAllowed(allowUsernameChange);
         this.datasource.getConnection().close();
         int withoutuser =10;
         int withuser = withoutuser;
@@ -52,7 +55,7 @@ public class AlternateUsernameTest extends DefaultTestCase {
         for (int i=0; i<withuser; i++) {
             TestRunner with = new TestRunner("foo","bar",datasource.getPoolProperties().getUsername(),datasource.getPoolProperties().getPassword());
             TestRunner without = new TestRunner(null,null,datasource.getPoolProperties().getUsername(),datasource.getPoolProperties().getPassword());
-            runners[i] = with;
+            runners[i] = allowUsernameChange?with:without;
             runners[i+withuser] = without;
         }
         ExecutorService svc = Executors.newFixedThreadPool(withuser+withoutuser);
@@ -65,17 +68,22 @@ public class AlternateUsernameTest extends DefaultTestCase {
             failures += results.get(i+withuser).get().failures;
             total+=results.get(i+withuser).get().iterations;
         }
+        long stop = System.currentTimeMillis();
         assertEquals("Nr of failures was:"+failures,0, failures);
         svc.shutdownNow();
         this.datasource.close();
         System.out.println("Nr of connect() calls:"+Driver.connectCount.get());
         System.out.println("Nr of disconnect() calls:"+Driver.disconnectCount.get());
-        System.out.println("Nr of iterations:"+total);
+        System.out.println("Nr of iterations:"+total+" over "+(stop-start)+ " ms.");
 
     }
     
     public void testUsernameCompareAgain() throws Exception {
         testUsernameCompare();
+    }
+    
+    public void testUsernameCompareNotAllowed() throws Exception {
+        testUsername(false);
     }
     
     public static class TestResult {
