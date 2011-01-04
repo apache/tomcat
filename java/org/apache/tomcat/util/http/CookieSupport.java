@@ -60,6 +60,11 @@ public final class CookieSupport {
     public static final boolean FWD_SLASH_IS_SEPARATOR;
 
     /**
+     * If true, name only cookies will be permitted.
+     */
+    public static final boolean ALLOW_NAME_ONLY;
+
+    /**
      * The list of separators that apply to version 0 cookies. To quote the
      * spec, these are comma, semi-colon and white-space. The HTTP spec
      * definition of linear white space is [CRLF] 1*( SP | HT )
@@ -106,6 +111,11 @@ public final class CookieSupport {
                 Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
         }
         
+        ALLOW_NAME_ONLY = Boolean.valueOf(System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY",
+                "false")).booleanValue();
+        
+
         /*
         Excluding the '/' char by default violates the RFC, but 
         it looks like a lot of people put '/'

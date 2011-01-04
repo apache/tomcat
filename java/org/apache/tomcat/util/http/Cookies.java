@@ -422,6 +422,11 @@ public final class Cookies { // extends MultiMap {
                 log.info("Cookies: Unknown Special Cookie");
 
             } else { // Normal Cookie
+                if (valueStart == -1 && !CookieSupport.ALLOW_NAME_ONLY) {
+                    // Skip name only cookies if not supported
+                    continue;
+                }
+
                 sc = addCookie();
                 sc.setVersion( version );
                 sc.getName().setBytes( bytes, nameStart,
