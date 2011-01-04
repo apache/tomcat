@@ -17,31 +17,10 @@
 
 package org.apache.tomcat.util.http; 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 
 public class TestCookies extends TestCase {
-    public static void main( String args[] ) {
-       TestRunner.run(suite());
-    }
-    public static Test suite() {
-       TestSuite suite = new TestSuite();
-       suite.addTest(new TestSuite(TestCookies.class));
-       return suite;
-    }
-/*
-       int i = 10000000;
-          // These tests are not really representative 
-         while (i-- > 0) { 
-             test("session=1234567890;name=\"John Q. Public\";");
-        }
-//        runtests();
-    } 
- */
-    
+
     public void testCookies() throws Exception {
         test("foo=bar; a=b", "foo", "bar", "a", "b");
         test("foo=bar;a=b", "foo", "bar", "a", "b");
@@ -119,6 +98,20 @@ public class TestCookies extends TestCase {
         test("$Version=1;foo=bar", 1);
         test("$Version=0;foo=bar", 0);
     }
+
+
+    public void testNameOnlyCookies() throws Exception {
+        // Bug 49000
+        /*
+        test("fred=1; jim=2; bob", "fred", "1", "jim", "2", "bob", "");
+        test("fred=1; jim=2; bob; george=3", "fred", "1", "jim", "2", "bob", "",
+                "george", "3");
+        test("fred=1; jim=2; bob=; george=3", "fred", "1", "jim", "2",
+                "bob", "", "george", "3");
+        */                    
+        test("fred=1; jim=2; bob=", "fred", "1", "jim", "2", "bob", "");
+    }
+
 
     public static void test( String s, int val ) throws Exception {
         System.out.println("Processing [" + s + "]");
