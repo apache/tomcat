@@ -180,6 +180,7 @@ public class DefaultTestCase extends TestCase {
         tDatasource = null;
         //c3p0Datasource = null;
         System.gc();
+        org.apache.tomcat.jdbc.test.driver.Driver.reset();
     }
 
     private final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
