@@ -48,15 +48,6 @@ public class VoidOutputFilter implements OutputFilter {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Next buffer in the pipeline.
-     */
-    protected OutputBuffer buffer;
-
-
     // --------------------------------------------------- OutputBuffer Methods
 
 
@@ -93,7 +84,7 @@ public class VoidOutputFilter implements OutputFilter {
      */
     @Override
     public void setBuffer(OutputBuffer buffer) {
-        this.buffer = buffer;
+        // NO-OP
     }
 
 

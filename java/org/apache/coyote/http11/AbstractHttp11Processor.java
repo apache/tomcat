@@ -61,9 +61,6 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    protected static boolean isSecurityEnabled = 
-        org.apache.coyote.Constants.IS_SECURITY_ENABLED;
-
     /*
      * Tracks how many internal filters are in the filter library so they
      * are skipped when looking for pluggable filters. 
@@ -360,14 +357,6 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
 
     /**
-     * Return the list of compressable mime-types.
-     */
-    public String[] findCompressableMimeTypes() {
-        return (compressableMimeTypes);
-    }
-
-
-    /**
      * Return compression level.
      */
     public String getCompression() {
@@ -486,19 +475,6 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
                 addRestrictedUserAgent(st.nextToken().trim());
             }
         }
-    }
-
-
-    /**
-     * Return the list of restricted user agents.
-     */
-    public String[] findRestrictedUserAgents() {
-        String[] sarr = new String [restrictedUserAgents.length];
-
-        for (int i = 0; i < restrictedUserAgents.length; i++)
-            sarr[i] = restrictedUserAgents[i].toString();
-
-        return (sarr);
     }
 
 
@@ -795,30 +771,6 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     }
 
     
-    /**
-     * Add input or output filter.
-     *
-     * @param className class name of the filter
-     */
-    protected void addFilter(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Object obj = clazz.newInstance();
-            if (obj instanceof InputFilter) {
-                getInputBuffer().addFilter((InputFilter) obj);
-            } else if (obj instanceof OutputFilter) {
-                getOutputBuffer().addFilter((OutputFilter) obj);
-            } else {
-                getLog().warn(sm.getString("http11processor.filter.unknown",
-                        className));
-            }
-        } catch (Exception e) {
-            getLog().error(sm.getString(
-                    "http11processor.filter.error", className), e);
-        }
-    }
-
-
     /**
      * Add an input filter to the current request.
      *

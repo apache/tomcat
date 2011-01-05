@@ -35,27 +35,14 @@ import org.apache.tomcat.util.http.HttpMessages;
 public class InternalAprOutputBuffer extends AbstractOutputBuffer {
 
 
-    // -------------------------------------------------------------- Constants
-
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Default constructor.
      */
-    public InternalAprOutputBuffer(Response response) {
-        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
-    }
-
-
-    /**
-     * Alternate constructor.
-     */
     public InternalAprOutputBuffer(Response response, int headerBufferSize) {
 
         this.response = response;
-        headers = response.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
         if (headerBufferSize < (8 * 1024)) {
