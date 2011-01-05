@@ -31,7 +31,6 @@ import org.apache.catalina.Store;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.session.PersistentManager;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -62,13 +61,6 @@ public class PersistentValve extends ValveBase {
      */
     private static final String info =
         "org.apache.catalina.valves.PersistentValve/1.0";
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties

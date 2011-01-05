@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a Valve that performs filtering based on comparing the
@@ -81,13 +80,6 @@ public abstract class RequestFilterValve
      */
     private static final String info =
         "org.apache.catalina.valves.RequestFilterValve/1.0";
-
-
-    /**
-     * The StringManager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ----------------------------------------------------- Instance Variables
