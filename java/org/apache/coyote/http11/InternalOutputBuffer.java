@@ -32,28 +32,14 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class InternalOutputBuffer extends AbstractOutputBuffer
     implements ByteChunk.ByteOutputChannel {
 
-    // -------------------------------------------------------------- Constants
-
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Default constructor.
      */
-    public InternalOutputBuffer(Response response) {
-        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
-    }
-
-
-    /**
-     * Alternate constructor.
-     */
     public InternalOutputBuffer(Response response, int headerBufferSize) {
 
         this.response = response;
-        
-        headers = response.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
 

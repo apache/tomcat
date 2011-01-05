@@ -28,7 +28,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractOutputBuffer implements OutputBuffer{
@@ -40,12 +39,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
      * Associated Coyote response.
      */
     protected Response response;
-
-
-    /**
-     * Headers of the associated request.
-     */
-    protected MimeHeaders headers;
 
 
     /**
@@ -137,17 +130,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
     public OutputFilter[] getFilters() {
 
         return filterLibrary;
-
-    }
-
-
-    /**
-     * Clear filters.
-     */
-    public void clearFilters() {
-
-        filterLibrary = new OutputFilter[0];
-        lastActiveFilter = -1;
 
     }
 
@@ -391,42 +373,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
      * @param value Header value
      */
     public void sendHeader(MessageBytes name, MessageBytes value) {
-
-        write(name);
-        buf[pos++] = Constants.COLON;
-        buf[pos++] = Constants.SP;
-        write(value);
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
-
-    }
-
-
-    /**
-     * Send a header.
-     * 
-     * @param name Header name
-     * @param value Header value
-     */
-    public void sendHeader(ByteChunk name, ByteChunk value) {
-
-        write(name);
-        buf[pos++] = Constants.COLON;
-        buf[pos++] = Constants.SP;
-        write(value);
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
-
-    }
-
-
-    /**
-     * Send a header.
-     * 
-     * @param name Header name
-     * @param value Header value
-     */
-    public void sendHeader(String name, String value) {
 
         write(name);
         buf[pos++] = Constants.COLON;

@@ -37,14 +37,6 @@ public class InternalInputBuffer extends AbstractInputBuffer {
     /**
      * Default constructor.
      */
-    public InternalInputBuffer(Request request) {
-        this(request, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
-    }
-
-
-    /**
-     * Alternate constructor.
-     */
     public InternalInputBuffer(Request request, int headerBufferSize) {
 
         this.request = request;

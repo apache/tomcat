@@ -38,8 +38,6 @@ public final class Constants {
 
     public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
-    public static final int DEFAULT_CONNECTION_UPLOAD_TIMEOUT = 300000;
-    public static final int DEFAULT_SERVER_SOCKET_TIMEOUT = 0;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
     
     
@@ -129,8 +127,6 @@ public final class Constants {
 
 
     /* Various constant "strings" */
-    public static final byte[] CRLF_BYTES = ByteChunk.convertToBytes(CRLF);
-    public static final byte[] COLON_BYTES = ByteChunk.convertToBytes(": ");
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
     public static final byte[] CLOSE_BYTES = 
