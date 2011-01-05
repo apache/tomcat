@@ -33,21 +33,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class VoidOutputFilter implements OutputFilter {
 
 
-    // -------------------------------------------------------------- Constants
-
-
-    protected static final String ENCODING_NAME = "void";
-    protected static final ByteChunk ENCODING = new ByteChunk();
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(), 0, ENCODING_NAME.length());
-    }
-
-
     // --------------------------------------------------- OutputBuffer Methods
 
 

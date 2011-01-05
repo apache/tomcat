@@ -34,26 +34,11 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class GzipOutputFilter implements OutputFilter {
 
 
-    // -------------------------------------------------------------- Constants
-
-
-    protected static final String ENCODING_NAME = "gzip";
-    protected static final ByteChunk ENCODING = new ByteChunk();
-
-
     /**
      * Logger.
      */
     protected static org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(GzipOutputFilter.class);
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(), 0, ENCODING_NAME.length());
-    }
 
 
     // ----------------------------------------------------- Instance Variables
