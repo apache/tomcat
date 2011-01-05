@@ -109,11 +109,6 @@ public final class Response {
      */
     protected boolean charsetSet = false;
 
-    /**
-     * Request error URI.
-     */
-    protected String errorURI = null;
-
     protected Request req;
 
     // ------------------------------------------------------------- Properties
@@ -242,22 +237,6 @@ public final class Response {
 
     public boolean isExceptionPresent() {
         return ( errorException != null );
-    }
-
-
-    /** 
-     * Set request URI that caused an error during
-     * request processing.
-     */
-    public void setErrorURI(String uri) {
-        errorURI = uri;
-    }
-
-
-    /** Get the request URI that caused the original error.
-     */
-    public String getErrorURI() {
-        return errorURI;
     }
 
 
@@ -569,7 +548,6 @@ public final class Response {
         message = null;
         commited = false;
         errorException = null;
-        errorURI = null;
         headers.clear();
 
         // update counters
@@ -578,9 +556,5 @@ public final class Response {
 
     public long getBytesWritten() {
         return bytesWritten;
-    }
-
-    public void setBytesWritten(long bytesWritten) {
-        this.bytesWritten = bytesWritten;
     }
 }
