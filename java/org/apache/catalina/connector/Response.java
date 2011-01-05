@@ -310,15 +310,8 @@ public class Response
     /**
      * Return the number of bytes actually written to the output stream.
      */
-    public int getContentCount() {
+    public long getContentCount() {
         return outputBuffer.getContentWritten();
-    }
-    
-    /**
-     * Return the number of bytes actually written to the output stream.
-     */
-    public long getContentCountLong() {
-        return outputBuffer.getContentWrittenLong();
     }
 
     /**

@@ -165,7 +165,7 @@ public class ErrorReportValve extends ValveBase {
 
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
-        if ((statusCode < 400) || (response.getContentCountLong() > 0))
+        if ((statusCode < 400) || (response.getContentCount() > 0))
             return;
 
         String message = RequestUtil.filter(response.getMessage());
