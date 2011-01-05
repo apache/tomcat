@@ -168,6 +168,11 @@
         Log a warning if context.xml files define values for properties  that do
         not exist (e.g. if there is a typo in a property name). (markt)
       </fix>
+      <fix>
+        <bug>50453</bug>: Correctly handle multiple <code>X-Forwarded-For</code>
+        headers in the RemoteIpFilter and RemoteIpValve. Patch provided by Jim
+        Riggs. (markt)
+      </fix>
       <add>
         <bug>50541</bug>: Add support for setting the size limit and time limit
         for LDAP seaches when using the JNDI Realm with <code>userSearch</code>.

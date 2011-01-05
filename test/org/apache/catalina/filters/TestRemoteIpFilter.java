@@ -111,6 +111,10 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
             getCoyoteRequest().getMimeHeaders().setValue(name).setString(value);
         }
 
+        public void addHeader(String name, String value) {
+            getCoyoteRequest().getMimeHeaders().addValue(name).setString(value);
+        }
+
         public void setScheme(String scheme) {
             getCoyoteRequest().scheme().setString(scheme);
         }
@@ -250,7 +254,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, 192.168.0.10, 192.168.0.11");
+        request.addHeader("x-forwarded-for", "140.211.11.130, 192.168.0.10, 192.168.0.11");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request);
@@ -315,7 +319,9 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+        request.addHeader("x-forwarded-for", "140.211.11.130");
+        request.addHeader("x-forwarded-for", "proxy1");
+        request.addHeader("x-forwarded-for", "proxy2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request);
