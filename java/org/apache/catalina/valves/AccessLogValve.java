@@ -1057,7 +1057,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            long length = response.getContentCountLong() ;
+            long length = response.getContentCount() ;
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {

@@ -340,6 +340,7 @@ public class OutputBuffer extends Writer
      * 
      * @throws IOException An underlying IOException occurred
      */
+    @Override
     public void realWriteBytes(byte buf[], int off, int cnt)
             throws IOException {
 
@@ -513,6 +514,7 @@ public class OutputBuffer extends Writer
                     conv = AccessController.doPrivileged(
                             new PrivilegedExceptionAction<C2BConverter>(){
 
+                                @Override
                                 public C2BConverter run() throws IOException{
                                     return new C2BConverter(bb, enc);
                                 }
@@ -547,29 +549,7 @@ public class OutputBuffer extends Writer
 
     }
 
-    public int getBytesWritten() {
-        if (bytesWritten < Integer.MAX_VALUE) {
-            return (int) bytesWritten;
-        }
-        return -1;
-    }
-
-    public int getCharsWritten() {
-        if (charsWritten < Integer.MAX_VALUE) {
-            return (int) charsWritten;
-        }
-        return -1;
-    }
-
-    public int getContentWritten() {
-        long size = bytesWritten + charsWritten ;
-        if (size < Integer.MAX_VALUE) {
-            return (int) size;
-        }
-        return -1;
-    }
-
-    public long getContentWrittenLong() {
+    public long getContentWritten() {
         return bytesWritten + charsWritten;
     }
     
