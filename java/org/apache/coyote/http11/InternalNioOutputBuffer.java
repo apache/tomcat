@@ -39,26 +39,14 @@ import org.apache.tomcat.util.net.NioSelectorPool;
  */
 public class InternalNioOutputBuffer extends AbstractOutputBuffer {
 
-
-    // -------------------------------------------------------------- Constants
-
-
     // ----------------------------------------------------------- Constructors
+
     /**
      * Default constructor.
-     */
-    public InternalNioOutputBuffer(Response response) {
-        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
-    }
-
-
-    /**
-     * Alternate constructor.
      */
     public InternalNioOutputBuffer(Response response, int headerBufferSize) {
 
         this.response = response;
-        headers = response.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
         
