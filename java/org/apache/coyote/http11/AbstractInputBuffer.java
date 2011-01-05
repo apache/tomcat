@@ -188,17 +188,6 @@ public abstract class AbstractInputBuffer implements InputBuffer{
 
 
     /**
-     * Clear filters.
-     */
-    public void clearFilters() {
-
-        filterLibrary = new InputFilter[0];
-        lastActiveFilter = -1;
-
-    }
-
-
-    /**
      * Add an input filter to the filter library.
      */
     public void addActiveFilter(InputFilter filter) {
