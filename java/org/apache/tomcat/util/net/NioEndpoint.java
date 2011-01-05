@@ -1141,9 +1141,15 @@ public class NioEndpoint extends AbstractEndpoint {
                     while (iterator != null && iterator.hasNext()) {
                         SelectionKey sk = iterator.next();
                         KeyAttachment attachment = (KeyAttachment)sk.attachment();
-                        attachment.access();
-                        iterator.remove();
-                        processKey(sk, attachment);
+                        // Attachment may be null if another thread has called
+                        // cancelledKey()
+                        if (attachment == null) {
+                            iterator.remove();
+                        } else {
+                            attachment.access();
+                            iterator.remove();
+                            processKey(sk, attachment);
+                        }
                     }//while
 
                     //process timeouts
