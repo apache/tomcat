@@ -179,16 +179,4 @@ public class ChunkedOutputFilter implements OutputFilter {
     public void recycle() {
         // NOOP: Nothing to recycle
     }
-
-
-    /**
-     * Return the name of the associated encoding; Here, the value is 
-     * "identity".
-     */
-    @Override
-    public ByteChunk getEncodingName() {
-        return ENCODING;
-    }
-
-
 }
