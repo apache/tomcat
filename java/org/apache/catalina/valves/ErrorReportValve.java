@@ -31,7 +31,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>
@@ -64,13 +63,6 @@ public class ErrorReportValve extends ValveBase {
      */
     private static final String info =
         "org.apache.catalina.valves.ErrorReportValve/1.0";
-
-
-    /**
-     * The StringManager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties

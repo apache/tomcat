@@ -35,7 +35,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -217,12 +216,6 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      */
     protected static final String info = 
         "org.apache.catalina.valves.JDBCAccessLogValve/1.1";
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties
