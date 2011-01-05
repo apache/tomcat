@@ -46,7 +46,6 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -187,13 +186,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Buffered logging.
      */
     private boolean buffered = true;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
