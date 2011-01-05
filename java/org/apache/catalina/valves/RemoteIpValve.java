@@ -31,7 +31,6 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -358,11 +357,6 @@ public class RemoteIpValve extends ValveBase {
      * Logger
      */
     private static final Log log = LogFactory.getLog(RemoteIpValve.class);
-    
-    /**
-     * The StringManager for this package.
-     */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
     
     /**
      * Convert a given comma delimited list of regular expressions into an array of compiled {@link Pattern}

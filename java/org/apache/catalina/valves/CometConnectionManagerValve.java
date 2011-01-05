@@ -41,7 +41,6 @@ import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.connector.CometEventImpl;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -71,13 +70,6 @@ public class CometConnectionManagerValve extends ValveBase
      */
     protected static final String info =
         "org.apache.catalina.valves.CometConnectionManagerValve/1.0";
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
