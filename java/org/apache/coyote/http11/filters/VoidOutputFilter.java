@@ -98,16 +98,6 @@ public class VoidOutputFilter implements OutputFilter {
 
 
     /**
-     * Return the name of the associated encoding; Here, the value is 
-     * "identity".
-     */
-    @Override
-    public ByteChunk getEncodingName() {
-        return ENCODING;
-    }
-
-
-    /**
      * End the current request. It is acceptable to write extra bytes using
      * buffer.doWrite during the execution of this method.
      * 
