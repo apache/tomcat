@@ -263,7 +263,9 @@ public class TestRemoteIpValve extends TestCase {
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
-        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130, proxy1, proxy2");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("proxy1");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("proxy2");
         
         // TEST
         remoteIpValve.invoke(request, null);
