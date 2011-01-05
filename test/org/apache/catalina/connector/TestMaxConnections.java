@@ -88,6 +88,7 @@ public class TestMaxConnections extends TomcatBaseTest{
         tomcat.getConnector().setProperty("maxConnections", "4");
         tomcat.getConnector().setProperty("acceptCount", "1");
         tomcat.start();
+        Thread.currentThread().sleep(2000);
     }
 
     private class TestClient extends SimpleHttpClient {
