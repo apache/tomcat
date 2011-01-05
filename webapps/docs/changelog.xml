@@ -195,6 +195,11 @@
         Remove a huge memory leak in the NIO connector introduced by the fix
         for <bug>49884</bug>. (markt)
       </fix>
+      <fix>
+        <bug>50467</bug>: Protected against NPE triggered by a race condition
+        that causes the NIO poller to fail, preventing the processing of further
+        requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
