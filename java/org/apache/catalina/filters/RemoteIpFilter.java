@@ -720,8 +720,17 @@ public class RemoteIpFilter implements Filter {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
+            StringBuffer concatRemoteIpHeaderValue = new StringBuffer();
             
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(request.getHeader(remoteIpHeader));
+            for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+                if (concatRemoteIpHeaderValue.length() > 0) {
+                    concatRemoteIpHeaderValue.append(", ");
+                }
+
+                concatRemoteIpHeaderValue.append(e.nextElement());
+            }
+
+            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             int idx;
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
@@ -782,11 +791,11 @@ public class RemoteIpFilter implements Filter {
                 log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + request.getRemoteAddr()
                         + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
                         + "', originalScheme='" + request.getScheme() + "', original[" + remoteIpHeader + "]='"
-                        + request.getHeader(remoteIpHeader) + ", original[" + protocolHeader + "]='"
+                        + concatRemoteIpHeaderValue + "', original[" + protocolHeader + "]='"
                         + (protocolHeader == null ? null : request.getHeader(protocolHeader)) + "' will be seen as newRemoteAddr='"
                         + xRequest.getRemoteAddr() + "', newRemoteHost='" + xRequest.getRemoteHost() + "', newScheme='"
                         + xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" + remoteIpHeader + "]='"
-                        + xRequest.getHeader(remoteIpHeader) + ", new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
+                        + xRequest.getHeader(remoteIpHeader) + "', new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
             }
             chain.doFilter(xRequest, response);
         } else {
