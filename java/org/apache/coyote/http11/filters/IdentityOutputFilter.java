@@ -32,21 +32,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class IdentityOutputFilter implements OutputFilter {
 
 
-    // -------------------------------------------------------------- Constants
-
-
-    protected static final String ENCODING_NAME = "identity";
-    protected static final ByteChunk ENCODING = new ByteChunk();
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(), 0, ENCODING_NAME.length());
-    }
-
-
     // ----------------------------------------------------- Instance Variables
 
 
