@@ -464,7 +464,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         String user = request.getRemoteUser();
         String query=request.getRequestURI();
         
-        long bytes = response.getContentCountLong() ;
+        long bytes = response.getContentCount() ;
         if(bytes < 0)
             bytes = 0;
         int status = response.getStatus();
