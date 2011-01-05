@@ -53,25 +53,6 @@ public class IdentityOutputFilter implements OutputFilter {
     protected OutputBuffer buffer;
 
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Get content length.
-     */
-    public long getContentLength() {
-        return contentLength;
-    }
-
-
-    /**
-     * Get remaining bytes.
-     */
-    public long getRemaining() {
-        return remaining;
-    }
-
-
     // --------------------------------------------------- OutputBuffer Methods
 
 
