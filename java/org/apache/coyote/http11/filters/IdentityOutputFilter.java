@@ -180,16 +180,4 @@ public class IdentityOutputFilter implements OutputFilter {
         contentLength = -1;
         remaining = 0;
     }
-
-
-    /**
-     * Return the name of the associated encoding; Here, the value is 
-     * "identity".
-     */
-    @Override
-    public ByteChunk getEncodingName() {
-        return ENCODING;
-    }
-
-
 }
