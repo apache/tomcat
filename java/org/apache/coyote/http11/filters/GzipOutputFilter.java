@@ -163,16 +163,6 @@ public class GzipOutputFilter implements OutputFilter {
     }
 
 
-    /**
-     * Return the name of the associated encoding; Here, the value is 
-     * "identity".
-     */
-    @Override
-    public ByteChunk getEncodingName() {
-        return ENCODING;
-    }
-
-
     // ------------------------------------------- FakeOutputStream Inner Class
 
 
