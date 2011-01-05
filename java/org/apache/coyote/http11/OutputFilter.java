@@ -56,12 +56,6 @@ public interface OutputFilter extends OutputBuffer {
 
 
     /**
-     * Get the name of the encoding handled by this filter.
-     */
-    public ByteChunk getEncodingName();
-
-
-    /**
      * Set the next buffer in the filter pipeline.
      */
     public void setBuffer(OutputBuffer buffer);
