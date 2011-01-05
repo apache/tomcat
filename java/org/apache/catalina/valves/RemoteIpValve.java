@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -548,8 +549,17 @@ public class RemoteIpValve extends ValveBase {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
+            StringBuffer concatRemoteIpHeaderValue = new StringBuffer();
             
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(request.getHeader(remoteIpHeader));
+            for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+                if (concatRemoteIpHeaderValue.length() > 0) {
+                    concatRemoteIpHeaderValue.append(", ");
+                }
+
+                concatRemoteIpHeaderValue.append(e.nextElement());
+            }
+
+            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             int idx;
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
