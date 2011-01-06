@@ -767,6 +767,7 @@ TCN_IMPLEMENT_CALL(jint, Registry, deleteKey)(TCN_STDARGS, jint root, jstring na
         rv = EBADF;
         goto cleanup;
     }
+    TCN_INIT_WSTRING(name);
     if (only_if_empty)
         rv = SHDeleteEmptyKeyW(TCN_KEYS[root].k, J2W(name));
     else
@@ -784,6 +785,7 @@ TCN_IMPLEMENT_CALL(jint, Registry, deleteValue)(TCN_STDARGS, jlong key,
     tcn_nt_registry_t *k = J2P(key, tcn_nt_registry_t *);
 
     UNREFERENCED(o);
+    TCN_INIT_WSTRING(name);
     rv = RegDeleteValueW(k->key, J2W(name));
     TCN_FREE_WSTRING(name);
     return (jint)rv;
