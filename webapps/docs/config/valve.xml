@@ -258,8 +258,8 @@
       </attribute>
 
       <attribute name="allow" required="false">
-        <p>A comma-separated list of <em>regular expression</em> patterns
-        that the remote client's IP address is compared to.  If this attribute
+        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        remote client&apos;s IP address is compared to.  If this attribute
         is specified, the remote address MUST match for this request to be
         accepted.  If this attribute is not specified, all requests will be
         accepted UNLESS the remote address matches a <code>deny</code>
@@ -267,8 +267,8 @@
       </attribute>
 
       <attribute name="deny" required="false">
-        <p>A comma-separated list of <em>regular expression</em> patterns
-        that the remote client's IP address is compared to.  If this attribute
+        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        remote client's IP address is compared to.  If this attribute
         is specified, the remote address MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
         governed solely by the <code>accept</code> attribute.</p>
@@ -314,8 +314,8 @@
       </attribute>
 
       <attribute name="allow" required="false">
-        <p>A comma-separated list of <em>regular expression</em> patterns
-        that the remote client's hostname is compared to.  If this attribute
+        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        remote client&apos;s hostname is compared to.  If this attribute
         is specified, the remote hostname MUST match for this request to be
         accepted.  If this attribute is not specified, all requests will be
         accepted UNLESS the remote hostname matches a <code>deny</code>
@@ -323,8 +323,8 @@
       </attribute>
 
       <attribute name="deny" required="false">
-        <p>A comma-separated list of <em>regular expression</em> patterns
-        that the remote client's hostname is compared to.  If this attribute
+        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        remote client's hostname is compared to.  If this attribute
         is specified, the remote hostname MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
         governed solely by the <code>accept</code> attribute.</p>
@@ -804,13 +804,13 @@
       </attribute>
 
       <attribute name="internalProxies" required="false">
-        <p>List of internal proxies' IP addresses as comma separated regular
-        expressions. If they appear in the <strong>remoteIpHeader</strong>
-        value, they will be trusted and will not appear in the
-        <strong>proxiesHeader</strong> value. If not specified the default value
-        of <code>10\.\d{1,3}\.\d{1,3}\.\d{1,3}, 192\.168\.\d{1,3}\.\d{1,3},
-        169\.254\.\d{1,3}\.\d{1,3}, 127\.\d{1,3}\.\d{1,3}\.\d{1,3}</code> will
-        be used.</p>
+        <p>Regular expression (using <code>java.util.regex</code>) that a
+        proxy&apos;s IP address must match to be considered an internal proxy.
+        Internal proxies that appear in the <strong>remoteIpHeader</strong> will
+        be trusted and will not appear in the <strong>proxiesHeader</strong>
+        value. If not specified the default value of <code>
+        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}
+        </code> will be used.</p>
       </attribute>
 
       <attribute name="proxiesHeader" required="false">
@@ -821,11 +821,11 @@
       </attribute>
 
       <attribute name="trustedProxies" required="false">
-        <p>List of trusted proxies' IP addresses as comma separated regular
-        expressions. If they appear in the <strong>remoteIpHeader</strong>
-        value, they will be trusted and will appear in the
-        <strong>proxiesHeader</strong> value. If not specified, no proxies will
-        be trusted.</p>
+        <p>Regular expression (using <code>java.util.regex</code>) that a
+        proxy&apos;s IP address must match to be considered an trusted proxy.
+        Trusted proxies that appear in the <strong>remoteIpHeader</strong> will
+        be trusted and will appear in the <strong>proxiesHeader</strong> value.
+        If not specified, no proxies will be trusted.</p>
       </attribute>
 
       <attribute name="protocolHeader" required="false">

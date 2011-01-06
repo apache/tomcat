@@ -178,6 +178,12 @@
         for LDAP seaches when using the JNDI Realm with <code>userSearch</code>.
         (markt)
       </add>
+      <update>
+        All configuration options that use regular expression now require a
+        single regular expression (using <code>java.util.regex</code>) rather
+        than a list of comma-separated or semi-colon-separated expressions.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
