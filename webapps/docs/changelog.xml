@@ -188,6 +188,12 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        <bug>47319</bug>: Return the client&apos;s IP address rather than null
+        for calls to <code>getRemoteHost()</code> when the APR connector is
+        used with <code>enableLookups=&quot;true&quot;</code> but the IP address
+        is not resolveable. (markt)
+      </fix>
       <add>
         <bug>50108</bug>: Add get/set methods for Connector property
         minSpareThreads. Patch provided by Eiji Takahashi. (markt)
