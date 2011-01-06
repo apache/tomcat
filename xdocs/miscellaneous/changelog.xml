@@ -39,6 +39,15 @@
 <section name="Changes between 1.1.20 and 1.1.21">
   <changelog>
     <update>
+      Update copyright year. (rjung)
+    </update>
+    <update>
+      Add tm logo. (mturk)
+    </update>
+    <update>
+      Make the non blocking write really no blocking. (jfclere)
+    </update>
+    <update>
       Add support for unsafe legacy renegotiation. (mturk)
     </update>
   </changelog>
