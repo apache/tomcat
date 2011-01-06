@@ -184,6 +184,11 @@
         than a list of comma-separated or semi-colon-separated expressions.
         (markt)
       </update>
+      <fix>
+        <bug>50550</bug>: When a new directory is created (e.g. via WebDAV)
+        ensure that a subsequent request for that directory does not result in a
+        404 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
