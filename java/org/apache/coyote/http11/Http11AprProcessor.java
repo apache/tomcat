@@ -464,6 +464,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
                 try {
                     long sa = Address.get(Socket.APR_REMOTE, socketRef);
                     remoteHost = Address.getnameinfo(sa, 0);
+                    if (remoteHost == null) {
+                        remoteHost = Address.getip(sa);
+                    }
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.info"), e);
                 }
