@@ -2706,18 +2706,23 @@ public class WebdavServlet
         @Override
         public String toString() {
 
-            String result =  "Type:" + type + "\n";
-            result += "Scope:" + scope + "\n";
-            result += "Depth:" + depth + "\n";
-            result += "Owner:" + owner + "\n";
-            result += "Expiration:"
-                + FastHttpDateFormat.formatDate(expiresAt, null) + "\n";
+            StringBuilder result =  new StringBuilder("Type:");
+            result.append(type);
+            result.append("\nScope:");
+            result.append(scope);
+            result.append("\nDepth:");
+            result.append(depth);
+            result.append("\nOwner:");
+            result.append(owner);
+            result.append("\nExpiration:");
+            result.append(FastHttpDateFormat.formatDate(expiresAt, null));
             Enumeration<String> tokensList = tokens.elements();
             while (tokensList.hasMoreElements()) {
-                result += "Token:" + tokensList.nextElement() + "\n";
+                result.append("\nToken:");
+                result.append(tokensList.nextElement());
             }
-            return result;
-
+            result.append("\n");
+            return result.toString();
         }
 
 
@@ -2797,7 +2802,7 @@ public class WebdavServlet
      * called with <code>false</code>. External references are filtered out for
      * security reasons. See CVE-2007-5461.
      */
-    private class WebdavResolver implements EntityResolver {
+    private static class WebdavResolver implements EntityResolver {
         private ServletContext context;
         
         public WebdavResolver(ServletContext theContext) {
