@@ -979,8 +979,68 @@
         application when it performs a lookup for this resource link.</p>
       </attribute>
 
+      <attribute name="factory" required="false">
+        <p>The fully qualified Java class name for the class creating these objects.
+        This class should implement the <code>javax.naming.spi.ObjectFactory</code> interface.</p>
+      </attribute>
     </attributes>
+    
+    <p>When the attribute <code>factory=&quot;org.apache.naming.factory.DataSourceLinkFactory&quot;</code> the resource link can be used with
+       two additional attributes to allow a shared data source to be used with different credentials.
+       When these two additional attributes are used in combination with the <code>javax.sql.DataSource</code>
+       type, different contexts can share a global data source with different credentials.
+       Under the hood, what happens is that a call to <a href="http://download.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection()"><code>getConnection()</code></a>
+       is simply translated to a call <a href="http://download.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)">
+       <code>getConnection(username, password)</code></a> on the global data source. This is an easy way to get code to be transparent to what schemas are being used,
+       yet be able to control connections (or pools) in the global configuration. 
+    </p>
+    <attributes>
 
+      <attribute name="username" required="false">
+        <p></p>
+      </attribute>
+
+      <attribute name="password" required="false">
+        <p></p>
+      </attribute>
+
+    </attributes>
+    <p>Shared Data Source Example</p>
+<source>
+&lt;GlobalNamingResources ...&gt;
+  ...
+  &lt;Resource name=&quot;sharedDataSource&quot;
+            global=&quot;sharedDataSource&quot;
+            type=&quot;javax.sql.DataSource&quot;
+            username=&quot;bar&quot;
+            password=&quot;barpass&quot;
+            
+            ...
+  ...
+&lt;/GlobalNamingResources&gt;
+
+&lt;Context path=&quot;/foo&quot;...&gt;
+  ...
+  &lt;ResourceLink 
+            name=&quot;appDataSource&quot;
+            global=&quot;sharedDataSource&quot;
+            type=&quot;javax.sql.DataSource&quot;
+            factory=&quot;org.apache.naming.factory.DataSourceLinkFactory&quot;
+            username=&quot;foo&quot;
+            password=&quot;foopass&quot;
+  ...
+&lt;/Context&gt;
+&lt;Context path=&quot;/bar&quot;...&gt;
+  ...
+  &lt;ResourceLink 
+            name=&quot;appDataSource&quot;
+            global=&quot;sharedDataSource&quot;
+            type=&quot;javax.sql.DataSource&quot;
+  ...
+&lt;/Context&gt;
+</source>    
+    <p>When a request for <code>getConnection()</code> is made in the <code>/foo</code> context, the request is translated into
+       <code>getConnection(&quot;foo&quot;,&quot;foopass&quot;)</code>, while a request in the <code>/bar</code> gets passed straight through.</p>
   </subsection>
 
   <subsection name="Transaction">
