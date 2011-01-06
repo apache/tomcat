@@ -16,7 +16,6 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -101,8 +99,8 @@ import org.apache.juli.logging.LogFactory;
  * <td>List of internal proxies ip adress. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will not appear
  * in the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPInternalProxy</td>
- * <td>Comma delimited list of regular expressions (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
- * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}, 192\.168\.\d{1,3}\.\d{1,3}, 169\.254\.\d{1,3}\.\d{1,3}, 127\.\d{1,3}\.\d{1,3}\.\d{1,3} <br/>
+ * <td>Regular expression (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
+ * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3} <br/>
  * By default, 10/8, 192.168/16, 169.254/16 and 127/8 are allowed ; 172.16/12 has not been enabled by default because it is complex to
  * describe with regular expressions</td>
  * </tr>
@@ -120,7 +118,7 @@ import org.apache.juli.logging.LogFactory;
  * <td>List of trusted proxies ip adress. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will appear in
  * the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPTrustedProxy</td>
- * <td>Comma delimited list of regular expressions (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
+ * <td>Regular expression (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
  * <td>&nbsp;</td>
  * </tr>
  * <tr>
@@ -610,24 +608,6 @@ public class RemoteIpFilter implements Filter {
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
     
     /**
-     * Convert a given comma delimited list of regular expressions into an array of compiled {@link Pattern}
-     * 
-     * @return array of patterns (not <code>null</code>)
-     */
-    protected static Pattern[] commaDelimitedListToPatternArray(String commaDelimitedPatterns) {
-        String[] patterns = commaDelimitedListToStringArray(commaDelimitedPatterns);
-        List<Pattern> patternsList = new ArrayList<Pattern>();
-        for (String pattern : patterns) {
-            try {
-                patternsList.add(Pattern.compile(pattern));
-            } catch (PatternSyntaxException e) {
-                throw new IllegalArgumentException("Illegal pattern syntax '" + pattern + "'", e);
-            }
-        }
-        return patternsList.toArray(new Pattern[0]);
-    }
-    
-    /**
      * Convert a given comma delimited list of regular expressions into an array of String
      * 
      * @return array of patterns (non <code>null</code>)
@@ -658,18 +638,6 @@ public class RemoteIpFilter implements Filter {
     }
     
     /**
-     * Return <code>true</code> if the given <code>str</code> matches at least one of the given <code>patterns</code>.
-     */
-    protected static boolean matchesOne(String str, Pattern... patterns) {
-        for (Pattern pattern : patterns) {
-            if (pattern.matcher(str).matches()) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
      * @see #setHttpServerPort(int)
      */
     private int httpServerPort = 80;
@@ -682,10 +650,11 @@ public class RemoteIpFilter implements Filter {
     /**
      * @see #setInternalProxies(String)
      */
-    private Pattern[] internalProxies = new Pattern[] {
-        Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"), Pattern.compile("192\\.168\\.\\d{1,3}\\.\\d{1,3}"),
-        Pattern.compile("169\\.254\\.\\d{1,3}\\.\\d{1,3}"), Pattern.compile("127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")
-    };
+    private Pattern internalProxies = Pattern.compile(
+            "10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
+            "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
+            "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     
     /**
      * @see #setProtocolHeader(String)
@@ -707,7 +676,7 @@ public class RemoteIpFilter implements Filter {
     /**
      * @see #setTrustedProxies(String)
      */
-    private Pattern[] trustedProxies = new Pattern[0];
+    private Pattern trustedProxies = null;
     
     @Override
     public void destroy() {
@@ -716,7 +685,8 @@ public class RemoteIpFilter implements Filter {
     
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         
-        if (matchesOne(request.getRemoteAddr(), internalProxies)) {
+        if (internalProxies != null &&
+                internalProxies.matcher(request.getRemoteAddr()).matches()) {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
@@ -736,9 +706,10 @@ public class RemoteIpFilter implements Filter {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (matchesOne(currentRemoteIp, internalProxies)) {
+                if (internalProxies.matcher(currentRemoteIp).matches()) {
                     // do nothing, internalProxies IPs are not appended to the
-                } else if (matchesOne(currentRemoteIp, trustedProxies)) {
+                } else if (trustedProxies != null &&
+                        trustedProxies.matcher(currentRemoteIp).matches()) {
                     proxiesHeaderValue.addFirst(currentRemoteIp);
                 } else {
                     idx--; // decrement idx because break statement doesn't do it
@@ -824,7 +795,7 @@ public class RemoteIpFilter implements Filter {
         return httpsServerPort;
     }
     
-    public Pattern[] getInternalProxies() {
+    public Pattern getInternalProxies() {
         return internalProxies;
     }
     
@@ -844,7 +815,7 @@ public class RemoteIpFilter implements Filter {
         return remoteIpHeader;
     }
     
-    public Pattern[] getTrustedProxies() {
+    public Pattern getTrustedProxies() {
         return trustedProxies;
     }
     
@@ -918,14 +889,18 @@ public class RemoteIpFilter implements Filter {
     
     /**
      * <p>
-     * Comma delimited list of internal proxies. Can be expressed with regular expressions.
+     * Regular expressions that defines the internal proxies.
      * </p>
      * <p>
-     * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}, 192\.168\.\d{1,3}\.\d{1,3}, 127\.\d{1,3}\.\d{1,3}\.\d{1,3}
+     * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}
      * </p>
      */
     public void setInternalProxies(String internalProxies) {
-        this.internalProxies = commaDelimitedListToPatternArray(internalProxies);
+        if (internalProxies == null || internalProxies.length() == 0) {
+            this.internalProxies = null;
+        } else {
+            this.internalProxies = Pattern.compile(internalProxies);
+        }
     }
     
     /**
@@ -990,14 +965,18 @@ public class RemoteIpFilter implements Filter {
     
     /**
      * <p>
-     * Comma delimited list of proxies that are trusted when they appear in the {@link #remoteIpHeader} header. Can be expressed as a
-     * regular expression.
+     * Regular expression defining proxies that are trusted when they appear in
+     * the {@link #remoteIpHeader} header.
      * </p>
      * <p>
      * Default value : empty list, no external proxy is trusted.
      * </p>
      */
     public void setTrustedProxies(String trustedProxies) {
-        this.trustedProxies = commaDelimitedListToPatternArray(trustedProxies);
+        if (trustedProxies == null || trustedProxies.length() == 0) {
+            this.trustedProxies = null;
+        } else {
+            this.trustedProxies = Pattern.compile(trustedProxies);
+        }
     }
 }

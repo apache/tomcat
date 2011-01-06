@@ -54,13 +54,14 @@
         Set value to <code>org.apache.catalina.ha.tcp.ReplicationValve</code>
       </attribute>
       <attribute name="filter" required="false">
-        For known file extensions or urls, you can use a filter to 
-        notify the cluster that the session has not been modified during this 
-        request and the cluster doesn't have to probe the session managers for changes.
-        If there is a filter match, the cluster assumes there has been no session change.
-        An example filter would look like <code>filter=&quot;.*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;&quot;</code>
-        The filter uses regular expressions and each filter is delimited by a semi colon.
-        <code>Pattern#compile(java.lang.String)</code>
+        For known file extensions or urls, you can use this Valve to notify the
+        cluster that the session has not been modified during this  request and
+        the cluster doesn't have to probe the session managers for changes. If
+        the request matches this filter pattern, the cluster assumes there has
+        been no session change. An example filter would look like <code>
+        filter=&quot;.*\.gif|.*\.js|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt;&quot;
+        </code>. The filter is a regular expression using
+        <code>java.util.regex</code>.
       </attribute>
       <attribute name="primaryIndicator" required="false">
         Boolean value, so to true, and the replication valve will insert a request attribute with the name

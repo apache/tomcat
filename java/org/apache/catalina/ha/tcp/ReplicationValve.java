@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
@@ -85,14 +85,9 @@ public class ReplicationValve
     private CatalinaCluster cluster = null ;
 
     /**
-     * holds file endings to not call for like images and others
+     * Filter expression 
      */
-    protected java.util.regex.Pattern[] reqFilters = new java.util.regex.Pattern[0];
-    
-    /**
-     * Orginal filter 
-     */
-    protected String filter ;
+    protected Pattern filter = null;
     
     /**
      * crossContext session container 
@@ -159,11 +154,14 @@ public class ReplicationValve
      * @return Returns the filter
      */
     public String getFilter() {
-       return filter ;
+       if (filter == null) {
+           return null;
+       }
+       return filter.toString();
     }
 
     /**
-     * compile filter string to regular expressions
+     * compile filter string to regular expression
      * @see Pattern#compile(java.lang.String)
      * @param filter
      *            The filter to set.
@@ -171,19 +169,15 @@ public class ReplicationValve
     public void setFilter(String filter) {
         if (log.isDebugEnabled())
             log.debug(sm.getString("ReplicationValve.filter.loading", filter));
-        this.filter = filter;
-        StringTokenizer t = new StringTokenizer(filter, ";");
-        this.reqFilters = new Pattern[t.countTokens()];
-        int i = 0;
-        while (t.hasMoreTokens()) {
-            String s = t.nextToken();
-            if (log.isTraceEnabled())
-                log.trace(sm.getString("ReplicationValve.filter.token", s));
+        
+        if (filter == null || filter.length() == 0) {
+            this.filter = null;
+        } else {
             try {
-                reqFilters[i++] = Pattern.compile(s);
-            } catch (Exception x) {
-                log.error(sm.getString("ReplicationValve.filter.token.failure",
-                        s), x);
+                this.filter = Pattern.compile(filter);
+            } catch (PatternSyntaxException pse) {
+                log.error(sm.getString("ReplicationValve.filter.failure",
+                        filter), pse);
             }
         }
     }
@@ -280,21 +274,6 @@ public class ReplicationValve
         return totalSendTime;
     }
 
-    /**
-     * @return Returns the reqFilters.
-     */
-    protected java.util.regex.Pattern[] getReqFilters() {
-        return reqFilters;
-    }
-    
-    /**
-     * @param reqFilters The reqFilters to set.
-     */
-    protected void setReqFilters(java.util.regex.Pattern[] reqFilters) {
-        this.reqFilters = reqFilters;
-    }
-    
-    
     // --------------------------------------------------------- Public Methods
     
     /**
@@ -572,14 +551,7 @@ public class ReplicationValve
      * @return True if no session change
      */
     protected boolean isRequestWithoutSessionChange(String uri) {
-
-        boolean filterfound = false;
-
-        for (int i = 0; (i < reqFilters.length) && (!filterfound); i++) {
-            java.util.regex.Matcher matcher = reqFilters[i].matcher(uri);
-            filterfound = matcher.matches();
-        }
-        return filterfound;
+        return filter.matcher(uri).matches();
     }
 
     /**

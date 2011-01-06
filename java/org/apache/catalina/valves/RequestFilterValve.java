@@ -20,9 +20,7 @@ package org.apache.catalina.valves;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -33,27 +31,25 @@ import org.apache.catalina.connector.Response;
 /**
  * Implementation of a Valve that performs filtering based on comparing the
  * appropriate request property (selected based on which subclass you choose
- * to configure into your Container's pipeline) against a set of regular
- * expressions configured for this Valve.
+ * to configure into your Container's pipeline) against the regular expressions
+ * configured for this Valve.
  * <p>
  * This valve is configured by setting the <code>allow</code> and/or
- * <code>deny</code> properties to a comma-delimited list of regular
- * expressions (in the syntax supported by the jakarta-regexp library) to
- * which the appropriate request property will be compared.  Evaluation
- * proceeds as follows:
+ * <code>deny</code> properties to a regular expressions (in the syntax
+ * supported by {@link Pattern}) to which the appropriate request property will
+ * be compared. Evaluation proceeds as follows:
  * <ul>
  * <li>The subclass extracts the request property to be filtered, and
  *     calls the common <code>process()</code> method.
- * <li>If there are any deny expressions configured, the property will
- *     be compared to each such expression.  If a match is found, this
- *     request will be rejected with a "Forbidden" HTTP response.</li>
- * <li>If there are any allow expressions configured, the property will
- *     be compared to each such expression.  If a match is found, this
- *     request will be allowed to pass through to the next Valve in the
- *     current pipeline.</li>
- * <li>If one or more deny expressions was specified but no allow expressions,
- *     allow this request to pass through (because none of the deny
- *     expressions matched it).
+ * <li>If there is a deny expression configured, the property will be compared
+ *     to the expression. If a match is found, this request will be rejected
+ *     with a "Forbidden" HTTP response.</li>
+ * <li>If there is a allow expression configured, the property will be compared
+ *     to each such expression.  If a match is found, this request will be
+ *     allowed to pass through to the next Valve in the current pipeline.</li>
+ * <li>If a deny expression was specified but no allow expression, allow this
+ *     request to pass through (because none of the deny expressions matched
+ *     it).
  * <li>The request will be rejected with a "Forbidden" HTTP response.</li>
  * </ul>
  * <p>
@@ -86,79 +82,71 @@ public abstract class RequestFilterValve
 
 
     /**
-     * The comma-delimited set of <code>allow</code> expressions.
+     * The regular expression used to test for allowed requests.
      */
-    protected String allow = null;
+    protected Pattern allow = null;
 
 
     /**
-     * The set of <code>allow</code> regular expressions we will evaluate.
+     * The regular expression used to test for denied requests.
      */
-    protected Pattern allows[] = new Pattern[0];
-
-
-    /**
-     * The set of <code>deny</code> regular expressions we will evaluate.
-     */
-    protected Pattern denies[] = new Pattern[0];
-
-
-    /**
-     * The comma-delimited set of <code>deny</code> expressions.
-     */
-    protected String deny = null;
+    protected Pattern deny = null;
 
 
     // ------------------------------------------------------------- Properties
 
 
     /**
-     * Return a comma-delimited set of the <code>allow</code> expressions
-     * configured for this Valve, if any; otherwise, return <code>null</code>.
+     * Return the regular expression used to test for allowed requests for this
+     * Valve, if any; otherwise, return <code>null</code>.
      */
     public String getAllow() {
-
-        return (this.allow);
-
+        if (allow == null) {
+            return null;
+        }
+        return allow.toString();
     }
 
 
     /**
-     * Set the comma-delimited set of the <code>allow</code> expressions
-     * configured for this Valve, if any.
+     * Set the regular expression used to test for allowed requests for this
+     * Valve, if any.
      *
-     * @param allow The new set of allow expressions
+     * @param allow The new allow expression
      */
     public void setAllow(String allow) {
-
-        this.allow = allow;
-        allows = precalculate(allow);
-
+        if (allow == null || allow.length() == 0) {
+            this.allow = null;
+        } else {
+            this.allow = Pattern.compile(allow);
+        }
     }
 
 
     /**
-     * Return a comma-delimited set of the <code>deny</code> expressions
-     * configured for this Valve, if any; otherwise, return <code>null</code>.
+     * Return the regular expression used to test for denied requests for this
+     * Valve, if any; otherwise, return <code>null</code>.
      */
     public String getDeny() {
-
-        return (this.deny);
-
+        if (deny == null) {
+            return null;
+        }
+        return deny.toString();
     }
 
 
     /**
-     * Set the comma-delimited set of the <code>deny</code> expressions
-     * configured for this Valve, if any.
+     * Set the regular expression used to test for denied requests for this
+     * Valve, if any.
      *
-     * @param deny The new set of deny expressions
+     * @param allow The new deny expression
      */
     public void setDeny(String deny) {
-
-        this.deny = deny;
-        denies = precalculate(deny);
-
+        if (deny == null || deny.length() == 0) {
+            this.deny = null;
+        } else {
+            this.deny = Pattern.compile(deny);
+        }
     }
 
 
@@ -197,48 +185,6 @@ public abstract class RequestFilterValve
 
 
     /**
-     * Return an array of regular expression objects initialized from the
-     * specified argument, which must be <code>null</code> or a comma-delimited
-     * list of regular expression patterns.
-     *
-     * @param list The comma-separated list of patterns
-     *
-     * @exception IllegalArgumentException if one of the patterns has
-     *  invalid syntax
-     */
-    protected Pattern[] precalculate(String list) {
-
-        if (list == null)
-            return (new Pattern[0]);
-        list = list.trim();
-        if (list.length() < 1)
-            return (new Pattern[0]);
-        list += ",";
-
-        ArrayList<Pattern> reList = new ArrayList<Pattern>();
-        while (list.length() > 0) {
-            int comma = list.indexOf(',');
-            if (comma < 0)
-                break;
-            String pattern = list.substring(0, comma).trim();
-            try {
-                reList.add(Pattern.compile(pattern));
-            } catch (PatternSyntaxException e) {
-                IllegalArgumentException iae = new IllegalArgumentException
-                    (sm.getString("requestFilterValve.syntax", pattern));
-                iae.initCause(e);
-                throw iae;
-            }
-            list = list.substring(comma + 1);
-        }
-
-        Pattern reArray[] = new Pattern[reList.size()];
-        return reList.toArray(reArray);
-
-    }
-
-
-    /**
      * Perform the filtering that has been configured for this Valve, matching
      * against the specified request property.
      *
@@ -254,23 +200,19 @@ public abstract class RequestFilterValve
         throws IOException, ServletException {
 
         // Check the deny patterns, if any
-        for (int i = 0; i < denies.length; i++) {
-            if (denies[i].matcher(property).matches()) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                return;
-            }
+        if (deny != null && deny.matcher(property).matches()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         // Check the allow patterns, if any
-        for (int i = 0; i < allows.length; i++) {
-            if (allows[i].matcher(property).matches()) {
-                getNext().invoke(request, response);
-                return;
-            }
+        if (allow != null && allow.matcher(property).matches()) {
+            getNext().invoke(request, response);
+            return;
         }
 
         // Allow if denies specified but not allows
-        if ((denies.length > 0) && (allows.length == 0)) {
+        if (deny != null && allow == null) {
             getNext().invoke(request, response);
             return;
         }
@@ -279,6 +221,4 @@ public abstract class RequestFilterValve
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
 
     }
-
-
 }
