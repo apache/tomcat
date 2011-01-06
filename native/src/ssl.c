@@ -37,6 +37,18 @@ ENGINE *tcn_ssl_engine = NULL;
 void *SSL_temp_keys[SSL_TMP_KEY_MAX];
 tcn_pass_cb_t tcn_password_callback;
 
+/* Global reference to the pool used by the dynamic mutexes */
+static apr_pool_t *dynlockpool = NULL;
+
+/* Dynamic lock structure */
+struct CRYPTO_dynlock_value {
+    apr_pool_t *pool;
+    const char* file;
+    int line;
+    apr_thread_mutex_t *mutex;
+};
+
+
 /*
  * Handle the Temporary RSA Keys and DH Params
  */
@@ -215,11 +227,94 @@ static apr_status_t ssl_thread_cleanup(void *data)
     UNREFERENCED(data);
     CRYPTO_set_locking_callback(NULL);
     CRYPTO_set_id_callback(NULL);
+    CRYPTO_set_dynlock_create_callback(NULL);
+    CRYPTO_set_dynlock_lock_callback(NULL);
+    CRYPTO_set_dynlock_destroy_callback(NULL);
+
+    dynlockpool = NULL;
+
     /* Let the registered mutex cleanups do their own thing
      */
     return APR_SUCCESS;
 }
 
+/*
+ * Dynamic lock creation callback
+ */
+static struct CRYPTO_dynlock_value *ssl_dyn_create_function(const char *file,
+                                                     int line)
+{
+    struct CRYPTO_dynlock_value *value;
+    apr_pool_t *p;
+    apr_status_t rv;
+
+    /* 
+     * We need a pool to allocate our mutex.  Since we can't clear
+     * allocated memory from a pool, create a subpool that we can blow
+     * away in the destruction callback. 
+     */
+    rv = apr_pool_create(&p, dynlockpool);
+    if (rv != APR_SUCCESS) {
+        /* TODO log that fprintf(stderr, "Failed to create subpool for dynamic lock"); */
+        return NULL;
+    }
+
+    value = (struct CRYPTO_dynlock_value *)apr_palloc(p,
+                                                      sizeof(struct CRYPTO_dynlock_value));
+    if (!value) {
+        /* TODO log that fprintf(stderr, "Failed to allocate dynamic lock structure"); */
+        return NULL;
+    }
+
+    value->pool = p;
+    /* Keep our own copy of the place from which we were created,
+       using our own pool. */
+    value->file = apr_pstrdup(p, file);
+    value->line = line;
+    rv = apr_thread_mutex_create(&(value->mutex), APR_THREAD_MUTEX_DEFAULT,
+                                p);
+    if (rv != APR_SUCCESS) {
+        /* TODO log that fprintf(stderr, "Failed to create thread mutex for dynamic lock"); */
+        apr_pool_destroy(p);
+        return NULL;
+    }
+    return value;
+}
+
+/*
+ * Dynamic locking and unlocking function
+ */
+
+static void ssl_dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
+                           const char *file, int line)
+{
+    apr_status_t rv;
+
+    if (mode & CRYPTO_LOCK) {
+        rv = apr_thread_mutex_lock(l->mutex);
+    }
+    else {
+        rv = apr_thread_mutex_unlock(l->mutex);
+    }
+}
+
+/*
+ * Dynamic lock destruction callback
+ */
+static void ssl_dyn_destroy_function(struct CRYPTO_dynlock_value *l,
+                          const char *file, int line)
+{
+    apr_status_t rv;
+    rv = apr_thread_mutex_destroy(l->mutex);
+    if (rv != APR_SUCCESS) {
+        /* TODO log that fprintf(stderr, "Failed to destroy mutex for dynamic lock %s:%d", l->file, l->line); */
+    }
+
+    /* Trust that whomever owned the CRYPTO_dynlock_value we were
+     * passed has no future use for it...
+     */
+    apr_pool_destroy(l->pool);
+}
 static void ssl_thread_setup(apr_pool_t *p)
 {
     int i;
@@ -234,6 +329,14 @@ static void ssl_thread_setup(apr_pool_t *p)
 
     CRYPTO_set_id_callback(ssl_thread_id);
     CRYPTO_set_locking_callback(ssl_thread_lock);
+
+    /* Set up dynamic locking scaffolding for OpenSSL to use at its
+     * convenience.
+     */
+    dynlockpool = p;
+    CRYPTO_set_dynlock_create_callback(ssl_dyn_create_function);
+    CRYPTO_set_dynlock_lock_callback(ssl_dyn_lock_function);
+    CRYPTO_set_dynlock_destroy_callback(ssl_dyn_destroy_function);
 
     apr_pool_cleanup_register(p, NULL, ssl_thread_cleanup,
                               apr_pool_cleanup_null);
@@ -404,6 +507,9 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     OPENSSL_load_builtin_modules();
 #endif
 
+    /* Initialize thread support */
+    ssl_thread_setup(tcn_global_pool);
+
 #ifndef OPENSSL_NO_ENGINE
     if (J2S(engine)) {
         ENGINE *ee = NULL;
@@ -457,8 +563,6 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     apr_pool_cleanup_register(tcn_global_pool, NULL,
                               ssl_init_cleanup,
                               apr_pool_cleanup_null);
-    /* Initialize thread support */
-    ssl_thread_setup(tcn_global_pool);
     TCN_FREE_CSTRING(engine);
     return (jint)APR_SUCCESS;
 }
