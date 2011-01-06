@@ -42,9 +42,7 @@ import org.apache.naming.ResourceLinkRef;
  * <p>Object factory for resource links for shared data sources.</p>
  * 
  * @author Filip Hanik
- * @version $Id: ResourceLinkFactory.java 939311 2010-04-29 14:01:02Z kkolinko $
  */
-
 public class DataSourceLinkFactory extends ResourceLinkFactory
     implements ObjectFactory {
 
