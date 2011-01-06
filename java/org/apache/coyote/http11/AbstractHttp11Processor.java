@@ -21,7 +21,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
@@ -125,7 +124,7 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     /**
      * List of restricted user agents.
      */
-    protected Pattern[] restrictedUserAgents = null;
+    protected Pattern restrictedUserAgents = null;
 
 
     /**
@@ -214,7 +213,7 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
     /**
      * List of user agents to not use gzip with
      */
-    protected Pattern noCompressionUserAgents[] = null;
+    protected Pattern noCompressionUserAgents = null;
 
     /**
      * List of MIMES which could be gzipped
@@ -272,46 +271,17 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
 
     /**
-     * Add user-agent for which gzip compression didn't works
-     * The user agent String given will be exactly matched
-     * to the user-agent header submitted by the client.
+     * Set no compression user agent pattern. Regular expression as supported
+     * by {@link Pattern}.
      *
-     * @param userAgent user-agent string
-     */
-    public void addNoCompressionUserAgent(String userAgent) {
-        try {
-            Pattern nRule = Pattern.compile(userAgent);
-            noCompressionUserAgents =
-                addREArray(noCompressionUserAgents, nRule);
-        } catch (PatternSyntaxException pse) {
-            getLog().error(sm.getString("http11processor.regexp.error", userAgent), pse);
-        }
-    }
-
-
-    /**
-     * Set no compression user agent list (this method is best when used with
-     * a large number of connectors, where it would be better to have all of
-     * them referenced a single array).
-     */
-    public void setNoCompressionUserAgents(Pattern[] noCompressionUserAgents) {
-        this.noCompressionUserAgents = noCompressionUserAgents;
-    }
-
-
-    /**
-     * Set no compression user agent list.
-     * List contains users agents separated by ',' :
-     *
-     * ie: "gorilla,desesplorer,tigrus"
+     * ie: "gorilla|desesplorer|tigrus"
      */
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
-        if (noCompressionUserAgents != null) {
-            StringTokenizer st = new StringTokenizer(noCompressionUserAgents, ",");
-
-            while (st.hasMoreTokens()) {
-                addNoCompressionUserAgent(st.nextToken().trim());
-            }
+        if (noCompressionUserAgents == null || noCompressionUserAgents.length() == 0) {
+            this.noCompressionUserAgents = null;
+        } else {
+            this.noCompressionUserAgents =
+                Pattern.compile(noCompressionUserAgents);
         }
     }
 
@@ -395,28 +365,6 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
 
     /**
-     * General use method
-     *
-     * @param rArray the REArray
-     * @param value Obj
-     */
-    private Pattern[] addREArray(Pattern rArray[], Pattern value) {
-        Pattern[] result = null;
-        if (rArray == null) {
-            result = new Pattern[1];
-            result[0] = value;
-        }
-        else {
-            result = new Pattern[rArray.length + 1];
-            for (int i = 0; i < rArray.length; i++)
-                result[i] = rArray[i];
-            result[rArray.length] = value;
-        }
-        return result;
-    }
-
-
-    /**
      * Checks if any entry in the string array starts with the specified value
      *
      * @param sArray the StringArray
@@ -435,45 +383,17 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
 
     /**
-     * Add restricted user-agent (which will downgrade the connector
-     * to HTTP/1.0 mode). The user agent String given will be matched
-     * via regexp to the user-agent header submitted by the client.
-     *
-     * @param userAgent user-agent string
-     */
-    public void addRestrictedUserAgent(String userAgent) {
-        try {
-            Pattern nRule = Pattern.compile(userAgent);
-            restrictedUserAgents = addREArray(restrictedUserAgents, nRule);
-        } catch (PatternSyntaxException pse) {
-            getLog().error(sm.getString("http11processor.regexp.error", userAgent), pse);
-        }
-    }
-
-
-    /**
-     * Set restricted user agent list (this method is best when used with
-     * a large number of connectors, where it would be better to have all of
-     * them referenced a single array).
-     */
-    public void setRestrictedUserAgents(Pattern[] restrictedUserAgents) {
-        this.restrictedUserAgents = restrictedUserAgents;
-    }
-
-
-    /**
      * Set restricted user agent list (which will downgrade the connector
-     * to HTTP/1.0 mode). List contains users agents separated by ',' :
+     * to HTTP/1.0 mode). Regular expression as supported by {@link Pattern}.
      *
-     * ie: "gorilla,desesplorer,tigrus"
+     * ie: "gorilla|desesplorer|tigrus"
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
-        if (restrictedUserAgents != null) {
-            StringTokenizer st =
-                new StringTokenizer(restrictedUserAgents, ",");
-            while (st.hasMoreTokens()) {
-                addRestrictedUserAgent(st.nextToken().trim());
-            }
+        if (restrictedUserAgents == null ||
+                restrictedUserAgents.length() == 0) {
+            this.restrictedUserAgents = null;
+        } else {
+            this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
         }
     }
 
@@ -675,10 +595,10 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
             if(userAgentValueMB != null) {
                 String userAgentValue = userAgentValueMB.toString();
 
-                // If one Regexp rule match, disable compression
-                for (int i = 0; i < noCompressionUserAgents.length; i++)
-                    if (noCompressionUserAgents[i].matcher(userAgentValue).matches())
+                if (noCompressionUserAgents != null &&
+                        noCompressionUserAgents.matcher(userAgentValue).matches()) {
                         return false;
+                }
             }
         }
 
