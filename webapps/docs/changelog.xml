@@ -245,6 +245,10 @@
         <bug>50503</bug>: When web application has a version, Engine level 
         Clustering works correctly. (kfujino)
       </fix>
+      <fix>
+        <bug>50547</bug>: Add time stamp for CHANGE_SESSION_ID message and 
+        SESSION_EXPIRED message. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
