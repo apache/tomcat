@@ -140,6 +140,10 @@ public class ConnectionPool {
      * @throws SQLException
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
+        PooledConnection pc = this.borrowConnection(0, null, null);
+        if (pc!=null) {
+            return new ConnectionFuture(pc);
+        } 
         //we can only retrieve a future if the underlying queue supports it.
         if (idle instanceof FairBlockingQueue<?>) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
@@ -1040,15 +1044,21 @@ public class ConnectionPool {
         Connection result = null;
         SQLException cause = null;
         AtomicBoolean cancelled = new AtomicBoolean(false);
+        volatile PooledConnection pc = null;
         public ConnectionFuture(Future<PooledConnection> pcf) {
             this.pcFuture = pcf;
         }
         
+        public ConnectionFuture(PooledConnection pc) {
+            this.pc = pc;
+        }
         /**
          * {@inheritDoc}
          */
         public boolean cancel(boolean mayInterruptIfRunning) {
-            if ((!cancelled.get()) && cancelled.compareAndSet(false, true)) {
+            if (pc!=null) {
+                return false;
+            } else if ((!cancelled.get()) && cancelled.compareAndSet(false, true)) {
                 //cancel by retrieving the connection and returning it to the pool
                 ConnectionPool.this.cancellator.execute(this);
             }
@@ -1070,7 +1080,7 @@ public class ConnectionPool {
          * {@inheritDoc}
          */
         public Connection get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            PooledConnection pc = pcFuture.get(timeout,unit);
+            PooledConnection pc = this.pc!=null?this.pc:pcFuture.get(timeout,unit);
             if (pc!=null) {
                 if (result!=null) return result;
                 if (configured.compareAndSet(false, true)) {
@@ -1097,14 +1107,14 @@ public class ConnectionPool {
          * {@inheritDoc}
          */
         public boolean isCancelled() {
-            return pcFuture.isCancelled() || cancelled.get();
+            return pc==null && (pcFuture.isCancelled() || cancelled.get());
         }
 
         /**
          * {@inheritDoc}
          */
         public boolean isDone() {
-            return pcFuture.isDone();
+            return pc!=null || pcFuture.isDone();
         }
         
         /**
