@@ -1694,10 +1694,16 @@ public class ProxyDirContext implements DirContext {
         if (cache == null)
             return false;
         synchronized (cache) {
-            return cache.unload(name);
+            boolean result = cache.unload(name);
+            // To ensure correct operation, particularly of WebDAV, unload
+            // the resource with and without a trailing /
+            if (name.endsWith("/")) {
+                cache.unload(name.substring(0, name.length() -1));
+            } else {
+                cache.unload(name + "/");
+            }
+            return result;
         }
     }
-
-
 }
 
