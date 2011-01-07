@@ -176,6 +176,12 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
      */
     protected AsyncStateMachine asyncStateMachine = new AsyncStateMachine(this);
 
+
+    /**
+     * Bytes written to client for the current request
+     */
+    protected long byteCount = 0;
+    
     
     // ------------------------------------------------------------- Properties
 
@@ -379,6 +385,7 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
        request.recycle();
        response.recycle();
        certificates.recycle();
+       byteCount = 0;
    }
    
    // ------------------------------------------------------ Connector Methods

@@ -725,7 +725,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
                 off += thisTime;
             }
 
+            byteCount += chunk.getLength();
             return chunk.getLength();
+        }
+
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
         }
     }
 }

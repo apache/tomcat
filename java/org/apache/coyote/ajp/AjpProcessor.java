@@ -590,9 +590,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
      * This class is an output buffer which will write data to an output
      * stream.
      */
-    protected class SocketOutputBuffer
-        implements OutputBuffer {
-
+    protected class SocketOutputBuffer implements OutputBuffer {
 
         /**
          * Write chunk.
@@ -631,7 +629,13 @@ public class AjpProcessor extends AbstractAjpProcessor {
                 off += thisTime;
             }
 
+            byteCount += chunk.getLength();
             return chunk.getLength();
+        }
+
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
         }
     }
 }

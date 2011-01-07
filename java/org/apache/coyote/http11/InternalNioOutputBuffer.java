@@ -295,11 +295,14 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
             addToBB(b, start, len);
+            byteCount += chunk.getLength();
             return chunk.getLength();
-
         }
 
-
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
+        }
     }
 
 
