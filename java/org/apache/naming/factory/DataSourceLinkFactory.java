@@ -31,10 +31,7 @@ import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
-import javax.naming.spi.ObjectFactory;
 import javax.sql.DataSource;
-
-import org.apache.naming.ResourceLinkRef;
 
 
 
@@ -43,8 +40,7 @@ import org.apache.naming.ResourceLinkRef;
  * 
  * @author Filip Hanik
  */
-public class DataSourceLinkFactory extends ResourceLinkFactory
-    implements ObjectFactory {
+public class DataSourceLinkFactory extends ResourceLinkFactory {
 
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -55,6 +51,7 @@ public class DataSourceLinkFactory extends ResourceLinkFactory
      * 
      * @param obj The reference object describing the DataSource
      */
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
                                     Hashtable<?,?> environment)
         throws NamingException {
@@ -103,6 +100,7 @@ public class DataSourceLinkFactory extends ResourceLinkFactory
             this.password = password;
         }
         
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             
             if ("getConnection".equals(method.getName()) && args.length==0) {
