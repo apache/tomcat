@@ -193,6 +193,9 @@
         ensure that a subsequent request for that directory does not result in a
         404 response. (markt)
       </fix>
+      <fix>
+        <bug>50554</bug>: Code clean up. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
