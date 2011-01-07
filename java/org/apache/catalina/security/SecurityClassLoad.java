@@ -231,6 +231,7 @@ public final class SecurityClassLoad {
                 basePackage + "util.http.FastHttpDateFormat");
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.HttpMessages");
+        loader.loadClass(basePackage + "util.net.Constants");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         loader.loadClass
             (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
