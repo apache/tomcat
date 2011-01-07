@@ -305,6 +305,10 @@
         <bug>14416</bug>: Make <code>TagLibraryInfo.getTag()</code> more robust
         at handling <code>null</code>s. (markt)
       </fix>
+      <fix>
+        <bug>50552</bug>: Avoid NPE that hides error message when using Ant
+        tasks. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
