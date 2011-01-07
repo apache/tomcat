@@ -286,6 +286,6 @@ public class TagSupport implements IterationTag, Serializable {
     /**
      * The PageContext.
      */
-    protected PageContext pageContext;
+    protected transient PageContext pageContext;
 }
 
