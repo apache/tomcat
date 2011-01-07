@@ -44,9 +44,6 @@
 <section name="Tomcat 7.0.6 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <fix><bug>49543</bug> Allow Tomcat to use shared data sources with 
-       per application credentials. (fhanik)
-      </fix>
       <fix>
         <bug>8705</bug>: <code>org.apache.catalina.SessionListener</code> now
         extends <code>java.util.EventListener</code>. (markt)
@@ -94,6 +91,10 @@
         initialisation fails (e.g. if a port is alreasy in use) do not trigger
         an <code>LifecycleException</code> for an invalid state transition.
         (markt)
+      </fix>
+      <fix>
+        <bug>49543</bug> Allow Tomcat to use shared data sources with per
+        application credentials. (fhanik)
       </fix>
       <fix>
         <bug>49650</bug>: Remove unnecessary entries package.access property
