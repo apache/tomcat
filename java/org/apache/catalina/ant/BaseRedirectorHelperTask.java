@@ -263,7 +263,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      */
     protected void closeRedirector() {
         try {
-            if (redirectOutput) {
+            if (redirectOutput && redirectOutPrintStream != null) {
                 redirector.complete();
             }
         } catch (IOException ioe) {
