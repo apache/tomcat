@@ -50,6 +50,12 @@ public class VoidOutputFilter implements OutputFilter {
     }
 
 
+    @Override
+    public long getBytesWritten() {
+        return 0;
+    }
+
+
     // --------------------------------------------------- OutputFilter Methods
 
 

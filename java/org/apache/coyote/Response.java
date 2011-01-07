@@ -97,7 +97,7 @@ public final class Response {
     private Locale locale = DEFAULT_LOCALE;
 
     // General informations
-    private long bytesWritten=0;
+    private long contentWritten = 0;
 
     /**
      * Holds request error exception.
@@ -531,7 +531,7 @@ public final class Response {
         throws IOException
     {
         outputBuffer.doWrite(chunk, this);
-        bytesWritten+=chunk.getLength();
+        contentWritten+=chunk.getLength();
     }
 
     // --------------------
@@ -551,10 +551,23 @@ public final class Response {
         headers.clear();
 
         // update counters
-        bytesWritten=0;
+        contentWritten=0;
     }
 
-    public long getBytesWritten() {
-        return bytesWritten;
+    /**
+     * Bytes written by application - i.e. before compression, chunking, etc.
+     */
+    public long getContentWritten() {
+        return contentWritten;
+    }
+    
+    /**
+     * Bytes written to socket - i.e. after compression, chunking, etc.
+     */
+    public long getBytesWritten(boolean flush) {
+        if (flush) {
+            action(ActionCode.CLIENT_FLUSH, this);
+        }
+        return outputBuffer.getBytesWritten();
     }
 }
