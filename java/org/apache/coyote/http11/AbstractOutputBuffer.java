@@ -88,6 +88,11 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
      */
     protected OutputBuffer outputStreamOutputBuffer;
 
+    /**
+     * Bytes written to client for the current request
+     */
+    protected long byteCount = 0;
+
     // -------------------------------------------------------------- Variables
 
 
@@ -185,7 +190,18 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
             return activeFilters[lastActiveFilter].doWrite(chunk, res);
 
     }
-    
+
+
+    @Override
+    public long getBytesWritten() {
+        if (lastActiveFilter == -1) {
+            return outputStreamOutputBuffer.getBytesWritten();
+        } else {
+            return activeFilters[lastActiveFilter].getBytesWritten();
+        }
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -299,7 +315,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         if (lastActiveFilter != -1)
             activeFilters[lastActiveFilter].end();
         finished = true;
-
+        byteCount = 0;
     }
     
     public abstract void sendAck() throws IOException;

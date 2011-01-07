@@ -107,7 +107,7 @@ public class RequestInfo  {
     }
 
     public long getRequestBytesSent() {
-        return req.getResponse().getBytesWritten();
+        return req.getResponse().getContentWritten();
     }
 
     public long getRequestProcessingTime() {
@@ -140,7 +140,7 @@ public class RequestInfo  {
      */
     void updateCounters() {
         bytesReceived+=req.getBytesRead();
-        bytesSent+=req.getResponse().getBytesWritten();
+        bytesSent+=req.getResponse().getContentWritten();
 
         requestCount++;
         if( req.getResponse().getStatus() >=400 )

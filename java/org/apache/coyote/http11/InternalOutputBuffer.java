@@ -74,6 +74,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
      */
     protected boolean useSocketBuffer = false;    
     
+
     /**
      * Set the underlying socket output stream.
      */
@@ -255,11 +256,14 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
                 outputStream.write(chunk.getBuffer(), chunk.getStart(), 
                                    length);
             }
-            return length;
-
+            byteCount += chunk.getLength();
+            return chunk.getLength();
         }
 
-
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
+        }
     }
 
 
