@@ -80,6 +80,8 @@ public class javaURLContextFactory
     /**
      * Crete a new Context's instance.
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
                                     Hashtable<?,?> environment)
         throws NamingException {
@@ -94,6 +96,8 @@ public class javaURLContextFactory
     /**
      * Get a new (writable) initial context.
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public Context getInitialContext(Hashtable<?,?> environment)
         throws NamingException {
         if (ContextBindings.isThreadBound() || 
@@ -105,7 +109,7 @@ public class javaURLContextFactory
 
         // If the thread is not bound, return a shared writable context
         if (initialContext == null) {
-            synchronized(getClass()) {
+            synchronized(javaURLContextFactory.class) {
                 if (initialContext == null) {
                     initialContext = new NamingContext(
                             (Hashtable<String,Object>)environment, MAIN);
