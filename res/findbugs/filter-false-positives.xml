@@ -5,6 +5,10 @@
     <Method name="checkResources" />
     <Bug code="SWL" />
   </Match>
+  <Match>
+    <Class name="org.apache.naming.java.javaURLContextFactory" />
+    <Bug code="Nm" />
+  </Match>
   <!--  Generated code -->
   <Match>
     <Class name="org.apache.el.parser.ELParserTokenManager" />
