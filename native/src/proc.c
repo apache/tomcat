@@ -211,7 +211,7 @@ TCN_IMPLEMENT_CALL(jint, Proc, create)(TCN_STDARGS, jlong proc,
     if (args)
         as = (*e)->GetArrayLength(e, args);
     if (env)
-        es = (*e)->GetArrayLength(e, args);
+        es = (*e)->GetArrayLength(e, env);
     if (as > (MAX_ARGS_SIZE - 1) || es > (MAX_ENV_SIZE - 2)) {
         TCN_FREE_CSTRING(progname);
         return APR_EINVAL;
@@ -228,7 +228,7 @@ TCN_IMPLEMENT_CALL(jint, Proc, create)(TCN_STDARGS, jlong proc,
     if (es) {
         for (i = 0; i < es; i++) {
             jstring str = (*e)->GetObjectArrayElement(e, env, i);
-            s_env[i+1] = tcn_get_string(e, str);
+            s_env[i] = tcn_get_string(e, str);
             (*e)->DeleteLocalRef(e, str);
         }
 #ifdef WIN32
