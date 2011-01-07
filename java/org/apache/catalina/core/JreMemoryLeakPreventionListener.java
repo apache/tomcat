@@ -35,6 +35,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+import com.sun.jndi.ldap.LdapPoolManager;
+
 /**
  * Provide a workaround for known places where the Java Runtime environment can
  * cause a memory leak or lock files.
@@ -160,6 +162,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public boolean isXmlParsingProtection() { return xmlParsingProtection; }
     public void setXmlParsingProtection(boolean xmlParsingProtection) {
         this.xmlParsingProtection = xmlParsingProtection;
+    }
+    
+    /**
+     * {@link LdapPoolManager} spawns a thread when it is initialized if the 
+     * system property <code>com.sun.jndi.ldap.connect.pool.timeout</code> is
+     * greater than 0.
+     * That thread inherits the context class loader of the current thread, so
+     * that there my be a web application class loader leak if the web app
+     * is the first to use {@link LdapPoolManager}. 
+     */
+    private boolean ldapPoolProtection = true;
+    public boolean isLdapPoolProtection() { return ldapPoolProtection; }
+    public void setLdapPoolProtection(boolean ldapPoolProtection) {
+        this.ldapPoolProtection = ldapPoolProtection;
     }
     
     @Override
@@ -358,6 +374,22 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                                 e);
                     }
                 }
+                
+                if (ldapPoolProtection) {
+                    try {
+                        Class.forName("com.sun.jndi.ldap.LdapPoolManager");
+                    } catch (ClassNotFoundException e) {
+                        if (System.getProperty("java.vendor").startsWith(
+                                "Sun")) {
+                            log.error(sm.getString(
+                                    "jreLeakListener.ldapPoolManagerFail"), e);
+                        } else {
+                            log.debug(sm.getString(
+                                    "jreLeakListener.ldapPoolManagerFail"), e);
+                        }
+                    }
+                }
+
             } finally {
                 Thread.currentThread().setContextClassLoader(loader);
             }
