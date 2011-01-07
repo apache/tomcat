@@ -149,5 +149,5 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
     /**
      * The current BodyContent for this BodyTag.
      */
-    protected BodyContent bodyContent;
+    protected transient BodyContent bodyContent;
 }
