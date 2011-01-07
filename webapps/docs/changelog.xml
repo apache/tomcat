@@ -320,6 +320,11 @@
         <bug>50552</bug>: Avoid NPE that hides error message when using Ant
         tasks. (schultz)
       </fix>
+      <add>
+        Provide two alternative locations for the libraries downloaded from
+        the ASF web site at build time. Use the main distribution site as
+        default and the archive one as fallback. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
