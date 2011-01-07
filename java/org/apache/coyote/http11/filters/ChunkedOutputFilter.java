@@ -126,6 +126,12 @@ public class ChunkedOutputFilter implements OutputFilter {
     }
 
 
+    @Override
+    public long getBytesWritten() {
+        return buffer.getBytesWritten();
+    }
+
+
     // --------------------------------------------------- OutputFilter Methods
 
 

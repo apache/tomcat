@@ -227,8 +227,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
      * This class is an output buffer which will write data to an output
      * stream.
      */
-    protected class SocketOutputBuffer 
-        implements OutputBuffer {
+    protected class SocketOutputBuffer implements OutputBuffer {
 
 
         /**
@@ -253,11 +252,14 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
                 len = len - thisTime;
                 start = start + thisTime;
             }
+            byteCount += chunk.getLength();
             return chunk.getLength();
-
         }
 
-
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
+        }
     }
 
 

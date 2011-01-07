@@ -189,6 +189,10 @@
         (markt)
       </update>
       <fix>
+        <bug>50496</bug>: Bytes sent in the access log are now counted after
+        compression, chunking etc rather than before. (markt)
+      </fix>
+      <fix>
         <bug>50550</bug>: When a new directory is created (e.g. via WebDAV)
         ensure that a subsequent request for that directory does not result in a
         404 response. (markt)

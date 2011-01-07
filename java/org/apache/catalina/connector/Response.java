@@ -308,10 +308,28 @@ public class Response
 
 
     /**
-     * Return the number of bytes actually written to the output stream.
+     * Return the number of bytes the application has actually written to the
+     * output stream. This excludes chunking, compression, etc. as well as
+     * headers.
      */
-    public long getContentCount() {
+    public long getContentWritten() {
         return outputBuffer.getContentWritten();
+    }
+
+
+    /**
+     * Return the number of bytes the actually written to the socket. This
+     * includes chunking, compression, etc. but excludes headers.
+     */
+    public long getBytesWritten(boolean flush) {
+        if (flush) {
+            try {
+                outputBuffer.flush();
+            } catch (IOException ioe) {
+                // Ignore - the client has probably closed the connection
+            }
+        }
+        return coyoteResponse.getBytesWritten(flush);
     }
 
     /**
@@ -330,7 +348,7 @@ public class Response
     public boolean isAppCommitted() {
         return (this.appCommitted || isCommitted() || isSuspended()
                 || ((getContentLength() > 0) 
-                    && (getContentCount() >= getContentLength())));
+                    && (getContentWritten() >= getContentLength())));
     }
 
 
