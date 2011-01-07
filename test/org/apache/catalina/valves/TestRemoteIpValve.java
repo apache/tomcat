@@ -131,8 +131,8 @@ public class TestRemoteIpValve extends TestCase {
         
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        remoteIpValve.setTrustedProxies("proxy1, proxy2, proxy3");
+        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
         remoteIpValve.setProxiesHeader("x-forwarded-by");
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
@@ -171,8 +171,8 @@ public class TestRemoteIpValve extends TestCase {
         
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        remoteIpValve.setTrustedProxies("proxy1, proxy2, proxy3");
+        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
         remoteIpValve.setProxiesHeader("x-forwarded-by");
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
@@ -212,8 +212,8 @@ public class TestRemoteIpValve extends TestCase {
         
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        remoteIpValve.setTrustedProxies("proxy1, proxy2, proxy3");
+        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
         remoteIpValve.setProxiesHeader("x-forwarded-by");
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
@@ -252,8 +252,8 @@ public class TestRemoteIpValve extends TestCase {
         
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("127\\.0\\.0\\.1, 192\\.168\\..*, another-internal-proxy");
-        remoteIpValve.setTrustedProxies("proxy1, proxy2, proxy3");
+        remoteIpValve.setInternalProxies("127\\.0\\.0\\.1|192\\.168\\..*|another-internal-proxy");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
         remoteIpValve.setProxiesHeader("x-forwarded-by");
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
@@ -549,8 +549,8 @@ public class TestRemoteIpValve extends TestCase {
     public void testInvokeNotAllowedRemoteAddr() throws Exception {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        remoteIpValve.setTrustedProxies("proxy1,proxy2,proxy3");
+        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
         remoteIpValve.setProxiesHeader("x-forwarded-by");
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
@@ -588,8 +588,8 @@ public class TestRemoteIpValve extends TestCase {
     public void testInvokeUntrustedProxyInTheChain() throws Exception {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        remoteIpValve.setTrustedProxies("proxy1, proxy2, proxy3");
+        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
         remoteIpValve.setProxiesHeader("x-forwarded-by");
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
