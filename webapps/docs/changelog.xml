@@ -200,6 +200,13 @@
       <fix>
         <bug>50554</bug>: Code clean up. (markt)
       </fix>
+      <add>
+        <bug>50556</bug>: Improve JreMemoryLeakPreventionListener to prevent
+        a potential class loader leak caused by a thread spawned when the class
+        <code>com.sun.jndi.ldap.LdapPoolManager</code> is initialized and the 
+        system property <code>com.sun.jndi.ldap.connect.pool.timeout</code> is 
+        set to a value greater than 0. (slaurent)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
