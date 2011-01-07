@@ -27,16 +27,16 @@ public class TestCookies extends TestCase {
         test("foo=bar;a=b;", "foo", "bar", "a", "b");
         test("foo=bar;a=b; ", "foo", "bar", "a", "b");
         test("foo=bar;a=b; ;", "foo", "bar", "a", "b");
-        test("foo=;a=b; ;", "foo", "", "a", "b");
-        test("foo;a=b; ;", "foo", "", "a", "b");
+        test("foo=;a=b; ;",  "a", "b");
+        test("foo;a=b; ;", "a", "b");
         // v1 
         test("$Version=1; foo=bar;a=b", "foo", "bar", "a", "b"); 
 
         // OK
         test("$Version=1;foo=bar;a=b; ; ",  "foo", "bar", "a", "b");
-        test("$Version=1;foo=;a=b; ; ",  "foo", "", "a", "b");
-        test("$Version=1;foo= ;a=b; ; ",  "foo", "", "a", "b");
-        test("$Version=1;foo;a=b; ; ", "foo", "", "a", "b");
+        test("$Version=1;foo=;a=b; ; ",  "a", "b");
+        test("$Version=1;foo= ;a=b; ; ",  "a", "b");
+        test("$Version=1;foo;a=b; ; ", "a", "b");
         test("$Version=1;foo=\"bar\";a=b; ; ", "foo", "bar", "a", "b");
 
         test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b", "foo", "bar", "a", "b");
@@ -69,26 +69,26 @@ public class TestCookies extends TestCase {
         test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", "foo", "bar", "a", "b");
 
         // Test name-only at the end of the header
-        test("foo;a=b;bar", "foo", "", "a", "b", "bar", "");
-        test("foo;a=b;bar;", "foo", "", "a", "b", "bar", "");
-        test("foo;a=b;bar ", "foo", "", "a", "b", "bar", "");
-        test("foo;a=b;bar ;", "foo", "", "a", "b", "bar", "");
+        test("foo;a=b;bar", "a", "b");
+        test("foo;a=b;bar;", "a", "b");
+        test("foo;a=b;bar ", "a", "b");
+        test("foo;a=b;bar ;", "a", "b");
 
         // Multiple delimiters next to each other
  
         // BUG -- the ' ' needs to be skipped.
-        test("foo;a=b; ;bar", "foo", "", "a", "b", "bar", "");
+        test("foo;a=b; ;bar", "a", "b");
         // BUG -- ';' needs skipping
-        test("foo;a=b;;bar", "foo", "", "a", "b", "bar", "");
-        test("foo;a=b; ;;bar=rab", "foo", "", "a", "b", "bar", "rab");
+        test("foo;a=b;;bar", "a", "b");
+        test("foo;a=b; ;;bar=rab", "a", "b", "bar", "rab");
         // These pass currently
-        test("foo;a=b;; ;bar=rab", "foo", "", "a", "b", "bar", "rab");
+        test("foo;a=b;; ;bar=rab", "a", "b", "bar", "rab");
 
         // '#' is a valid cookie name (not a separator)
-        test("foo;a=b;;#;bar=rab","foo", "", "a", "b", "#", "", "bar", "rab");
+        test("foo;a=b;;#;bar=rab","a", "b", "bar", "rab");
 
         
-        test("foo;a=b;;\\;bar=rab", "foo", "", "a", "b", "bar", "rab");
+        test("foo;a=b;;\\;bar=rab", "a", "b", "bar", "rab");
 
         // Try all the separators of version1 in version0 cookie.
         // Won't work we only parse version1 cookie result 1 cookie.
