@@ -295,6 +295,10 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <fix>
+        <bug>21157</bug>: Ensure cookies are written before the response is
+        commited in the Cookie example. Patch provided by Stefan Radzom. (markt)
+      </fix>
       <add>
         <bug>50294</bug>: Add more information to documentation regarding format
         of configuration files. Patch provided by Luke Meyer. (markt) 
