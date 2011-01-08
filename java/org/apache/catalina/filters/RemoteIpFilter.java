@@ -690,7 +690,7 @@ public class RemoteIpFilter implements Filter {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
-            StringBuffer concatRemoteIpHeaderValue = new StringBuffer();
+            StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
             
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
                 if (concatRemoteIpHeaderValue.length() > 0) {
