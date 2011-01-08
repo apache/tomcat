@@ -42,6 +42,13 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
 -->
 <section name="Tomcat 7.0.6 (markt)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.0.5. (mturk)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
