@@ -1693,15 +1693,17 @@ public class ProxyDirContext implements DirContext {
     protected boolean cacheUnload(String name) {
         if (cache == null)
             return false;
+        // To ensure correct operation, particularly of WebDAV, unload
+        // the resource with and without a trailing /
+        String name2;
+        if (name.endsWith("/")) {
+            name2 = name.substring(0, name.length() -1);
+        } else {
+            name2 = name + "/";
+        }
         synchronized (cache) {
             boolean result = cache.unload(name);
-            // To ensure correct operation, particularly of WebDAV, unload
-            // the resource with and without a trailing /
-            if (name.endsWith("/")) {
-                cache.unload(name.substring(0, name.length() -1));
-            } else {
-                cache.unload(name + "/");
-            }
+            cache.unload(name2);
             return result;
         }
     }
