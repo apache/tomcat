@@ -35,8 +35,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-import com.sun.jndi.ldap.LdapPoolManager;
-
 /**
  * Provide a workaround for known places where the Java Runtime environment can
  * cause a memory leak or lock files.
@@ -165,12 +163,12 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
     
     /**
-     * {@link LdapPoolManager} spawns a thread when it is initialized if the 
-     * system property <code>com.sun.jndi.ldap.connect.pool.timeout</code> is
-     * greater than 0.
+     * <code>com.sun.jndi.ldap.LdapPoolManager</code> class spawns a thread when it
+     * is initialized if the system property
+     * <code>com.sun.jndi.ldap.connect.pool.timeout</code> is greater than 0.
      * That thread inherits the context class loader of the current thread, so
-     * that there my be a web application class loader leak if the web app
-     * is the first to use {@link LdapPoolManager}. 
+     * that there may be a web application class loader leak if the web app
+     * is the first to use <code>LdapPoolManager</code>. 
      */
     private boolean ldapPoolProtection = true;
     public boolean isLdapPoolProtection() { return ldapPoolProtection; }
