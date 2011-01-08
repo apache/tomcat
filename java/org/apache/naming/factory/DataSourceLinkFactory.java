@@ -91,9 +91,9 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
      * {@link javax.sql.DataSource#getConnection(String, String)} with the preconfigured username and password.
      */
     public static class DataSourceHandler implements InvocationHandler {
-        DataSource ds; 
-        String username; 
-        String password;
+        private final DataSource ds; 
+        private final String username; 
+        private final String password;
         public DataSourceHandler(DataSource ds, String username, String password) {
             this.ds = ds;
             this.username = username;
