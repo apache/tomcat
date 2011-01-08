@@ -47,6 +47,15 @@ public class CookieExample extends HttpServlet {
                       HttpServletResponse response)
         throws IOException, ServletException
     {
+        
+        String cookieName = request.getParameter("cookiename");
+        String cookieValue = request.getParameter("cookievalue");
+        Cookie aCookie = null;
+        if (cookieName != null && cookieValue != null) {
+            aCookie = new Cookie(cookieName, cookieValue);
+            response.addCookie(aCookie);
+        }
+
         response.setContentType("text/html");
 
         PrintWriter out = response.getWriter();
@@ -89,11 +98,7 @@ public class CookieExample extends HttpServlet {
             out.println(RB.getString("cookies.no-cookies"));
         }
 
-        String cookieName = request.getParameter("cookiename");
-        String cookieValue = request.getParameter("cookievalue");
-        if (cookieName != null && cookieValue != null) {
-            Cookie cookie = new Cookie(cookieName, cookieValue);
-            response.addCookie(cookie);
+        if (aCookie != null) {
             out.println("<P>");
             out.println(RB.getString("cookies.set") + "<br>");
             out.print(RB.getString("cookies.name") + "  " 
