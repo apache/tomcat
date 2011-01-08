@@ -71,13 +71,13 @@ public class TestRemoteIpValve extends TestCase {
         }
     }
     
-    public void testCommaDelimitedListToStringArray() {
+    public void testListToCommaDelimitedString() {
         List<String> elements = Arrays.asList("element1", "element2", "element3");
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
         assertEquals("element1, element2, element3", actual);
     }
     
-    public void testCommaDelimitedListToStringArrayEmptyList() {
+    public void testListToCommaDelimitedStringEmptyList() {
         List<String> elements = new ArrayList<String>();
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
         assertEquals("", actual);
@@ -625,7 +625,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
     
-    public void testListToCommaDelimitedString() {
+    public void testCommaDelimitedListToStringArray() {
         String[] actual = RemoteIpValve.commaDelimitedListToStringArray("element1, element2, element3");
         String[] expected = new String[] {
             "element1", "element2", "element3"
@@ -633,7 +633,7 @@ public class TestRemoteIpValve extends TestCase {
         assertArrayEquals(expected, actual);
     }
     
-    public void testListToCommaDelimitedStringMixedSpaceChars() {
+    public void testCommaDelimitedListToStringArrayMixedSpaceChars() {
         String[] actual = RemoteIpValve.commaDelimitedListToStringArray("element1  , element2,\t element3");
         String[] expected = new String[] {
             "element1", "element2", "element3"
