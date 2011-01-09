@@ -220,8 +220,47 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
-        // FIXME: The following currently fails
-        // assertEquals("It is 404.html", client.getResponseBody());
+        assertEquals("It is 404.html", client.getResponseBody());
+    }
+
+    /**
+     * Test what happens if a custom 404 page is configured,
+     * but its file is actually missing.
+     */
+    public void testCustomErrorPageMissing() throws Exception {
+        File appDir = new File(getTemporaryDirectory(), "MyApp");
+        new File(appDir, "WEB-INF").mkdirs();
+        Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
+                "WEB-INF/web.xml")), "UTF-8");
+        try {
+            w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
+                    + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
+                    + " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee "
+                    + " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'"
+                    + " version='2.4'>\n"
+                    + "<error-page>\n<error-code>404</error-code>\n"
+                    + "<location>/404-absent.html</location>\n</error-page>\n"
+                    + "</web-app>\n");
+            w.flush();
+        } finally {
+            w.close();
+        }
+
+        Tomcat tomcat = getTomcatInstance();
+        String contextPath = "/MyApp";
+        tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
+        tomcat.start();
+
+        TestCustomErrorClient client = new TestCustomErrorClient();
+        client.setPort(getPort());
+
+        client.reset();
+        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" + CRLF
+                + CRLF });
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse404());
     }
 
     public static int getUrl(String path, ByteChunk out,

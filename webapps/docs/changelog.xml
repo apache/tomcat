@@ -165,7 +165,7 @@
       </fix>
       <fix>
         <bug>50413</bug>: Ensure 304 responses are not returned when using
-        static files as error pages. (markt)
+        static files as error pages. (markt/kkolinko)
       </fix>
       <fix>
         <bug>50448</bug>: Fix possible <code>IllegalStateException</code>
