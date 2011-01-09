@@ -89,6 +89,7 @@ public class MailSessionFactory implements ObjectFactory {
      *
      * @exception Exception if an error occurs during object creation
      */
+    @Override
     public Object getObjectInstance(Object refObj, Name name, Context context,
             Hashtable<?,?> env) throws Exception {
 
@@ -103,6 +104,7 @@ public class MailSessionFactory implements ObjectFactory {
         //
         // Bugzilla 31288, 33077: add support for authentication.
         return AccessController.doPrivileged(new PrivilegedAction<Session>() {
+                @Override
                 public Session run() {
 
                     // Create the JavaMail properties we will use
@@ -137,6 +139,7 @@ public class MailSessionFactory implements ObjectFactory {
                         if(user != null) {
                             final PasswordAuthentication pa = new PasswordAuthentication(user, password);
                             auth = new Authenticator() {
+                                    @Override
                                     protected PasswordAuthentication getPasswordAuthentication() {
                                         return pa;
                                     }

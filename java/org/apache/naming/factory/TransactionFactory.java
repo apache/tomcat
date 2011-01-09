@@ -60,6 +60,7 @@ public class TransactionFactory
      * 
      * @param obj The reference object describing the DataSource
      */
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
                                     Hashtable<?,?> environment)
         throws Exception {
