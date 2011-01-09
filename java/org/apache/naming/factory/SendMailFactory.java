@@ -26,7 +26,6 @@ import java.util.Properties;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimePart;
 import javax.mail.internet.MimePartDataSource;
 import javax.naming.Context;
 import javax.naming.Name;
@@ -80,6 +79,7 @@ public class SendMailFactory implements ObjectFactory
     protected final String DataSourceClassName = 
         "javax.mail.internet.MimePartDataSource";
 
+    @Override
     public Object getObjectInstance(Object RefObj, Name Nm, Context Ctx,
             Hashtable<?,?> Env) throws Exception {
         final Reference Ref = (Reference)RefObj;
@@ -91,6 +91,7 @@ public class SendMailFactory implements ObjectFactory
             return AccessController.doPrivileged(
                     new PrivilegedAction<MimePartDataSource>()
             {
+                @Override
                 public MimePartDataSource run() {
                     // set up the smtp session that will send the message
                     Properties props = new Properties();
@@ -114,8 +115,7 @@ public class SendMailFactory implements ObjectFactory
                         message.setFrom(new InternetAddress(from));
                         message.setSubject("");
                     } catch (Exception e) {}
-                    MimePartDataSource mds = new MimePartDataSource(
-                        (MimePart)message);
+                    MimePartDataSource mds = new MimePartDataSource(message);
                     return mds;
                 }
             } );
