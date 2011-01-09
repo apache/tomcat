@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.servlets;
 
-import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +38,8 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestDefaultServlet extends TomcatBaseTest {
 
     /**
-     * Test attempting to access special paths (WEB-INF/META-INF) using DefaultServlet 
+     * Test attempting to access special paths (WEB-INF/META-INF) using
+     * DefaultServlet. 
      */
     public void testGetSpecials() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -187,8 +186,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.setPort(getPort());
 
         client.reset();
-        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" + CRLF
-                + CRLF });
+        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" +
+                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
@@ -203,9 +202,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
         // https://issues.apache.org/bugzilla/show_bug.cgi?id=50413
         //
         client.reset();
-        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.1" + CRLF
-                + "Host: localhost" + CRLF + "Connection: close" + CRLF
-                + "If-Modified-Since: " + tomorrow + CRLF + CRLF });
+        client.setRequest(new String[] {
+                "GET /MyApp/missing HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost" + SimpleHttpClient.CRLF +
+                "Connection: close" + SimpleHttpClient.CRLF +
+                "If-Modified-Since: " + tomorrow + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
@@ -214,9 +216,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
         // https://issues.apache.org/bugzilla/show_bug.cgi?id=50413#c6
         //
         client.reset();
-        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.1" + CRLF
-                + "Host: localhost" + CRLF + "Connection: close" + CRLF
-                + "Range: bytes=0-100" + CRLF + CRLF });
+        client.setRequest(new String[] {
+                "GET /MyApp/missing HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost" + SimpleHttpClient.CRLF +
+                "Connection: close" + SimpleHttpClient.CRLF +
+                "Range: bytes=0-100" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
@@ -256,8 +261,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.setPort(getPort());
 
         client.reset();
-        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" + CRLF
-                + CRLF });
+        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" +
+                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
