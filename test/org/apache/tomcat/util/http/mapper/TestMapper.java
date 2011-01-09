@@ -147,9 +147,9 @@ public class TestMapper extends TestCase {
         }
         long time = System.currentTimeMillis() - start;
         
-        // Takes ~1s on markt's laptop. If this takes more than 3s something
+        // Takes ~1s on markt's laptop. If this takes more than 4s something
         // probably needs looking at. If this fails repeatedly then we may need
         // to increase this limit.
-        assertTrue(time < 3000);
+        assertTrue(String.valueOf(time), time < 4000);
     }
 }
