@@ -16,13 +16,23 @@
  */
 package org.apache.catalina.servlets;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -136,10 +146,94 @@ public class TestDefaultServlet extends TomcatBaseTest {
         
     }
 
+    /**
+     * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50413 Serving a
+     * custom error page
+     */
+    public void testCustomErrorPage() throws Exception {
+        File appDir = new File(getTemporaryDirectory(), "MyApp");
+        new File(appDir, "WEB-INF").mkdirs();
+        Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
+                "WEB-INF/web.xml")), "UTF-8");
+        try {
+            w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
+                    + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
+                    + " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee "
+                    + " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'"
+                    + " version='2.4'>\n"
+                    + "<error-page>\n<error-code>404</error-code>\n"
+                    + "<location>/404.html</location>\n</error-page>\n"
+                    + "</web-app>\n");
+            w.flush();
+        } finally {
+            w.close();
+        }
+        w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
+                "404.html")), "ISO-8859-1");
+        try {
+            w.write("It is 404.html");
+            w.flush();
+        } finally {
+            w.close();
+        }
+
+        Tomcat tomcat = getTomcatInstance();
+        String contextPath = "/MyApp";
+        tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
+        tomcat.start();
+
+        TestCustomErrorClient client = new TestCustomErrorClient();
+        client.setPort(getPort());
+
+        client.reset();
+        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" + CRLF
+                + CRLF });
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse404());
+        assertEquals("It is 404.html", client.getResponseBody());
+
+        SimpleDateFormat format = new SimpleDateFormat(
+                "EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String tomorrow = format.format(new Date(System.currentTimeMillis()
+                + 24 * 60 * 60 * 1000));
+
+        // https://issues.apache.org/bugzilla/show_bug.cgi?id=50413
+        //
+        client.reset();
+        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.1" + CRLF
+                + "Host: localhost" + CRLF + "Connection: close" + CRLF
+                + "If-Modified-Since: " + tomorrow + CRLF + CRLF });
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse404());
+        assertEquals("It is 404.html", client.getResponseBody());
+
+        // https://issues.apache.org/bugzilla/show_bug.cgi?id=50413#c6
+        //
+        client.reset();
+        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.1" + CRLF
+                + "Host: localhost" + CRLF + "Connection: close" + CRLF
+                + "Range: bytes=0-100" + CRLF + CRLF });
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse404());
+        // FIXME: The following currently fails
+        // assertEquals("It is 404.html", client.getResponseBody());
+    }
+
     public static int getUrl(String path, ByteChunk out,
             Map<String, List<String>> resHead) throws IOException {
         out.recycle();
         return TomcatBaseTest.getUrl(path, out, resHead);
     }
 
+    private static class TestCustomErrorClient extends SimpleHttpClient {
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
 }
