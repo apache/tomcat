@@ -107,6 +107,7 @@ public class BeanFactory
      * 
      * @param obj The reference object describing the Bean
      */
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
                                     Hashtable<?,?> environment)
         throws NamingException {
@@ -169,7 +170,8 @@ public class BeanFactory
                                 valueArray[0] = value;
                             } else if (propType.equals(Character.class) 
                                        || propType.equals(char.class)) {
-                                valueArray[0] = new Character(value.charAt(0));
+                                valueArray[0] =
+                                    Character.valueOf(value.charAt(0));
                             } else if (propType.equals(Byte.class) 
                                        || propType.equals(byte.class)) {
                                 valueArray[0] = new Byte(value);
