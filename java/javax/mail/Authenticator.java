@@ -17,5 +17,7 @@
 package javax.mail;
 
 public class Authenticator {
-    // Dummy implementation
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return null;
+    }
 }
