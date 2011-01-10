@@ -31,10 +31,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 
 import javax.management.ObjectName;
 
@@ -460,13 +462,41 @@ public class HostConfig
 
         File appBase = appBase();
         File configBase = configBase();
+        String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
         deployDescriptors(configBase, configBase.list());
         // Deploy WARs, and loop if additional descriptors are found
-        deployWARs(appBase, appBase.list());
+        deployWARs(appBase, filteredAppPaths);
         // Deploy expanded folders
-        deployDirectories(appBase, appBase.list());
+        deployDirectories(appBase, filteredAppPaths);
         
+    }
+
+
+    /**
+     * Filter the list of application file paths to remove those that match
+     * the regular expression defined by {@link Host#getDeployIgnore()}.
+     *  
+     * @param unfilteredAppPaths    The list of application paths to filtert
+     * 
+     * @return  The filtered list of application paths
+     */
+    protected String[] filterAppPaths(String[] unfilteredAppPaths) {
+        if (host.getDeployIgnore() == null) {
+            return unfilteredAppPaths;
+        }
+        
+        Pattern filter = Pattern.compile(host.getDeployIgnore());
+
+        List<String> filteredList = new ArrayList<String>();
+        for (String appPath : unfilteredAppPaths) {
+            if (filter.matcher(appPath).matches()) {
+                log.debug(sm.getString("hostConfig.ignorePath", appPath));
+            } else {
+                filteredList.add(appPath);
+            }
+        }
+        return filteredList.toArray(new String[filteredList.size()]);
     }
 
 
