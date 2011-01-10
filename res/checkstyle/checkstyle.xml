@@ -37,7 +37,10 @@
     
     <!-- Imports -->
     <module name="AvoidStarImport"/>
-    <module name="AvoidStaticImport"/>
+    <module name="AvoidStaticImport">
+        <property name="excludes"
+                  value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
+    </module>
     <module name="IllegalImport"/>
     <module name="ImportOrder">
         <property name="groups" value="java,javax,async,jsp2,junit,org,util"/>
