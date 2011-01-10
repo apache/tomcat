@@ -523,19 +523,21 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
                 
                 args = new Object[7];
-                args[0] = "<a href=\"" + URL_ENCODER.encode(displayPath) +
-                        "\">" + displayPath + "</a>";
-                args[1] = ctxt.getWebappVersion();
-                if ("".equals(args[1])) {
-                    args[1]= noVersion;
+                args[0] = "<a href=\"" + URL_ENCODER.encode(displayPath)
+                        + "\">" + RequestUtil.filter(displayPath) + "</a>";
+                if ("".equals(ctxt.getWebappVersion())) {
+                    args[1] = noVersion;
+                } else {
+                    args[1] = RequestUtil.filter(ctxt.getWebappVersion());
                 }
-                args[2] = ctxt.getDisplayName();
-                if (args[2] == null) {
+                if (ctxt.getDisplayName() == null) {
                     args[2] = "&nbsp;";
+                } else {
+                    args[2] = RequestUtil.filter(ctxt.getDisplayName());
                 }
                 args[3] = Boolean.valueOf(ctxt.getAvailable());
-                args[4] = response.encodeURL(request.getContextPath() +
-                     "/html/sessions?" + pathVersion);
+                args[4] = RequestUtil.filter(response.encodeURL(request.getContextPath() +
+                     "/html/sessions?" + pathVersion));
                 Manager manager = ctxt.getManager(); 
                 if (manager instanceof DistributedManager && showProxySessions) {
                     args[5] = Integer.valueOf(
@@ -552,20 +554,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
                 args = new Object[14];
-                args[0] = response.encodeURL(request.getContextPath() +
-                        "/html/start?" + pathVersion);
+                args[0] = RequestUtil.filter(response.encodeURL(request
+                        .getContextPath() + "/html/start?" + pathVersion));
                 args[1] = appsStart;
-                args[2] = response.encodeURL(request.getContextPath() +
-                        "/html/stop?" + pathVersion);
+                args[2] = RequestUtil.filter(response.encodeURL(request
+                        .getContextPath() + "/html/stop?" + pathVersion));
                 args[3] = appsStop;
-                args[4] = response.encodeURL(request.getContextPath() +
-                     "/html/reload?" + pathVersion);
+                args[4] = RequestUtil.filter(response.encodeURL(request
+                        .getContextPath() + "/html/reload?" + pathVersion));
                 args[5] = appsReload;
-                args[6] = response.encodeURL(request.getContextPath() +
-                     "/html/undeploy?" + pathVersion);
+                args[6] = RequestUtil.filter(response.encodeURL(request
+                        .getContextPath() + "/html/undeploy?" + pathVersion));
                 args[7] = appsUndeploy;
-                args[8] = response.encodeURL(request.getContextPath() +
-                     "/html/expire?" + pathVersion);
+                args[8] = RequestUtil.filter(response.encodeURL(request
+                        .getContextPath() + "/html/expire?" + pathVersion));
                 args[9] = appsExpire;
                 args[10] = smClient.getString(
                         "htmlManagerServlet.expire.explain");
