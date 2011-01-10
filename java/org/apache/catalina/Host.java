@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 
 /**
@@ -146,6 +143,22 @@ public interface Host extends Container {
      * @param deployOnStartup The new deploy on startup flag
      */
     public void setDeployOnStartup(boolean deployOnStartup);
+
+
+    /**
+     * Return the regular expression that defines the files and directories in
+     * the host's {@link #appBase} that will be ignored by the automatic
+     * deployment process.
+     */
+    public String getDeployIgnore();
+
+
+    /**
+     * Set the regular expression that defines the files and directories in
+     * the host's {@link #appBase} that will be ignored by the automatic
+     * deployment process.
+     */
+    public void setDeployIgnore(String deployIgnore);
 
 
     // --------------------------------------------------------- Public Methods
