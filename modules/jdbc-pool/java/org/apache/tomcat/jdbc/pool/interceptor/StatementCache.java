@@ -63,6 +63,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         return cacheSize;
     }
 
+    @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         InterceptorProperty p = properties.get("prepared");
@@ -90,11 +91,13 @@ public class StatementCache extends StatementDecoratorInterceptor {
     
     private AtomicInteger cacheSize;
 
+    @Override
     public void poolStarted(ConnectionPool pool) {
         cacheSizeMap.putIfAbsent(pool, new AtomicInteger(0));
         super.poolStarted(pool);
     }
     
+    @Override
     public void poolClosed(ConnectionPool pool) {
         cacheSizeMap.remove(pool);
         super.poolClosed(pool);
@@ -156,7 +159,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
     }
 
-
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         boolean process = process(this.types, method, false);
         if (process && args.length>0 && args[0] instanceof String) {
