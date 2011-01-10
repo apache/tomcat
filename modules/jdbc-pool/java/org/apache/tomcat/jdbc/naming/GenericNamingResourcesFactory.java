@@ -47,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class GenericNamingResourcesFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(GenericNamingResourcesFactory.class);
-    @Override
+    
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
         if ((obj == null) || !(obj instanceof Reference)) {
             return null;
