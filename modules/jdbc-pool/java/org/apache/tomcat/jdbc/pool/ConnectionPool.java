@@ -402,6 +402,10 @@ public class ConnectionPool {
         } //end if
 
         //make sure the pool is properly configured
+        if (properties.getMaxActive()<1) {
+            log.warn("maxActive is smaller than 1, setting maxActive to: "+PoolProperties.DEFAULT_MAX_ACTIVE);
+            properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
+        }
         if (properties.getMaxActive()<properties.getInitialSize()) {
             log.warn("initialSize is larger than maxActive, setting initialSize to: "+properties.getMaxActive());
             properties.setInitialSize(properties.getMaxActive());

@@ -36,6 +36,8 @@ import org.apache.juli.logging.LogFactory;
 public class PoolProperties implements PoolConfiguration {
     private static final Log log = LogFactory.getLog(PoolProperties.class);
     
+    public static final int DEFAULT_MAX_ACTIVE = 100;
+    
     protected static AtomicInteger poolCounter = new AtomicInteger(0);
     protected Properties dbProperties = new Properties();
     protected String url = null;
@@ -46,7 +48,7 @@ public class PoolProperties implements PoolConfiguration {
     protected String defaultCatalog = null;
     protected String connectionProperties;
     protected int initialSize = 10;
-    protected int maxActive = 100;
+    protected int maxActive = DEFAULT_MAX_ACTIVE;
     protected int maxIdle = maxActive;
     protected int minIdle = initialSize;
     protected int maxWait = 30000;
