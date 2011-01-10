@@ -314,6 +314,9 @@
         <bug>50488</bug>: Update classpath required when using jsvc and add a
         note regarding server VMs. (markt)
       </fix>
+      <fix>
+        Further filtering of Manager and Host Manager display output. (kkolinko) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
