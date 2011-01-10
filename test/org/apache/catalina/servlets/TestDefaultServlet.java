@@ -30,6 +30,8 @@ import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
+
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -186,8 +188,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.setPort(getPort());
 
         client.reset();
-        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF });
+        client.setRequest(new String[] {
+                "GET /MyApp/missing HTTP/1.0" +CRLF + CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
@@ -203,11 +205,10 @@ public class TestDefaultServlet extends TomcatBaseTest {
         //
         client.reset();
         client.setRequest(new String[] {
-                "GET /MyApp/missing HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost" + SimpleHttpClient.CRLF +
-                "Connection: close" + SimpleHttpClient.CRLF +
-                "If-Modified-Since: " + tomorrow + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF });
+                "GET /MyApp/missing HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: close" + CRLF +
+                "If-Modified-Since: " + tomorrow + CRLF + CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
@@ -217,11 +218,10 @@ public class TestDefaultServlet extends TomcatBaseTest {
         //
         client.reset();
         client.setRequest(new String[] {
-                "GET /MyApp/missing HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost" + SimpleHttpClient.CRLF +
-                "Connection: close" + SimpleHttpClient.CRLF +
-                "Range: bytes=0-100" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF });
+                "GET /MyApp/missing HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: close" + CRLF +
+                "Range: bytes=0-100" + CRLF + CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
@@ -261,8 +261,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.setPort(getPort());
 
         client.reset();
-        client.setRequest(new String[] { "GET /MyApp/missing HTTP/1.0" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF });
+        client.setRequest(new String[] {
+                "GET /MyApp/missing HTTP/1.0" + CRLF + CRLF });
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
