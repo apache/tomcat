@@ -711,28 +711,27 @@ public class StandardHost extends ContainerBase implements Host {
     protected synchronized void startInternal() throws LifecycleException {
         
         // Set error report valve
-        if ((errorReportValveClass != null)
-            && (!errorReportValveClass.equals(""))) {
+        String errorValve = getErrorReportValveClass();
+        if ((errorValve != null) && (!errorValve.equals(""))) {
             try {
                 boolean found = false;
                 Valve[] valves = getPipeline().getValves();
                 for (Valve valve : valves) {
-                    if (errorReportValveClass.equals(
-                            valve.getClass().getName())) {
+                    if (errorValve.equals(valve.getClass().getName())) {
                         found = true;
                         break;
                     }
                 }
                 if(!found) {
-                    Valve valve = (Valve) Class.forName(errorReportValveClass).
-                            newInstance();
+                    Valve valve =
+                        (Valve) Class.forName(errorValve).newInstance();
                     getPipeline().addValve(valve);
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString
-                    ("standardHost.invalidErrorReportValveClass", 
-                     errorReportValveClass), t);
+                log.error(sm.getString(
+                        "standardHost.invalidErrorReportValveClass",
+                        errorValve), t);
             }
         }
         super.startInternal();
