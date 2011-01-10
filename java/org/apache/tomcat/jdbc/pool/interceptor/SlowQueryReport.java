@@ -240,7 +240,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             "The date and time of the last invocation"
         };
         
-        static final OpenType<?>[] FIELD_TYPES = new OpenType[] { 
+        static final OpenType[] FIELD_TYPES = new OpenType[] { 
             SimpleType.STRING,
             SimpleType.INTEGER,
             SimpleType.LONG,
@@ -274,7 +274,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return FIELD_DESCRIPTIONS;
         }
         
-        public static OpenType<?>[] getFieldTypes() {
+        public static OpenType[] getFieldTypes() {
             return FIELD_TYPES;
         }
         

@@ -279,7 +279,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getValidatorClassName() {
         return getPoolProperties().getValidatorClassName();
     }
@@ -287,7 +287,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public Validator getValidator() {
         return getPoolProperties().getValidator();
     }
@@ -415,156 +415,156 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setDriverClassName(driverClassName);
     }
     
-    @Override
+    
     public void setFairQueue(boolean fairQueue) {
         getPoolProperties().setFairQueue(fairQueue);
     }
 
-    @Override
+    
     public void setInitialSize(int initialSize) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setInitSQL(String initSQL) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setJdbcInterceptors(String jdbcInterceptors) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setJmxEnabled(boolean jmxEnabled) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setLogAbandoned(boolean logAbandoned) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setMaxActive(int maxActive) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override 
+     
     public void setMaxIdle(int maxIdle) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setMaxWait(int maxWait) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setMinIdle(int minIdle) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setPassword(String password) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setRemoveAbandoned(boolean removeAbandoned) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setTestOnBorrow(boolean testOnBorrow) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setTestOnConnect(boolean testOnConnect) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setTestOnReturn(boolean testOnReturn) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setTestWhileIdle(boolean testWhileIdle) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setUrl(String url) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setUseEquals(boolean useEquals) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setUseLock(boolean useLock) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setUsername(String username) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setValidationInterval(long validationInterval) {
         // TODO Auto-generated method stub
         
     }
 
-    @Override
+    
     public void setValidationQuery(String validationQuery) {
         // TODO Auto-generated method stub
         
@@ -573,7 +573,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public void setValidatorClassName(String className) {
         getPoolProperties().setValidatorClassName(className);
     }
@@ -581,7 +581,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public int getSuspectTimeout() {
         return getPoolProperties().getSuspectTimeout(); 
     }
@@ -589,7 +589,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public void setSuspectTimeout(int seconds) {
         //no op
     }
