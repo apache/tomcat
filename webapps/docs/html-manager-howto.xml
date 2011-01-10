@@ -467,9 +467,9 @@ file, the war will be unpacked into a directory in your Host appBase
 directory.</p>
 
 <p>If the application war or directory is deployed in your Host appBase
-directory and either the Host is configured with autoDeploy=true or
-liveDeploy=true, the Context path must match the directory name or
-war file name without the ".war" extension.</p>
+directory and either the Host is configured with autoDeploy=true the Context
+path must match the directory name or war file name without the ".war"
+extension.</p>
 
 <p>For security when untrusted users can manage web applications, the
 Host deployXML flag can be set to false.  This prevents untrusted users
@@ -528,9 +528,9 @@ error message.  Possible causes for problems include:</p>
 <li><em>Context path must match the directory or WAR file name:</em>
     <blockquote>
     If the application war or directory is deployed in your Host appBase
-    directory and either the Host is configured with autoDeploy=true or
-    liveDeploy=true, the Context path must match the directory name or
-    war file name without the ".war" extension.
+    directory and either the Host is configured with autoDeploy=true the Context
+    path must match the directory name or war file name without the ".war"
+    extension.
     </blockquote></li>
 <li><em>Only web applications in the Host web application directory can
      be deployed</em>
