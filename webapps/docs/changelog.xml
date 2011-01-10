@@ -315,7 +315,7 @@
         note regarding server VMs. (markt)
       </fix>
       <fix>
-        Further filtering of Manager and Host Manager display output. (kkolinko) 
+        Further filtering of Manager display output. (kkolinko) 
       </fix>
     </changelog>
   </subsection>
