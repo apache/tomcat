@@ -166,7 +166,8 @@ public class StandardHost extends ContainerBase implements Host {
       */
      private Map<ClassLoader, String> childClassLoaders =
          new WeakHashMap<ClassLoader, String>();
-
+     
+     
     // ------------------------------------------------------------- Properties
 
 
@@ -397,28 +398,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
     
     
-    /**
-     * Return the value of the live deploy flag.  If true, it indicates that 
-     * a background thread should be started that looks for web application
-     * context files, WAR files, or unpacked directories being dropped in to
-     * the <code>appBase</code> directory, and deploys new ones as they are
-     * encountered.
-     */
-    public boolean getLiveDeploy() {
-        return (this.autoDeploy);
-    }
-
-
-    /**
-     * Set the live deploy flag value for this host.
-     * 
-     * @param liveDeploy The new live deploy flag
-     */
-    public void setLiveDeploy(boolean liveDeploy) {
-        setAutoDeploy(liveDeploy);
-    }
-
-
     /**
      * Return the Java class name of the error report valve class
      * for new web applications.
