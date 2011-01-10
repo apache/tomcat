@@ -75,7 +75,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
     public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNETION ABANDONED";
 
-
+    @Override
     public MBeanNotificationInfo[] getNotificationInfo() { 
         MBeanNotificationInfo[] pres = super.getNotificationInfo();
         MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
