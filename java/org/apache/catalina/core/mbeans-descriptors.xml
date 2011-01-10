@@ -1164,6 +1164,10 @@
                description="Should we create directories upon startup for appBase and xmlBase? "
                type="boolean"/>
       
+    <attribute name="deployIgnore"
+               description="Paths within appBase ignored for automatic deployment"
+               type="java.lang.String"/>
+
     <attribute name="deployOnStartup"
                description="The deploy on startup flag for this Host"
                type="boolean"/>

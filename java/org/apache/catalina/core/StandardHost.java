@@ -168,6 +168,14 @@ public class StandardHost extends ContainerBase implements Host {
          new WeakHashMap<ClassLoader, String>();
      
      
+     /**
+      * Any file or directory in {@link #appBase} that this pattern matches will
+      * be ignored by the automatic deployment process (both
+      * {@link #deployOnStartup} and {@link #autoDeploy}).
+      */
+     private String deployIgnore = null;
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -424,8 +432,8 @@ public class StandardHost extends ContainerBase implements Host {
                                    this.errorReportValveClass);
 
     }
-
-
+    
+    
     /**
      * Return the canonical, fully qualified, name of the virtual host
      * this Container represents.
@@ -497,6 +505,32 @@ public class StandardHost extends ContainerBase implements Host {
     public void setWorkDir(String workDir) {
 
         this.workDir = workDir;
+    }
+
+
+    /**
+     * Return the regular expression that defines the files and directories in
+     * the host's {@link #appBase} that will be ignored by the automatic
+     * deployment process.
+     */
+    @Override
+    public String getDeployIgnore() {
+        return this.deployIgnore;
+    }
+
+
+    /**
+     * Set the regular expression that defines the files and directories in
+     * the host's {@link #appBase} that will be ignored by the automatic
+     * deployment process.
+     */
+    @Override
+    public void setDeployIgnore(String deployIgnore) {
+        String oldDeployIgnore = this.deployIgnore;
+        this.deployIgnore = deployIgnore;
+        support.firePropertyChange("deployIgnore",
+                                   oldDeployIgnore, 
+                                   this.deployIgnore);
     }
 
 

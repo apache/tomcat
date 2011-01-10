@@ -144,6 +144,22 @@
         If not specified, the standard value (defined below) will be used.</p>
       </attribute>
 
+      <attribute name="deployIgnore" required="false">
+        <p>A regular expression defining paths to ignore when
+        <code>autoDeploy</code> and <code>deployOnStartup</code> are set. This
+        allows you to keep your configuration in a version control system, for
+        example, and not deploy a .svn or CVS folder that happens to be in the
+        <code>appBase</code>.</p>
+        <p>This regular expression is relative to <code>appBase</code>. It is
+        also <em>anchored</em>, meaning the match is performed against the
+        entire file/directory name. So, <code>foo</code> matches only a file or
+        directory named <code>foo</code> but not <code>foo.war</code>,
+        <code>foobar</code>, or <code>myfooapp</code>. To match anything with
+        &quot;foo&quot;, you could use <code>.*foo.*</code>.</p>
+        <p>See <a href="#Automatic Application Deployment">Automatic Application
+        Deployment</a> for more information.</p>
+      </attribute>
+
       <attribute name="deployOnStartup" required="false">
         <p>This flag value indicates if web applications from this host should
         be automatically deployed when Tomcat starts. The flag's value defaults
@@ -337,14 +353,15 @@
         <code>ROOT.xml</code>.</li>
     <li>Any web application archive file within the Host's <code>appBase</code>
         directory that has not already been deployed as a result of a context
-        XML descriptor and does not have a corresponding directory of the same
-        name (without the ".war" extension) will be deployed next. The context
-        path used will be a slash character ("/") followed by the web
-        application archive name less the ".war" extension. The one exception to
-        this rule is that a web application archive named "ROOT.war" will be
-        deployed with a context path of <code>/</code>. Multi-level contexts may
-        be defined by using #, e.g. use a WAR named <code>foo#bar.war</code> for
-        a context path of <code>/foo/bar</code>.<br/>
+        XML descriptor, does not have a corresponding directory of the same
+        name (without the ".war" extension), and is not excluded by
+        <code>deployIgnore</code> will be deployed next. The context path
+        used will be a slash character ("/") followed by the web application
+        archive name less the ".war" extension. The one exception to this rule
+        is that a web application archive named "ROOT.war" will be deployed with
+        a context path of <code>/</code>. Multi-level contexts may be defined by
+        using #, e.g. use a WAR named <code>foo#bar.war</code> for a context
+        path of <code>/foo/bar</code>.<br/>
         If the <code>unpackWARs</code> attribute is <code>true</code>, the web
         application archive file will be expanded to a directory of the same
         name (without the ".war" extension".<br/>
@@ -363,11 +380,12 @@
         </li>
     <li>Finally, any sub-directory within the Host's <code>appBase</code> that
         has not already been deployed as a result of a context XML descriptor
-        will be deployed. The context path used will be a slash character
-        ("/") followed by the directory name, unless the directory name is ROOT,
-        in which case the context path will <code>/</code>. Multi-level contexts
-        may be defined by using #, e.g. use a directory named
-        <code>foo#bar</code> for a context path of <code>/foo/bar</code>.<br/>
+        and is not excluded by <code>deployIgnore</code> will be deployed.
+        The context path used will be a slash character ("/") followed by the
+        directory name, unless the directory name is ROOT, in which case the
+        context path will <code>/</code>. Multi-level contexts may be defined by
+        using #, e.g. use a directory named <code>foo#bar</code> for a context
+        path of <code>/foo/bar</code>.<br/>
         If <code>copyXml</code> is <code>true</code> (it is <code>false</code>
         by default), any directory within the Hosts's <code>appBase</code>
         directory that does not have a corresponding context XML descriptor in
@@ -420,15 +438,16 @@
 
     <p>When using automatic deployment, the <code>docBase</code> defined by
     an XML <a href="context.html">Context</a> file should be outside of the
-    <code>appBase</code> directory. If this is not the case difficulties
+    <code>appBase</code> directory. If this is not the case, difficulties
     may be experienced deploying the web application or the application may
-    be deployed twice.</p>
+    be deployed twice. The <code>deployIgnore</code> attribute can be used
+    to avoid this situation.</p>
 
     <p>Finally, note that if you are defining contexts explicitly in server.xml,
-    you should probably turn off automatic application deployment.  Otherwise,
-    the web applications will each be deployed twice, and that may cause
-    problems for the applications.
-    </p>
+    you should probably turn off automatic application deployment or specify
+    <code>deployIgnore</code> carefully. Otherwise, the web applications
+    will each be deployed twice, and that may cause problems for the
+    applications.</p>
 
   </subsection>
 
