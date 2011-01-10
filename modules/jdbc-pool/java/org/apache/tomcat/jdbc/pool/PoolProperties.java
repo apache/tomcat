@@ -86,7 +86,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setAbandonWhenPercentageFull(int percentage) {
         if (percentage<0) abandonWhenPercentageFull = 0;
         else if (percentage>100) abandonWhenPercentageFull = 100;
@@ -96,7 +96,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getAbandonWhenPercentageFull() {
         return abandonWhenPercentageFull;
     }
@@ -104,7 +104,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isFairQueue() {
         return fairQueue;
     }
@@ -112,7 +112,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setFairQueue(boolean fairQueue) {
         this.fairQueue = fairQueue;
     }
@@ -120,7 +120,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isAccessToUnderlyingConnectionAllowed() {
         return accessToUnderlyingConnectionAllowed;
     }
@@ -128,7 +128,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getConnectionProperties() {
         return connectionProperties;
     }
@@ -136,7 +136,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public Properties getDbProperties() {
         return dbProperties;
     }
@@ -144,7 +144,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public Boolean isDefaultAutoCommit() {
         return defaultAutoCommit;
     }
@@ -152,7 +152,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getDefaultCatalog() {
         return defaultCatalog;
     }
@@ -160,7 +160,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public Boolean isDefaultReadOnly() {
         return defaultReadOnly;
     }
@@ -168,7 +168,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getDefaultTransactionIsolation() {
         return defaultTransactionIsolation;
     }
@@ -176,7 +176,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getDriverClassName() {
         return driverClassName;
     }
@@ -184,7 +184,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getInitialSize() {
         return initialSize;
     }
@@ -192,7 +192,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isLogAbandoned() {
         return logAbandoned;
     }
@@ -200,7 +200,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getMaxActive() {
         return maxActive;
     }
@@ -208,7 +208,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getMaxIdle() {
         return maxIdle;
     }
@@ -216,7 +216,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getMaxWait() {
         return maxWait;
     }
@@ -224,7 +224,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getMinEvictableIdleTimeMillis() {
         return minEvictableIdleTimeMillis;
     }
@@ -232,7 +232,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getMinIdle() {
         return minIdle;
     }
@@ -240,7 +240,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getName() {
         return name;
     }
@@ -248,7 +248,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getNumTestsPerEvictionRun() {
         return numTestsPerEvictionRun;
     }
@@ -256,7 +256,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getPassword() {
         return password;
     }
@@ -264,7 +264,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getPoolName() {
         return getName();
     }
@@ -272,7 +272,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isRemoveAbandoned() {
         return removeAbandoned;
     }
@@ -280,7 +280,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getRemoveAbandonedTimeout() {
         return removeAbandonedTimeout;
     }
@@ -288,7 +288,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isTestOnBorrow() {
         return testOnBorrow;
     }
@@ -296,7 +296,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isTestOnReturn() {
         return testOnReturn;
     }
@@ -304,7 +304,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isTestWhileIdle() {
         return testWhileIdle;
     }
@@ -312,7 +312,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public int getTimeBetweenEvictionRunsMillis() {
         return timeBetweenEvictionRunsMillis;
     }
@@ -320,7 +320,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getUrl() {
         return url;
     }
@@ -328,7 +328,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getUsername() {
         return username;
     }
@@ -336,7 +336,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getValidationQuery() {
         return validationQuery;
     }
@@ -344,7 +344,7 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getValidatorClassName() {
         return validatorClassName;
     }
@@ -352,7 +352,7 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public Validator getValidator() {
         return validator;
     }
@@ -360,7 +360,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public long getValidationInterval() {
         return validationInterval;
     }
@@ -368,7 +368,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getInitSQL() {
         return initSQL;
     }
@@ -376,7 +376,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isTestOnConnect() {
         return testOnConnect;
     }
@@ -384,7 +384,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public String getJdbcInterceptors() {
         return jdbcInterceptors;
     }
@@ -392,7 +392,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
         if (interceptors == null) {
             if (jdbcInterceptors==null) {
@@ -427,7 +427,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
         // NOOP
     }
@@ -435,7 +435,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setConnectionProperties(String connectionProperties) {
         this.connectionProperties = connectionProperties;
         getProperties(connectionProperties, getDbProperties());
@@ -444,7 +444,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setDbProperties(Properties dbProperties) {
         this.dbProperties = dbProperties;
     }
@@ -452,7 +452,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setDefaultAutoCommit(Boolean defaultAutoCommit) {
         this.defaultAutoCommit = defaultAutoCommit;
     }
@@ -460,7 +460,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setDefaultCatalog(String defaultCatalog) {
         this.defaultCatalog = defaultCatalog;
     }
@@ -468,7 +468,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setDefaultReadOnly(Boolean defaultReadOnly) {
         this.defaultReadOnly = defaultReadOnly;
     }
@@ -476,7 +476,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setDefaultTransactionIsolation(int defaultTransactionIsolation) {
         this.defaultTransactionIsolation = defaultTransactionIsolation;
     }
@@ -484,7 +484,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
     }
@@ -492,7 +492,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setInitialSize(int initialSize) {
         this.initialSize = initialSize;
     }
@@ -500,7 +500,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setLogAbandoned(boolean logAbandoned) {
         this.logAbandoned = logAbandoned;
     }
@@ -508,7 +508,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setMaxActive(int maxActive) {
         this.maxActive = maxActive;
     }
@@ -516,7 +516,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setMaxIdle(int maxIdle) {
         this.maxIdle = maxIdle;
     }
@@ -524,7 +524,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setMaxWait(int maxWait) {
         this.maxWait = maxWait;
     }
@@ -532,7 +532,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
         this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
     }
@@ -540,7 +540,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setMinIdle(int minIdle) {
         this.minIdle = minIdle;
     }
@@ -548,7 +548,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setName(String name) {
         this.name = name;
     }
@@ -556,7 +556,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
         this.numTestsPerEvictionRun = numTestsPerEvictionRun;
     }
@@ -564,7 +564,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setPassword(String password) {
         this.password = password;
     }
@@ -572,7 +572,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setRemoveAbandoned(boolean removeAbandoned) {
         this.removeAbandoned = removeAbandoned;
     }
@@ -580,7 +580,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
         this.removeAbandonedTimeout = removeAbandonedTimeout;
     }
@@ -588,7 +588,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setTestOnBorrow(boolean testOnBorrow) {
         this.testOnBorrow = testOnBorrow;
     }
@@ -596,7 +596,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setTestWhileIdle(boolean testWhileIdle) {
         this.testWhileIdle = testWhileIdle;
     }
@@ -604,7 +604,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setTestOnReturn(boolean testOnReturn) {
         this.testOnReturn = testOnReturn;
     }
@@ -612,7 +612,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setTimeBetweenEvictionRunsMillis(int
                                                  timeBetweenEvictionRunsMillis) {
         this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
@@ -621,7 +621,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setUrl(String url) {
         this.url = url;
     }
@@ -629,7 +629,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setUsername(String username) {
         this.username = username;
     }
@@ -637,7 +637,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setValidationInterval(long validationInterval) {
         this.validationInterval = validationInterval;
     }
@@ -645,7 +645,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setValidationQuery(String validationQuery) {
         this.validationQuery = validationQuery;
     }
@@ -653,7 +653,7 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public void setValidatorClassName(String className) {
         this.validatorClassName = className;
         
@@ -681,7 +681,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setInitSQL(String initSQL) {
         this.initSQL = initSQL;
     }
@@ -689,7 +689,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setTestOnConnect(boolean testOnConnect) {
         this.testOnConnect = testOnConnect;
     }
@@ -697,13 +697,13 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setJdbcInterceptors(String jdbcInterceptors) {
         this.jdbcInterceptors = jdbcInterceptors;
         this.interceptors = null;
     }
 
-    @Override
+    
     public String toString() {
         StringBuilder buf = new StringBuilder("ConnectionPool[");
         try {
@@ -741,7 +741,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isJmxEnabled() {
         return jmxEnabled;
     }
@@ -749,7 +749,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setJmxEnabled(boolean jmxEnabled) {
         this.jmxEnabled = jmxEnabled;
     }
@@ -757,7 +757,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public Boolean getDefaultAutoCommit() {
         return defaultAutoCommit;
     }
@@ -765,7 +765,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public Boolean getDefaultReadOnly() {
         return defaultReadOnly;
     }
@@ -774,7 +774,7 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public int getSuspectTimeout() {
         return this.suspectTimeout;
     }
@@ -782,7 +782,7 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public void setSuspectTimeout(int seconds) {
         this.suspectTimeout = seconds;
     }
@@ -790,7 +790,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isPoolSweeperEnabled() {
         boolean timer = getTimeBetweenEvictionRunsMillis()>0;
         boolean result = timer && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
@@ -928,11 +928,11 @@ public class PoolProperties implements PoolConfiguration {
                 return def;
             }
         }
-        @Override
+        
         public int hashCode() {
             return name.hashCode();
         }
-        @Override
+        
         public boolean equals(Object o) {
             if (o==this) return true;
             if (o instanceof InterceptorProperty) {
@@ -946,7 +946,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean isUseEquals() {
         return useEquals;
     }
@@ -954,7 +954,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setUseEquals(boolean useEquals) {
         this.useEquals = useEquals;
     }
@@ -962,7 +962,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public long getMaxAge() {
         return maxAge;
     }
@@ -970,7 +970,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setMaxAge(long maxAge) {
         this.maxAge = maxAge;
     }
@@ -978,7 +978,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public boolean getUseLock() {
         return useLock;
     }
@@ -986,7 +986,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
-    @Override
+    
     public void setUseLock(boolean useLock) {
         this.useLock = useLock;
     }
