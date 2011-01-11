@@ -41,9 +41,9 @@ public class PooledConnection {
      */
     private static final Log log = LogFactory.getLog(PooledConnection.class);
 
-    public static final String PROP_USER = "user";
+    public static final String PROP_USER = PoolUtilities.PROP_USER;
     
-    public static final String PROP_PASSWORD = "password";
+    public static final String PROP_PASSWORD = PoolUtilities.PROP_PASSWORD;
     
     /**
      * Validate when connection is borrowed flag
@@ -61,7 +61,6 @@ public class PooledConnection {
      * Validate when connection is initialized flag
      */
     public static final int VALIDATE_INIT = 4;
-
     /**
      * The properties for the connection pool
      */
@@ -260,7 +259,7 @@ public class PooledConnection {
             pwd = poolProperties.getPassword();
             getAttributes().put(PROP_PASSWORD, pwd);
         }
-        Properties properties = clone(poolProperties.getDbProperties());
+        Properties properties = PoolUtilities.clone(poolProperties.getDbProperties());
         if (usr != null) properties.setProperty(PROP_USER, usr);
         if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
 
@@ -285,12 +284,6 @@ public class PooledConnection {
         if (connection==null) {
             throw new SQLException("Driver:"+driver+" returned null for URL:"+driverURL);
         }
-    }
-    
-    private Properties clone(Properties p) {
-        Properties c = new Properties();
-        c.putAll(p);
-        return c;
     }
     
     /**
