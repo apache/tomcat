@@ -16,6 +16,8 @@
  */
 package org.apache.catalina;
 
+import java.util.regex.Pattern;
+
 
 /**
  * A <b>Host</b> is a Container that represents a virtual host in the
@@ -151,6 +153,14 @@ public interface Host extends Container {
      * deployment process.
      */
     public String getDeployIgnore();
+
+
+    /**
+     * Return the compiled regular expression that defines the files and
+     * directories in the host's {@link #appBase} that will be ignored by the
+     * automatic deployment process.
+     */
+    public Pattern getDeployIgnorePattern();
 
 
     /**
