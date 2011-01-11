@@ -306,8 +306,9 @@ class Generator {
             private String createTagHandlerPoolName(String prefix,
                     String shortName, Attributes attrs, Node.Nodes namedAttrs,
                     boolean hasEmptyBody) {
-                StringBuilder poolName = new StringBuilder("_jspx_tagPool_" +
-                        prefix + "_" + shortName);
+                StringBuilder poolName = new StringBuilder(64);
+                poolName.append("_jspx_tagPool_").append(prefix).append('_')
+                        .append(shortName);
 
                 if (attrs != null) {
                     String[] attrNames =
@@ -324,7 +325,7 @@ class Generator {
                         poolName.append('&');
                     }
                     for (int i = 0; i < attrNames.length; i++) {
-                        poolName.append("_");
+                        poolName.append('_');
                         poolName.append(attrNames[i]);
                     }
                 }
