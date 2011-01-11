@@ -1,11 +1,3 @@
-<%@page contentType="text/html; charset=UTF-8" %>
-<% if (session.getAttribute("nickname") == null) {
-    response.sendRedirect("login.jsp");
-    return;
-}
-%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-<html>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -22,6 +14,14 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<%@page contentType="text/html; charset=UTF-8" %>
+<% if (session.getAttribute("nickname") == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
 <head>
    <title>JSP Chat</title>
 </head>
