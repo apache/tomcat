@@ -65,7 +65,7 @@ public class JmxPasswordTest extends DefaultTestCase{
         String jmxPassword = mbean.getPassword();
         Properties jmxProperties = mbean.getDbProperties();
         assertFalse("Passwords should not match.", password.equals(jmxPassword));
-        assertEquals("Password property should be missing", jmxProperties.containsKey(PoolUtilities.PROP_PASSWORD));
+        assertFalse("Password property should be missing", jmxProperties.containsKey(PoolUtilities.PROP_PASSWORD));
     }
     
 }
