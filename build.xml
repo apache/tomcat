@@ -429,8 +429,13 @@
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
         <exclude name="**/*.mdl"/>
-        <!-- Exclude auto-generated files with known errors -->
-        <exclude name="java/org/apache/el/parser/ELParser.java" />
+        <!-- Exclude auto-generated files -->
+        <exclude name="java/org/apache/el/parser/ELParser*.java" />
+        <exclude name="java/org/apache/el/parser/JJTELParserState.java" />
+        <exclude name="java/org/apache/el/parser/Node.java" />
+        <exclude name="java/org/apache/el/parser/ParseException.java" />
+        <exclude name="java/org/apache/el/parser/SimpleCharStream.java" />
+        <exclude name="java/org/apache/el/parser/Token*.java" />
         <!-- Exclude these else Gump runs validate on them -->
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
         <exclude name="**/tomcat-deps/**"/>
