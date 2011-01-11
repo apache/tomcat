@@ -42,8 +42,10 @@ import javax.sql.DataSource;
  */
 public class DataSourceLinkFactory extends ResourceLinkFactory {
 
-
-    // -------------------------------------------------- ObjectFactory Methods
+    public static void setGlobalContext(Context newGlobalContext) {
+        ResourceLinkFactory.setGlobalContext(newGlobalContext);
+    }
+    // ------------------------------------------------- ObjectFactory Methods
 
 
     /**
@@ -52,14 +54,12 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
      * @param obj The reference object describing the DataSource
      */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable<?,?> environment)
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
         throws NamingException {
         Object result = super.getObjectInstance(obj, name, nameCtx, environment);
         // Can we process this request?
         if (result!=null) {
             Reference ref = (Reference) obj;
-    
             RefAddr userAttr = ref.get("username");
             RefAddr passAttr = ref.get("password");
             if (userAttr.getContent()!=null && passAttr.getContent()!=null) {
@@ -94,17 +94,20 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
         private final DataSource ds; 
         private final String username; 
         private final String password;
-        public DataSourceHandler(DataSource ds, String username, String password) {
+        private final Method getConnection;
+        public DataSourceHandler(DataSource ds, String username, String password) throws Exception {
             this.ds = ds;
             this.username = username;
             this.password = password;
+            getConnection = ds.getClass().getMethod("getConnection", String.class, String.class);
         }
         
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             
-            if ("getConnection".equals(method.getName()) && args.length==0) {
+            if ("getConnection".equals(method.getName()) && (args==null || args.length==0)) {
                 args = new String[] {username,password};
+                method = getConnection;
             } else if ("unwrap".equals(method.getName())) {
                 return unwrap((Class<?>)args[0]);
             }
@@ -134,3 +137,4 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
 
 
 }
+
