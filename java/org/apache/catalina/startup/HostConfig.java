@@ -486,12 +486,14 @@ public class HostConfig
             return unfilteredAppPaths;
         }
         
-        Pattern filter = Pattern.compile(host.getDeployIgnore());
+        Pattern filter = host.getDeployIgnorePattern();
 
         List<String> filteredList = new ArrayList<String>();
         for (String appPath : unfilteredAppPaths) {
             if (filter.matcher(appPath).matches()) {
-                log.debug(sm.getString("hostConfig.ignorePath", appPath));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("hostConfig.ignorePath", appPath));
+                }
             } else {
                 filteredList.add(appPath);
             }

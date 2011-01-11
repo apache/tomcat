@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -173,7 +174,7 @@ public class StandardHost extends ContainerBase implements Host {
       * be ignored by the automatic deployment process (both
       * {@link #deployOnStartup} and {@link #autoDeploy}).
       */
-     private String deployIgnore = null;
+     private Pattern deployIgnore = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -515,6 +516,20 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     public String getDeployIgnore() {
+        if (deployIgnore == null) {
+            return null;
+        } 
+        return this.deployIgnore.toString();
+    }
+
+
+    /**
+     * Return the compiled regular expression that defines the files and
+     * directories in the host's {@link #appBase} that will be ignored by the
+     * automatic deployment process.
+     */
+    @Override
+    public Pattern getDeployIgnorePattern() {
         return this.deployIgnore;
     }
 
@@ -526,11 +541,20 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     public void setDeployIgnore(String deployIgnore) {
-        String oldDeployIgnore = this.deployIgnore;
-        this.deployIgnore = deployIgnore;
+        String oldDeployIgnore;
+        if (this.deployIgnore == null) {
+            oldDeployIgnore = null;
+        } else {
+            oldDeployIgnore = this.deployIgnore.toString();
+        }
+        if (deployIgnore == null) {
+            this.deployIgnore = null;
+        } else {
+            this.deployIgnore = Pattern.compile(deployIgnore);
+        }
         support.firePropertyChange("deployIgnore",
                                    oldDeployIgnore, 
-                                   this.deployIgnore);
+                                   deployIgnore);
     }
 
 
