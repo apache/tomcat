@@ -180,7 +180,7 @@
         Correct handling of versioned web applications in deployer. (markt)
       </fix>
       <fix>
-        Correct removal of <code>LifeCycleListenter</code>s from
+        Correct removal of <code>LifeCycleListener</code>s from
         <code>Container</code>s via JMX. (markt)
       </fix>
       <fix>
@@ -292,7 +292,7 @@
         scoped variables with EL method invocation. (markt)
       </fix>
       <fix>
-        <bug>50460</bug>: Avoid leak caused by using a cached exception
+        <bug>50460</bug>: Avoid a memory leak caused by using a cached exception
         instance in <code>JspDocumentParser</code> and
         <code>ProxyDirContext</code>. (kkolinko)
       </fix>
