@@ -41,6 +41,38 @@
 <!--
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
 -->
+<section name="Tomcat 7.0.7 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Improve fix for <bug>50205</bug> to trigger an error earlier if invalid
+        configuration is used. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Improve special case handling of
+        <code>javax.servlet.jsp.el.ScopedAttributeELResolver</code> in
+        <code>javax.el.CompositeELResolver </code> to handle sub-classes.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Extend the Checkstyle tests to check for license headers. (markt)
+      </add>
+      <fix>
+        Modify the build script so a release build always rebuilds the
+        dependencies to ensure that the correct Tomcat version appears in the
+        manifest. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.6 (markt)">
   <subsection name="General">
     <changelog>
