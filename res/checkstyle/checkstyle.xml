@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
- Licensed to the Apache Software Foundation (ASF) under one or more
+  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
   The ASF licenses this file to You under the Apache License, Version 2.0
@@ -22,6 +22,12 @@
   <!-- When adding checks, keep to the order checks are listed under         -->
   <!-- 'Standard Checks' in the Checkstyle documentation:                    -->
   <!-- http://checkstyle.sourceforge.net/config_coding.html                  -->
+
+  <!-- Headers -->
+  <module name="RegexpHeader">
+    <property name="headerFile" value="${basedir}/res/checkstyle/header-al2.txt"/>
+    <property name="fileExtensions" value="java"/>
+  </module>
 
   <!-- Whitespace -->
   <module name="FileTabCharacter"/>
