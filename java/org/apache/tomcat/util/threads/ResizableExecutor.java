@@ -19,17 +19,21 @@ package org.apache.tomcat.util.threads;
 import java.util.concurrent.Executor;
 
 public interface ResizableExecutor extends Executor {
+
     /**
-     * {@link java.util.concurrent.ThreadPoolExecutor#getPoolSize()}
-     * @return  {@link java.util.concurrent.ThreadPoolExecutor#getPoolSize()}
+     * Returns the current number of threads in the pool.
+     *
+     * @return the number of threads
      */
     public int getPoolSize();
     
     public int getMaxThreads();
 
     /**
-     * {@link java.util.concurrent.ThreadPoolExecutor#getActiveCount()}
-     * @return {@link java.util.concurrent.ThreadPoolExecutor#getActiveCount()}
+     * Returns the approximate number of threads that are actively executing
+     * tasks.
+     *
+     * @return the number of threads
      */
     public int getActiveCount();
     

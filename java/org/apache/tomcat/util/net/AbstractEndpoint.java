@@ -312,17 +312,19 @@ public abstract class AbstractEndpoint {
 
     /**
      * Attributes provide a way for configuration to be passed to sub-components
-     * without the {@link ProtocolHandler} being aware of the properties
-     * available on those sub-components. One example of such a sub-component is
-     * the {@link org.apache.tomcat.util.net.ServerSocketFactory}.
+     * without the {@link org.apache.coyote.ProtocolHandler} being aware of the
+     * properties available on those sub-components. One example of such a
+     * sub-component is the
+     * {@link org.apache.tomcat.util.net.ServerSocketFactory}.
      */
     protected HashMap<String, Object> attributes =
         new HashMap<String, Object>();
     /** 
      * Generic property setter called when a property for which a specific
-     * setter already exists within the {@link ProtocolHandler} needs to be
-     * made available to sub-components. The specific setter will call this
-     * method to populate the attributes.
+     * setter already exists within the
+     * {@link org.apache.coyote.ProtocolHandler} needs to be made available to
+     * sub-components. The specific setter will call this method to populate the
+     * attributes.
      */
     public void setAttribute(String name, Object value) {
         if (getLog().isTraceEnabled()) {
