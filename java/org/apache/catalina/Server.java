@@ -118,9 +118,19 @@ public interface Server extends Lifecycle {
 
     
     /**
-     * Return the parent class loader.
+     * Return the parent class loader for this component. If not set, return
+     * {@link Server#getCatalina()#getParentClassLoader(). If no catalina has
+     * been set, return the system class loader.
      */
     public ClassLoader getParentClassLoader();
+
+
+    /**
+     * Set the parent class loader for this server.
+     *
+     * @param parent The new parent class loader
+     */
+    public void setParentClassLoader(ClassLoader parent);
 
     
     /**
