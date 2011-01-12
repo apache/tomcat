@@ -149,24 +149,24 @@ public interface Host extends Container {
 
     /**
      * Return the regular expression that defines the files and directories in
-     * the host's {@link #appBase} that will be ignored by the automatic
-     * deployment process.
+     * the host's appBase that will be ignored by the automatic deployment
+     * process.
      */
     public String getDeployIgnore();
 
 
     /**
      * Return the compiled regular expression that defines the files and
-     * directories in the host's {@link #appBase} that will be ignored by the
-     * automatic deployment process.
+     * directories in the host's appBase that will be ignored by the automatic
+     * deployment process.
      */
     public Pattern getDeployIgnorePattern();
 
 
     /**
      * Set the regular expression that defines the files and directories in
-     * the host's {@link #appBase} that will be ignored by the automatic
-     * deployment process.
+     * the host's appBase that will be ignored by the automatic deployment
+     * process.
      */
     public void setDeployIgnore(String deployIgnore);
 

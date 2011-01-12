@@ -126,7 +126,7 @@ public abstract class RequestFilter
      * Set the regular expression used to test for denied requests for this
      * Filter, if any.
      *
-     * @param allow The new deny expression
+     * @param deny The new deny expression
      */
     public void setDeny(String deny) {
         if (deny == null || deny.length() == 0) {

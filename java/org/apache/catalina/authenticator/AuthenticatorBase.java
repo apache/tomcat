@@ -169,14 +169,14 @@ public abstract class AuthenticatorBase extends ValveBase
      * The Java class name of the secure random number generator class to be
      * used when generating SSO session identifiers. The random number generator
      * class must be self-seeding and have a zero-argument constructor. If not
-     * specified, an instance of {@link java.secure.SecureRandom} will be
+     * specified, an instance of {@link java.security.SecureRandom} will be
      * generated.
      */
     protected String secureRandomClass = null;
 
     /**
      * The name of the algorithm to use to create instances of
-     * {@link java.secure.SecureRandom} which are used to generate SSO session
+     * {@link java.security.SecureRandom} which are used to generate SSO session
      * IDs. If no algorithm is specified, SHA1PRNG is used. To use the platform
      * default (which may be SHA1PRNG), specify the empty string. If an invalid
      * algorithm and/or provider is specified the SecureRandom instances will be
@@ -187,7 +187,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
     /**
      * The name of the provider to use to create instances of
-     * {@link java.secure.SecureRandom} which are used to generate session SSO
+     * {@link java.security.SecureRandom} which are used to generate session SSO
      * IDs. If no algorithm is specified the of SHA1PRNG default is used. If an
      * invalid algorithm and/or provider is specified the SecureRandom instances
      * will be created using the defaults. If that fails, the SecureRandom
