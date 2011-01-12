@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -56,8 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-public final class StandardServer extends LifecycleMBeanBase
-        implements Server {
+public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     private static final Log log = LogFactory.getLog(StandardServer.class);
    
@@ -158,6 +154,8 @@ public final class StandardServer extends LifecycleMBeanBase
     private boolean stopAwait = false;
     
     private Catalina catalina = null;
+
+    private ClassLoader parentClassLoader = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -751,12 +749,28 @@ public final class StandardServer extends LifecycleMBeanBase
      */
     @Override
     public ClassLoader getParentClassLoader() {
+        if (parentClassLoader != null)
+            return (parentClassLoader);
         if (catalina != null) {
             return (catalina.getParentClassLoader());
         }
         return (ClassLoader.getSystemClassLoader());
     }
 
+    /**
+     * Set the parent class loader for this server.
+     *
+     * @param parent The new parent class loader
+     */
+    @Override
+    public void setParentClassLoader(ClassLoader parent) {
+        ClassLoader oldParentClassLoader = this.parentClassLoader;
+        this.parentClassLoader = parent;
+        support.firePropertyChange("parentClassLoader", oldParentClassLoader,
+                                   this.parentClassLoader);
+    }
+
+    
     private ObjectName onameStringCache;
     private ObjectName onameMBeanFactory;
     private ObjectName onameNamingResoucres;

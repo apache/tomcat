@@ -103,6 +103,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     protected Container container = null;
 
+    private ClassLoader parentClassLoader = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -600,12 +601,26 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public ClassLoader getParentClassLoader() {
+        if (parentClassLoader != null)
+            return (parentClassLoader);
         if (server != null) {
             return (server.getParentClassLoader());
         }
         return (ClassLoader.getSystemClassLoader());
     }
 
+    /**
+     * Set the parent class loader for this server.
+     *
+     * @param parent The new parent class loader
+     */
+    @Override
+    public void setParentClassLoader(ClassLoader parent) {
+        ClassLoader oldParentClassLoader = this.parentClassLoader;
+        this.parentClassLoader = parent;
+        support.firePropertyChange("parentClassLoader", oldParentClassLoader,
+                                   this.parentClassLoader);
+    }
     @Override
     protected String getDomainInternal() {
         
