@@ -57,7 +57,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertEquals("paramLarge.png", servletDef.getLargeIcon());
         assertEquals("paramSmall.png", servletDef.getSmallIcon());
         assertEquals(Boolean.FALSE, servletDef.getAsyncSupported());
-        assertEquals(new Integer(0), servletDef.getLoadOnStartup());
+        assertEquals(Integer.valueOf(0), servletDef.getLoadOnStartup());
         assertNull(servletDef.getEnabled());
         assertNull(servletDef.getJspFile());
 
@@ -97,7 +97,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertEquals("LargeIcon", servletDef.getLargeIcon());
         assertEquals("SmallIcon", servletDef.getSmallIcon());
         assertEquals(Boolean.TRUE, servletDef.getAsyncSupported());
-        assertEquals(new Integer(1), servletDef.getLoadOnStartup());
+        assertEquals(Integer.valueOf(1), servletDef.getLoadOnStartup());
         assertNull(servletDef.getEnabled());
         assertNull(servletDef.getJspFile());
     }
