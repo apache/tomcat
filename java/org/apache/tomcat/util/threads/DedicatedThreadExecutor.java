@@ -44,7 +44,7 @@ public class DedicatedThreadExecutor {
      * @param <V>
      *            the type of the returned value
      * @param callable
-     * @return
+     * @return the completed result
      */
     public <V> V execute(final Callable<V> callable) {
         final Future<V> futureTask = executorService.submit(callable);
@@ -99,7 +99,7 @@ public class DedicatedThreadExecutor {
      * 
      * @param <V>
      * @param callable
-     * @return
+     * @return the completed result
      */
     public static <V> V executeInOwnThread(
         final Callable<V> callable) {

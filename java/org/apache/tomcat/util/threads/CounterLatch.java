@@ -35,13 +35,17 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 public class CounterLatch {
 
     private class Sync extends AbstractQueuedSynchronizer {
+        private static final long serialVersionUID = 1L;
+
         public Sync() {
         }
 
+        @Override
         protected int tryAcquireShared(int arg) {
             return ((!released) && count.get() == signal) ? -1 : 1;
         }
 
+        @Override
         protected boolean tryReleaseShared(int arg) {
             return true;
         }
@@ -123,7 +127,8 @@ public class CounterLatch {
      * If the operation is successful and {@code expect==waitValue && expect!=update} waiting threads will be released.  
      * @param expect - the expected counter value
      * @param update - the new counter value
-     * @return
+     * @return <code>true</code> if successful, <code>false</code> if the
+     *         current value wasn't as expected
      */
     public boolean compareAndSet(long expect, long update) {
         boolean result = count.compareAndSet(expect, update);
@@ -152,7 +157,9 @@ public class CounterLatch {
     /**
      * releases all waiting threads. This operation is permanent, and no threads will block,
      * even if the counter hits the {@code waitValue} until {@link #reset(long)} has been called.
-     * @return
+     * @return <code>true</code> if this release of shared mode may permit a
+     *         waiting acquire (shared or exclusive) to succeed; and
+     *         <code>false</code> otherwise
      */
     public boolean releaseAll() {
         released = true;
@@ -162,7 +169,7 @@ public class CounterLatch {
     /**
      * Resets the latch and initializes the counter with the new value.
      * @param value the new counter value
-     * @see {@link #releaseAll()}
+     * @see #releaseAll()
      */
     public void reset(long value) {
         this.count.set(value);
