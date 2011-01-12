@@ -282,14 +282,16 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the parent class loader (if any) for web applications.
+     * Return the parent class loader for this component. If not set, return
+     * {@link Container#getParent()#getParentClassLoader()}. If no parent has
+     * been set, return the system class loader.
      */
     public ClassLoader getParentClassLoader();
 
 
     /**
-     * Set the parent class loader (if any) for web applications.
-     * This call is meaningful only <strong>before</strong> a Loader has
+     * Set the parent class loader for this component. For {@link Context}s
+     * this call is meaningful only <strong>before</strong> a Loader has
      * been configured, and the specified value (if non-null) should be
      * passed as an argument to the class loader constructor.
      *
