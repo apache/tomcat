@@ -219,7 +219,7 @@ class Generator {
                     return;
 
                 getServletInfoGenerated = true;
-                out.printil("public String getServletInfo() {");
+                out.printil("public java.lang.String getServletInfo() {");
                 out.pushIndent();
                 out.printin("return ");
                 out.print(quote(info));
@@ -417,7 +417,7 @@ class Generator {
     private void generateInit() {
 
         if (ctxt.isTagFile()) {
-            out.printil("private void _jspInit(ServletConfig config) {");
+            out.printil("private void _jspInit(javax.servlet.ServletConfig config) {");
         } else {
             out.printil("public void _jspInit() {");
         }
@@ -512,18 +512,19 @@ class Generator {
      * preamble generation)
      */
     private void genPreambleStaticInitializers() {
-        out.printil("private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();");
+        out.printil("private static final javax.servlet.jsp.JspFactory _jspxFactory =");
+        out.printil("        javax.servlet.jsp.JspFactory.getDefaultFactory();");
         out.println();
 
         // Static data for getDependants()
-        out.printil("private static java.util.List<String> _jspx_dependants;");
+        out.printil("private static java.util.List<java.lang.String> _jspx_dependants;");
         out.println();
         List<String> dependants = pageInfo.getDependants();
         Iterator<String> iter = dependants.iterator();
         if (!dependants.isEmpty()) {
             out.printil("static {");
             out.pushIndent();
-            out.printin("_jspx_dependants = new java.util.ArrayList<String>(");
+            out.printin("_jspx_dependants = new java.util.ArrayList<java.lang.String>(");
             out.print("" + dependants.size());
             out.println(");");
             while (iter.hasNext()) {
@@ -567,7 +568,7 @@ class Generator {
      */
     private void genPreambleMethods() {
         // Method used to get compile time file dependencies
-        out.printil("public java.util.List<String> getDependants() {");
+        out.printil("public java.util.List<java.lang.String> getDependants() {");
         out.pushIndent();
         out.printil("return _jspx_dependants;");
         out.popIndent();
@@ -601,7 +602,7 @@ class Generator {
         out.printin("    implements org.apache.jasper.runtime.JspSourceDependent");
         if (!pageInfo.isThreadSafe()) {
             out.println(",");
-            out.printin("                 SingleThreadModel");
+            out.printin("                 javax.servlet.SingleThreadModel");
         }
         out.println(" {");
         out.pushIndent();
@@ -621,34 +622,34 @@ class Generator {
         // Now the service method
         out.printin("public void ");
         out.print(serviceMethodName);
-        out.println("(final HttpServletRequest request, final HttpServletResponse response)");
-        out.println("        throws java.io.IOException, ServletException {");
+        out.println("(final javax.servlet.http.HttpServletRequest request, final javax.servlet.http.HttpServletResponse response)");
+        out.println("        throws java.io.IOException, javax.servlet.ServletException {");
 
         out.pushIndent();
         out.println();
 
         // Local variable declarations
-        out.printil("final PageContext pageContext;");
+        out.printil("final javax.servlet.jsp.PageContext pageContext;");
 
         if (pageInfo.isSession())
-            out.printil("HttpSession session = null;");
+            out.printil("javax.servlet.http.HttpSession session = null;");
 
         if (pageInfo.isErrorPage()) {
-            out.printil("Throwable exception = org.apache.jasper.runtime.JspRuntimeLibrary.getThrowable(request);");
+            out.printil("java.lang.Throwable exception = org.apache.jasper.runtime.JspRuntimeLibrary.getThrowable(request);");
             out.printil("if (exception != null) {");
             out.pushIndent();
-            out.printil("response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);");
+            out.printil("response.setStatus(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR);");
             out.popIndent();
             out.printil("}");
         }
 
-        out.printil("final ServletContext application;");
-        out.printil("final ServletConfig config;");
-        out.printil("JspWriter out = null;");
-        out.printil("final Object page = this;");
+        out.printil("final javax.servlet.ServletContext application;");
+        out.printil("final javax.servlet.ServletConfig config;");
+        out.printil("javax.servlet.jsp.JspWriter out = null;");
+        out.printil("final java.lang.Object page = this;");
 
-        out.printil("JspWriter _jspx_out = null;");
-        out.printil("PageContext _jspx_page_context = null;");
+        out.printil("javax.servlet.jsp.JspWriter _jspx_out = null;");
+        out.printil("javax.servlet.jsp.PageContext _jspx_page_context = null;");
         out.println();
 
         declareTemporaryScriptingVars(page);
@@ -1036,7 +1037,7 @@ class Generator {
             printParams(n, pageParam, page.isLiteral());
             out.println(");");
             if (isTagFile || isFragment) {
-                out.printil("throw new SkipPageException();");
+                out.printil("throw new javax.servlet.jsp.SkipPageException();");
             } else {
                 out.printil((methodNesting > 0) ? "return true;" : "return;");
             }
@@ -1233,16 +1234,16 @@ class Generator {
 
             // JSP.5.1, Sematics, para 1 - lock not required for request or
             // page scope
-            String scopename = "PageContext.PAGE_SCOPE"; // Default to page
+            String scopename = "javax.servlet.jsp.PageContext.PAGE_SCOPE"; // Default to page
             String lock = null;
 
             if ("request".equals(scope)) {
-                scopename = "PageContext.REQUEST_SCOPE";
+                scopename = "javax.servlet.jsp.PageContext.REQUEST_SCOPE";
             } else if ("session".equals(scope)) {
-                scopename = "PageContext.SESSION_SCOPE";
+                scopename = "javax.servlet.jsp.PageContext.SESSION_SCOPE";
                 lock = "session";
             } else if ("application".equals(scope)) {
-                scopename = "PageContext.APPLICATION_SCOPE";
+                scopename = "javax.servlet.jsp.PageContext.APPLICATION_SCOPE";
                 lock = "application";
             }
 
@@ -1323,13 +1324,13 @@ class Generator {
                      * Note: Beans.instantiate throws ClassNotFoundException if
                      * the bean class is abstract.
                      */
-                    out.printil("} catch (ClassNotFoundException exc) {");
+                    out.printil("} catch (java.lang.ClassNotFoundException exc) {");
                     out.pushIndent();
                     out.printil("throw new InstantiationException(exc.getMessage());");
                     out.popIndent();
-                    out.printil("} catch (Exception exc) {");
+                    out.printil("} catch (java.lang.Exception exc) {");
                     out.pushIndent();
-                    out.printin("throw new ServletException(");
+                    out.printin("throw new javax.servlet.ServletException(");
                     out.print("\"Cannot create bean of class \" + ");
                     out.print(binaryName);
                     out.println(", exc);");
@@ -1686,20 +1687,20 @@ class Generator {
                     out.print(parent);
                     out.print(", ");
                 }
-                out.print("PageContext _jspx_page_context");
+                out.print("javax.servlet.jsp.PageContext _jspx_page_context");
                 if (pushBodyCountVar != null) {
                     out.print(", int[] ");
                     out.print(pushBodyCountVar);
                 }
                 out.println(")");
-                out.printil("        throws Throwable {");
+                out.printil("        throws java.lang.Throwable {");
                 out.pushIndent();
 
                 // Initialize local variables used in this method.
                 if (!isTagFile) {
-                    out.printil("PageContext pageContext = _jspx_page_context;");
+                    out.printil("javax.servlet.jsp.PageContext pageContext = _jspx_page_context;");
                 }
-                out.printil("JspWriter out = _jspx_page_context.getOut();");
+                out.printil("javax.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
                 generateLocalVariables(out, n);
             }
 
@@ -1877,7 +1878,7 @@ class Generator {
                         nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
                                 value + " + \"\\\"\"";
                     } else {
-                        nvp = " + (Boolean.valueOf(" + omit + ")?\"\":\" " +
+                        nvp = " + (java.lang.Boolean.valueOf(" + omit + ")?\"\":\" " +
                                 attrs[i].getName() + "=\\\"\" + " + value +
                                 " + \"\\\"\")";
                     }
@@ -2103,7 +2104,7 @@ class Generator {
             }
 
             // Restore EL context
-            out.printil("jspContext.getELContext().putContext(JspContext.class,getJspContext());");
+            out.printil("jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,getJspContext());");
 
             n.setEndJavaLine(out.getJavaLine());
         }
@@ -2149,7 +2150,7 @@ class Generator {
             }
 
             // Restore EL context
-            out.printil("jspContext.getELContext().putContext(JspContext.class,getJspContext());");
+            out.printil("jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,getJspContext());");
 
             n.setEndJavaLine(out.getJavaLine());
         }
@@ -2404,7 +2405,7 @@ class Generator {
                 }
             }
             if (isTagFile || isFragment) {
-                out.printil("throw new SkipPageException();");
+                out.printil("throw new javax.servlet.jsp.SkipPageException();");
             } else {
                 out.printil((methodNesting > 0) ? "return true;" : "return;");
             }
@@ -2416,7 +2417,7 @@ class Generator {
             // TryCatchFinally
             if (n.implementsTryCatchFinally()) {
                 out.popIndent(); // try
-                out.printil("} catch (Throwable _jspx_exception) {");
+                out.printil("} catch (java.lang.Throwable _jspx_exception) {");
                 out.pushIndent();
 
                 out.printin("while (");
@@ -2933,7 +2934,7 @@ class Generator {
                     sb.append(',');
                     sb.append(JspUtil.toJavaSourceTypeFromTld(attr.getExpectedTypeName()));
                     sb.append(',');
-                    sb.append("new Class[] {");
+                    sb.append("new java.lang.Class[] {");
 
                     String[] p = attr.getParameterTypeNames();
                     for (int i = 0; i < p.length; i++) {
@@ -3166,14 +3167,14 @@ class Generator {
          * scope constant.
          */
         private String getScopeConstant(String scope) {
-            String scopeName = "PageContext.PAGE_SCOPE"; // Default to page
+            String scopeName = "javax.servlet.jsp.PageContext.PAGE_SCOPE"; // Default to page
 
             if ("request".equals(scope)) {
-                scopeName = "PageContext.REQUEST_SCOPE";
+                scopeName = "javax.servlet.jsp.PageContext.REQUEST_SCOPE";
             } else if ("session".equals(scope)) {
-                scopeName = "PageContext.SESSION_SCOPE";
+                scopeName = "javax.servlet.jsp.PageContext.SESSION_SCOPE";
             } else if ("application".equals(scope)) {
-                scopeName = "PageContext.APPLICATION_SCOPE";
+                scopeName = "javax.servlet.jsp.PageContext.APPLICATION_SCOPE";
             }
 
             return scopeName;
@@ -3244,7 +3245,7 @@ class Generator {
                     Node bodyElement = body.getNode(0);
                     if (bodyElement instanceof Node.TemplateText) {
                         templateTextOptimization = true;
-                        out.printil("String "
+                        out.printil("java.lang.String "
                                 + varName
                                 + " = "
                                 + quote(((Node.TemplateText) bodyElement)
@@ -3258,14 +3259,14 @@ class Generator {
                 if (!templateTextOptimization) {
                     out.printil("out = _jspx_page_context.pushBody();");
                     visitBody(n);
-                    out.printil("String " + varName + " = "
+                    out.printil("java.lang.String " + varName + " = "
                             + "((javax.servlet.jsp.tagext.BodyContent)"
                             + "out).getString();");
                     out.printil("out = _jspx_page_context.popBody();");
                 }
             } else {
                 // Empty body must be treated as ""
-                out.printil("String " + varName + " = \"\";");
+                out.printil("java.lang.String " + varName + " = \"\";");
             }
 
             return varName;
@@ -3313,15 +3314,15 @@ class Generator {
         }
 
         if (ci.hasUseBean()) {
-            out.printil("HttpSession session = _jspx_page_context.getSession();");
-            out.printil("ServletContext application = _jspx_page_context.getServletContext();");
+            out.printil("javax.servlet.http.HttpSession session = _jspx_page_context.getSession();");
+            out.printil("javax.servlet.ServletContext application = _jspx_page_context.getServletContext();");
         }
         if (ci.hasUseBean() || ci.hasIncludeAction() || ci.hasSetProperty()
                 || ci.hasParamAction()) {
-            out.printil("HttpServletRequest request = (HttpServletRequest)_jspx_page_context.getRequest();");
+            out.printil("javax.servlet.http.HttpServletRequest request = (javax.servlet.http.HttpServletRequest)_jspx_page_context.getRequest();");
         }
         if (ci.hasIncludeAction()) {
-            out.printil("HttpServletResponse response = (HttpServletResponse)_jspx_page_context.getResponse();");
+            out.printil("javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)_jspx_page_context.getResponse();");
         }
     }
 
@@ -3358,9 +3359,9 @@ class Generator {
      */
     private void generatePostamble() {
         out.popIndent();
-        out.printil("} catch (Throwable t) {");
+        out.printil("} catch (java.lang.Throwable t) {");
         out.pushIndent();
-        out.printil("if (!(t instanceof SkipPageException)){");
+        out.printil("if (!(t instanceof javax.servlet.jsp.SkipPageException)){");
         out.pushIndent();
         out.printil("out = _jspx_out;");
         out.printil("if (out != null && out.getBufferSize() != 0)");
@@ -3499,7 +3500,7 @@ class Generator {
         // Static initializations here
         genPreambleStaticInitializers();
 
-        out.printil("private JspContext jspContext;");
+        out.printil("private javax.servlet.jsp.JspContext jspContext;");
 
         // Declare writer used for storing result of fragment/body invocation
         // if 'varReader' or 'var' attribute is specified
@@ -3519,7 +3520,7 @@ class Generator {
         genPreambleMethods();
 
         // Now the doTag() method
-        out.printil("public void doTag() throws JspException, java.io.IOException {");
+        out.printil("public void doTag() throws javax.servlet.jsp.JspException, java.io.IOException {");
 
         if (ctxt.isPrototypeMode()) {
             out.printil("}");
@@ -3535,21 +3536,21 @@ class Generator {
          * implicit object in tag files. Declare _jspx_page_context, so we can
          * share the code generator with JSPs.
          */
-        out.printil("PageContext _jspx_page_context = (PageContext)jspContext;");
+        out.printil("javax.servlet.jsp.PageContext _jspx_page_context = (javax.servlet.jsp.PageContext)jspContext;");
 
         // Declare implicit objects.
-        out.printil("HttpServletRequest request = "
-                + "(HttpServletRequest) _jspx_page_context.getRequest();");
-        out.printil("HttpServletResponse response = "
-                + "(HttpServletResponse) _jspx_page_context.getResponse();");
-        out.printil("HttpSession session = _jspx_page_context.getSession();");
-        out.printil("ServletContext application = _jspx_page_context.getServletContext();");
-        out.printil("ServletConfig config = _jspx_page_context.getServletConfig();");
-        out.printil("JspWriter out = jspContext.getOut();");
+        out.printil("javax.servlet.http.HttpServletRequest request = "
+                + "(javax.servlet.http.HttpServletRequest) _jspx_page_context.getRequest();");
+        out.printil("javax.servlet.http.HttpServletResponse response = "
+                + "(javax.servlet.http.HttpServletResponse) _jspx_page_context.getResponse();");
+        out.printil("javax.servlet.http.HttpSession session = _jspx_page_context.getSession();");
+        out.printil("javax.servlet.ServletContext application = _jspx_page_context.getServletContext();");
+        out.printil("javax.servlet.ServletConfig config = _jspx_page_context.getServletConfig();");
+        out.printil("javax.servlet.jsp.JspWriter out = jspContext.getOut();");
         out.printil("_jspInit(config);");
 
         // set current JspContext on ELContext
-        out.printil("jspContext.getELContext().putContext(JspContext.class,jspContext);");
+        out.printil("jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,jspContext);");
 
         generatePageScopedVariables(tagInfo);
 
@@ -3565,17 +3566,17 @@ class Generator {
 
         // Have to catch Throwable because a classic tag handler
         // helper method is declared to throw Throwable.
-        out.printil("} catch( Throwable t ) {");
+        out.printil("} catch( java.lang.Throwable t ) {");
         out.pushIndent();
-        out.printil("if( t instanceof SkipPageException )");
-        out.printil("    throw (SkipPageException) t;");
+        out.printil("if( t instanceof javax.servlet.jsp.SkipPageException )");
+        out.printil("    throw (javax.servlet.jsp.SkipPageException) t;");
         out.printil("if( t instanceof java.io.IOException )");
         out.printil("    throw (java.io.IOException) t;");
-        out.printil("if( t instanceof IllegalStateException )");
-        out.printil("    throw (IllegalStateException) t;");
-        out.printil("if( t instanceof JspException )");
-        out.printil("    throw (JspException) t;");
-        out.printil("throw new JspException(t);");
+        out.printil("if( t instanceof java.lang.IllegalStateException )");
+        out.printil("    throw (java.lang.IllegalStateException) t;");
+        out.printil("if( t instanceof javax.servlet.jsp.JspException )");
+        out.printil("    throw (javax.servlet.jsp.JspException) t;");
+        out.printil("throw new javax.servlet.jsp.JspException(t);");
         out.popIndent();
         out.printil("} finally {");
         out.pushIndent();
@@ -3593,7 +3594,7 @@ class Generator {
         }
 
         // restore nested JspContext on ELContext
-        out.printil("jspContext.getELContext().putContext(JspContext.class,super.getJspContext());");
+        out.printil("jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,super.getJspContext());");
 
         out.printil("((org.apache.jasper.runtime.JspContextWrapper) jspContext).syncEndTagFile();");
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
@@ -3711,9 +3712,9 @@ class Generator {
         }
 
         if (aliasSeen) {
-            out.printil("public void setJspContext(JspContext ctx, java.util.Map aliasMap) {");
+            out.printil("public void setJspContext(javax.servlet.jsp.JspContext ctx, java.util.Map aliasMap) {");
         } else {
-            out.printil("public void setJspContext(JspContext ctx) {");
+            out.printil("public void setJspContext(javax.servlet.jsp.JspContext ctx) {");
         }
         out.pushIndent();
         out.printil("super.setJspContext(ctx);");
@@ -3760,7 +3761,7 @@ class Generator {
         out.popIndent();
         out.printil("}");
         out.println();
-        out.printil("public JspContext getJspContext() {");
+        out.printil("public javax.servlet.jsp.JspContext getJspContext() {");
         out.pushIndent();
         out.printil("return this.jspContext;");
         out.popIndent();
@@ -3774,7 +3775,7 @@ class Generator {
      * variable can later be created for it.
      */
     public void generateSetDynamicAttribute() {
-        out.printil("public void setDynamicAttribute(String uri, String localName, Object value) throws JspException {");
+        out.printil("public void setDynamicAttribute(java.lang.String uri, java.lang.String localName, java.lang.Object value) throws javax.servlet.jsp.JspException {");
         out.pushIndent();
         /*
          * According to the spec, only dynamic attributes with no uri are to be
@@ -4085,7 +4086,7 @@ class Generator {
             out.printil("private int[] _jspx_push_body_count;");
             out.println();
             out.printil("public " + className
-                    + "( int discriminator, JspContext jspContext, "
+                    + "( int discriminator, javax.servlet.jsp.JspContext jspContext, "
                     + "javax.servlet.jsp.tagext.JspTag _jspx_parent, "
                     + "int[] _jspx_push_body_count ) {");
             out.pushIndent();
@@ -4117,11 +4118,11 @@ class Generator {
             } else {
                 out.printin("public void invoke");
             }
-            out.println(result.getId() + "( " + "JspWriter out ) ");
+            out.println(result.getId() + "( " + "javax.servlet.jsp.JspWriter out ) ");
             out.pushIndent();
             // Note: Throwable required because methods like _jspx_meth_*
             // throw Throwable.
-            out.printil("throws Throwable");
+            out.printil("throws java.lang.Throwable");
             out.popIndent();
             out.printil("{");
             out.pushIndent();
@@ -4154,11 +4155,11 @@ class Generator {
             // Generate postamble:
             out.printil("public void invoke( java.io.Writer writer )");
             out.pushIndent();
-            out.printil("throws JspException");
+            out.printil("throws javax.servlet.jsp.JspException");
             out.popIndent();
             out.printil("{");
             out.pushIndent();
-            out.printil("JspWriter out = null;");
+            out.printil("javax.servlet.jsp.JspWriter out = null;");
             out.printil("if( writer != null ) {");
             out.pushIndent();
             out.printil("out = this.jspContext.pushBody(writer);");
@@ -4170,7 +4171,7 @@ class Generator {
             out.printil("}");
             out.printil("try {");
             out.pushIndent();
-            out.printil("this.jspContext.getELContext().putContext(JspContext.class,this.jspContext);");
+            out.printil("this.jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,this.jspContext);");
             out.printil("switch( this.discriminator ) {");
             out.pushIndent();
             for (int i = 0; i < fragments.size(); i++) {
@@ -4184,11 +4185,11 @@ class Generator {
             out.printil("}"); // switch
             out.popIndent();
             out.printil("}"); // try
-            out.printil("catch( Throwable e ) {");
+            out.printil("catch( java.lang.Throwable e ) {");
             out.pushIndent();
-            out.printil("if (e instanceof SkipPageException)");
-            out.printil("    throw (SkipPageException) e;");
-            out.printil("throw new JspException( e );");
+            out.printil("if (e instanceof javax.servlet.jsp.SkipPageException)");
+            out.printil("    throw (javax.servlet.jsp.SkipPageException) e;");
+            out.printil("throw new javax.servlet.jsp.JspException( e );");
             out.popIndent();
             out.printil("}"); // catch
             out.printil("finally {");
