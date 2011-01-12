@@ -283,7 +283,7 @@ public interface Container extends Lifecycle {
 
     /**
      * Return the parent class loader for this component. If not set, return
-     * {@link Container#getParent()#getParentClassLoader()}. If no parent has
+     * {@link #getParent()} {@link #getParentClassLoader()}. If no parent has
      * been set, return the system class loader.
      */
     public ClassLoader getParentClassLoader();

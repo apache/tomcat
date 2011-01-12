@@ -86,8 +86,8 @@ public interface Service extends Lifecycle {
 
     /**
      * Return the parent class loader for this component. If not set, return
-     * {@link Service#getServer()#getParentClassLoader(). If no server has
-     * been set, return the system class loader.
+     * {@link #getServer()} {@link Server#getParentClassLoader()}. If no server
+     * has been set, return the system class loader.
      */
     public ClassLoader getParentClassLoader();
 
