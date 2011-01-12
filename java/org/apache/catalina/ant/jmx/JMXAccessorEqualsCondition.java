@@ -232,6 +232,7 @@ public class JMXAccessorEqualsCondition  extends ProjectComponent  implements Co
     }
 
     // This method evaluates the condition
+    @Override
     public boolean eval() {
         if (value == null) {
             throw new BuildException("value attribute is not set");
