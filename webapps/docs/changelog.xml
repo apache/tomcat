@@ -48,6 +48,10 @@
         Improve fix for <bug>50205</bug> to trigger an error earlier if invalid
         configuration is used. (markt)
       </update>
+      <add>
+        Provide additional control over component class loaders, primarily for
+        use when embedding. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
