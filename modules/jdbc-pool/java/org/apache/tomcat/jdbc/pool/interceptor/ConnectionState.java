@@ -54,7 +54,14 @@ public class ConnectionState extends JdbcInterceptor  {
     
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
-        if (parent==null || con==null) return;
+        if (parent==null || con==null) {
+            //we are resetting, reset our defaults
+            autoCommit = null;
+            transactionIsolation = null;
+            readOnly = null;
+            catalog = null;
+            return;
+        }
         PoolConfiguration poolProperties = parent.getPoolProperties();
         if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
             try {
