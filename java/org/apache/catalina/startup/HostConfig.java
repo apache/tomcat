@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.management.ObjectName;
@@ -482,15 +483,20 @@ public class HostConfig
      * @return  The filtered list of application paths
      */
     protected String[] filterAppPaths(String[] unfilteredAppPaths) {
-        if (host.getDeployIgnore() == null) {
+        Pattern filter = host.getDeployIgnorePattern();
+        if (filter == null) {
             return unfilteredAppPaths;
         }
-        
-        Pattern filter = host.getDeployIgnorePattern();
 
         List<String> filteredList = new ArrayList<String>();
+        Matcher matcher = null;
         for (String appPath : unfilteredAppPaths) {
-            if (filter.matcher(appPath).matches()) {
+            if (matcher == null) {
+                matcher = filter.matcher(appPath);
+            } else {
+                matcher.reset(appPath);
+            }
+            if (matcher.matches()) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("hostConfig.ignorePath", appPath));
                 }
