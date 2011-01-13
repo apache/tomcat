@@ -178,12 +178,6 @@ public abstract class PersistentManagerBase extends ManagerBase {
 
 
     /**
-     * Processing time during session expiration and passivation.
-     */
-    protected long processingTime = 0;
-
-
-    /**
      * Sessions currently being swapped in and the associated locks
      */
     private final Map<String,Object> sessionSwapInLocks =
@@ -232,8 +226,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
         int oldBackup = this.maxIdleBackup;
         this.maxIdleBackup = backup;
         support.firePropertyChange("maxIdleBackup",
-                                   new Integer(oldBackup),
-                                   new Integer(this.maxIdleBackup));
+                                   Integer.valueOf(oldBackup),
+                                   Integer.valueOf(this.maxIdleBackup));
 
     }
 
@@ -260,8 +254,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
         int oldMaxIdleSwap = this.maxIdleSwap;
         this.maxIdleSwap = max;
         support.firePropertyChange("maxIdleSwap",
-                                   new Integer(oldMaxIdleSwap),
-                                   new Integer(this.maxIdleSwap));
+                                   Integer.valueOf(oldMaxIdleSwap),
+                                   Integer.valueOf(this.maxIdleSwap));
 
     }
 
@@ -290,8 +284,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
         int oldMinIdleSwap = this.minIdleSwap;
         this.minIdleSwap = min;
         support.firePropertyChange("minIdleSwap",
-                                   new Integer(oldMinIdleSwap),
-                                   new Integer(this.minIdleSwap));
+                                   Integer.valueOf(oldMinIdleSwap),
+                                   Integer.valueOf(this.minIdleSwap));
 
     }
 
@@ -901,7 +895,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
                                 ("persistentManager.swapMaxIdle",
-                                 session.getIdInternal(), new Integer(timeIdle)));
+                                 session.getIdInternal(),
+                                 Integer.valueOf(timeIdle)));
                         try {
                             swapOut(session);
                         } catch (IOException e) {
@@ -932,7 +927,7 @@ public abstract class PersistentManagerBase extends ManagerBase {
         if(log.isDebugEnabled())
             log.debug(sm.getString
                 ("persistentManager.tooManyActive",
-                 new Integer(sessions.length)));
+                 Integer.valueOf(sessions.length)));
 
         int toswap = sessions.length - getMaxActiveSessions();
         long timeNow = System.currentTimeMillis();
@@ -951,7 +946,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
                     if(log.isDebugEnabled())
                         log.debug(sm.getString
                             ("persistentManager.swapTooManyActive",
-                             session.getIdInternal(), new Integer(timeIdle)));
+                             session.getIdInternal(),
+                             Integer.valueOf(timeIdle)));
                     try {
                         swapOut(session);
                     } catch (IOException e) {
@@ -989,7 +985,8 @@ public abstract class PersistentManagerBase extends ManagerBase {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
                                 ("persistentManager.backupMaxIdle",
-                                session.getIdInternal(), new Integer(timeIdle)));
+                                session.getIdInternal(),
+                                Integer.valueOf(timeIdle)));
     
                         try {
                             writeSession(session);
