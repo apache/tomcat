@@ -759,9 +759,8 @@ public class Catalina {
 
     protected void initStreams() {
         // Replace System.out and System.err with a custom PrintStream
-        SystemLogHandler systemlog = new SystemLogHandler(System.out);
-        System.setOut(systemlog);
-        System.setErr(systemlog);
+        System.setOut(new SystemLogHandler(System.out));
+        System.setErr(new SystemLogHandler(System.err));
     }
 
 
