@@ -31,7 +31,6 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterDeployer;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterMessage;
@@ -69,8 +68,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     private static final String info = "FarmWarDeployer/1.2";
 
     /*--Instance Variables--------------------------------------*/
-    protected CatalinaCluster cluster = null;
-
     protected boolean started = false; //default 5 seconds
 
     protected HashMap<String, FileMessageFactory> fileFactories =
@@ -244,7 +241,11 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                             addServiced(path);
                             try {
                                 remove(path);
-                                factory.getFile().renameTo(deployable);
+                                if (!factory.getFile().renameTo(deployable)) {
+                                    log.error("Failed to rename [" +
+                                            factory.getFile() + "] to [" +
+                                            deployable + "]");
+                                }
                                 check(path);
                             } finally {
                                 removeServiced(path);
@@ -541,11 +542,15 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             File dir = new File(getAppBase(), baseName);
             File xml = new File(configBase, baseName + ".xml");
             if (war.exists()) {
-                war.delete();
+                if (!war.delete()) {
+                    log.error("Failed to delete [" + war + "]");
+                }
             } else if (dir.exists()) {
                 undeployDir(dir);
             } else {
-                xml.delete();
+                if (!xml.delete()) {
+                    log.error("Failed to delete [" + xml + "]");
+                }
             }
             // Perform new deployment and remove internal HostConfig state
             check(path);
@@ -571,11 +576,14 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             if (file.isDirectory()) {
                 undeployDir(file);
             } else {
-                file.delete();
+                if (!file.delete()) {
+                    log.error("Failed to delete [" + file + "]");
+                }
             }
         }
-        dir.delete();
-
+        if (!dir.delete()) {
+            log.error("Failed to delete [" + dir + "]");
+        }
     }
 
     /*
@@ -635,16 +643,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /*--Instance Getters/Setters--------------------------------*/
-    @Override
-    public CatalinaCluster getCluster() {
-        return cluster;
-    }
-
-    @Override
-    public void setCluster(CatalinaCluster cluster) {
-        this.cluster = cluster;
-    }
-
     @Override
     public boolean equals(Object listener) {
         return super.equals(listener);
@@ -722,8 +720,12 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected boolean copy(File from, File to) {
         try {
-            if (!to.exists())
-                to.createNewFile();
+            if (!to.exists()) {
+                if (!to.createNewFile()) {
+                    log.error("Unable to create [" + to + "]");
+                    return false;
+                }
+            }
             java.io.FileInputStream is = new java.io.FileInputStream(from);
             java.io.FileOutputStream os = new java.io.FileOutputStream(to,
                     false);
