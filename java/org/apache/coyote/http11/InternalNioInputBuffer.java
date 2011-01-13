@@ -84,7 +84,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * Parsing state - used for non blocking parsing so that
      * when more data arrives, we can pick up where we left off.
      */
-    protected boolean parsingHeader;
     protected boolean parsingRequestLine;
     protected int parsingRequestLinePhase = 0;
     protected boolean parsingRequestLineEol = false;
@@ -131,15 +130,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
 
     // --------------------------------------------------------- Public Methods
     /**
-     * Returns true if there are bytes available from the socket layer
-     * @return boolean
-     * @throws IOException
-     */
-    public boolean isReadable() throws IOException {
-        return (pos < lastValid) || (nbRead()>0);
-    }
-    
-    /**
      * Issues a non blocking read
      * @return int
      * @throws IOException
@@ -179,7 +169,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
     @Override
     public void nextRequest() {
         super.nextRequest();
-        parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
         parsingRequestLinePhase = 0;
