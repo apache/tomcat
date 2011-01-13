@@ -49,6 +49,11 @@
         <code>stderr</code> internally so users retain the option to treat the
         separately. (markt)
       </fix>
+      <add>
+        <bug>18797</bug>: Provide protection against <code>null</code> or zero
+        length names being provided for users, roles and groups in the
+        <code>MemoryRealm</code> and <code>UserDatabaseRealm</code>. (markt)
+      </add>
       <update>
         Improve fix for <bug>50205</bug> to trigger an error earlier if invalid
         configuration is used. (markt)
