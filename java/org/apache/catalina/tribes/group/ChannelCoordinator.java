@@ -45,17 +45,13 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
     private ChannelSender clusterSender = new ReplicationTransmitter();
     private MembershipService membershipService = new McastService();
     
-    //override optionflag
-    protected int optionFlag = Channel.SEND_OPTIONS_BYTE_MESSAGE|Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
-    @Override
-    public int getOptionFlag() {return optionFlag;}
-    @Override
-    public void setOptionFlag(int flag) {optionFlag=flag;}
-    
     private int startLevel = 0;
 
     public ChannelCoordinator() {
-        
+        // Override default
+        this.optionFlag = Channel.SEND_OPTIONS_BYTE_MESSAGE |
+                Channel.SEND_OPTIONS_USE_ACK |
+                Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
     }
     
     public ChannelCoordinator(ChannelReceiver receiver,
