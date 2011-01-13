@@ -64,16 +64,6 @@ public final class Mapper {
 
 
     /**
-     * Get default host.
-     *
-     * @return Default host name
-     */
-    public String getDefaultHostName() {
-        return defaultHostName;
-    }
-
-
-    /**
      * Set default host.
      *
      * @param defaultHostName Default host name
@@ -1509,7 +1499,6 @@ public final class Mapper {
     protected static class Wrapper
         extends MapElement {
 
-        public String path = null;
         public boolean jspWildCard = false;
         public boolean resourceOnly = false;
     }
