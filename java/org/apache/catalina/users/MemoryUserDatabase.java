@@ -272,6 +272,12 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     public Group createGroup(String groupname, String description) {
 
+        if (groupname == null || groupname.length() == 0) {
+            String msg = sm.getString("memoryUserDatabase.nullGroup");
+            log.warn(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
         MemoryGroup group = new MemoryGroup(this, groupname, description);
         synchronized (groups) {
             groups.put(group.getGroupname(), group);
@@ -288,6 +294,12 @@ public class MemoryUserDatabase implements UserDatabase {
      * @param description The description of this group
      */
     public Role createRole(String rolename, String description) {
+
+        if (rolename == null || rolename.length() == 0) {
+            String msg = sm.getString("memoryUserDatabase.nullRole");
+            log.warn(msg);
+            throw new IllegalArgumentException(msg);
+        }
 
         MemoryRole role = new MemoryRole(this, rolename, description);
         synchronized (roles) {
@@ -308,12 +320,17 @@ public class MemoryUserDatabase implements UserDatabase {
     public User createUser(String username, String password,
                            String fullName) {
 
+        if (username == null || username.length() == 0) {
+            String msg = sm.getString("memoryUserDatabase.nullUser");
+            log.warn(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
         MemoryUser user = new MemoryUser(this, username, password, fullName);
         synchronized (users) {
             users.put(user.getUsername(), user);
         }
         return (user);
-
     }
 
 
@@ -399,13 +416,13 @@ public class MemoryUserDatabase implements UserDatabase {
                 }
                 digester.addFactoryCreate
                     ("tomcat-users/group",
-                     new MemoryGroupCreationFactory(this));
+                     new MemoryGroupCreationFactory(this), true);
                 digester.addFactoryCreate
                     ("tomcat-users/role",
-                     new MemoryRoleCreationFactory(this));
+                     new MemoryRoleCreationFactory(this), true);
                 digester.addFactoryCreate
                     ("tomcat-users/user",
-                     new MemoryUserCreationFactory(this));
+                     new MemoryUserCreationFactory(this), true);
 
                 // Parse the XML input file to load this database
                 try {
