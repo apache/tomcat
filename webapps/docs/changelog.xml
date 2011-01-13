@@ -44,6 +44,11 @@
 <section name="Tomcat 7.0.7 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>18462</bug>: Don&apos;t merge <code>stdout</code> and
+        <code>stderr</code> internally so users retain the option to treat the
+        separately. (markt)
+      </fix>
       <update>
         Improve fix for <bug>50205</bug> to trigger an error earlier if invalid
         configuration is used. (markt)
