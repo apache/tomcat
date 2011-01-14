@@ -157,7 +157,7 @@ public class WarWatcher {
     /**
      * File name filter for war files
      */
-    protected class WarFilter implements java.io.FilenameFilter {
+    protected static class WarFilter implements java.io.FilenameFilter {
         @Override
         public boolean accept(File path, String name) {
             if (name == null)
@@ -169,7 +169,7 @@ public class WarWatcher {
     /**
      * File information on existing WAR files
      */
-    protected class WarInfo {
+    protected static class WarInfo {
         protected File war = null;
 
         protected long lastChecked = 0;
