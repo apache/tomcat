@@ -148,10 +148,6 @@ public class DeltaRequest implements Externalizable {
         actions.addLast(info);
     }
     
-    public void execute(DeltaSession session) {
-        execute(session,true);
-    }
-
     public void execute(DeltaSession session, boolean notifyListeners) {
         if ( !this.sessionId.equals( session.getId() ) )
             throw new java.lang.IllegalArgumentException("Session id mismatch, not executing the delta request");
@@ -248,11 +244,11 @@ public class DeltaRequest implements Externalizable {
                     info = actionPool.removeFirst();
                 } catch ( Exception x )  {
                     log.error("Unable to remove element",x);
-                    info = new AttributeInfo(-1,-1,null,null);
+                    info = new AttributeInfo();
                 }
             }
             else {
-                info = new AttributeInfo(-1,-1,null,null);
+                info = new AttributeInfo();
             }
             info.readExternal(in);
             actions.addLast(info);
@@ -296,6 +292,10 @@ public class DeltaRequest implements Externalizable {
         private Object value = null;
         private int action;
         private int type;
+
+        public AttributeInfo() {
+            this(-1, -1, null, null);
+        }
 
         public AttributeInfo(int type,
                              int action,
