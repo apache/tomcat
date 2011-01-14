@@ -34,6 +34,11 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Class has to implement clone since its superclass does but fakes it -->
+    <Class name="org.apache.naming.resources.ResourceAttributes" />
+    <Bug code="CN" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
