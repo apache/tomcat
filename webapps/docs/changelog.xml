@@ -81,7 +81,7 @@
   <subsection name="Cluster">
     <changelog>
       <add>
-        Internationalise the log messages for the WarFarmDeployer. (markt)
+        Internationalise the log messages for the FarmWarDeployer. (markt)
       </add>
     </changelog>
   </subsection>
