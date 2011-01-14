@@ -78,6 +78,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Internationalise the log messages for the WarFarmDeployer. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
