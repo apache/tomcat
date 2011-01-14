@@ -33,6 +33,11 @@
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
   </Match>
+  <Match>
+    <!-- Yes the simple name is the same as the super class. Accept it. -->
+    <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
+    <Bug code="Nm" />
+  </Match>
   <!--  Generated code -->
   <Match>
     <Class name="org.apache.el.parser.ELParserTokenManager" />
