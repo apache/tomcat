@@ -17,16 +17,19 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
+    <!-- Have to trigger GC for leak detection to work. Clearly documented -->
     <Class name="org.apache.catalina.core.StandardHost" />
     <Method name="findReloadedContextMemoryLeaks" />
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Sleep is short, needs to keep lock -->
     <Class name="org.apache.catalina.startup.HostConfig" />
     <Method name="checkResources" />
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
   </Match>
