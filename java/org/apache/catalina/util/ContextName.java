@@ -90,7 +90,7 @@ public final class ContextName {
     }
     
     /**
-     * Construct and instance from a path and version.
+     * Construct an instance from a path and version.
      * 
      * @param path      Context path to use
      * @param version   Context version to use
