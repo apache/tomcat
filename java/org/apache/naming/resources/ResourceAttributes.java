@@ -88,21 +88,9 @@ public class ResourceAttributes implements Attributes {
     
     
     /**
-     * Source.
-     */
-    public static final String SOURCE = "source";
-    
-    
-    /**
      * MIME type of the content.
      */
     public static final String CONTENT_TYPE = "getcontenttype";
-    
-    
-    /**
-     * Content language.
-     */
-    public static final String CONTENT_LANGUAGE = "getcontentlanguage";
     
     
     /**
@@ -333,7 +321,7 @@ public class ResourceAttributes implements Attributes {
     public void setContentLength(long contentLength) {
         this.contentLength = contentLength;
         if (attributes != null)
-            attributes.put(CONTENT_LENGTH, new Long(contentLength));
+            attributes.put(CONTENT_LENGTH, Long.valueOf(contentLength));
     }
     
     
@@ -808,11 +796,11 @@ public class ResourceAttributes implements Attributes {
             } else if (attrID.equals(CONTENT_LENGTH)) {
                 long contentLength = getContentLength();
                 if (contentLength < 0) return null;
-                return new BasicAttribute(CONTENT_LENGTH, new Long(contentLength));
+                return new BasicAttribute(CONTENT_LENGTH, Long.valueOf(contentLength));
             } else if (attrID.equals(ALTERNATE_CONTENT_LENGTH)) {
                 long contentLength = getContentLength();
                 if (contentLength < 0) return null;
-                return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, new Long(contentLength));
+                return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, Long.valueOf(contentLength));
             } else if (attrID.equals(ETAG)) {
                 String etag = getETag();
                 if (etag == null) return null;
@@ -904,7 +892,7 @@ public class ResourceAttributes implements Attributes {
             }
             long contentLength = getContentLength();
             if (contentLength >= 0) {
-                Long contentLengthLong = new Long(contentLength);
+                Long contentLengthLong = Long.valueOf(contentLength);
                 attributes.addElement(new BasicAttribute(CONTENT_LENGTH, contentLengthLong));
                 attributes.addElement(new BasicAttribute(ALTERNATE_CONTENT_LENGTH, contentLengthLong));
             }
