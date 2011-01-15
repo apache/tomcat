@@ -224,7 +224,7 @@ public abstract class RequestFilter
         }
      
         // Check the allow patterns, if any
-        if (allow != null & allow.matcher(property).matches()) {
+        if (allow != null && allow.matcher(property).matches()) {
             return true;
         }
 
