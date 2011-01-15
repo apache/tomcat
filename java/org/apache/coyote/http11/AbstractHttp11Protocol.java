@@ -115,8 +115,8 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
 
 
     /**
-     * User agents regular expressions which should be restricted to HTTP/1.0
-     * support.
+     * Regular expression that defines the User agents which should be
+     * restricted to HTTP/1.0 support.
      */
     private String restrictedUserAgents = null;
     public String getRestrictedUserAgents() { return restrictedUserAgents; }
