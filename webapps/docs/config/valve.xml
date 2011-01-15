@@ -258,7 +258,7 @@
       </attribute>
 
       <attribute name="allow" required="false">
-        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        <p>A regular expression (using <code>java.util.regex</code>) that the
         remote client&apos;s IP address is compared to.  If this attribute
         is specified, the remote address MUST match for this request to be
         accepted.  If this attribute is not specified, all requests will be
@@ -267,7 +267,7 @@
       </attribute>
 
       <attribute name="deny" required="false">
-        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        <p>A regular expression (using <code>java.util.regex</code>) that the
         remote client's IP address is compared to.  If this attribute
         is specified, the remote address MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
@@ -314,7 +314,7 @@
       </attribute>
 
       <attribute name="allow" required="false">
-        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        <p>A regular expression (using <code>java.util.regex</code>) that the
         remote client&apos;s hostname is compared to.  If this attribute
         is specified, the remote hostname MUST match for this request to be
         accepted.  If this attribute is not specified, all requests will be
@@ -323,7 +323,7 @@
       </attribute>
 
       <attribute name="deny" required="false">
-        <p>A regular expression (using <code>java.util.Regex</code>) that the
+        <p>A regular expression (using <code>java.util.regex</code>) that the
         remote client's hostname is compared to.  If this attribute
         is specified, the remote hostname MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
