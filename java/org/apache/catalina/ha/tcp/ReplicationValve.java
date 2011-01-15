@@ -551,7 +551,8 @@ public class ReplicationValve
      * @return True if no session change
      */
     protected boolean isRequestWithoutSessionChange(String uri) {
-        return filter.matcher(uri).matches();
+        Pattern f = filter;
+        return f != null && f.matcher(uri).matches();
     }
 
     /**

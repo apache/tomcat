@@ -80,6 +80,9 @@
   </subsection>
   <subsection name="Cluster">
     <changelog>
+      <fix>
+        <bug>50591</bug>: Fix NPE in ReplicationValve. (kkolinko)
+      </fix>
       <add>
         Internationalise the log messages for the FarmWarDeployer. (markt)
       </add>
