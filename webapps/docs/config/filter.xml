@@ -796,7 +796,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
        &lt;/init-param&gt;
        &lt;init-param&gt;
          &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
-         &lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+         &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
        &lt;/init-param&gt;
      &lt;/filter&gt;
     </source>
@@ -851,7 +851,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
        &lt;/init-param&gt;
        &lt;init-param&gt;
          &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
-         &lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+         &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
        &lt;/init-param&gt;
      &lt;/filter&gt;
     </source>
@@ -909,7 +909,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
        &lt;/init-param&gt;
        &lt;init-param&gt;
          &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
-         &lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+         &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
        &lt;/init-param&gt;
      &lt;/filter&gt;
     </source>
