@@ -83,6 +83,11 @@
       <add>
         Internationalise the log messages for the FarmWarDeployer. (markt)
       </add>
+      <fix>
+        The recovery feature of the default cluster membership service can now
+        be enabled. Previously it any configuration settings for it were
+        ignored. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
