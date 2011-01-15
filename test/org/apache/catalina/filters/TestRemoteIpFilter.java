@@ -215,8 +215,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeader() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
+        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -247,7 +247,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -375,8 +375,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testInvokeNotAllowedRemoteAddr() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10, 192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1, proxy2, proxy3");
+        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
