@@ -210,21 +210,21 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The system timezone.
      */
-    private TimeZone timezone = null;
+    private volatile TimeZone timezone = null;
 
     
     /**
      * The time zone offset relative to GMT in text form when daylight saving
      * is not in operation.
      */
-    private String timeZoneNoDST = null;
+    private volatile String timeZoneNoDST = null;
 
 
     /**
      * The time zone offset relative to GMT in text form when daylight saving
      * is in operation.
      */
-    private String timeZoneDST = null;
+    private volatile String timeZoneDST = null;
     
     
     /**
@@ -518,7 +518,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * throwables will be caught and logged.
      */
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
         if (getState().isAvailable() && getEnabled() && writer != null &&
                 buffered) {
             writer.flush();
@@ -538,13 +538,13 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     @Override
     public void invoke(Request request, Response response) throws IOException,
             ServletException {
-        final String t1Name = AccessLogValve.class.getName()+".t1";
         if (getState().isAvailable() && getEnabled()) {                
+            final String t1Name = AccessLogValve.class.getName()+".t1";
             // Pass this request on to the next valve in our pipeline
             long t1 = System.currentTimeMillis();
             boolean asyncdispatch = request.isAsyncDispatching();
             if (!asyncdispatch) {
-                request.setAttribute(t1Name, new Long(t1));
+                request.setAttribute(t1Name, Long.valueOf(t1));
             }
     
             getNext().invoke(request, response);
@@ -601,7 +601,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 holder.renameTo(new File(newFileName));
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                log.error("rotate failed", e);
+                log.error(sm.getString("accessLogValve.rotateFail"), e);
             }
 
             /* Make sure date is correct */
@@ -672,7 +672,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                         close();
                     } catch (Throwable e) {
                         ExceptionUtils.handleThrowable(e);
-                        log.info("at least this wasn't swallowed", e);
+                        log.info(sm.getString("accessLogValve.closeFail"), e);
                     }
 
                     /* Make sure date is correct */
@@ -723,7 +723,11 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         File dir = new File(directory);
         if (!dir.isAbsolute())
             dir = new File(System.getProperty(Globals.CATALINA_BASE_PROP), directory);
-        dir.mkdirs();
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                log.error(sm.getString("accessLogValve.openDirFail", dir));
+            }
+        }
 
         // Open the current log file
         try {
@@ -811,15 +815,19 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     protected synchronized void startInternal() throws LifecycleException {
 
         // Initialize the timeZone, Date formatters, and currentDate
-        timezone = TimeZone.getDefault();
-        timeZoneNoDST = calculateTimeZoneOffset(timezone.getRawOffset());
-        int offset = timezone.getDSTSavings();
-        timeZoneDST = calculateTimeZoneOffset(timezone.getRawOffset() + offset);
+        TimeZone tz = TimeZone.getDefault();
+        timezone = tz;
+        timeZoneNoDST = calculateTimeZoneOffset(tz.getRawOffset());
+        int offset = tz.getDSTSavings();
+        timeZoneDST = calculateTimeZoneOffset(tz.getRawOffset() + offset);
 
-        if (fileDateFormat == null || fileDateFormat.length() == 0)
-            fileDateFormat = "yyyy-MM-dd";
-        fileDateFormatter = new SimpleDateFormat(fileDateFormat);
-        fileDateFormatter.setTimeZone(timezone);
+        String format = getFileDateFormat();
+        if (format == null || format.length() == 0) {
+            format = "yyyy-MM-dd";
+            setFileDateFormat(format);
+        }
+        fileDateFormatter = new SimpleDateFormat(format);
+        fileDateFormatter.setTimeZone(tz);
         dateStamp = fileDateFormatter.format(currentDateStruct.get().currentDate);
         open();
         
@@ -853,7 +861,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write thread name - %I
      */
-    protected class ThreadNameElement implements AccessLogElement {
+    protected static class ThreadNameElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -894,7 +902,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write remote IP address - %a
      */
-    protected class RemoteAddrElement implements AccessLogElement {
+    protected static class RemoteAddrElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -905,7 +913,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write remote host name - %h
      */
-    protected class HostElement implements AccessLogElement {
+    protected static class HostElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -916,7 +924,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write remote logical username from identd (always returns '-') - %l
      */
-    protected class LogicalUserNameElement implements AccessLogElement {
+    protected static class LogicalUserNameElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -927,7 +935,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write request protocol - %H
      */
-    protected class ProtocolElement implements AccessLogElement {
+    protected static class ProtocolElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -938,7 +946,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write remote user that was authenticated (if any), else '-' - %u
      */
-    protected class UserElement implements AccessLogElement {
+    protected static class UserElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -987,7 +995,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write first line of the request (method and request URI) - %r
      */
-    protected class RequestElement implements AccessLogElement {
+    protected static class RequestElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1010,7 +1018,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write HTTP status code of the response - %s
      */
-    protected class HttpStatusCodeElement implements AccessLogElement {
+    protected static class HttpStatusCodeElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1025,7 +1033,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write local port on which this request was received - %p
      */
-    protected class LocalPortElement implements AccessLogElement {
+    protected static class LocalPortElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1036,7 +1044,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write bytes sent, excluding HTTP headers - %b, %B
      */
-    protected class ByteSentElement implements AccessLogElement {
+    protected static class ByteSentElement implements AccessLogElement {
         private boolean conversion;
 
         /**
@@ -1061,7 +1069,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write request method (GET, POST, etc.) - %m
      */
-    protected class MethodElement implements AccessLogElement {
+    protected static class MethodElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1074,7 +1082,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write time taken to process the request - %D, %T
      */
-    protected class ElapsedTimeElement implements AccessLogElement {
+    protected static class ElapsedTimeElement implements AccessLogElement {
         private boolean millis;
 
         /**
@@ -1106,7 +1114,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write Query string (prepended with a '?' if it exists) - %q
      */
-    protected class QueryElement implements AccessLogElement {
+    protected static class QueryElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1123,7 +1131,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write user session ID - %S
      */
-    protected class SessionIdElement implements AccessLogElement {
+    protected static class SessionIdElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1143,7 +1151,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write requested URL path - %U
      */
-    protected class RequestURIElement implements AccessLogElement {
+    protected static class RequestURIElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1158,7 +1166,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write local server name - %v
      */
-    protected class LocalServerNameElement implements AccessLogElement {
+    protected static class LocalServerNameElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -1169,7 +1177,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write any string
      */
-    protected class StringElement implements AccessLogElement {
+    protected static class StringElement implements AccessLogElement {
         private String str;
 
         public StringElement(String str) {
@@ -1186,7 +1194,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write incoming headers - %{xxx}i
      */
-    protected class HeaderElement implements AccessLogElement {
+    protected static class HeaderElement implements AccessLogElement {
         private String header;
 
         public HeaderElement(String header) {
@@ -1208,7 +1216,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write a specific cookie - %{xxx}c
      */
-    protected class CookieElement implements AccessLogElement {
+    protected static class CookieElement implements AccessLogElement {
         private String header;
 
         public CookieElement(String header) {
@@ -1235,7 +1243,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write a specific response header - %{xxx}o
      */
-    protected class ResponseHeaderElement implements AccessLogElement {
+    protected static class ResponseHeaderElement implements AccessLogElement {
         private String header;
 
         public ResponseHeaderElement(String header) {
@@ -1263,7 +1271,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write an attribute in the ServletRequest - %{xxx}r
      */
-    protected class RequestAttributeElement implements AccessLogElement {
+    protected static class RequestAttributeElement implements AccessLogElement {
         private String header;
 
         public RequestAttributeElement(String header) {
@@ -1294,7 +1302,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write an attribute in the HttpSession - %{xxx}s
      */
-    protected class SessionAttributeElement implements AccessLogElement {
+    protected static class SessionAttributeElement implements AccessLogElement {
         private String header;
 
         public SessionAttributeElement(String header) {
