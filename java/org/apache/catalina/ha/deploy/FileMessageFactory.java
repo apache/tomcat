@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This factory is used to read files and write files by splitting them up into
@@ -47,6 +48,8 @@ import org.apache.tomcat.util.buf.HexUtils;
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/
     private static final Log log = LogFactory.getLog(FileMessageFactory.class);
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     /**
      * The number of bytes that we read from file
@@ -144,7 +147,9 @@ public class FileMessageFactory {
             log.debug("open file " + f + " write " + openForWrite);
         if (openForWrite) {
             if (!file.exists())
-                file.createNewFile();
+                if (!file.createNewFile()) {
+                    throw new IOException(sm.getString("fileNewFail", file));
+                }
             out = new FileOutputStream(f);
         } else {
             size = file.length();
@@ -238,7 +243,7 @@ public class FileMessageFactory {
                     + " war: "
                     + msg.getFileName()
                     + " data: "
-                    + msg.getData()
+                    + HexUtils.toHexString(msg.getData())
                     + " data length: " + msg.getDataLength() + " ]");
             return false;
         }
@@ -252,7 +257,7 @@ public class FileMessageFactory {
                     + " war: "
                     + msg.getFileName()
                     + " data: "
-                    + msg.getData()
+                    + HexUtils.toHexString(msg.getData())
                     + " data length: " + msg.getDataLength() + " ]");
             return false;
         }
