@@ -130,7 +130,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                     membership.memberAlive( (MemberImpl) member);
                     notify = true;
                 } else {
-                    addSuspects.put(member, new Long(System.currentTimeMillis()));
+                    addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
                 }
             }
         }
@@ -160,7 +160,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 notify = true;
             } else {
                 //add the member as suspect
-                removeSuspects.put(member, new Long(System.currentTimeMillis()));
+                removeSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
             }
         }
         if ( notify ) {
