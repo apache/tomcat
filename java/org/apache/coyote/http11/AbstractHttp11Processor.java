@@ -122,7 +122,7 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
 
     /**
-     * List of restricted user agents.
+     * Regular expression that defines the restricted user agents.
      */
     protected Pattern restrictedUserAgents = null;
 
@@ -211,7 +211,7 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
 
 
     /**
-     * List of user agents to not use gzip with
+     * Regular expression that defines the user agents to not use gzip with
      */
     protected Pattern noCompressionUserAgents = null;
 
