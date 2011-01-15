@@ -62,6 +62,9 @@
         Provide additional control over component class loaders, primarily for
         use when embedding. (markt)
       </add>
+      <fix>
+        Fix NPE in RemoteAddrFilter, RemoteHostFilter. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
