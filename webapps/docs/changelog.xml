@@ -83,11 +83,6 @@
       <add>
         Internationalise the log messages for the FarmWarDeployer. (markt)
       </add>
-      <fix>
-        The recovery feature of the default cluster membership service can now
-        be enabled. Previously it any configuration settings for it were
-        ignored. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -99,6 +94,10 @@
         Provide additional detail about how web application version order is
         determined when using parallel deployment. (markt)
       </add>
+      <fix>
+        Correct the documentation for the recoveryCount count attribute of the
+        the default cluster membership. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
