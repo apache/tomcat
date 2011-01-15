@@ -269,7 +269,7 @@ should be completed:</p>
           &lt;/Channel&gt;
 
           &lt;Valve className=&quot;org.apache.catalina.ha.tcp.ReplicationValve&quot;
-                 filter=&quot;.*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;&quot;/&gt;
+                 filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt&quot;/&gt;
 
           &lt;Deployer className=&quot;org.apache.catalina.ha.deploy.FarmWarDeployer&quot;
                     tempDir=&quot;/tmp/war-temp/&quot;
@@ -393,7 +393,7 @@ should be completed:</p>
     </p>
     <source>
           &lt;Valve className=&quot;org.apache.catalina.ha.tcp.ReplicationValve&quot;
-                 filter=&quot;.*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;&quot;/&gt;
+                 filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt&quot;/&gt;
     </source>
     <p>
         The cluster uses valves to track requests to web applications, we've mentioned the ReplicationValve and the JvmRouteBinderValve above.
