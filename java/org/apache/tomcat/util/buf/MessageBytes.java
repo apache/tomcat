@@ -154,19 +154,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasLongValue=false;
     }
 
-    /** Remove the cached string value. Use it after a conversion on the
-     *  byte[] or after the encoding is changed
-     *  XXX Is this needed ?
-     */
-    public void resetStringValue() {
-        if( type != T_STR ) {
-            // If this was created as a byte[] or char[], we remove
-            // the old string value
-            hasStrValue=false;
-            strValue=null;
-        }
-    }
-
     /** 
      * Set the content to be a string
      */
@@ -294,7 +281,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     public boolean equals(String s) {
         switch (type) {
         case T_STR:
-            if( strValue==null && s!=null) return false;
+            if (strValue == null) return s == null;
             return strValue.equals( s );
         case T_CHARS:
             return charC.equals( s );
@@ -313,7 +300,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     public boolean equalsIgnoreCase(String s) {
         switch (type) {
         case T_STR:
-            if( strValue==null && s!=null) return false;
+            if (strValue == null) return s == null;
             return strValue.equalsIgnoreCase( s );
         case T_CHARS:
             return charC.equalsIgnoreCase( s );
@@ -322,6 +309,14 @@ public final class MessageBytes implements Cloneable, Serializable {
         default:
             return false;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MessageBytes) {
+            return equals((MessageBytes) obj);
+        }
+        return false;
     }
 
     public boolean equals(MessageBytes mb) {
