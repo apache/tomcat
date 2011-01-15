@@ -99,10 +99,13 @@ import org.apache.juli.logging.LogFactory;
  * </tr>
  * <tr>
  * <td>internalProxies</td>
- * <td>List of internal proxies ip adress. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will not appear
+ * <td>Regular expression that matches the IP addresses of internal proxies.
+ * If they appear in the <code>remoteIpHeader</code> value, they will be
+ * trusted and will not appear
  * in the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPInternalProxy</td>
- * <td>Regular expression (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
+ * <td>Regular expression (in the syntax supported by
+ * {@link java.util.regex.Pattern java.util.regex})</td>
  * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3} <br/>
  * By default, 10/8, 192.168/16, 169.254/16 and 127/8 are allowed ; 172.16/12 has not been enabled by default because it is complex to
  * describe with regular expressions</td>
@@ -118,10 +121,12 @@ import org.apache.juli.logging.LogFactory;
  * </tr>
  * <tr>
  * <td>trustedProxies</td>
- * <td>List of trusted proxies ip adress. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will appear in
- * the <code>proxiesHeader</code> value</td>
+ * <td>Regular expression that matches the IP addresses of trusted proxies.
+ * If they appear in the <code>remoteIpHeader</code> value, they will be
+ * trusted and will appear in the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPTrustedProxy</td>
- * <td>Regular expression (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
+ * <td>Regular expression (in the syntax supported by
+ * {@link java.util.regex.Pattern java.util.regex})</td>
  * <td>&nbsp;</td>
  * </tr>
  * <tr>
@@ -174,16 +179,20 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+ *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;protocolHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
+ *       &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
  * 
@@ -251,16 +260,20 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+ *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;&lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+ *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
  * 
@@ -308,16 +321,20 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+ *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;&lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+ *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
  * 
@@ -366,16 +383,20 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;&lt;param-value&gt;192\.168\.0\.10, 192\.168\.0\.11&lt;/param-value&gt;
+ *       &lt;param-name&gt;internalProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;&lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
+ *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;&lt;param-value&gt;proxy1, proxy2&lt;/param-value&gt;
+ *       &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
+ *       &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
  * 
@@ -892,7 +913,7 @@ public class RemoteIpFilter implements Filter {
     
     /**
      * <p>
-     * Regular expressions that defines the internal proxies.
+     * Regular expression that defines the internal proxies.
      * </p>
      * <p>
      * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}
