@@ -59,7 +59,7 @@
         the cluster doesn't have to probe the session managers for changes. If
         the request matches this filter pattern, the cluster assumes there has
         been no session change. An example filter would look like <code>
-        filter=&quot;.*\.gif|.*\.js|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt;&quot;
+        filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt&quot;
         </code>. The filter is a regular expression using
         <code>java.util.regex</code>.
       </attribute>
