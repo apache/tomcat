@@ -29,6 +29,26 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <Class name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
+    <Method name="memberAlive"/>
+    <Bug code="DE"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.membership.McastServiceImpl"/>
+    <Method name="stop"/>
+    <Bug code="DE"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.membership.McastServiceImpl$ReceiverThread"/>
+    <Method name="run"/>
+    <Bug code="DE"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.membership.McastServiceImpl$RecoveryThread"/>
+    <Method name="run"/>
+    <Bug code="NS"/>
+  </Match>
+  <Match>
     <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
