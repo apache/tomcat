@@ -138,8 +138,9 @@
     </attribute>
     <attribute name="recoveryCounter" required="false">
       <p>
-      When <code>recoveryEnabled==true</code> this value indicates how many times we will try recovery.
-      The default is <code>10</code>. <br/>
+      When <code>recoveryEnabled==true</code> this value indicates how many
+      times an error has to occur before recovery is attempted. The default is
+      <code>10</code>. <br/>
       </p>
     </attribute>
     <attribute name="recoverySleepTime" required="false">
