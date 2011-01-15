@@ -42,11 +42,6 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         // NO-OP
     }
 
-    /**
-     *
-     * @throws IOException
-     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
-     */
     @Override
     public void start() throws IOException {
         super.start();
@@ -82,10 +77,6 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         return result;
     }
 
-    /**
-     *
-     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
-     */
     @Override
     public void stop() {
         setListen(false);
