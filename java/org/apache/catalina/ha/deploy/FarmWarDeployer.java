@@ -732,7 +732,7 @@ public class FarmWarDeployer extends ClusterListener
         try {
             if (!to.exists()) {
                 if (!to.createNewFile()) {
-                    log.error(sm.getString("farmWarDeployer.fileNewFail", to));
+                    log.error(sm.getString("fileNewFail", to));
                     return false;
                 }
             }
