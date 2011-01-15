@@ -107,6 +107,15 @@
     <tr><td><i>Empty String</i></td><td>42</td><td>##42</td><td>ROOT##42</td></tr>
   </table>
   
+  <p>The version component is treated as a <code>String</code> both for
+  performance reasons and to allow flexability in versioning schemes. String
+  comparissions are used to determine version order. Therefore
+  <code>foo##11.war</code> will be treated as an earlier version than
+  <code>foo##2.war</code>. If using a purely numerical versioning scheme it is
+  recommended that zero padding is used so that <code>foo##002.war</code> is
+  treated as an earlier version than <code>foo##011.war</code>.
+  </p>
+
   <p><b>It is NOT recommended to place &lt;Context&gt; elements directly in the
   server.xml file.</b> This is because it makes modifying the
   <strong>Context</strong> configuration more invasive since the main
