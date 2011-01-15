@@ -91,7 +91,7 @@
         Correct a handful of Javadoc warnings. (markt)
       </fix>
       <add>
-        Provide additional detail about how web application version order it
+        Provide additional detail about how web application version order is
         determined when using parallel deployment. (markt)
       </add>
     </changelog>
@@ -105,6 +105,9 @@
         Modify the build script so a release build always rebuilds the
         dependencies to ensure that the correct Tomcat version appears in the
         manifest. (markt) 
+      </fix>
+      <fix>
+        Code clean-up to remove unused code and reduce IDE warnings. (markt)
       </fix>
     </changelog>
   </subsection>

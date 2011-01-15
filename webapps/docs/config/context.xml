@@ -108,7 +108,7 @@
   </table>
   
   <p>The version component is treated as a <code>String</code> both for
-  performance reasons and to allow flexability in versioning schemes. String
+  performance reasons and to allow flexibility in versioning schemes. String
   comparissions are used to determine version order. Therefore
   <code>foo##11.war</code> will be treated as an earlier version than
   <code>foo##2.war</code>. If using a purely numerical versioning scheme it is
