@@ -837,10 +837,9 @@
     incoming request directed to the surrounding
     <a href="engine.html">Engine</a>, <a href="host.html">Host</a>, or
     <a href="context.html">Context</a> element.  The remote address or name
-    will be checked against a configured list of "accept" and/or "deny"
-    filters, which are defined using the Regular Expression syntax supported
-    by the <a href="http://jakarta.apache.org/regexp/">Jakarta Regexp</a>
-    regular expression library.  Requests that come from locations that are
+    will be checked against configured "accept" and/or "deny"
+    filters, which are defined using <code>java.util.regex</code> Regular
+    Expression syntax.  Requests that come from locations that are
     not accepted will be rejected with an HTTP "Forbidden" error.
     Example filter declarations:</p>
 
@@ -848,9 +847,9 @@
 &lt;Context path="/examples" ...&gt;
   ...
   &lt;Valve className="org.apache.catalina.valves.RemoteHostValve"
-         allow="*.mycompany.com,www.yourcompany.com"/&gt;
+         allow=".*\.mycompany\.com|www\.yourcompany\.com"/&gt;
   &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         deny="192.168.1.*"/&gt;
+         deny="192\.168\.1\.\d+"/&gt;
   ...
 &lt;/Context&gt;
 </source>
