@@ -465,7 +465,8 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         String method = EMPTY;
         String referer = EMPTY;
         String userAgent = EMPTY;
-        if (pattern.equals("combined")) {
+        String logPattern = pattern;
+        if (logPattern.equals("combined")) {
             virtualHost = request.getServerName();
             method = request.getMethod();
             referer = request.getHeader("referer");
@@ -490,7 +491,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
                         bytes = -1 ;
                     ps.setInt(6, (int) bytes);
                 }               
-                if (pattern.equals("combined")) {
+                if (logPattern.equals("combined")) {
                       ps.setString(7, virtualHost);
                       ps.setString(8, method);
                       ps.setString(9, referer);
@@ -545,14 +546,15 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
             props.put("password", connectionPassword);
         conn = driver.connect(connectionURL, props);
         conn.setAutoCommit(true);
-        if (pattern.equals("common")) {
+        String logPattern = pattern;
+        if (logPattern.equals("common")) {
                 ps = conn.prepareStatement
                     ("INSERT INTO " + tableName + " (" 
                      + remoteHostField + ", " + userField + ", "
                      + timestampField +", " + queryField + ", "
                      + statusField + ", " + bytesField 
                      + ") VALUES(?, ?, ?, ?, ?, ?)");
-        } else if (pattern.equals("combined")) {
+        } else if (logPattern.equals("combined")) {
                 ps = conn.prepareStatement
                     ("INSERT INTO " + tableName + " (" 
                      + remoteHostField + ", " + userField + ", "
