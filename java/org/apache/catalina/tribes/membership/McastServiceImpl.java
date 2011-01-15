@@ -547,7 +547,7 @@ public class McastServiceImpl
                             try { Thread.sleep(500); } catch ( Exception ignore ){}
                             if ( (++errorCounter)>=recoveryCounter ) {
                                 errorCounter=0;
-                                new RecoveryThread(McastServiceImpl.this).start();
+                                RecoveryThread.recover(McastServiceImpl.this);
                             }
                         }
                     }
@@ -575,7 +575,7 @@ public class McastServiceImpl
                     else log.debug("Unable to send mcast message.",x);
                     if ( (++errorCounter)>=recoveryCounter ) {
                         errorCounter=0;
-                        new RecoveryThread(McastServiceImpl.this).start();
+                        RecoveryThread.recover(McastServiceImpl.this);
                     }
                 }
                 try { Thread.sleep(time); } catch ( Exception ignore ) {}
@@ -585,22 +585,27 @@ public class McastServiceImpl
 
     protected static class RecoveryThread extends Thread {
         static volatile boolean running = false;
-        McastServiceImpl parent = null;
-        public RecoveryThread(McastServiceImpl parent) {
-            this.parent = parent;
-            if (!init(this)) parent = null;
-        }
-        
-        public static synchronized boolean init(RecoveryThread t) {
-            if ( running ) return false;
-            if ( !t.parent.isRecoveryEnabled()) return false;
+
+        public static synchronized void recover(McastServiceImpl parent) {
+            if (running) return;
+            if (!parent.isRecoveryEnabled())
+                return;
+            
             running = true;
+            
+            Thread t = new RecoveryThread(parent);
+            
             t.setName("Tribes-MembershipRecovery");
             t.setDaemon(true);
             t.start();
-            return true;
         }
 
+
+        McastServiceImpl parent = null;
+        public RecoveryThread(McastServiceImpl parent) {
+            this.parent = parent;
+        }
+        
         public boolean stopService() {
             try {
                 parent.stop(Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
