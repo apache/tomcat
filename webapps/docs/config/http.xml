@@ -383,8 +383,9 @@
     </attribute>
 
     <attribute name="noCompressionUserAgents" required="false">
-      <p>The value is a comma separated list of regular expressions matching
-      user-agents of HTTP clients for which compression should not be used,
+      <p>The value is a regular expression (using <code>java.util.regex</code>)
+      matching the <code>user-agent</code> header of HTTP clients for which
+      compression should not be used,
       because these clients, although they do advertise support for the
       feature, have a broken implementation.
       The default value is an empty String (regexp matching disabled).</p>
@@ -398,10 +399,10 @@
     </attribute>
       
     <attribute name="restrictedUserAgents" required="false">
-      <p>The value is a comma separated list of regular expressions matching
-      user-agents of HTTP clients for which HTTP/1.1 or HTTP/1.0 keep alive
-      should not be used, even if the clients advertise support for these
-      features.
+      <p>The value is a regular expression (using <code>java.util.regex</code>) matching
+      matching the <code>user-agent</code> header of HTTP clients for which
+      HTTP/1.1 or HTTP/1.0 keep alive should not be used, even if the clients
+      advertise support for these features.
       The default value is an empty String (regexp matching disabled).</p>
     </attribute>
 
