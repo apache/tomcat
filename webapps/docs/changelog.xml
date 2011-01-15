@@ -90,6 +90,10 @@
       <fix>
         Correct a handful of Javadoc warnings. (markt)
       </fix>
+      <add>
+        Provide additional detail about how web application version order it
+        determined when using parallel deployment. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -105,7 +109,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.6 (markt)">
+<section name="Tomcat 7.0.6 (markt)" rtext="released 2011-01-14">
   <subsection name="General">
     <changelog>
       <update>
