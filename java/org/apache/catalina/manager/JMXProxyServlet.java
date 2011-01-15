@@ -52,8 +52,8 @@ public class JMXProxyServlet extends HttpServlet  {
     /**
      * MBean server.
      */
-    protected MBeanServer mBeanServer = null;
-    protected Registry registry;
+    protected transient MBeanServer mBeanServer = null;
+    protected transient Registry registry;
 
     // --------------------------------------------------------- Public Methods
     /**
@@ -227,8 +227,8 @@ public class JMXProxyServlet extends HttpServlet  {
                         ExceptionUtils.handleThrowable(t);
                     }
                 }
-            } catch (Exception e) {
-                // Ignore
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
             }
             writer.println();
         }
@@ -269,7 +269,13 @@ public class JMXProxyServlet extends HttpServlet  {
         sb.append( value.substring(pos,end));
     }
 
-    public boolean isSupported( String type ) {
+    /**
+     * Determines if a type is supported by the {@link JMXProxyServlet}.
+     * 
+     * @param type  The type to check
+     * @return      Always returns <code>true</code>
+     */
+    public boolean isSupported(String type) {
         return true;
     }
 }
