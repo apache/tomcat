@@ -547,7 +547,7 @@ public class McastServiceImpl
                             try { Thread.sleep(500); } catch ( Exception ignore ){}
                             if ( (++errorCounter)>=recoveryCounter ) {
                                 errorCounter=0;
-                                new RecoveryThread(McastServiceImpl.this);
+                                new RecoveryThread(McastServiceImpl.this).start();
                             }
                         }
                     }
@@ -575,7 +575,7 @@ public class McastServiceImpl
                     else log.debug("Unable to send mcast message.",x);
                     if ( (++errorCounter)>=recoveryCounter ) {
                         errorCounter=0;
-                        new RecoveryThread(McastServiceImpl.this);
+                        new RecoveryThread(McastServiceImpl.this).start();
                     }
                 }
                 try { Thread.sleep(time); } catch ( Exception ignore ) {}
