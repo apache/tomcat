@@ -78,6 +78,7 @@ public class Digester extends DefaultHandler {
     // ---------------------------------------------------------- Static Fields    
     private static class SystemPropertySource 
         implements IntrospectionUtils.PropertySource {
+        @Override
         public String getProperty( String key ) {
             return System.getProperty(key);
         }

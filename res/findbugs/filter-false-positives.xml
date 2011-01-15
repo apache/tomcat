@@ -39,6 +39,18 @@
     <Bug code="CN" />
   </Match>
   <Match>
+    <!-- Returning null here is fine -->
+    <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
+    <Method name="toString"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Test really is for the same object rather than equality -->
+    <Class name="org.apache.tomcat.util.digester.Digester"/>
+    <Method name="updateBodyText"/>
+    <Bug code="ES" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
