@@ -425,7 +425,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
     
-    protected class PatternTokenizer {
+    protected static class PatternTokenizer {
         private StringReader sr = null;
         private StringBuilder buf = new StringBuilder();
         private boolean ended = false;
@@ -727,7 +727,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         throws IOException {
         String token = null;
         if (tokenizer.hasSubToken()) {
-            token = tokenizer.getToken();
+            tokenizer.getToken();
             return new StringElement("-");
         } else if (tokenizer.hasParameter()) {
             tokenizer.getParameter();
