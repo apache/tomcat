@@ -81,10 +81,13 @@ import org.apache.juli.logging.LogFactory;
  * </tr>
  * <tr>
  * <td>internalProxies</td>
- * <td>List of internal proxies ip adress. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will not appear
+ * <td>Regular expression that matches the IP addresses of internal proxies.
+ * If they appear in the <code>remoteIpHeader</code> value, they will be
+ * trusted and will not appear
  * in the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPInternalProxy</td>
- * <td>Regular expression (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
+ * <td>Regular expression (in the syntax supported by
+ * {@link java.util.regex.Pattern java.util.regex})</td>
  * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}<br/>
  * By default, 10/8, 192.168/16, 169.254/16 and 127/8 are allowed ; 172.16/12 has not been enabled by default because it is complex to
  * describe with regular expressions</td>
@@ -100,10 +103,12 @@ import org.apache.juli.logging.LogFactory;
  * </tr>
  * <tr>
  * <td>trustedProxies</td>
- * <td>List of trusted proxies ip adress. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will appear
- * in the <code>proxiesHeader</code> value</td>
+ * <td>Regular expression that matches the IP addresses of trusted proxies.
+ * If they appear in the <code>remoteIpHeader</code> value, they will be
+ * trusted and will appear in the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPTrustedProxy</td>
- * <td>Regular expression (in the syntax supported by the {@link java.util.regex.Pattern} library)</td>
+ * <td>Regular expression (in the syntax supported by
+ * {@link java.util.regex.Pattern java.util.regex})</td>
  * <td>&nbsp;</td>
  * </tr>
  * <tr>
@@ -158,7 +163,7 @@ import org.apache.juli.logging.LogFactory;
  * <code><pre>
  * &lt;Valve 
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10, 192\.168\.0\.11"
+ *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
  *   remoteIpProxiesHeader="x-forwarded-by"
  *   protocolHeader="x-forwarded-proto"
@@ -220,10 +225,10 @@ import org.apache.juli.logging.LogFactory;
  * <code><pre>
  * &lt;Valve 
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10, 192\.168\.0\.11"
+ *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
  *   remoteIpProxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1, proxy2"
+ *   trustedProxies="proxy1|proxy2"
  *   /&gt;</pre></code>
  * <p>
  * Request values:
@@ -262,10 +267,10 @@ import org.apache.juli.logging.LogFactory;
  * <code><pre>
  * &lt;Valve 
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10, 192\.168\.0\.11"
+ *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
  *   remoteIpProxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1, proxy2"
+ *   trustedProxies="proxy1|proxy2"
  *   /&gt;</pre></code>
  * <p>
  * Request values:
@@ -305,10 +310,10 @@ import org.apache.juli.logging.LogFactory;
  * <code><pre>
  * &lt;Valve 
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10, 192\.168\.0\.11"
+ *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
  *   remoteIpProxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1, proxy2"
+ *   trustedProxies="proxy1|proxy2"
  *   /&gt;</pre></code>
  * <p>
  * Request values:
@@ -449,7 +454,7 @@ public class RemoteIpValve extends ValveBase {
     
     /**
      * @see #setInternalProxies(String)
-     * @return comma delimited list of internal proxies
+     * @return Regular expression that defines the internal proxies
      */
     public String getInternalProxies() {
         if (internalProxies == null) {
@@ -492,7 +497,7 @@ public class RemoteIpValve extends ValveBase {
 
     /**
      * @see #setTrustedProxies(String)
-     * @return comma delimited list of trusted proxies
+     * @return Regular expression that defines the trusted proxies
      */
     public String getTrustedProxies() {
         if (trustedProxies == null) {
@@ -643,7 +648,7 @@ public class RemoteIpValve extends ValveBase {
     
     /**
      * <p>
-     * Regular expressions that defines the internal proxies.
+     * Regular expression that defines the internal proxies.
      * </p>
      * <p>
      * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}

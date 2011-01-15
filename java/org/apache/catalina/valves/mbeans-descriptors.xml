@@ -355,7 +355,7 @@
                writeable="false"/>
                
     <attribute name="internalProxies"
-               description="Comma delimited list of internal proxies"
+               description="Regular expression that matches IP addresses of internal proxies"
                type="java.lang.String"
                writeable="false" />
     
@@ -385,7 +385,7 @@
                writeable="false"/>
 
     <attribute name="trustedProxies"
-               description="Comma delimited list of trusted proxies"
+               description="Regular expression that matches IP addresses of trusted proxies"
                type="java.lang.String"
                writeable="false" />
                
