@@ -1435,7 +1435,7 @@ public class AprEndpoint extends AbstractEndpoint {
             if (rv == Status.APR_SUCCESS) {
                 sendfileCount--;
             }
-            sendfileData.remove(new Long(data.socket));
+            sendfileData.remove(Long.valueOf(data.socket));
         }
 
         /**
@@ -1488,7 +1488,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                     SendfileData data = addS.get(i);
                                     int rv = Poll.add(sendfilePollset, data.socket, Poll.APR_POLLOUT);
                                     if (rv == Status.APR_SUCCESS) {
-                                        sendfileData.put(new Long(data.socket), data);
+                                        sendfileData.put(Long.valueOf(data.socket), data);
                                         successCount++;
                                     } else {
                                         log.warn(sm.getString("endpoint.sendfile.addfail", "" + rv, Error.strerror(rv)));
@@ -1511,7 +1511,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         for (int n = 0; n < rv; n++) {
                             // Get the sendfile state
                             SendfileData state =
-                                sendfileData.get(new Long(desc[n*2+1]));
+                                sendfileData.get(Long.valueOf(desc[n*2+1]));
                             // Problem events
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)) {
@@ -1575,7 +1575,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         if (rv > 0) {
                             for (int n = 0; n < rv; n++) {
                                 // Get the sendfile state
-                                SendfileData state = sendfileData.get(new Long(desc[n]));
+                                SendfileData state = sendfileData.get(Long.valueOf(desc[n]));
                                 // Close socket and clear pool
                                 remove(state);
                                 // Destroy file descriptor pool, which should close the file
