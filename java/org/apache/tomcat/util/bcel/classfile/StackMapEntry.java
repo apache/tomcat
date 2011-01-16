@@ -20,6 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * This class represents a stack map entry recording the types of
@@ -31,7 +32,9 @@ import java.io.IOException;
  * @see     StackMap
  * @see     StackMapType
  */
-public final class StackMapEntry implements Cloneable {
+public final class StackMapEntry implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private int byte_code_offset;
     private int number_of_locals;

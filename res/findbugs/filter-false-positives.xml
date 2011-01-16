@@ -23,6 +23,11 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Field is only modified during Servlet load -->
+    <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
+    <Bug code="MSF" />
+  </Match>
+  <Match>
     <!-- Sleep is short, needs to keep lock -->
     <Class name="org.apache.catalina.startup.HostConfig" />
     <Method name="checkResources" />
@@ -69,6 +74,11 @@
     <!-- Class name is appropriate -->
     <Class name="org.apache.tomcat.util.bcel.classfile.CodeException"/>
     <Bug code="Nm" />
+  </Match>
+  <Match>
+    <!-- Field by field copy is fine for clone in thos case -->
+    <Class name="org.apache.tomcat.util.bcel.classfile.StackMapType"/>
+    <Bug code="CN" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->

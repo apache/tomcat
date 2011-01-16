@@ -65,12 +65,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     private static final long serialVersionUID = 1L;
 
     // Logger
-    private final Log log = LogFactory.getLog(JspServlet.class);
+    private final transient Log log = LogFactory.getLog(JspServlet.class);
 
-    private ServletContext context;
+    private transient ServletContext context;
     private ServletConfig config;
-    private Options options;
-    private JspRuntimeContext rctxt;
+    private transient Options options;
+    private transient JspRuntimeContext rctxt;
     //jspFile for a jsp configured explicitly as a servlet, in environments where this configuration is
     //translated into an init-param for this servlet.
     private String jspFile;
