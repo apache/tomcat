@@ -84,7 +84,7 @@ public class TestOrderInterceptor extends TestCase {
         Member[] dest = channels[0].getMembers();
         final AtomicInteger value = new AtomicInteger(0);
         for ( int i=0; i<100; i++ ) {
-            channels[0].send(dest,new Integer(value.getAndAdd(1)),0);
+            channels[0].send(dest,Integer.valueOf(value.getAndAdd(1)),0);
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
@@ -102,7 +102,7 @@ public class TestOrderInterceptor extends TestCase {
                 for (int i = 0; i < 100; i++) {
                     try {
                         synchronized (channels[0]) {
-                            channels[0].send(dest, new Integer(value.getAndAdd(1)), 0);
+                            channels[0].send(dest, Integer.valueOf(value.getAndAdd(1)), 0);
                         }
                     }catch ( Exception x ) {
                         exceptionQueue.add(x);
@@ -153,7 +153,7 @@ public class TestOrderInterceptor extends TestCase {
         }
         int cnt = 0;
         int total = 0;
-        boolean fail = false;
+        volatile boolean fail = false;
         @Override
         public synchronized void messageReceived(Serializable msg, Member sender) {
             total++;
@@ -171,7 +171,6 @@ public class TestOrderInterceptor extends TestCase {
     }
     
     public static class MangleOrderInterceptor extends ChannelInterceptorBase {
-        int cnt = 1;
         ChannelMessage hold = null;
         Member[] dest = null;
         @Override
