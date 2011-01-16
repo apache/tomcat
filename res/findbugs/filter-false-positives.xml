@@ -99,6 +99,30 @@
     <Bug code="ES" />
   </Match>
   <Match>
+    <!-- addCount is modified in other threads -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
+    <Method name="run"/>
+    <Bug code="NN" />
+  </Match>
+  <Match>
+    <!-- addCount is modified in other threads -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
+    <Method name="run"/>
+    <Bug code="NN" />
+  </Match>
+  <Match>
+    <!-- Sync is there to protect referenced object not field -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketEventProcessor"/>
+    <Method name="run"/>
+    <Bug code="ML" />
+  </Match>
+  <Match>
+    <!-- Sync is there to protect referenced object not field -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketWithOptionsProcessor"/>
+    <Method name="run"/>
+    <Bug code="ML" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
