@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * <p>Title: </p>
@@ -32,6 +35,10 @@ import org.apache.catalina.tribes.Member;
  * @version 1.0
  */
 public abstract class PooledSender extends AbstractSender implements MultiPointSender {
+    
+    private static final Log log = LogFactory.getLog(PooledSender.class);
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
     
     private SenderQueue queue = null;
     private int poolSize = 25;
@@ -189,7 +196,15 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             inuse.remove(sender);
             //just in case the limit has changed
             if ( notinuse.size() < this.getLimit() ) notinuse.add(sender);
-            else try {sender.disconnect(); } catch ( Exception ignore){}
+            else
+                try {
+                    sender.disconnect();
+                } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "PooledSender.senderDisconnectFail"), e);
+                    }
+                }
             notify();
         }
 
