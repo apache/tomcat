@@ -21,6 +21,8 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -54,10 +56,10 @@ public final class ClassLoaderFactory {
 
     private static final Log log = LogFactory.getLog(ClassLoaderFactory.class);
 
-    protected static final Integer IS_DIR = new Integer(0);
-    protected static final Integer IS_JAR = new Integer(1);
-    protected static final Integer IS_GLOB = new Integer(2);
-    protected static final Integer IS_URL = new Integer(3);
+    protected static final Integer IS_DIR = Integer.valueOf(0);
+    protected static final Integer IS_JAR = Integer.valueOf(1);
+    protected static final Integer IS_GLOB = Integer.valueOf(2);
+    protected static final Integer IS_URL = Integer.valueOf(3);
 
     // --------------------------------------------------------- Public Methods
 
@@ -79,7 +81,7 @@ public final class ClassLoaderFactory {
      */
     public static ClassLoader createClassLoader(File unpacked[],
                                                 File packed[],
-                                                ClassLoader parent)
+                                                final ClassLoader parent)
         throws Exception {
 
         if (log.isDebugEnabled())
@@ -124,14 +126,17 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        URL[] array = set.toArray(new URL[set.size()]);
-        StandardClassLoader classLoader = null;
-        if (parent == null)
-            classLoader = new StandardClassLoader(array);
-        else
-            classLoader = new StandardClassLoader(array, parent);
-        return (classLoader);
-
+        final URL[] array = set.toArray(new URL[set.size()]);
+        return AccessController.doPrivileged(
+                new PrivilegedAction<StandardClassLoader>() {
+                    @Override
+                    public StandardClassLoader run() {
+                        if (parent == null)
+                            return new StandardClassLoader(array);
+                        else
+                            return new StandardClassLoader(array, parent);
+                    }
+                });
     }
 
 
@@ -152,7 +157,7 @@ public final class ClassLoaderFactory {
      */
     public static ClassLoader createClassLoader(String locations[],
                                                 Integer types[],
-                                                ClassLoader parent)
+                                                final ClassLoader parent)
         throws Exception {
 
         if (log.isDebugEnabled())
@@ -216,18 +221,22 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        URL[] array = set.toArray(new URL[set.size()]);
+        final URL[] array = set.toArray(new URL[set.size()]);
         if (log.isDebugEnabled())
             for (int i = 0; i < array.length; i++) {
                 log.debug("  location " + i + " is " + array[i]);
             }
-        StandardClassLoader classLoader = null;
-        if (parent == null)
-            classLoader = new StandardClassLoader(array);
-        else
-            classLoader = new StandardClassLoader(array, parent);
-        return (classLoader);
 
+        return AccessController.doPrivileged(
+                new PrivilegedAction<StandardClassLoader>() {
+                    @Override
+                    public StandardClassLoader run() {
+                        if (parent == null)
+                            return new StandardClassLoader(array);
+                        else
+                            return new StandardClassLoader(array, parent);
+                    }
+                });
     }
 
 
