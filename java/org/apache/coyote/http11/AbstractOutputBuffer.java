@@ -289,7 +289,7 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         lastActiveFilter = -1;
         committed = false;
         finished = false;
-
+        byteCount = 0;
     }
     
     /**
@@ -315,7 +315,6 @@ public abstract class AbstractOutputBuffer implements OutputBuffer{
         if (lastActiveFilter != -1)
             activeFilters[lastActiveFilter].end();
         finished = true;
-        byteCount = 0;
     }
     
     public abstract void sendAck() throws IOException;

@@ -538,36 +538,14 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     @Override
     public void invoke(Request request, Response response) throws IOException,
             ServletException {
-        if (getState().isAvailable() && getEnabled()) {                
-            final String t1Name = AccessLogValve.class.getName()+".t1";
-            // Pass this request on to the next valve in our pipeline
-            long t1 = System.currentTimeMillis();
-            boolean asyncdispatch = request.isAsyncDispatching();
-            if (!asyncdispatch) {
-                request.setAttribute(t1Name, Long.valueOf(t1));
-            }
-    
-            getNext().invoke(request, response);
-    
-            //we're not done with the request
-            if (request.isAsyncDispatching()) {
-                return;
-            } else if (asyncdispatch && request.getAttribute(t1Name)!=null) {
-                t1 = ((Long)request.getAttribute(t1Name)).longValue();
-            }
-            
-            long t2 = System.currentTimeMillis();
-            long time = t2 - t1;
-
-            log(request,response, time);
-        } else
-            getNext().invoke(request, response);       
+        getNext().invoke(request, response);       
     }
 
     
     @Override
     public void log(Request request, Response response, long time) {
-        if (logElements == null || condition != null
+        if (!getState().isAvailable() || !getEnabled() ||
+                logElements == null || condition != null
                 && null != request.getRequest().getAttribute(condition)) {
             return;
         }
@@ -1057,7 +1035,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            long length = response.getBytesWritten(true);
+            // Don't need to flush since trigger for log message is after the
+            // response has been committed
+            long length = response.getBytesWritten(false);
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {
