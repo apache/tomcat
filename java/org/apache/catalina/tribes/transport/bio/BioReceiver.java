@@ -82,7 +82,11 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         setListen(false);
         try {
             this.serverSocket.close();
-        } catch (Exception x) {/* Ignore */}
+        } catch (Exception x) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to close socket", x);
+            }
+        }
         super.stop();
     }
 
