@@ -43,7 +43,6 @@ import javax.servlet.http.HttpSessionActivationListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
-import javax.servlet.http.HttpSessionContext;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
@@ -274,7 +273,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * The HTTP session context associated with this session.
      */
     @Deprecated
-    protected static volatile HttpSessionContext sessionContext = null;
+    protected static volatile
+            javax.servlet.http.HttpSessionContext sessionContext = null;
 
 
     /**
@@ -1137,7 +1137,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     @Deprecated
-    public HttpSessionContext getSessionContext() {
+    public javax.servlet.http.HttpSessionContext getSessionContext() {
 
         if (sessionContext == null)
             sessionContext = new StandardSessionContext();
@@ -1860,7 +1860,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
  */
 
 @Deprecated
-final class StandardSessionContext implements HttpSessionContext {
+final class StandardSessionContext
+        implements javax.servlet.http.HttpSessionContext {
 
 
     protected HashMap<?,String> dummy = new HashMap<String,String>();
