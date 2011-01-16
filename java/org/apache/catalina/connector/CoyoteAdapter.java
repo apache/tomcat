@@ -404,6 +404,9 @@ public class CoyoteAdapter implements Adapter {
                 async = true;
             } else if (!comet) {
                 response.finishResponse();
+                ((Context) request.getMappingData().context).logAccess(request,
+                        response,
+                        System.currentTimeMillis() - req.getStartTime(), false);
                 req.action(ActionCode.POST_REQUEST , null);
             }
 
@@ -435,9 +438,10 @@ public class CoyoteAdapter implements Adapter {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
-
+        boolean create = false;
+        
         if (request == null) {
-
+            create = true;
             // Create objects
             request = connector.createRequest();
             request.setCoyoteRequest(req);
@@ -460,8 +464,10 @@ public class CoyoteAdapter implements Adapter {
         connector.getService().getContainer().logAccess(
                 request, response, time, true);
         
-        request.recycle();
-        response.recycle();
+        if (create) {
+            request.recycle();
+            response.recycle();
+        }
     }
     
     

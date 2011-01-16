@@ -436,17 +436,18 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      * in a ServletException.
      */
     @Override
-    public void invoke(Request request, Response response) 
-        throws IOException, ServletException {
-        
+    public void invoke(Request request, Response response) throws IOException,
+            ServletException {
         getNext().invoke(request, response);
-
-        log (request, response, 0);
     }
 
 
     @Override
     public void log(Request request, Response response, long time) {
+        if (!getState().isAvailable()) {
+            return;
+        }
+
         final String EMPTY = "" ;
         
         String remoteHost;
