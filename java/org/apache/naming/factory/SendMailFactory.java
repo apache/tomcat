@@ -111,10 +111,16 @@ public class SendMailFactory implements ObjectFactory
                     MimeMessage message = new MimeMessage(
                         Session.getInstance(props));
                     try {
-                        String from = (String)ref.get("mail.from").getContent();
-                        message.setFrom(new InternetAddress(from));
+                        RefAddr fromAddr = ref.get("mail.from");
+                        String from = null;
+                        if (fromAddr != null) {
+                            from = (String)ref.get("mail.from").getContent();
+                        }
+                        if (from != null) {
+                            message.setFrom(new InternetAddress(from));
+                        }
                         message.setSubject("");
-                    } catch (Exception e) {}
+                    } catch (Exception e) {/*Ignore*/}
                     MimePartDataSource mds = new MimePartDataSource(message);
                     return mds;
                 }
