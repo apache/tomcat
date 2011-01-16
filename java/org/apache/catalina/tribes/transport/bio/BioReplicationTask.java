@@ -67,8 +67,20 @@ public class BioReplicationTask extends AbstractRxTask {
         } catch ( Exception x ) {
             log.error("Unable to service bio socket", x);
         }finally {
-            try {socket.close();}catch ( Exception e){/* Ignore */}
-            try {reader.close();}catch ( Exception e){/* Ignore */}
+            try {
+                socket.close();
+            }catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Failed to close socket", e);
+                }
+            }
+            try {
+                reader.close();
+            }catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Failed to close reader", e);
+                }
+            }
             reader = null;
             socket = null;
         }
@@ -158,8 +170,20 @@ public class BioReplicationTask extends AbstractRxTask {
     @Override
     public void close() {
         setDoRun(false);
-        try {socket.close();}catch ( Exception e){/* Ignore */}
-        try {reader.close();}catch ( Exception e){/* Ignore */}
+        try {
+            socket.close();
+        }catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to close socket", e);
+            }
+        }
+        try {
+            reader.close();
+        }catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to close reader", e);
+            }
+        }
         reader = null;
         socket = null;
         super.close();

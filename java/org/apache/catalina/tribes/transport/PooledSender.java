@@ -88,10 +88,12 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         return (queue==null)?false:queue.checkIdleKeepAlive();
     }
 
+    @Override
     public void add(Member member) {
         // no op, senders created upon demands
     }
 
+    @Override
     public void remove(Member member) {
         //no op for now, should not cancel out any keys
         //can create serious sync issues
@@ -100,7 +102,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     }
     //  ----------------------------------------------------- Inner Class
 
-    private class SenderQueue {
+    private static class SenderQueue {
         private int limit = 25;
 
         PooledSender parent = null;
