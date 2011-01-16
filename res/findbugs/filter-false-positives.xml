@@ -59,6 +59,11 @@
     <Bug code="CN" />
   </Match>
   <Match>
+    <!-- Class name is appropriate -->
+    <Class name="org.apache.tomcat.util.bcel.classfile.CodeException"/>
+    <Bug code="Nm" />
+  </Match>
+  <Match>
     <!-- Returning null here is fine -->
     <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
     <Method name="toString"/>
@@ -84,5 +89,60 @@
   </Match>
   <Match>
     <Class name="org.apache.el.parser.ParseException" />
+  </Match>
+  <!-- Test code -->
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.channel.TestChannelOptionFlag" />
+    <Method name="tearDown" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.channel.TestChannelStartStop" />
+    <Method name="tearDown" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.channel.TestChannelStartStop" />
+    <Method name="testDoublePartialStart" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.channel.TestChannelStartStop" />
+    <Method name="testFalseOption" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.channel.TestRemoteProcessException" />
+   <Bug code="Nm" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.interceptors.TestNonBlockingCoordinator" />
+    <Method name="testCoord1" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.membership.TestTcpFailureDetector" />
+    <Method name="tearDown" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.transport.SocketReceive$1" />
+    <Method name="run" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.transport.SocketTribesReceive$1" />
+    <Method name="run" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.transport.SocketTribesReceive" />
+    <Method name="main" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.test.transport.SocketValidateReceive$1" />
+    <Method name="run" />
+    <Bug code="DE" />
   </Match>
 </FindBugsFilter>

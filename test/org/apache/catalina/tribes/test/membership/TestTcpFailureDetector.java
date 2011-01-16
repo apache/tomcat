@@ -135,7 +135,7 @@ public class TestTcpFailureDetector extends TestCase {
         super.tearDown();
     }
     
-    public class TestMbrListener implements MembershipListener {
+    public static class TestMbrListener implements MembershipListener {
         public String name = null;
         public TestMbrListener(String name) {
             this.name = name;
