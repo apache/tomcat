@@ -909,6 +909,7 @@ final class CallMethodMultiRule extends CallMethodRule {
         if (paramCount > 0) {
             parameters = (Object[]) digester.popParams();
         } else {
+            parameters = new Object[0];
             super.end(namespace, name);
         }
         
