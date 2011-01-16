@@ -83,7 +83,6 @@ public class SocketValidateReceive {
     }
     
     public static class MyDataReader {
-        byte[] data = new byte[43800];
         int length = 10;
         int cur = 0;
         byte seq = 0;

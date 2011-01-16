@@ -111,7 +111,7 @@ public class TestSenderConnections extends TestCase {
         }
     }
 
-    public class TestMsgListener implements ChannelListener {
+    public static class TestMsgListener implements ChannelListener {
         public String name = null;
         public TestMsgListener(String name) {
             this.name = name;
