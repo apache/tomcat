@@ -28,6 +28,12 @@
     <Bug code="MSF" />
   </Match>
   <Match>
+    <!-- Catalina isn'y used when embedding -->
+    <Class name="org.apache.catalina.startup.Catalina" />
+    <Method name="stopServer" />
+    <Bug code="Dm" />
+  </Match>
+  <Match>
     <!-- Sleep is short, needs to keep lock -->
     <Class name="org.apache.catalina.startup.HostConfig" />
     <Method name="checkResources" />
