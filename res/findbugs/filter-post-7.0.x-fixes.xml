@@ -38,4 +38,10 @@
     <Method name="writeObject" />
     <Bug code="Se" />
   </Match>
+  <!-- Refactor Integer constants to an enum -->
+  <Match>
+    <Class name="org.apache.catalina.startup.ClassLoaderFactory" />
+    <Method name="createClassLoader" />
+    <Bug code="RC" />
+  </Match>
 </FindBugsFilter>
