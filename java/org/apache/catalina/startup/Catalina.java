@@ -491,7 +491,9 @@ public class Catalina {
             inputStream = new FileInputStream(file);
             inputSource = new InputSource("file://" + file.getAbsolutePath());
         } catch (Exception e) {
-            // Ignore
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("catalina.configFail", file), e);
+            }
         }
         if (inputStream == null) {
             try {
@@ -501,7 +503,10 @@ public class Catalina {
                     (getClass().getClassLoader()
                      .getResource(getConfigFile()).toString());
             } catch (Exception e) {
-                // Ignore
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("catalina.configFail",
+                            getConfigFile()), e);
+                }
             }
         }
 
@@ -510,20 +515,29 @@ public class Catalina {
         if( inputStream==null ) {
             try {
                 inputStream = getClass().getClassLoader()
-                .getResourceAsStream("server-embed.xml");
+                        .getResourceAsStream("server-embed.xml");
                 inputSource = new InputSource
                 (getClass().getClassLoader()
                         .getResource("server-embed.xml").toString());
             } catch (Exception e) {
-                // Ignore
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("catalina.configFail",
+                            "server-embed.xml"), e);
+                }
             }
         }
 
 
-        if ((inputStream == null) && (file != null)) {
-            log.warn("Can't load server.xml from " + file.getAbsolutePath());
-            if (file.exists() && !file.canRead()) {
-                log.warn("Permissions incorrect, read permission is not allowed on the file.");
+        if (inputStream == null || inputSource == null) {
+            if  (file == null) {
+                log.warn(sm.getString("catalina.configFail",
+                        getConfigFile() + "] or [server-embed.xml]"));
+            } else {
+                log.warn(sm.getString("catalina.configFail",
+                        file.getAbsolutePath()));
+                if (file.exists() && !file.canRead()) {
+                    log.warn("Permissions incorrect, read permission is not allowed on the file.");
+                }
             }
             return;
         }
