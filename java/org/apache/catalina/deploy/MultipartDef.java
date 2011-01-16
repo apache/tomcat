@@ -18,11 +18,15 @@
 
 package org.apache.catalina.deploy;
 
+import java.io.Serializable;
+
 
 /**
  * Representation of a the multipart configuration for a servlet.
  */
-public class MultipartDef {
+public class MultipartDef implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
     private String location;

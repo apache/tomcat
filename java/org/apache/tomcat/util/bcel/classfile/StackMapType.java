@@ -20,6 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -33,7 +34,9 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see     StackMap
  * @see     Constants
  */
-public final class StackMapType implements Cloneable {
+public final class StackMapType implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private byte type;
     private int index = -1; // Index to CONSTANT_Class or offset
