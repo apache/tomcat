@@ -27,15 +27,10 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.SessionListener;
@@ -49,7 +44,6 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.ReplicatedMapEntry;
-import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -816,56 +810,4 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if ( accessCount == null && ACTIVITY_CHECK ) accessCount = new AtomicInteger();
         if ( accessCount != null ) super.accessCount.set(count);
     }
-}
-
-// -------------------------------------------------------------- Private Class
-
-/**
- * This class is a dummy implementation of the <code>HttpSessionContext</code>
- * interface, to conform to the requirement that such an object be returned when
- * <code>HttpSession.getSessionContext()</code> is called.
- *
- * @author Craig R. McClanahan
- *
- * @deprecated As of Java Servlet API 2.1 with no replacement. The interface
- *             will be removed in a future version of this API.
- */
-
-@Deprecated
-final class StandardSessionContext
-    implements HttpSessionContext {
-
-    private HashMap<?,String> dummy = new HashMap<String,String>();
-
-    /**
-     * Return the session identifiers of all sessions defined within this
-     * context.
-     *
-     * @deprecated As of Java Servlet API 2.1 with no replacement. This method
-     *             must return an empty <code>Enumeration</code> and will be
-     *             removed in a future version of the API.
-     */
-    @Override
-    @Deprecated
-    public Enumeration<String> getIds() {
-        return (new Enumerator<String>(dummy));
-    }
-
-    /**
-     * Return the <code>HttpSession</code> associated with the specified
-     * session identifier.
-     *
-     * @param id
-     *            Session identifier for which to look up a session
-     *
-     * @deprecated As of Java Servlet API 2.1 with no replacement. This method
-     *             must return null and will be removed in a future version of
-     *             the API.
-     */
-    @Override
-    @Deprecated
-    public HttpSession getSession(String id) {
-        return (null);
-    }
-
 }
