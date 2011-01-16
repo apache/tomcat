@@ -49,6 +49,13 @@
     <Bug code="NS"/>
   </Match>
   <Match>
+    <!-- Simpler to catch Exception than to create dummy implementations of the
+         necessary exception hierarchy -->
+    <Class name="org.apache.naming.factory.SendMailFactory$1" />
+    <Method name="run" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
