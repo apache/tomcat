@@ -1060,8 +1060,26 @@ public class NioEndpoint extends AbstractEndpoint {
                 if (ka!=null) handler.release(ka.getChannel());
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
-                if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
-                try {if (ka!=null) ka.getSocket().close(true);}catch (Exception ignore){}
+                if (key.channel().isOpen()) {
+                    try {
+                        key.channel().close();
+                    } catch (Exception e) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString(
+                                    "endpoint.debug.channelCloseFail"), e);
+                        }
+                    }
+                }
+                try {
+                    if (ka!=null) {
+                        ka.getSocket().close(true);
+                    }
+                } catch (Exception e){
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "endpoint.debug.socketCloseFail"), e);
+                    }
+                }
                 try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
                 if (ka!=null) {
                     ka.reset();
@@ -1069,8 +1087,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                if ( log.isDebugEnabled() ) log.error("",e);
-                // Ignore
+                if (log.isDebugEnabled()) log.error("",e);
             }
         }
         /**
