@@ -88,7 +88,7 @@ public class TestMemberArrival
         super.tearDown();
     }
 
-    public class TestMbrListener
+    public static class TestMbrListener
         implements MembershipListener {
         public String name = null;
         public TestMbrListener(String name) {
