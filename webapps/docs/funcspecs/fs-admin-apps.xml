@@ -261,10 +261,10 @@
   <p>In addition, this web application shall conform to the following
   requirements:</p>
   <ul>
-  <li>All request URIs shall be protected by a security constraint that
-      requires security role <code>manager</code> for processing.</li>
+  <li>All request URIs shall be protected by security constraints that
+      require a security role to be assigned for processing.</li>
   <li>The default user database shall <strong>not</strong> contain any
-      user that has been assigned the role <code>manager</code>.</li>
+      user that has been assigned a security role.</li>
   </ul>
 
   <h5>HTML-Based Web Application</h5>
