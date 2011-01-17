@@ -121,6 +121,10 @@
         Correct the documentation for the recoveryCount count attribute of the
         the default cluster membership. (markt)
       </fix>
+      <fix>
+        <bug>50599</bug>: Use correct names of roles required to access the 
+        Manager application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
