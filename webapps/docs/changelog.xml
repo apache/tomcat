@@ -75,6 +75,9 @@
         <code>ServletContext.addFilter(String, Filter)</code> method. Patch
         provided by Ismael Juma. (markt)
       </fix>
+      <fix>
+        <bug>50598</bug>: Correct URL for Manager text interface. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

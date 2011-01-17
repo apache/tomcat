@@ -27,7 +27,7 @@
   <property name="path"     value="/myapp"/>
 
   <!-- Configure properties to access the Manager application -->
-  <property name="url"      value="http://localhost:8080/manager"/>
+  <property name="url"      value="http://localhost:8080/manager/text"/>
   <property name="username" value="tomcat"/>
   <property name="password" value="tomcat"/>
 
