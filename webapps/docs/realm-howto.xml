@@ -250,15 +250,16 @@ and log on with one of the usernames and passwords described for the default
 
 <p>If you wish to use the <a href="manager-howto.html">Manager Application</a>
 to deploy and undeploy applications in a running Tomcat installation, you
-MUST add the "manager" role to at least one username in your selected Realm
-implementation.  This is because the manager web application itself uses a
-security constraint that requires role "manager" to access ANY request URI
-within that application.</p>
+MUST add the "manager-gui" role to at least one username in your selected
+Realm implementation.  This is because the manager web application itself uses a
+security constraint that requires role "manager-gui" to access ANY request URI
+within the HTML interface of that application.</p>
 
 <p>For security reasons, no username in the default Realm (i.e. using
-<code>conf/tomcat-users.xml</code> is assigned the "manager" role.  Therefore,
-no one will be able to utilize the features of this application until the
-Tomcat administrator specifically assigns this role to one or more users.</p>
+<code>conf/tomcat-users.xml</code> is assigned the "manager-gui" role.
+Therefore, no one will be able to utilize the features of this application
+until the Tomcat administrator specifically assigns this role to one or more
+users.</p>
 
 </subsection>
 

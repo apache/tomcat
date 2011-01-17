@@ -113,7 +113,7 @@
                        Defaults to "dist".
 
   manager.password     The login password of a user that is assigned the
-                       "manager" role (so that he or she can execute
+                       "manager-script" role (so that he or she can execute
                        commands via the "/manager" web application)
 
   manager.url          The URL of the "/manager" web application on the
@@ -121,7 +121,7 @@
                        applications and web services.
 
   manager.username     The login username of a user that is assigned the
-                       "manager" role (so that he or she can execute
+                       "manager-script" role (so that he or she can execute
                        commands via the "/manager" web application)
 
 -->
