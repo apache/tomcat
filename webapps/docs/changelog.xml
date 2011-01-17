@@ -93,6 +93,10 @@
       <add>
         Internationalise the log messages for the FarmWarDeployer. (markt)
       </add>
+      <fix>
+        <bug>50600</bug>: Prevent a <code>ConcurrentModificationException</code>
+        when removing a WAR file via the FarmWarDeployer. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
