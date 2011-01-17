@@ -320,7 +320,7 @@
                 running Tomcat server, which will be used to deploy and undeploy the
                 web application. By default, the deployer will attempt to access 
                 a Tomcat instance running on localhost, at 
-                <code>http://localhost:8080/manager</code>.
+                <code>http://localhost:8080/manager/text</code>.
             </li>
             <li>
                 <code>username</code>: Tomcat Manager username (user should have a role of

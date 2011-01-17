@@ -88,7 +88,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     /**
      * The URL of the <code>Manager</code> application to be used.
      */
-    protected String url = "http://localhost:8080/manager";
+    protected String url = "http://localhost:8080/manager/text";
 
     public String getUrl() {
         return (this.url);
