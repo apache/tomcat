@@ -35,13 +35,13 @@
 
 <section name="Introduction">
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <blockquote><p><em>
+    The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.
+    </em></p></blockquote>
 
   <p>The <strong>Context</strong> element represents a <em>web
   application</em>, which is run within a particular virtual host.
@@ -68,8 +68,8 @@
   web application for this virtual host, and is used to process all
   requests that do not match any other Context's context path.</p>
 
-  <p>You may deploy multiple versions of a web application with the same context
-  path at the same time. The rules used to match requests to a context version
+  <p><b>You may deploy multiple versions of a web application with the same context
+  path at the same time.</b> The rules used to match requests to a context version
   are as follows:
   <ul>
   <li>If no session information is present in the request, use the latest
@@ -93,7 +93,7 @@
         contextPath with the leading '/' removed and any remaining '/'
         characters in the path replaced with '#'.</li>
   </ul>
-  When a version is specified, ##version is added to the contextName and base
+  When a version is specified, <code>##version</code> is added to the contextName and base
   name. To help clarify these rules, some examples are given in the following
   table.</p>
   
@@ -109,7 +109,11 @@
   
   <p>The version component is treated as a <code>String</code> both for
   performance reasons and to allow flexibility in versioning schemes. String
-  comparissions are used to determine version order. Therefore
+  comparisons are used to determine version order. If version is not specified,
+  it is treated as the empty string.
+  Therefore,
+  <code>foo.war</code> will be treated as an earlier version than
+  <code>foo##11.war</code> and
   <code>foo##11.war</code> will be treated as an earlier version than
   <code>foo##2.war</code>. If using a purely numerical versioning scheme it is
   recommended that zero padding is used so that <code>foo##002.war</code> is
