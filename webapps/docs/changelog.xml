@@ -69,6 +69,12 @@
         <bug>50582</bug>: Refactor access logging so chunked encoding is not
         forced for all requests if bytes sent is logged. (markt)
       </fix>
+      <fix>
+        <bug>50597</bug>: Don&apos;t instantiate a new instance of a Filter if
+        an instance was provided via the
+        <code>ServletContext.addFilter(String, Filter)</code> method. Patch
+        provided by Ismael Juma. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

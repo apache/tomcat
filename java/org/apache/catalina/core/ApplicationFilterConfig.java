@@ -367,10 +367,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
             this.filter = null;
 
         } else {
-
-            // Allocate a new filter instance
-            getFilter();
-
+            // Allocate a new filter instance if necessary
+            if (filterDef.getFilter() == null) {
+                getFilter();
+            }
         }
 
     }
