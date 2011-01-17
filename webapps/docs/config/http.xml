@@ -288,6 +288,18 @@
       the content-length is not known and compression is set to "on" or more
       aggressive, the output will also be compressed. If not specified, this
       attribute is set to "off".</p>
+      <p><em>Note</em>: There is a tradeoff between using compression (saving
+      your bandwidth) and using the sendfile feature (saving your CPU cycles).
+      If the connector supports the sendfile feature, e.g. the NIO connector,
+      using sendfile will take precedence over compression. The symptoms will
+      be that static files greater that 48 Kb will be sent uncompressed.
+      You can turn off sendfile by setting <code>useSendfile</code> attribute
+      of the connector, as documented below, or change the sendfile usage
+      threshold in the configuration of the
+      <a href="../default-servlet.html">DefaultServlet</a> in the default
+      <code>conf/web.xml</code> or in the <code>web.xml</code> of your web
+      application.
+      </p>
     </attribute>
 
     <attribute name="compressionMinSize" required="false">
