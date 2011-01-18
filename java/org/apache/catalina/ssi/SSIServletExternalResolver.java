@@ -74,6 +74,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
+    @Override
     public void log(String message, Throwable throwable) {
         //We can't assume that Servlet.log( message, null )
         //is the same as Servlet.log( message ), since API
@@ -86,6 +87,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
+    @Override
     public void addVariableNames(Collection<String> variableNames) {
         for (int i = 0; i < VARIABLE_NAMES.length; i++) {
             String variableName = VARIABLE_NAMES[i];
@@ -132,6 +134,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
+    @Override
     public void setVariableValue(String name, String value) {
         if (!isNameReserved(name)) {
             req.setAttribute(name, value);
@@ -139,6 +142,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
+    @Override
     public String getVariableValue(String name) {
         String retVal = null;
         Object object = getReqAttributeIgnoreCase(name);
@@ -331,6 +335,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             return retVal;
     }
 
+    @Override
     public Date getCurrentDate() {
         return new Date();
     }
@@ -480,6 +485,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
+    @Override
     public long getFileLastModified(String path, boolean virtual)
             throws IOException {
         long lastModified = 0;
@@ -493,6 +499,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
+    @Override
     public long getFileSize(String path, boolean virtual) throws IOException {
         long fileSize = -1;
         try {
@@ -508,6 +515,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     //We are making lots of unnecessary copies of the included data here. If
     //someone ever complains that this is slow, we should connect the included
     // stream to the print writer that SSICommand uses.
+    @Override
     public String getFileText(String originalPath, boolean virtual)
             throws IOException {
         try {
@@ -552,7 +560,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         }
     }
 
-    protected class ServletContextAndPath {
+    protected static class ServletContextAndPath {
         protected ServletContext servletContext;
         protected String path;
 

@@ -130,7 +130,7 @@ final class ApplicationDispatcher
      * variables causes threading issues and state is too complex to pass and
      * return single ServletRequest or ServletResponse objects.
      */
-    private class State {
+    private static class State {
         State(ServletRequest request, ServletResponse response,
                 boolean including) {
             this.outerRequest = request;

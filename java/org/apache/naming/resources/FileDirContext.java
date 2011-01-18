@@ -894,7 +894,7 @@ public class FileDirContext extends BaseDirContext {
      * This specialized resource implementation avoids opening the InputStream
      * to the file right away (which would put a lock on the file).
      */
-    protected class FileResource extends Resource {
+    protected static class FileResource extends Resource {
 
 
         // -------------------------------------------------------- Constructor
@@ -912,12 +912,6 @@ public class FileDirContext extends BaseDirContext {
          * Associated file object.
          */
         protected File file;
-
-
-        /**
-         * File length.
-         */
-        protected long length = -1L;
 
 
         // --------------------------------------------------- Resource Methods
@@ -951,7 +945,7 @@ public class FileDirContext extends BaseDirContext {
      * reading (to speed up simple checks, like checking the last modified
      * date).
      */
-    protected class FileResourceAttributes extends ResourceAttributes {
+    protected static class FileResourceAttributes extends ResourceAttributes {
 
         private static final long serialVersionUID = 1L;
 

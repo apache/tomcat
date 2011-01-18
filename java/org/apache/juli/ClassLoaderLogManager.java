@@ -679,7 +679,7 @@ public class ClassLoaderLogManager extends LogManager {
      * This class is needed to instantiate the root of each per classloader 
      * hierarchy.
      */
-    protected class RootLogger extends Logger {
+    protected static class RootLogger extends Logger {
         public RootLogger() {
             super("", null);
         }
