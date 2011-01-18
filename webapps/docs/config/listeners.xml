@@ -121,7 +121,7 @@
     (org.apache.catalina.mbeans.ServerLifecycleListener)</h3>
 
     <p>The <strong>Server Lifecycle Listener</strong> initializes the
-    MBeanServer for the MBeans that may be used to manager Tomcat via JMX.
+    MBeanServer for the MBeans that may be used to manage Tomcat via JMX.
     Without this listener, none of the Tomcat MBeans will be available.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
