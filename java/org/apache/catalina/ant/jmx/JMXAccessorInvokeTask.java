@@ -60,8 +60,8 @@ import org.apache.tools.ant.BuildException;
  * <code>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory" 
- *           operation="createAcccesLoggerValve"
- *           resultproperty="acccesLoggerObjectName"
+ *           operation="createAccessLoggerValve"
+ *           resultproperty="accessLoggerObjectName"
  *       &gt;
  *         &lt;arg value="Catalina:type=Host,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
