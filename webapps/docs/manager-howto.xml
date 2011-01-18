@@ -72,8 +72,8 @@ Manager web application <code>Context</code> to a new host install the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
 example:</p>
 <pre>
-&lt;Context path="/manager" debug="0" privileged="true"
-         docBase="/usr/local/kinetic/tomcat6/server/webapps/manager"&gt;
+&lt;Context path="/manager" privileged="true"
+         docBase="/usr/local/kinetic/tomcat7/server/webapps/manager"&gt;
 &lt;/Context&gt;
 </pre>
 
@@ -164,7 +164,7 @@ could be restricted by the remote IP address or host by adding a
 an example of restricting access to the localhost by IP address:</p>
 <pre>
 &lt;Context path="/manager" privileged="true"
-         docBase="/usr/local/kinetic/tomcat6/server/webapps/manager"&gt;
+         docBase="/usr/local/kinetic/tomcat7/server/webapps/manager"&gt;
          &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
                 allow="127\.0\.0\.1"/&gt;
 &lt;/Context&gt;
@@ -389,8 +389,7 @@ web application Context just as if it were configured in your
 Tomcat <code>server.xml</code> configuration file. Here is an
 example:</p>
 <source>
-&lt;Context path="/foobar" docBase="/path/to/application/foobar"
-         debug="0"&gt;
+&lt;Context path="/foobar" docBase="/path/to/application/foobar"&gt;
 
   &lt;!-- Link to the user database we will get roles from --&gt;
   &lt;ResourceLink name="users" global="UserDatabase"
