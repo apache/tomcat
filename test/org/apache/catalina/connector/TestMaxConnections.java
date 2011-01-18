@@ -59,7 +59,7 @@ public class TestMaxConnections extends TomcatBaseTest{
         
     }
 
-    private class ConnectThread extends Thread {
+    private static class ConnectThread extends Thread {
         public boolean passed = true;
         public boolean connectfailed = false;
         @Override
@@ -91,7 +91,7 @@ public class TestMaxConnections extends TomcatBaseTest{
         tomcat.start();
     }
 
-    private class TestClient extends SimpleHttpClient {
+    private static class TestClient extends SimpleHttpClient {
 
         private void doHttp10Request() throws Exception {
             

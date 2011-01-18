@@ -126,7 +126,7 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
 
-    private class PrivilegedGetPageContext
+    private static class PrivilegedGetPageContext
             implements PrivilegedAction<PageContext> {
 
         private JspFactoryImpl factory;
@@ -158,7 +158,7 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
 
-    private class PrivilegedReleasePageContext
+    private static class PrivilegedReleasePageContext
             implements PrivilegedAction<Void> {
 
         private JspFactoryImpl factory;

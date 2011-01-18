@@ -119,7 +119,7 @@ public class DedicatedThreadExecutor {
     // This can lead to false alarms about potential memory leaks because the
     // thread may have a web application class loader for its context class
     // loader.
-    private class SingleThreadFactory implements ThreadFactory {
+    private static class SingleThreadFactory implements ThreadFactory {
         private volatile Thread singleThread;
 
         @Override
