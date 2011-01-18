@@ -611,13 +611,13 @@ Example to create a new access logger valve at vhost <em>localhost</em>
 <source>
  &lt;jmx:invoke
          name="Catalina:type=MBeanFactory" 
-         operation="createAcccesLoggerValve"
-         resultproperty="acccesLoggerObjectName"
+         operation="createAccessLoggerValve"
+         resultproperty="accessLoggerObjectName"
  &gt;
      &lt;arg value="Catalina:type=Host,host=localhost"/&gt;
  &lt;/jmx:invoke&gt;
 </source>
-Now you can find new MBean with name stored at <em>${acccesLoggerObjectName}</em>
+Now you can find new MBean with name stored at <em>${accessLoggerObjectName}</em>
 property.
 </p>  
 
