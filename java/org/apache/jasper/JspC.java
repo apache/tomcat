@@ -151,7 +151,6 @@ public class JspC implements Options {
         insertBefore.add("<ejb-local-ref>");
     }
 
-    protected static int die;
     protected String classPath = null;
     protected URLClassLoader loader = null;
     protected boolean trimSpaces = false;
@@ -251,8 +250,9 @@ public class JspC implements Options {
         if (arg.length == 0) {
             System.out.println(Localizer.getMessage("jspc.usage"));
         } else {
+            JspC jspc = null;
             try {
-                JspC jspc = new JspC();
+                jspc = new JspC();
                 jspc.setArgs(arg);
                 if (jspc.helpNeeded) {
                     System.out.println(Localizer.getMessage("jspc.usage"));
@@ -261,8 +261,8 @@ public class JspC implements Options {
                 }
             } catch (JasperException je) {
                 System.err.println(je);
-                if (die != NO_DIE_LEVEL) {
-                    System.exit(die);
+                if (jspc != null && jspc.dieLevel != NO_DIE_LEVEL) {
+                    System.exit(jspc.dieLevel);
                 }
             }
         }
@@ -279,7 +279,6 @@ public class JspC implements Options {
         String tok;
 
         dieLevel = NO_DIE_LEVEL;
-        die = dieLevel;
 
         while ((tok = nextArg()) != null) {
             if (tok.equals(SWITCH_VERBOSE)) {
@@ -341,7 +340,6 @@ public class JspC implements Options {
                 } catch (NumberFormatException nfe) {
                     dieLevel = DEFAULT_DIE_LEVEL;
                 }
-                die = dieLevel;
             } else if (tok.equals(SWITCH_HELP)) {
                 helpNeeded = true;
             } else if (tok.equals(SWITCH_POOLING)) {
@@ -804,8 +802,8 @@ public class JspC implements Options {
      * includes.
      */
     public void setUriroot( String s ) {
-        if( s==null ) {
-            uriRoot = s;
+        if (s == null) {
+            uriRoot = null;
             return;
         }
         try {
@@ -1097,8 +1095,12 @@ public class JspC implements Options {
         fis.close();
         fos.close();
 
-        webXml2.delete();
-        (new File(webxmlFile)).delete();
+        if(!webXml2.delete() && log.isDebugEnabled())
+            log.debug(Localizer.getMessage("jspc.delete.fail",
+                    webXml2.toString()));
+        
+        if (!(new File(webxmlFile)).delete() && log.isDebugEnabled())
+            log.debug(Localizer.getMessage("jspc.delete.fail", webxmlFile));
 
     }
     

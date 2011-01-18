@@ -17,6 +17,11 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
+    <!-- JNI library can only be loaded once so statics are appropriate -->
+    <Class name="org.apache.catalina.core.AprLifecycleListener" />
+    <Bug code="ST" />
+  </Match>
+  <Match>
     <!-- Have to trigger GC for leak detection to work. Clearly documented -->
     <Class name="org.apache.catalina.core.StandardHost" />
     <Method name="findReloadedContextMemoryLeaks" />
@@ -28,7 +33,7 @@
     <Bug code="MSF" />
   </Match>
   <Match>
-    <!-- Catalina isn'y used when embedding -->
+    <!-- Catalina isn't used when embedding -->
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
     <Bug code="Dm" />
@@ -60,11 +65,30 @@
     <Bug code="NS"/>
   </Match>
   <Match>
+    <!-- JspC will not be used under a security manager -->
+    <Class name="org.apache.jasper.JspC"/>
+    <Method name="initClassLoader"/>
+    <Bug code="DP" />
+  </Match>
+  <Match>
+    <!-- Parser config is static so statics are appropriate -->
+    <Class name="org.apache.jasper.JspC"/>
+    <Method name="setValidateXml"/>
+    <Bug code="ST" />
+  </Match>
+  <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
          necessary exception hierarchy -->
     <Class name="org.apache.naming.factory.SendMailFactory$1" />
     <Method name="run" />
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Simpler to catch Exception than to create dummy implementations of the
+         necessary exception hierarchy -->
+    <Class name="org.apache.naming.factory.webservices.ServiceProxy" />
+    <Method name="&lt;init&gt;"/>
+    <Bug code="ST" />
   </Match>
   <Match>
     <!-- Class name needs to start with a lower case letter in this case -->
@@ -91,6 +115,12 @@
     <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
     <Method name="toString"/>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Whilst cache is global there may be multiple instances (one per     -->
+    <!-- server so statics are appropriate -->
+    <Class name="org.apache.tomcat.util.buf.StringCache"/>
+    <Bug code="ST" />
   </Match>
   <Match>
     <!-- Test really is for the same object rather than equality -->

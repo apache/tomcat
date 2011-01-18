@@ -75,9 +75,11 @@ public class ServiceProxy
     }
 
     /**
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+     * @see InvocationHandler#invoke(Object, Method, Object[])
      */
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args)
+            throws Throwable {
 
         if (portQNameClass.equals(method)) {
             return getProxyPortQNameClass(args);
@@ -99,6 +101,7 @@ public class ServiceProxy
      * @return Returns the correct Port
      * @throws ServiceException if port's QName is an unknown Port (not defined in WSDL).
      */
+    @SuppressWarnings("unchecked")
     private Object getProxyPortQNameClass(Object[] args)
     throws ServiceException {
         QName name = (QName) args[0];
