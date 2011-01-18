@@ -554,8 +554,7 @@
 <source>
 &lt;Host name="localhost" ...&gt;
   ...
-  &lt;Valve className="org.apache.catalina.authenticator.SingleSignOn"
-         debug="0"/&gt;
+  &lt;Valve className="org.apache.catalina.authenticator.SingleSignOn"/&gt;
   ...
 &lt;/Host&gt;
 </source>

@@ -324,7 +324,7 @@
             </li>
             <li>
                 <code>username</code>: Tomcat Manager username (user should have a role of
-                manager)
+                manager-script)
             </li>
             <li><code>password</code>: Tomcat Manager password.</li>
         </ul>
