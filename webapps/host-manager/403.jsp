@@ -77,7 +77,7 @@
    </p>
    <ul>
     <li>Users with the <tt>admin-gui</tt> role should not be granted the
-       <tt>manager-script</tt> role.</li>
+       <tt>admin-script</tt> role.</li>
     <li>If the text interface is accessed through a browser (e.g. for testing
         since this interface is intended for tools not humans) then the browser
         must be closed afterwards to terminate the session.</li>
