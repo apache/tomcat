@@ -156,7 +156,7 @@ public class WebappClassLoader
     }
 
     
-    protected final class PrivilegedGetClassLoader
+    protected static final class PrivilegedGetClassLoader
         implements PrivilegedAction<ClassLoader> {
 
         public Class<?> clazz;
