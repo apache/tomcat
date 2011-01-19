@@ -38,10 +38,18 @@
     <Method name="writeObject" />
     <Bug code="Se" />
   </Match>
-  <!-- Refactor Integer constants to an enum -->
+  <!-- Re-factor Integer constants to an enum -->
   <Match>
     <Class name="org.apache.catalina.startup.ClassLoaderFactory" />
     <Method name="createClassLoader" />
     <Bug code="RC" />
   </Match>
+  <!-- Re-factor to only have the thread running when an instance of the     -->
+  <!-- handler is active -->
+  <Match>
+    <Class name="org.apache.juli.AsyncFileHandler$LoggerThread"/>
+    <Method name="run"/>
+    <Bug code="IL"/>
+  </Match>
+  
 </FindBugsFilter>
