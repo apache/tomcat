@@ -15,4 +15,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<Context antiResourceLocking="false" privileged="true" />
+<Context antiResourceLocking="false" privileged="true" >
+  <!--
+    Remove the comment markers from around the Valve below to limit access to
+    the host-manager application to clients connecting from localhost
+  -->
+  <!--
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.0\.0\.1|::1" />
+  -->
+</Context>
