@@ -1214,11 +1214,11 @@ public interface Context extends Container {
 
     
     /**
-     * Add a URL for a location (usually a JAR) that contains static resources
-     * in a META-INF/resources directory that should be included in the static
+     * Add a URL for a JAR that contains static resources in a
+     * META-INF/resources directory that should be included in the static
      * resources for this context.
      */
-    public void addAltResourceUrl(URL url);
+    public void addResourceJarUrl(URL url);
     
     
     /**
