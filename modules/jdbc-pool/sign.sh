@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-VERSION=v1.0.9.2
+VERSION=v1.0.9.3
 for i in $(find output/release/$VERSION -name "*.zip" -o -name "*.tar.gz"); do
   echo Signing $i
   echo $1|gpg --passphrase-fd 0 -a -b $i
