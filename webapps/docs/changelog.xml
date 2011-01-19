@@ -111,6 +111,11 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
+        <bug>22278</bug>: Add a commented out <code>RemoteAddrValve</code> that
+        limits access to the Manager and Host Manager applications to localhost.
+        Based on a patch by Yann Cébron. (markt)
+      </fix>
+      <fix>
         Correct a handful of Javadoc warnings. (markt)
       </fix>
       <add>
