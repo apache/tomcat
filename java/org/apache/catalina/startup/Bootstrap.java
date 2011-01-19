@@ -21,6 +21,7 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -442,6 +443,11 @@ public final class Bootstrap {
             }
         } catch (Throwable t) {
             handleThrowable(t);
+            // Unwrap the Exception for clearer error reporting
+            if (t instanceof InvocationTargetException &&
+                    t.getCause() != null) {
+                t = t.getCause();
+            }
             t.printStackTrace();
             System.exit(1);
         }
