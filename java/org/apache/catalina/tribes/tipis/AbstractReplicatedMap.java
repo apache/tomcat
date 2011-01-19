@@ -353,7 +353,6 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
     
     @Override
     public boolean equals(Object o) {
-        if ( o == null ) return false;
         if ( !(o instanceof AbstractReplicatedMap)) return false;
         if ( !(o.getClass().equals(this.getClass())) ) return false;
         AbstractReplicatedMap other = (AbstractReplicatedMap)o;

@@ -180,9 +180,6 @@ public abstract class SimpleNode extends ELSupport implements Node {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof SimpleNode)) {
             return false;
         }
