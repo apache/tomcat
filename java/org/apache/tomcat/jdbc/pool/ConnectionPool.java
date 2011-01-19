@@ -545,7 +545,7 @@ public class ConnectionPool {
         // we could have threads stuck in idle.poll(timeout) that will never be
         // notified
         if (waitcount.get() > 0) {
-            idle.offer(new PooledConnection(poolProperties, this));
+            idle.offer(create(true));
         }
     }
 
@@ -637,7 +637,7 @@ public class ConnectionPool {
      */
     protected PooledConnection createConnection(long now, PooledConnection notUsed, String username, String password) throws SQLException {
         //no connections where available we'll create one
-        PooledConnection con = create();
+        PooledConnection con = create(false);
         if (username!=null) con.getAttributes().put(con.PROP_USER, username);
         if (password!=null) con.getAttributes().put(con.PROP_PASSWORD, password);
         boolean error = false;
@@ -984,7 +984,8 @@ public class ConnectionPool {
      * Create a new pooled connection object. Not connected nor validated.
      * @return a pooled connection object
      */
-    protected PooledConnection create() {
+    protected PooledConnection create(boolean incrementCounter) {
+        if (incrementCounter) size.incrementAndGet();
         PooledConnection con = new PooledConnection(getPoolProperties(), this);
         return con;
     }
