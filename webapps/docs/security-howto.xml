@@ -50,11 +50,25 @@
   <section name="Non-Tomcat settings">
     <p>Tomcat configuration should not be the only line of defense. The other
     components in the system (operating system, network, database, etc.) should
-    also be secured. For the operating system, consider limiting the privileges
-    of the user under which Tomcat is running and limiting access to Tomcat's
-    files by other users. At the network level, consider using a firewall to
-    limit both incoming and outgoing connections to only those connections you 
-    expect to be present.</p>
+    also be secured.</p>
+    <p>Tomcat should not be run under the root user. Create a dedicated user for
+    the Tomcat process and provide that user with the minimum necessary
+    permissions for the operating system. For example, it should not be possible
+    to log on remotely using the Tomcat user.</p>
+    <p>File permissions should also be suitable restricted. Taking the Tomcat
+    instances at the ASF as an example (where auto-deployment is disabled and
+    web applications are deployed as exploded directories), the standard
+    configuration is to have all Tomcat files owned by root with group Tomcat
+    and whilst owner has read/write priviliges, group only has read and world
+    has no permissions. The exceptions are the logs, temp and work directory
+    that are owned by the Tomcat user rather than root. This means that even if
+    an attacker compromises the Tomcat process, they can&apos;t change the
+    Tomcat configuration, deploy new web applications or modify existing web
+    applications. The Tomcat process runs with a umask of 007 to maintain these
+    permissions.</p>
+    <p>At the network level, consider using a firewall to limit both incoming
+    and outgoing connections to only those connections you  expect to be
+    present.</p>
   </section>
   
   <section name="Default web applications">
@@ -210,14 +224,15 @@
     </subsection>
     
     <subsection name="Valves">
-      <p>It is strongly recommended that an AccessLogValve is configured. These
-      are normally configured per host but may also be configured per engine or
-      per context as required.</p>
+      <p>It is strongly recommended that an AccessLogValve is configured. The
+      default Tomcat configuration includes an AccessLogValve. These are
+      normally configured per host but may also be configured per engine or per
+      context as required.</p>
       
       <p>Any administrative application should be protected by a
       RemoteAddressValve. (Note that this Valve is also available as a Filter.)
-      The <strong>allow</strong> attribute should be used to limit access to a set of known
-      trusted hosts.</p>
+      The <strong>allow</strong> attribute should be used to limit access to a
+      set of known trusted hosts.</p>
       
       <p>The default ErrorReportValve includes the Tomcat version number in the
       response sent to clients. To avoid this, custom error handling can be
