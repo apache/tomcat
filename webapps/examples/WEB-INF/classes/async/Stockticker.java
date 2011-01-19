@@ -99,7 +99,7 @@ public class Stockticker implements Runnable {
         public void tick(Stock stock);
     }
     
-    public static class Stock {
+    public static final class Stock implements Cloneable {
         protected static DecimalFormat df = new DecimalFormat("0.00");
         protected String symbol = "";
         protected double value = 0.0d;
