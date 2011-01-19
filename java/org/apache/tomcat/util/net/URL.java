@@ -304,8 +304,6 @@ public final class URL implements Serializable {
     @Override
     public boolean equals(Object obj) {
 
-        if (obj == null)
-            return (false);
         if (!(obj instanceof URL))
             return (false);
         URL other = (URL) obj;

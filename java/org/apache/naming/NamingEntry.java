@@ -66,7 +66,7 @@ public class NamingEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if ((obj != null) && (obj instanceof NamingEntry)) {
+        if (obj instanceof NamingEntry) {
             return name.equals(((NamingEntry) obj).name);
         } else {
             return false;
