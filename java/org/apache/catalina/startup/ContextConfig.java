@@ -1502,7 +1502,7 @@ public class ContextConfig
                     jarFile = conn.getJarFile();   
                     ZipEntry entry = jarFile.getEntry("META-INF/resources/");
                     if (entry != null) {
-                        context.addAltResourceUrl(url);
+                        context.addResourceJarUrl(url);
                     }
                 }
             } catch (IOException ioe) {
