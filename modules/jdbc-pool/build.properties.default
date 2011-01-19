@@ -28,7 +28,7 @@
 version.major=1
 version.minor=0
 version.build=9
-version.patch=2
+version.patch=3
 version.suffix=
 
 # ----- Default Base Path for Dependent Packages -----
