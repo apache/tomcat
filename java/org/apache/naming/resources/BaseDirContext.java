@@ -153,7 +153,7 @@ public abstract class BaseDirContext implements DirContext {
      * Add a resources JAR. The contents of /META-INF/resources/ will be used if
      * a requested resource can not be found in the main context.
      */
-    public void addAltResources(URL url) {
+    public void addResourcesJar(URL url) {
         try {
             JarURLConnection conn = (JarURLConnection) url.openConnection();
             JarFile jarFile = conn.getJarFile();   
