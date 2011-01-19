@@ -145,6 +145,9 @@
       <fix>
         Code clean-up to remove unused code and reduce IDE warnings. (markt)
       </fix>
+      <fix>
+        <bug>50601</bug>: Code clean-up. Patch provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
