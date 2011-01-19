@@ -54,9 +54,6 @@ public class ApplicationTaglibDescriptor implements TaglibDescriptor {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof ApplicationTaglibDescriptor)) {
             return false;
         }
