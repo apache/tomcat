@@ -492,6 +492,14 @@ Transport.send(message);
     Customize the value of the <code>mail.smtp.host</code> parameter to
     point at the server that provides SMTP service for your network.</p>
 
+    <p>Additional resource attributes and values will be converted to properties
+    and values and passed to
+    <code>javax.mail.Session.getInstance(java.util.Properties)</code> as part of
+    the <code>java.util.Properties</code> collection. In addition to the
+    properties defined in Annex A of the JavaMail specification, individual
+    providers may also support additional properties like <code>password</code>.
+    </p>
+
     <h3>4.  Install the JavaMail libraries</h3>
 
     <p><a href="http://www.oracle.com/technetwork/java/index-138643.html">
