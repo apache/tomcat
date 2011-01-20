@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -257,7 +258,10 @@ public final class CGIServlet extends HttpServlet {
 
     /** the executable to use with the script */
     private String cgiExecutable = "perl";
-    
+
+    /** additional arguments for the executable */
+    private List<String> cgiExecutableArgs = null;
+
     /** the encoding to use for parameters */
     private String parameterEncoding =
         System.getProperty("file.encoding", "UTF-8");
@@ -307,6 +311,19 @@ public final class CGIServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("executable") != null) {
             cgiExecutable = getServletConfig().getInitParameter("executable");
+        }
+
+        if (getServletConfig().getInitParameter("executable-arg-1") != null) {
+            List<String> args = new ArrayList<String>();
+            for (int i = 1;; i++) {
+                String arg = getServletConfig().getInitParameter(
+                        "executable-arg-" + i);
+                if (arg == null) {
+                    break;
+                }
+                args.add(arg);
+            }
+            cgiExecutableArgs = args;
         }
 
         if (getServletConfig().getInitParameter("parameterEncoding") != null) {
@@ -1578,20 +1595,21 @@ public final class CGIServlet extends HttpServlet {
             Process proc = null;
             int bufRead = -1;
 
-            String[] cmdAndArgs = new String[params.size() + 2];
-            
-            cmdAndArgs[0] = cgiExecutable;
-            
-            cmdAndArgs[1] = command;
-
-            //create query arguments
-            for (int i=0; i < params.size(); i++) {
-                cmdAndArgs[i + 2] = params.get(i);
+            List<String> cmdAndArgs = new ArrayList<String>();
+            if (cgiExecutable.length() != 0) {
+                cmdAndArgs.add(cgiExecutable);
             }
+            if (cgiExecutableArgs != null) {
+                cmdAndArgs.addAll(cgiExecutableArgs);
+            }
+            cmdAndArgs.add(command);
+            cmdAndArgs.addAll(params);
 
             try {
                 rt = Runtime.getRuntime();
-                proc = rt.exec(cmdAndArgs, hashToStringArray(env), wd);
+                proc = rt.exec(
+                        cmdAndArgs.toArray(new String[cmdAndArgs.size()]),
+                        hashToStringArray(env), wd);
     
                 String sContentLength = env.get("CONTENT_LENGTH");
 
