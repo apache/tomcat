@@ -75,6 +75,8 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -105,7 +107,8 @@ import org.apache.tomcat.util.res.StringManager;
 public class Request
     implements HttpServletRequest {
 
-
+    private static final Log log = LogFactory.getLog(Connector.class);
+    
     // ----------------------------------------------------------- Constructors
 
 
@@ -492,7 +495,12 @@ public class Request
         cookies = null;
 
         if (session != null) {
-            session.endAccess();
+            try {
+                session.endAccess();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.warn(sm.getString("coyoteRequest.sessionEndAccessFail"), t);
+            }
         }
         session = null;
         requestedSessionCookie = false;
