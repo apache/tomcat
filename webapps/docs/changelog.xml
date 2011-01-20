@@ -224,7 +224,7 @@
         (markt)
       </fix>
       <fix>
-        <bug>49543</bug> Allow Tomcat to use shared data sources with per
+        <bug>49543</bug>: Allow Tomcat to use shared data sources with per
         application credentials. (fhanik)
       </fix>
       <fix>
