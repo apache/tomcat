@@ -127,6 +127,10 @@
         the default cluster membership. (markt)
       </fix>
       <fix>
+        <bug>50526</bug>: Provide additional documetation on configuring
+        JavaMail resources. (markt)
+      </fix>
+      <fix>
         <bug>50599</bug>: Use correct names of roles required to access the 
         Manager application. (markt)
       </fix>
