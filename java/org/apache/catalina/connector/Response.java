@@ -100,7 +100,7 @@ public class Response
      * Descriptive information about this Response implementation.
      */
     protected static final String info =
-        "org.apache.coyote.tomcat5.CoyoteResponse/1.0";
+        "org.apache.coyote.catalina.CoyoteResponse/1.0";
 
 
     /**
