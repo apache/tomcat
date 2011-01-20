@@ -107,7 +107,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class Request
     implements HttpServletRequest {
 
-    private static final Log log = LogFactory.getLog(Connector.class);
+    private static final Log log = LogFactory.getLog(Request.class);
     
     // ----------------------------------------------------------- Constructors
 
