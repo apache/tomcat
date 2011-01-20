@@ -78,6 +78,11 @@
       <fix>
         <bug>50598</bug>: Correct URL for Manager text interface. (markt)
       </fix>
+      <fix>
+        <bug>50620</bug>: Stop exceptions that occur during
+        <code>Session.endAccess()</code> from preventing the normal completion
+        of <code>Request.recycle()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
