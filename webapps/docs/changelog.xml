@@ -127,6 +127,10 @@
         the default cluster membership. (markt)
       </fix>
       <fix>
+        <bug>50441</bug>: Clarify when it is valid to set the docBase attribute
+        in a Context element. (markt)
+      </fix>
+      <fix>
         <bug>50526</bug>: Provide additional documetation on configuring
         JavaMail resources. (markt)
       </fix>

@@ -231,9 +231,9 @@
         an absolute pathname for this directory or WAR file, or a pathname
         that is relative to the <code>appBase</code> directory of the
         owning <a href="host.html">Host</a>.</p>
-        <p>The value of this field must not be set when the Context is
-        configured using a <code>META-INF/context.xml</code> file as it will be
-        inferred by the automatic deployment process.</p>
+        <p>The value of this field must not be set unless the Context element is
+        defined in server.xml or the <code>docBase</code> is not located under
+        the <a href="host.html">Host</a>&apos;s <code>appBase</code>.</p>
       </attribute>
 
       <attribute name="logEffectiveWebXml" required="false">
