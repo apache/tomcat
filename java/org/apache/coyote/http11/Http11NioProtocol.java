@@ -402,9 +402,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("http11protocol.proto.error"), e);
             }
-            connections.remove(socket);
-            processor.recycle();
-            recycledProcessors.offer(processor);
+            release(socket, processor);
             return SocketState.CLOSED;
         }
 
