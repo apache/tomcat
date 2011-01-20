@@ -1294,6 +1294,8 @@ public class ContextConfig
                     }
                 }
                 processResourceJARs(resourceJars);
+                // See also StandardContext.resourcesStart() for
+                // WEB-INF/classes/META-INF/resources configuration
             }
             
             // Only look for ServletContainerInitializer if metadata is not

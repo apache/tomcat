@@ -817,7 +817,20 @@ public class StandardContext extends ContainerBase
 
     private String webappVersion = "";
 
+    private boolean addWebinfClassesResources = false;
+
     // ----------------------------------------------------- Context Properties
+
+
+    public void setAddWebinfClassesResources(
+            boolean addWebinfClassesResources) {
+        this.addWebinfClassesResources = addWebinfClassesResources;
+    }
+
+
+    public boolean getAddWebinfClassesResources() {
+        return addWebinfClassesResources;
+    }
 
 
     @Override
@@ -4640,6 +4653,20 @@ public class StandardContext extends ContainerBase
                 ((BaseDirContext) webappResources).allocate();
                 // Alias support
                 ((BaseDirContext) webappResources).setAliases(getAliases());
+                
+                if (effectiveMajorVersion >=3 && addWebinfClassesResources) {
+                    try {
+                        DirContext webInfCtx =
+                            (DirContext) webappResources.lookup(
+                                    "/WEB-INF/classes");
+                        // Do the lookup to make sure it exists
+                        webInfCtx.lookup("META-INF/resources");
+                        ((BaseDirContext) webappResources).addAltDirContext(
+                                webInfCtx);
+                    } catch (NamingException e) {
+                        // Doesn't exist - ignore and carry on
+                    }
+                }
             }
             // Register the cache in JMX
             if (isCachingAllowed()) {

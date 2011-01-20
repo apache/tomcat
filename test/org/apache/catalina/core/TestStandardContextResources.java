@@ -71,6 +71,35 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceD.jsp in resources.jar</p>");
         assertPageContains("/test/folder/resourceE.jsp",
                 "<p>resourceE.jsp in the web application</p>");
+        assertPageContains("/test/resourceG.jsp",
+                "<p>resourceG.jsp in WEB-INF/classes</p>", 404);
+    }
+
+    public void testResourcesWebInfClasses() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // app dir is relative to server home
+        File appDir = new File("test/webapp-3.0-fragments");
+
+        // Need to cast to be able to set StandardContext specific attribute
+        StandardContext ctxt = (StandardContext)
+            tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        ctxt.setAddWebinfClassesResources(true);
+
+        tomcat.start();
+
+        assertPageContains("/test/resourceA.jsp",
+                "<p>resourceA.jsp in the web application</p>");
+        assertPageContains("/test/resourceB.jsp",
+                "<p>resourceB.jsp in resources.jar</p>");
+        assertPageContains("/test/folder/resourceC.jsp",
+                "<p>resourceC.jsp in the web application</p>");
+        assertPageContains("/test/folder/resourceD.jsp",
+                "<p>resourceD.jsp in resources.jar</p>");
+        assertPageContains("/test/folder/resourceE.jsp",
+                "<p>resourceE.jsp in the web application</p>");
+        assertPageContains("/test/resourceG.jsp",
+                "<p>resourceG.jsp in WEB-INF/classes</p>");
     }
 
     public void testResourcesAbsoluteOrdering() throws Exception {
@@ -196,11 +225,22 @@ public class TestStandardContextResources extends TomcatBaseTest {
         }
     }
 
-    private void assertPageContains(String pageUrl, String expected)
+    private void assertPageContains(String pageUrl, String expectedBody)
             throws IOException {
-        ByteChunk res = getUrl("http://localhost:" + getPort() + pageUrl);
 
-        String result = res.toString();
-        assertTrue(result, result.indexOf(expected) > 0);
+        assertPageContains(pageUrl, expectedBody, 200);
+    }
+
+    private void assertPageContains(String pageUrl, String expectedBody,
+            int expectedStatus) throws IOException {
+        ByteChunk res = new ByteChunk();
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, null);
+
+        assertEquals(expectedStatus, sc);
+        
+        if (expectedStatus == 200) {
+            String result = res.toString();
+            assertTrue(result, result.indexOf(expectedBody) > 0);
+        }
     }
 }
