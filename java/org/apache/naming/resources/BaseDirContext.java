@@ -167,7 +167,15 @@ public abstract class BaseDirContext implements DirContext {
         }
     }
     
-    
+
+    /**
+     * Add an alternative DirContext (must contain META-INF/resources) directly.
+     */
+    public void addAltDirContext(DirContext altDirContext) {
+        altDirContexts.add(altDirContext);
+    }
+
+
     /**
      * Add an alias.
      */

@@ -397,6 +397,17 @@
 
     <attributes>
 
+      <attribute name="addWebinfClassesResources" required="false">
+        <p>This attribute controls if, in addition to static resources being
+        served from <code>META-INF/resources</code> inside web application JAR
+        files, static resources are also served from
+        <code>WEB-INF/classes/META-INF/resources</code>. This only applies to
+        web applications with a major version of 3 or higher. Since this is a
+        proprietary extension to the Servlet 3 specification, it is disabled by
+        default. To enable this feature, set the attribute to <code>true</code>.
+        </p>
+      </attribute>
+
       <attribute name="aliases" required="false">
         <p>This attribute provides a list of external locations from which to
         load resources for this context. The list of aliases should be of
