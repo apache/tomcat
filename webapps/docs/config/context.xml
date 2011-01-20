@@ -1020,11 +1020,15 @@
     <attributes>
 
       <attribute name="username" required="false">
-        <p></p>
+        <p><code>username</code> value for the <code>getConnection(username, password)</code>
+           call on the linked global DataSource.
+        </p>
       </attribute>
 
       <attribute name="password" required="false">
-        <p></p>
+        <p><code>password</code> value for the <code>getConnection(username, password)</code>
+           call on the linked global DataSource.
+        </p>
       </attribute>
 
     </attributes>
