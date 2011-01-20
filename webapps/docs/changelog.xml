@@ -148,6 +148,12 @@
       <fix>
         <bug>50601</bug>: Code clean-up. Patch provided by sebb. (markt)
       </fix>
+      <fix>
+        <bug>50606</bug>: Improve CGIServlet: Provide support for specifying
+        empty value for the <code>executable</code> init-param. Provide support
+        for explicit additional arguments for the executable. Those were
+        broken when implementing fix for bug <bug>49657</bug>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>

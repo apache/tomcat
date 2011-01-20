@@ -80,9 +80,14 @@ The default cgiPathPrefix is <code>WEB-INF/cgi</code></li>
 <li><strong>debug</strong> - Debugging detail level for messages logged
 by this servlet. Default 0.</li>
 <li><strong>executable</strong> - The of the executable to be used to
-run the script. Default is <code>perl</code>.</li>
+run the script. You may explicitly set this parameter to be an empty string
+if your script is itself executable (e.g. an exe file). Default is
+<code>perl</code>.</li>
+<li><strong>executable-arg-1</strong>, <strong>executable-arg-2</strong>,
+and so on - additional arguments for the executable. These precede the
+CGI script name. By default there are no additional arguments.</li>
 <li><strong>parameterEncoding</strong> - Name of the parameter encoding
-to be used with the GCI servlet. Default is
+to be used with the CGI servlet. Default is
 <code>System.getProperty("file.encoding","UTF-8")</code>.</li>
 <li><strong>passShellEnvironment</strong> - Should the shell environment
 variables (if any) be passed to the CGI script? Default is
