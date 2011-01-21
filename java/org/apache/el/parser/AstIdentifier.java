@@ -129,8 +129,8 @@ public final class AstIdentifier extends SimpleNode {
     @Override
     public void setImage(String image) {
         if (!Validation.isIdentifier(image)) {
-            throw new ELException("[" + image +
-                    "] is not a valid Java identifier");
+            throw new ELException(MessageFactory.get("error.identifier.notjava",
+                    image));
         }
         this.image = image;
     }
