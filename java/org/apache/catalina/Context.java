@@ -89,6 +89,26 @@ public interface Context extends Container {
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Set to <code>true</code> to allow requests mapped to servlets that
+     * do not explicitly declare @MultipartConfig or have
+     * &lt;multipart-config&gt; specified in web.xml to parse
+     * multipart/form-data requests.
+     *
+     * @param allowCasualMultipartParsing <code>true</code> to allow such
+     *        casual parsing, <code>false</code> otherwise.
+     */
+    public void setAllowCasualMultipartParsing(boolean allowCasualMultipartParsing);
+
+    /**
+     * Returns <code>true</code> if requests mapped to servlets without
+     * "multipart config" to parse multipart/form-data requests anyway.
+     *
+     * @return <code>true</code> if requests mapped to servlets without
+     *    "multipart config" to parse multipart/form-data requests,
+     *    <code>false</code> otherwise.
+     */
+    public boolean getAllowCasualMultipartParsing();
 
     /**
      * Return the set of initialized application event listener objects,
