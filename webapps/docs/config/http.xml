@@ -74,17 +74,6 @@
 
   <attributes>
  
-    <attribute name="allowCasualMultipartParsing" required="false">
-      <p>Set to true if Tomcat should automatically parse
-      multipart/form-data request bodies when HttpServletRequest.getPart*
-      or HttpServletRequest.getParameter* is called, even when the
-      target servlet isn't marked with the @MultipartConfig annotation
-      (See Servlet Specification 3.0, Section 3.2 for details).
-      Note that any setting other than <code>true</code> causes Tomcat
-      to behave in a way that is not technically spec-compliant.
-      The default is <code>false</code></p>
-    </attribute>
-
     <attribute name="allowTrace" required="false">
       <p>A boolean value which can be used to enable or disable the TRACE
       HTTP method. If not specified, this attribute is set to false.</p>

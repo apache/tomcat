@@ -191,6 +191,13 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * Allow multipart/form-data requests to be parsed even when the
+     * target servlet doesn't specify @MultipartConfig or have a
+     * &lt;multipart-config&gt; element.
+     */
+    protected boolean allowCasualMultipartParsing = false;
+     
+    /**
      * The alternate deployment descriptor name.
      */
     private String altDDName = null;
@@ -1001,6 +1008,34 @@ public class StandardContext extends ContainerBase
         return allowLinking;
     }
 
+    /**
+     * Set to <code>true</code> to allow requests mapped to servlets that
+     * do not explicitly declare @MultipartConfig or have
+     * &lt;multipart-config&gt; specified in web.xml to parse
+     * multipart/form-data requests.
+     *
+     * @param allowCasualMultipartParsing <code>true</code> to allow such
+     *        casual parsing, <code>false</code> otherwise.
+     */
+    @Override
+    public void setAllowCasualMultipartParsing(boolean allowCasualMultipartParsing)
+    {
+        this.allowCasualMultipartParsing = allowCasualMultipartParsing;
+    }
+
+    /**
+     * Returns <code>true</code> if requests mapped to servlets without
+     * "multipart config" to parse multipart/form-data requests anyway.
+     *
+     * @return <code>true</code> if requests mapped to servlets without
+     *    "multipart config" to parse multipart/form-data requests,
+     *    <code>false</code> otherwise.
+     */
+    @Override
+    public boolean getAllowCasualMultipartParsing()
+    {
+        return this.allowCasualMultipartParsing;
+    }
 
     /**
      * Set cache TTL.

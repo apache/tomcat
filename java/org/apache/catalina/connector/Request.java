@@ -2547,8 +2547,7 @@ public class Request
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
 
         if (mce == null) {
-            Connector connector = getConnector();
-            if(connector.getAllowCasualMultipartParsing()) {
+            if(getContext().getAllowCasualMultipartParsing()) {
                 mce = new MultipartConfigElement(null,
                                                  connector.getMaxPostSize(),
                                                  connector.getMaxPostSize(),
