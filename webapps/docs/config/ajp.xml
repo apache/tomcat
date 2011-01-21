@@ -74,6 +74,17 @@
 
   <attributes>
 
+    <attribute name="allowCasualMultipartParsing" required="false">
+      <p>Set to true if Tomcat should automatically parse
+      multipart/form-data request bodies when HttpServletRequest.getPart*
+      or HttpServletRequest.getParameter* is called, even when the
+      target servlet isn't marked with the @MultipartConfig annotation
+      (See Servlet Specification 3.0, Section 3.2 for details).
+      Note that any setting other than <code>true</code> causes Tomcat
+      to behave in a way that is not technically spec-compliant.
+      The default is <code>false</code></p>
+    </attribute>
+
     <attribute name="allowTrace" required="false">
       <p>A boolean value which can be used to enable or disable the TRACE
       HTTP method. If not specified, this attribute is set to false.</p>
@@ -121,7 +132,7 @@
       to POST. This is useful in RESTful applications that want to
       support POST-style semantics for PUT requests.
       Note that any setting other than <code>POST</code> causes Tomcat
-      to behave in a way that does against the intent of the servlet
+      to behave in a way that goes against the intent of the servlet
       specification.
       The HTTP method TRACE is specifically forbidden here in accordance
       with the HTTP specification.
