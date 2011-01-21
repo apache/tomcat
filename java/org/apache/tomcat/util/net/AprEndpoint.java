@@ -242,9 +242,6 @@ public class AprEndpoint extends AbstractEndpoint {
     public String getSSLCipherSuite() { return SSLCipherSuite; }
     public void setSSLCipherSuite(String SSLCipherSuite) { this.SSLCipherSuite = SSLCipherSuite; }
 
-    protected boolean SSLFIPSMode = false;
-    public boolean getSSLFIPSMode() { return SSLFIPSMode; }
-    public void setSSLFIPSMode(boolean SSLFIPSMode) { this.SSLFIPSMode = SSLFIPSMode; }
 
     /**
      * SSL certificate file.
