@@ -247,13 +247,6 @@ public class Connector extends LifecycleMBeanBase  {
      protected boolean useBodyEncodingForURI = false;
 
 
-    /**
-     * Allow multipart/form-data requests to be parsed even when the
-     * target servlet doesn't specify @MultipartConfig or have a
-     * &lt;multipart-config&gt; element.
-     */
-    protected boolean allowCasualMultipartParsing = false;
-     
      protected static HashMap<String,String> replacements =
          new HashMap<String,String>();
      static {
@@ -773,33 +766,6 @@ public class Connector extends LifecycleMBeanBase  {
              ("useBodyEncodingForURI", String.valueOf(useBodyEncodingForURI));
 
      }
-
-    /**
-     * Set to <code>true</code> to allow requests mapped to servlets that
-     * do not explicitly declare @MultipartConfig or have
-     * &lt;multipart-config&gt; specified in web.xml to parse
-     * multipart/form-data requests.
-     *
-     * @param allowCasualMultipartParsing <code>true</code> to allow such
-     *        casual parsing, <code>false</code> otherwise.
-     */
-    public void setAllowCasualMultipartParsing(boolean allowCasualMultipartParsing)
-    {
-        this.allowCasualMultipartParsing = allowCasualMultipartParsing;
-    }
-
-    /**
-     * Returns <code>true</code> if requests mapped to servlets without
-     * "multipart config" to parse multipart/form-data requests anyway.
-     *
-     * @return <code>true</code> if requests mapped to servlets without
-     *    "multipart config" to parse multipart/form-data requests,
-     *    <code>false</code> otherwise.
-     */
-    protected boolean getAllowCasualMultipartParsing()
-    {
-        return this.allowCasualMultipartParsing;
-    }
 
     /**
      * Indicates whether the generation of an X-Powered-By response header for
