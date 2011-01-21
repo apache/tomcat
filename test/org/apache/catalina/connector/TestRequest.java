@@ -25,12 +25,15 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.TreeMap;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -506,6 +509,167 @@ public class TestRequest extends TomcatBaseTest {
                      + (null == requestBody ? "" : requestBody)
                      )
                 };
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+                
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return false; // Don't care
+        }
+    }
+
+    /**
+     * Test case for bug 49711: HttpServletRequest.getParts does not work
+     * in a filter.
+     */
+    public void testBug49711() {
+        Bug49711Client client = new Bug49711Client();
+        client.setPort(getPort());
+
+        // Make sure non-multipart works properly
+        client.doRequest("/regular", false, false);
+
+        assertEquals("Incorrect response for GET request",
+                     "parts=0",
+                     client.getResponseBody());
+
+        client.reset();
+
+        // Make sure regular multipart works properly
+        client.doRequest("/multipart", false, true); // send multipart request
+
+        assertEquals("Regular multipart doesn't work",
+                     "parts=1",
+                     client.getResponseBody());
+
+        client.reset();
+
+        // Make casual multipart request to "regular" servlet w/o config
+        // We expect that no parts will be available
+        client.doRequest("/regular", false, true); // send multipart request
+
+        assertEquals("Incorrect response for non-configured casual multipart request",
+                     "parts=0", // multipart request should be ignored
+                     client.getResponseBody());
+
+        client.reset();
+
+        // Make casual multipart request to "regular" servlet w/config
+        // We expect that the server /will/ parse the parts, even though
+        // there is no @MultipartConfig
+        client.doRequest("/regular", true, true); // send multipart request
+
+        assertEquals("Incorrect response for configured casual multipart request",
+                     "parts=1",
+                     client.getResponseBody());
+
+        client.reset();
+    }
+
+    private static class Bug49711Servlet extends HttpServlet {
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+            // Just echo the parameters and values back as plain text
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            PrintWriter out = resp.getWriter();
+            
+            out.println("parts=" + (null == req.getParts()
+                                    ? "null"
+                                    : req.getParts().size()));
+        }
+    }
+
+    @MultipartConfig
+    private static class Bug49711Servlet_multipart extends Bug49711Servlet {
+    }
+
+    /**
+     * Bug 49711 test client: test for casual getParts calls.
+     */
+    private class Bug49711Client extends SimpleHttpClient {
+
+        private boolean init;
+        
+        private synchronized void init() throws Exception {
+            if (init) return;
+            
+            Tomcat tomcat = getTomcatInstance();
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "regular", new Bug49711Servlet());
+            Wrapper w = Tomcat.addServlet(root, "multipart", new Bug49711Servlet_multipart());
+
+            // Tomcat.addServlet does not respect annotations, so we have
+            // to set our own MultipartConfigElement.
+            w.setMultipartConfigElement(new MultipartConfigElement(""));
+
+            root.addServletMapping("/regular", "regular");
+            root.addServletMapping("/multipart", "multipart");
+            tomcat.start();
+            
+            init = true;
+        }
+        
+        private Exception doRequest(String uri,
+                                    boolean allowCasualMultipart,
+                                    boolean makeMultipartRequest) {
+            Tomcat tomcat = getTomcatInstance();
+
+            tomcat.getConnector().setAllowCasualMultipartParsing(allowCasualMultipart);
+
+            try {
+                init();
+
+                // Open connection
+                connect();
+
+                // Send specified request body using method
+                String[] request;
+
+                if(makeMultipartRequest) {
+                    String boundary = "--simpleboundary";
+
+                    String content = "--" + boundary + CRLF
+                        + "Content-Disposition: form-data; name=\"name\"" + CRLF + CRLF
+                        + "value" + CRLF
+                        + "--" + boundary + "--" + CRLF
+                        ;
+
+                    // Re-encode the content so that bytes = characters
+                    if(null != content)
+                        content = new String(content.getBytes("UTF-8"), "ASCII");
+
+                    request = new String[] {
+                        "POST http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF
+                        + "Host: localhost" + CRLF
+                        + "Connection: close" + CRLF
+                        + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
+                        + "Content-Length: " + content.length() + CRLF
+                        + CRLF
+                        + content
+                        + CRLF
+                    };
+                }
+                else
+                {
+                    request = new String[] {
+                        "GET http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF
+                        + "Host: localhost" + CRLF
+                        + "Connection: close" + CRLF
+                        + CRLF
+                    };
+                }
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read

@@ -2537,7 +2537,7 @@ public class Request
         
         return parts;
     }
-    
+
     private void parseParts() {
 
         // Return immediately if the parts have already been parsed
@@ -2545,13 +2545,22 @@ public class Request
             return;
 
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
+
         if (mce == null) {
-            parts = Collections.emptyList();
-            return;
+            Connector connector = getConnector();
+            if(connector.getAllowCasualMultipartParsing()) {
+                mce = new MultipartConfigElement(null,
+                                                 connector.getMaxPostSize(),
+                                                 connector.getMaxPostSize(),
+                                                 connector.getMaxPostSize());
+            } else {
+                parts = Collections.emptyList();
+                return;
+            }
         }
         
         Parameters parameters = coyoteRequest.getParameters();
-        
+
         File location;
         String locationStr = mce.getLocation();
         if (locationStr == null || locationStr.length() == 0) {
@@ -2582,7 +2591,7 @@ public class Request
         upload.setFileItemFactory(factory);
         upload.setFileSizeMax(mce.getMaxFileSize());
         upload.setSizeMax(mce.getMaxRequestSize());
-        
+
         parts = new ArrayList<Part>();
         try {
             List<FileItem> items = upload.parseRequest(this);
@@ -2604,11 +2613,12 @@ public class Request
                                             Parameters.DEFAULT_ENCODING)});
                         } catch (UnsupportedEncodingException e) {
                             // Should not be possible
+                            e.printStackTrace();
                         }
                     }
                 }
             }
-            
+
         } catch (InvalidContentTypeException e) {
             partsParseException = new ServletException(e);
         } catch (FileUploadBase.SizeException e) {

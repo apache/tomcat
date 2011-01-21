@@ -66,6 +66,12 @@
         Fix NPE in RemoteAddrFilter, RemoteHostFilter. (kkolinko)
       </fix>
       <fix>
+        <bug>49711</bug>: HttpServletRequest#getParts will work in a filter
+        or servlet without an @MultipartConfig annotation or
+        MultipartConfigElement if the new "allowCasualMultipartParsing"
+        connector attribute is set to "true". (schultz)
+      </fix>
+      <fix>
         <bug>50582</bug>: Refactor access logging so chunked encoding is not
         forced for all requests if bytes sent is logged. (markt)
       </fix>

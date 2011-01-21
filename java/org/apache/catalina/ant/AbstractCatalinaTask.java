@@ -170,6 +170,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         URLConnection conn = null;
         InputStreamReader reader = null;
         try {
+            openRedirector();
 
             // Create a connection for this command
             conn = (new URL(url + command)).openConnection();
