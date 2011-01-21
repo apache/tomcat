@@ -83,6 +83,11 @@
         <code>Session.endAccess()</code> from preventing the normal completion
         of <code>Request.recycle()</code>. (markt)
       </fix>
+      <fix>
+        <bug>50629</bug>: Make <code>StandardContext.bindThread()</code> and
+        <code>StandardContext.unbindThread()</code> protected to allow use by
+        sub-classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
