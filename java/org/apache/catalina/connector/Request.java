@@ -2612,7 +2612,6 @@ public class Request
                                             Parameters.DEFAULT_ENCODING)});
                         } catch (UnsupportedEncodingException e) {
                             // Should not be possible
-                            e.printStackTrace();
                         }
                     }
                 }
