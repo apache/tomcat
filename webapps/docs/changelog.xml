@@ -97,6 +97,10 @@
         <bug>15688</bug>: Use fully-qualified class names in generated jsp files
         to avoid naming conflicts with user imports. (markt)
       </update>
+      <update>
+        Improve error message when EL identifiers are not valid Java identifiers
+        and use i18n for the error message. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">
