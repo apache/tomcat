@@ -5547,16 +5547,13 @@ public class StandardContext extends ContainerBase
     }
 
 
-    // -------------------------------------------------------- Private Methods
-
-
     /**
      * Bind current thread, both for CL purposes and for JNDI ENC support
      * during : startup, shutdown and realoading of the context.
      *
      * @return the previous context class loader
      */
-    private ClassLoader bindThread() {
+    protected ClassLoader bindThread() {
 
         ClassLoader oldContextClassLoader =
             Thread.currentThread().getContextClassLoader();
@@ -5588,7 +5585,7 @@ public class StandardContext extends ContainerBase
     /**
      * Unbind thread.
      */
-    private void unbindThread(ClassLoader oldContextClassLoader) {
+    protected void unbindThread(ClassLoader oldContextClassLoader) {
 
         if (isUseNaming()) {
             ContextBindings.unbindThread(this, this);
