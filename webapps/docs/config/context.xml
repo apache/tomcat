@@ -431,7 +431,7 @@
         or HttpServletRequest.getParameter* is called, even when the
         target servlet isn't marked with the @MultipartConfig annotation
         (See Servlet Specification 3.0, Section 3.2 for details).
-        Note that any setting other than <code>true</code> causes Tomcat
+        Note that any setting other than <code>false</code> causes Tomcat
         to behave in a way that is not technically spec-compliant.
         The default is <code>false</code></p>
       </attribute>
