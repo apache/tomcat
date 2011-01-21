@@ -90,6 +90,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection>
+    <changelog>
+      <fix>
+        Prevent possible thread exhaustion if a Comet timeout event takes a
+        while to complete. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

@@ -1387,6 +1387,8 @@ public class NioEndpoint extends AbstractEndpoint {
                         long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
                         boolean isTimedout = delta > timeout;
                         if (isTimedout) {
+                            // Prevent subsequent timeouts if the timeout event takes a while to process
+                            ka.access(Long.MAX_VALUE);
                             processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
                         }
                     }//end if
