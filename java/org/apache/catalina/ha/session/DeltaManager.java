@@ -1120,15 +1120,19 @@ public CatalinaCluster getCluster() {
     public synchronized void resetStatistics() {
         processingTime = 0 ;
         expiredSessions.set(0);
-        sessionCreationTiming.clear();
-        while (sessionCreationTiming.size() <
-                ManagerBase.TIMING_STATS_CACHE_SIZE) {
-            sessionCreationTiming.add(null);
+        synchronized (sessionCreationTiming) {
+            sessionCreationTiming.clear();
+            while (sessionCreationTiming.size() <
+                    ManagerBase.TIMING_STATS_CACHE_SIZE) {
+                sessionCreationTiming.add(null);
+            }
         }
-        sessionExpirationTiming.clear();
-        while (sessionExpirationTiming.size() <
-                ManagerBase.TIMING_STATS_CACHE_SIZE) {
-            sessionExpirationTiming.add(null);
+        synchronized (sessionExpirationTiming) {
+            sessionExpirationTiming.clear();
+            while (sessionExpirationTiming.size() <
+                    ManagerBase.TIMING_STATS_CACHE_SIZE) {
+                sessionExpirationTiming.add(null);
+            }
         }
         rejectedSessions = 0 ;
         sessionReplaceCounter = 0 ;

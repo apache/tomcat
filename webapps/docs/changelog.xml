@@ -46,7 +46,7 @@
     <changelog>
       <fix>
         <bug>18462</bug>: Don&apos;t merge <code>stdout</code> and
-        <code>stderr</code> internally so users retain the option to treat the
+        <code>stderr</code> internally so users retain the option to treat them
         separately. (markt)
       </fix>
       <add>
@@ -96,7 +96,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Coyote">
     <changelog>
       <fix>
         Prevent possible thread exhaustion if a Comet timeout event takes a
@@ -133,6 +133,10 @@
       <fix>
         <bug>50600</bug>: Prevent a <code>ConcurrentModificationException</code>
         when removing a WAR file via the FarmWarDeployer. (markt)
+      </fix>
+      <fix>
+        Be consistent with locks on sessionCreationTiming,
+        sessionExpirationTiming in DeltaManager.resetStatistics(). (kkolinko)
       </fix>
     </changelog>
   </subsection>
