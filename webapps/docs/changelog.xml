@@ -94,6 +94,10 @@
         <code>StandardContext.unbindThread()</code> protected to allow use by
         sub-classes. (markt)
       </fix>
+      <update>
+        Use getName() instead of logName() in error messages in StandardContext.
+        (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
