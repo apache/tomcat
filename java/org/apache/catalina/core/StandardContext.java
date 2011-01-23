@@ -3684,7 +3684,7 @@ public class StandardContext extends ContainerBase
         // Validate our current component state
         if (!getState().isAvailable())
             throw new IllegalStateException
-                (sm.getString("containerBase.notStarted", logName()));
+                (sm.getString("standardContext.notStarted", getName()));
 
         if(log.isInfoEnabled())
             log.info(sm.getString("standardContext.reloadingStarted",
@@ -3697,14 +3697,14 @@ public class StandardContext extends ContainerBase
             stop();
         } catch (LifecycleException e) {
             log.error(
-                sm.getString("standardContext.stoppingContext", logName()), e);
+                sm.getString("standardContext.stoppingContext", getName()), e);
         }
 
         try {
             start();
         } catch (LifecycleException e) {
             log.error(
-                sm.getString("standardContext.startingContext", logName()), e);
+                sm.getString("standardContext.startingContext", getName()), e);
         }
 
         setPaused(false);
