@@ -1018,8 +1018,8 @@ public class StandardContext extends ContainerBase
      *        casual parsing, <code>false</code> otherwise.
      */
     @Override
-    public void setAllowCasualMultipartParsing(boolean allowCasualMultipartParsing)
-    {
+    public void setAllowCasualMultipartParsing(
+            boolean allowCasualMultipartParsing) {
         this.allowCasualMultipartParsing = allowCasualMultipartParsing;
     }
 
@@ -1032,8 +1032,7 @@ public class StandardContext extends ContainerBase
      *    <code>false</code> otherwise.
      */
     @Override
-    public boolean getAllowCasualMultipartParsing()
-    {
+    public boolean getAllowCasualMultipartParsing() {
         return this.allowCasualMultipartParsing;
     }
 
