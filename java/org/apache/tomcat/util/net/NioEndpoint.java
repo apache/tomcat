@@ -1107,9 +1107,9 @@ public class NioEndpoint extends AbstractEndpoint {
                             // Ignore
                         }
                     }
-                    boolean hasEvents = false;
 
-                    hasEvents = (hasEvents | events());
+                    boolean hasEvents = events();
+
                     // Time to terminate?
                     if (close) {
                         timeout(0, false);
