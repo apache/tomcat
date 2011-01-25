@@ -161,8 +161,9 @@
       </attribute>
 
       <attribute name="sessionIdLength" required="false">
-       <p>The length of session ids created by this Manager, excluding any
-        JVM route information used for load balancing. 
+       <p>The length of session ids created by this Manager, measured in bytes,
+        excluding subsequent conversion to a hexadecimal string and
+        excluding any JVM route information used for load balancing.
         The default is 16.</p>
       </attribute>
 
@@ -256,8 +257,9 @@
       </attribute>
 
       <attribute name="sessionIdLength" required="false">
-        <p>The length of session ids created by this Manager, excluding any
-        JVM route information used for load balancing. 
+       <p>The length of session ids created by this Manager, measured in bytes,
+        excluding subsequent conversion to a hexadecimal string and
+        excluding any JVM route information used for load balancing.
         The default is 16.</p>
       </attribute>
 
