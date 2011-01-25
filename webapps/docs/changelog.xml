@@ -198,6 +198,10 @@
         for explicit additional arguments for the executable. Those were
         broken when implementing fix for bug <bug>49657</bug>. (kkolinko)
       </fix>
+      <fix>
+        Prvent multiple Comet END events if the CometServlet calls
+        <code>event.close()</code> during an END event. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
