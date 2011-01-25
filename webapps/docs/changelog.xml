@@ -115,8 +115,8 @@
         events. (markt)
       </fix>
       <fix>
-        Correct interaction of NIO socket and Poller when processing Comet
-        events. (markt)
+        <bug>50627</bug>: Correct interaction of NIO socket and Poller when
+        processing Comet events. (markt)
       </fix>
     </changelog>
   </subsection>
