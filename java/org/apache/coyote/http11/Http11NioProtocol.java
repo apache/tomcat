@@ -17,6 +17,8 @@
 
 package org.apache.coyote.http11;
 
+import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -317,8 +319,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         } else {
                             // Comet
                             if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
-                            //add correct poller events here based on Comet stuff
-                            socket.getPoller().add(socket,att.getCometOps());
+                            // May receive more data from client
+                            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+                            key.interestOps(SelectionKey.OP_READ);
+                            att.interestOps(SelectionKey.OP_READ);
                         }
                     } else {
                         // state == SocketState.ASYNC_END
@@ -358,8 +362,11 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     connections.put(socket, processor);
                     
                     if (processor.comet) {
+                        // May receive more data from client
+                        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-                        socket.getPoller().add(socket,att.getCometOps());
+                        key.interestOps(SelectionKey.OP_READ);
+                        att.interestOps(SelectionKey.OP_READ);
                     } else if (processor.isAsync()) {
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         att.setAsync(true);
@@ -367,7 +374,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         // complete or dispatch)
                         state = processor.asyncPostProcess();
                     } else {
-                        socket.getPoller().add(socket);
+                        // Error condition. A connection in this state should
+                        // by using one of async or comet
+                        throw new IOException(sm.getString(
+                                "http11protocol.state.long.error"));
                     }
                 }
                 if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
