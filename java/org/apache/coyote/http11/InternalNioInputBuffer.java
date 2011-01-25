@@ -144,11 +144,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      */
     @Override
     public void recycle() {
-        super.recycle();
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
             activeFilters[i].recycle();
         }
+        // This must be after filters since it resets the lastFilterIndex
+        super.recycle();
         socket = null;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
