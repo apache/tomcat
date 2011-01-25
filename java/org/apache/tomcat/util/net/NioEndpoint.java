@@ -1008,22 +1008,21 @@ public class NioEndpoint extends AbstractEndpoint {
         
         public boolean events() {
             boolean result = false;
-            //synchronized (events) {
-                Runnable r = null;
-                result = (events.size() > 0);
-                while ( (r = events.poll()) != null ) {
-                    try {
-                        r.run();
-                        if ( r instanceof PollerEvent ) {
-                            ((PollerEvent)r).reset();
-                            eventCache.offer((PollerEvent)r);
-                        }
-                    } catch ( Throwable x ) {
-                        log.error("",x);
+
+            Runnable r = null;
+            result = (events.size() > 0);
+            while ( (r = events.poll()) != null ) {
+                try {
+                    r.run();
+                    if ( r instanceof PollerEvent ) {
+                        ((PollerEvent)r).reset();
+                        eventCache.offer((PollerEvent)r);
                     }
+                } catch ( Throwable x ) {
+                    log.error("",x);
                 }
-                //events.clear();
-            //}
+            }
+
             return result;
         }
         
