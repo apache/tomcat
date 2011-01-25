@@ -28,6 +28,7 @@ import javax.servlet.SessionTrackingMode;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.comet.CometEvent.EventType;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.util.ServerInfo;
@@ -217,8 +218,9 @@ public class CoyoteAdapter implements Adapter {
                 connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
             }
             if (response.isClosed() || !request.isComet()) {
-                if (status==SocketStatus.OPEN) {
-                    //CometEvent.close was called during an event.
+                if (status==SocketStatus.OPEN &&
+                        request.getEvent().getEventType() != EventType.END) {
+                    //CometEvent.close was called during an event other than END
                     request.getEvent().setEventType(CometEvent.EventType.END);
                     request.getEvent().setEventSubType(null);
                     error = true;
