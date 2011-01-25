@@ -106,6 +106,14 @@
         Prevent possible thread exhaustion if a Comet timeout event takes a
         while to complete. (markt)
       </fix>
+      <fix>
+        Prvent multiple Comet END events if the CometServlet calls
+        <code>event.close()</code> during an END event. (markt) 
+      </fix>
+      <fix>
+        Ensure correct recycling of NIO input filters when processing Comet
+        events. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -197,10 +205,6 @@
         empty value for the <code>executable</code> init-param. Provide support
         for explicit additional arguments for the executable. Those were
         broken when implementing fix for bug <bug>49657</bug>. (kkolinko)
-      </fix>
-      <fix>
-        Prvent multiple Comet END events if the CometServlet calls
-        <code>event.close()</code> during an END event. (markt) 
       </fix>
     </changelog>
   </subsection>
