@@ -114,6 +114,10 @@
         Ensure correct recycling of NIO input filters when processing Comet
         events. (markt)
       </fix>
+      <fix>
+        Correct interaction of NIO socket and Poller when processing Comet
+        events. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
