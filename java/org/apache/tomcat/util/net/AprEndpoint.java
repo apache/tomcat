@@ -1688,7 +1688,9 @@ public class AprEndpoint extends AbstractEndpoint {
                     socket = null;
                 } else if (state == Handler.SocketState.LONG) {
                     socket.access();
-                    waitingRequests.add(socket);
+                    if (socket.async) {
+                        waitingRequests.add(socket);
+                    }
                 } else if (state == Handler.SocketState.ASYNC_END) {
                     socket.access();
                     SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN);
