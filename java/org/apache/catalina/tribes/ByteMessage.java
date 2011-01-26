@@ -86,7 +86,7 @@ public class ByteMessage implements Externalizable {
     public void readExternal(ObjectInput in ) throws IOException {
         int length = in.readInt();
         message = new byte[length];
-        in.read(message,0,length);
+        in.readFully(message);
     }
 
     /**
