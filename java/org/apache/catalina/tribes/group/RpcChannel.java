@@ -95,8 +95,7 @@ public class RpcChannel implements ChannelListener{
                 if ( rpcOptions != NO_REPLY ) collector.wait(timeout);
             }
         } catch ( InterruptedException ix ) {
-            Thread.interrupted();
-            //throw new ChannelException(ix);
+            Thread.currentThread().interrupt();
         }finally {
             responseMap.remove(key);
         }
