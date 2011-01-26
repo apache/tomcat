@@ -158,6 +158,11 @@
         Be consistent with locks on sessionCreationTiming,
         sessionExpirationTiming in DeltaManager.resetStatistics(). (kkolinko)
       </fix>
+      <fix>
+        <bug>50648</bug>: Correctly set the interrupt status if a thread using
+        <code>RpcChannel</code> is interrupted waiting for a message reply.
+        Based on a patch by Olivier Costet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
