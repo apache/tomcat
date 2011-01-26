@@ -163,6 +163,10 @@
         <code>RpcChannel</code> is interrupted waiting for a message reply.
         Based on a patch by Olivier Costet. (markt)
       </fix>
+      <fix>
+        <bug>50646</bug>: Ensure larger Tribes messages are fully read. Patch
+        provided by Olivier Costet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
