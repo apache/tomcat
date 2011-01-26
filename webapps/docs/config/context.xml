@@ -234,6 +234,10 @@
         <p>The value of this field must not be set unless the Context element is
         defined in server.xml or the <code>docBase</code> is not located under
         the <a href="host.html">Host</a>&apos;s <code>appBase</code>.</p>
+        <p>If a symbolic link is used for docBase then changes to the
+        symbolic link will only be effective after a Tomcat restart or
+        by undeploying and redeploying the context. A context reload is not
+        sufficient.</p>
       </attribute>
 
       <attribute name="logEffectiveWebXml" required="false">
@@ -250,10 +254,6 @@
         or <a href="host.html">Host</a> default contexts.  By default, settings
         from a default context will be used but may be overridden by a setting
         the same attribute explicitly for the Context.</p>
-        <p>If a symbolic link is used for docBase then changes to the
-        symbolic link will only be effective after a Tomcat restart or
-        by undeploying and redeploying the context. A context reload is not
-        sufficient.</p>
       </attribute>
 
       <attribute name="privileged" required="false">
