@@ -118,6 +118,10 @@
         <bug>50627</bug>: Correct interaction of NIO socket and Poller when
         processing Comet events. (markt)
       </fix>
+      <fix>
+        Correct interaction of APR socket and Poller when processing Comet
+        events. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
