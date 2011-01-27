@@ -254,8 +254,8 @@ set this to <code>true</code>.</li>
 <section name="Web Application Compilation">
 
 <p>Using Ant is the preferred way to compile web applications using JSPC. Note
-that when pre-compiling JSPs, SMAP information only be included in the final
-classes if suppressSmap is false and compile is true.
+that when pre-compiling JSPs, SMAP information will only be included in the 
+final classes if suppressSmap is false and compile is true.
 Use the script given below (a similar script is included in the "deployer" 
 download) to precompile a webapp:
 </p>
