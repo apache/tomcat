@@ -117,6 +117,10 @@
         <code>event.close()</code> during an END event. (markt) 
       </fix>
       <fix>
+        <bug>50405</bug>: Fix occassional NPE when using NIO connector and
+        Comet. (markt)
+      </fix>
+      <fix>
         Ensure correct recycling of NIO input filters when processing Comet
         events. (markt)
       </fix>
