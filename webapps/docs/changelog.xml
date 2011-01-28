@@ -139,8 +139,7 @@
       <fix>
         Improve special case handling of
         <code>javax.servlet.jsp.el.ScopedAttributeELResolver</code> in
-        <code>javax.el.CompositeELResolver </code> to handle sub-classes.
-        (markt)
+        <code>javax.el.CompositeELResolver</code> to handle sub-classes. (markt)
       </fix>
       <update>
         <bug>15688</bug>: Use fully-qualified class names in generated jsp files
