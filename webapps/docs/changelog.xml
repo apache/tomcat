@@ -145,6 +145,10 @@
         <bug>15688</bug>: Use fully-qualified class names in generated jsp files
         to avoid naming conflicts with user imports. (markt)
       </update>
+      <fix>
+        <bug>46819</bug>: Remove redundant object instantiations in
+        JspRuntimeLibrary. Patch provided by Anthony Whitford. (markt)
+      </fix>
       <update>
         Improve error message when EL identifiers are not valid Java identifiers
         and use i18n for the error message. (markt)
