@@ -37,14 +37,14 @@ public class FileMessage extends ClusterMessageBase {
     private long totalLength;
     private long totalNrOfMsgs;
     private String fileName;
-    private String contextPath;
+    private String contextName;
     
     public FileMessage(Member source,
                        String fileName,
-                       String contextPath) {
+                       String contextName) {
         this.address=source;
         this.fileName=fileName;
-        this.contextPath=contextPath;
+        this.contextName=contextName;
     }
     
     /*
@@ -106,8 +106,8 @@ public class FileMessage extends ClusterMessageBase {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    public String getContextPath() {
-        return contextPath;
+    public String getContextName() {
+        return contextName;
     }
     
 }

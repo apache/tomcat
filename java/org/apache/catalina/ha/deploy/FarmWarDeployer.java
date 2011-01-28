@@ -19,7 +19,6 @@ package org.apache.catalina.ha.deploy;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 
 import javax.management.MBeanServer;
@@ -35,6 +34,7 @@ import org.apache.catalina.ha.ClusterDeployer;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
@@ -44,7 +44,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * <p>
  * A farm war deployer is a class that is able to deploy/undeploy web
- * applications in WAR form within the cluster.
+ * applications in WAR from within the cluster.
  * </p>
  * Any host can act as the admin, and will have three directories
  * <ul>
@@ -233,7 +233,7 @@ public class FarmWarDeployer extends ClusterListener
                 FileMessage fmsg = (FileMessage) msg;
                 if (log.isDebugEnabled())
                     log.debug(sm.getString("farmWarDeployer.msgRxDeploy",
-                            fmsg.getContextPath(), fmsg.getFileName()));
+                            fmsg.getContextName(), fmsg.getFileName()));
                 FileMessageFactory factory = getFactory(fmsg);
                 // TODO correct second try after app is in service!
                 if (factory.writeMessage(fmsg)) {
@@ -243,27 +243,28 @@ public class FarmWarDeployer extends ClusterListener
                         name = name + ".war";
                     File deployable = new File(getDeployDir(), name);
                     try {
-                        String path = fmsg.getContextPath();
-                        if (!isServiced(path)) {
-                            addServiced(path);
+                        String contextName = fmsg.getContextName();
+                        if (!isServiced(contextName)) {
+                            addServiced(contextName);
                             try {
-                                remove(path);
+                                remove(contextName);
                                 if (!factory.getFile().renameTo(deployable)) {
                                     log.error(sm.getString(
                                             "farmWarDeployer.renameFail",
                                             factory.getFile(), deployable));
                                 }
-                                check(path);
+                                check(contextName);
                             } finally {
-                                removeServiced(path);
+                                removeServiced(contextName);
                             }
                             if (log.isDebugEnabled())
                                 log.debug(sm.getString(
-                                        "farmWarDeployer.deployEnd", path));
+                                        "farmWarDeployer.deployEnd",
+                                        contextName));
                         } else
                             log.error(sm.getString(
-                                    "farmWarDeployer.servicingDeploy", path,
-                                    name));
+                                    "farmWarDeployer.servicingDeploy",
+                                    contextName, name));
                     } catch (Exception ex) {
                         log.error(ex);
                     } finally {
@@ -273,23 +274,25 @@ public class FarmWarDeployer extends ClusterListener
             } else if (msg instanceof UndeployMessage) {
                 try {
                     UndeployMessage umsg = (UndeployMessage) msg;
-                    String path = umsg.getContextPath();
+                    String contextName = umsg.getContextName();
                     if (log.isDebugEnabled())
                         log.debug(sm.getString("farmWarDeployer.msgRxUndeploy",
-                                path));
-                    if (!isServiced(path)) {
-                        addServiced(path);
+                                contextName));
+                    if (!isServiced(contextName)) {
+                        addServiced(contextName);
                         try {
-                            remove(path);
+                            remove(contextName);
                         } finally {
-                            removeServiced(path);
+                            removeServiced(contextName);
                         }
                         if (log.isDebugEnabled())
                             log.debug(sm.getString(
-                                    "farmWarDeployer.undeployEnd", path));
+                                    "farmWarDeployer.undeployEnd",
+                                    contextName));
                     } else
                         log.error(sm.getString(
-                                "farmWarDeployer.servicingUneploy", path));
+                                "farmWarDeployer.servicingUneploy",
+                                contextName));
                 } catch (Exception ex) {
                     log.error(ex);
                 }
@@ -309,8 +312,7 @@ public class FarmWarDeployer extends ClusterListener
      */
     public synchronized FileMessageFactory getFactory(FileMessage msg)
             throws java.io.FileNotFoundException, java.io.IOException {
-        File tmpFile = new File(msg.getFileName());
-        File writeToFile = new File(getTempDir(), tmpFile.getName());
+        File writeToFile = new File(getTempDir(), msg.getFileName());
         FileMessageFactory factory = fileFactories.get(msg.getFileName());
         if (factory == null) {
             factory = FileMessageFactory.getInstance(writeToFile, true);
@@ -347,109 +349,103 @@ public class FarmWarDeployer extends ClusterListener
     /**
      * Install a new web application, whose web application archive is at the
      * specified URL, into this container and all the other members of the
-     * cluster with the specified context path. A context path of "" (the empty
-     * string) should be used for the root application for this container.
-     * Otherwise, the context path must start with a slash.
+     * cluster with the specified context name.
      * <p>
      * If this application is successfully installed locally, a ContainerEvent
      * of type <code>INSTALL_EVENT</code> will be sent to all registered
      * listeners, with the newly created <code>Context</code> as an argument.
      * 
-     * @param contextPath
-     *            The context path to which this application should be installed
+     * @param contextName
+     *            The context name to which this application should be installed
      *            (must be unique)
-     * @param war
-     *            A URL of type "jar:" that points to a WAR file, or type
-     *            "file:" that points to an unpacked directory structure
-     *            containing the web application to be installed
+     * @param webapp
+     *            A WAR file or unpacked directory structure containing the web
+     *            application to be installed
      * 
      * @exception IllegalArgumentException
-     *                if the specified context path is malformed (it must be ""
-     *                or start with a slash)
+     *                if the specified context name is malformed
      * @exception IllegalStateException
-     *                if the specified context path is already attached to an
-     *                existing web application
+     *                if the specified context name is already deployed
      * @exception IOException
      *                if an input/output error was encountered during
      *                installation
      */
     @Override
-    public void install(String contextPath, URL war) throws IOException {
+    public void install(String contextName, File webapp) throws IOException {
         Member[] members = getCluster().getMembers();
         Member localMember = getCluster().getLocalMember();
-        FileMessageFactory factory = FileMessageFactory.getInstance(new File(
-                war.getFile()), false);
-        FileMessage msg = new FileMessage(localMember, war.getFile(),
-                contextPath);
+        FileMessageFactory factory =
+            FileMessageFactory.getInstance(webapp, false);
+        FileMessage msg = new FileMessage(localMember, webapp.getName(),
+                contextName);
         if(log.isDebugEnabled())
-            log.debug(sm.getString("farmWarDeployer.sendStart", contextPath,
-                    war));
+            log.debug(sm.getString("farmWarDeployer.sendStart", contextName,
+                    webapp));
         msg = factory.readMessage(msg);
         while (msg != null) {
             for (int i = 0; i < members.length; i++) {
                 if (log.isDebugEnabled())
                     log.debug(sm.getString("farmWarDeployer.sendFragment",
-                            contextPath, war, members[i]));
+                            contextName, webapp, members[i]));
                 getCluster().send(msg, members[i]);
             }
             msg = factory.readMessage(msg);
         }
         if(log.isDebugEnabled())
             log.debug(sm.getString(
-                    "farmWarDeployer.sendEnd", contextPath, war));
+                    "farmWarDeployer.sendEnd", contextName, webapp));
     }
 
     /**
      * Remove an existing web application, attached to the specified context
-     * path. If this application is successfully removed, a ContainerEvent of
+     * name. If this application is successfully removed, a ContainerEvent of
      * type <code>REMOVE_EVENT</code> will be sent to all registered
      * listeners, with the removed <code>Context</code> as an argument.
      * Deletes the web application war file and/or directory if they exist in
      * the Host's appBase.
      * 
-     * @param contextPath
-     *            The context path of the application to be removed
+     * @param contextName
+     *            The context name of the application to be removed
      * @param undeploy
      *            boolean flag to remove web application from server
      * 
      * @exception IllegalArgumentException
-     *                if the specified context path is malformed (it must be ""
-     *                or start with a slash)
+     *                if the specified context name is malformed
      * @exception IllegalArgumentException
-     *                if the specified context path does not identify a
+     *                if the specified context name does not identify a
      *                currently installed web application
      * @exception IOException
      *                if an input/output error occurs during removal
      */
     @Override
-    public void remove(String contextPath, boolean undeploy)
+    public void remove(String contextName, boolean undeploy)
             throws IOException {
         if (log.isInfoEnabled())
-            log.info(sm.getString("farmWarDeployer.removeStart", contextPath));
+            log.info(sm.getString("farmWarDeployer.removeStart", contextName));
         Member localMember = getCluster().getLocalMember();
         UndeployMessage msg = new UndeployMessage(localMember, System
-                .currentTimeMillis(), "Undeploy:" + contextPath + ":"
-                + System.currentTimeMillis(), contextPath, undeploy);
+                .currentTimeMillis(), "Undeploy:" + contextName + ":"
+                + System.currentTimeMillis(), contextName, undeploy);
         if (log.isDebugEnabled())
-            log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextPath));
+            log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
         cluster.send(msg);
         // remove locally
         if (undeploy) {
             try {
-                if (!isServiced(contextPath)) {
-                    addServiced(contextPath);
+                if (!isServiced(contextName)) {
+                    addServiced(contextName);
                     try {
-                        remove(contextPath);
+                        remove(contextName);
                     } finally {
-                        removeServiced(contextPath);
+                        removeServiced(contextName);
                     }
                 } else
                     log.error(sm.getString("farmWarDeployer.removeFailRemote",
-                            contextPath));
+                            contextName));
 
             } catch (Exception ex) {
                 log.error(sm.getString("farmWarDeployer.removeFailLocal",
-                        contextPath), ex);
+                        contextName), ex);
             }
         }
 
@@ -465,16 +461,16 @@ public class FarmWarDeployer extends ClusterListener
         try {
             File deployWar = new File(getDeployDir(), newWar.getName());
             copy(newWar, deployWar);
-            String contextName = getContextName(deployWar);
+            ContextName cn = new ContextName(deployWar.getName());
             if (log.isInfoEnabled())
-                log.info(sm.getString("farmWarDeployer.modInstall", contextName,
-                        deployWar.getAbsolutePath()));
+                log.info(sm.getString("farmWarDeployer.modInstall",
+                        cn.getName(), deployWar.getAbsolutePath()));
             try {
-                remove(contextName, false);
+                remove(cn.getName(), false);
             } catch (Exception x) {
                 log.error(sm.getString("farmWarDeployer.modRemoveFail"), x);
             }
-            install(contextName, deployWar.toURI().toURL());
+            install(cn.getName(), deployWar);
         } catch (Exception x) {
             log.error(sm.getString("farmWarDeployer.modInstallFail"), x);
         }
@@ -488,31 +484,16 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void fileRemoved(File removeWar) {
         try {
-            String contextName = getContextName(removeWar);
+            ContextName cn = new ContextName(removeWar.getName());
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.removeLocal",
-                        contextName));
-            remove(contextName, true);
+                        cn.getName()));
+            remove(cn.getName(), true);
         } catch (Exception x) {
             log.error(sm.getString("farmWarDeployer.removeLocalFail"), x);
         }
     }
 
-    /**
-     * Create a context path from war
-     * @param war War filename
-     * @return '/filename' or if war name is ROOT.war context name is empty
-     *         string '' 
-     */
-    protected String getContextName(File war) {
-        String contextName = "/"
-        + war.getName().substring(0,
-                war.getName().lastIndexOf(".war"));
-        if("/ROOT".equals(contextName))
-            contextName= "" ;
-        return contextName ;
-    }
-    
     /**
      * Return a File object representing the "application root" directory for
      * our associated Host.
@@ -539,13 +520,14 @@ public class FarmWarDeployer extends ClusterListener
     /**
      * Invoke the remove method on the deployer.
      */
-    protected void remove(String path) throws Exception {
+    protected void remove(String contextName) throws Exception {
         // TODO Handle remove also work dir content !
         // Stop the context first to be nicer
-        Context context = (Context) host.findChild(path);
+        Context context = (Context) host.findChild(contextName);
         if (context != null) {
             if(log.isDebugEnabled())
-                log.debug(sm.getString("farmWarDeployer.undeployLocal", path));
+                log.debug(sm.getString("farmWarDeployer.undeployLocal",
+                        contextName));
             context.stop();
             String baseName = context.getBaseName();
             File war = new File(getAppBase(), baseName + ".war");
@@ -563,7 +545,7 @@ public class FarmWarDeployer extends ClusterListener
                 }
             }
             // Perform new deployment and remove internal HostConfig state
-            check(path);
+            check(contextName);
         }
 
     }
