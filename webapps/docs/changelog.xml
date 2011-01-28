@@ -150,6 +150,11 @@
         Improve error message when EL identifiers are not valid Java identifiers
         and use i18n for the error message. (markt)
       </update>
+      <fix>
+        <bug>50680</bug>: Prevent an NPE when using tag files from an exploded
+        JAR file, e.g. from within an IDE. Patch provided by Larry Isaacs.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
