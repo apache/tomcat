@@ -503,6 +503,18 @@
         of the flag is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="clearReferencesHttpClientKeepAliveThread" required = "false">
+        <p>If <code>true</code> and an HttpClient keep-alive timer thread has
+        been started by this web application and is still running, Tomcat will
+        change the context class loader for that thread from the current
+        <code>WebappClassLoader</code> to
+        <code>WebappClassLoader#parent</code> to prevent a memory leak. Note
+        that the keep-alive timer thread will stop on its own once the
+        keep-alives all expire however, on a busy system that might not happen
+        for some time. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
       <attribute name="clearReferencesStatic" required = "false">
         <p>If <code>true</code>, Tomcat attempts to null out any static or final
         fields from loaded classes when a web application is stopped as a work
