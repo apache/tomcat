@@ -132,8 +132,10 @@ public class WebappClassLoader
     private static final List<String> JVM_THREAD_GROUP_NAMES =
         new ArrayList<String>();
 
+    private static final String JVN_THREAD_GROUP_SYSTEM = "system";
+    
     static {
-        JVM_THREAD_GROUP_NAMES.add("system");
+        JVM_THREAD_GROUP_NAMES.add(JVN_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
@@ -465,6 +467,15 @@ public class WebappClassLoader
      */
     private boolean clearReferencesLogFactoryRelease = true;
 
+    /**
+     * If an HttpClient keep-alive timer thread has been started by this web
+     * application and is still running, should Tomcat change the context class
+     * loader from the current {@link WebappClassLoader} to
+     * {@link WebappClassLoader#parent} to prevent a memory leak? Note that the
+     * keep-alive timer thread will stop on its own once the keep-alives all
+     * expire however, on a busy system that might not happen for some time.
+     */
+    private boolean clearReferencesHttpClientKeepAliveThread = true;
     
     /**
      * Name of associated context used with logging and JMX to associate with
@@ -745,6 +756,28 @@ public class WebappClassLoader
      }
 
 
+     /**
+      * Return the clearReferencesHttpClientKeepAliveThread flag for this
+      * Context.
+      */
+     public boolean getClearReferencesHttpClientKeepAliveThread() {
+         return (this.clearReferencesHttpClientKeepAliveThread);
+     }
+
+
+     /**
+      * Set the clearReferencesHttpClientKeepAliveThread feature for this
+      * Context.
+      *
+      * @param clearReferencesHttpClientKeepAliveThread The new flag value
+      */
+     public void setClearReferencesHttpClientKeepAliveThread(
+             boolean clearReferencesHttpClientKeepAliveThread) {
+         this.clearReferencesHttpClientKeepAliveThread =
+             clearReferencesHttpClientKeepAliveThread;
+     }
+
+     
     // ------------------------------------------------------- Reloader Methods
 
 
@@ -2166,10 +2199,20 @@ public class WebappClassLoader
                         continue;
                     }
 
-                    // Don't warn about JVM controlled threads
+                    // JVM controlled threads
                     ThreadGroup tg = thread.getThreadGroup();
                     if (tg != null &&
                             JVM_THREAD_GROUP_NAMES.contains(tg.getName())) {
+
+                        // HttpClient keep-alive threads
+                        if (clearReferencesHttpClientKeepAliveThread &&
+                                thread.getName().equals("Keep-Alive-Timer")) {
+                            thread.setContextClassLoader(parent);
+                            log.debug(sm.getString(
+                                    "webappClassLoader.checkThreadsHttpClient"));
+                        }
+                    
+                        // Don't warn about remaining JVM controlled threads
                         continue;
                     }
                    

@@ -98,6 +98,12 @@
         Use getName() instead of logName() in error messages in StandardContext.
         (kkolinko)
       </update>
+      <fix>
+        <bug>50642</bug>: Move the HttpClient keep-alive thread memory leak
+        protection from the JreMemoryLeakPreventionListener to the
+        WebappClassLoader since the thread that triggers the memory leak is
+        created on demand. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

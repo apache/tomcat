@@ -260,16 +260,6 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
         startup on non-Sun JVMs. The default is <code>true</code>.</p>
       </attribute>
 
-      <attribute name="keepAliveProtection" required="false">
-        <p>Enables protection so that the KeepAlive thread started by
-        <code>sun.net.www.http.HttpClient</code> does not result in a memory
-        leak. The thread is started the first time the <code>HttpClient</code>
-        class is used. Without this protection, if a web application uses this
-        class the KeepAlive thread will be configured with the thread's context
-        class loader set to the web application class loader which in turn will
-        trigger a memory leak on reload. Defaults to <code>true</code>.</p>
-      </attribute>
-
       <attribute name="ldapPoolProtection" required="false">
         <p>Enables protection so that the PoolCleaner thread started by
         <code>com.sun.jndi.ldap.LdapPoolManager</code> does not result in a 
