@@ -26,7 +26,7 @@ public class UndeployMessage implements ClusterMessage {
     private Member address;
     private long timestamp;
     private String uniqueId;
-    private String contextPath;
+    private String contextName;
     private boolean undeploy;
     private int resend = 0;
     private int compress = 0;
@@ -35,14 +35,14 @@ public class UndeployMessage implements ClusterMessage {
     public UndeployMessage(Member address,
                            long timestamp,
                            String uniqueId,
-                           String contextPath,
+                           String contextName,
                            boolean undeploy) {
         this.address  = address;
         this.timestamp= timestamp;
         this.undeploy = undeploy;
         this.uniqueId = uniqueId;
         this.undeploy = undeploy;
-        this.contextPath = contextPath;
+        this.contextName = contextName;
     }
 
     @Override
@@ -75,12 +75,12 @@ public class UndeployMessage implements ClusterMessage {
         this.uniqueId = uniqueId;
     }
 
-    public String getContextPath() {
-        return contextPath;
+    public String getContextName() {
+        return contextName;
     }
 
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
+    public void setContextPath(String contextName) {
+        this.contextName = contextName;
     }
 
     public boolean getUndeploy() {

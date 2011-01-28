@@ -238,8 +238,8 @@ public class FileMessageFactory {
         
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
             // Duplicate of message already processed
-            log.warn("Receive Message again -- Sender ActTimeout too short [ path: "
-                    + msg.getContextPath()
+            log.warn("Receive Message again -- Sender ActTimeout too short [ name: "
+                    + msg.getContextName()
                     + " war: "
                     + msg.getFileName()
                     + " data: "
@@ -252,8 +252,8 @@ public class FileMessageFactory {
             msgBuffer.put(Long.valueOf(msg.getMessageNumber()), msg);
         if (previous !=null) {
             // Duplicate of message not yet processed
-            log.warn("Receive Message again -- Sender ActTimeout too short [ path: "
-                    + msg.getContextPath()
+            log.warn("Receive Message again -- Sender ActTimeout too short [ name: "
+                    + msg.getContextName()
                     + " war: "
                     + msg.getFileName()
                     + " data: "
