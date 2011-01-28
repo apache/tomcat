@@ -626,10 +626,15 @@ class TagFileProcessor {
                         compiler.getCompilationContext().getTldLocation(
                             tagFileInfo.getTagInfo().getTagLibrary().getURI());
                     JarResource jarResource = location.getJarResource();
-                    // Add TLD
-                    pageInfo.addDependant(jarResource.getEntry(location.getName()).toString());
-                    // Add Tag
-                    pageInfo.addDependant(jarResource.getEntry(tagFilePath.substring(1)).toString());
+                    if (jarResource != null) {
+                        // Add TLD
+                        pageInfo.addDependant(jarResource.getEntry(location.getName()).toString());
+                        // Add Tag
+                        pageInfo.addDependant(jarResource.getEntry(tagFilePath.substring(1)).toString());
+                    }
+                    else {
+                        pageInfo.addDependant(tagFilePath);
+                    }
                 } else {
                     pageInfo.addDependant(tagFilePath);
                 }
