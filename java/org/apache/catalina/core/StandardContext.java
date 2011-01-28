@@ -801,6 +801,16 @@ public class StandardContext extends ContainerBase
     private boolean clearReferencesStopTimerThreads = false;
 
     /**
+     * If an HttpClient keep-alive timer thread has been started by this web
+     * application and is still running, should Tomcat change the context class
+     * loader from the current {@link WebappClassLoader} to
+     * {@link WebappClassLoader#parent} to prevent a memory leak? Note that the
+     * keep-alive timer thread will stop on its own once the keep-alives all
+     * expire however, on a busy system that might not happen for some time.
+     */
+    private boolean clearReferencesHttpClientKeepAliveThread = true;
+
+    /**
      * Should Tomcat renew the threads of the thread pool when the application
      * is stopped to avoid memory leaks because of uncleaned ThreadLocal
      * variables. This also requires that the threadRenewalDelay property of the
@@ -2532,6 +2542,28 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("clearReferencesStopTimerThreads",
                                    oldClearReferencesStopTimerThreads,
                                    this.clearReferencesStopTimerThreads);
+    }
+
+
+    /**
+     * Return the clearReferencesHttpClientKeepAliveThread flag for this
+     * Context.
+     */
+    public boolean getClearReferencesHttpClientKeepAliveThread() {
+        return (this.clearReferencesHttpClientKeepAliveThread);
+    }
+
+
+    /**
+     * Set the clearReferencesHttpClientKeepAliveThread feature for this
+     * Context.
+     *
+     * @param clearReferencesHttpClientKeepAliveThread The new flag value
+     */
+    public void setClearReferencesHttpClientKeepAliveThread(
+            boolean clearReferencesHttpClientKeepAliveThread) {
+        this.clearReferencesHttpClientKeepAliveThread =
+            clearReferencesHttpClientKeepAliveThread;
     }
 
 
