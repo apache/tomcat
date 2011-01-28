@@ -75,8 +75,8 @@ public class WarWatcher {
      * check for modification and send notification to listener
      */
     public void check() {
-        if (log.isInfoEnabled())
-            log.info("check cluster wars at " + watchDir);
+        if (log.isDebugEnabled())
+            log.debug("check cluster wars at " + watchDir);
         File[] list = watchDir.listFiles(new WarFilter());
         if (list == null)
             list = new File[0];
