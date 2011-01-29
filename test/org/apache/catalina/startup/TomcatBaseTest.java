@@ -94,6 +94,8 @@ public abstract class TomcatBaseTest extends TestCase {
         // Need to use JULI so log messages from the tests are visible
         System.setProperty("java.util.logging.manager",
                 "org.apache.juli.ClassLoaderLogManager");
+        System.setProperty("java.util.logging.config.file", new File(
+                getBuildDirectory(), "conf/logging.properties").toString());
 
         tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         if (!tempDir.exists() && !tempDir.mkdirs()) {
