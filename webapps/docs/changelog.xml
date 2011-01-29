@@ -1090,6 +1090,10 @@
         enable GZIP compressed output streams to be flushed. Based on a patch
         provided by Jiong Wang. (markt)
       </fix>
+      <update>
+        <bug>48967</bug>: Replace strings "catalina.base" and "catalina.home"
+        by globally defined constants. Patch provided by Marc Guillemot. (rjung)
+      </update>
       <fix>
         <bug>49195</bug>: Don't report an error when shutting down a Windows
         service for a Tomcat instance that has a disabled shutdown port. (markt)
@@ -1149,10 +1153,6 @@
         provided by Gábor. (markt)
       </fix>
       <fix>
-        Provide 100 Continue responses at appropriate points during FORM
-        authentication if client indicates that they are expected. (markt)
-      </fix>
-      <fix>
         <bug>49779</bug>: Improve handling of POST requests and FORM
         authentication, particularly when the user agent responds to the 302
         response by repeating the POST request including a request body. Any
@@ -1171,10 +1171,6 @@
         More tweaks to the Lifecycle refactoring to ensure that when a component
         is being destroyed, the destroy method is only called once on each
         child component. (markt)
-      </update>
-      <update>
-        <bug>48967</bug>: Replace strings "catalina.base" and "catalina.home"
-        by globally defined constants. Patch provided by Marc Guillemot. (rjung)
       </update>
       <fix>
         Keep the MBean names for web applications consistent between Tomcat 6
@@ -1246,6 +1242,11 @@
         regardless of where it is mapped, which is a breaking change for
         current servlet-mappings that map the default servlet to a subpath.
         (timw)
+      </fix>
+      <fix>
+        <bug>50689</bug>: Provide 100 Continue responses at appropriate points
+        during FORM authentication if client indicates that they are expected.
+        (markt)
       </fix>
     </changelog>
   </subsection>
