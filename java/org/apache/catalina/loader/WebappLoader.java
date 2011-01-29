@@ -1128,7 +1128,7 @@ public class WebappLoader extends LifecycleMBeanBase
                     if (!copy((InputStream) object, os))
                         return false;
                 } else if (object instanceof DirContext) {
-                    if (!currentFile.mkdir())
+                    if (!currentFile.isDirectory() && !currentFile.mkdir())
                         return false;
                     if (!copyDir((DirContext) object, currentFile))
                         return false;
