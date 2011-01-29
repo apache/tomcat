@@ -17,7 +17,6 @@
 
 package org.apache.coyote.http11;
 
-import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.security.AccessController;
@@ -361,23 +360,23 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     // socket associated with the processor.
                     connections.put(socket, processor);
                     
-                    if (processor.comet) {
-                        // May receive more data from client
-                        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-                        key.interestOps(SelectionKey.OP_READ);
-                        att.interestOps(SelectionKey.OP_READ);
-                    } else if (processor.isAsync()) {
+                    if (processor.isAsync()) {
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         att.setAsync(true);
                         // longPoll may change socket state (e.g. to trigger a
                         // complete or dispatch)
                         state = processor.asyncPostProcess();
                     } else {
-                        // Error condition. A connection in this state should
-                        // by using one of async or comet
-                        throw new IOException(sm.getString(
-                                "http11protocol.state.long.error"));
+                        // Either:
+                        //  - this is comet request
+                        //  - the request line/headers have not been completely
+                        //    read
+                        SelectionKey key = socket.getIOChannel().keyFor(
+                                socket.getPoller().getSelector());
+                        NioEndpoint.KeyAttachment att =
+                            (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                        key.interestOps(SelectionKey.OP_READ);
+                        att.interestOps(SelectionKey.OP_READ);
                     }
                 }
                 if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
