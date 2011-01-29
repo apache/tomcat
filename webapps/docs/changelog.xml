@@ -108,6 +108,11 @@
         WebappClassLoader since the thread that triggers the memory leak is
         created on demand. (markt)
       </fix>
+      <fix>
+        <bug>50683</bug>: Ensure annotations are scanned when upackWars is set
+        to <code>false</code> in the Host where a web application is deployed.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
