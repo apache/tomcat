@@ -39,6 +39,11 @@ import org.apache.tomcat.util.net.NioSelectorPool;
  */
 public class InternalNioInputBuffer extends AbstractInputBuffer {
 
+    /**
+     * Logger.
+     */
+    private static org.apache.juli.logging.Log log
+        = org.apache.juli.logging.LogFactory.getLog(InternalNioInputBuffer.class);
 
     // -------------------------------------------------------------- Constants
 
@@ -228,6 +233,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
                 if ( readSocket(true, false)==0 ) return false;
             }
             parsingRequestLinePhase = 2;
+            if (log.isDebugEnabled()) {
+                log.debug("Received ["
+                        + new String(buf, pos, lastValid - pos, "ISO-8859-1")
+                        + "]");
+            }
         }
         if ( parsingRequestLinePhase == 2 ) {
             //
