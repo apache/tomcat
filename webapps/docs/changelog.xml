@@ -72,6 +72,10 @@
         context attribute is set to "true". (schultz)
       </fix>
       <fix>
+        <bug>49978</bug>: Correct another instance where deployment incorrectly
+        failed if a directory in the work area already existed. (markt)
+      </fix>
+      <fix>
         <bug>50582</bug>: Refactor access logging so chunked encoding is not
         forced for all requests if bytes sent is logged. (markt)
       </fix>
