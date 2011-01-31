@@ -26,7 +26,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CRL;
@@ -78,12 +80,16 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JSSESocketFactory implements ServerSocketFactory {
 
+    private static final org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
+    private static final boolean RFC_5746_SUPPORTED;
+
     // Defaults - made public where re-used
-    static String defaultProtocol = "TLS";
-    static String defaultKeystoreType = "JKS";
+    private static final String defaultProtocol = "TLS";
+    private static final String defaultKeystoreType = "JKS";
     private static final String defaultKeystoreFile
         = System.getProperty("user.home") + "/.keystore";
     private static final int defaultSessionCacheSize = 0;
@@ -91,8 +97,28 @@ public class JSSESocketFactory implements ServerSocketFactory {
     private static final String ALLOW_ALL_SUPPORTED_CIPHERS = "ALL";
     public static final String DEFAULT_KEY_PASS = "changeit";
     
-    static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
+    static {
+        boolean result = false;
+        SSLContext context;
+        try {
+            context = SSLContext.getInstance("TLS");
+            context.init(null, null, new SecureRandom());
+            SSLServerSocketFactory ssf = context.getServerSocketFactory();
+            String ciphers[] = ssf.getSupportedCipherSuites();
+            for (String cipher : ciphers) {
+                if ("TLS_EMPTY_RENEGOTIATION_INFO_SCSV".equals(cipher)) {
+                    result = true;
+                    break;
+                }
+            }
+        } catch (NoSuchAlgorithmException e) {
+            // Assume no RFC 5746 support
+        } catch (KeyManagementException e) {
+            // Assume no RFC 5746 support
+        }
+        RFC_5746_SUPPORTED = result;
+    }
+
 
     private AbstractEndpoint endpoint;
 
@@ -168,8 +194,8 @@ public class JSSESocketFactory implements ServerSocketFactory {
         if (session.getCipherSuite().equals("SSL_NULL_WITH_NULL_NULL"))
             throw new IOException("SSL handshake failed. Ciper suite in SSL Session is SSL_NULL_WITH_NULL_NULL");
 
-        if (!allowUnsafeLegacyRenegotiation) {
-            // Prevent futher handshakes by removing all cipher suites
+        if (!allowUnsafeLegacyRenegotiation && !RFC_5746_SUPPORTED) {
+            // Prevent further handshakes by removing all cipher suites
             ((SSLSocket) sock).setEnabledCipherSuites(new String[0]);
         }
     }
