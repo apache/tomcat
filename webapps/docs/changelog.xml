@@ -126,6 +126,12 @@
         <code>event.close()</code> during an END event. (markt) 
       </fix>
       <fix>
+        <bug>50325</bug>: When the JVM indicates support for RFC 5746, disable
+        Tomcat&apos;s <code>allowUnsafeLegacyRenegotiation</code> configuration
+        attribute and use the JVM configuration to control renegotiation.
+        (markt)
+      </fix>
+      <fix>
         <bug>50405</bug>: Fix occassional NPE when using NIO connector and
         Comet. (markt)
       </fix>
