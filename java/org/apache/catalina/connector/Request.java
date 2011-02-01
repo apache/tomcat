@@ -3005,7 +3005,12 @@ public class Request
             int semi = entry.indexOf(";q=");
             if (semi >= 0) {
                 try {
-                    quality = Double.parseDouble(entry.substring(semi + 3));
+                    String strQuality = entry.substring(semi + 3);
+                    if (strQuality.length() <= 5) {
+                        quality = Double.parseDouble(strQuality);
+                    } else {
+                        quality = 0.0;
+                    }
                 } catch (NumberFormatException e) {
                     quality = 0.0;
                 }
