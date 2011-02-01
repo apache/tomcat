@@ -147,6 +147,10 @@
         Correct interaction of APR socket and Poller when processing Comet
         events. (markt)
       </fix>
+      <fix>
+        <bug>50631</bug>: InternalNioInputBuffer should honor
+        <code>maxHttpHeadSize</code>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
