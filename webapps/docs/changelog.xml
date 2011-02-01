@@ -113,6 +113,10 @@
         to <code>false</code> in the Host where a web application is deployed.
         (markt)
       </fix>
+      <fix>
+        Improve HTTP specification compliance in support of
+        <code>Accept-Language</code> header. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
