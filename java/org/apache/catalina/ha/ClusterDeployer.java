@@ -59,7 +59,7 @@ public interface ClusterDeployer extends ChannelListener {
      *
      * @param contextName The context name to which this application should
      *  be installed (must be unique)
-     * @param wepapp    A WAR file or unpacked directory structure containing
+     * @param webapp    A WAR file or unpacked directory structure containing
      *                  the web application to be installed
      *
      * @exception IllegalArgumentException if the specified context name
