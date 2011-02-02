@@ -504,10 +504,10 @@
       </attribute>
 
       <attribute name="clearReferencesHttpClientKeepAliveThread" required = "false">
-        <p>If <code>true</code> and an HttpClient keep-alive timer thread has
-        been started by this web application and is still running, Tomcat will
-        change the context class loader for that thread from the current
-        <code>WebappClassLoader</code> to
+        <p>If <code>true</code> and an <code>sun.net.www.http.HttpClient</code>
+        keep-alive timer thread has been started by this web application and is
+        still running, Tomcat will change the context class loader for that
+        thread from the current <code>WebappClassLoader</code> to
         <code>WebappClassLoader#parent</code> to prevent a memory leak. Note
         that the keep-alive timer thread will stop on its own once the
         keep-alives all expire however, on a busy system that might not happen
