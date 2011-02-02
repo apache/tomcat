@@ -151,11 +151,21 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    private boolean stopAwait = false;
+    private volatile boolean stopAwait = false;
     
     private Catalina catalina = null;
 
     private ClassLoader parentClassLoader = null;
+
+    /**
+     * Thread that currently is inside our await() method.
+     */
+    private volatile Thread awaitThread = null;
+
+    /**
+     * Server socket that is used to wait for the shutdown command.
+     */
+    private volatile ServerSocket awaitSocket = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -358,6 +368,24 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     public void stopAwait() {
         stopAwait=true;
+        Thread t = awaitThread;
+        if (t != null) {
+            ServerSocket s = awaitSocket;
+            if (s != null) {
+                awaitSocket = null;
+                try {
+                    s.close();
+                } catch (IOException e) {
+                    // Ignored
+                }
+            }
+            t.interrupt();
+            try {
+                t.join(1000);
+            } catch (InterruptedException e) {
+                // Ignored
+            }
+        }
     }
 
     /**
@@ -373,94 +401,117 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             return;
         }
         if( port==-1 ) {
-            while( true ) {
-                try {
-                    Thread.sleep( 10000 );
-                } catch( InterruptedException ex ) {
+            try {
+                awaitThread = Thread.currentThread();
+                while(!stopAwait) {
+                    try {
+                        Thread.sleep( 10000 );
+                    } catch( InterruptedException ex ) {
+                    }
                 }
-                if( stopAwait ) return;
+            } finally {
+                awaitThread = null;
             }
+            return;
         }
-        
+
         // Set up a server socket to wait on
-        ServerSocket serverSocket = null;
         try {
-            serverSocket =
-                new ServerSocket(port, 1,
-                                 InetAddress.getByName(address));
+            awaitSocket = new ServerSocket(port, 1,
+                    InetAddress.getByName(address));
         } catch (IOException e) {
             log.error("StandardServer.await: create[" + address
                                + ":" + port
                                + "]: ", e);
-            System.exit(1);
+            return;
         }
 
-        // Loop waiting for a connection and a valid command
-        while (true) {
-
-            // Wait for the next connection
-            Socket socket = null;
-            InputStream stream = null;
-            try {
-                socket = serverSocket.accept();
-                socket.setSoTimeout(10 * 1000);  // Ten seconds
-                stream = socket.getInputStream();
-            } catch (AccessControlException ace) {
-                log.warn("StandardServer.accept security exception: "
-                                   + ace.getMessage(), ace);
-                continue;
-            } catch (IOException e) {
-                log.error("StandardServer.await: accept: ", e);
-                System.exit(1);
-            }
-
-            // Read a set of characters from the socket
-            StringBuilder command = new StringBuilder();
-            int expected = 1024; // Cut off to avoid DoS attack
-            while (expected < shutdown.length()) {
-                if (random == null)
-                    random = new Random();
-                expected += (random.nextInt() % 1024);
-            }
-            while (expected > 0) {
-                int ch = -1;
-                try {
-                    ch = stream.read();
-                } catch (IOException e) {
-                    log.warn("StandardServer.await: read: ", e);
-                    ch = -1;
-                }
-                if (ch < 32)  // Control character or EOF terminates loop
-                    break;
-                command.append((char) ch);
-                expected--;
-            }
-
-            // Close the socket now that we are done with it
-            try {
-                socket.close();
-            } catch (IOException e) {
-                // Ignore
-            }
-
-            // Match against our command string
-            boolean match = command.toString().equals(shutdown);
-            if (match) {
-                log.info(sm.getString("standardServer.shutdownViaPort"));
-                break;
-            } else
-                log.warn("StandardServer.await: Invalid command '" +
-                                   command.toString() + "' received");
-
-        }
-
-        // Close the server socket and return
         try {
-            serverSocket.close();
-        } catch (IOException e) {
-            // Ignore
-        }
+            awaitThread = Thread.currentThread();
 
+            // Loop waiting for a connection and a valid command
+            while (!stopAwait) {
+                ServerSocket serverSocket = awaitSocket;
+                if (serverSocket == null) {
+                    break;
+                }
+    
+                // Wait for the next connection
+                Socket socket = null;
+                StringBuilder command = new StringBuilder();
+                try {
+                    InputStream stream;
+                    try {
+                        socket = serverSocket.accept();
+                        socket.setSoTimeout(10 * 1000);  // Ten seconds
+                        stream = socket.getInputStream();
+                    } catch (AccessControlException ace) {
+                        log.warn("StandardServer.accept security exception: "
+                                + ace.getMessage(), ace);
+                        continue;
+                    } catch (IOException e) {
+                        if (stopAwait) {
+                            // Wait was aborted with socket.close()
+                            break;
+                        }
+                        log.error("StandardServer.await: accept: ", e);
+                        break;
+                    }
+
+                    // Read a set of characters from the socket
+                    int expected = 1024; // Cut off to avoid DoS attack
+                    while (expected < shutdown.length()) {
+                        if (random == null)
+                            random = new Random();
+                        expected += (random.nextInt() % 1024);
+                    }
+                    while (expected > 0) {
+                        int ch = -1;
+                        try {
+                            ch = stream.read();
+                        } catch (IOException e) {
+                            log.warn("StandardServer.await: read: ", e);
+                            ch = -1;
+                        }
+                        if (ch < 32)  // Control character or EOF terminates loop
+                            break;
+                        command.append((char) ch);
+                        expected--;
+                    }
+                } finally {
+                    // Close the socket now that we are done with it
+                    try {
+                        if (socket != null) {
+                            socket.close();
+                        }
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+
+                // Match against our command string
+                boolean match = command.toString().equals(shutdown);
+                if (match) {
+                    log.info(sm.getString("standardServer.shutdownViaPort"));
+                    break;
+                } else
+                    log.warn("StandardServer.await: Invalid command '"
+                            + command.toString() + "' received");
+            }
+        } finally {
+            ServerSocket serverSocket = awaitSocket;
+            awaitThread = null;
+            awaitSocket = null;
+
+            // Close the server socket and return
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
     }
 
 
@@ -693,7 +744,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             services[i].stop();
         }
 
-        if (port == -1)
+        if (awaitThread != null)
             stopAwait();
 
     }
