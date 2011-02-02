@@ -109,9 +109,13 @@
         created on demand. (markt)
       </fix>
       <fix>
-        <bug>50683</bug>: Ensure annotations are scanned when upackWars is set
-        to <code>false</code> in the Host where a web application is deployed.
-        (markt)
+        <bug>50673</bug>: Improve Catalina shutdown when running as a service.
+        Do not call System.exit(). (kkolinko)
+      </fix>
+      <fix>
+        <bug>50683</bug>: Ensure annotations are scanned when
+        <code>unpackWARs</code> is set to <code>false</code> in the Host
+        where a web application is deployed. (markt)
       </fix>
       <fix>
         Improve HTTP specification compliance in support of

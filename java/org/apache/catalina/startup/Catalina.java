@@ -33,6 +33,7 @@ import java.util.logging.LogManager;
 import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.security.SecurityConfig;
@@ -420,7 +421,8 @@ public class Catalina {
             arguments(arguments);
         }
 
-        if( getServer() == null ) {
+        Server s = getServer();
+        if( s == null ) {
             // Create and execute our Digester
             Digester digester = createStopDigester();
             digester.setClassLoader(Thread.currentThread().getContextClassLoader());
@@ -439,15 +441,19 @@ public class Catalina {
             }
         } else {
             // Server object already present. Must be running as a service
-            // Shutdown hook will take care of clean-up
-            System.exit(0);
+            try {
+                s.stop();
+            } catch (LifecycleException e) {
+                log.error("Catalina.stop: ", e);
+            }
+            return;
         }
 
         // Stop the existing server
+        s = getServer();
         try {
-            if (getServer().getPort()>0) {
-                Socket socket = new Socket(getServer().getAddress(),
-                        getServer().getPort());
+            if (s.getPort()>0) {
+                Socket socket = new Socket(s.getAddress(), s.getPort());
                 OutputStream stream = socket.getOutputStream();
                 String shutdown = getServer().getShutdown();
                 for (int i = 0; i < shutdown.length(); i++)
@@ -678,7 +684,14 @@ public class Catalina {
 
         // Shut down the server
         try {
-            getServer().stop();
+            Server s = getServer();
+            LifecycleState state = s.getState();
+            if (LifecycleState.STOPPING_PREP.compareTo(state) <= 0
+                    && LifecycleState.DESTROYED.compareTo(state) >= 0) {
+                // Nothing to do. stop() was already called
+            } else {
+                s.stop();
+            }
         } catch (LifecycleException e) {
             log.error("Catalina.stop", e);
         }
