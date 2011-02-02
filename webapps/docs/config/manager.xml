@@ -77,6 +77,30 @@
         deployment descriptor (<code>/WEB-INF/web.xml</code>).</p>
       </attribute>
 
+      <attribute name="maxActiveSessions" required="false">
+        <p>The maximum number of active sessions that will be created by
+        this Manager, or -1 (the default) for no limit.</p>
+      </attribute>
+
+      <attribute name="maxInactiveInterval" required="false">
+        <p>The initial maximum time interval, in seconds, 
+        between client requests before a session is invalidated. A negative value
+        will result in sessions never timing out. If the attribute is not provided,
+        a default of 60 seconds is used.</p>
+        
+        <p>This attribute provides the initial value whenever a 
+        new session is created, but the interval may be dynamically 
+        varied by a servlet via the 
+        <code>setMaxInactiveInterval</code> method of the <code>HttpSession</code> object.</p>
+      </attribute>
+
+      <attribute name="sessionIdLength" required="false">
+       <p>The length of session ids created by this Manager, measured in bytes,
+        excluding subsequent conversion to a hexadecimal string and
+        excluding any JVM route information used for load balancing.
+        The default is 16.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -98,23 +122,6 @@
     common attributes listed above):</p>
 
     <attributes>
-
-      <attribute name="maxActiveSessions" required="false">
-        <p>The maximum number of active sessions that will be created by
-        this Manager, or -1 (the default) for no limit.</p>
-      </attribute>
-
-      <attribute name="maxInactiveInterval" required="false">
-        <p>The initial maximum time interval, in seconds, 
-        between client requests before a session is invalidated. A negative value
-        will result in sessions never timing out. If the attribute is not provided,
-        a default of 60 seconds is used.</p>
-        
-        <p>This attribute provides the initial value whenever a 
-        new session is created, but the interval may be dynamically 
-        varied by a servlet via the 
-        <code>setMaxInactiveInterval</code> method of the <code>HttpSession</code> object.</p>
-      </attribute>
 
       <attribute name="pathname" required="false">
         <p>Absolute or relative (to the work directory for this Context)
@@ -160,13 +167,6 @@
         string.</p>
       </attribute>
 
-      <attribute name="sessionIdLength" required="false">
-       <p>The length of session ids created by this Manager, measured in bytes,
-        excluding subsequent conversion to a hexadecimal string and
-        excluding any JVM route information used for load balancing.
-        The default is 16.</p>
-      </attribute>
-
     </attributes>
 
     <h3>Persistent Manager Implementation</h3>
@@ -193,17 +193,12 @@
 
     <attributes>
 
-      <attribute name="className" required="false">
-        <p>Java class name of the implementation to use.  This class must
-        implement the <code>org.apache.catalina.Manager</code> interface.
+      <attribute name="className" required="true">
+        <p>It has the same meaning as described in the
+        <a href="#Common Attributes">Common Attributes</a> above.
         You <strong>must</strong> specify
         <code>org.apache.catalina.session.PersistentManager</code> to use
         this manager implementation.</p>
-      </attribute>
-
-      <attribute name="maxActiveSessions" required="false">
-        <p>The maximum number of active sessions that will be created by
-        this Manager, or -1 (the default) for no limit.</p>
       </attribute>
 
       <attribute name="maxIdleBackup" required="false">
@@ -231,23 +226,10 @@
         this value is set to <code>-1</code>.</p>
       </attribute>
 
-      <attribute name="maxInactiveInterval" required="false">
-        <p>The initial maximum time interval, in seconds, 
-        between client requests before a session is invalidated. A negative value
-        will result in sessions never timing out. If the attribute is not provided,
-        a default of 60 seconds is used.</p>
-        
-        <p>This attribute provides the initial value whenever a 
-        new session is created, but the interval may be dynamically 
-        varied by a servlet via the 
-        <code>setMaxInactiveInterval</code>method of the <code>HttpSession</code> object.</p>
-      </attribute>
-
-      <attribute name="randomClass" required="false">
-        <p>Name of the Java class that extends
-        <code>java.security.SecureRandom</code> to use to generate session IDs.
-        If not specified, the default value is
-        <code>java.security.SecureRandom</code>.</p>
+      <attribute name="processExpiresFrequency" required="false">
+        <p>It is the same as described above for the
+        <code>org.apache.catalina.session.StandardManager</code> class.
+        </p>
       </attribute>
 
       <attribute name="saveOnRestart" required="false">
@@ -256,13 +238,24 @@
         this attribute is set to <code>true</code>.</p>
       </attribute>
 
-      <attribute name="sessionIdLength" required="false">
-       <p>The length of session ids created by this Manager, measured in bytes,
-        excluding subsequent conversion to a hexadecimal string and
-        excluding any JVM route information used for load balancing.
-        The default is 16.</p>
+
+      <attribute name="secureRandomClass" required="false">
+        <p>It is the same as described above for the
+        <code>org.apache.catalina.session.StandardManager</code> class.
+        </p>
       </attribute>
 
+      <attribute name="secureRandomProvider" required="false">
+        <p>It is the same as described above for the
+        <code>org.apache.catalina.session.StandardManager</code> class.
+        </p>
+      </attribute>
+
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>It is the same as described above for the
+        <code>org.apache.catalina.session.StandardManager</code> class.
+        </p>
+      </attribute>
     </attributes>
 
     <p>In order to successfully use a PersistentManager, you must nest inside
