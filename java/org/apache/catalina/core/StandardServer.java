@@ -407,6 +407,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     try {
                         Thread.sleep( 10000 );
                     } catch( InterruptedException ex ) {
+                        // continue and check the flag
                     }
                 }
             } finally {
@@ -744,8 +745,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             services[i].stop();
         }
 
-        if (awaitThread != null)
-            stopAwait();
+        stopAwait();
 
     }
 
