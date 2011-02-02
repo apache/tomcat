@@ -47,14 +47,17 @@ public class ClusterMessageBase implements ClusterMessage {
      * @return Member
      * TODO Implement this org.apache.catalina.ha.ClusterMessage method
      */
+    @Override
     public Member getAddress() {
         return address;
     }
 
+    @Override
     public String getUniqueId() {
         return uniqueId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -65,14 +68,17 @@ public class ClusterMessageBase implements ClusterMessage {
      * @param member Member
      * TODO Implement this org.apache.catalina.ha.ClusterMessage method
      */
+    @Override
     public void setAddress(Member member) {
         this.address = member;
     }
 
+    @Override
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
 
+    @Override
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
