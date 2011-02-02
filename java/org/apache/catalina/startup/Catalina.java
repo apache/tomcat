@@ -455,7 +455,7 @@ public class Catalina {
             if (s.getPort()>0) {
                 Socket socket = new Socket(s.getAddress(), s.getPort());
                 OutputStream stream = socket.getOutputStream();
-                String shutdown = getServer().getShutdown();
+                String shutdown = s.getShutdown();
                 for (int i = 0; i < shutdown.length(); i++)
                     stream.write(shutdown.charAt(i));
                 stream.flush();
