@@ -103,10 +103,10 @@
         (kkolinko)
       </update>
       <fix>
-        <bug>50642</bug>: Move the HttpClient keep-alive thread memory leak
-        protection from the JreMemoryLeakPreventionListener to the
-        WebappClassLoader since the thread that triggers the memory leak is
-        created on demand. (markt)
+        <bug>50642</bug>: Move the <code>sun.net.www.http.HttpClient</code>
+        keep-alive thread memory leak protection from the
+        JreMemoryLeakPreventionListener to the WebappClassLoader since the
+        thread that triggers the memory leak is created on demand. (markt)
       </fix>
       <fix>
         <bug>50673</bug>: Improve Catalina shutdown when running as a service.
