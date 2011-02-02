@@ -389,7 +389,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                         state = result.asyncPostProcess();
                     }
                     if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
-                        connections.remove(socket);
+                        connections.remove(socket.getSocket());
                         socket.setAsync(false);
                         recycledProcessors.offer(result);
                         if (state == SocketState.OPEN) {
