@@ -1,4 +1,4 @@
-<!--
+<%--
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements.  See the NOTICE file distributed with
 this work for additional information regarding copyright ownership.
@@ -13,7 +13,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->
+--%>
 <!DOCTYPE html>
 <%
 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy");
@@ -21,7 +21,6 @@ request.setAttribute("year", sdf.format(new java.util.Date()));
 request.setAttribute("tomcat7Url", "http://tomcat.apache.org/");
 request.setAttribute("tomcat7DocUrl", "/docs/");
 %>
-<!-- License must be after DOCTYPE to ensure IE Standards Mode fires -->
 <html lang="en">
     <head>
         <title><%=request.getServletContext().getServerInfo() %></title>
