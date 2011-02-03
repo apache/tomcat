@@ -20,15 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -41,55 +38,15 @@ import org.apache.tomcat.util.buf.ByteChunk;
  *  CN: localhost ( for hostname validation )
  */
 public class TestSsl extends TomcatBaseTest {
-    static TrustManager[] trustAllCerts = new TrustManager[] { 
-        new X509TrustManager() { 
-            @Override
-            public X509Certificate[] getAcceptedIssuers() { 
-                return null;
-            }
-            @Override
-            public void checkClientTrusted(X509Certificate[] certs,
-                    String authType) {
-                // NOOP - Trust everything
-            }
-            @Override
-            public void checkServerTrusted(X509Certificate[] certs,
-                    String authType) {
-                // NOOP - Trust everything
-            }
-        }
-    };
 
-    private void initSsl(Tomcat tomcat) {
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Apr") == -1) {
-            tomcat.getConnector().setProperty("sslProtocol", "tls");
-            File keystoreFile = new File(
-                    "test/org/apache/catalina/startup/test.keystore");
-            tomcat.getConnector().setAttribute("keystoreFile",
-                    keystoreFile.getAbsolutePath());
-        } else {
-            File keystoreFile = new File(
-                    "test/org/apache/catalina/startup/test-cert.pem");
-            tomcat.getConnector().setAttribute("SSLCertificateFile",
-                    keystoreFile.getAbsolutePath());
-            keystoreFile = new File(
-                    "test/org/apache/catalina/startup/test-key.pem");
-            tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
-                    keystoreFile.getAbsolutePath());
-        }
-        tomcat.getConnector().setSecure(true);            
-        tomcat.getConnector().setProperty("SSLEnabled", "true");
-
-    }
-    
     public void testSimpleSsl() throws Exception {
         // Install the all-trusting trust manager so https:// works 
         // with unsigned certs. 
 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            sc.init(null, TesterSupport.TRUST_ALL_CERTS,
+                    new java.security.SecureRandom());
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
                     sc.getSocketFactory());
         } catch (Exception e) {
@@ -101,7 +58,7 @@ public class TestSsl extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
-        initSsl(tomcat);
+        TesterSupport.initSsl(tomcat);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -118,13 +75,14 @@ public class TestSsl extends TomcatBaseTest {
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        initSsl(tomcat);
+        TesterSupport.initSsl(tomcat);
 
         // Default - MITM attack prevented
         
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
+        sslCtx.init(null, TesterSupport.TRUST_ALL_CERTS,
+                new java.security.SecureRandom());
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
 
@@ -182,7 +140,7 @@ public class TestSsl extends TomcatBaseTest {
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        initSsl(tomcat);
+        TesterSupport.initSsl(tomcat);
         
         // Enable MITM attack
         tomcat.getConnector().setAttribute("allowUnsafeLegacyRenegotiation", "true");
@@ -198,7 +156,7 @@ public class TestSsl extends TomcatBaseTest {
         }
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, trustAllCerts, new java.security.SecureRandom());
+        sslCtx.init(null, TesterSupport.TRUST_ALL_CERTS, new java.security.SecureRandom());
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
 
