@@ -578,8 +578,10 @@ public class AjpProcessor extends AbstractAjpProcessor {
      */
     @Override
     protected void flush(boolean explicit) throws IOException {
-        // Send the flush message
-        output.write(flushMessageArray);
+        if (!finished) {
+            // Send the flush message
+            output.write(flushMessageArray);
+        }
     }
 
 
