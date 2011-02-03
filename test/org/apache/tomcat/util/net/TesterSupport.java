@@ -17,14 +17,44 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.catalina.startup.Tomcat;
 
 public final class TesterSupport {
+    
+    protected static final boolean RFC_5746_SUPPORTED;
+
+    static {
+        boolean result = false;
+        SSLContext context;
+        try {
+            context = SSLContext.getInstance("TLS");
+            context.init(null, null, new SecureRandom());
+            SSLServerSocketFactory ssf = context.getServerSocketFactory();
+            String ciphers[] = ssf.getSupportedCipherSuites();
+            for (String cipher : ciphers) {
+                if ("TLS_EMPTY_RENEGOTIATION_INFO_SCSV".equals(cipher)) {
+                    result = true;
+                    break;
+                }
+            }
+        } catch (NoSuchAlgorithmException e) {
+            // Assume no RFC 5746 support
+        } catch (KeyManagementException e) {
+            // Assume no RFC 5746 support
+        }
+        RFC_5746_SUPPORTED = result;
+    }
+
     protected static final TrustManager[] TRUST_ALL_CERTS = new TrustManager[] { 
         new X509TrustManager() { 
             @Override
@@ -65,4 +95,5 @@ public final class TesterSupport {
         tomcat.getConnector().setSecure(true);            
         tomcat.getConnector().setProperty("SSLEnabled", "true");
     }
+    
 }

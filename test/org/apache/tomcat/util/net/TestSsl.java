@@ -69,6 +69,13 @@ public class TestSsl extends TomcatBaseTest {
     boolean handshakeDone = false;
     
     public void testRenegotiateFail() throws Exception {
+        
+        // If RFC5746 is supported, renegotiation will always will (and will
+        // always be secure)
+        if (TesterSupport.RFC_5746_SUPPORTED) {
+            return;
+        }
+
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
@@ -200,8 +207,10 @@ public class TestSsl extends TomcatBaseTest {
 
     @Override
     public void setUp() throws Exception {
-        // Make sure SSL renegotiation is not disabled in the JVM
-        System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
+        if (!TesterSupport.RFC_5746_SUPPORTED) {
+            // Make sure SSL renegotiation is not disabled in the JVM
+            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
+        }
         super.setUp();
     }
 }
