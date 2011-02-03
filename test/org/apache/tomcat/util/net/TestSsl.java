@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.startup;
+package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +30,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -38,7 +40,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  *  pass: changeit 
  *  CN: localhost ( for hostname validation )
  */
-public class TestTomcatSSL extends TomcatBaseTest {
+public class TestSsl extends TomcatBaseTest {
     static TrustManager[] trustAllCerts = new TrustManager[] { 
         new X509TrustManager() { 
             @Override
