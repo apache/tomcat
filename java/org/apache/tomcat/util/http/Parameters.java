@@ -249,21 +249,23 @@ public final class Parameters {
             pos=valEnd+1;
             
             if( nameEnd<=nameStart ) {
-                StringBuilder msg = new StringBuilder("Parameters: Invalid chunk ");
-                // No name eg ...&=xx&... will trigger this
-                if (valEnd >= nameStart) {
-                    msg.append('\'');
-                    try {
-                        msg.append(new String(bytes, nameStart,
-                                valEnd - nameStart, DEFAULT_ENCODING));
-                    } catch (UnsupportedEncodingException e) {
-                        // Should never happen...
-                        log.error("Unable to convert bytes", e);
+                if (log.isInfoEnabled()) {
+                    StringBuilder msg = new StringBuilder("Parameters: Invalid chunk ");
+                    // No name eg ...&=xx&... will trigger this
+                    if (valEnd >= nameStart) {
+                        msg.append('\'');
+                        try {
+                            msg.append(new String(bytes, nameStart,
+                                    valEnd - nameStart, DEFAULT_ENCODING));
+                        } catch (UnsupportedEncodingException e) {
+                            // Should never happen...
+                            log.error("Unable to convert bytes", e);
+                        }
+                        msg.append("' ");
                     }
-                    msg.append("' ");
+                    msg.append("ignored.");
+                    log.info(msg);
                 }
-                msg.append("ignored.");
-                log.warn(msg);
                 continue;
                 // invalid chunk - it's better to ignore
             }
