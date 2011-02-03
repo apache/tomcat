@@ -663,7 +663,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
             outputBuffer.clear();
         }
         // Send explicit flush message
-        if (explicit) {
+        if (explicit && !finished) {
             if (Socket.sendb(socketRef, flushMessageBuffer, 0,
                     flushMessageBuffer.position()) < 0) {
                 throw new IOException(sm.getString("ajpprocessor.failedflush"));
