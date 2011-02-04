@@ -578,7 +578,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
      */
     @Override
     protected void flush(boolean explicit) throws IOException {
-        if (!finished) {
+        if (explicit && !finished) {
             // Send the flush message
             output.write(flushMessageArray);
         }
