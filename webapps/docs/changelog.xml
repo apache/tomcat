@@ -63,6 +63,10 @@
         Reduce level of log message for invalid URL parameters from WARNING to
         INFO. (markt) 
       </fix>
+      <fix>
+        Fix hanging Servlet 3 asynchronous requests when using the APR based AJP
+        connector. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
