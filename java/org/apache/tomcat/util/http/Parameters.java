@@ -297,7 +297,7 @@ public final class Parameters {
                     msg.append(origValue.toString());
                     msg.append("' has been ignored.");
                     log.debug(msg, e);
-                } else {
+                } else if (log.isInfoEnabled()) {
                     msg.append(tmpName.toString());
                     msg.append("' with value '");
                     msg.append(tmpValue.toString());
@@ -305,7 +305,7 @@ public final class Parameters {
                     msg.append("value quoted here may be corrupted due to ");
                     msg.append("the failed decoding. Use debug level logging ");
                     msg.append("to see the original, non-corrupted values.");
-                    log.warn(msg);
+                    log.info(msg);
                 }
             }
 
