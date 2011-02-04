@@ -41,6 +41,15 @@
 <!--
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
 -->
+<section name="Tomcat 7.0.8 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix NPE in CoyoteAdapter when postParseRequest() call fails. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.7 (markt)">
   <subsection name="Catalina">
     <changelog>

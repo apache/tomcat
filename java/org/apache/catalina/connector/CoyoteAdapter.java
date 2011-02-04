@@ -375,7 +375,8 @@ public class CoyoteAdapter implements Adapter {
             // Parse and set Catalina and configuration specific 
             // request parameters
             req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
-            if (postParseRequest(req, request, res, response)) {
+            boolean postParseSuccess = postParseRequest(req, request, res, response);
+            if (postParseSuccess) {
                 //check valves if we support async
                 request.setAsyncSupported(connector.getService().getContainer().getPipeline().isAsyncSupported());
                 // Calling the container
@@ -406,9 +407,14 @@ public class CoyoteAdapter implements Adapter {
                 async = true;
             } else if (!comet) {
                 response.finishResponse();
-                ((Context) request.getMappingData().context).logAccess(request,
-                        response,
-                        System.currentTimeMillis() - req.getStartTime(), false);
+                if (postParseSuccess) {
+                    // Log only if processing was invoked.
+                    // If postParseRequest() failed, it has already logged it.
+                    ((Context) request.getMappingData().context).logAccess(
+                            request, response,
+                            System.currentTimeMillis() - req.getStartTime(),
+                            false);
+                }
                 req.action(ActionCode.POST_REQUEST , null);
             }
 
