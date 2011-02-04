@@ -195,6 +195,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                     // Need to make socket available for next processing cycle
                     // but no need for the poller
                     connections.put(socket, processor);
+                    socket.setAsync(true);
                 } else {
                     if (state == SocketState.OPEN) {
                         connections.put(socket, processor);
