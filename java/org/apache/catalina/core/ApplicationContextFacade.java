@@ -59,8 +59,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @version $Id$
  */
 
-public final class ApplicationContextFacade
-    implements ServletContext {
+public class ApplicationContextFacade implements ServletContext {
         
     // ---------------------------------------------------------- Attributes
     /**
