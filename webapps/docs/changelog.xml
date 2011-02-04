@@ -47,6 +47,10 @@
       <fix>
         Fix NPE in CoyoteAdapter when postParseRequest() call fails. (kkolinko)
       </fix>
+      <fix>
+       <bug>50709</bug>: Make <code>ApplicationContextFacade</code> non-final to
+       enable extension. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
