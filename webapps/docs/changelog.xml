@@ -51,6 +51,10 @@
        <bug>50709</bug>: Make <code>ApplicationContextFacade</code> non-final to
        enable extension. (markt)
       </fix>
+      <fix>
+        When running under a security manager, user requests may fail with a
+        security exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
