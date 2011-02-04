@@ -49,6 +49,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Align server.xml installed by the Windows installer with the one
+        bundled in zip/tar.gz files. The differences are LockOutRealm being
+        used and AccessLogValve being enabled by default. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.7 (markt)">
   <subsection name="Catalina">
