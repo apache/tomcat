@@ -49,7 +49,15 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Catalina">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Reduce level of log message for invalid URL parameters from WARNING to
+        INFO. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
     <changelog>
       <fix>
         Align server.xml installed by the Windows installer with the one
@@ -59,7 +67,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.7 (markt)">
+<section name="Tomcat 7.0.7 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
