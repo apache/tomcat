@@ -31,6 +31,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Web crawlers can trigger the creation of many thousands of sessions as they
@@ -40,6 +42,9 @@ import org.apache.catalina.connector.Response;
  * requests.
  */
 public class CrawlerSessionManagerValve extends ValveBase {
+
+    private static final Log log =
+        LogFactory.getLog(CrawlerSessionManagerValve.class);
 
     private Map<String,SessionInfo> uaIpSessionInfo =
         new ConcurrentHashMap<String, SessionInfo>();
@@ -110,6 +115,12 @@ public class CrawlerSessionManagerValve extends ValveBase {
         SessionInfo sessionInfo = null;
         String clientIp = null;
 
+        if (log.isDebugEnabled()) {
+            log.debug(request.hashCode() + ": ClientIp=" +
+                    request.getRemoteAddr() + ", RequestedSessionId=" +
+                    request.getRequestedSessionId());
+        }
+
         // If the incoming request has a session ID, no action is required
         if (request.getRequestedSessionId() == null) {
 
@@ -117,10 +128,21 @@ public class CrawlerSessionManagerValve extends ValveBase {
             Enumeration<String> uaHeaders = request.getHeaders("user-agent");
             while (!isBot && uaMatcher != null &&
                     uaHeaders.hasMoreElements()) {
+                
                 String uaHeader = uaHeaders.nextElement();
                 uaMatcher.reset(uaHeader);
+                
+                if (log.isDebugEnabled()) {
+                    log.debug(request.hashCode() + ": UserAgent=" + uaHeader);
+                }
+                
                 if (uaMatcher.matches()) {
                     isBot = true;
+                    
+                    if (log.isDebugEnabled()) {
+                        log.debug(request.hashCode() +
+                                ": Bot found. UserAgent=" + uaHeader);
+                    }
                 }
             }
             
@@ -130,6 +152,11 @@ public class CrawlerSessionManagerValve extends ValveBase {
                 sessionInfo = uaIpSessionInfo.get(clientIp);
                 if (sessionInfo != null) {
                     request.setRequestedSessionId(sessionInfo.getSessionId());
+
+                    if (log.isDebugEnabled()) {
+                        log.debug(request.hashCode() +
+                                ": SessionID=" + sessionInfo.getSessionId());
+                    }
                 }
             }
         }
@@ -143,9 +170,20 @@ public class CrawlerSessionManagerValve extends ValveBase {
                 if (s != null) {
                     uaIpSessionInfo.put(clientIp, new SessionInfo(s.getId()));
                     s.setMaxInactiveInterval(sessionInactiveInterval);
+
+                    if (log.isDebugEnabled()) {
+                        log.debug(request.hashCode() +
+                                ": New bot session. SessionID=" + s.getId());
+                    }
                 }
             } else {
                 sessionInfo.access();
+
+                if (log.isDebugEnabled()) {
+                    log.debug(request.hashCode() +
+                            ": Bot session accessed. SessionID=" +
+                            sessionInfo.getSessionId());
+                }
             }
         }
     }
