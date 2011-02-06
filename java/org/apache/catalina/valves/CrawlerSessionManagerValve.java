@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
@@ -51,7 +50,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     private String crawlerUserAgents =
         ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*";
-    private Matcher uaMatcher = null;
+    private Pattern uaPattern = null;
     private int sessionInactiveInterval = 60;
 
 
@@ -65,9 +64,9 @@ public class CrawlerSessionManagerValve extends ValveBase {
     public void setCrawlerUserAgents(String crawlerUserAgents) {
         this.crawlerUserAgents = crawlerUserAgents;
         if (crawlerUserAgents == null || crawlerUserAgents.length() == 0) {
-            uaMatcher = null;
+            uaPattern = null;
         } else {
-            uaMatcher = Pattern.compile(crawlerUserAgents).matcher("");
+            uaPattern = Pattern.compile(crawlerUserAgents);
         }
     }
 
@@ -103,7 +102,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
     protected void initInternal() throws LifecycleException {
         super.initInternal();
         
-        uaMatcher = Pattern.compile(crawlerUserAgents).matcher("");
+        uaPattern = Pattern.compile(crawlerUserAgents);
     }
 
 
@@ -124,19 +123,18 @@ public class CrawlerSessionManagerValve extends ValveBase {
         // If the incoming request has a session ID, no action is required
         if (request.getRequestedSessionId() == null) {
 
-            // Is this a crawler
+            // Is this a crawler - cheack the UA headers
             Enumeration<String> uaHeaders = request.getHeaders("user-agent");
-            while (!isBot && uaMatcher != null &&
-                    uaHeaders.hasMoreElements()) {
-                
-                String uaHeader = uaHeaders.nextElement();
-                uaMatcher.reset(uaHeader);
-                
+            String uaHeader = uaHeaders.nextElement();
+            
+            // If more than one UA header - assume not a bot
+            if (!uaHeaders.hasMoreElements()) {
+
                 if (log.isDebugEnabled()) {
                     log.debug(request.hashCode() + ": UserAgent=" + uaHeader);
                 }
                 
-                if (uaMatcher.matches()) {
+                if (uaPattern.matcher(uaHeader).matches()) {
                     isBot = true;
                     
                     if (log.isDebugEnabled()) {
