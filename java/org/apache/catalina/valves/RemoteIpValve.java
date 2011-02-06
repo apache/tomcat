@@ -430,7 +430,12 @@ public class RemoteIpValve extends ValveBase {
      * @see #setRemoteIpHeader(String)
      */
     private String remoteIpHeader = "X-Forwarded-For";
-    
+
+    /**
+     * @see #setRequestAttributesEnabled(boolean)
+     */
+    private boolean requestAttributesEnabled = true;
+
     /**
      * @see RemoteIpValve#setTrustedProxies(String)
      */
@@ -493,6 +498,15 @@ public class RemoteIpValve extends ValveBase {
      */
     public String getRemoteIpHeader() {
         return remoteIpHeader;
+    }
+
+    /**
+     * @see #setRequestAttributesEnabled(boolean)
+     * @return <code>true</code> if the attributes will be logged, otherwise
+     *         <code>false</code>
+     */
+    public boolean getRequestAttributesEnabled() {
+        return requestAttributesEnabled;
     }
 
     /**
@@ -606,6 +620,16 @@ public class RemoteIpValve extends ValveBase {
                 log.debug("Skip RemoteIpValve for request " + request.getRequestURI() + " with originalRemoteAddr '"
                         + request.getRemoteAddr() + "'");
             }
+        }
+        if (requestAttributesEnabled) {
+            request.setAttribute("org.apache.catalina.RemoteAddr",
+                    request.getRemoteAddr());
+            request.setAttribute("org.apache.catalina.RemoteHost",
+                    request.getRemoteHost());
+            request.setAttribute("org.apache.catalina.Protocol",
+                    request.getProtocol());
+            request.setAttribute("org.apache.catalina.ServerPort",
+                    Integer.valueOf(request.getServerPort()));
         }
         try {
             getNext().invoke(request, response);
@@ -724,6 +748,28 @@ public class RemoteIpValve extends ValveBase {
         this.remoteIpHeader = remoteIpHeader;
     }
     
+    /**
+     * Should this valve set request attributes for IP address, Hostname,
+     * protocol and port used for the request? This are typically used in
+     * conjunction with the {@link AccessLogValve} which will otherwise log the
+     * original values. Default is <code>true</code>.
+     * 
+     * The attributes set are:
+     * <ul>
+     * <li>org.apache.catalina.RemoteAddr</li>
+     * <li>org.apache.catalina.RemoteHost</li>
+     * <li>org.apache.catalina.Protocol</li>
+     * <li>org.apache.catalina.ServerPost</li>
+     * </ul>
+     * 
+     * @param requestAttributesEnabled  <code>true</code> causes the attributes
+     *                                  to be set, <code>false</code> disables
+     *                                  the setting of the attributes. 
+     */
+    public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
+        this.requestAttributesEnabled = requestAttributesEnabled;
+    }
+
     /**
      * <p>
      * Regular expression defining proxies that are trusted when they appear in
