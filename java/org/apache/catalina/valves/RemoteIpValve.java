@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.AccessLog;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
@@ -622,13 +623,13 @@ public class RemoteIpValve extends ValveBase {
             }
         }
         if (requestAttributesEnabled) {
-            request.setAttribute("org.apache.catalina.RemoteAddr",
+            request.setAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE,
                     request.getRemoteAddr());
-            request.setAttribute("org.apache.catalina.RemoteHost",
+            request.setAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE,
                     request.getRemoteHost());
-            request.setAttribute("org.apache.catalina.Protocol",
+            request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
                     request.getProtocol());
-            request.setAttribute("org.apache.catalina.ServerPort",
+            request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
                     Integer.valueOf(request.getServerPort()));
         }
         try {

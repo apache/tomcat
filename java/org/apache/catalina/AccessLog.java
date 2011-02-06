@@ -34,6 +34,35 @@ import org.apache.catalina.connector.Response;
 public interface AccessLog {
 
     /**
+     * Name of request attribute used to override the remote address recorded by
+     * the AccessLog.
+     */
+    public static final String REMOTE_ADDR_ATTRIBUTE =
+        "org.apache.catalina.AccessLog.RemoteAddr";
+
+    /**
+     * Name of request attribute used to override remote host name recorded by
+     * the AccessLog.
+     */
+    public static final String REMOTE_HOST_ATTRIBUTE =
+        "org.apache.catalina.AccessLog.RemoteHost";
+
+    /**
+     * Name of request attribute used to override the protocol recorded by the
+     * AccessLog.
+     */
+    public static final String PROTOCOL_ATTRIBUTE =
+        "org.apache.catalina.AccessLog.Protocol";
+
+    /**
+     * Name of request attribute used to override the server port recorded by
+     * the AccessLog.
+     */
+    public static final String SERVER_PORT_ATTRIBUTE =
+        "org.apache.catalina.AccessLog.ServerPort";
+    
+
+    /**
      * Add the request/response to the access log using the specified processing
      * time.
      * 
@@ -43,4 +72,31 @@ public interface AccessLog {
      *                  milliseconds (use 0 if not known) 
      */
     public void log(Request request, Response response, long time);
+    
+    /**
+     * Should this valve set request attributes for IP address, Hostname,
+     * protocol and port used for the request? This are typically used in
+     * conjunction with the {@link AccessLogValve} which will otherwise log the
+     * original values. Default is <code>true</code>.
+     * 
+     * The attributes set are:
+     * <ul>
+     * <li>org.apache.catalina.RemoteAddr</li>
+     * <li>org.apache.catalina.RemoteHost</li>
+     * <li>org.apache.catalina.Protocol</li>
+     * <li>org.apache.catalina.ServerPost</li>
+     * </ul>
+     * 
+     * @param requestAttributesEnabled  <code>true</code> causes the attributes
+     *                                  to be set, <code>false</code> disables
+     *                                  the setting of the attributes. 
+     */
+    public void setRequestAttributesEnabled(boolean requestAttributesEnabled);
+    
+    /**
+     * @see #setRequestAttributesEnabled(boolean)
+     * @return <code>true</code> if the attributes will be logged, otherwise
+     *         <code>false</code>
+     */
+    public boolean getRequestAttributesEnabled();
 }

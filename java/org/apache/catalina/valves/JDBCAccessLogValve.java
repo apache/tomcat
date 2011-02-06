@@ -210,6 +210,10 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     private long currentTimeMillis;
 
+    /**
+     * @see #setRequestAttributesEnabled(boolean)
+     */
+    protected boolean requestAttributesEnabled = true;
 
     /**
      * The descriptive information about this implementation.
@@ -219,7 +223,23 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
 
     // ------------------------------------------------------------- Properties
- 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
+        this.requestAttributesEnabled = requestAttributesEnabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getRequestAttributesEnabled() {
+        return requestAttributesEnabled;
+    }
+
     /**
      * Return the username to use to connect to the database.
      *
@@ -451,10 +471,29 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         final String EMPTY = "" ;
         
         String remoteHost;
-        if(resolveHosts)
-            remoteHost = request.getRemoteHost();
-        else
-            remoteHost = request.getRemoteAddr();
+        if(resolveHosts) {
+            if (requestAttributesEnabled) {
+                Object host = request.getAttribute(REMOTE_HOST_ATTRIBUTE);
+                if (host == null) {
+                    remoteHost = request.getRemoteHost();
+                } else {
+                    remoteHost = (String) host;
+                }
+            } else {
+                remoteHost = request.getRemoteHost();
+            }
+        } else {
+            if (requestAttributesEnabled) {
+                Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
+                if (addr == null) {
+                    remoteHost = request.getRemoteAddr();
+                } else {
+                    remoteHost = (String) addr;
+                }
+            } else {
+                remoteHost = request.getRemoteAddr();
+            }
+        }
         String user = request.getRemoteUser();
         String query=request.getRequestURI();
         
