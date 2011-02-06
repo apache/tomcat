@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.AccessLog;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -698,6 +699,11 @@ public class RemoteIpFilter implements Filter {
     private String remoteIpHeader = "X-Forwarded-For";
     
     /**
+     * @see #setRequestAttributesEnabled(boolean)
+     */
+    private boolean requestAttributesEnabled = true;
+
+    /**
      * @see #setTrustedProxies(String)
      */
     private Pattern trustedProxies = null;
@@ -792,6 +798,16 @@ public class RemoteIpFilter implements Filter {
                         + xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" + remoteIpHeader + "]='"
                         + xRequest.getHeader(remoteIpHeader) + "', new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
             }
+            if (requestAttributesEnabled) {
+                request.setAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE,
+                        request.getRemoteAddr());
+                request.setAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE,
+                        request.getRemoteHost());
+                request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
+                        request.getProtocol());
+                request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
+                        Integer.valueOf(request.getServerPort()));
+            }
             chain.doFilter(xRequest, response);
         } else {
             if (log.isDebugEnabled()) {
@@ -839,6 +855,15 @@ public class RemoteIpFilter implements Filter {
         return remoteIpHeader;
     }
     
+    /**
+     * @see #setRequestAttributesEnabled(boolean)
+     * @return <code>true</code> if the attributes will be logged, otherwise
+     *         <code>false</code>
+     */
+    public boolean getRequestAttributesEnabled() {
+        return requestAttributesEnabled;
+    }
+
     public Pattern getTrustedProxies() {
         return trustedProxies;
     }
@@ -987,6 +1012,28 @@ public class RemoteIpFilter implements Filter {
         this.remoteIpHeader = remoteIpHeader;
     }
     
+    /**
+     * Should this filter set request attributes for IP address, Hostname,
+     * protocol and port used for the request? This are typically used in
+     * conjunction with an {@link AccessLog} which will otherwise log the
+     * original values. Default is <code>true</code>.
+     * 
+     * The attributes set are:
+     * <ul>
+     * <li>org.apache.catalina.RemoteAddr</li>
+     * <li>org.apache.catalina.RemoteHost</li>
+     * <li>org.apache.catalina.Protocol</li>
+     * <li>org.apache.catalina.ServerPost</li>
+     * </ul>
+     * 
+     * @param requestAttributesEnabled  <code>true</code> causes the attributes
+     *                                  to be set, <code>false</code> disables
+     *                                  the setting of the attributes. 
+     */
+    public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
+        this.requestAttributesEnabled = requestAttributesEnabled;
+    }
+
     /**
      * <p>
      * Regular expression defining proxies that are trusted when they appear in
