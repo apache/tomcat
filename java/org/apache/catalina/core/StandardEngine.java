@@ -400,6 +400,19 @@ public class StandardEngine extends ContainerBase implements Engine {
         public void log(Request request, Response response, long time) {
             // NOOP
         }
+
+        @Override
+        public void setRequestAttributesEnabled(
+                boolean requestAttributesEnabled) {
+            // NOOP
+            
+        }
+
+        @Override
+        public boolean getRequestAttributesEnabled() {
+            // NOOP
+            return false;
+        }
     }
     
     protected static final class AccessLogListener

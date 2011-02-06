@@ -293,6 +293,11 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected AccessLogElement[] logElements = null;
 
+    /**
+     * @see #setRequestAttributesEnabled(boolean)
+     */
+    protected boolean requestAttributesEnabled = true;
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -300,6 +305,22 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     public boolean getEnabled() {
         return enabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
+        this.requestAttributesEnabled = requestAttributesEnabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getRequestAttributesEnabled() {
+        return requestAttributesEnabled;
     }
 
     /**
@@ -880,22 +901,40 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write remote IP address - %a
      */
-    protected static class RemoteAddrElement implements AccessLogElement {
+    protected class RemoteAddrElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(request.getRemoteAddr());
+            if (requestAttributesEnabled) {
+                Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
+                if (addr == null) {
+                    buf.append(request.getRemoteAddr());
+                } else {
+                    buf.append(addr);
+                }
+            } else {
+                buf.append(request.getRemoteAddr());
+            }
         }
     }
     
     /**
      * write remote host name - %h
      */
-    protected static class HostElement implements AccessLogElement {
+    protected class HostElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(request.getRemoteHost());
+            if (requestAttributesEnabled) {
+                Object host = request.getAttribute(REMOTE_HOST_ATTRIBUTE);
+                if (host == null) {
+                    buf.append(request.getRemoteHost());
+                } else {
+                    buf.append(host);
+                }
+            } else {
+                buf.append(request.getRemoteHost());
+            }
         }
     }
     
@@ -913,11 +952,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write request protocol - %H
      */
-    protected static class ProtocolElement implements AccessLogElement {
+    protected class ProtocolElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(request.getProtocol());
+            if (requestAttributesEnabled) {
+                Object proto = request.getAttribute(PROTOCOL_ATTRIBUTE);
+                if (proto == null) {
+                    buf.append(request.getProtocol());
+                } else {
+                    buf.append(proto);
+                }
+            } else {
+                buf.append(request.getProtocol());
+            }
         }
     }
 
@@ -1011,11 +1059,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * write local port on which this request was received - %p
      */
-    protected static class LocalPortElement implements AccessLogElement {
+    protected class LocalPortElement implements AccessLogElement {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(request.getServerPort());
+            if (requestAttributesEnabled) {
+                Object port = request.getAttribute(SERVER_PORT_ATTRIBUTE);
+                if (port == null) {
+                    buf.append(request.getServerPort());
+                } else {
+                    buf.append(port);
+                }
+            } else {
+                buf.append(request.getServerPort());
+            }
         }
     }
 
