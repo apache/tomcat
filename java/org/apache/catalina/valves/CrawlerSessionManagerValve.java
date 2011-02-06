@@ -155,7 +155,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
     public void backgroundProcess() {
         super.backgroundProcess();
         
-        long expireTime = System.currentTimeMillis() +
+        long expireTime = System.currentTimeMillis() -
                 (sessionInactiveInterval + 60) * 1000;
 
         Iterator<Entry<String,SessionInfo>> iter =
@@ -164,7 +164,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
         // Remove any sessions in the cache that have expired. 
         while (iter.hasNext()) {
             Entry<String,SessionInfo> entry = iter.next();
-            if (entry.getValue().getLastAccessed() > expireTime) {
+            if (entry.getValue().getLastAccessed() < expireTime) {
                 iter.remove();
             }
         }
