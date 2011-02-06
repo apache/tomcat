@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.LifecycleException;
@@ -150,7 +151,9 @@ public class CrawlerSessionManagerValve extends ValveBase {
                 sessionInfo = uaIpSessionInfo.get(clientIp);
                 if (sessionInfo != null) {
                     request.setRequestedSessionId(sessionInfo.getSessionId());
-
+                    // Hack for testing with Jira
+                    request.addCookie(new Cookie("JSESSIONID",
+                            sessionInfo.getSessionId()));
                     if (log.isDebugEnabled()) {
                         log.debug(request.hashCode() +
                                 ": SessionID=" + sessionInfo.getSessionId());
