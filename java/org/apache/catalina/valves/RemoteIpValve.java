@@ -752,7 +752,7 @@ public class RemoteIpValve extends ValveBase {
     /**
      * Should this valve set request attributes for IP address, Hostname,
      * protocol and port used for the request? This are typically used in
-     * conjunction with the {@link AccessLogValve} which will otherwise log the
+     * conjunction with the {@link AccessLog} which will otherwise log the
      * original values. Default is <code>true</code>.
      * 
      * The attributes set are:

@@ -296,7 +296,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * @see #setRequestAttributesEnabled(boolean)
      */
-    protected boolean requestAttributesEnabled = true;
+    protected boolean requestAttributesEnabled = false;
 
     // ------------------------------------------------------------- Properties
 
