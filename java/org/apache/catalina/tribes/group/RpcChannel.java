@@ -24,7 +24,9 @@ import java.util.HashMap;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelListener;
+import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -126,14 +128,46 @@ public class RpcChannel implements ChannelListener{
                 }//synchronized
             }//end if
         } else{
+            boolean finished = false;
+            final ExtendedRpcCallback excallback = (callback instanceof ExtendedRpcCallback)?((ExtendedRpcCallback)callback) : null;
+            boolean asyncReply = ((replyMessageOptions & Channel.SEND_OPTIONS_ASYNCHRONOUS) == Channel.SEND_OPTIONS_ASYNCHRONOUS);
             Serializable reply = callback.replyRequest(rmsg.message,sender);
-            rmsg.reply = true;
-            rmsg.message = reply;
-            try {
-                channel.send(new Member[] {sender}, rmsg,
-                        replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
-            }catch ( Exception x )  {
-                log.error("Unable to send back reply in RpcChannel.",x);
+            while (!finished) {
+                ErrorHandler handler = null;
+                final Serializable request = msg;
+                final Serializable response = reply;
+                final Member fsender = sender;
+                if (excallback!=null && asyncReply) {
+                    handler = new ErrorHandler() {
+                        public void handleError(ChannelException x, UniqueId id) {
+                            excallback.replyFailed(request, response, fsender, x);
+                        }
+                        
+                        public void handleCompletion(UniqueId id) {
+                            excallback.replySucceeded(request, response, fsender);
+                        }
+                    };
+                }
+                rmsg.reply = true;
+                rmsg.message = reply;
+                try {
+                    if (handler!=null) {
+                        channel.send(new Member[] {sender}, rmsg,replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK, handler);
+                    } else {
+                        channel.send(new Member[] {sender}, rmsg,replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
+                    }
+                    finished = true;
+                    if (excallback != null && !asyncReply) {
+                        excallback.replySucceeded(rmsg.message, reply, sender);
+                    }
+                }catch ( Exception x )  {
+                    if (excallback != null && !asyncReply) {
+                        finished = !excallback.replyFailed(rmsg.message, reply, sender, x);
+                    } else {
+                        finished = true;
+                        log.error("Unable to send back reply in RpcChannel.",x);
+                    }
+                }
             }
         }//end if
     }
