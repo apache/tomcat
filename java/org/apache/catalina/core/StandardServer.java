@@ -718,6 +718,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_START_EVENT, null);
         setState(LifecycleState.STARTING);
 
+        globalNamingResources.start();
+        
         // Start our defined Services
         synchronized (services) {
             for (int i = 0; i < services.length; i++) {
@@ -745,8 +747,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             services[i].stop();
         }
 
+        globalNamingResources.stop();
+        
         stopAwait();
-
     }
 
     /**
@@ -770,8 +773,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         onameMBeanFactory = register(factory, "type=MBeanFactory");
         
         // Register the naming resources
-        onameNamingResoucres = register(globalNamingResources,
-                "type=NamingResources");
+        globalNamingResources.init();
         
         // Initialize our defined Services
         for (int i = 0; i < services.length; i++) {
@@ -786,12 +788,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             services[i].destroy();
         }
 
+        globalNamingResources.destroy();
+        
         unregister(onameMBeanFactory);
         
         unregister(onameStringCache);
-        
-        unregister(onameNamingResoucres);
-        
+                
         super.destroyInternal();
     }
 
@@ -824,7 +826,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     
     private ObjectName onameStringCache;
     private ObjectName onameMBeanFactory;
-    private ObjectName onameNamingResoucres;
     
     /**
      * Obtain the MBean domain for this server. The domain is obtained using
