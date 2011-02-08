@@ -41,6 +41,15 @@
 <!--
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
 -->
+<section name="Tomcat 7.0.9 (markt)">
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get confirmation when sending a reply.
+      </fix>  
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.8 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -80,13 +89,6 @@
         Fix hanging Servlet 3 asynchronous requests when using the APR based AJP
         connector. (markt) 
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Tribes">
-    <changelog>
-      <fix>
-        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get confirmation when sending a reply.
-      </fix>  
     </changelog>
   </subsection>
   <subsection name="Other">
