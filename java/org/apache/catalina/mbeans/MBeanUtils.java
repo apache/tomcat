@@ -136,7 +136,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static DynamicMBean createMBean(ContextEnvironment environment)
+    public static DynamicMBean createMBean(ContextEnvironment environment)
         throws Exception {
 
         String mname = createManagedName(environment);
@@ -167,7 +167,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static DynamicMBean createMBean(ContextResource resource)
+    public static DynamicMBean createMBean(ContextResource resource)
         throws Exception {
 
         String mname = createManagedName(resource);
@@ -198,7 +198,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static DynamicMBean createMBean(ContextResourceLink resourceLink)
+    public static DynamicMBean createMBean(ContextResourceLink resourceLink)
         throws Exception {
 
         String mname = createManagedName(resourceLink);
@@ -1026,7 +1026,7 @@ public class MBeanUtils {
 
         if (registry == null) {
             registry = Registry.getRegistry(null, null);
-            ClassLoader cl=ServerLifecycleListener.class.getClassLoader();
+            ClassLoader cl = MBeanUtils.class.getClassLoader();
 
             registry.loadDescriptors("org.apache.catalina.mbeans",  cl);
             registry.loadDescriptors("org.apache.catalina.authenticator", cl);
@@ -1140,7 +1140,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be deregistered
      */
-    static void destroyMBean(ContextEnvironment environment)
+    public static void destroyMBean(ContextEnvironment environment)
         throws Exception {
 
         String mname = createManagedName(environment);
@@ -1166,7 +1166,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be deregistered
      */
-    static void destroyMBean(ContextResource resource)
+    public static void destroyMBean(ContextResource resource)
         throws Exception {
 
         // If this is a user database resource need to destroy groups, roles,
@@ -1198,7 +1198,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be deregistered
      */
-    static void destroyMBean(ContextResourceLink resourceLink)
+    public static void destroyMBean(ContextResourceLink resourceLink)
         throws Exception {
 
         String mname = createManagedName(resourceLink);

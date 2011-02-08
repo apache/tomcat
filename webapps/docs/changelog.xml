@@ -60,6 +60,10 @@
         address, remote host, protocol and server port may be used in an access
         log if desired. (markt)
       </add>
+      <fix>
+        Restore access to Environments, Resources and ResourceLinks via JMX
+        which was lost in early 7.0.x re-factoring. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
