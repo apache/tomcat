@@ -64,6 +64,10 @@
         Restore access to Environments, Resources and ResourceLinks via JMX
         which was lost in early 7.0.x re-factoring. (markt)
       </fix>
+      <update>
+        Remove ServerLifeListener. This was already removed from server.xml and
+        with the Lifecycle re-factoring is no longer required. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -117,19 +117,6 @@
     <p>No additional attributes are supported by the <strong>Jasper Listener
     </strong>.</p>
 
-    <h3>Server Lifecycle Listener
-    (org.apache.catalina.mbeans.ServerLifecycleListener)</h3>
-
-    <p>The <strong>Server Lifecycle Listener</strong> initializes the
-    MBeanServer for the MBeans that may be used to manage Tomcat via JMX.
-    Without this listener, none of the Tomcat MBeans will be available.</p>
-
-    <p>This listener must only be nested within <a href="server.html">Server</a>
-    elements.</p>
-
-    <p>No additional attributes are supported by the <strong>Server Lifecycle
-    Listener</strong>.</p>
-
     <h3>Global Resources Lifecycle Listener
     (org.apache.catalina.mbeans.GlobalResourcesLifecycleListener)</h3>
 
