@@ -132,8 +132,8 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * Utility method to enable sub-classes to easily register additional
      * components that don't implement {@link MBeanRegistration} with
      * an MBean server.<br/>
-     * Note: This method can only be used once {@link #initInternal()} has been
-     * called. 
+     * Note: This method should only be used once {@link #initInternal()} has
+     * been called and before {@link #destroyInternal()} has been called. 
      * 
      * @param obj                       The object the register
      * @param objectNameKeyProperties   The key properties component of the
@@ -171,7 +171,10 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /**
      * Utility method to enable sub-classes to easily unregister additional
      * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.
+     * an MBean server.<br/>
+     * Note: This method should only be used once {@link #initInternal()} has
+     * been called and before {@link #destroyInternal()} has been called. 
+     * 
      * @param on    The name of the component to unregister
      */
     protected final void unregister(ObjectName on) {
