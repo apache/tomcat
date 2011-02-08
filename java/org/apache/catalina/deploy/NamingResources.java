@@ -25,9 +25,17 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
+import org.apache.catalina.mbeans.MBeanUtils;
+import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -38,9 +46,16 @@ import org.apache.catalina.Server;
  * @version $Id$
  */
 
-public class NamingResources implements Serializable {
+public class NamingResources extends LifecycleMBeanBase implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    private static final Log log = LogFactory.getLog(NamingResources.class);
+    
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
+
+    private volatile boolean resourceRequireExplicitRegistration = false;
 
     // ----------------------------------------------------------- Constructors
 
@@ -238,6 +253,15 @@ public class NamingResources implements Serializable {
         }
         support.firePropertyChange("environment", null, environment);
 
+        // Register with JMX
+        if (resourceRequireExplicitRegistration) {
+            try {
+                MBeanUtils.createMBean(environment);
+            } catch (Exception e) {
+                log.warn(sm.getString("namingResources.mbeanCreateFail",
+                        environment.getName()), e);
+            }
+        }
     }
 
     // Container should be an instance of Server or Context. If it is anything
@@ -330,6 +354,15 @@ public class NamingResources implements Serializable {
         }
         support.firePropertyChange("resource", null, resource);
 
+        // Register with JMX
+        if (resourceRequireExplicitRegistration) {
+            try {
+                MBeanUtils.createMBean(resource);
+            } catch (Exception e) {
+                log.warn(sm.getString("namingResources.mbeanCreateFail",
+                        resource.getName()), e);
+            }
+        }
     }
 
 
@@ -378,6 +411,15 @@ public class NamingResources implements Serializable {
         }
         support.firePropertyChange("resourceLink", null, resourceLink);
 
+        // Register with JMX
+        if (resourceRequireExplicitRegistration) {
+            try {
+                MBeanUtils.createMBean(resourceLink);
+            } catch (Exception e) {
+                log.warn(sm.getString("namingResources.mbeanCreateFail",
+                        resourceLink.getName()), e);
+            }
+        }
     }
 
 
@@ -689,9 +731,17 @@ public class NamingResources implements Serializable {
         }
         if (environment != null) {
             support.firePropertyChange("environment", environment, null);
+            // De-register with JMX
+            if (resourceRequireExplicitRegistration) {
+                try {
+                    MBeanUtils.destroyMBean(environment);
+                } catch (Exception e) {
+                    log.warn(sm.getString("namingResources.mbeanDestroyFail",
+                            environment.getName()), e);
+                }
+            }
             environment.setNamingResources(null);
         }
-
     }
 
 
@@ -765,9 +815,17 @@ public class NamingResources implements Serializable {
         }
         if (resource != null) {
             support.firePropertyChange("resource", resource, null);
+            // De-register with JMX
+            if (resourceRequireExplicitRegistration) {
+                try {
+                    MBeanUtils.destroyMBean(resource);
+                } catch (Exception e) {
+                    log.warn(sm.getString("namingResources.mbeanDestroyFail",
+                            resource.getName()), e);
+                }
+            }
             resource.setNamingResources(null);
         }
-
     }
 
 
@@ -808,9 +866,17 @@ public class NamingResources implements Serializable {
         }
         if (resourceLink != null) {
             support.firePropertyChange("resourceLink", resourceLink, null);
+            // De-register with JMX
+            if (resourceRequireExplicitRegistration) {
+                try {
+                    MBeanUtils.destroyMBean(resourceLink);
+                } catch (Exception e) {
+                    log.warn(sm.getString("namingResources.mbeanDestroyFail",
+                            resourceLink.getName()), e);
+                }
+            }
             resourceLink.setNamingResources(null);
         }
-
     }
 
 
@@ -835,4 +901,119 @@ public class NamingResources implements Serializable {
     }
 
 
+    // ------------------------------------------------------- Lifecycle methods
+    
+    @Override
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        
+        // Set this before we register currently known naming resources to avoid
+        // timing issues. Duplication registration is not an issue.
+        resourceRequireExplicitRegistration = true;
+        
+        for (ContextResource cr : resources.values()) {
+            try {
+                MBeanUtils.createMBean(cr);
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "namingResources.mbeanCreateFail", cr.getName()), e);
+            }
+        }
+        
+        for (ContextEnvironment ce : envs.values()) {
+            try {
+                MBeanUtils.createMBean(ce);
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "namingResources.mbeanCreateFail", ce.getName()), e);
+            }
+        }
+        
+        for (ContextResourceLink crl : resourceLinks.values()) {
+            try {
+                MBeanUtils.createMBean(crl);
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "namingResources.mbeanCreateFail", crl.getName()), e);
+            }
+        }
+    }
+
+
+    @Override
+    protected void startInternal() throws LifecycleException {
+        fireLifecycleEvent(CONFIGURE_START_EVENT, null);
+        setState(LifecycleState.STARTING);
+    }
+
+
+    @Override
+    protected void stopInternal() throws LifecycleException {
+        setState(LifecycleState.STOPPING);
+        fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
+    }
+
+    
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+
+        // Set this before we de-register currently known naming resources to
+        // avoid timing issues. Duplication de-registration is not an issue.
+        resourceRequireExplicitRegistration = false;
+
+        // Destroy in reverse order to create, although it should not matter
+        for (ContextResourceLink crl : resourceLinks.values()) {
+            try {
+                MBeanUtils.destroyMBean(crl);
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "namingResources.mbeanDestroyFail", crl.getName()), e);
+            }
+        }
+        
+        for (ContextEnvironment ce : envs.values()) {
+            try {
+                MBeanUtils.destroyMBean(ce);
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "namingResources.mbeanDestroyFail", ce.getName()), e);
+            }
+        }
+        
+        for (ContextResource cr : resources.values()) {
+            try {
+                MBeanUtils.destroyMBean(cr);
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "namingResources.mbeanDestroyFail", cr.getName()), e);
+            }
+        }
+        
+        super.destroyInternal();
+    }
+
+
+    @Override
+    protected String getDomainInternal() {
+        // Use the same domain as our associated container if we have one
+        Object c = getContainer();
+        
+        if (c instanceof LifecycleMBeanBase) {
+            return ((LifecycleMBeanBase) c).getDomain();
+        }
+
+        return null;
+    }
+
+
+    @Override
+    protected String getObjectNameKeyProperties() {
+        Object c = getContainer();
+        if (c instanceof Container) {
+            return "type=NamingResources" +
+                    MBeanUtils.getContainerKeyProperties((Container) c);
+        }
+        // Server or just unknown
+        return "type=NamingResources";
+    }
 }

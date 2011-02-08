@@ -448,7 +448,6 @@ public class StandardContext extends ContainerBase
      * The naming resources for this web application.
      */
     private NamingResources namingResources = null;
-    private ObjectName onameNamingResources;
 
     /**
      * The message destinations for this web application.
@@ -1934,16 +1933,29 @@ public class StandardContext extends ContainerBase
         // Process the property setting change
         NamingResources oldNamingResources = this.namingResources;
         this.namingResources = namingResources;
-        namingResources.setContainer(this);
+        if (namingResources != null) {
+            namingResources.setContainer(this);
+        }
         support.firePropertyChange("namingResources",
                                    oldNamingResources, this.namingResources);
         
         // If set from server.xml, getObjectKeyPropertiesNameOnly() will
         // trigger an NPE. Initial registration takes place on INIT. 
         if (getState() != LifecycleState.NEW) {
-            unregister(onameNamingResources);
-            onameNamingResources = register(namingResources,
-                    "type=NamingResources," + getObjectKeyPropertiesNameOnly());
+            if (oldNamingResources != null) {
+                try {
+                    oldNamingResources.destroy();
+                } catch (LifecycleException e) {
+                    log.warn("standardContext.namingResource.destroy.fail", e);
+                }
+            }
+            if (namingResources != null) {
+                try {
+                    namingResources.init();
+                } catch (LifecycleException e) {
+                    log.warn("standardContext.namingResource.init.fail", e);
+                }
+            }
         }
     }
 
@@ -5435,7 +5447,9 @@ public class StandardContext extends ContainerBase
                              sequenceNumber.getAndIncrement());
         broadcaster.sendNotification(notification);
 
-        unregister(onameNamingResources);
+        if (namingResources != null) {
+            namingResources.destroy();
+        }
 
         synchronized (instanceListenersLock) {
             instanceListeners = new String[0];
@@ -6087,8 +6101,7 @@ public class StandardContext extends ContainerBase
 
         // Register the naming resources
         if (namingResources != null) {
-            onameNamingResources = register(namingResources,
-                    "type=NamingResources," + getObjectNameKeyProperties());
+            namingResources.init();
         }
 
         // Send j2ee.object.created notification 
