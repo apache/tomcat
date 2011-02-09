@@ -326,7 +326,7 @@ public final class RequestUtil {
             if (b == '+' && isQuery) {
                 b = (byte)' ';
             } else if (b == '%') {
-                if (ix + 2 >= len) {
+                if (ix + 2 > len) {
                     throw new IllegalArgumentException(
                             sm.getString("requestUtil.urlDecode.missingDigit"));
                 }
