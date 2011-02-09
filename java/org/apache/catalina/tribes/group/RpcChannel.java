@@ -158,9 +158,6 @@ public class RpcChannel implements ChannelListener{
                         channel.send(new Member[] {sender}, rmsg,replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
                     }
                     finished = true;
-                    if (excallback != null && !asyncReply) {
-                        excallback.replySucceeded(rmsg.message, reply, sender);
-                    }
                 }catch ( Exception x )  {
                     if (excallback != null && !asyncReply) {
                         finished = !excallback.replyFailed(rmsg.message, reply, sender, x);
@@ -168,6 +165,9 @@ public class RpcChannel implements ChannelListener{
                         finished = true;
                         log.error("Unable to send back reply in RpcChannel.",x);
                     }
+                }
+                if (finished && excallback != null && !asyncReply) {
+                    excallback.replySucceeded(rmsg.message, reply, sender);
                 }
             }
         }//end if
