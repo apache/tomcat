@@ -95,16 +95,16 @@ public abstract class LifecycleBase implements Lifecycle {
         if (!state.equals(LifecycleState.NEW)) {
             invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
         }
-        setState(LifecycleState.INITIALIZING);
+        setStateInternal(LifecycleState.INITIALIZING, null, false);
 
         try {
             initInternal();
         } catch (LifecycleException e) {
-            setState(LifecycleState.FAILED);
+            setStateInternal(LifecycleState.FAILED, null, false);
             throw e;
         }
 
-        setState(LifecycleState.INITIALIZED);
+        setStateInternal(LifecycleState.INITIALIZED, null, false);
     }
     
     
@@ -139,12 +139,12 @@ public abstract class LifecycleBase implements Lifecycle {
             invalidTransition(Lifecycle.BEFORE_START_EVENT);
         }
 
-        setState(LifecycleState.STARTING_PREP);
+        setStateInternal(LifecycleState.STARTING_PREP, null, false);
 
         try {
             startInternal();
         } catch (LifecycleException e) {
-            setState(LifecycleState.FAILED);
+            setStateInternal(LifecycleState.FAILED, null, false);
             throw e;
         }
 
@@ -158,7 +158,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 invalidTransition(Lifecycle.AFTER_START_EVENT);
             }
             
-            setState(LifecycleState.STARTED);
+            setStateInternal(LifecycleState.STARTED, null, false);
         }
     }
 
@@ -212,18 +212,18 @@ public abstract class LifecycleBase implements Lifecycle {
             invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
         }
         
-        setState(LifecycleState.STOPPING_PREP);
+        setStateInternal(LifecycleState.STOPPING_PREP, null, false);
 
         try {
             stopInternal();
         } catch (LifecycleException e) {
-            setState(LifecycleState.FAILED);
+            setStateInternal(LifecycleState.FAILED, null, false);
             throw e;
         }
 
         if (state.equals(LifecycleState.MUST_DESTROY)) {
             // Complete stop process first
-            setState(LifecycleState.STOPPED);
+            setStateInternal(LifecycleState.STOPPED, null, false);
 
             destroy();
         } else {
@@ -233,7 +233,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 invalidTransition(Lifecycle.AFTER_STOP_EVENT);
             }
 
-            setState(LifecycleState.STOPPED);
+            setStateInternal(LifecycleState.STOPPED, null, false);
         }
     }
 
@@ -271,16 +271,16 @@ public abstract class LifecycleBase implements Lifecycle {
             invalidTransition(Lifecycle.BEFORE_DESTROY_EVENT);
         }
 
-        setState(LifecycleState.DESTROYING);
+        setStateInternal(LifecycleState.DESTROYING, null, false);
         
         try {
             destroyInternal();
         } catch (LifecycleException e) {
-            setState(LifecycleState.FAILED);
+            setStateInternal(LifecycleState.FAILED, null, false);
             throw e;
         }
         
-        setState(LifecycleState.DESTROYED);
+        setStateInternal(LifecycleState.DESTROYED, null, false);
     }
     
     
@@ -307,28 +307,62 @@ public abstract class LifecycleBase implements Lifecycle {
     /**
      * Provides a mechanism for sub-classes to update the component state.
      * Calling this method will automatically fire any associated
-     * {@link Lifecycle} event.
+     * {@link Lifecycle} event. It will also check that any attempted state
+     * transition is valid for a sub-class.
      * 
      * @param state The new state for this component
      */
-    protected synchronized void setState(LifecycleState state) {
-        setState(state, null);
+    protected synchronized void setState(LifecycleState state)
+            throws LifecycleException {
+        setStateInternal(state, null, true);
     }
     
     
     /**
      * Provides a mechanism for sub-classes to update the component state.
      * Calling this method will automatically fire any associated
-     * {@link Lifecycle} event.
+     * {@link Lifecycle} event. It will also check that any attempted state
+     * transition is valid for a sub-class.
      * 
      * @param state The new state for this component
      * @param data  The data to pass to the associated {@link Lifecycle} event
      */
-    protected synchronized void setState(LifecycleState state, Object data) {
+    protected synchronized void setState(LifecycleState state, Object data)
+            throws LifecycleException {
+        setStateInternal(state, data, true);
+    }
+
+    private synchronized void setStateInternal(LifecycleState state,
+            Object data, boolean check) throws LifecycleException {
         
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("lifecycleBase.setState", this, state));
         }
+        
+        if (check) {
+            // Must have been triggered by one of the abstract methods (assume
+            // code in this class is correct)
+            // null is never a valid state
+            if (state == null) {
+                invalidTransition("null");
+                // Unreachable code - here to stop eclipse complaining about
+                // a possible NPE further down the method
+                return;
+            }
+            
+            // Any method can transition to failed
+            // startInternal() permits STARTING_PREP to STARTING
+            // stopInternal() permits STOPPING_PREP to STOPPING
+            if (!(state == LifecycleState.FAILED ||
+                    (this.state == LifecycleState.STARTING_PREP &&
+                            state == LifecycleState.STARTING) ||
+                    (this.state == LifecycleState.STOPPING_PREP &&
+                            state == LifecycleState.STOPPING))) {
+                // No other transition permitted
+                invalidTransition(state.name());
+            }
+        }
+        
         this.state = state;
         String lifecycleEvent = state.getLifecycleEvent();
         if (lifecycleEvent != null) {
@@ -336,7 +370,6 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-    
     private void invalidTransition(String type) throws LifecycleException {
         String msg = sm.getString("lifecycleBase.invalidTransition", type,
                 toString(), state);
