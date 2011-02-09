@@ -24,6 +24,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
@@ -92,7 +93,7 @@ public class MapperListener extends LifecycleMBeanBase
     // ------------------------------------------------------- Lifecycle Methods
 
     @Override
-    public void startInternal() {
+    public void startInternal() throws LifecycleException {
 
         setState(LifecycleState.STARTING);
 
@@ -116,7 +117,7 @@ public class MapperListener extends LifecycleMBeanBase
         
 
     @Override
-    public void stopInternal() {
+    public void stopInternal() throws LifecycleException {
         setState(LifecycleState.STOPPING);
     }
 

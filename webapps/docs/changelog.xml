@@ -39,7 +39,8 @@
 
 <body>
 <!--
-  General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
+  General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
+  Other
 -->
 <section name="Tomcat 7.0.9 (markt)">
   <subsection name="Catalina">
@@ -57,6 +58,11 @@
         Remove ServerLifecycleListener. This was already removed from server.xml
         and with the Lifecycle re-factoring is no longer required. (markt)
       </update>
+      <add>
+        Add additional checks to ensure that sub-classes of
+        <code>org.apache.catalina.LifecycleBase</code> correctly implement the
+        expected state transitions. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
