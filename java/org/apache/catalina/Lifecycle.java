@@ -31,7 +31,7 @@ package org.apache.catalina;
  * NEW ->-- INITIALIZING
  * |||           |                  --------------------<-----------------------
  * |||           |auto              |                                          |
- * |||           |     start()      |        auto          auto         stop() |
+ * |||          \|/    start()     \|/       auto          auto         stop() |
  * |||      INITIALIZED -->-- STARTING_PREP -->- STARTING -->- STARTED -->---  |
  * |||                              ^                             |         |  |
  * |||        start()               |                             |         |  |
@@ -42,7 +42,7 @@ package org.apache.catalina;
  * |  |          |                                                          |  |
  * |  |          ---------------------------<--------------------------------  ^
  * |  |          |                                                             |
- * |  |          |             auto                 auto              start()  |
+ * |  |         \|/            auto                 auto              start()  |
  * |  |     STOPPING_PREP ------>----- STOPPING ------>----- STOPPED ---->------
  * |  |          ^                                           |  |  ^
  * |  |          |                                  auto     |  |  |
