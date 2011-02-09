@@ -164,13 +164,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes must ensure that:
-     * <ul>
-     * <li>the {@link Lifecycle#START_EVENT} is fired during the execution of
-     *     this method</li>
-     * <li>the state is changed to {@link LifecycleState#STARTING} when the
-     *     {@link Lifecycle#START_EVENT} is fired
-     * </ul>
+     * Sub-classes must ensure that the state is changed to
+     * {@link LifecycleState#STARTING} during the execution of this method.
+     * Changing state will trigger the {@link Lifecycle#START_EVENT} event.
      * 
      * If a component fails to start it may either throw a
      * {@link LifecycleException} which will cause it's parent to fail to start
@@ -243,13 +239,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes must ensure that:
-     * <ul>
-     * <li>the {@link Lifecycle#STOP_EVENT} is fired during the execution of
-     *     this method</li>
-     * <li>the state is changed to {@link LifecycleState#STOPPING} when the
-     *     {@link Lifecycle#STOP_EVENT} is fired
-     * </ul>
+     * Sub-classes must ensure that the state is changed to
+     * {@link LifecycleState#STOPPING} during the execution of this method.
+     * Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
      * 
      * @throws LifecycleException
      */
