@@ -63,6 +63,10 @@
         <code>org.apache.catalina.util.LifecycleBase</code> correctly implement
         the expected state transitions. (markt)
       </add>
+      <fix>
+        <bug>50747</bug>: Allow the content length header to be set up to the
+        point the response is committed when a writer is beng used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
