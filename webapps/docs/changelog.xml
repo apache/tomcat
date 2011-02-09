@@ -42,28 +42,8 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Other
 -->
 <section name="Tomcat 7.0.9 (markt)">
-  <subsection name="Tribes">
-    <changelog>
-      <fix>
-        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get confirmation when sending a reply.
-      </fix>  
-    </changelog>
-  </subsection>
-</section>
-<section name="Tomcat 7.0.8 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <fix>
-        Fix NPE in CoyoteAdapter when postParseRequest() call fails. (kkolinko)
-      </fix>
-      <fix>
-       <bug>50709</bug>: Make <code>ApplicationContextFacade</code> non-final to
-       enable extension. (markt)
-      </fix>
-      <fix>
-        When running under a security manager, user requests may fail with a
-        security exception. (markt)
-      </fix>
       <add>
         Enhance the RemoteIpFilter and RemoteIpValve so that the modified remote
         address, remote host, protocol and server port may be used in an access
@@ -77,6 +57,30 @@
         Remove ServerLifecycleListener. This was already removed from server.xml
         and with the Lifecycle re-factoring is no longer required. (markt)
       </update>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get confirmation when sending a reply.
+      </fix>  
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 7.0.8 (markt)" rtext="released 2011-02-05">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix NPE in CoyoteAdapter when postParseRequest() call fails. (kkolinko)
+      </fix>
+      <fix>
+       <bug>50709</bug>: Make <code>ApplicationContextFacade</code> non-final to
+       enable extension. (markt)
+      </fix>
+      <fix>
+        When running under a security manager, user requests may fail with a
+        security exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
