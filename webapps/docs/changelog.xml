@@ -60,8 +60,8 @@
       </update>
       <add>
         Add additional checks to ensure that sub-classes of
-        <code>org.apache.catalina.LifecycleBase</code> correctly implement the
-        expected state transitions. (markt)
+        <code>org.apache.catalina.util.LifecycleBase</code> correctly implement
+        the expected state transitions. (markt)
       </add>
     </changelog>
   </subsection>
