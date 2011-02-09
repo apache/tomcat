@@ -139,10 +139,11 @@ public class RpcChannel implements ChannelListener{
                 final Member fsender = sender;
                 if (excallback!=null && asyncReply) {
                     handler = new ErrorHandler() {
+                        @Override
                         public void handleError(ChannelException x, UniqueId id) {
                             excallback.replyFailed(request, response, fsender, x);
                         }
-                        
+                        @Override
                         public void handleCompletion(UniqueId id) {
                             excallback.replySucceeded(request, response, fsender);
                         }
