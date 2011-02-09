@@ -64,8 +64,12 @@
         the expected state transitions. (markt)
       </add>
       <fix>
+        <bug>50721</bug>: Correctly handle URL decoding where the URL ends in
+        %nn. Patch provided by Christof Marti. (markt)
+      </fix>
+      <fix>
         <bug>50748</bug>: Allow the content length header to be set up to the
-        point the response is committed when a writer is beng used. (markt)
+        point the response is committed when a writer is being used. (markt)
       </fix>
     </changelog>
   </subsection>
