@@ -1944,6 +1944,7 @@ public class StandardContext extends ContainerBase
         if (getState() != LifecycleState.NEW) {
             if (oldNamingResources != null) {
                 try {
+                    oldNamingResources.stop();
                     oldNamingResources.destroy();
                 } catch (LifecycleException e) {
                     log.warn("standardContext.namingResource.destroy.fail", e);
@@ -1952,6 +1953,7 @@ public class StandardContext extends ContainerBase
             if (namingResources != null) {
                 try {
                     namingResources.init();
+                    namingResources.start();
                 } catch (LifecycleException e) {
                     log.warn("standardContext.namingResource.init.fail", e);
                 }
@@ -4880,6 +4882,12 @@ public class StandardContext extends ContainerBase
         setConfigured(false);
         boolean ok = true;
 
+        // Currently this is effectively a NO-OP but needs to be called to
+        // ensure the NamingResources follows the correct lifecycle
+        if (namingResources != null) {
+            namingResources.start();
+        }
+        
         // Add missing components as necessary
         if (webappResources == null) {   // (1) Required by Loader
             if (log.isDebugEnabled())
@@ -5303,6 +5311,12 @@ public class StandardContext extends ContainerBase
         
         setState(LifecycleState.STOPPING);
 
+        // Currently this is effectively a NO-OP but needs to be called to
+        // ensure the NamingResources follows the correct lifecycle
+        if (namingResources != null) {
+            namingResources.stop();
+        }
+        
         // Binding thread
         ClassLoader oldCCL = bindThread();
 
