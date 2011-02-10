@@ -19,6 +19,9 @@ package org.apache.catalina.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -803,6 +806,62 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     }
                 }
             });
+        }
+    }
+    
+    public void testBug50753() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctx = 
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Bug50753Servlet servlet = new Bug50753Servlet();
+        
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/", "servlet");
+        
+        tomcat.start();
+        
+        // Call the servlet once
+        Map<String,List<String>> headers =
+            new LinkedHashMap<String,List<String>>();
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, headers);
+        assertEquals(200, rc);
+        assertEquals("OK", bc.toString());
+        List<String> testHeader = headers.get("A");
+        assertNotNull(testHeader);
+        assertEquals(1, testHeader.size());
+        assertEquals("xyz",testHeader.get(0));
+    }
+
+    private static class Bug50753Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req,
+                final HttpServletResponse resp)
+                throws ServletException, IOException {
+            final AsyncContext ctx = req.startAsync(); 
+            ctx.start(new Runnable() { 
+                @Override
+                public void run() { 
+                    try { 
+                        Thread.sleep(5000); 
+                        resp.setHeader("A", "xyz"); 
+                        resp.setContentType("text/plain"); 
+                        resp.setContentLength("OK".getBytes().length); 
+                        resp.getWriter().print("OK"); 
+                        ctx.complete(); 
+                    } catch (Exception e) { 
+                        e.printStackTrace();
+                    } 
+                } 
+            }); 
         }
     }
 }
