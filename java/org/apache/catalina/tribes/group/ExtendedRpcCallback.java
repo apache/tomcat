@@ -18,7 +18,6 @@ package org.apache.catalina.tribes.group;
 
 import java.io.Serializable;
 
-import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
 /**
  * Extension to the {@link RpcCallback} interface. Allows a RPC messenger to get a confirmation if the reply
