@@ -73,6 +73,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>50720</bug>: Ensure that the use of non-ISO-8859-1 character sets
+        for web.xml does not trigger an error when Jasper parses the web.xml
+        file. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
