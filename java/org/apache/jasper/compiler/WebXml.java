@@ -17,9 +17,9 @@
 
 package org.apache.jasper.compiler;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -46,8 +46,8 @@ public class WebXml {
 
     private final Log log = LogFactory.getLog(WebXml.class);
             
-    private InputStream is;
-    private InputSource ip;
+    private InputStream stream;
+    private InputSource source;
     private String systemId;
 
     public WebXml(ServletContext ctxt) throws IOException {
@@ -55,13 +55,13 @@ public class WebXml {
         String webXml = (String) ctxt.getAttribute(
                 org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML);
         if (webXml != null) {
-            is = new ByteArrayInputStream(webXml.getBytes());
+            source = new InputSource(new StringReader(webXml));
             systemId = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML;
         }
         
         // If not available as context attribute, look for an alternative
         // location
-        if (is == null) {
+        if (source == null) {
             // Acquire input stream to web application deployment descriptor
             String altDDName = (String)ctxt.getAttribute(
                                                     Constants.ALT_DD_ATTR);
@@ -69,7 +69,8 @@ public class WebXml {
                 try {
                     URL uri =
                         new URL(FILE_PROTOCOL+altDDName.replace('\\', '/'));
-                    is = uri.openStream();
+                    stream = uri.openStream();
+                    source = new InputSource(stream);
                     systemId = uri.toExternalForm();
                 } catch (MalformedURLException e) {
                     log.warn(Localizer.getMessage(
@@ -80,22 +81,22 @@ public class WebXml {
         }
         
         // Finally, try the default /WEB-INF/web.xml
-        if (is == null) {
+        if (source == null) {
             URL uri = ctxt.getResource(WEB_XML);
             if (uri == null) {
                 log.warn(Localizer.getMessage(
                         "jsp.error.internal.filenotfound", WEB_XML));
             } else {
-                is = uri.openStream();
+                stream = uri.openStream();
+                source = new InputSource(stream);
                 systemId = uri.toExternalForm();
             }
         }
 
-        if (is == null) {
+        if (source == null) {
             systemId = null;
         } else {
-            ip = new InputSource(is);
-            ip.setSystemId(systemId);
+            source.setSystemId(systemId);
         }
     }
     
@@ -104,13 +105,13 @@ public class WebXml {
     }
 
     public InputSource getInputSource() {
-        return ip;
+        return source;
     }
 
     public void close() {
-        if (is != null) {
+        if (stream != null) {
             try {
-                is.close();
+                stream.close();
             } catch (IOException e) {
                 log.error(Localizer.getMessage(
                         "jsp.error.stream.close.failed"));
