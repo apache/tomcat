@@ -159,9 +159,8 @@ public class RpcChannel implements ChannelListener{
                 finished = true;
             }catch ( Exception x )  {
                 if (excallback != null && !asyncReply) {
-                    finished = !excallback.replyFailed(rmsg.message, reply, sender, x);
+                    excallback.replyFailed(rmsg.message, reply, sender, x);
                 } else {
-                    finished = true;
                     log.error("Unable to send back reply in RpcChannel.",x);
                 }
             }
