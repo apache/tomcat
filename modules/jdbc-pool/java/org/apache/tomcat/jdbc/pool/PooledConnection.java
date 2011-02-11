@@ -417,7 +417,12 @@ public class PooledConnection {
         }
 
         if (poolProperties.getValidator() != null) {
-            return poolProperties.getValidator().validate(connection, validateAction);
+            if (poolProperties.getValidator().validate(connection, validateAction)) {
+                this.lastValidated = now;
+                return true;
+            } else {
+                return false;
+            }
         }
         
         String query = sql;
