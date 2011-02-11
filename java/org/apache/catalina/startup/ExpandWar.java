@@ -389,27 +389,6 @@ public class ExpandWar {
 
 
     /**
-     * Expand the specified input stream into the specified directory, creating
-     * a file named from the specified relative path.
-     *
-     * @param input InputStream to be copied
-     * @param docBase Document base directory into which we are expanding
-     * @param name Relative pathname of the file to be created
-     * @return A handle to the expanded File
-     *
-     * @exception IOException if an input/output error occurs
-     * 
-     * @deprecated
-     */
-    protected static File expand(InputStream input, File docBase, String name)
-        throws IOException {
-        File file = new File(docBase, name);
-        expand(input, file);
-        return file;
-    }
-
-
-    /**
      * Expand the specified input stream into the specified file.
      *
      * @param input InputStream to be copied
