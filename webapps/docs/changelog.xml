@@ -71,6 +71,10 @@
         <bug>50748</bug>: Allow the content length header to be set up to the
         point the response is committed when a writer is being used. (markt)
       </fix>
+      <fix>
+        <bug>50752</bug>: Fix typo in debug message in deprecated Embedded
+        class. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
