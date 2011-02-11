@@ -370,6 +370,8 @@ public class TestStandardContext extends TomcatBaseTest {
     }
 
     private static class Bug49711Servlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -381,12 +383,13 @@ public class TestStandardContext extends TomcatBaseTest {
             
             out.println("parts=" + (null == req.getParts()
                                     ? "null"
-                                    : req.getParts().size()));
+                                    : Integer.valueOf(req.getParts().size())));
         }
     }
 
     @MultipartConfig
     private static class Bug49711Servlet_multipart extends Bug49711Servlet {
+        private static final long serialVersionUID = 1L;
     }
 
     /**
@@ -436,12 +439,10 @@ public class TestStandardContext extends TomcatBaseTest {
                     String content = "--" + boundary + CRLF
                         + "Content-Disposition: form-data; name=\"name\"" + CRLF + CRLF
                         + "value" + CRLF
-                        + "--" + boundary + "--" + CRLF
-                        ;
+                        + "--" + boundary + "--" + CRLF;
 
                     // Re-encode the content so that bytes = characters
-                    if(null != content)
-                        content = new String(content.getBytes("UTF-8"), "ASCII");
+                    content = new String(content.getBytes("UTF-8"), "ASCII");
 
                     request = new String[] {
                         "POST http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF
