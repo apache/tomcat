@@ -28,6 +28,14 @@
   </properties>
 
 <body>
+<section name="Tomcat JDBC Connection Pool 1.0.9.4">
+  <subsection name="pool">
+    <changelog>
+      <fix><rev>1069864</rev> <bug>50759</bug> Correctly set validation timestamp when using external validator.(fhanik)</fix>
+    </changelog>
+  </subsection>
+</section>
+
 <section name="Tomcat JDBC Connection Pool 1.0.9.3">
   <subsection name="pool">
     <changelog>
