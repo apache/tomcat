@@ -67,6 +67,10 @@
         <bug>50721</bug>: Correctly handle URL decoding where the URL ends in
         %nn. Patch provided by Christof Marti. (markt)
       </fix>
+      <add>
+        <bug>50737</bug>: Add additional information when an invalid WAR file is
+        detected. (markt)
+      </add>
       <fix>
         <bug>50748</bug>: Allow the content length header to be set up to the
         point the response is committed when a writer is being used. (markt)
