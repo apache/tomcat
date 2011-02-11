@@ -507,18 +507,6 @@ public class ResourceAttributes implements Attributes {
     
     
     /**
-     * Set last modified date.
-     * 
-     * @param lastModified New last modified date value
-     * @deprecated
-     */
-    @Deprecated
-    public void setLastModified(Date lastModified) {
-        setLastModifiedDate(lastModified);
-    }
-
-
-    /**
      * Get lastModified date.
      * 
      * @return LastModified date value
