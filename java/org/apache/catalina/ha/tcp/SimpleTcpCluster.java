@@ -274,27 +274,6 @@ public class SimpleTcpCluster extends LifecycleBase
     }
 
     /**
-     * @deprecated use getManagerTemplate().getClass().getName() instead.
-     * @return String
-     */
-    @Deprecated
-    public String getManagerClassName() {
-        return managerTemplate.getClass().getName();
-    }
-
-    /**
-     * @deprecated use nested &lt;Manager&gt; element inside the cluster config instead.
-     * @param managerClassName String
-     */
-    @Deprecated
-    public void setManagerClassName(
-            @SuppressWarnings("unused") String managerClassName) {
-        log.warn("setManagerClassName is deprecated, use nested <Manager> " +
-                 "element inside the <Cluster> element instead, this request " +
-                 "will be ignored.");
-    }
-
-    /**
      * Add cluster valve 
      * Cluster Valves are only add to container when cluster is started!
      * @param valve The new cluster Valve.
@@ -527,7 +506,10 @@ public class SimpleTcpCluster extends LifecycleBase
      */
     @Override
     public synchronized Manager createManager(String name) {
-        if (log.isDebugEnabled()) log.debug("Creating ClusterManager for context " + name + " using class " + getManagerClassName());
+        if (log.isDebugEnabled()) {
+            log.debug("Creating ClusterManager for context " + name +
+                    " using class " + getManagerTemplate().getClass().getName());
+        }
         Manager manager = null;
         try {
             manager = managerTemplate.cloneFromTemplate();
