@@ -72,6 +72,11 @@
         point the response is committed when a writer is being used. (markt)
       </fix>
       <fix>
+        <bug>50751</bug>: When authenticating with the JNDI Realm, only attempt
+        to read user attributes from the directory if attributes are required.
+        (markt)
+      </fix>
+      <fix>
         <bug>50752</bug>: Fix typo in debug message in deprecated Embedded
         class. (markt)
       </fix>
