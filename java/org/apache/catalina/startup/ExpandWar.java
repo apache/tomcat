@@ -119,7 +119,9 @@ public class ExpandWar {
                     // Trying to expand outside the docBase
                     // Throw an exception to stop the deployment
                     throw new IllegalArgumentException(
-                            sm.getString("expandWar.illegalPath",war, name));
+                            sm.getString("expandWar.illegalPath",war, name,
+                                    expandedFile.getCanonicalPath(),
+                                    canonicalDocBasePrefix));
                 }
                 int last = name.lastIndexOf('/');
                 if (last >= 0) {
@@ -220,7 +222,9 @@ public class ExpandWar {
                     // Entry located outside the docBase
                     // Throw an exception to stop the deployment
                     throw new IllegalArgumentException(
-                            sm.getString("expandWar.illegalPath",war, name));
+                            sm.getString("expandWar.illegalPath",war, name,
+                                    expandedFile.getCanonicalPath(),
+                                    canonicalDocBasePrefix));
                 }
             }
         } catch (IOException e) {
