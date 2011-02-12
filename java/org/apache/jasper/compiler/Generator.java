@@ -1975,20 +1975,36 @@ class Generator {
                 } else {
                     caOut = charArrayBuffer.getOut();
                 }
-                String charArrayName = textMap.get(text);
-                if (charArrayName == null) {
-                    charArrayName = "_jspx_char_array_" + charArrayCount++;
-                    textMap.put(text, charArrayName);
-                    caOut.printin("static char[] ");
-                    caOut.print(charArrayName);
-                    caOut.print(" = ");
-                    caOut.print(quote(text));
-                    caOut.println(".toCharArray();");
+                // UTF-8 is up to 4 bytes per character
+                // String constants are limited to 64k bytes
+                // Limit string constants here to 16k characters
+                int textIndex = 0;
+                int textLength = text.length();
+                while (textIndex < textLength) {
+                    int len = 0;
+                    if (textLength - textIndex > 16384) {
+                        len = 16384;
+                    } else {
+                        len = textLength - textIndex;
+                    }
+                    String output = text.substring(textIndex, textIndex + len);
+                    String charArrayName = textMap.get(output);
+                    if (charArrayName == null) {
+                        charArrayName = "_jspx_char_array_" + charArrayCount++;
+                        textMap.put(output, charArrayName);
+                        caOut.printin("static char[] ");
+                        caOut.print(charArrayName);
+                        caOut.print(" = ");
+                        caOut.print(quote(output));
+                        caOut.println(".toCharArray();");
+                    }
+    
+                    n.setBeginJavaLine(out.getJavaLine());
+                    out.printil("out.write(" + charArrayName + ");");
+                    n.setEndJavaLine(out.getJavaLine());
+                    
+                    textIndex = textIndex + len;
                 }
-
-                n.setBeginJavaLine(out.getJavaLine());
-                out.printil("out.write(" + charArrayName + ");");
-                n.setEndJavaLine(out.getJavaLine());
                 return;
             }
 
