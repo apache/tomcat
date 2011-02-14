@@ -1246,7 +1246,7 @@ public class JNDIRealm extends RealmBase {
         throws NamingException {
 
         // If no attributes are requested, no need to look for them
-        if (attrIds == null || attrIds.length > 0) {
+        if (attrIds == null || attrIds.length == 0) {
             return new User(username, dn, null, null);
         }
 
