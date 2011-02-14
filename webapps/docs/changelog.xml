@@ -64,6 +64,10 @@
         the expected state transitions. (markt)
       </add>
       <fix>
+        <bug>50700</bug>: Ensure that the override attribute of context
+        parameters is correctly followed. (markt)
+      </fix>
+      <fix>
         <bug>50721</bug>: Correctly handle URL decoding where the URL ends in
         %nn. Patch provided by Christof Marti. (markt)
       </fix>
