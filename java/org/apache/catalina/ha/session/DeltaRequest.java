@@ -53,6 +53,7 @@ public class DeltaRequest implements Externalizable {
     public static final int TYPE_PRINCIPAL = 1;
     public static final int TYPE_ISNEW = 2;
     public static final int TYPE_MAXINTERVAL = 3;
+    public static final int TYPE_AUTHTYPE = 4;
 
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
@@ -60,6 +61,7 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_PRINCIPAL = "__SET__PRINCIPAL__";
     public static final String NAME_MAXINTERVAL = "__SET__MAXINTERVAL__";
     public static final String NAME_ISNEW = "__SET__ISNEW__";
+    public static final String NAME_AUTHTYPE = "__SET__AUTHTYPE__";
 
     private String sessionId;
     private LinkedList<AttributeInfo> actions = new LinkedList<AttributeInfo>();
@@ -117,6 +119,11 @@ public class DeltaRequest implements Externalizable {
     public void setNew(boolean n) {
         int action = ACTION_SET;
         addAction(TYPE_ISNEW,action,NAME_ISNEW,Boolean.valueOf(n));
+    }
+
+    public void setAuthType(String authType) {
+        int action = (authType==null)?ACTION_REMOVE:ACTION_SET;
+        addAction(TYPE_AUTHTYPE,action,NAME_AUTHTYPE, authType);
     }
 
     protected void addAction(int type,
@@ -183,6 +190,14 @@ public class DeltaRequest implements Externalizable {
                         p = sp.getPrincipal();
                     }
                     session.setPrincipal(p,false);
+                    break;
+                }//case
+                case TYPE_AUTHTYPE: {
+                    String authType = null;
+                    if ( info.getAction() == ACTION_SET ) {
+                        authType = (String)info.getValue();
+                    }
+                    session.setAuthType(authType,false);
                     break;
                 }//case
                 default : throw new java.lang.IllegalArgumentException("Invalid attribute info type="+info);

@@ -338,6 +338,28 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     /**
+     * Set the authentication type used to authenticate our cached
+     * Principal, if any.
+     *
+     * @param authType The new cached authentication type
+     */
+    @Override
+    public void setAuthType(String authType) {
+        setAuthType(authType, true);
+    }
+
+    public void setAuthType(String authType, boolean addDeltaRequest) {
+        try { 
+            lock();
+            super.setAuthType(authType);
+            if (addDeltaRequest && (deltaRequest != null))
+                deltaRequest.setAuthType(authType);
+        } finally {
+            unlock();
+        }
+    }
+
+    /**
      * Return the <code>isValid</code> flag for this session.
      */
     @Override

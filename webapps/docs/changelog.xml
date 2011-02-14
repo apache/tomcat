@@ -100,6 +100,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>50771</bug>: Ensure HttpServletRequest#getAuthType() returns the 
+        name of the authentication scheme if request has already been 
+        authenticated. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
