@@ -48,10 +48,6 @@
       type="java.lang.String"
       writeable="false"/>
     <attribute
-      name="managerClassName"
-      description="session mananager classname"
-      type="java.lang.String"/>
-    <attribute
       name="notifyLifecycleListenerOnFailure"
       description="notify lifecycleListener from message transfer failure"
       is="true"
