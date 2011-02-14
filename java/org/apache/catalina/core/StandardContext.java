@@ -5270,24 +5270,30 @@ public class StandardContext extends ContainerBase
      * the application parameters appropriately.
      */
     private void mergeParameters() {
-        ServletContext sc = getServletContext();
+        Map<String,String> mergedParams = new HashMap<String,String>();
         
         String names[] = findParameters();
         for (int i = 0; i < names.length; i++) {
-            sc.setInitParameter(names[i], findParameter(names[i]));
+            mergedParams.put(names[i], findParameter(names[i]));
         }
 
         ApplicationParameter params[] = findApplicationParameters();
         for (int i = 0; i < params.length; i++) {
             if (params[i].getOverride()) {
-                if (sc.getInitParameter(params[i].getName()) == null) {
-                    sc.setInitParameter(params[i].getName(),
+                if (mergedParams.get(params[i].getName()) == null) {
+                    mergedParams.put(params[i].getName(),
                             params[i].getValue());
                 }
             } else {
-                sc.setInitParameter(params[i].getName(), params[i].getValue());
+                mergedParams.put(params[i].getName(), params[i].getValue());
             }
         }
+        
+        ServletContext sc = getServletContext();
+        for (Map.Entry<String,String> entry : mergedParams.entrySet()) {
+            sc.setInitParameter(entry.getKey(), entry.getValue());
+        }
+
     }
 
 
