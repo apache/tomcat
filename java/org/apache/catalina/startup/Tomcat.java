@@ -691,6 +691,7 @@ public class Tomcat {
      */
     public static class FixContextListener implements LifecycleListener {
 
+        @Override
         public void lifecycleEvent(LifecycleEvent event) {
             try {
                 Context context = (Context) event.getLifecycle();
@@ -711,6 +712,7 @@ public class Tomcat {
      * listener sets the equivalent of conf/web.xml when the context starts.
      */
     public static class DefaultWebXmlListener implements LifecycleListener {
+        @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
                 initWebappDefaults((Context) event.getLifecycle());
