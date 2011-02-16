@@ -26,15 +26,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Locale;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.Binding;
-import javax.naming.InitialContext;
 import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -50,10 +47,8 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
-import org.apache.catalina.Role;
 import org.apache.catalina.Server;
 import org.apache.catalina.Session;
-import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
@@ -101,9 +96,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li><b>/resources?type=xxxx</b> - Enumerate the available global JNDI
  *     resources, optionally limited to those of the specified type
  *     (fully qualified Java class name), if available.</li>
- * <li><b>/roles</b> - Enumerate the available security role names and
- *     descriptions from the user database connected to the <code>users</code>
- *     resource reference.
  * <li><b>/serverinfo</b> - Display system OS and JVM properties.
  * <li><b>/sessions</b> - Deprecated. Use expire.
  * <li><b>/expire?path=/xxx</b> - List session idle timeinformation about the
@@ -362,8 +354,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             reload(writer, cn, smClient);
         } else if (command.equals("/resources")) {
             resources(writer, type, smClient);
-        } else if (command.equals("/roles")) {
-            roles(writer, smClient);
         } else if (command.equals("/save")) {
             save(writer, path, smClient);
         } else if (command.equals("/serverinfo")) {
@@ -1029,57 +1019,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
-
-    }
-
-
-    /**
-     * Render a list of security role names (and corresponding descriptions)
-     * from the <code>org.apache.catalina.UserDatabase</code> resource that is
-     * connected to the <code>users</code> resource reference.  Typically, this
-     * will be the global user database, but can be adjusted if you have
-     * different user databases for different virtual hosts.
-     *
-     * @param writer Writer to render to
-     */
-    protected void roles(PrintWriter writer,  StringManager smClient) {
-
-        if (debug >= 1) {
-            log("roles:  List security roles from user database");
-        }
-
-        // Look up the UserDatabase instance we should use
-        UserDatabase database = null;
-        try {
-            InitialContext ic = new InitialContext();
-            database = (UserDatabase) ic.lookup("java:comp/env/users");
-        } catch (NamingException e) {
-            writer.println(smClient.getString(
-                    "managerServlet.userDatabaseError"));
-            log("java:comp/env/users", e);
-            return;
-        }
-        if (database == null) {
-            writer.println(smClient.getString(
-                    "managerServlet.userDatabaseMissing"));
-            return;
-        }
-
-        // Enumerate the available roles
-        writer.println(smClient.getString("managerServlet.rolesList"));
-        Iterator<Role> roles = database.getRoles();
-        if (roles != null) {
-            while (roles.hasNext()) {
-                Role role = roles.next();
-                writer.print(role.getRolename());
-                writer.print(':');
-                if (role.getDescription() != null) {
-                    writer.print(role.getDescription());
-                }
-                writer.println();
-            }
-        }
-
 
     }
 

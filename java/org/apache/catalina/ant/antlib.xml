@@ -35,9 +35,6 @@
         name="undeploy"
         classname="org.apache.catalina.ant.UndeployTask" />
   <typedef
-        name="roles"
-        classname="org.apache.catalina.ant.RolesTask" />
-  <typedef
         name="resources"
         classname="org.apache.catalina.ant.ResourcesTask" />
   <typedef
