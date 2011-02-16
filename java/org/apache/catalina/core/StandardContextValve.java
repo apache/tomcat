@@ -21,6 +21,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
@@ -152,15 +153,24 @@ final class StandardContextValve
             }
         }
 
+        // Don't fire listeners during async processing
         // If a request init listener throws an exception, the request is
         // aborted
-        if (context.fireRequestInitEvent(request)) {
+        boolean asyncAtStart = request.isAsync(); 
+        if (asyncAtStart || context.fireRequestInitEvent(request)) {
             if (request.isAsyncSupported()) {
                 request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
             }
             wrapper.getPipeline().getFirst().invoke(request, response);
 
-            context.fireRequestDestroyEvent(request);
+            // If the request was async at the start and an error occurred then
+            // the async error handling will kick-in and that will fire the
+            // request destroyed event *after* the error handling has taken
+            // place
+            if (!(request.isAsync() || (asyncAtStart && request.getAttribute(
+                        RequestDispatcher.ERROR_EXCEPTION) != null))) {
+                context.fireRequestDestroyEvent(request);
+            }
         }
     }
 
