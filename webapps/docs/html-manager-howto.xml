@@ -388,11 +388,6 @@ Tomcat <code>server.xml</code> configuration file. Here is an
 example for Tomcat running on Windows:</p>
 <source>
 &lt;Context path="/foobar" docBase="C:\path\to\application\foobar"&gt;
-
-  &lt;!-- Link to the user database we will get roles from --&gt;
-  &lt;ResourceLink name="users" global="UserDatabase"
-                type="org.apache.catalina.UserDatabase"/&gt;
-
 &lt;/Context&gt;
 </source>
 

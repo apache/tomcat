@@ -58,7 +58,6 @@ the following functions:</p>
 <li>List the available global JNDI resources, for use in deployment
     tools that are preparing <code>&lt;ResourceLink&gt;</code> elements
     nested in a <code>&lt;Context&gt;</code> deployment description.</li>
-<li>List the available security roles defined in the user database.</li>
 <li>Start a stopped application (thus making it available again).</li>
 <li>Stop an existing application (so that it becomes unavailable), but
     do not undeploy it.</li>
@@ -390,11 +389,6 @@ Tomcat <code>server.xml</code> configuration file. Here is an
 example:</p>
 <source>
 &lt;Context path="/foobar" docBase="/path/to/application/foobar"&gt;
-
-  &lt;!-- Link to the user database we will get roles from --&gt;
-  &lt;ResourceLink name="users" global="UserDatabase"
-                type="org.apache.catalina.UserDatabase"/&gt;
-
 &lt;/Context&gt;
 </source>
 
@@ -651,60 +645,6 @@ include an error message.  Possible causes for problems include:</p>
 
 
 </subsection>
-
-
-<subsection name="List Available Security Roles">
-
-<source>
-http://localhost:8080/manager/text/roles
-</source>
-
-<p>List the security role names (and corresponding descriptions) that are
-available in the <code>org.apache.catalina.UserDatabase</code> resource that
-is linked to the <code>users</code> resource reference in the web.xml file
-for the Manager web application.  This would typically be used, for example,
-by a deployment tool that wanted to create
-<code>&lt;security-role-ref&gt;</code> elements to map security role names
-used in a web application to the role names actually defined within the
-container.</p>
-
-<p>By default, the <code>users</code> resource reference is pointed at the
-global <code>UserDatabase</code> resource.  If you choose to utilize a
-different user database per virtual host, you should modify the
-<code>&lt;ResourceLink&gt;</code> element in the default
-<code>manager.xml</code> context configuration file to point at the global
-user database resource for this virtual host.</p>
-
-<p>When this command is executed, the first line of the response will be:</p>
-<pre>
-  OK - Listed security roles
-</pre>
-<p>followed by one line for each security role.  Each line is composed of
-fields delimited by colon characters (":") as follows:</p>
-<ul>
-<li><em>Security Role Name</em> - A security role name that is known to Tomcat
-    in the user database.</li>
-<li><em>Description</em> - Description of this security role (useful in
-    creating user interfaces for selecting roles.</li>
-</ul>
-
-<p>If an error occurs, the response will start with <code>FAIL</code> and
-include an error message.  Possible causes for problems include:</p>
-<ul>
-<li><em>Cannot resolve user database reference</em> - A JNDI error prevented
-    the successful lookup of the <code>org.apache.catalina.UserDatabase</code>
-    resource.  Check the Tomcat log files for a stack trace associated with
-    this error.</li>
-<li><em>No user database is available</em> - You have not configured a resource
-    reference for the <code>users</code> resource that points at an
-    appropriate user database instance.  Check your <code>manager.xml</code>
-    file and ensure that you have created an appropriate
-    <code>&lt;ResourceLink&gt;</code> or
-    <code>&lt;ResourceParams&gt;</code> element for this resource.</li>
-</ul>
-
-</subsection>
-
 
 <subsection name="Session Statistics">
 
@@ -996,7 +936,6 @@ file might look something like this:</p>
   &lt;taskdef name="list"      classname="org.apache.catalina.ant.ListTask"/&gt;
   &lt;taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask"/&gt;
   &lt;taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/&gt;
-  &lt;taskdef name="roles"     classname="org.apache.catalina.ant.RolesTask"/&gt;
   &lt;taskdef name="start"     classname="org.apache.catalina.ant.StartTask"/&gt;
   &lt;taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/&gt;
   &lt;taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/&gt;
