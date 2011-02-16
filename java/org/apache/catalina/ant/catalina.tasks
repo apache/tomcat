@@ -19,7 +19,6 @@ list=org.apache.catalina.ant.ListTask
 reload=org.apache.catalina.ant.ReloadTask
 sessions=org.apache.catalina.ant.SessionsTask
 resources=org.apache.catalina.ant.ResourcesTask
-roles=org.apache.catalina.ant.RolesTask
 start=org.apache.catalina.ant.StartTask
 stop=org.apache.catalina.ant.StopTask
 undeploy=org.apache.catalina.ant.UndeployTask

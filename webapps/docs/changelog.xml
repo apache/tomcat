@@ -113,10 +113,19 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Wep applications">
+    <changelog>
+      <fix>
+        <bug>50713</bug>: Remove roles command from the Manager application.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
-        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get confirmation when sending a reply.
+        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get
+        confirmation when sending a reply. (fhanik)
       </fix>  
     </changelog>
   </subsection>
