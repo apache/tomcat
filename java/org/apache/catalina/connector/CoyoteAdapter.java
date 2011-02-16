@@ -268,6 +268,17 @@ public class CoyoteAdapter implements Adapter {
         boolean success = true;
         AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
         try {
+            if (!request.isAsync() && !comet) {
+                // Error or timeout - need to tell listeners the request is over
+                // Have to test this first since state may change while in this
+                // method and this is only required if entering this methos in
+                // this state 
+                Context ctxt = (Context) request.getMappingData().context;
+                if (ctxt != null) {
+                    ctxt.fireRequestDestroyEvent(request);
+                }
+            }
+
             if (status==SocketStatus.TIMEOUT) {
                 success = true;
                 if (!asyncConImpl.timeout()) {
