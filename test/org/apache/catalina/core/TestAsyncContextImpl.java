@@ -27,6 +27,8 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -358,9 +361,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             ctx.addServletMapping(dispatchUrl, "nonasync");
         }
 
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
+
         tomcat.start();
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
-        StringBuilder expected = new StringBuilder();
+        StringBuilder expected = new StringBuilder("requestInitialized-");
         expected.append("TimeoutServletGet-onTimeout-");
         if (!completeOnTimeout) {
             expected.append("onError-");
@@ -370,6 +375,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         } else {
             expected.append("NonAsyncServletGet-");
         }
+        expected.append("requestDestroyed");
         assertEquals(expected.toString(), res.toString());
     }
     
@@ -442,6 +448,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper2.setAsyncSupported(true);
         ctx.addServletMapping("/stage2", "nonasync");
 
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
+
         tomcat.start();
         
         StringBuilder url = new StringBuilder(48);
@@ -454,13 +462,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
         ByteChunk res = getUrl(url.toString());
         
-        StringBuilder expected = new StringBuilder();
+        StringBuilder expected = new StringBuilder("requestInitialized-");
         int loop = iter;
         while (loop > 0) {
             expected.append("DispatchingServletGet-");
             loop--;
         }
         expected.append("NonAsyncServletGet-");
+        expected.append("requestDestroyed");
         assertEquals(expected.toString(), res.toString());
     }
     
@@ -643,6 +652,34 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
     
+    public static class TrackingRequestListener
+            implements ServletRequestListener {
+
+        @Override
+        public void requestDestroyed(ServletRequestEvent sre) {
+            // Need the response and it isn't available via the Servlet API
+            Request r = (Request) sre.getServletRequest();
+            try {
+                r.getResponse().getWriter().print("requestDestroyed");
+            } catch (IOException e) {
+                // Test will fail if this happens
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void requestInitialized(ServletRequestEvent sre) {
+            // Need the response and it isn't available via the Servlet API
+            Request r = (Request) sre.getServletRequest();
+            try {
+                r.getResponse().getWriter().print("requestInitialized-");
+            } catch (IOException e) {
+                // Test will fail if this happens
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void testDispatchErrorSingle() throws Exception {
         doTestDispatchError(1, false, false);
     }
@@ -715,6 +752,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "error", error);
         ctx.addServletMapping("/stage2", "error");
 
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
+
         tomcat.start();
         
         StringBuilder url = new StringBuilder(48);
@@ -727,7 +766,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
         ByteChunk res = getUrl(url.toString());
         
-        StringBuilder expected = new StringBuilder();
+        StringBuilder expected = new StringBuilder("requestInitialized-");
         int loop = iter;
         while (loop > 0) {
             expected.append("DispatchingServletGet-");
@@ -736,7 +775,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
             loop--;
         }
-        expected.append("ErrorServletGet-onError-onComplete-");
+        expected.append("ErrorServletGet-onError-onComplete-requestDestroyed");
         assertEquals(expected.toString(), res.toString());
     }
     
