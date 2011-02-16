@@ -105,20 +105,6 @@
     <servlet-name>jsp</servlet-name>
   </filter-mapping>
   
-  <!-- Define reference to the user database for looking up roles -->
-  <resource-env-ref>
-    <description>
-      Link to the UserDatabase instance from which we request lists of
-      defined role names.  Typically, this will be connected to the global
-      user database with a ResourceLink element in server.xml or the context
-      configuration file for the Manager web application.
-    </description>
-    <resource-env-ref-name>users</resource-env-ref-name>
-    <resource-env-ref-type>
-      org.apache.catalina.UserDatabase
-    </resource-env-ref-type>
-  </resource-env-ref>
-
   <!-- Define a Security Constraint on this Application -->
   <!-- NOTE:  None of these roles are present in the default users file -->
   <security-constraint>
