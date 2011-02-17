@@ -56,10 +56,10 @@ public class RpcMessage implements Externalizable {
         reply = in.readBoolean();
         int length = in.readInt();
         uuid = new byte[length];
-        in.read(uuid, 0, length);
+        in.readFully(uuid);
         length = in.readInt();
         rpcId = new byte[length];
-        in.read(rpcId, 0, length);
+        in.readFully(rpcId);
         message = (Serializable)in.readObject();
     }
 
@@ -100,10 +100,10 @@ public class RpcMessage implements Externalizable {
             reply = true;
             int length = in.readInt();
             uuid = new byte[length];
-            in.read(uuid, 0, length);
+            in.readFully(uuid);
             length = in.readInt();
             rpcId = new byte[length];
-            in.read(rpcId, 0, length);
+            in.readFully(rpcId);
         }
 
         @Override
