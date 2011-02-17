@@ -26,9 +26,9 @@
 
 # ----- Vesion Control Flags -----
 version.major=1
-version.minor=0
-version.build=9
-version.patch=4
+version.minor=1
+version.build=0
+version.patch=0
 version.suffix=
 
 # ----- Default Base Path for Dependent Packages -----
@@ -80,7 +80,7 @@ dbcp.home=${base.path}/commons-dbcp-1.3
 dbcp.jar=${dbcp.home}/commons-dbcp-1.3.jar
 dbcp.loc=http://archive.apache.org/dist/commons/dbcp/binaries/commons-dbcp-1.3.zip
 
-tomcat.version=6.0.29
+tomcat.version=6.0.32
 tomcat.home=${base.path}/apache-tomcat-${tomcat.version}
 tomcat.dbcp.jar=${tomcat.home}/lib/tomcat-dbcp.jar
 tomcat.juli.jar=${tomcat.home}/bin/tomcat-juli.jar
