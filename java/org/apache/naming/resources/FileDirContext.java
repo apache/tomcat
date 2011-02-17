@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 
-import javax.naming.Binding;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
@@ -42,7 +42,6 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.catalina.util.RequestUtil;
-import org.apache.naming.NamingContextBindingsEnumeration;
 import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
 
@@ -318,7 +317,7 @@ public class FileDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    protected NamingEnumeration<Binding> doListBindings(String name)
+    protected List<NamingEntry> doListBindings(String name)
         throws NamingException {
 
         File file = file(name);
@@ -326,8 +325,7 @@ public class FileDirContext extends BaseDirContext {
         if (file == null)
             return null;
         
-        return new NamingContextBindingsEnumeration(list(file).iterator(),
-                this);
+        return list(file);
 
     }
 
@@ -848,9 +846,9 @@ public class FileDirContext extends BaseDirContext {
      * @param file Collection
      * @return Vector containing NamingEntry objects
      */
-    protected ArrayList<NamingEntry> list(File file) {
+    protected List<NamingEntry> list(File file) {
 
-        ArrayList<NamingEntry> entries = new ArrayList<NamingEntry>();
+        List<NamingEntry> entries = new ArrayList<NamingEntry>();
         if (!file.isDirectory())
             return entries;
         String[] names = file.list();
