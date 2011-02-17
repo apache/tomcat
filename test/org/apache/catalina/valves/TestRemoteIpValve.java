@@ -70,7 +70,14 @@ public class TestRemoteIpValve extends TestCase {
             this.serverPort = request.getServerPort();
         }
     }
-    
+
+    public static class MockRequest extends Request {
+        @Override
+        public void setAttribute(String name, Object value) {
+            // NOOP. Prevents NPE during testing.
+        }
+    }
+
     public void testListToCommaDelimitedString() {
         List<String> elements = Arrays.asList("element1", "element2", "element3");
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
@@ -98,7 +105,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
@@ -138,7 +145,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
@@ -178,7 +185,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
@@ -219,7 +226,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
@@ -259,7 +266,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
@@ -299,7 +306,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         // client ip
         request.setRemoteAddr("192.168.0.10");
@@ -363,7 +370,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         // client ip
         request.setRemoteAddr("192.168.0.10");
@@ -427,7 +434,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         // client ip
         request.setRemoteAddr("192.168.0.10");
@@ -491,7 +498,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         // client ip
         request.setRemoteAddr("192.168.0.10");
@@ -556,7 +563,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("not-allowed-internal-proxy");
         request.setRemoteHost("not-allowed-internal-proxy-host");
@@ -595,7 +602,7 @@ public class TestRemoteIpValve extends TestCase {
         RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
         
-        Request request = new Request();
+        Request request = new MockRequest();
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
