@@ -1315,5 +1315,18 @@ public interface Context extends Container {
      * deployment. If not specified, defaults to the empty string.
      */
     public String getWebappVersion();
+    
+    /**
+     * Configure whether or not requests listeners will be fired on forwards for
+     * this Context.
+     */
+    public void setFireRequestListenersOnForwards(boolean enable);
+
+    /**
+     * Determine whether or not requests listeners will be fired on forwards for
+     * this Context.
+     */
+    public boolean getFireRequestListenersOnForwards();
+    
 }
 
