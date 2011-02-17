@@ -156,8 +156,8 @@ public final class AstValue extends SimpleNode {
                 AstMethodParameters mps =
                     (AstMethodParameters) this.children[i+1];
                 // This is a method
-                base = resolver.invoke(ctx, base, suffix,
-                        mps.getParameterTypes(ctx), mps.getParameters(ctx));
+                base = resolver.invoke(ctx, base, suffix, null,
+                        mps.getParameters(ctx));
                 i+=2;
             } else {
                 // This is a property
