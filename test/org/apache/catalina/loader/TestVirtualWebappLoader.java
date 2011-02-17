@@ -46,16 +46,16 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         ctx.resourcesStart();
         File dir = new File("test/webapp-3.0-fragments/WEB-INF/lib");
         loader.setVirtualClasspath(dir.getAbsolutePath() + "/*.jar");
-        loader.startInternal();
+        loader.start();
         String[] repos = loader.getRepositories();
         assertEquals(2,repos.length);
-        loader.stopInternal();
+        loader.stop();
         // ToDo: Why doesn't remove repositories?
         repos = loader.getRepositories();
         assertEquals(2, repos.length);
         
         // no leak
-        loader.startInternal();
+        loader.start();
         repos = loader.getRepositories();
         assertEquals(2,repos.length);
         
