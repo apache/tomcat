@@ -1427,7 +1427,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Member[] members = new Member[nodecount];
             for ( int i=0; i<members.length; i++ ) {
                 byte[] d = new byte[in.readInt()];
-                in.read(d);
+                in.readFully(d);
                 if (d.length > 0) members[i] = MemberImpl.getMember(d);
             }
             return members;
