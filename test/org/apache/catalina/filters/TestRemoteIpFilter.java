@@ -118,6 +118,11 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         public void setScheme(String scheme) {
             getCoyoteRequest().scheme().setString(scheme);
         }
+
+        @Override
+        public void setAttribute(String name, Object value) {
+            // NOOP. Prevents NPE during testing.
+        }
     }
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
