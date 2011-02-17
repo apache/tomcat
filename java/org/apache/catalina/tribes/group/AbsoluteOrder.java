@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.group;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import org.apache.catalina.tribes.Member;
 
@@ -53,10 +54,14 @@ public class AbsoluteOrder {
 
 
     public static void absoluteOrder(Member[] members) {
-        if ( members == null || members.length == 0 ) return;
+        if ( members == null || members.length <= 1 ) return;
         Arrays.sort(members,comp);
     }
     
+    public static void absoluteOrder(List<Member> members) {
+        if ( members == null || members.size() <= 1 ) return;
+        java.util.Collections.sort(members, comp);
+    }
     
     public static class AbsoluteComparator implements Comparator<Member>,
             Serializable {
