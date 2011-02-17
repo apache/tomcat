@@ -833,8 +833,22 @@ public class StandardContext extends ContainerBase
     private String webappVersion = "";
 
     private boolean addWebinfClassesResources = false;
+    
+    private boolean fireRequestListenersOnForwards = false;
 
     // ----------------------------------------------------- Context Properties
+
+
+    @Override
+    public void setFireRequestListenersOnForwards(boolean enable) {
+        fireRequestListenersOnForwards = enable;
+    }
+
+
+    @Override
+    public boolean getFireRequestListenersOnForwards() {
+        return fireRequestListenersOnForwards;
+    }
 
 
     public void setAddWebinfClassesResources(

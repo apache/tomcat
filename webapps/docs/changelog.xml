@@ -89,6 +89,10 @@
         class. (markt)
       </fix>
       <fix>
+        <bug>50789</bug>: Provide an option to enable ServletRequestListeners
+        for forwards as required by some CDI frameworks. (markt)
+      </fix>
+      <fix>
         <bug>50793</bug>: When processing Servlet 3.0 async requests, ensure
         that the requestInitialized and requestDestroyed events are only fired
         once per request at the correct times. (markt)
