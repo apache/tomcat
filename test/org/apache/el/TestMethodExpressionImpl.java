@@ -349,4 +349,18 @@ public class TestMethodExpressionImpl extends TestCase {
         String actual = (String) me1.invoke(context, null);
         assertEquals("Hello Tomcat from B", actual);
     }
+    
+    public void testBug50790a() throws Exception {
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanAA.name.contains(beanA.name)}", java.lang.Boolean.class);
+        Boolean actual = (Boolean) ve.getValue(context);
+        assertEquals(Boolean.TRUE, actual);
+    }
+
+    public void testBug50790b() throws Exception {
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanA.name.contains(beanAA.name)}", java.lang.Boolean.class);
+        Boolean actual = (Boolean) ve.getValue(context);
+        assertEquals(Boolean.FALSE, actual);
+    }
 }
