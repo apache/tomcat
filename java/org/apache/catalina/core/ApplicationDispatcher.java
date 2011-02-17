@@ -453,19 +453,31 @@ final class ApplicationDispatcher
                 
         DispatcherType disInt = (DispatcherType) request.getAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
         if (disInt != null) {
-            if (disInt != DispatcherType.ERROR) {
-                state.outerRequest.setAttribute
-                    (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                     getCombinedPath());
-                state.outerRequest.setAttribute
-                    (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                     DispatcherType.FORWARD);
-                invoke(state.outerRequest, response, state);
-            } else {
-                invoke(state.outerRequest, response, state);
+            boolean doInvoke = true;
+            
+            if (context.getFireRequestListenersOnForwards() &&
+                    !context.fireRequestInitEvent(request)) {
+                doInvoke = false;
+            }
+
+            if (doInvoke) {
+                if (disInt != DispatcherType.ERROR) {
+                    state.outerRequest.setAttribute
+                        (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
+                         getCombinedPath());
+                    state.outerRequest.setAttribute
+                        (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
+                         DispatcherType.FORWARD);
+                    invoke(state.outerRequest, response, state);
+                } else {
+                    invoke(state.outerRequest, response, state);
+                }
+                
+                if (context.getFireRequestListenersOnForwards()) {
+                    context.fireRequestDestroyEvent(request);
+                }
             }
         }
-
     }
     
     
