@@ -240,6 +240,15 @@
         sufficient.</p>
       </attribute>
 
+      <attribute name="fireRequestListenersOnForwards" required="false">
+        <p>Set to <code>true</code> to fire any configured
+        ServletRequestListeners  when Tomcat forwards a request. This is
+        primarily of use to users of CDI frameworks that use
+        ServletRequestListeners to configure the necessary environment for a
+        request. If not specified, the default value of <code>false</code> is
+        used.</p>
+      </attribute>
+
       <attribute name="logEffectiveWebXml" required="false">
         <p>Set to <code>true</code> if you want the effective web.xml used for a
         web application to be logged (at INFO level) when the application
