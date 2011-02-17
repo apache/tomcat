@@ -47,6 +47,8 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.naming.NameParserImpl;
+import org.apache.naming.NamingContextBindingsEnumeration;
+import org.apache.naming.NamingEntry;
 import org.apache.naming.StringManager;
 
 /**
@@ -703,25 +705,28 @@ public abstract class BaseDirContext implements DirContext {
         }
         
         // Next do a standard lookup
-        NamingEnumeration<Binding> bindings = doListBindings(name);
+        List<NamingEntry> bindings = doListBindings(name);
 
-        if (bindings != null)
-            return bindings;
-        
         // Check the alternate locations
+        List<NamingEntry> altBindings = null;
+
         for (DirContext altDirContext : altDirContexts) {
-            if (altDirContext instanceof BaseDirContext)
-                bindings = ((BaseDirContext) altDirContext).doListBindings(
+            if (altDirContext instanceof BaseDirContext) {
+                altBindings = ((BaseDirContext) altDirContext).doListBindings(
                         "/META-INF/resources" + name);
-            else {
-                try {
-                    bindings = altDirContext.listBindings(name);
-                } catch (NamingException ne) {
-                    // Ignore
+            }
+            if (altBindings != null) {
+                if (bindings == null) {
+                    bindings = altBindings;
+                } else {
+                    bindings.addAll(altBindings);
                 }
             }
-            if (bindings != null)
-                return bindings;
+        }
+
+        if (bindings != null) {
+            return new NamingContextBindingsEnumeration(bindings.iterator(),
+                    this);
         }
 
         // Really not found
@@ -1590,7 +1595,7 @@ public abstract class BaseDirContext implements DirContext {
 
     protected abstract Object doLookup(String name);
 
-    protected abstract NamingEnumeration<Binding> doListBindings(String name)
+    protected abstract List<NamingEntry> doListBindings(String name)
         throws NamingException;
 
     protected abstract String doGetRealPath(String name);

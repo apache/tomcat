@@ -26,11 +26,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import javax.naming.Binding;
 import javax.naming.CompositeName;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
@@ -45,7 +45,6 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.naming.NamingContextBindingsEnumeration;
 import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
 
@@ -331,20 +330,19 @@ public class WARDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    protected NamingEnumeration<Binding> doListBindings(String strName)
+    protected List<NamingEntry> doListBindings(String strName)
         throws NamingException {
         
         Name name = getEscapedJndiName(strName);
 
         if (name.isEmpty())
-            return new NamingContextBindingsEnumeration(list(entries).iterator(),
-                    this);
+            return list(entries);
+
         Entry entry = treeLookup(name);
         if (entry == null)
             return null;
         
-        return new NamingContextBindingsEnumeration(list(entry).iterator(),
-                this);
+        return list(entry);
     }
 
 
