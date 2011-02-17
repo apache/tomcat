@@ -193,7 +193,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     // complete or dispatch)
                     return processor.asyncPostProcess();
                 } else {
-                    connections.remove(socket);
                     socket.setAsync(false);
                     recycledProcessors.offer(processor);
                 }
