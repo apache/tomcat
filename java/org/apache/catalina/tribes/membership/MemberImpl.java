@@ -622,7 +622,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         int length = in.readInt();
         byte[] message = new byte[length];
-        in.read(message);
+        in.readFully(message);
         getMember(message,this);
 
     }
