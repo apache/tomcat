@@ -188,7 +188,6 @@ public class AjpProtocol extends AbstractAjpProtocol {
                     // complete or dispatch)
                     return processor.asyncPostProcess();
                 } else {
-                    connections.remove(socket);
                     socket.setAsync(false);
                     recycledProcessors.offer(processor);
                 }
