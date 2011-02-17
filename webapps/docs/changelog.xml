@@ -107,6 +107,9 @@
         not result in String constants that are too long for valid Java code.
         (markt)
       </fix>
+      <fix>
+        <bug>50790</bug>: Improve method resolution in EL expressions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
