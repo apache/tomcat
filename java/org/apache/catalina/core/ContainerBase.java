@@ -959,8 +959,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         
         fireContainerEvent(REMOVE_CHILD_EVENT, child);
         
-        // Set child's parent to null to prevent a loop
-        child.setParent(null);
         try {
             // child.destroy() may have already been called which would have
             // triggered this call. If that is the case, no need to destroy the
