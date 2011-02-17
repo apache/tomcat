@@ -197,9 +197,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                     connections.put(socket, processor);
                     socket.setAsync(true);
                 } else {
-                    if (state == SocketState.OPEN) {
-                        connections.put(socket, processor);
-                    }
                     recycledProcessors.offer(processor);
                 }
                 return state;
