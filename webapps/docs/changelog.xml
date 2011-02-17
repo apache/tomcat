@@ -97,6 +97,11 @@
         that the requestInitialized and requestDestroyed events are only fired
         once per request at the correct times. (markt)
       </fix>
+      <fix>
+        <bug>50802</bug>: Ensure that
+        <code>ServletContext.getResourcePaths()</code> includes static resources
+        packaged in JAR files in its output. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
