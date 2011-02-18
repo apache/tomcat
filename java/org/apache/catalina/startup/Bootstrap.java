@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.management.MBeanServer;
@@ -34,6 +35,8 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
+import org.apache.catalina.startup.ClassLoaderFactory.Repository;
+import org.apache.catalina.startup.ClassLoaderFactory.RepositoryType;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -113,8 +116,7 @@ public final class Bootstrap {
         if ((value == null) || (value.equals("")))
             return parent;
 
-        ArrayList<String> repositoryLocations = new ArrayList<String>();
-        ArrayList<Integer> repositoryTypes = new ArrayList<Integer>();
+        List<Repository> repositories = new ArrayList<Repository>();
         int i;
 
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
@@ -150,8 +152,8 @@ public final class Bootstrap {
             // Check for a JAR URL repository
             try {
                 new URL(repository);
-                repositoryLocations.add(repository);
-                repositoryTypes.add(ClassLoaderFactory.IS_URL);
+                repositories.add(
+                        new Repository(repository, RepositoryType.URL));
                 continue;
             } catch (MalformedURLException e) {
                 // Ignore
@@ -160,22 +162,19 @@ public final class Bootstrap {
             if (repository.endsWith("*.jar")) {
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
-                repositoryLocations.add(repository);
-                repositoryTypes.add(ClassLoaderFactory.IS_GLOB);
+                repositories.add(
+                        new Repository(repository, RepositoryType.GLOB));
             } else if (repository.endsWith(".jar")) {
-                repositoryLocations.add(repository);
-                repositoryTypes.add(ClassLoaderFactory.IS_JAR);
+                repositories.add(
+                        new Repository(repository, RepositoryType.JAR));
             } else {
-                repositoryLocations.add(repository);
-                repositoryTypes.add(ClassLoaderFactory.IS_DIR);
+                repositories.add(
+                        new Repository(repository, RepositoryType.DIR));
             }
         }
 
-        String[] locations = repositoryLocations.toArray(new String[0]);
-        Integer[] types = repositoryTypes.toArray(new Integer[0]);
-
         ClassLoader classLoader = ClassLoaderFactory.createClassLoader
-            (locations, types, parent);
+            (repositories, parent);
 
         // Retrieving MBean server
         MBeanServer mBeanServer = null;
