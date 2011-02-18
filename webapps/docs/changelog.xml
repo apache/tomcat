@@ -159,6 +159,14 @@
       </fix>  
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>50743</bug>: Cache CheckStyle results between builds to speed up
+        validation. Patch provided by Oliver. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.8 (markt)" rtext="released 2011-02-05">
   <subsection name="Catalina">
