@@ -34,12 +34,6 @@ public final class ContainerEvent extends EventObject {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The Container on which this event occurred.
-     */
-    private Container container = null;
-
-
-    /**
      * The event data associated with this event.
      */
     private Object data = null;
@@ -61,7 +55,6 @@ public final class ContainerEvent extends EventObject {
     public ContainerEvent(Container container, String type, Object data) {
 
         super(container);
-        this.container = container;
         this.type = type;
         this.data = data;
 
@@ -83,7 +76,7 @@ public final class ContainerEvent extends EventObject {
      */
     public Container getContainer() {
 
-        return (this.container);
+        return (Container) getSource();
 
     }
 
