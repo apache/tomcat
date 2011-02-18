@@ -26,6 +26,10 @@
   <!-- Specific checks for javax.* packages -->
 
   <module name="TreeWalker">
+    <!-- Cache what has passed checkstyle -->
+    <property name="cacheFile"
+              value="${tomcat.output}/res/checkstyle/cachefile-org-checkstyle.xml"/>
+
     <module name="ImportControl">
       <property name="file" value="${basedir}/res/checkstyle/org-import-control.xml"/>
     </module>
