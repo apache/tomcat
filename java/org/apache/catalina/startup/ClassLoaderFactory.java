@@ -190,7 +190,7 @@ public final class ClassLoaderFactory {
                 } else if (repository.getType() == RepositoryType.GLOB) {
                     File directory=new File(repository.getLocation());
                     if (!directory.exists() || !directory.isDirectory() ||
-                        !directory.canRead()) {
+                            !directory.canRead()) {
                         log.warn("Problem with directory [" +
                                 directory.getAbsolutePath() + "], exists: [" +
                                 directory.exists() + "], isDirectory: [" +
