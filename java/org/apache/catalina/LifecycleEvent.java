@@ -49,10 +49,8 @@ public final class LifecycleEvent extends EventObject {
     public LifecycleEvent(Lifecycle lifecycle, String type, Object data) {
 
         super(lifecycle);
-        this.lifecycle = lifecycle;
         this.type = type;
         this.data = data;
-
     }
 
 
@@ -63,12 +61,6 @@ public final class LifecycleEvent extends EventObject {
      * The event data associated with this event.
      */
     private Object data = null;
-
-
-    /**
-     * The Lifecycle on which this event occurred.
-     */
-    private Lifecycle lifecycle = null;
 
 
     /**
@@ -95,7 +87,7 @@ public final class LifecycleEvent extends EventObject {
      */
     public Lifecycle getLifecycle() {
 
-        return (this.lifecycle);
+        return (Lifecycle) getSource();
 
     }
 
