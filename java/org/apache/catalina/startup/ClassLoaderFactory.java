@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.catalina.loader.StandardClassLoader;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -55,6 +56,9 @@ public final class ClassLoaderFactory {
 
 
     private static final Log log = LogFactory.getLog(ClassLoaderFactory.class);
+    
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     protected static final Integer IS_DIR = Integer.valueOf(0);
     protected static final Integer IS_JAR = Integer.valueOf(1);
@@ -196,8 +200,14 @@ public final class ClassLoaderFactory {
                 } else if ( types[i] == IS_GLOB ) {
                     File directory=new File(location);
                     if (!directory.exists() || !directory.isDirectory() ||
-                        !directory.canRead())
+                        !directory.canRead()) {
+                        log.warn(sm.getString("classLoaderFactory.badDirectory",
+                                directory.getAbsolutePath(),
+                                Boolean.valueOf(directory.exists()),
+                                Boolean.valueOf(directory.isDirectory()),
+                                Boolean.valueOf(directory.canRead())));
                         continue;
+                    }
                     if (log.isDebugEnabled())
                         log.debug("  Including directory glob "
                             + directory.getAbsolutePath());
