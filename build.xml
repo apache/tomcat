@@ -422,6 +422,9 @@
   </target>
 
   <target name="validate" depends="download-validate" if="${execute.validate}">
+    <!-- Required so we can cache checkstyle results -->
+    <mkdir dir="${tomcat.output}/res/checkstyle"/>
+
     <taskdef resource="checkstyletask.properties"
              classpath="${checkstyle.jar}" />
     <checkstyle config="res/checkstyle/checkstyle.xml">
