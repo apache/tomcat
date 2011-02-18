@@ -17,6 +17,11 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
+    <!-- Yes the simple name is the same as the super class. Accept it. -->
+    <Class name="org.apache.catalina.Executor" />
+    <Bug code="Nm" />
+  </Match>
+  <Match>
     <!-- JNI library can only be loaded once so statics are appropriate -->
     <Class name="org.apache.catalina.core.AprLifecycleListener" />
     <Bug code="ST" />
