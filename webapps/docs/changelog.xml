@@ -49,6 +49,9 @@
         <bug>48863</bug>: Better logging when specifying an invalid directory
         for a class loader. Based on a patch by Ralf Hauser. (markt)
       </fix>
+      <fix>
+        <bug>48870</bug>: Refactor to remove use of parallel arrays. (markt)
+      </fix>
       <add>
         Enhance the RemoteIpFilter and RemoteIpValve so that the modified remote
         address, remote host, protocol and server port may be used in an access
