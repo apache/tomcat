@@ -34,6 +34,10 @@
   <module name="FileTabCharacter"/>
 
   <module name="TreeWalker">
+    <!-- Cache what has passed checkstyle -->
+    <property name="cacheFile"
+              value="${tomcat.output}/res/checkstyle/cachefile-checkstyle.xml"/>
+
     <!-- Block Checks -->
     <!--  ~60 errors
     <module name="AvoidNestedBlocks"/>
