@@ -275,6 +275,13 @@ public class OutputBuffer extends Writer
         doFlush(false);
         closed = true;
 
+        // The request should have been completely read by the time the response
+        // is closed. Further reads of the input a) are pointless and b) really
+        // confuse AJP (bug 50189) so close the input buffer to prevent them.
+        Request req = (Request) coyoteResponse.getRequest().getNote(
+                CoyoteAdapter.ADAPTER_NOTES);
+        req.inputBuffer.close();
+        
         coyoteResponse.finish();
 
     }
