@@ -24,13 +24,13 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import org.apache.catalina.loader.StandardClassLoader;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -57,14 +57,6 @@ public final class ClassLoaderFactory {
 
     private static final Log log = LogFactory.getLog(ClassLoaderFactory.class);
     
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-    protected static final Integer IS_DIR = Integer.valueOf(0);
-    protected static final Integer IS_JAR = Integer.valueOf(1);
-    protected static final Integer IS_GLOB = Integer.valueOf(2);
-    protected static final Integer IS_URL = Integer.valueOf(3);
-
     // --------------------------------------------------------- Public Methods
 
 
@@ -159,8 +151,7 @@ public final class ClassLoaderFactory {
      *
      * @exception Exception if an error occurs constructing the class loader
      */
-    public static ClassLoader createClassLoader(String locations[],
-                                                Integer types[],
+    public static ClassLoader createClassLoader(List<Repository> repositories,
                                                 final ClassLoader parent)
         throws Exception {
 
@@ -170,16 +161,15 @@ public final class ClassLoaderFactory {
         // Construct the "class path" for this class loader
         Set<URL> set = new LinkedHashSet<URL>();
 
-        if (locations != null && types != null && locations.length == types.length) {
-            for (int i = 0; i < locations.length; i++)  {
-                String location = locations[i];
-                if ( types[i] == IS_URL ) {
-                    URL url = new URL(location);
+        if (repositories != null) {
+            for (Repository repository : repositories)  {
+                if (repository.getType() == RepositoryType.URL) {
+                    URL url = new URL(repository.getLocation());
                     if (log.isDebugEnabled())
                         log.debug("  Including URL " + url);
                     set.add(url);
-                } else if ( types[i] == IS_DIR ) {
-                    File directory = new File(location);
+                } else if (repository.getType() == RepositoryType.DIR) {
+                    File directory = new File(repository.getLocation());
                     directory = new File(directory.getCanonicalPath());
                     if (!directory.exists() || !directory.isDirectory() ||
                         !directory.canRead())
@@ -188,8 +178,8 @@ public final class ClassLoaderFactory {
                     if (log.isDebugEnabled())
                         log.debug("  Including directory " + url);
                     set.add(url);
-                } else if ( types[i] == IS_JAR ) {
-                    File file=new File(location);
+                } else if (repository.getType() == RepositoryType.JAR) {
+                    File file=new File(repository.getLocation());
                     file = new File(file.getCanonicalPath());
                     if (!file.exists() || !file.canRead())
                         continue;
@@ -197,15 +187,15 @@ public final class ClassLoaderFactory {
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + url);
                     set.add(url);
-                } else if ( types[i] == IS_GLOB ) {
-                    File directory=new File(location);
+                } else if (repository.getType() == RepositoryType.GLOB) {
+                    File directory=new File(repository.getLocation());
                     if (!directory.exists() || !directory.isDirectory() ||
                         !directory.canRead()) {
-                        log.warn(sm.getString("classLoaderFactory.badDirectory",
-                                directory.getAbsolutePath(),
-                                Boolean.valueOf(directory.exists()),
-                                Boolean.valueOf(directory.isDirectory()),
-                                Boolean.valueOf(directory.canRead())));
+                        log.warn("Problem with directory [" +
+                                directory.getAbsolutePath() + "], exists: [" +
+                                directory.exists() + "], isDirectory: [" +
+                                directory.isDirectory() + "], canRead: [" +
+                                directory.canRead() + "]");
                         continue;
                     }
                     if (log.isDebugEnabled())
@@ -250,4 +240,28 @@ public final class ClassLoaderFactory {
     }
 
 
+    public static enum RepositoryType {
+        DIR,
+        GLOB,
+        JAR,
+        URL
+    }
+    
+    public static class Repository {
+        private String location;
+        private RepositoryType type;
+        
+        public Repository(String location, RepositoryType type) {
+            this.location = location;
+            this.type = type;
+        }
+        
+        public String getLocation() {
+            return location;
+        }
+        
+        public RepositoryType getType() {
+            return type;
+        }
+    }
 }
