@@ -140,12 +140,9 @@ public final class ClassLoaderFactory {
      * Create and return a new class loader, based on the configuration
      * defaults and the specified directory paths:
      *
-     * @param locations Array of strings containing class directories, jar files,
-     *  jar directories or URLS that should be added to the repositories of
-     *  the class loader. The type is given by the member of param types.
-     * @param types Array of types for the members of param locations.
-     *  Possible values are IS_DIR (class directory), IS_JAR (single jar file),
-     *  IS_GLOB (directory of jar files) and IS_URL (URL).
+     * @param repositories List of class directories, jar files, jar directories
+     *                     or URLS that should be added to the repositories of
+     *                     the class loader.
      * @param parent Parent class loader for the new class loader, or
      *  <code>null</code> for the system class loader.
      *
