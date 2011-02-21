@@ -28,22 +28,35 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
-/*
- * Valve to fill the SSL informations in the request
- * mod_header is used to fill the headers and the valve
- * will fill the parameters of the request.
+/**
+ * When using mod_proxy_http, the client SSL information is not included in the
+ * protocol (unlike mod_jk and mod_proxy_ajp). To make the client SSL
+ * information available to Tomcat, some additional configuration is required.
+ * In httpd, mod_headers is used to add the SSL information as HTTP headers. In
+ * Tomcat, this valve is used to read the information from the HTTP headers and
+ * insert it into the request.<p>
+ * 
+ * <b>Note: Ensure that the headers are always set by httpd for all requests to
+ * prevent a client spoofing SSL information by sending fake headers. </b><p>
+ * 
  * In httpd.conf add the following:
- * <IfModule ssl_module>
+ * <pre>
+ * &lt;IfModule ssl_module&gt;
  *   RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
  *   RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
  *   RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
  *   RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
- * </IfModule>
- *
- * @author Jean-Frederic Clere
- * @version $Id$
+ * &lt;/IfModule&gt;
+ * </pre>
+ * 
+ * In server.xml, configure this valve under the Engine element in server.xml:
+ * <pre>
+ * &lt;Engine ...&gt;
+ *   &lt;Valve className="org.apache.catalina.valves.SSLValve" /&gt;
+ *   &lt;Host ... /&gt;
+ * &lt;/Engine&gt;
+ * </pre>
  */
-
 public class SSLValve extends ValveBase {
     
     
