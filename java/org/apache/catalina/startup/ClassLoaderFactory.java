@@ -168,9 +168,9 @@ public final class ClassLoaderFactory {
                 } else if (repository.getType() == RepositoryType.DIR) {
                     File directory = new File(repository.getLocation());
                     directory = new File(directory.getCanonicalPath());
-                    if (!directory.exists() || !directory.isDirectory() ||
-                        !directory.canRead())
-                         continue;
+                    if (!validateFile(directory, RepositoryType.DIR)) {
+                        continue;
+                    }
                     URL url = directory.toURI().toURL();
                     if (log.isDebugEnabled())
                         log.debug("  Including directory " + url);
@@ -178,21 +178,16 @@ public final class ClassLoaderFactory {
                 } else if (repository.getType() == RepositoryType.JAR) {
                     File file=new File(repository.getLocation());
                     file = new File(file.getCanonicalPath());
-                    if (!file.exists() || !file.canRead())
+                    if (!validateFile(file, RepositoryType.JAR)) {
                         continue;
+                    }
                     URL url = file.toURI().toURL();
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + url);
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.GLOB) {
                     File directory=new File(repository.getLocation());
-                    if (!directory.exists() || !directory.isDirectory() ||
-                            !directory.canRead()) {
-                        log.warn("Problem with directory [" +
-                                directory.getAbsolutePath() + "], exists: [" +
-                                directory.exists() + "], isDirectory: [" +
-                                directory.isDirectory() + "], canRead: [" +
-                                directory.canRead() + "]");
+                    if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
                     if (log.isDebugEnabled())
@@ -236,6 +231,38 @@ public final class ClassLoaderFactory {
                 });
     }
 
+    private static boolean validateFile(File file,
+            RepositoryType type) {
+        if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
+            if (!file.exists() || !file.isDirectory() || !file.canRead()) {
+                String msg = "Problem with directory [" +
+                        file.getAbsolutePath() + "], exists: [" +
+                        file.exists() + "], isDirectory: [" +
+                        file.isDirectory() + "], canRead: [" +
+                        file.canRead() + "]";
+                
+                if (!Bootstrap.getCatalinaHome().equals(
+                                Bootstrap.getCatalinaBase()) &&
+                        file.getAbsolutePath().startsWith(
+                                Bootstrap.getCatalinaBase())) {
+                    
+                    log.debug(msg);
+                } else {
+                    log.warn(msg);
+                }
+                return false;
+            }
+        } else if (RepositoryType.JAR == type) {
+            if (!file.exists() || !file.canRead()) {
+                log.warn("Problem with JAR file [" +
+                        file.getAbsolutePath() + "], exists: [" +
+                        file.exists() + "], canRead: [" +
+                        file.canRead() + "]");
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static enum RepositoryType {
         DIR,
