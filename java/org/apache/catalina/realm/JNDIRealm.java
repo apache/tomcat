@@ -365,7 +365,14 @@ public class JNDIRealm extends RealmBase {
      */
     protected boolean roleNested = false;
 
-
+    /**
+     * When searching for user roles, should the search be performed as the user
+     * currently being authenticated? If false, {@link #connectionName} and
+     * {@link #connectionPassword} will be used if specified, else an anonymous
+     * connection will be used. 
+     */
+    protected boolean roleSearchAsUser = false;
+    
     /**
      * An alternate URL, to which, we should connect if connectionURL fails.
      */
@@ -1692,8 +1699,18 @@ public class JNDIRealm extends RealmBase {
         controls.setReturningAttributes(new String[] {roleName});
 
         // Perform the configured search and process the results
-        NamingEnumeration<SearchResult> results =
-            context.search(roleBase, filter, controls);
+        NamingEnumeration<SearchResult> results = null;
+        try {
+            if (roleSearchAsUser) {
+                userCredentialsAdd(context, dn, user.getPassword());
+            }
+            results = context.search(roleBase, filter, controls);
+        } finally {
+            if (roleSearchAsUser) {
+                userCredentialsRemove(context);
+            }
+        }
+
         if (results == null)
             return (list);  // Should never happen, but just in case ...
 
