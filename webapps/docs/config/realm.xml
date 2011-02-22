@@ -387,9 +387,12 @@
       </attribute>
 
       <attribute name="roleBase" required="false">
-        <p>The base directory entry for performing role searches. If
-        not specified the top-level element in the directory context
-        will be used.</p>
+        <p>The base directory entry for performing role searches. If not
+        specified the top-level element in the directory context will be used.
+        If specified it may optionally include pattern replacements
+        &quot;{0}&quot;..&quot;{n}&quot; corrosponding to the name parts of the
+        user's distinguished name (as returned by
+        <code>javax.naming.Name.get()</code>).</p>
       </attribute>
 
       <attribute name="roleName" required="false">
