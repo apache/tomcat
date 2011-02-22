@@ -330,6 +330,13 @@ public class JNDIRealm extends RealmBase {
 
     /**
      * The MessageFormat object associated with the current
+     * <code>roleBase</code>.
+     */
+    protected MessageFormat roleBaseFormat = null;
+
+
+    /**
+     * The MessageFormat object associated with the current
      * <code>roleSearch</code>.
      */
     protected MessageFormat roleFormat = null;
@@ -697,6 +704,10 @@ public class JNDIRealm extends RealmBase {
     public void setRoleBase(String roleBase) {
 
         this.roleBase = roleBase;
+        if (roleBase == null)
+            roleBaseFormat = null;
+        else
+            roleBaseFormat = new MessageFormat(roleBase);
 
     }
 
@@ -1698,13 +1709,24 @@ public class JNDIRealm extends RealmBase {
             controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
         controls.setReturningAttributes(new String[] {roleName});
 
+        String base = null;
+        if (roleBaseFormat != null) {
+            NameParser np = context.getNameParser("");
+            Name name = np.parse(dn);
+            String nameParts[] = new String[name.size()];
+            for (int i = 0; i < name.size(); i++) {
+                nameParts[i] = name.get(i);
+            }
+            base = roleBaseFormat.format(nameParts);
+        }
+
         // Perform the configured search and process the results
         NamingEnumeration<SearchResult> results = null;
         try {
             if (roleSearchAsUser) {
                 userCredentialsAdd(context, dn, user.getPassword());
             }
-            results = context.search(roleBase, filter, controls);
+            results = context.search(base, filter, controls);
         } finally {
             if (roleSearchAsUser) {
                 userCredentialsRemove(context);

@@ -49,6 +49,10 @@
         <bug>19444</bug>: Add an option to the JNDI realm to allow role searches
         to be performed by the authenticated user. (markt)
       </add>
+      <add>
+        <bug>21669</bug>: Add the ability to specify the roleBase for the JNDI
+        Realm as relative to the users DN. Based on a patch by Art W. (markt)
+      </add>
       <fix>
         <bug>48863</bug>: Better logging when specifying an invalid directory
         for a class loader. Based on a patch by Ralf Hauser. (markt)
