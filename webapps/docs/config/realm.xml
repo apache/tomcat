@@ -412,6 +412,14 @@
         property.</p>
       </attribute>
 
+      <attribute name="roleSearchAsUser" required="false">
+        <p> When searching for user roles, should the search be performed as the
+        user currently being authenticated? If false,
+        <code>connectionName</code>} and <code>connectionPassword</code> will be
+        used if specified, else an anonymous. If not specified, the default
+        value of <code>false</code> is used.</p>
+      </attribute>
+
       <attribute name="roleSubtree" required="false">
         <p>Set to <code>true</code> if you want to search the entire
         subtree of the element specified by the <code>roleBase</code>
