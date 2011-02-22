@@ -1312,27 +1312,11 @@ public class JNDIRealm extends RealmBase {
             // If the getUserByPattern() call fails, try it again with the
             // credentials of the user that we're searching for
             try {
-                // Set up security environment to bind as the user
-                context.addToEnvironment(Context.SECURITY_PRINCIPAL, dn);
-                context.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+                userCredentialsAdd(context, dn, credentials);
 
                 user = getUserByPattern(context, username, attrIds, dn);
             } finally {
-                // Restore the original security environment
-                if (connectionName != null) {
-                    context.addToEnvironment(Context.SECURITY_PRINCIPAL,
-                                             connectionName);
-                } else {
-                    context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
-                }
-
-                if (connectionPassword != null) {
-                    context.addToEnvironment(Context.SECURITY_CREDENTIALS,
-                                             connectionPassword);
-                }
-                else {
-                    context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
-                }
+                userCredentialsRemove(context);
             }
         }
         return user;
@@ -1590,9 +1574,7 @@ public class JNDIRealm extends RealmBase {
              containerLog.trace("  validating credentials by binding as the user");
         }
 
-        // Set up security environment to bind as the user
-        context.addToEnvironment(Context.SECURITY_PRINCIPAL, dn);
-        context.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+        userCredentialsAdd(context, dn, credentials);
 
         // Elicit an LDAP bind operation
         boolean validated = false;
@@ -1609,6 +1591,35 @@ public class JNDIRealm extends RealmBase {
             }
         }
 
+        userCredentialsRemove(context);
+
+        return (validated);
+    }
+
+     /**
+      * Configure the context to use the provided credentials for
+      * authentication.
+      *
+      * @param context      DirContext to configure
+      * @param dn           Distinguished name of user
+      * @param credentials  Credentials of user
+      */
+    private void userCredentialsAdd(DirContext context, String dn,
+            String credentials) throws NamingException {
+        // Set up security environment to bind as the user
+        context.addToEnvironment(Context.SECURITY_PRINCIPAL, dn);
+        context.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+    }
+
+    /**
+     * Configure the context to use {@link #connectionName} and
+     * {@link #connectionPassword} if specified or an anonymous connection if
+     * those attributes are not specified.
+     * 
+      * @param context      DirContext to configure
+     */
+    private void userCredentialsRemove(DirContext context)
+            throws NamingException {
         // Restore the original security environment
         if (connectionName != null) {
             context.addToEnvironment(Context.SECURITY_PRINCIPAL,
@@ -1624,9 +1635,7 @@ public class JNDIRealm extends RealmBase {
         else {
             context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
         }
-
-        return (validated);
-     }
+    }
 
     /**
      * Return a List of roles associated with the given User.  Any
