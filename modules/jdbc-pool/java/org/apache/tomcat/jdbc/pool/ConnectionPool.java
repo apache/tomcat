@@ -142,6 +142,7 @@ public class ConnectionPool {
     public Future<Connection> getConnectionAsync() throws SQLException {
         PooledConnection pc = this.borrowConnection(0, null, null);
         if (pc!=null) {
+            
             return new ConnectionFuture(pc);
         } 
         //we can only retrieve a future if the underlying queue supports it.
@@ -1054,8 +1055,10 @@ public class ConnectionPool {
             this.pcFuture = pcf;
         }
         
-        public ConnectionFuture(PooledConnection pc) {
+        public ConnectionFuture(PooledConnection pc) throws SQLException {
             this.pc = pc;
+            result = ConnectionPool.this.setupConnection(pc);
+            configured.set(true);
         }
         /**
          * {@inheritDoc}
