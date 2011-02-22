@@ -28,6 +28,14 @@
   </properties>
 
 <body>
+<section name="Tomcat JDBC Connection Pool 1.1.0.0">
+  <subsection name="pool">
+    <changelog>
+      <fix><rev>1073531</rev> <bug>50805</bug> Only initialize connections once when async (fhanik)</fix>
+    </changelog>
+  </subsection>
+</section>
+
 <section name="Tomcat JDBC Connection Pool 1.0.9.4">
   <subsection name="pool">
     <changelog>
