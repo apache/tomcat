@@ -271,7 +271,14 @@ public abstract class Compiler {
                 }
             }
             // Remove the generated .java file
-            new File(javaFileName).delete();
+            File file = new File(javaFileName);
+            if (file.exists()) {
+                if (!file.delete()) {
+                    log.warn(Localizer.getMessage(
+                            "jsp.warning.compiler.javafile.delete.fail",
+                            file.getAbsolutePath()));
+                }
+            }
             throw e;
         } finally {
             if (writer != null) {
@@ -451,7 +458,8 @@ public abstract class Compiler {
             }
             uc.getInputStream().close();
         } catch (Exception e) {
-            log.debug("Problem accessing resource. Treat as outdated.", e);
+            if (log.isDebugEnabled())
+                log.debug("Problem accessing resource. Treat as outdated.", e);
             return true;
         }
 
@@ -514,7 +522,9 @@ public abstract class Compiler {
                     return true;
                 }
             } catch (Exception e) {
-                log.debug("Problem accessing resource. Treat as outdated.", e);
+                if (log.isDebugEnabled())
+                    log.debug("Problem accessing resource. Treat as outdated.",
+                            e);
                 return true;
             }
         }
@@ -551,7 +561,13 @@ public abstract class Compiler {
                 File classFile = new File(classFileName);
                 if (log.isDebugEnabled())
                     log.debug("Deleting " + classFile);
-                classFile.delete();
+                if (classFile.exists()) {
+                    if (!classFile.delete()) {
+                        log.warn(Localizer.getMessage(
+                                "jsp.warning.compiler.classfile.delete.fail",
+                                classFile.getAbsolutePath()));
+                    }
+                }
             }
         } catch (Exception e) {
             // Remove as much as possible, ignore possible exceptions
@@ -562,7 +578,13 @@ public abstract class Compiler {
                 File javaFile = new File(javaFileName);
                 if (log.isDebugEnabled())
                     log.debug("Deleting " + javaFile);
-                javaFile.delete();
+                if (javaFile.exists()) {
+                    if (!javaFile.delete()) {
+                        log.warn(Localizer.getMessage(
+                                "jsp.warning.compiler.javafile.delete.fail",
+                                javaFile.getAbsolutePath()));
+                    }
+                }
             }
         } catch (Exception e) {
             // Remove as much as possible, ignore possible exceptions
@@ -576,7 +598,13 @@ public abstract class Compiler {
                 File classFile = new File(classFileName);
                 if (log.isDebugEnabled())
                     log.debug("Deleting " + classFile);
-                classFile.delete();
+                if (classFile.exists()) {
+                    if (!classFile.delete()) {
+                        log.warn(Localizer.getMessage(
+                                "jsp.warning.compiler.classfile.delete.fail",
+                                classFile.getAbsolutePath()));
+                    }
+                }
             }
         } catch (Exception e) {
             // Remove as much as possible, ignore possible exceptions
