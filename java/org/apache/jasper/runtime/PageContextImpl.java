@@ -424,7 +424,7 @@ public class PageContextImpl extends PageContext {
                     .doPrivileged(new PrivilegedAction<Integer>() {
                         @Override
                         public Integer run() {
-                            return new Integer(doGetAttributeScope(name));
+                            return Integer.valueOf(doGetAttributeScope(name));
                         }
                     })).intValue();
         } else {
@@ -585,10 +585,6 @@ public class PageContextImpl extends PageContext {
     @Override
     public HttpSession getSession() {
         return session;
-    }
-
-    public Servlet getServlet() {
-        return servlet;
     }
 
     @Override
