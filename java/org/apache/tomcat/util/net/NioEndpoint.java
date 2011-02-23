@@ -794,7 +794,9 @@ public class NioEndpoint extends AbstractEndpoint {
          */
         @Override
         public void run() {
-            
+
+            int errorDelay = 0;
+
             // Loop until we receive a shutdown command
             while (running) {
                 
@@ -813,8 +815,21 @@ public class NioEndpoint extends AbstractEndpoint {
                 try {
                     //if we have reached max connections, wait
                     awaitConnection();
-                    // Accept the next incoming connection from the server socket
-                    SocketChannel socket = serverSock.accept();
+                    
+                    SocketChannel socket = null;
+                    try {
+                        // Accept the next incoming connection from the server
+                        // socket
+                        socket = serverSock.accept();
+                    } catch (IOException ioe) {
+                        // Introduce delay if necessary
+                        errorDelay = handleExceptionWithDelay(errorDelay);
+                        // re-throw
+                        throw ioe;
+                    }
+                    // Successful accept, reset the error delay
+                    errorDelay = 0;
+
                     // Hand this socket off to an appropriate processor
                     //TODO FIXME - this is currently a blocking call, meaning we will be blocking
                     //further accepts until there is a thread available.

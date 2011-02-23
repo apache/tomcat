@@ -183,6 +183,8 @@ public class JIoEndpoint extends AbstractEndpoint {
         @Override
         public void run() {
 
+            int errorDelay = 0;
+
             // Loop until we receive a shutdown command
             while (running) {
 
@@ -200,10 +202,22 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
                 try {
                     //if we have reached max connections, wait
-                    awaitConnection();                    
-                    // Accept the next incoming connection from the server socket
-                    Socket socket = serverSocketFactory.acceptSocket(serverSocket);
-                    
+                    awaitConnection();
+
+                    Socket socket = null;
+                    try {
+                        // Accept the next incoming connection from the server
+                        // socket
+                        socket = serverSocketFactory.acceptSocket(serverSocket);
+                    } catch (IOException ioe) {
+                        // Introduce delay if necessary
+                        errorDelay = handleExceptionWithDelay(errorDelay);
+                        // re-throw
+                        throw ioe;
+                    }
+                    // Successful accept, reset the error delay
+                    errorDelay = 0;
+
                     // Configure the socket
                     if (setSocketOptions(socket)) {
                         // Hand this socket off to an appropriate processor

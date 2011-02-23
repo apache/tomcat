@@ -130,6 +130,14 @@
         <bug>50780</bug>: Fix memory leak in APR implementation of AJP
         connector introduced by the refactoring for <bug>49884</bug>. (markt) 
       </fix>
+      <fix>
+        If server configuration errors and/or faulty applications caused the
+        ulimit for open files to be reached, the acceptor threads for all
+        connectors could enter a tight loop. This loop consumed CPU and also
+        logged an error message for every iteration of the loop which lead to
+        large log files being generated. The acceptors have been enhanced to
+        better handle this situation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
