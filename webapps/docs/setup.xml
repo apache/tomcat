@@ -131,8 +131,12 @@
     <p>jsvc has other useful parameters, such as <code>-user</code> which 
        causes it to switch to another user after the daemon initialization is
        complete. This allows, for example, running Tomcat as a non privileged
-       user while still being able to use privileged ports. 
-       <code>jsvc --help</code> will return the full jsvc usage 
+       user while still being able to use privileged ports. Note that if you
+       use this option and start Tomcat as root, you&apos;ll need to disable the
+       <code>org.apache.catalina.security.SecurityListener</code> check that
+       prevents Tomcat starting when running as root.</p> 
+       
+    <p><code>jsvc --help</code> will return the full jsvc usage 
        information. In particular, the <code>-debug</code> option is useful
        to debug issues running jsvc.</p>
 
