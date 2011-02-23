@@ -104,6 +104,9 @@ public abstract class AbstractEndpoint {
     public static final String SSL_ATTR_ALLOW_UNSAFE_RENEG =
         "allowUnsafeLegacyRenegotiation";
 
+    private static final int INITIAL_ERROR_DELAY = 50;
+    private static final int MAX_ERROR_DELAY = 1600;
+
     // ----------------------------------------------------------------- Fields
 
 
@@ -614,7 +617,37 @@ public abstract class AbstractEndpoint {
         } else return -1;
     }
     
-    
+    /**
+     * Provides a common approach for sub-classes to handle exceptions where a
+     * delay is required to prevent a Thread from entering a tight loop which
+     * will consume CPU and may also trigger large amounts of logging. For
+     * example, this can happen with the Acceptor thread if the ulimit for open
+     * files is reached.
+     * 
+     * @param currentErrorDelay The current delay beign applied on failure
+     * @return  The delay to apply on the next failure
+     */
+    protected int handleExceptionWithDelay(int currentErrorDelay) {
+        // Don't delay on first exception
+        if (currentErrorDelay > 0) {
+            try {
+                Thread.sleep(currentErrorDelay);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+        
+        // On subsequent exceptions, start the delay at 50ms, doubling the delay
+        // on every subsequent exception until the delay reaches 1.6 seconds.
+        if (currentErrorDelay == 0) {
+            return INITIAL_ERROR_DELAY;
+        } else if (currentErrorDelay < MAX_ERROR_DELAY) {
+            return currentErrorDelay * 2;
+        } else {
+            return MAX_ERROR_DELAY;
+        }
+
+    }
 
     // --------------------  SSL related properties --------------------
 
