@@ -914,6 +914,8 @@ public class AprEndpoint extends AbstractEndpoint {
         @Override
         public void run() {
 
+            int errorDelay = 0;
+
             // Loop until we receive a shutdown command
             while (running) {
 
@@ -932,8 +934,21 @@ public class AprEndpoint extends AbstractEndpoint {
                 try {
                     //if we have reached max connections, wait
                     awaitConnection();
-                    // Accept the next incoming connection from the server socket
-                    long socket = Socket.accept(serverSock);
+                    
+                    long socket = 0;
+                    try {
+                        // Accept the next incoming connection from the server
+                        // socket
+                        socket = Socket.accept(serverSock);
+                    } catch (Exception e) {
+                        // Introduce delay if necessary
+                        errorDelay = handleExceptionWithDelay(errorDelay);
+                        // re-throw
+                        throw e;
+                    }
+                    // Successful accept, reset the error delay
+                    errorDelay = 0;
+
                     //increment socket count
                     countUpConnection();
                     /*
