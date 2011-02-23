@@ -310,6 +310,39 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
 
     </attributes>
 
+    <h3>Security Lifecycle Listener (org.apache.catalina.security.SecurityListener)</h3>
+
+    <p>The <strong>Security Lifecycle Listener</strong> performs a number of
+    security checks when Tomcat starts and prevents Tomcat from starting if they
+    fail. The listener is not enabled by default. To enabled it uncomment the
+    listener in $CATALINA_BASE/conf/server.xml. If the operating system supports
+    umask then the line in $CATALINA_HOME/bin/catalina.sh that obtains the umask
+    also needs to be uncommented.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>The following additional attributes are supported by the <strong>Security
+    Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="checkedOsUsers" required="false">
+        <p>A comma separated list of OS users that must not be used to start
+        Tomcat. If not specified, the default value of <b>root</b> is used. To
+        disable this check, set the attribute to the empty string. Usernames
+        are checked in a case-insensitive manner.</p>
+      </attribute>
+
+      <attribute name="minimumUmask" required="false">
+        <p>The least rectrictive umask that must be configured before Tomcat
+        will start. If not specified, the default value of <b>0007</b> is used.
+        To disable this check, set the attribute to the empty string. The check
+        is not performed on Windows platforms.</p>
+      </attribute>
+
+    </attributes>
+
   </subsection>
 
 </section>

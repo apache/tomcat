@@ -73,8 +73,6 @@ public final class SecurityUtil{
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityUtil.class );
     
-    private static String PACKAGE = "org.apache.catalina.security";
-    
     private static boolean packageDefinitionEnabled =  
          (System.getProperty("package.definition") == null && 
            System.getProperty("package.access")  == null) ? false : true;
@@ -83,7 +81,7 @@ public final class SecurityUtil{
      * The string resources for this package.
      */
     private static final StringManager sm =
-        StringManager.getManager(PACKAGE);    
+        StringManager.getManager(Constants.PACKAGE);    
     
     
     /**

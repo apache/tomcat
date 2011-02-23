@@ -53,6 +53,14 @@
         <bug>21669</bug>: Add the ability to specify the roleBase for the JNDI
         Realm as relative to the users DN. Based on a patch by Art W. (markt)
       </add>
+      <add>
+        <bug>22405</bug>: Add a new Lifecycle listener,
+        <code>org.apache.catalina.security.SecurityListener</code> that prevents
+        Tomcat from starting insecurely. It requires that Tomcat is not started
+        as root and that a umask at least as restrictive as 0007 is used. This
+        new listener is not enabled by default.
+        (markt)
+      </add>
       <fix>
         <bug>48863</bug>: Better logging when specifying an invalid directory
         for a class loader. Based on a patch by Ralf Hauser. (markt)
