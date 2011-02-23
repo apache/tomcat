@@ -119,6 +119,9 @@
       <p>The APR Lifecycle Listener is not stable if compiled on Solaris using
       gcc. If using the APR/native connector on Solaris, compile it with the
       Sun Studio compiler.</p>
+      
+      <p>The Security Listener should be enabled and configured as appropriate.  
+      </p>
     </subsection>
     
     <subsection name="Connectors">
