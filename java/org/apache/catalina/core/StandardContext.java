@@ -1952,24 +1952,36 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("namingResources",
                                    oldNamingResources, this.namingResources);
         
-        // If set from server.xml, getObjectKeyPropertiesNameOnly() will
-        // trigger an NPE. Initial registration takes place on INIT. 
-        if (getState() != LifecycleState.NEW) {
-            if (oldNamingResources != null) {
-                try {
-                    oldNamingResources.stop();
-                    oldNamingResources.destroy();
-                } catch (LifecycleException e) {
-                    log.warn("standardContext.namingResource.destroy.fail", e);
-                }
+        if (getState() == LifecycleState.NEW ||
+                getState() == LifecycleState.INITIALIZING ||
+                getState() == LifecycleState.INITIALIZED) {
+            // NEW will occur if Context is defined in server.xml
+            // At this point getObjectKeyPropertiesNameOnly() will trigger an
+            // NPE.
+            // INITIALIZED will occur if the Context is defined in a context.xml
+            // file
+            // If started now, a second start will be attempted when the context
+            // starts
+            
+            // In both cases, return and let context init the namingResources
+            // when it starts
+            return;
+        }
+        
+        if (oldNamingResources != null) {
+            try {
+                oldNamingResources.stop();
+                oldNamingResources.destroy();
+            } catch (LifecycleException e) {
+                log.warn("standardContext.namingResource.destroy.fail", e);
             }
-            if (namingResources != null) {
-                try {
-                    namingResources.init();
-                    namingResources.start();
-                } catch (LifecycleException e) {
-                    log.warn("standardContext.namingResource.init.fail", e);
-                }
+        }
+        if (namingResources != null) {
+            try {
+                namingResources.init();
+                namingResources.start();
+            } catch (LifecycleException e) {
+                log.warn("standardContext.namingResource.init.fail", e);
             }
         }
     }
