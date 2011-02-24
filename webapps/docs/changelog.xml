@@ -133,7 +133,7 @@
       <add>
         Web crawlers can trigger the creation of many thousands of sessions as
         they crawl a site which may result in significant memory consumption.
-        Thw new Crawler Session Manager Valve ensures that crawlers are
+        The new Crawler Session Manager Valve ensures that crawlers are
         associated with a single session - just like normal users - regardless
         of whether or not they provide a session token with their requests.
         (markt)
@@ -141,6 +141,11 @@
       <fix>
         Don&apos;t attempt to start NamingResources for Contexts multiple times.
         (markt) 
+      </fix>
+      <fix>
+        <bug>50826</bug>: Avoid <code>IllegalArgumentException</code> if an
+        embedded Tomcat instance that includes at least one Context is destroyed
+        without ever being started. (markt)
       </fix>
     </changelog>
   </subsection>

@@ -5486,11 +5486,15 @@ public class StandardContext extends ContainerBase
             ((Lifecycle) loader).destroy();
         }
 
-        // Send j2ee.object.deleted notification 
-        Notification notification = 
-            new Notification("j2ee.object.deleted", this.getObjectName(), 
-                             sequenceNumber.getAndIncrement());
-        broadcaster.sendNotification(notification);
+        // If in state NEW when destroy is called, the object name will never
+        // have been set so the notification can't be created
+        if (getObjectName() != null) { 
+            // Send j2ee.object.deleted notification 
+            Notification notification = 
+                new Notification("j2ee.object.deleted", this.getObjectName(), 
+                                 sequenceNumber.getAndIncrement());
+            broadcaster.sendNotification(notification);
+        }
 
         if (namingResources != null) {
             namingResources.destroy();
