@@ -880,6 +880,62 @@
 </section>
 
 
+<section name="Crawler Session Manager Valve">
+
+  <subsection name="Introduction">
+  
+    <p>Web crawlers can trigger the creation of many thousands of sessions as
+    they crawl a site which may result in significant memory consumption. This
+    Valve ensures that crawlers are associated with a single session - just like
+    normal users - regardless of whether or not they provide a session token
+    with their requests.</p>
+    
+    <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
+    <code>Context</code> level as required. Normally, this Valve would be used
+    at the <code>Engine</code> level.</p>
+    
+    <p>If used in conjunction with Remote IP valve then the Remote IP valve
+    should be defined before this valve to ensure that the correct client IP
+    address is presented to this valve.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Crawler Session Manager Valve</strong> supports the
+    following configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.CrawlerSessionManagerValve</strong>.
+        </p>
+      </attribute>
+
+      <attribute name="crawlerUserAgents" required="false">
+        <p>Regular expression (using <code>java.util.regex</code>) that the user
+        agent HTTP request header is matched against to determine if a request
+        is from a web crawler. If not set, the default of
+        <code>.*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*</code> is used.</p>
+      </attribute>
+
+      <attribute name="sessionInactiveInterval" required="false">
+        <p>The minimum time in seconds that the Crawler Session Manager Valve
+        should keep the mapping of client IP to session ID in memory without any
+        activity from the client. The client IP / session cache will be
+        periodically purged of mappings that have been inactive for longer than
+        this interval. If not specified the default value of <code>60</code>
+        will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 </body>
 
 
