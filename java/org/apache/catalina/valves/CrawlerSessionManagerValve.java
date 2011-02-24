@@ -125,10 +125,13 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
             // Is this a crawler - cheack the UA headers
             Enumeration<String> uaHeaders = request.getHeaders("user-agent");
-            String uaHeader = uaHeaders.nextElement();
+            String uaHeader = null;
+            if (uaHeaders.hasMoreElements()) {
+                uaHeader = uaHeaders.nextElement();
+            }
             
             // If more than one UA header - assume not a bot
-            if (!uaHeaders.hasMoreElements()) {
+            if (uaHeader != null && !uaHeaders.hasMoreElements()) {
 
                 if (log.isDebugEnabled()) {
                     log.debug(request.hashCode() + ": UserAgent=" + uaHeader);
