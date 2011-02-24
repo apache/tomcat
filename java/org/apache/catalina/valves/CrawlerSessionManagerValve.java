@@ -123,7 +123,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
         // If the incoming request has a session ID, no action is required
         if (request.getRequestedSessionId() == null) {
 
-            // Is this a crawler - cheack the UA headers
+            // Is this a crawler - check the UA headers
             Enumeration<String> uaHeaders = request.getHeaders("user-agent");
             String uaHeader = null;
             if (uaHeaders.hasMoreElements()) {
