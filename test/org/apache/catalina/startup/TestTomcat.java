@@ -326,4 +326,21 @@ public class TestTomcat extends TomcatBaseTest {
         assertTrue(res.toString().contains("<?xml version=\"1.0\" "));
     }
 
+    public void testBug50826() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        String contextPath = "/examples";
+        
+        File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+
+        Exception e = null;
+        try {
+            tomcat.destroy();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            e = ex;
+        }
+        assertNull(e);
+    }
 }
