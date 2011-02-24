@@ -138,6 +138,10 @@
         of whether or not they provide a session token with their requests.
         (markt)
       </add>
+      <fix>
+        Don&apos;t attempt to start NamingResources for Contexts multiple times.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
