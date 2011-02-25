@@ -151,6 +151,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>49284</bug>: Add SSL re-negotiation support to the HTTP NIO
+        connector. (markt)
+      </add>
       <fix>
         <bug>50780</bug>: Fix memory leak in APR implementation of AJP
         connector introduced by the refactoring for <bug>49884</bug>. (markt) 
