@@ -143,7 +143,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         }
         if (jsseCerts == null)
             jsseCerts = new X509Certificate[0];
-        if(jsseCerts.length <= 0 && force) {
+        if(jsseCerts.length <= 0 && force && ssl != null) {
             session.invalidate();
             handShake();
             session = ssl.getSession();
