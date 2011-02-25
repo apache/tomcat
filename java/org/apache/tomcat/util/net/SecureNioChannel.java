@@ -43,8 +43,8 @@ public class SecureNioChannel extends NioChannel  {
     
     protected SSLEngine sslEngine;
     
-    protected boolean initHandshakeComplete = false;
-    protected HandshakeStatus initHandshakeStatus; //gets set by begin handshake
+    protected boolean handshakeComplete = false;
+    protected HandshakeStatus handshakeStatus; //gets set by begin handshake
     
     protected boolean closed = false;
     protected boolean closing = false;
@@ -82,12 +82,12 @@ public class SecureNioChannel extends NioChannel  {
         netOutBuffer.limit(0);
         netInBuffer.position(0);
         netInBuffer.limit(0);
-        initHandshakeComplete = false;
+        handshakeComplete = false;
         closed = false;
         closing = false;
         //initiate handshake
         sslEngine.beginHandshake();
-        initHandshakeStatus = sslEngine.getHandshakeStatus();
+        handshakeStatus = sslEngine.getHandshakeStatus();
     }
     
     @Override
@@ -146,35 +146,35 @@ public class SecureNioChannel extends NioChannel  {
      */
     @Override
     public int handshake(boolean read, boolean write) throws IOException {
-        if ( initHandshakeComplete ) return 0; //we have done our initial handshake
+        if ( handshakeComplete ) return 0; //we have done our initial handshake
         
         if (!flush(netOutBuffer)) return SelectionKey.OP_WRITE; //we still have data to write
         
         SSLEngineResult handshake = null;
         
-        while (!initHandshakeComplete) {
-            switch ( initHandshakeStatus ) {
+        while (!handshakeComplete) {
+            switch ( handshakeStatus ) {
                 case NOT_HANDSHAKING: {
                     //should never happen
                     throw new IOException("NOT_HANDSHAKING during handshake");
                 }
                 case FINISHED: {
                     //we are complete if we have delivered the last package
-                    initHandshakeComplete = !netOutBuffer.hasRemaining();
+                    handshakeComplete = !netOutBuffer.hasRemaining();
                     //return 0 if we are complete, otherwise we still have data to write
-                    return initHandshakeComplete?0:SelectionKey.OP_WRITE; 
+                    return handshakeComplete?0:SelectionKey.OP_WRITE; 
                 }
                 case NEED_WRAP: {
                     //perform the wrap function
                     handshake = handshakeWrap(write);
                     if ( handshake.getStatus() == Status.OK ){
-                        if (initHandshakeStatus == HandshakeStatus.NEED_TASK) 
-                            initHandshakeStatus = tasks();
+                        if (handshakeStatus == HandshakeStatus.NEED_TASK) 
+                            handshakeStatus = tasks();
                     } else {
                         //wrap should always work with our buffers
                         throw new IOException("Unexpected status:" + handshake.getStatus() + " during handshake WRAP.");
                     }
-                    if ( initHandshakeStatus != HandshakeStatus.NEED_UNWRAP || (!flush(netOutBuffer)) ) {
+                    if ( handshakeStatus != HandshakeStatus.NEED_UNWRAP || (!flush(netOutBuffer)) ) {
                         //should actually return OP_READ if we have NEED_UNWRAP
                         return SelectionKey.OP_WRITE;
                     }
@@ -185,26 +185,26 @@ public class SecureNioChannel extends NioChannel  {
                     //perform the unwrap function
                     handshake = handshakeUnwrap(read);
                     if ( handshake.getStatus() == Status.OK ) {
-                        if (initHandshakeStatus == HandshakeStatus.NEED_TASK) 
-                            initHandshakeStatus = tasks();
+                        if (handshakeStatus == HandshakeStatus.NEED_TASK) 
+                            handshakeStatus = tasks();
                     } else if ( handshake.getStatus() == Status.BUFFER_UNDERFLOW ){
                         //read more data, reregister for OP_READ
                         return SelectionKey.OP_READ;
                     } else {
-                        throw new IOException("Invalid handshake status:"+initHandshakeStatus+" during handshake UNWRAP.");
+                        throw new IOException("Invalid handshake status:"+handshakeStatus+" during handshake UNWRAP.");
                     }//switch
                     break;
                 }
                 case NEED_TASK: {
-                    initHandshakeStatus = tasks();
+                    handshakeStatus = tasks();
                     break;
                 }
-                default: throw new IllegalStateException("Invalid handshake status:"+initHandshakeStatus);
+                default: throw new IllegalStateException("Invalid handshake status:"+handshakeStatus);
             }//switch
         }//while      
         //return 0 if we are complete, otherwise reregister for any activity that 
         //would cause this method to be called again.
-        return initHandshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+        return handshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
     }
     
     /**
@@ -234,7 +234,7 @@ public class SecureNioChannel extends NioChannel  {
         //prepare the results to be written
         netOutBuffer.flip();
         //set the status
-        initHandshakeStatus = result.getHandshakeStatus();
+        handshakeStatus = result.getHandshakeStatus();
         //optimization, if we do have a writable channel, write it now
         if ( doWrite ) flush(netOutBuffer);
         return result;
@@ -268,19 +268,42 @@ public class SecureNioChannel extends NioChannel  {
             //compact the buffer, this is an optional method, wonder what would happen if we didn't
             netInBuffer.compact();
             //read in the status
-            initHandshakeStatus = result.getHandshakeStatus();
+            handshakeStatus = result.getHandshakeStatus();
             if ( result.getStatus() == SSLEngineResult.Status.OK &&
                  result.getHandshakeStatus() == HandshakeStatus.NEED_TASK ) {
                 //execute tasks if we need to
-                initHandshakeStatus = tasks();
+                handshakeStatus = tasks();
             }
             //perform another unwrap?
             cont = result.getStatus() == SSLEngineResult.Status.OK &&
-                   initHandshakeStatus == HandshakeStatus.NEED_UNWRAP;
+                   handshakeStatus == HandshakeStatus.NEED_UNWRAP;
         }while ( cont );
         return result;
     }
     
+    public void rehandshake() throws IOException {
+        int readBufLimit = getBufHandler().getReadBuffer().limit();
+        try {
+            // Expand read buffer to maximum to allow handshaking to take place
+            getBufHandler().getReadBuffer().limit(
+                    getBufHandler().getReadBuffer().capacity());
+            sslEngine.getSession().invalidate();
+            sslEngine.beginHandshake();
+            handshakeComplete = false;
+            handshakeStatus = sslEngine.getHandshakeStatus();
+            while (!handshakeComplete) {
+                handshake(true, true);
+                if (handshakeStatus == HandshakeStatus.NEED_UNWRAP)  {
+                    handshakeUnwrap(true);
+                }
+            }
+        } finally {
+            // Restore the pre-handshak value
+            getBufHandler().getReadBuffer().limit(readBufLimit);
+        }
+    }
+
+
     /**
      * Sends a SSL close message, will not physically close the connection here.<br>
      * To close the connection, you could do something like
@@ -353,7 +376,7 @@ public class SecureNioChannel extends NioChannel  {
         //are we in the middle of closing or closed?
         if ( closing || closed) return -1;
         //did we finish our handshake?
-        if (!initHandshakeComplete) throw new IllegalStateException("Handshake incomplete, you must complete handshake before reading data.");
+        if (!handshakeComplete) throw new IllegalStateException("Handshake incomplete, you must complete handshake before reading data.");
 
         //read from the network
         int netread = sc.read(netInBuffer);
@@ -474,8 +497,8 @@ public class SecureNioChannel extends NioChannel  {
     }
 
     @Override
-    public boolean isInitHandshakeComplete() {
-        return initHandshakeComplete;
+    public boolean isHandshakeComplete() {
+        return handshakeComplete;
     }
 
     @Override
