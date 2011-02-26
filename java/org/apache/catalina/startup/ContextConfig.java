@@ -1337,7 +1337,6 @@ public class ContextConfig
     private void convertJsp(ServletDef servletDef, ServletDef jspServletDef) {
         servletDef.setServletClass(org.apache.catalina.core.Constants.JSP_SERVLET_CLASS);
         String jspFile = servletDef.getJspFile();
-        servletDef.getParameterMap().put("jspFile", jspFile);
         if ((jspFile != null) && !jspFile.startsWith("/")) {
             if (context.isServlet22()) {
                 if(log.isDebugEnabled())
@@ -1349,6 +1348,7 @@ public class ContextConfig
                     (sm.getString("contextConfig.jspFile.error", jspFile));
             }
         }
+        servletDef.getParameterMap().put("jspFile", jspFile);
         servletDef.setJspFile(null);
         for (Map.Entry<String, String> initParam: jspServletDef.getParameterMap().entrySet()) {
             servletDef.addInitParameter(initParam.getKey(), initParam.getValue());
