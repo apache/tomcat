@@ -151,6 +151,10 @@
         Ensure a web application is taken out of service if the web.xml file is
         not valid. (kkolinko/markt)
       </fix>
+      <fix>
+        Ensure Servlet 2.2 jspFile elements are correctly converted to use a
+        leading &apos;/&apos; if missing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
