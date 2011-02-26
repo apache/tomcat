@@ -72,7 +72,7 @@ public class FilterDef implements Serializable {
     /**
      * The filter instance associated with this definition
      */
-    private Filter filter = null;
+    private transient Filter filter = null;
     
     public Filter getFilter() {
         return filter;
