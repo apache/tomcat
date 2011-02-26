@@ -147,6 +147,10 @@
         embedded Tomcat instance that includes at least one Context is destroyed
         without ever being started. (markt)
       </fix>
+      <fix>
+        Ensure a web application is taken out of service if the web.xml file is
+        not valid. (kkolinko/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
