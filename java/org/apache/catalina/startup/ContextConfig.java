@@ -1341,12 +1341,12 @@ public class ContextConfig
         if ((jspFile != null) && !jspFile.startsWith("/")) {
             if (context.isServlet22()) {
                 if(log.isDebugEnabled())
-                    log.debug(sm.getString("standardContext.wrapper.warning",
+                    log.debug(sm.getString("contextConfig.jspFile.warning",
                                        jspFile));
                 jspFile = "/" + jspFile;
             } else {
                 throw new IllegalArgumentException
-                    (sm.getString("standardContext.wrapper.error", jspFile));
+                    (sm.getString("contextConfig.jspFile.error", jspFile));
             }
         }
         servletDef.setJspFile(null);
