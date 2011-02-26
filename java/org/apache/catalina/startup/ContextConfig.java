@@ -1222,7 +1222,9 @@ public class ContextConfig
                 orderedFragments = WebXml.orderWebFragments(webXml, fragments);
     
                 // Step 3. Look for ServletContainerInitializer implementations
-                ok = processServletContainerInitializers(orderedFragments);
+                if (ok) {
+                    processServletContainerInitializers(orderedFragments);
+                }
     
                 // Step 4. Process /WEB-INF/classes for annotations
                 // This will add any matching classes to the typeInitializerMap
@@ -1274,7 +1276,6 @@ public class ContextConfig
                 }
             } else {
                 webXml.configureContext(context);
-                ok = true;
             }
             
             // Always need to look for static resources
@@ -1362,7 +1363,7 @@ public class ContextConfig
      * Scan JARs for ServletContainerInitializer implementations.
      * Implementations will be added in web-fragment.xml priority order.
      */
-    protected boolean processServletContainerInitializers(
+    protected void processServletContainerInitializers(
             Set<WebXml> fragments) {
         
         for (WebXml fragment : fragments) {
@@ -1393,7 +1394,8 @@ public class ContextConfig
                 log.error(sm.getString(
                         "contextConfig.servletContainerInitializerFail", url,
                         context.getName()));
-                return false;
+                ok = false;
+                return;
             } finally {
                 if (is != null) {
                     try {
@@ -1435,7 +1437,6 @@ public class ContextConfig
             }
 
         }
-        return true;
     }
     
     
