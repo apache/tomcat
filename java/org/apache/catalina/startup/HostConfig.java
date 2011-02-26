@@ -1248,7 +1248,10 @@ public class HostConfig
                     log.info(sm.getString("hostConfig.reload", app.name));
                 Container context = host.findChild(app.name);
                 try {
-                    context.stop();
+                    // Might not have started if start failed last time
+                    if (context.getState().isAvailable()) {
+                        context.stop();
+                    }
                 } catch (Exception e) {
                     log.warn(sm.getString
                              ("hostConfig.context.restart", app.name), e);
