@@ -92,12 +92,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     /**
-     * The number of random bytes to include when generating a
-     * session identifier.
-     */
-    protected static final int SESSION_ID_BYTES = 16;
-
-    /**
      * Authentication header
      */
     protected static final String AUTH_HEADER_NAME = "WWW-Authenticate";
@@ -789,6 +783,15 @@ public abstract class AuthenticatorBase extends ValveBase
 
     protected abstract String getAuthMethod();
 
+    /**
+     * Process the login request.
+     * 
+     * @param request   Associated request
+     * @param username  The user
+     * @param password  The password
+     * @return          The authenticated Principal
+     * @throws ServletException
+     */
     protected Principal doLogin(Request request, String username,
             String password) throws ServletException {
         Principal p = context.getRealm().authenticate(username, password);
