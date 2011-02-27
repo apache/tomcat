@@ -22,6 +22,11 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <Class name="org.apache.catalina.ant.AbstractCatalinaTask"/>
+    <Method name="execute"/>
+    <Bug code="REC"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.ant.jmx.JMXAccessorCondition"/>
     <Method name="accessJMXValue"/>
     <Bug code="REC"/>
