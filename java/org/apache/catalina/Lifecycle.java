@@ -25,7 +25,8 @@ package org.apache.catalina;
  * the functionality they support) in order to provide a consistent mechanism
  * to start and stop the component.
  * <br>
- * The valid state transitions for components that support Lifecycle are:
+ * The valid state transitions for components that support {@link Lifecycle}
+ * are:
  * <pre>
  *    init()
  * NEW ->-- INITIALIZING
@@ -44,9 +45,11 @@ package org.apache.catalina;
  * |  |          |                                                             |
  * |  |         \|/            auto                 auto              start()  |
  * |  |     STOPPING_PREP ------>----- STOPPING ------>----- STOPPED ---->------
- * |  |          ^                                           |  |  ^
+ * |  |                                   ^                  |  |  ^
+ * |  |                  stop()           |                  |  |  |
+ * |  |          --------------------------                  |  |  |
  * |  |          |                                  auto     |  |  |
- * |  |          |stop()            MUST_DESTROY------<-------  |  |
+ * |  |          |                  MUST_DESTROY------<-------  |  |
  * |  |          |                    |                         |  |
  * |  |          |                    |auto                     |  |
  * |  |          |    destroy()      \|/              destroy() |  |
@@ -197,8 +200,8 @@ public interface Lifecycle {
 
 
     /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
+     * Get the life cycle listeners associated with this life cycle. If this 
+     * component has no listeners registered, a zero-length array is returned.
      */
     public LifecycleListener[] findLifecycleListeners();
 
@@ -226,10 +229,12 @@ public interface Lifecycle {
     public void init() throws LifecycleException;
 
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component.  This method should be called before any of the public
-     * methods of this component are utilized. The following
-     * {@link LifecycleEvent}s will be fired in the following order:
+     * Prepare for the beginning of active use of the public methods other than
+     * property getters/setters and life cycle methods of this component. This
+     * method should be called before any of the public methods other than
+     * property getters/setters and life cycle methods of this component are
+     * utilized. The following {@link LifecycleEvent}s will be fired in the
+     * following order:
      * <ol>
      *   <li>BEFORE_START_EVENT: At the beginning of the method. It is as this
      *                           point the state transitions to
@@ -237,7 +242,9 @@ public interface Lifecycle {
      *   <li>START_EVENT: During the method once it is safe to call start() for
      *                    any child components. It is at this point that the
      *                    state transitions to {@link LifecycleState#STARTING}
-     *                    and that the public methods may be used.</li>
+     *                    and that the public methods other than property
+     *                    getters/setters and life cycle methods may be 
+     *                    used.</li>
      *   <li>AFTER_START_EVENT: At the end of the method, immediately before it
      *                          returns. It is at this point that the state
      *                          transitions to {@link LifecycleState#STARTED}.
@@ -251,10 +258,11 @@ public interface Lifecycle {
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component. Once the STOP_EVENT is fired, the public methods should not
-     * be used. The following {@link LifecycleEvent}s will be fired in the
-     * following order:
+     * Gracefully terminate the active use of the public methods other than
+     * property getters/setters and life cycle methods of this component. Once
+     * the STOP_EVENT is fired, the public methods other than property
+     * getters/setters and life cycle methods should not be used. The following
+     * {@link LifecycleEvent}s will be fired in the following order:
      * <ol>
      *   <li>BEFORE_STOP_EVENT: At the beginning of the method. It is at this
      *                          point that the state transitions to
@@ -262,12 +270,20 @@ public interface Lifecycle {
      *   <li>STOP_EVENT: During the method once it is safe to call stop() for
      *                   any child components. It is at this point that the
      *                   state transitions to {@link LifecycleState#STOPPING}
-     *                   and that the public methods may no longer be used.</li>
+     *                   and that the public methods other than property
+     *                   getters/setters and life cycle methods may no longer be
+     *                   used.</li>
      *   <li>AFTER_STOP_EVENT: At the end of the method, immediately before it
      *                         returns. It is at this point that the state
      *                         transitions to {@link LifecycleState#STOPPED}.
      *                         </li>
      * </ol>
+     * 
+     * Note that if transitioning from {@link LifecycleState#FAILED} then the
+     * three events above will be fired but the component will transition
+     * directly from {@link LifecycleState#FAILED} to
+     * {@link LifecycleState#STOPPING}, bypassing
+     * {@link LifecycleState#STOPPING_PREP}
      * 
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
