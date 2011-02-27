@@ -17,6 +17,16 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
+    <!--  Can do anything about this. API is fixed by the specification. -->
+    <Class name="javax.servlet.jsp.tagext.TagData"/>
+    <Bug code="CN" />
+  </Match>
+  <Match>
+    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
+    <Method name="equals"/>
+    <Bug code="Eq" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.catalina.Executor" />
     <Bug code="Nm" />
