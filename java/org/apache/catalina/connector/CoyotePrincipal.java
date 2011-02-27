@@ -51,6 +51,7 @@ public class CoyotePrincipal implements Principal, Serializable {
      */
     protected String name = null;
 
+    @Override
     public String getName() {
         return (this.name);
     }
