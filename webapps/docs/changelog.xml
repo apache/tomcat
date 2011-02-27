@@ -62,6 +62,11 @@
         (markt)
       </add>
       <fix>
+        <bug>31027</bug>: Trim whitespace from names and values obtained from
+        <code>$CATALINA_BASE/conf/catalina.properties</code> to avoid hard to
+        diagnose errors on startup. (markt)
+      </fix>
+      <fix>
         <bug>48863</bug>: Better logging when specifying an invalid directory
         for a class loader. Based on a patch by Ralf Hauser. (markt)
       </fix>
