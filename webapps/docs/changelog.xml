@@ -155,6 +155,11 @@
         Ensure Servlet 2.2 jspFile elements are correctly converted to use a
         leading &apos;/&apos; if missing. (markt)
       </fix>
+      <fix>
+        <bug>50836</bug>: Better documentation of the meaning of
+        <code>Lifecycle.isAvailable()</code> and correct a couple of cases where
+        this could incorrectly return true. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
