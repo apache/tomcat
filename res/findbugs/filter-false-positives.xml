@@ -22,6 +22,16 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <Class name="org.apache.catalina.ant.jmx.JMXAccessorCondition"/>
+    <Method name="accessJMXValue"/>
+    <Bug code="REC"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition"/>
+    <Method name="accessJMXValue"/>
+    <Bug code="REC"/>
+  </Match>
+  <Match>
     <!-- JNI library can only be loaded once so statics are appropriate -->
     <Class name="org.apache.catalina.core.AprLifecycleListener" />
     <Bug code="ST" />
