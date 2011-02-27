@@ -294,7 +294,18 @@ public class SecureNioChannel extends NioChannel  {
             while (!handshakeComplete) {
                 handshake(true, true);
                 if (handshakeStatus == HandshakeStatus.NEED_UNWRAP)  {
-                    handshakeUnwrap(true);
+                    // Block until there is data to read from the client
+                    Selector selector = null;
+                    try {
+                        selector = Selector.open();
+                        sc.register(selector, SelectionKey.OP_READ);
+                        selector.select();
+                        handshakeUnwrap(true);
+                    } finally {
+                        if (selector != null) {
+                            selector.close();
+                        }
+                    }
                 }
             }
         } finally {
