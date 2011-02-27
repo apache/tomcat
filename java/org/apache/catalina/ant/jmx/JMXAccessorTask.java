@@ -420,6 +420,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @throws MalformedURLException
      * @throws IOException
      */
+    @SuppressWarnings("null")
     public static MBeanServerConnection accessJMXConnection(Project project,
             String url, String host, String port, String username,
             String password, String refId) throws MalformedURLException,
@@ -680,22 +681,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * get all properties, when project is there got all project Properties
-     * @return properties
-     */
-    public Map getProperties() {
-        Project currentProject = getProject();
-        if (currentProject != null) {
-            return currentProject.getProperties();
-        } else {
-            return properties;
-        }        
-    }
-    
-    /**
-     * get all Properties
-     * @param property
-     * @return The property
+     * Get Property
+     * @param property name
+     * @return The property value
      */
     public String getProperty(String property) {
         Project currentProject = getProject();
