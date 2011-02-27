@@ -70,6 +70,11 @@
     <Bug code="NS"/>
   </Match>
   <Match>
+    <Class name="org.apache.catalina.util.LifecycleBase" />
+    <Method name="getState"/>
+    <Bug code="UG" />
+  </Match>
+  <Match>
     <!-- JspC will not be used under a security manager -->
     <Class name="org.apache.jasper.JspC"/>
     <Method name="initClassLoader"/>
