@@ -212,7 +212,14 @@ public abstract class LifecycleBase implements Lifecycle {
             invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
         }
         
-        setStateInternal(LifecycleState.STOPPING_PREP, null, false);
+        if (state.equals(LifecycleState.FAILED)) {
+            // Don't transition to STOPPING_PREP as that would briefly mark the
+            // component as available but do ensure the BEFORE_STOP_EVENT is
+            // fired
+            fireLifecycleEvent(BEFORE_STOP_EVENT, null);
+        } else {
+            setStateInternal(LifecycleState.STOPPING_PREP, null, false);
+        }
 
         try {
             stopInternal();
@@ -352,11 +359,14 @@ public abstract class LifecycleBase implements Lifecycle {
             
             // Any method can transition to failed
             // startInternal() permits STARTING_PREP to STARTING
-            // stopInternal() permits STOPPING_PREP to STOPPING
+            // stopInternal() permits STOPPING_PREP to STOPPING and FAILED to
+            // STOPPING
             if (!(state == LifecycleState.FAILED ||
                     (this.state == LifecycleState.STARTING_PREP &&
                             state == LifecycleState.STARTING) ||
                     (this.state == LifecycleState.STOPPING_PREP &&
+                            state == LifecycleState.STOPPING) ||
+                    (this.state == LifecycleState.FAILED &&
                             state == LifecycleState.STOPPING))) {
                 // No other transition permitted
                 invalidTransition(state.name());

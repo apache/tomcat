@@ -35,7 +35,7 @@ public enum LifecycleState {
     DESTROYED(false, Lifecycle.AFTER_DESTROY_EVENT),
     FAILED(false, null),
     MUST_STOP(true, null),
-    MUST_DESTROY(true, null);
+    MUST_DESTROY(false, null);
     
     private final boolean available;
     private final String lifecycleEvent;
@@ -46,7 +46,15 @@ public enum LifecycleState {
     }
     
     /**
-     * Is a component in this state available for use?
+     * May the public methods other than property getters/setters and lifecycle
+     * methods be called for a component in this state? It returns
+     * <code>true</code> for any component in any of the following states:
+     * <ul>
+     * <li>{@link #STARTING}</li>
+     * <li>{@link #STARTED}</li>
+     * <li>{@link #STOPPING_PREP}</li>
+     * <li>{@link #MUST_STOP}</li>
+     * </ul>
      */
     public boolean isAvailable() {
         return available;
