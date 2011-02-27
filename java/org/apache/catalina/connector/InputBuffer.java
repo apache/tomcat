@@ -272,6 +272,7 @@ public class InputBuffer extends Reader
      * 
      * @throws IOException An underlying IOException occurred
      */
+    @Override
     public int realReadBytes(byte cbuf[], int off, int len)
             throws IOException {
 
@@ -319,6 +320,7 @@ public class InputBuffer extends Reader
      * been read before, they are ignored. If a mark was set, then the
      * mark is lost.
      */
+    @Override
     public void realWriteChars(char c[], int off, int len) 
         throws IOException {
         markPos = -1;
@@ -332,6 +334,7 @@ public class InputBuffer extends Reader
     }
 
 
+    @Override
     public int realReadChars(char cbuf[], int off, int len)
         throws IOException {
 
@@ -518,6 +521,7 @@ public class InputBuffer extends Reader
                     conv = AccessController.doPrivileged(
                             new PrivilegedExceptionAction<B2CConverter>(){
 
+                                @Override
                                 public B2CConverter run() throws IOException {
                                     return new B2CConverter(enc);
                                 }
