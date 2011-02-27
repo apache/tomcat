@@ -88,6 +88,7 @@ public class CoyoteInputStream
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
+                            @Override
                             public Integer run() throws IOException{
                                 Integer integer = Integer.valueOf(ib.readByte());
                                 return integer;
@@ -117,6 +118,7 @@ public class CoyoteInputStream
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
+                            @Override
                             public Integer run() throws IOException{
                                 Integer integer = Integer.valueOf(ib.available());
                                 return integer;
@@ -146,6 +148,7 @@ public class CoyoteInputStream
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
+                            @Override
                             public Integer run() throws IOException{
                                 Integer integer = 
                                     Integer.valueOf(ib.read(b, 0, b.length));
@@ -178,6 +181,7 @@ public class CoyoteInputStream
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
+                            @Override
                             public Integer run() throws IOException{
                                 Integer integer = 
                                     Integer.valueOf(ib.read(b, off, len));
@@ -219,6 +223,7 @@ public class CoyoteInputStream
                 AccessController.doPrivileged(
                     new PrivilegedExceptionAction<Void>(){
 
+                        @Override
                         public Void run() throws IOException{
                             ib.close();
                             return null;

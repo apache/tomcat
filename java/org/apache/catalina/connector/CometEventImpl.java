@@ -88,6 +88,7 @@ public class CometEventImpl implements CometEvent {
         this.eventSubType = eventSubType;
     }
     
+    @Override
     public void close() throws IOException {
         if (request == null) {
             throw new IllegalStateException(sm.getString("cometEvent.nullRequest"));
@@ -98,22 +99,27 @@ public class CometEventImpl implements CometEvent {
         if (iscomet) request.cometClose();
     }
 
+    @Override
     public EventSubType getEventSubType() {
         return eventSubType;
     }
 
+    @Override
     public EventType getEventType() {
         return eventType;
     }
 
+    @Override
     public HttpServletRequest getHttpServletRequest() {
         return request.getRequest();
     }
 
+    @Override
     public HttpServletResponse getHttpServletResponse() {
         return response.getResponse();
     }
 
+    @Override
     public void setTimeout(int timeout) throws IOException, ServletException,
             UnsupportedOperationException {
         if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {

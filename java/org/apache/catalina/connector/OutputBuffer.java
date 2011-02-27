@@ -546,16 +546,6 @@ public class OutputBuffer extends Writer
     // --------------------  BufferedOutputStream compatibility
 
 
-    /**
-     * Real write - this buffer will be sent to the client
-     */
-    public void flushBytes()
-        throws IOException {
-
-        bb.flushBuffer();
-
-    }
-
     public long getContentWritten() {
         return bytesWritten + charsWritten;
     }

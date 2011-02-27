@@ -1005,8 +1005,6 @@ public class Connector extends LifecycleMBeanBase  {
 
     // -------------------- JMX registration  --------------------
 
-    private ObjectName onameProtocolHandler;
-    
     @Override
     protected String getDomainInternal() {
         return MBeanUtils.getDomain(getService());
