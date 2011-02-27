@@ -140,7 +140,9 @@ public class CatalinaProperties {
             String name = (String) enumeration.nextElement();
             String value = properties.getProperty(name);
             if (value != null) {
-                System.setProperty(name, value);
+                // Remove leading/trailing whitespace as that can lead to hard
+                // to diagnose failures
+                System.setProperty(name.trim(), value.trim());
             }
         }
 
