@@ -20,6 +20,7 @@ package org.apache.catalina.startup;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -187,6 +188,7 @@ public final class ClassLoaderFactory {
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.GLOB) {
                     File directory=new File(repository.getLocation());
+                    directory = new File(directory.getCanonicalPath());
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
@@ -232,20 +234,21 @@ public final class ClassLoaderFactory {
     }
 
     private static boolean validateFile(File file,
-            RepositoryType type) {
+            RepositoryType type) throws IOException {
         if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
             if (!file.exists() || !file.isDirectory() || !file.canRead()) {
-                String msg = "Problem with directory [" +
-                        file.getAbsolutePath() + "], exists: [" +
-                        file.exists() + "], isDirectory: [" +
-                        file.isDirectory() + "], canRead: [" +
-                        file.canRead() + "]";
+                String msg = "Problem with directory [" + file +
+                        "], exists: [" + file.exists() +
+                        "], isDirectory: [" + file.isDirectory() +
+                        "], canRead: [" + file.canRead() + "]";
                 
-                if (!Bootstrap.getCatalinaHome().equals(
-                                Bootstrap.getCatalinaBase()) &&
-                        file.getAbsolutePath().startsWith(
-                                Bootstrap.getCatalinaBase())) {
-                    
+                File home = new File (Bootstrap.getCatalinaHome());
+                home = home.getCanonicalFile();
+                File base = new File (Bootstrap.getCatalinaBase());
+                base = base.getCanonicalFile();
+
+                if (!home.getPath().equals(base.getPath()) &&
+                        file.getPath().startsWith(base.getPath())) {
                     log.debug(msg);
                 } else {
                     log.warn(msg);
@@ -254,10 +257,9 @@ public final class ClassLoaderFactory {
             }
         } else if (RepositoryType.JAR == type) {
             if (!file.exists() || !file.canRead()) {
-                log.warn("Problem with JAR file [" +
-                        file.getAbsolutePath() + "], exists: [" +
-                        file.exists() + "], canRead: [" +
-                        file.canRead() + "]");
+                log.warn("Problem with JAR file [" + file +
+                        "], exists: [" + file.exists() +
+                        "], canRead: [" + file.canRead() + "]");
                 return false;
             }
         }
