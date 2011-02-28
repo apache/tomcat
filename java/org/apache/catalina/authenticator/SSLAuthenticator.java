@@ -70,8 +70,8 @@ public class SSLAuthenticator
 
     /**
      * Authenticate the user by checking for the existence of a certificate
-     * chain, and optionally asking a trust manager to validate that we trust
-     * this user.
+     * chain, validating it against the trust manager for the connector and then
+     * validating the user's identity against the configured Realm.
      *
      * @param request Request we are processing
      * @param response Response we are creating
