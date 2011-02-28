@@ -42,6 +42,17 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
 -->
+<section name="Tomcat 7.0.10 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>28852</bug>: Add URL encoding where missing to parameters in URLs
+        presented by Ant tasks to the Manager application. Based on a patch by
+        Stephane Bailliez. (mark) 
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.9 (markt)">
   <subsection name="Catalina">
     <changelog>
