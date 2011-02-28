@@ -79,16 +79,16 @@ public final class TesterSupport {
         if (protocol.indexOf("Apr") == -1) {
             tomcat.getConnector().setProperty("sslProtocol", "tls");
             File keystoreFile = new File(
-                    "test/org/apache/catalina/startup/test.keystore");
+                    "test/org/apache/tomcat/util/net/test.keystore");
             tomcat.getConnector().setAttribute("keystoreFile",
                     keystoreFile.getAbsolutePath());
         } else {
             File keystoreFile = new File(
-                    "test/org/apache/catalina/startup/test-cert.pem");
+                    "test/org/apache/tomcat/util/net/test-cert.pem");
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
             keystoreFile = new File(
-                    "test/org/apache/catalina/startup/test-key.pem");
+                    "test/org/apache/tomcat/util/net/test-key.pem");
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     keystoreFile.getAbsolutePath());
         }
