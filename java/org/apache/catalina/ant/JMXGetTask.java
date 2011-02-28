@@ -19,6 +19,9 @@
 package org.apache.catalina.ant;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.tools.ant.BuildException;
 
 
@@ -90,8 +93,13 @@ public class JMXGetTask extends AbstractCatalinaTask {
                 ("Must specify 'bean' and 'attribute' attributes");
         }
         log("Getting attribute " + attribute +
-                " in bean " + bean ); 
-        execute("/jmxproxy/?get=" + bean 
-                + "&att=" + attribute );
+                " in bean " + bean );
+        try {
+            execute("/jmxproxy/?get=" + URLEncoder.encode(bean, getCharset()) 
+                    + "&att=" + URLEncoder.encode(attribute, getCharset()));
+        } catch (UnsupportedEncodingException e) {
+            throw new BuildException
+                ("Invalid 'charset' attribute: " + getCharset());
+        }
     }
 }
