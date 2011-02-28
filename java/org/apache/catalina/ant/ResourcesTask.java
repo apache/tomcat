@@ -19,6 +19,9 @@
 package org.apache.catalina.ant;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.tools.ant.BuildException;
 
 
@@ -64,7 +67,13 @@ public class ResourcesTask extends AbstractCatalinaTask {
 
         super.execute();
         if (type != null) {
-            execute("/resources?type=" + type);
+            try {
+                execute("/resources?type=" +
+                        URLEncoder.encode(type, getCharset()));
+            } catch (UnsupportedEncodingException e) {
+                throw new BuildException
+                    ("Invalid 'charset' attribute: " + getCharset());
+            }
         } else {
             execute("/resources");
         }

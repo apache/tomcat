@@ -19,6 +19,9 @@
 package org.apache.catalina.ant;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.tools.ant.BuildException;
 
 
@@ -66,7 +69,13 @@ public class UndeployTask extends AbstractCatalinaTask {
                 ("Must specify 'path' attribute");
         }
 
-        execute("/undeploy?path=" + this.path);
+        try {
+            execute("/undeploy?path=" +
+                    URLEncoder.encode(this.path, getCharset()));
+        } catch (UnsupportedEncodingException e) {
+            throw new BuildException
+                ("Invalid 'charset' attribute: " + getCharset());
+        }
     }
 
 
