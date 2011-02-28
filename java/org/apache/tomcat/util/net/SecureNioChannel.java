@@ -181,6 +181,7 @@ public class SecureNioChannel extends NioChannel  {
                     //fall down to NEED_UNWRAP on the same call, will result in a 
                     //BUFFER_UNDERFLOW if it needs data
                 }
+                //$FALL-THROUGH$
                 case NEED_UNWRAP: {
                     //perform the unwrap function
                     handshake = handshakeUnwrap(read);
