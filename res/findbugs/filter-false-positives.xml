@@ -209,6 +209,27 @@
   </Match>
   <!-- Test code -->
   <Match>
+    <Or>
+      <Class name="org.apache.catalina.startup.TestListener$SCL" />
+      <Class name="org.apache.catalina.startup.TestListener$SCL3" />
+    </Or>
+    <Method name="contextInitialized" />
+    <Bug code="ST" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.demos.EchoRpcTest$SystemExit" />
+    <Bug code="Dm" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.demos.IntrospectionUtils" />
+    <Method name="findMethod"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.demos.MapDemo$SystemExit" />
+    <Bug code="Dm" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.test.channel.TestChannelOptionFlag" />
     <Method name="tearDown" />
     <Bug code="DE" />
@@ -261,5 +282,13 @@
     <Class name="org.apache.catalina.tribes.test.transport.SocketValidateReceive$1" />
     <Method name="run" />
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <Class name="org.apache.tomcat.util.net.TestSsl" />
+    <Or>
+      <Method name="testRenegotiateFail" />
+      <Method name="testRenegotiateWorks" />
+    </Or>
+    <Bug code="RR" />
   </Match>
 </FindBugsFilter>
