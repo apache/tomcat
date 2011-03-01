@@ -50,6 +50,10 @@
         presented by Ant tasks to the Manager application. Based on a patch by
         Stephane Bailliez. (mark) 
       </fix>
+      <fix>
+        Improve handling of SSL renegotiation by failing earlier when the
+        request body contains more bytes than maxSavePostSize. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

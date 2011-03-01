@@ -132,8 +132,15 @@ public class SSLAuthenticator
         X509Certificate certs[] = (X509Certificate[])
             request.getAttribute(Globals.CERTIFICATES_ATTR);
         if ((certs == null) || (certs.length < 1)) {
-            request.getCoyoteRequest().action
-                              (ActionCode.REQ_SSL_CERTIFICATE, null);
+            try {
+                request.getCoyoteRequest().action
+                                  (ActionCode.REQ_SSL_CERTIFICATE, null);
+            } catch (IllegalStateException ise) {
+                // Request body was too large for save buffer
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                        sm.getString("authenticator.certificates"));
+                return false;
+            }
             certs = (X509Certificate[])
                 request.getAttribute(Globals.CERTIFICATES_ATTR);
         }
