@@ -80,8 +80,10 @@ public class BufferedInputFilter implements InputFilter {
                 buffered.append(tempRead);
                 tempRead.recycle();
             }
-        } catch(IOException iex) {
-            // Ignore
+        } catch(IOException ioe) {
+            // No need for i18n - this isn't going to get logged anywhere
+            throw new IllegalStateException(
+                    "Request body too large for buffer");
         }
     }
 
