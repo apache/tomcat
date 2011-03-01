@@ -21,8 +21,9 @@ import java.math.BigInteger;
 import junit.framework.TestCase;
 
 public class TestELArithmetic extends TestCase {
-    private final String a = "1.1";
-    private final BigInteger b = new BigInteger("1000000000000000000000");
+    private static final String a = "1.1";
+    private static final BigInteger b =
+        new BigInteger("1000000000000000000000");
 
     public void testAdd() throws Exception {
         assertEquals("1000000000000000000001.1",
