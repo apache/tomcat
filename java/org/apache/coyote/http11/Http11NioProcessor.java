@@ -23,8 +23,6 @@ import java.nio.channels.SelectionKey;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 
-import javax.net.ssl.SSLEngine;
-
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
@@ -44,9 +42,7 @@ import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.jsse.JSSEFactory;
 
 
 /**
@@ -629,25 +625,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                     .setLimit(maxSavePostSize);
                 inputBuffer.addActiveFilter
                     (inputFilters[Constants.BUFFERED_FILTER]);
-
-                SecureNioChannel sslChannel = (SecureNioChannel) socket;
-                SSLEngine engine = sslChannel.getSslEngine();
-                if (!engine.getNeedClientAuth() && !engine.getWantClientAuth()) {
-                    // Need to re-negotiate SSL connection
-                    engine.setNeedClientAuth(true);
-                    try {
-                        sslChannel.rehandshake();
-                        sslSupport = (new JSSEFactory()).getSSLSupport(
-                                engine.getSession());
-                    } catch (IOException ioe) {
-                        log.warn(sm.getString("http11processor.socket.sslreneg",
-                                ioe));
-                    }
-                }
                 try {
-                    // use force=false since re-negotiation is handled above
-                    // (and it is a NO-OP for NIO anyway)
-                    Object sslO = sslSupport.getPeerCertificateChain(false);
+                    Object sslO = sslSupport.getPeerCertificateChain(true);
                     if( sslO != null) {
                         request.setAttribute
                             (SSLSupport.CERTIFICATE_KEY, sslO);
