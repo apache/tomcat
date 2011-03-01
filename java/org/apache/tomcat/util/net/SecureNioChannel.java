@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -207,6 +209,58 @@ public class SecureNioChannel extends NioChannel  {
         //would cause this method to be called again.
         return handshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
     }
+    
+    /**
+     * Force a blocking handshake to take place for this key.
+     * This requires that both network and application buffers have been emptied out prior to this call taking place, or a 
+     * IOException will be thrown.
+     * @param timeout - timeout in milliseconds for each socket operation
+     * @throws IOException - if an IO exception occurs or if application or network buffers contain data
+     * @throws SocketTimeoutException - if a socket operation timed out
+     */
+    public void rehandshake(long timeout) throws IOException {
+        //validate the network buffers are empty
+        if (netInBuffer.position() > 0) throw new IOException("Network input buffer still contains data. Handshake will fail.");
+        if (netOutBuffer.position() > 0) throw new IOException("Network output buffer still contains data. Handshake will fail.");
+        if (getBufHandler().getReadBuffer().position()>0) throw new IOException("Aplication input buffer still contains data. Data would have been lost.");
+        if (getBufHandler().getWriteBuffer().position()>0) throw new IOException("Aplication output buffer still contains data. Data would have been lost.");
+        reset();
+        boolean isReadable = true;
+        boolean isWriteable = true;
+        boolean handshaking = true;
+        Selector selector = null;
+        SelectionKey key = null;
+        try {
+            while (handshaking) {
+                int hsStatus = this.handshake(isReadable, isWriteable);
+                switch (hsStatus) {
+                    case -1 : throw new EOFException("EOF during handshake.");
+                    case  0 : handshaking = false; break;
+                    default : {
+                        long now = System.currentTimeMillis();
+                        if (selector==null) {
+                            selector = Selector.open();
+                            key = getIOChannel().register(selector, hsStatus);
+                        } else {
+                            key.interestOps(hsStatus);
+                        }
+                        int keyCount = selector.select(timeout);
+                        if (keyCount == 0 && ((System.currentTimeMillis()-now) >= timeout)) {
+                            throw new SocketTimeoutException("Handshake operation timed out.");
+                        }
+                        isReadable = key.isReadable();
+                        isWriteable = key.isWritable();
+                    }
+                }
+            }
+        } finally {
+            if (key!=null) try {key.cancel();} catch (Exception ignore) {}
+            if (selector!=null) try {selector.close();} catch (Exception ignore) {}
+        }
+
+    }
+    
+    
     
     /**
      * Executes all the tasks needed on the same thread.
