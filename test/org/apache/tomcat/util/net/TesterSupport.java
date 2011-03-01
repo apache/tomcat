@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -102,9 +103,20 @@ public final class TesterSupport {
 
     private static KeyStore getKeyStore(String keystore) throws Exception {
         File keystoreFile = new File(keystore);
-        InputStream is = new FileInputStream(keystoreFile);
         KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(is, "changeit".toCharArray());
+        InputStream is = null;
+        try {
+            is = new FileInputStream(keystoreFile);
+            ks.load(is, "changeit".toCharArray());
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
+        }
         return ks;
     }
 }
