@@ -26,7 +26,17 @@ import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.authenticator.SSLAuthenticator;
+import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.deploy.SecurityCollection;
+import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -40,18 +50,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestSsl extends TomcatBaseTest {
 
     public void testSimpleSsl() throws Exception {
-        // Install the all-trusting trust manager so https:// works 
-        // with unsigned certs. 
-
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, TesterSupport.TRUST_ALL_CERTS,
-                    new java.security.SecureRandom());
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
-                    sc.getSocketFactory());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
+        configureClientSsl();
         
         Tomcat tomcat = getTomcatInstance();
 
@@ -88,7 +87,7 @@ public class TestSsl extends TomcatBaseTest {
         
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, TesterSupport.TRUST_ALL_CERTS,
+        sslCtx.init(null, TesterSupport.getTrustManagers(),
                 new java.security.SecureRandom());
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
@@ -163,7 +162,8 @@ public class TestSsl extends TomcatBaseTest {
         }
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, TesterSupport.TRUST_ALL_CERTS, new java.security.SecureRandom());
+        sslCtx.init(null, TesterSupport.getTrustManagers(),
+                new java.security.SecureRandom());
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
 
@@ -205,6 +205,64 @@ public class TestSsl extends TomcatBaseTest {
         
     }
 
+    public void testClientCert() throws Exception {
+        
+        Tomcat tomcat = getTomcatInstance();
+
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.indexOf("Nio") != -1) {
+            return; // Not supported yet (2011-03-01)
+        }
+        if (protocol.indexOf("Apr") != -1) {
+            return; // Disabled by default in 1.1.20 windows binary (2010-07-27)
+        }
+
+        TesterSupport.initSsl(tomcat);
+        
+        // Need a web application with a protected and unprotected URL
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "simple", new SimpleServlet());
+        ctx.addServletMapping("/unprotected", "simple");
+        ctx.addServletMapping("/protected", "simple");
+
+        // Security constraints
+        SecurityCollection collection = new SecurityCollection();
+        collection.addPattern("/protected");
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.addAuthRole("testrole");
+        sc.addCollection(collection);
+        ctx.addConstraint(sc);
+
+        // Configure the Realm
+        MapRealm realm = new MapRealm();
+        realm.addUser("CN=user1, C=US", "not used");
+        realm.addUserRole("CN=user1, C=US", "testrole");
+        ctx.setRealm(realm);
+        
+        // Configure the authenticator
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("CLIENT-CERT");
+        ctx.setLoginConfig(lc);
+        ctx.getPipeline().addValve(new SSLAuthenticator());
+        
+        // Start Tomcat
+        tomcat.start();
+        
+        configureClientSsl();
+        
+        // Get the unprotected resource
+        ByteChunk res =
+                getUrl("https://localhost:" + getPort() + "/unprotected");
+        assertEquals("OK", res.toString());
+        
+        // Get the protected resource
+        res = getUrl("https://localhost:" + getPort() + "/protected");
+        assertEquals("OK", res.toString());
+    }
+
     @Override
     public void setUp() throws Exception {
         if (!TesterSupport.RFC_5746_SUPPORTED) {
@@ -212,5 +270,30 @@ public class TestSsl extends TomcatBaseTest {
             System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
         }
         super.setUp();
+    }
+
+    private void configureClientSsl() {
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(TesterSupport.getUser1KeyManagers(),
+                    TesterSupport.getTrustManagers(),
+                    new java.security.SecureRandom());     
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
+                    sc.getSocketFactory());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+
+    public static class SimpleServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+        }
     }
 }
