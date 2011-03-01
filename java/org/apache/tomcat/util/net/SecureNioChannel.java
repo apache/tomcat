@@ -253,11 +253,15 @@ public class SecureNioChannel extends NioChannel  {
                     }
                 }
             }
+        } catch (IOException x) {
+            throw x;
+        } catch (Exception cx) {
+            IOException x = new IOException(cx);
+            throw x;
         } finally {
             if (key!=null) try {key.cancel();} catch (Exception ignore) {}
             if (selector!=null) try {selector.close();} catch (Exception ignore) {}
         }
-
     }
     
     
