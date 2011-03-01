@@ -1290,7 +1290,7 @@
         attributes as well. (timw)
       </fix>
       <fix>
-        Correctly handle the setting of primitve bean values via expression
+        Correctly handle the setting of primitive bean values via expression
         language. (markt)
       </fix>
       <fix>
