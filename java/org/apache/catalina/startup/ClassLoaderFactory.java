@@ -168,7 +168,7 @@ public final class ClassLoaderFactory {
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.DIR) {
                     File directory = new File(repository.getLocation());
-                    directory = new File(directory.getCanonicalPath());
+                    directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.DIR)) {
                         continue;
                     }
@@ -178,7 +178,7 @@ public final class ClassLoaderFactory {
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.JAR) {
                     File file=new File(repository.getLocation());
-                    file = new File(file.getCanonicalPath());
+                    file = file.getCanonicalFile();
                     if (!validateFile(file, RepositoryType.JAR)) {
                         continue;
                     }
@@ -188,7 +188,7 @@ public final class ClassLoaderFactory {
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.GLOB) {
                     File directory=new File(repository.getLocation());
-                    directory = new File(directory.getCanonicalPath());
+                    directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
@@ -201,9 +201,10 @@ public final class ClassLoaderFactory {
                         if (!filename.endsWith(".jar"))
                             continue;
                         File file = new File(directory, filenames[j]);
-                        file = new File(file.getCanonicalPath());
-                        if (!file.exists() || !file.canRead())
+                        file = file.getCanonicalFile();
+                        if (!validateFile(file, RepositoryType.JAR)) {
                             continue;
+                        }
                         if (log.isDebugEnabled())
                             log.debug("    Including glob jar file "
                                 + file.getAbsolutePath());
@@ -241,14 +242,19 @@ public final class ClassLoaderFactory {
                         "], exists: [" + file.exists() +
                         "], isDirectory: [" + file.isDirectory() +
                         "], canRead: [" + file.canRead() + "]";
-                
+
                 File home = new File (Bootstrap.getCatalinaHome());
                 home = home.getCanonicalFile();
                 File base = new File (Bootstrap.getCatalinaBase());
                 base = base.getCanonicalFile();
+                File defaultValue = new File(base, "lib");
 
-                if (!home.getPath().equals(base.getPath()) &&
-                        file.getPath().startsWith(base.getPath())) {
+                // Existence of ${catalina.base}/lib directory is optional.
+                // Hide the warning if Tomcat runs with separate catalina.home
+                // and catalina.base and that directory is absent.
+                if (!home.getPath().equals(base.getPath())
+                        && file.getPath().equals(defaultValue.getPath())
+                        && !file.exists()) {
                     log.debug(msg);
                 } else {
                     log.warn(msg);
