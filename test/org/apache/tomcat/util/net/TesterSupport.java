@@ -17,15 +17,19 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.catalina.startup.Tomcat;
 
@@ -55,40 +59,25 @@ public final class TesterSupport {
         RFC_5746_SUPPORTED = result;
     }
 
-    protected static final TrustManager[] TRUST_ALL_CERTS = new TrustManager[] { 
-        new X509TrustManager() { 
-            @Override
-            public X509Certificate[] getAcceptedIssuers() { 
-                return null;
-            }
-            @Override
-            public void checkClientTrusted(X509Certificate[] certs,
-                    String authType) {
-                // NOOP - Trust everything
-            }
-            @Override
-            public void checkServerTrusted(X509Certificate[] certs,
-                    String authType) {
-                // NOOP - Trust everything
-            }
-        }
-    };
-
     protected static void initSsl(Tomcat tomcat) {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.indexOf("Apr") == -1) {
             tomcat.getConnector().setProperty("sslProtocol", "tls");
             File keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/test.keystore");
+                    "test/org/apache/tomcat/util/net/localhost.jks");
             tomcat.getConnector().setAttribute("keystoreFile",
                     keystoreFile.getAbsolutePath());
+            File truststoreFile = new File(
+                    "test/org/apache/tomcat/util/net/ca.jks");
+            tomcat.getConnector().setAttribute("truststoreFile",
+                    truststoreFile.getAbsolutePath());
         } else {
             File keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/test-cert.pem");
+                    "test/org/apache/tomcat/util/net/localhost-cert.pem");
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
             keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/test-key.pem");
+                    "test/org/apache/tomcat/util/net/localhost-key.pem");
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     keystoreFile.getAbsolutePath());
         }
@@ -96,4 +85,26 @@ public final class TesterSupport {
         tomcat.getConnector().setProperty("SSLEnabled", "true");
     }
     
+    protected static KeyManager[] getUser1KeyManagers() throws Exception {
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(
+                KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(getKeyStore("test/org/apache/tomcat/util/net/user1.jks"),
+                "changeit".toCharArray());
+        return kmf.getKeyManagers();
+    }
+    
+    protected static TrustManager[] getTrustManagers() throws Exception {
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(getKeyStore("test/org/apache/tomcat/util/net/ca.jks"));
+        return tmf.getTrustManagers();
+    }
+
+    private static KeyStore getKeyStore(String keystore) throws Exception {
+        File keystoreFile = new File(keystore);
+        InputStream is = new FileInputStream(keystoreFile);
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(is, "changeit".toCharArray());
+        return ks;
+    }
 }

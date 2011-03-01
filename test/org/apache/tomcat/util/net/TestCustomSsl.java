@@ -40,7 +40,7 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, TesterSupport.TRUST_ALL_CERTS,
+            sc.init(null, TesterSupport.getTrustManagers(),
                     new java.security.SecureRandom());
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
                     sc.getSocketFactory());
