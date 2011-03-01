@@ -220,10 +220,10 @@ public class SecureNioChannel extends NioChannel  {
      */
     public void rehandshake(long timeout) throws IOException {
         //validate the network buffers are empty
-        if (netInBuffer.position() > 0) throw new IOException("Network input buffer still contains data. Handshake will fail.");
-        if (netOutBuffer.position() > 0) throw new IOException("Network output buffer still contains data. Handshake will fail.");
-        if (getBufHandler().getReadBuffer().position()>0) throw new IOException("Aplication input buffer still contains data. Data would have been lost.");
-        if (getBufHandler().getWriteBuffer().position()>0) throw new IOException("Aplication output buffer still contains data. Data would have been lost.");
+        if (netInBuffer.position() > 0 && netInBuffer.position()<netInBuffer.limit()) throw new IOException("Network input buffer still contains data. Handshake will fail.");
+        if (netOutBuffer.position() > 0 && netOutBuffer.position()<netOutBuffer.limit()) throw new IOException("Network output buffer still contains data. Handshake will fail.");
+        if (getBufHandler().getReadBuffer().position()>0 && getBufHandler().getReadBuffer().position()<getBufHandler().getReadBuffer().limit()) throw new IOException("Aplication input buffer still contains data. Data would have been lost.");
+        if (getBufHandler().getWriteBuffer().position()>0 && getBufHandler().getWriteBuffer().position()<getBufHandler().getWriteBuffer().limit()) throw new IOException("Aplication output buffer still contains data. Data would have been lost.");
         reset();
         boolean isReadable = true;
         boolean isWriteable = true;
