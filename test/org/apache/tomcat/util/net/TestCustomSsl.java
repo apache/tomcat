@@ -63,7 +63,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         connector.setProperty("sslProtocol", "tls");
         
         File keystoreFile =
-            new File("test/org/apache/catalina/startup/test.keystore");
+            new File("test/org/apache/tomcat/util/net/localhost.jks");
         connector.setAttribute(
                 "keystoreFile", keystoreFile.getAbsolutePath());
 
