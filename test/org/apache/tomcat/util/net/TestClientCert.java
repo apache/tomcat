@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,7 +41,8 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * repository since not all of them are AL2 licensed.
  */
 public class TestClientCert extends TomcatBaseTest {
-
+    public static final byte DATA = (byte)33;
+    
     public void testClientCertGet() throws Exception {
         // Unprotected resource
         ByteChunk res =
@@ -74,6 +76,7 @@ public class TestClientCert extends TomcatBaseTest {
             throws Exception {
 
         byte[] body = new byte[bodySize];
+        Arrays.fill(body, DATA);
 
         // Unprotected resource
         ByteChunk res = postUrl(body,
@@ -163,16 +166,23 @@ public class TestClientCert extends TomcatBaseTest {
             int len = 0;
             byte[] buffer = new byte[4096];
             InputStream is = req.getInputStream();
+            boolean contentOK = true;
             while (len > -1) {
                 len = is.read(buffer);
                 read = read + len;
+                for (int i=0; i<len && contentOK; i++) {
+                    contentOK = (buffer[i] == DATA);
+                }
             }
             // len will have been -1 on last iteration
             read++;
             
             // Report the number of bytes read
             resp.setContentType("text/plain");
-            resp.getWriter().print("OK-" + read);
+            if (contentOK) 
+                resp.getWriter().print("OK-" + read);
+            else
+                resp.getWriter().print("CONTENT-MISMATCH-" + read);
         }
     }
 }
