@@ -113,8 +113,8 @@ public class TestTomcat extends TomcatBaseTest {
                 try {
                     is = conn.getInputStream();
                     reader = new InputStreamReader(is);
-                    reader.read(cbuf);
-                    res.getWriter().write(cbuf);
+                    int len = reader.read(cbuf);
+                    res.getWriter().write(cbuf, 0, len);
                 } finally {
                     if (reader != null) {
                         try { reader.close(); } catch(IOException ioe) {/*Ignore*/}
