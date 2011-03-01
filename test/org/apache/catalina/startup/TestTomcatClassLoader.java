@@ -74,7 +74,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
     private static final class ClassLoaderReport extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
-        ClassLoader custom;
+        private transient ClassLoader custom;
 
         public ClassLoaderReport(ClassLoader custom) {
             this.custom = custom;
