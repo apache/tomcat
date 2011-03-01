@@ -78,7 +78,7 @@
       </add>
       <fix>
         <bug>48863</bug>: Better logging when specifying an invalid directory
-        for a class loader. Based on a patch by Ralf Hauser. (markt)
+        for a class loader. Based on a patch by Ralf Hauser. (markt/kkolinko)
       </fix>
       <fix>
         <bug>48870</bug>: Refactor to remove use of parallel arrays. (markt)
