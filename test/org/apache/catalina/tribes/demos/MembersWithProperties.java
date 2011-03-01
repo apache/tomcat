@@ -29,11 +29,9 @@ import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 
 public class MembersWithProperties implements MembershipListener{
-    Channel channel;
     static Thread main;
 
     public MembersWithProperties(Channel channel, Properties props) throws IOException {
-        this.channel = channel;
         channel.addMembershipListener(this);
         ManagedChannel mchannel = (ManagedChannel)channel;
         mchannel.getMembershipService().setPayload(getPayload(props));
