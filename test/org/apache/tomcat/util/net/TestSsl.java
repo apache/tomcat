@@ -42,10 +42,9 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Requires test.keystore (checked in), generated with:
- *  keytool -genkey -alias tomcat -keyalg RSA
- *  pass: changeit 
- *  CN: localhost ( for hostname validation )
+ * The keys and certificates used in this file are all available in svn and were
+ * generated using a test CA the files for which are in the Tomcat PMC private
+ * repository since not all of them are AL2 licensed.
  */
 public class TestSsl extends TomcatBaseTest {
 
@@ -69,7 +68,7 @@ public class TestSsl extends TomcatBaseTest {
     
     public void testRenegotiateFail() throws Exception {
         
-        // If RFC5746 is supported, renegotiation will always will (and will
+        // If RFC5746 is supported, renegotiation will always work (and will
         // always be secure)
         if (TesterSupport.RFC_5746_SUPPORTED) {
             return;
