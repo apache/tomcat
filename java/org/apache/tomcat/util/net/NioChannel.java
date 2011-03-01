@@ -173,9 +173,8 @@ public class NioChannel implements ByteChannel{
      * isInitHandshakeComplete
      *
      * @return boolean
-     * TODO Implement this org.apache.tomcat.util.net.SecureNioChannel method
      */
-    public boolean isInitHandshakeComplete() {
+    public boolean isHandshakeComplete() {
         return true;
     }
 
