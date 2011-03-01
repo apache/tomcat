@@ -17,7 +17,7 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
-    <!--  Can do anything about this. API is fixed by the specification. -->
+    <!--  Cannot do anything about this. API is fixed by the specification. -->
     <Class name="javax.servlet.jsp.tagext.TagData"/>
     <Bug code="CN" />
   </Match>
