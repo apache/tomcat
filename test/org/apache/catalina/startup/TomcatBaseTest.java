@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -215,4 +216,65 @@ public abstract class TomcatBaseTest extends TestCase {
         }
         return rc;
     }
+    
+    public static ByteChunk postUrl(byte[] body, String path)
+            throws IOException {
+        ByteChunk out = new ByteChunk();
+        postUrl(body, path, out, null);
+        return out;
+    }
+
+    public static int postUrl(byte[] body, String path, ByteChunk out,
+            Map<String, List<String>> resHead) throws IOException {
+
+        URL url = new URL(path);
+        HttpURLConnection connection = 
+            (HttpURLConnection) url.openConnection();
+        connection.setDoOutput(true);
+        connection.setReadTimeout(1000000);
+        connection.connect();
+        
+        // Write the request body
+        OutputStream os = null;
+        try {
+            os = connection.getOutputStream();
+            os.write(body, 0, body.length);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
+        }
+
+        int rc = connection.getResponseCode();
+        if (resHead != null) {
+            Map<String, List<String>> head = connection.getHeaderFields();
+            resHead.putAll(head);
+        }
+        if (rc == HttpServletResponse.SC_OK) {
+            InputStream is = connection.getInputStream();
+            BufferedInputStream bis = null;
+            try {
+                bis = new BufferedInputStream(is);
+                byte[] buf = new byte[2048];
+                int rd = 0;
+                while((rd = bis.read(buf)) > 0) {
+                    out.append(buf, 0, rd);
+                }
+            } finally {
+                if (bis != null) {
+                    try {
+                        bis.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            }
+        }
+        return rc;
+    }
+
 }

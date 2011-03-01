@@ -101,6 +101,20 @@ public final class TesterSupport {
         return tmf.getTrustManagers();
     }
 
+
+    protected static void configureClientSsl() {
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(TesterSupport.getUser1KeyManagers(),
+                    TesterSupport.getTrustManagers(),
+                    new java.security.SecureRandom());     
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
+                    sc.getSocketFactory());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+
     private static KeyStore getKeyStore(String keystore) throws Exception {
         File keystoreFile = new File(keystore);
         KeyStore ks = KeyStore.getInstance("JKS");
