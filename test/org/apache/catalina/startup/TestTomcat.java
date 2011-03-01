@@ -112,9 +112,9 @@ public class TestTomcat extends TomcatBaseTest {
                 char cbuf[] = new char[20];
                 int read = 0;
                 try {
+                    is = conn.getInputStream();
+                    reader = new InputStreamReader(is);
                     while (read < 20) {
-                        is = conn.getInputStream();
-                        reader = new InputStreamReader(is);
                         int len = reader.read(cbuf, read, cbuf.length - read);
                         res.getWriter().write(cbuf, read, len);
                         read = read + len;
