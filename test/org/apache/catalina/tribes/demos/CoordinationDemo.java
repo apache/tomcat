@@ -113,7 +113,12 @@ public class CoordinationDemo {
         for ( int i=0; i<status.length; i++ ) status[i] = new Status(this);
         printScreen();
         String l = reader.readLine();
-        String[] args = tokenize(l);
+        String[] args;
+        if (l == null) {
+            args = new String[] {};
+        } else {
+            args = tokenize(l);
+        }
         while ( args.length >= 1 && (!"quit".equalsIgnoreCase(args[0]))) {
             if ("start".equalsIgnoreCase(args[0])) {
                 cmdStart(args);
@@ -123,7 +128,9 @@ public class CoordinationDemo {
             }
             printScreen();
             l = reader.readLine();
-            args = tokenize(l);
+            if (l != null) {
+                args = tokenize(l);
+            }
         }
         for ( int i=0; i<status.length; i++ ) status[i].stop();
     }
@@ -275,8 +282,10 @@ public class CoordinationDemo {
                 Member lm = channel.getLocalMember(false);
                 local = lm!=null?lm.getName():"";
                 coord = interceptor!=null && interceptor.getCoordinator()!=null?interceptor.getCoordinator().getName():"";
-                viewId = getByteString(interceptor.getViewId()!=null?interceptor.getViewId().getBytes():new byte[0]);
-                count = String.valueOf(interceptor.getView().length);
+                if (interceptor != null) {
+                    viewId = getByteString(interceptor.getViewId()!=null?interceptor.getViewId().getBytes():new byte[0]);
+                    count = String.valueOf(interceptor.getView().length);
+                }
             }
             buf.append(leftfill(local,30," "));
             buf.append(leftfill(startstatus, 10, " "));
