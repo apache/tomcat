@@ -140,11 +140,16 @@ public class ConnectionPool {
      * @throws SQLException
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
-        PooledConnection pc = this.borrowConnection(0, null, null);
-        if (pc!=null) {
-            
-            return new ConnectionFuture(pc);
-        } 
+        try {
+            PooledConnection pc = borrowConnection(0, null, null);
+            if (pc!=null) {
+                return new ConnectionFuture(pc);
+            } 
+        }catch (SQLException x) {
+            if (x.getMessage().indexOf("NoWait")<0) {
+                throw x;
+            }
+        }
         //we can only retrieve a future if the underlying queue supports it.
         if (idle instanceof FairBlockingQueue<?>) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
