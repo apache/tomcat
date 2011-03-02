@@ -44,6 +44,10 @@ public class TestClientCert extends TomcatBaseTest {
     public static final byte DATA = (byte)33;
     
     public void testClientCertGet() throws Exception {
+        if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
+            return;
+        }
+
         // Unprotected resource
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
@@ -74,6 +78,9 @@ public class TestClientCert extends TomcatBaseTest {
 
     public void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
+        if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
+            return;
+        }
 
         byte[] body = new byte[bodySize];
         Arrays.fill(body, DATA);
@@ -104,11 +111,6 @@ public class TestClientCert extends TomcatBaseTest {
         super.setUp();
 
         Tomcat tomcat = getTomcatInstance();
-
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Apr") != -1) {
-            return; // Disabled by default in 1.1.20 windows binary (2010-07-27)
-        }
 
         TesterSupport.initSsl(tomcat);
         
