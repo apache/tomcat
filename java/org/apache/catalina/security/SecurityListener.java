@@ -72,8 +72,8 @@ public class SecurityListener implements LifecycleListener {
      * effectively disables this check. User names will always be checked in a
      * case insensitive manner.
      * 
-     * @param userList  A comma separated list of operating system users not
-     *                  permitted to run Tomcat
+     * @param userNameList  A comma separated list of operating system users not
+     *                      permitted to run Tomcat
      */
     public void setCheckedOsUsers(String userNameList) {
         if (userNameList == null || userNameList.length() == 0) {
