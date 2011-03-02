@@ -133,4 +133,13 @@ public final class TesterSupport {
         }
         return ks;
     }
+    
+    protected static boolean isRenegotiationSupported(Tomcat tomcat) {
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.contains("Apr")) {
+            // Disabled by default in 1.1.20 windows binary (2010-07-27)
+            return false; 
+        }
+        return true;
+    }
 }
