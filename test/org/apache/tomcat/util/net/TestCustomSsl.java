@@ -50,7 +50,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
-        if (connector.getProtocol().indexOf("Apr") > -1) {
+        if (connector.getProtocolHandlerClassName().contains("Apr")) {
             // This test is only for JSSE based SSL connectors
             return;
         }
