@@ -57,6 +57,10 @@
         Improve handling of SSL renegotiation by failing earlier when the
         request body contains more bytes than maxSavePostSize. (markt)
       </fix>
+      <fix>
+        Improve shut down speed by not renewing threads during shut down when
+        the <code>ThreadLocalLeakPreventionListener</code> is enabled. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
