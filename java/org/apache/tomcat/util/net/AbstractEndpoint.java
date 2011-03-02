@@ -73,37 +73,6 @@ public abstract class AbstractEndpoint {
         UNBOUND, BOUND_ON_INIT, BOUND_ON_START
     }
 
-    // Standard SSL Configuration attributes
-    // JSSE
-    // Standard configuration attribute names
-    public static final String SSL_ATTR_ALGORITHM = "algorithm";
-    public static final String SSL_ATTR_CLIENT_AUTH = "clientAuth";
-    public static final String SSL_ATTR_KEYSTORE_FILE = "keystoreFile";
-    public static final String SSL_ATTR_KEYSTORE_PASS = "keystorePass";
-    public static final String SSL_ATTR_KEYSTORE_TYPE = "keystoreType";
-    public static final String SSL_ATTR_KEYSTORE_PROVIDER = "keystoreProvider";
-    public static final String SSL_ATTR_SSL_PROTOCOL = "sslProtocol";
-    public static final String SSL_ATTR_CIPHERS = "ciphers";
-    public static final String SSL_ATTR_KEY_ALIAS = "keyAlias";
-    public static final String SSL_ATTR_KEY_PASS = "keyPass";
-    public static final String SSL_ATTR_TRUSTSTORE_FILE = "truststoreFile";
-    public static final String SSL_ATTR_TRUSTSTORE_PASS = "truststorePass";
-    public static final String SSL_ATTR_TRUSTSTORE_TYPE = "truststoreType";
-    public static final String SSL_ATTR_TRUSTSTORE_PROVIDER =
-        "truststoreProvider";
-    public static final String SSL_ATTR_TRUSTSTORE_ALGORITHM =
-        "truststoreAlgorithm";
-    public static final String SSL_ATTR_CRL_FILE =
-        "crlFile";
-    public static final String SSL_ATTR_TRUST_MAX_CERT_LENGTH =
-        "trustMaxCertLength";
-    public static final String SSL_ATTR_SESSION_CACHE_SIZE =
-        "sessionCacheSize";
-    public static final String SSL_ATTR_SESSION_TIMEOUT =
-        "sessionTimeout";
-    public static final String SSL_ATTR_ALLOW_UNSAFE_RENEG =
-        "allowUnsafeLegacyRenegotiation";
-
     private static final int INITIAL_ERROR_DELAY = 50;
     private static final int MAX_ERROR_DELAY = 1600;
 
