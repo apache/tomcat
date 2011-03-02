@@ -56,6 +56,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>49284</bug>: Add SSL re-negotiation support to the HTTP NIO
+        connector and extend test cases to cover CLIENT-CERT authentication.
+        (fhanik/markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.9 (markt)">
   <subsection name="Catalina">
