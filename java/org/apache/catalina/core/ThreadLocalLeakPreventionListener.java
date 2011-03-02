@@ -53,9 +53,12 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * 
  */
 public class ThreadLocalLeakPreventionListener implements LifecycleListener,
-    ContainerListener {
+        ContainerListener {
+
     private static final Log log =
         LogFactory.getLog(ThreadLocalLeakPreventionListener.class);
+
+    private volatile boolean serverStopping = false;
 
     /**
      * The string manager for this package.
@@ -72,7 +75,7 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
         try {
             Lifecycle lifecycle = event.getLifecycle();
             if (Lifecycle.AFTER_START_EVENT.equals(event.getType()) &&
-                lifecycle instanceof Server) {
+                    lifecycle instanceof Server) {
                 // when the server starts, we register ourself as listener for
                 // all context
                 // as well as container event listener so that we know when new
@@ -81,8 +84,15 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
                 registerListenersForServer(server);
             }
 
+            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType()) &&
+                    lifecycle instanceof Server) {
+                // Server is shutting down, so thread pools will be shut down so
+                // there is no need to clean the threads
+                serverStopping = true;
+            }
+
             if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType()) &&
-                lifecycle instanceof Context) {
+                    lifecycle instanceof Context) {
                 stopIdleThreads((Context) lifecycle);
             }
         } catch (Exception e) {
@@ -182,6 +192,8 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
      *            of its parent Service.
      */
     private void stopIdleThreads(Context context) {
+        if (serverStopping) return;
+
         if (context instanceof StandardContext &&
             !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {
             log.debug("Not renewing threads when the context is stopping, "
