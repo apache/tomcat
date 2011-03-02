@@ -46,6 +46,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>27988</bug>: Improve reporting of missing files. (markt)
+      </fix>
+      <fix>
         <bug>28852</bug>: Add URL encoding where missing to parameters in URLs
         presented by Ant tasks to the Manager application. Based on a patch by
         Stephane Bailliez. (mark) 
