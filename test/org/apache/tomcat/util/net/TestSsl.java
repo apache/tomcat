@@ -16,10 +16,13 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -97,39 +100,39 @@ public class TestSsl extends TomcatBaseTest {
 
         // Make sure the NIO connector has read the request before the handshake
         Thread.sleep(100);
+
         socket.startHandshake();
-        handshakeDone = false;
-        byte[] b = new byte[0];
-        int maxTries = 5;  // 5 sec should be enough - in NIO we'll timeout
-        socket.setSoTimeout(1000);
-        for (int i = 0; i < maxTries; i++) {
-            try {
-                is.read(b);
-            } catch (IOException e) {
-                // timeout
-            }
-            if (handshakeDone) {
-                break;
-            }
-        }
+
         os = socket.getOutputStream();
-        if (!handshakeDone) {
-            // success - we timedout without handshake
-            return;
-        }
+        
         try {
             os.write("Host: localhost\n\n".getBytes());
         } catch (IOException ex) {
-            // success - connection closed
+            ex.printStackTrace();
+            fail("Re-negotiation failed");
+        }
+        Reader r = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(r);
+        String line = br.readLine();
+        while (line != null) {
+            // For testing System.out.println(line);
+            line = br.readLine();
+        }
+
+        if (!handshakeDone) {
+            // success - we timed-out without handshake
             return;
         }
         
         fail("Re-negotiation worked");
-        
     }
     
     public void testRenegotiateWorks() throws Exception {
         Tomcat tomcat = getTomcatInstance();
+
+        if (!TesterSupport.isRenegotiationSupported(tomcat)) {
+            return;
+        }
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
@@ -137,61 +140,37 @@ public class TestSsl extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat);
         
-        // Enable MITM attack
-        tomcat.getConnector().setAttribute("allowUnsafeLegacyRenegotiation", "true");
-
         tomcat.start();
-
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Nio") != -1) {
-            return; // Not supported yet (2010-07-22)
-        }
-        if (protocol.indexOf("Apr") != -1) {
-            return; // Disabled by default in 1.1.20 windows binary (2010-07-27)
-        }
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, TesterSupport.getTrustManagers(),
                 new java.security.SecureRandom());
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
-        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
+        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
+                getPort());
 
-        socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
-            @Override
-            public void handshakeCompleted(HandshakeCompletedEvent event) {
-                handshakeDone = true;
-            }
-        });
-        
         OutputStream os = socket.getOutputStream();
-        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
+
+        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1\n".getBytes());
         os.flush();
 
-        InputStream is = socket.getInputStream();
-
         socket.startHandshake();
-        handshakeDone = false;
-        byte[] b = new byte[0];
-        int maxTries = 5; 
-        socket.setSoTimeout(1000);
-        for (int i = 0; i < maxTries; i++) {
-            try {
-                is.read(b);
-            } catch (IOException e) {
-                // timeout
-            }
-            if (handshakeDone) {
-                break;
-            }
-        }
-        os = socket.getOutputStream();
-        
+
         try {
             os.write("Host: localhost\n\n".getBytes());
         } catch (IOException ex) {
+            ex.printStackTrace();
             fail("Re-negotiation failed");
         }
-        
+
+        InputStream is = socket.getInputStream();
+        Reader r = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(r);
+        String line = br.readLine();
+        while (line != null) {
+            // For testing System.out.println(line);
+            line = br.readLine();
+        }
     }
 
     @Override
