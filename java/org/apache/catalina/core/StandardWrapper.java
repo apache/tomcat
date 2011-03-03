@@ -42,9 +42,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.ServletSecurityElement;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.ServletSecurity;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
@@ -1075,10 +1077,20 @@ public class StandardWrapper extends ContainerBase
                 }
             }
 
+            ServletSecurity secAnnotation =
+                servlet.getClass().getAnnotation(ServletSecurity.class);
+            Context ctxt = (Context) getParent();
+            if (secAnnotation != null) {
+                ctxt.addServletSecurity(
+                        new ApplicationServletRegistration(this, ctxt),
+                        new ServletSecurityElement(secAnnotation));
+            }
+            
+
             // Special handling for ContainerServlet instances
             if ((servlet instanceof ContainerServlet) &&
                   (isContainerProvidedServlet(servletClass) ||
-                    ((Context)getParent()).getPrivileged() )) {
+                    ctxt.getPrivileged() )) {
                 ((ContainerServlet) servlet).setWrapper(this);
             }
 
